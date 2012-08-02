@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # @author Edwin Chen (@echen)
 # Automatically write product monoid, product group, and product ring
 # classes for tuples up to size 22.
@@ -6,7 +8,7 @@
 #
 #   ruby scripts/ntuple_generators.rb > src/main/scala/com/twitter/scalding/mathematics/GeneratedAbstractAlgebra.scala
 
-PACKAGE_NAME = "com.twitter.scalding.mathematics"
+PACKAGE_NAME = "com.twitter.algebird"
 
 # The tuple sizes we want.
 TUPLE_SIZES = (3..22).to_a
