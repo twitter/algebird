@@ -18,12 +18,12 @@ class HyperLogLogTest extends Specification {
   def test(bits : Int) {
     val data = (0 to 10000).map { i => r.nextInt(1000) }
     val exact = exactCount(data).toDouble
-    scala.math.abs(exact - approxCount(5, data)) / exact must be_<(2.0 * aveErrorOf(5))
+    scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
   def testLong(bits : Int) {
     val data = (0 to 10000).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
-    scala.math.abs(exact - approxCount(5, data)) / exact must be_<(2.0 * aveErrorOf(5))
+    scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
 
   "HyperLogLog" should {
