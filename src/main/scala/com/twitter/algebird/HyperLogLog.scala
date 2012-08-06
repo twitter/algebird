@@ -28,17 +28,20 @@ object HyperLogLog {
   val md = java.security.MessageDigest.getInstance("MD5")
   def hash(input : Array[Byte]) : Array[Byte] = md.digest(input)
 
-  val bytes4 = java.nio.ByteBuffer.allocate(4)
-  val bytes8 = java.nio.ByteBuffer.allocate(8)
-
   implicit def int2Bytes(i : Int) = {
-    bytes4.rewind
-    bytes4.putInt(i).array
+    val buf = new Array[Byte](4)
+    java.nio.ByteBuffer
+      .wrap(buf)
+      .putInt(i)
+    buf
   }
 
   implicit def long2Bytes(i : Long) = {
-    bytes8.rewind
-    bytes8.putLong(i).array
+    val buf = new Array[Byte](8)
+    java.nio.ByteBuffer
+      .wrap(buf)
+      .putLong(i)
+    buf
   }
 
   def twopow(i : Int) : Double = scala.math.pow(2.0, i)
@@ -62,7 +65,7 @@ object HyperLogLog {
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-class HLLInstance(val v : IndexedSeq[Int]) extends java.io.Serializable {
+case class HLLInstance(v : IndexedSeq[Int]) extends java.io.Serializable {
   lazy val zeroCnt = v.count { _ == 0 }
   lazy val isZero = zeroCnt == v.size
 
