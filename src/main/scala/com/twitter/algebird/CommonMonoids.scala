@@ -30,7 +30,7 @@ object DecayedValue extends java.io.Serializable {
   def scale(newv : DecayedValue, oldv : DecayedValue, eps : Double) = {
     val newValue = newv.value +
         scala.math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
-    if( newValue > eps ) {
+    if( scala.math.abs(newValue) > eps ) {
       DecayedValue(newValue, newv.scaledTime)
     }
     else {
@@ -60,6 +60,7 @@ case class DecayedValue(value : Double, scaledTime : Double) extends Ordered[Dec
 }
 
 object AveragedValue {
+  implicit val monoid = AveragedMonoid
   def apply[V <% Double](v : V) = new AveragedValue(1L, v)
   def apply[V <% Double](c : Long, v : V) = new AveragedValue(c, v)
 }
