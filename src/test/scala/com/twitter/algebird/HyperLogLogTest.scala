@@ -2,6 +2,22 @@ package com.twitter.algebird
 
 import org.specs._
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Properties
+import org.scalacheck.Gen.choose
+
+object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
+  import HyperLogLog._
+  implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
+  implicit val hllGen = Arbitrary { for(
+      v <- choose(0,10000)
+    ) yield (hllMonoid(v))
+  }
+
+  property("HyperLogLog is a Monoid") = monoidLaws[HLLInstance]
+}
+
 class HyperLogLogTest extends Specification {
   noDetailedDiffs()
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes

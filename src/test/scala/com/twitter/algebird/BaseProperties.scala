@@ -39,7 +39,8 @@ trait BaseProperties {
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
-    grp.plus(grp.negate(a), a) == grp.zero
+    (grp.plus(grp.negate(a), a) == grp.zero) &&
+      (grp.plus(a, grp.negate(a)) == grp.zero)
   }
 
   def groupLaws[T : Group : Arbitrary] = monoidLaws[T] && hasAdditiveInverses[T]
@@ -50,8 +51,14 @@ trait BaseProperties {
   }
   def isDistributive[T : Ring : Arbitrary] = forAll { (a : T, b : T, c : T) =>
     val rng = implicitly[Ring[T]]
-    rng.times(a, rng.plus(b,c)) == rng.plus(rng.times(a,b), rng.times(a,c))
+    (rng.times(a, rng.plus(b,c)) == rng.plus(rng.times(a,b), rng.times(a,c))) &&
+      (rng.times(rng.plus(b,c),a) == rng.plus(rng.times(b,a), rng.times(c,a)))
   }
-  def ringLaws[T : Ring : Arbitrary] = validOne[T] && isDistributive[T] && groupLaws[T]
+  def timesIsAssociative[T : Ring : Arbitrary] = forAll { (a : T, b : T, c : T) =>
+    val rng = implicitly[Ring[T]]
+    rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
+  }
+  def ringLaws[T : Ring : Arbitrary] = validOne[T] && isDistributive[T] &&
+    groupLaws[T] && timesIsAssociative[T]
 }
 
