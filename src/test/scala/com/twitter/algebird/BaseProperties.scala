@@ -39,7 +39,7 @@ trait BaseProperties {
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
-    (grp.plus(grp.negate(a), a) == grp.zero) &&
+    (grp.plus(grp.negate(a), a) == grp.zero) && (grp.minus(a,a) == grp.zero) &&
       (grp.plus(a, grp.negate(a)) == grp.zero)
   }
 
@@ -60,5 +60,14 @@ trait BaseProperties {
   }
   def ringLaws[T : Ring : Arbitrary] = validOne[T] && isDistributive[T] &&
     groupLaws[T] && timesIsAssociative[T]
+
+  def hasMultiplicativeInverse[T : Field : Arbitrary] = forAll { (a : T) =>
+    val fld = implicitly[Field[T]]
+    (!fld.isNonZero(a)) || {
+      val inva = fld.inverse(a)
+      (fld.times(inva, a) == fld.one) && (fld.times(a, inva) == fld.one)
+    }
+  }
+  def fieldLaws[T : Field : Arbitrary] = ringLaws[T] && hasMultiplicativeInverse[T]
 }
 
