@@ -17,6 +17,8 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 
+import java.lang.{Integer => JInt, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.util.{List => JList}
 /**
  * Monoid (take a deep breath, and relax about the weird name):
  *   This is a class that has an additive identify (called zero), and plus method that is
@@ -41,7 +43,7 @@ import scala.annotation.tailrec
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
   def zero : T //additive identity
   def assertNotZero(v : T) {
-    if(zero == v) {
+    if(!isNonZero(v)) {
       throw new java.lang.IllegalArgumentException("argument should not be zero")
     }
   }
@@ -202,18 +204,24 @@ class SetMonoid[T] extends Monoid[Set[T]] {
 /** You can think of this as a Sparse vector monoid
  */
 class MapMonoid[K,V](implicit monoid : Monoid[V]) extends Monoid[Map[K,V]] {
-  override def zero = Map[K,V]()
-  override def plus(left : Map[K,V], right : Map[K,V]) = {
-    (left.keys.toSet ++ right.keys.toSet).foldLeft(Map[K,V]()) { (oldMap, newK) =>
-      val leftV = left.getOrElse(newK, monoid.zero)
-      val rightV = right.getOrElse(newK, monoid.zero)
-      val newValue = monoid.plus(leftV, rightV)
-      if (monoid.isNonZero(newValue)) {
-        oldMap + (newK -> newValue)
+  override lazy val zero = Map[K,V]()
+  override def isNonZero(x : Map[K,V]) = !x.isEmpty && x.valuesIterator.exists { v =>
+    monoid.isNonZero(v)
+  }
+  override def plus(x : Map[K,V], y : Map[K,V]) = {
+    // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
+    // This really saves computation when adding lots of small maps into big ones (common)
+    val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
+    small.foldLeft(big) { (oldMap, kv) =>
+      val newV = big
+        .get(kv._1)
+        .map { bigV => if(bigOnLeft) monoid.plus(bigV, kv._2) else monoid.plus(kv._2, bigV) }
+        .getOrElse(kv._2)
+      if (monoid.isNonZero(newV)) {
+        oldMap + (kv._1 -> newV)
       }
       else {
-        //this key is already absent from oldMap
-        oldMap
+        oldMap - kv._1
       }
     }
   }
@@ -235,18 +243,16 @@ class MapRing[K,V](implicit ring : Ring[V]) extends MapGroup[K,V]()(ring) with R
   // Then we have to manage the delta from this map as we add elements.  That said, it
   // is not actually needed in matrix multiplication, so we are punting on it for now.
   override def one = error("multiplicative identity for Map unimplemented")
-  override def times(left : Map[K,V], right : Map[K,V]) : Map[K,V] = {
-    (left.keys.toSet & right.keys.toSet).foldLeft(Map[K,V]()) { (oldMap, newK) =>
-      // The key is on both sides, so it is safe to get it out:
-      val leftV = left(newK)
-      val rightV = right(newK)
-      val newValue = ring.times(leftV, rightV)
-      if (ring.isNonZero(newValue)) {
-        oldMap + (newK -> newValue)
+  override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
+    val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
+    small.foldLeft(zero) { (oldMap, kv) =>
+      val bigV = big.getOrElse(kv._1, ring.zero)
+      val newV = if(bigOnLeft) ring.times(bigV, kv._2) else ring.times(kv._2, bigV)
+      if (ring.isNonZero(newV)) {
+        oldMap + (kv._1 -> newV)
       }
       else {
-        // Keep it sparse
-        oldMap - newK
+        oldMap - kv._1
       }
     }
   }
@@ -364,15 +370,22 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
   implicit val boolMonoid : Monoid[Boolean] = BooleanField
+  implicit val jboolMonoid : Monoid[JBool] = JBoolField
   implicit val intMonoid : Monoid[Int] = IntRing
+  implicit val jintMonoid : Monoid[JInt] = JIntRing
   implicit val longMonoid : Monoid[Long] = LongRing
+  implicit val jlongMonoid : Monoid[JLong] = JLongRing
   implicit val floatMonoid : Monoid[Float] = FloatField
+  implicit val jfloatMonoid : Monoid[JFloat] = JFloatField
   implicit val doubleMonoid : Monoid[Double] = DoubleField
+  implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
   implicit val stringMonoid : Monoid[String] = StringMonoid
   implicit def optionMonoid[T : Monoid] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
+  implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
+  implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
   implicit def pairMonoid[T,U](implicit tg : Monoid[T], ug : Monoid[U]) : Monoid[(T,U)] = {
     new Tuple2Monoid[T,U]()(tg,ug)
   }
@@ -383,10 +396,15 @@ object Group extends GeneratedGroupImplicits {
   implicit val nullGroup : Group[Null] = NullGroup
   implicit val unitGroup : Group[Unit] = UnitGroup
   implicit val boolGroup : Group[Boolean] = BooleanField
+  implicit val jboolGroup : Group[JBool] = JBoolField
   implicit val intGroup : Group[Int] = IntRing
+  implicit val jintGroup : Group[JInt] = JIntRing
   implicit val longGroup : Group[Long] = LongRing
+  implicit val jlongGroup : Group[JLong] = JLongRing
   implicit val floatGroup : Group[Float] = FloatField
+  implicit val jfloatGroup : Group[JFloat] = JFloatField
   implicit val doubleGroup : Group[Double] = DoubleField
+  implicit val jdoubleGroup : Group[JDouble] = JDoubleField
   implicit def mapGroup[K,V](implicit group : Group[V]) = new MapGroup[K,V]()(group)
   implicit def pairGroup[T,U](implicit tg : Group[T], ug : Group[U]) : Group[(T,U)] = {
     new Tuple2Group[T,U]()(tg,ug)
@@ -395,10 +413,15 @@ object Group extends GeneratedGroupImplicits {
 
 object Ring extends GeneratedRingImplicits {
   implicit val boolRing : Ring[Boolean] = BooleanField
+  implicit val jboolRing : Ring[JBool] = JBoolField
   implicit val intRing : Ring[Int] = IntRing
+  implicit val jintRing : Ring[JInt] = JIntRing
   implicit val longRing : Ring[Long] = LongRing
+  implicit val jlongRing : Ring[JLong] = JLongRing
   implicit val floatRing : Ring[Float] = FloatField
+  implicit val jfloatRing : Ring[JFloat] = JFloatField
   implicit val doubleRing : Ring[Double] = DoubleField
+  implicit val jdoubleRing : Ring[JDouble] = JDoubleField
   implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
   implicit def pairRing[T,U](implicit tr : Ring[T], ur : Ring[U]) : Ring[(T,U)] = {
     new Tuple2Ring[T,U]()(tr,ur)
@@ -407,6 +430,9 @@ object Ring extends GeneratedRingImplicits {
 
 object Field {
   implicit val boolField : Field[Boolean] = BooleanField
+  implicit val jboolField : Field[JBool] = JBoolField
   implicit val floatField : Field[Float] = FloatField
+  implicit val jfloatField : Field[JFloat] = JFloatField
   implicit val doubleField : Field[Double] = DoubleField
+  implicit val jdoubleField : Field[JDouble] = JDoubleField
 }
