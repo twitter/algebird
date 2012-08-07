@@ -21,6 +21,13 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
   }
   property("Set Monoid laws") = monoidLaws[Set[Int]]
 
+  implicit def mapArb[K : Arbitrary, V : Arbitrary : Monoid] = Arbitrary {
+    val mv = implicitly[Monoid[V]]
+    implicitly[Arbitrary[Map[K,V]]]
+      .arbitrary
+      .map { _.filter { kv => mv.isNonZero(kv._2) } }
+  }
+
   property("Map plus/times keys") = forAll { (a : Map[Int,Int], b : Map[Int,Int]) =>
     val rng = implicitly[Ring[Map[Int,Int]]]
     (rng.zero == Map[Int,Int]()) &&
@@ -29,8 +36,10 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
       (rng.plus(a,b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
       (rng.plus(a,a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys)
   }
-  property("Map Monoid laws") = isAssociative[Map[Int,Int]] && weakZero[Map[Int,Int]]
-  // We haven't implemented one yet for the Map, so skip the one property
+  property("Map[Int,Int] Monoid laws") = isAssociative[Map[Int,Int]] && weakZero[Map[Int,Int]]
+  property("Map[Int,Int] has -") = hasAdditiveInverses[Map[Int,Int]]
+  property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
+  // We haven't implemented ring.one yet for the Map, so skip the one property
   property("Map is distributive") = isDistributive[Map[Int,Int]]
 
   // Either is actually a semigroup, but we don't yet have a typeclass for that:
