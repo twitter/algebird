@@ -16,7 +16,7 @@ The answer is a mix of the following:
 ## Authors
 
 * Oscar Boykin <http://twitter.com/posco>
-* Sam Ritchie <http://twitter.com/sritchie09>
+* Sam Ritchie <http://twitter.com/sritchie>
 
 ## License
 Copyright 2012 Twitter, Inc.
