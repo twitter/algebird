@@ -367,6 +367,10 @@ class Tuple2Ring[T,U](implicit tring : Ring[T], uring : Ring[U]) extends Ring[(T
 }
 
 object Monoid extends GeneratedMonoidImplicits {
+  // This pattern is really useful for typeclasses
+  def zero[T](implicit mon : Monoid[T]) = mon.zero
+  def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
+
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
   implicit val boolMonoid : Monoid[Boolean] = BooleanField
@@ -393,6 +397,9 @@ object Monoid extends GeneratedMonoidImplicits {
 }
 
 object Group extends GeneratedGroupImplicits {
+  // This pattern is really useful for typeclasses
+  def minus[T](l : T, r : T)(implicit grp : Group[T]) = grp.minus(l,r)
+
   implicit val nullGroup : Group[Null] = NullGroup
   implicit val unitGroup : Group[Unit] = UnitGroup
   implicit val boolGroup : Group[Boolean] = BooleanField
@@ -412,6 +419,10 @@ object Group extends GeneratedGroupImplicits {
 }
 
 object Ring extends GeneratedRingImplicits {
+  // This pattern is really useful for typeclasses
+  def one[T](implicit rng : Ring[T]) = rng.one
+  def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
+
   implicit val boolRing : Ring[Boolean] = BooleanField
   implicit val jboolRing : Ring[JBool] = JBoolField
   implicit val intRing : Ring[Int] = IntRing
@@ -429,6 +440,9 @@ object Ring extends GeneratedRingImplicits {
 }
 
 object Field {
+  // This pattern is really useful for typeclasses
+  def div[T](l : T, r : T)(implicit fld : Field[T]) = fld.div(l,r)
+
   implicit val boolField : Field[Boolean] = BooleanField
   implicit val jboolField : Field[JBool] = JBoolField
   implicit val floatField : Field[Float] = FloatField
