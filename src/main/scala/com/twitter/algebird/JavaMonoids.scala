@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{Map => JMap, List => JList}
 
 import scala.collection.JavaConverters._
@@ -27,6 +27,15 @@ object JIntRing extends Ring[JInt] {
   override def negate(x : JInt) : JInt = -x
   override def minus(x : JInt, y : JInt) = x - y
   override def times(x : JInt, y : JInt) = x * y
+}
+
+object JShortRing extends Ring[JShort] {
+  override val zero = Short.box(0)
+  override val one = Short.box(1)
+  override def plus(x : JShort, y : JShort) = (x + y).toShort
+  override def negate(x : JShort) = (-x).toShort
+  override def minus(x : JShort, y : JShort) = (x - y).toShort
+  override def times(x : JShort, y : JShort) = (x * y).toShort
 }
 
 object JLongRing extends Ring[JLong] {
