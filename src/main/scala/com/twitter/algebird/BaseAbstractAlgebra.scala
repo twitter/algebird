@@ -253,7 +253,7 @@ class MapRing[K,V](implicit ring : Ring[V]) extends MapGroup[K,V]()(ring) with R
   // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
   // Then we have to manage the delta from this map as we add elements.  That said, it
   // is not actually needed in matrix multiplication, so we are punting on it for now.
-  override def one = error("multiplicative identity for Map unimplemented")
+  override def one = Map[K, V]().withDefaultValue(ring.one)
   override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
     small.foldLeft(zero) { (oldMap, kv) =>
@@ -412,6 +412,7 @@ object Monoid extends GeneratedMonoidImplicits {
     new Tuple2Monoid[T,U]()(tg,ug)
   }
   implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
+  implicit def function1Monoid[T] = new Function1Monoid[T]
 }
 
 object Group extends GeneratedGroupImplicits {
