@@ -370,6 +370,10 @@ object Monoid extends GeneratedMonoidImplicits {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
   def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
+  def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
+  def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
+  def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
+  def sum[T](iter: Traversable[T])(implicit monoid: Monoid[T]) = monoid.sum(iter)
 
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
@@ -422,6 +426,7 @@ object Ring extends GeneratedRingImplicits {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
   def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
+  def product[T](it : Traversable[T])(implicit rng : Ring[T]) = rng.product(it)
 
   implicit val boolRing : Ring[Boolean] = BooleanField
   implicit val jboolRing : Ring[JBool] = JBoolField
