@@ -210,7 +210,7 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   }
   
   override def plus(f1 : Function1[T,T], f2 : Function1[T,T]) = {
-    (t : T) => f2(f1(t))
+    (t : T) => f1(f2(t))
   }
 }
 
