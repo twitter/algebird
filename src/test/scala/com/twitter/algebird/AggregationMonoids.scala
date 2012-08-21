@@ -27,4 +27,20 @@ object AggregationMonoidSpecification extends Properties("Aggregations") with Ba
   property("AveragedValue Monoid laws") = monoidLawsEq[AveragedValue] { (avl, avr) =>
     approxEq(avl.value, avr.value) && (avl.count == avr.count)
   }
+  
+  implicit val momentsgen = Arbitrary { for {
+    m0 <- choose(1L,Int.MaxValue.toLong)
+    m1 <- choose(-1e50, 1e50)
+    m2 <- choose(0, 1e50)
+    m3 <- choose(-1e10, 1e50)
+    m4 <- choose(0, 1e50)
+  } yield new Moments(m0, m1, m2, m3, m4) }
+
+  property("Moments Monoid laws") = monoidLawsEq[Moments] { (ml, mr) =>
+    (ml.m0 == mr.m0) &&
+    approxEq(ml.m1, mr.m1) && 
+    approxEq(ml.m2, mr.m2) && 
+    approxEq(ml.m3, mr.m3) && 
+    approxEq(ml.m4, mr.m4)
+  }  
 }
