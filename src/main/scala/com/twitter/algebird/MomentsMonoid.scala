@@ -28,7 +28,11 @@ case class Moments(m0 : Long, m1 : Double, m2 : Double, m3 : Double, m4 : Double
   
   def mean = m1
   
+  // Population variance, not sample variance.
   def variance = m2 / count
+  
+  // Population standard deviation, not sample standard deviation.
+  def stddev = math.sqrt(variance)
   
   def skewness = math.sqrt(count) * m3 / math.pow(m2, 1.5)
   
