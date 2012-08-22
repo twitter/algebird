@@ -6,7 +6,7 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 import org.scalacheck.Gen.oneOf
 
-import java.lang.{Integer => JInt, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.lang.{Integer => JInt,Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
 import scala.collection.JavaConverters._
@@ -15,8 +15,12 @@ object JavaBoxedTests extends Properties("JavaBoxed") with BaseProperties {
 
   implicit val jboolArg = Arbitrary { for( v <- oneOf(JBool.TRUE, JBool.FALSE) ) yield v }
   implicit val jintArg = Arbitrary {
-    for( v <- choose(Int.MinValue,Int.MaxValue) )
+    for( v <- choose(Int.MinValue, Int.MaxValue) )
       yield JInt.valueOf(v)
+  }
+  implicit val jshortArg = Arbitrary {
+    for( v <- choose(Short.MinValue, Short.MaxValue) )
+      yield Short.box(v)
   }
   implicit val jlongArg = Arbitrary {
     // If we put Long.Max/Min we get overflows that seem to break the ring properties, not clear why
@@ -28,6 +32,8 @@ object JavaBoxedTests extends Properties("JavaBoxed") with BaseProperties {
   property("JBoolean is a Field") = fieldLaws[JBool]
   property("Int is a Ring") = ringLaws[Int]
   property("JInt is a Ring") = ringLaws[JInt]
+  property("Short is a Ring") = ringLaws[Short]
+  property("JShort is a Ring") = ringLaws[JShort]
   property("Long is a Ring") = ringLaws[Long]
   property("JLong is a Ring") = ringLaws[JLong]
   // TODO add testing with JFloat/JDouble but check for approximate equals, pain in the ass.
