@@ -7,6 +7,8 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
+import java.util.Arrays
+
 object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
   import HyperLogLog._
   implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
@@ -58,6 +60,12 @@ class HyperLogLogTest extends Specification {
      "count with 7-bits" in {
         test(7)
         testLong(7)
+     }
+     "sum different sized HLL instances properly" in {
+        val larger = new HLLInstance((1L << 32) + 1)
+        val smaller = new HLLInstance(2)
+        Arrays.equals((smaller + larger).v, (1L << 32) + 2) must beTrue
+        Arrays.equals((larger + smaller).v, (1L << 32) + 2) must beTrue
      }
   }
 }
