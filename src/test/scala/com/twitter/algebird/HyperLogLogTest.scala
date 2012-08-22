@@ -7,6 +7,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
+import java.lang.AssertionError
+import java.util.Arrays
+
 object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
   import HyperLogLog._
   implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
@@ -31,6 +34,16 @@ class HyperLogLogTest extends Specification {
   }
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
 
+  def exactIntersect[T](it : Seq[Iterable[T]]) : Int = {
+    it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
+  }
+  def approxIntersect[T <% Array[Byte]](bits : Int, it : Seq[Iterable[T]]) : Double = {
+    val hll = new HyperLogLogMonoid(bits)
+    //Map each iterable to a HLL instance:
+    val seqHlls = it.map { iter => hll.sum(iter.view.map { hll(_) }) }
+    hll.estimateIntersectionSize(seqHlls)
+  }
+
   def test(bits : Int) {
     val data = (0 to 10000).map { i => r.nextInt(1000) }
     val exact = exactCount(data).toDouble
@@ -40,6 +53,15 @@ class HyperLogLogTest extends Specification {
     val data = (0 to 10000).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
+  }
+  def testLongIntersection(bits : Int, sets : Int) {
+    val data : Seq[Iterable[Int]] = (0 until sets).map { idx =>
+      (0 to 1000).map { i => r.nextInt(100) }
+    }.toSeq
+    val exact = exactIntersect(data)
+    val errorMult = scala.math.pow(2.0, sets) - 1.0
+    scala.math.abs(exact - approxIntersect(bits, data)) / exact must be_<(errorMult *
+      aveErrorOf(bits))
   }
 
   "HyperLogLog" should {
@@ -58,6 +80,15 @@ class HyperLogLogTest extends Specification {
      "count with 7-bits" in {
         test(7)
         testLong(7)
+     }
+     "count intersections of 2" in { testLongIntersection(10,2) }
+     "count intersections of 3" in { testLongIntersection(10,3) }
+     "count intersections of 4" in { testLongIntersection(10,4) }
+
+     "throw error for differently sized HLL instances" in {
+        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        (larger + smaller) must throwA[AssertionError]
      }
   }
 }

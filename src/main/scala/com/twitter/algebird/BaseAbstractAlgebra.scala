@@ -17,7 +17,7 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 
-import java.lang.{Integer => JInt, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList}
 /**
  * Monoid (take a deep breath, and relax about the weird name):
@@ -201,6 +201,19 @@ class SetMonoid[T] extends Monoid[Set[T]] {
   override def plus(left : Set[T], right : Set[T]) = left ++ right
 }
 
+/** Function1 monoid.
+ * plus means function composition, zero is the identity function
+ */
+class Function1Monoid[T] extends Monoid[Function1[T,T]] {
+  override def zero = {
+    (t : T) => t
+  }
+  
+  override def plus(f1 : Function1[T,T], f2 : Function1[T,T]) = {
+    (t : T) => f1(f2(t))
+  }
+}
+
 /** You can think of this as a Sparse vector monoid
  */
 class MapMonoid[K,V](implicit monoid : Monoid[V]) extends Monoid[Map[K,V]] {
@@ -268,6 +281,15 @@ object IntRing extends Ring[Int] {
   override def plus(l : Int, r : Int) = l + r
   override def minus(l : Int, r : Int) = l - r
   override def times(l : Int, r : Int) = l * r
+}
+
+object ShortRing extends Ring[Short] {
+  override def zero = 0.toShort
+  override def one = 1.toShort
+  override def negate(v : Short) = (-v).toShort
+  override def plus(l : Short, r : Short) = (l + r).toShort
+  override def minus(l : Short, r : Short) = (l - r).toShort
+  override def times(l : Short, r : Short) = (l * r).toShort
 }
 
 object LongRing extends Ring[Long] {
@@ -367,12 +389,22 @@ class Tuple2Ring[T,U](implicit tring : Ring[T], uring : Ring[U]) extends Ring[(T
 }
 
 object Monoid extends GeneratedMonoidImplicits {
+  // This pattern is really useful for typeclasses
+  def zero[T](implicit mon : Monoid[T]) = mon.zero
+  def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
+  def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
+  def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
+  def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
+  def sum[T](iter: Traversable[T])(implicit monoid: Monoid[T]) = monoid.sum(iter)
+
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
   implicit val boolMonoid : Monoid[Boolean] = BooleanField
   implicit val jboolMonoid : Monoid[JBool] = JBoolField
   implicit val intMonoid : Monoid[Int] = IntRing
   implicit val jintMonoid : Monoid[JInt] = JIntRing
+  implicit val shortMonoid : Monoid[Short] = ShortRing
+  implicit val jshortMonoid : Monoid[JShort] = JShortRing
   implicit val longMonoid : Monoid[Long] = LongRing
   implicit val jlongMonoid : Monoid[JLong] = JLongRing
   implicit val floatMonoid : Monoid[Float] = FloatField
@@ -390,15 +422,21 @@ object Monoid extends GeneratedMonoidImplicits {
     new Tuple2Monoid[T,U]()(tg,ug)
   }
   implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
+  implicit def function1Monoid[T] = new Function1Monoid[T]
 }
 
 object Group extends GeneratedGroupImplicits {
+  // This pattern is really useful for typeclasses
+  def minus[T](l : T, r : T)(implicit grp : Group[T]) = grp.minus(l,r)
+
   implicit val nullGroup : Group[Null] = NullGroup
   implicit val unitGroup : Group[Unit] = UnitGroup
   implicit val boolGroup : Group[Boolean] = BooleanField
   implicit val jboolGroup : Group[JBool] = JBoolField
   implicit val intGroup : Group[Int] = IntRing
-  implicit val jintGroup : Group[JInt] = JIntRing
+  implicit val jintGroup : Group[JInt] = JIntRing  
+  implicit val shortGroup : Group[Short] = ShortRing
+  implicit val jshortGroup : Group[JShort] = JShortRing  
   implicit val longGroup : Group[Long] = LongRing
   implicit val jlongGroup : Group[JLong] = JLongRing
   implicit val floatGroup : Group[Float] = FloatField
@@ -412,10 +450,17 @@ object Group extends GeneratedGroupImplicits {
 }
 
 object Ring extends GeneratedRingImplicits {
+  // This pattern is really useful for typeclasses
+  def one[T](implicit rng : Ring[T]) = rng.one
+  def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
+  def product[T](it : Traversable[T])(implicit rng : Ring[T]) = rng.product(it)
+
   implicit val boolRing : Ring[Boolean] = BooleanField
   implicit val jboolRing : Ring[JBool] = JBoolField
   implicit val intRing : Ring[Int] = IntRing
   implicit val jintRing : Ring[JInt] = JIntRing
+  implicit val shortRing : Ring[Short] = ShortRing
+  implicit val jshortRing : Ring[JShort] = JShortRing  
   implicit val longRing : Ring[Long] = LongRing
   implicit val jlongRing : Ring[JLong] = JLongRing
   implicit val floatRing : Ring[Float] = FloatField
@@ -429,6 +474,9 @@ object Ring extends GeneratedRingImplicits {
 }
 
 object Field {
+  // This pattern is really useful for typeclasses
+  def div[T](l : T, r : T)(implicit fld : Field[T]) = fld.div(l,r)
+
   implicit val boolField : Field[Boolean] = BooleanField
   implicit val jboolField : Field[JBool] = JBoolField
   implicit val floatField : Field[Float] = FloatField
