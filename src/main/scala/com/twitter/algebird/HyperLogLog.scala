@@ -76,7 +76,7 @@ case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
     // pad smaller array with 0s at front
     new HLLInstance(larger.reverse
       .zip(smaller.reverse.toStream ++ Stream.continually(0.toByte))
-      .map { pair => if (pair._1 > pair._2) pair._1 else pair._2 }
+      .map { pair => pair._1 max pair._2 }
       .reverse)
   }
 
