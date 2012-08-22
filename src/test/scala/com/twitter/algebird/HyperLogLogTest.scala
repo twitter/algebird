@@ -7,6 +7,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
+import java.lang.AssertionError
+import java.util.Arrays
+
 object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
   import HyperLogLog._
   implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
@@ -58,6 +61,11 @@ class HyperLogLogTest extends Specification {
      "count with 7-bits" in {
         test(7)
         testLong(7)
+     }
+     "throw error for differently sized HLL instances" in {
+        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        (larger + smaller) must throwA[AssertionError]
      }
   }
 }
