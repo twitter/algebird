@@ -165,8 +165,14 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   // The error for k items is ~ (2^{k} - 1) * error of single HLLInstance
   final def estimateIntersectionSize(his : Seq[HLLInstance]) : Double = {
     his.headOption.map { head =>
-      //Recursively apply:
       val tail = his.tail
+      /*
+       * |A n B| = |A| + |B| - |A u B|
+       * in the below, we set A = head, and B = tail.
+       * then note that A u (B0 n B1 n ...) = (B0 u A) n (B1 u A) n ...
+       * the latter we can compute with tail.map { _ + A } using the HLLInstance +
+       * since + on HLLInstance creates the instance for the union.
+       */
       estimateSize(head) + estimateIntersectionSize(tail) -
         estimateIntersectionSize(tail.map { _ + head })
     }
