@@ -7,6 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
+import java.lang.AssertionError
 import java.util.Arrays
 
 object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
@@ -61,11 +62,10 @@ class HyperLogLogTest extends Specification {
         test(7)
         testLong(7)
      }
-     "sum different sized HLL instances properly" in {
-        val larger = new HLLInstance((1L << 32) + 1)
-        val smaller = new HLLInstance(2)
-        Arrays.equals((smaller + larger).v, (1L << 32) + 2) must beTrue
-        Arrays.equals((larger + smaller).v, (1L << 32) + 2) must beTrue
+     "throw error for differently sized HLL instances" in {
+        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        (larger + smaller) must throwA[AssertionError]
      }
   }
 }

@@ -72,12 +72,11 @@ case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
   lazy val isZero = zeroCnt == v.size
 
   def +(other : HLLInstance) : HLLInstance = {
-    val (larger, smaller) = if (v.size > other.v.size) (v, other.v) else (other.v, v)
-    // pad smaller array with 0s at front
-    new HLLInstance(larger.reverse
-      .zip(smaller.reverse.toStream ++ Stream.continually(0.toByte))
+    assert(v.size == other.v.size, "HLLInstances must use the same memory size")
+    new HLLInstance(v.view
+      .zip(other.v)
       .map { pair => pair._1 max pair._2 }
-      .reverse)
+      .toArray)
   }
 
   override def equals(other: Any) = {
