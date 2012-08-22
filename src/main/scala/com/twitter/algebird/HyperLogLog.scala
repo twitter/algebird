@@ -18,6 +18,8 @@ package com.twitter.algebird
 
 import scala.collection.BitSet
 
+import java.util.Arrays
+
 /** Implementation of the HyperLogLog approximate counting as a Monoid
  * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
  *
@@ -65,16 +67,21 @@ object HyperLogLog {
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class HLLInstance(v : IndexedSeq[Int]) extends java.io.Serializable {
+case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
   lazy val zeroCnt = v.count { _ == 0 }
   lazy val isZero = zeroCnt == v.size
 
   def +(other : HLLInstance) : HLLInstance = {
-    new HLLInstance(v.view
-      .zip(other.v)
-      .map { pair => scala.math.max(pair._1, pair._2) }
-      .force
-      .toIndexedSeq)
+    val (larger, smaller) = if (v.size > other.v.size) (v, other.v) else (other.v, v)
+    // pad smaller array with 0s at front
+    new HLLInstance(larger.reverse
+      .zip(smaller.reverse.toStream ++ Stream.continually(0.toByte))
+      .map { pair => if (pair._1 > pair._2) pair._1 else pair._2 }
+      .reverse)
+  }
+
+  override def equals(other: Any) = {
+    other.isInstanceOf[HLLInstance] && Arrays.equals(v, other.asInstanceOf[HLLInstance].v)
   }
 
   // Named from the parameter in the paper, probably never useful to anyone
@@ -106,17 +113,18 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   // We are computing j and \rho(w) from the paper,
   // sorry for the name, but it allows someone to compare
   // to the paper
-  protected def jRhoW(in : Array[Byte]) : (Int,Int) = {
+  // extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
+  protected def jRhoW(in : Array[Byte]) : (Int,Byte) = {
     val onBits = HyperLogLog.bytesToBitSet(in)
     (onBits.filter { _ < bits }.map { 1 << _ }.sum,
-     (onBits.filter { _ >= bits }.min - bits + 1))
+     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
   }
 
-  val zero : HLLInstance = new HLLInstance(Vector.fill(memSize)(0))
+  val zero : HLLInstance = new HLLInstance(new Array[Byte](memSize))
 
   def plus(left : HLLInstance, right : HLLInstance) = left + right
 
-  protected val zeroVector = Vector.fill(memSize)(0)
+  protected val zeroVector = new Array[Byte](memSize)
 
   def create(example : Array[Byte]) : HLLInstance = {
     val hashed = HyperLogLog.hash(example)
