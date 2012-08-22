@@ -119,11 +119,11 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
      (onBits.filter { _ >= bits }.min - bits + 1).toByte)
   }
 
-  val zero : HLLInstance = new HLLInstance(new Array[Byte](memSize))
+  protected val zeroVector = new Array[Byte](memSize)
+
+  lazy val zero : HLLInstance = new HLLInstance(zeroVector)
 
   def plus(left : HLLInstance, right : HLLInstance) = left + right
-
-  protected val zeroVector = new Array[Byte](memSize)
 
   def create(example : Array[Byte]) : HLLInstance = {
     val hashed = HyperLogLog.hash(example)
@@ -148,7 +148,7 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   // Some constant from the algorithm:
   protected val fourBillionSome = HyperLogLog.twopow(32)
 
-  def estimateSize(hi : HLLInstance) : Double = {
+  final def estimateSize(hi : HLLInstance) : Double = {
     val e = factor * hi.z
     // There are large and small value corrections from the paper
     if(e > largeE) {
@@ -160,5 +160,22 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
     else {
       e
     }
+  }
+
+  // The error for k items is ~ (2^{k} - 1) * error of single HLLInstance
+  final def estimateIntersectionSize(his : Seq[HLLInstance]) : Double = {
+    his.headOption.map { head =>
+      val tail = his.tail
+      /*
+       * |A n B| = |A| + |B| - |A u B|
+       * in the below, we set A = head, and B = tail.
+       * then note that A u (B0 n B1 n ...) = (B0 u A) n (B1 u A) n ...
+       * the latter we can compute with tail.map { _ + A } using the HLLInstance +
+       * since + on HLLInstance creates the instance for the union.
+       */
+      estimateSize(head) + estimateIntersectionSize(tail) -
+        estimateIntersectionSize(tail.map { _ + head })
+    }
+    .getOrElse(0.0) max 0.0
   }
 }
