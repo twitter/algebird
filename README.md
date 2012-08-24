@@ -12,6 +12,7 @@ The answer is a mix of the following:
 * The trait itself is tiny, we just need zero and plus, it is the implementations for all the types that are important. We wrote a code generator to derive instances for all the tuples, and by hand wrote monoids for List, Set, Option, Map, and several other objects used for counting (DecayedValue for exponential decay, AveragedValue for averaging, HyperLogLog for approximate cardinality counting). It's the instances that are useful in scalding and elsewhere.
 * We needed this to work in scala 2.8, and it appeared that Scalaz 7 didn't support 2.8. We've since moved to 2.9, though.
 * We also needed Ring and Field, and those are not (as of the writing of the code) in Scalaz.
+* If you want to interop, it is trivial to define implicit conversions to and from Scalaz Monoid.
 * Scalaz is big and scary for some people. We have enough trouble with adoption without scaring people with [Cokleisli star operators](https://github.com/scalaz/scalaz/blob/master/core/src/main/scala/scalaz/Cokleisli.scala#L19).
 
 ## Authors
