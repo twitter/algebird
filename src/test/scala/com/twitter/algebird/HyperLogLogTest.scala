@@ -32,6 +32,13 @@ class HyperLogLogTest extends Specification {
     val hll = new HyperLogLogMonoid(bits)
     hll.estimateSize(hll.sum(it.map { hll(_) }))
   }
+
+  def approxCountBuilder[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
+    val hllBuilder = it.foldLeft(new HLLInstanceBuilder(bits)) { (left, right) => left.add(right) }
+    val hll = new HyperLogLogMonoid(bits)
+    hll.estimateSize(hllBuilder.build())
+  }
+
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
 
   def exactIntersect[T](it : Seq[Iterable[T]]) : Int = {
@@ -48,11 +55,13 @@ class HyperLogLogTest extends Specification {
     val data = (0 to 10000).map { i => r.nextInt(1000) }
     val exact = exactCount(data).toDouble
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
+    scala.math.abs(exact - approxCountBuilder(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
   def testLong(bits : Int) {
     val data = (0 to 10000).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
+    scala.math.abs(exact - approxCountBuilder(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
   def testLongIntersection(bits : Int, sets : Int) {
     val data : Seq[Iterable[Int]] = (0 until sets).map { idx =>

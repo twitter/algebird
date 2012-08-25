@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.BitSet
 
 import java.util.Arrays
@@ -62,6 +63,15 @@ object HyperLogLog {
       }
     }
   }
+
+  // We are computing j and \rho(w) from the paper,
+  // sorry for the name, but it allows someone to compare to the paper
+  // extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
+  def jRhoW(in : Array[Byte], bits: Int) : (Int,Byte) = {
+    val onBits = HyperLogLog.bytesToBitSet(in)
+    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
+     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
+  }
 }
 
 /**
@@ -88,6 +98,22 @@ case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
   lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
 }
 
+class HLLInstanceBuilder(val bits: Int) {
+  lazy val v = new Array[Byte](1 << bits)
+
+  def add(example: Array[Byte]): HLLInstanceBuilder = {
+    val hashed = HyperLogLog.hash(example)
+    val (j,rhow) = HyperLogLog.jRhoW(hashed, bits)
+    v(j) = rhow max v(j)
+    this
+  }
+
+  def build(): HLLInstance = {
+    new HLLInstance(v.clone())
+  }
+
+}
+
 /*
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
  * which means each HLLInstance is about 2^{12 + 2} = 16kb per instance.
@@ -109,16 +135,6 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
 
   def apply[T <% Array[Byte]](t : T) = create(t)
 
-  // We are computing j and \rho(w) from the paper,
-  // sorry for the name, but it allows someone to compare
-  // to the paper
-  // extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-  protected def jRhoW(in : Array[Byte]) : (Int,Byte) = {
-    val onBits = HyperLogLog.bytesToBitSet(in)
-    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
-     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
-  }
-
   protected val zeroVector = new Array[Byte](memSize)
 
   lazy val zero : HLLInstance = new HLLInstance(zeroVector)
@@ -126,8 +142,8 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   def plus(left : HLLInstance, right : HLLInstance) = left + right
 
   def create(example : Array[Byte]) : HLLInstance = {
-    val hashed = HyperLogLog.hash(example)
-    val (j,rhow) = jRhoW(hashed)
+    val hashed = hash(example)
+    val (j,rhow) = jRhoW(hashed, bits)
     new HLLInstance(zeroVector.updated(j, rhow))
   }
 
