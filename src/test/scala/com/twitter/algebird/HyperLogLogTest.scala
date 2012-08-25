@@ -32,11 +32,13 @@ class HyperLogLogTest extends Specification {
     val hll = new HyperLogLogMonoid(bits)
     hll.estimateSize(hll.sum(it.map { hll(_) }))
   }
+
   def approxCountBuilder[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
     val hllBuilder = it.foldLeft(new HLLInstanceBuilder(bits)) { (left, right) => left.add(right) }
     val hll = new HyperLogLogMonoid(bits)
     hll.estimateSize(hllBuilder.build())
   }
+
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
 
   def exactIntersect[T](it : Seq[Iterable[T]]) : Int = {
