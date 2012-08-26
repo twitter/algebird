@@ -21,7 +21,7 @@ package com.twitter.algebird
  * Also, you must start on the right, with a value, and all subsequent RightFolded must
  * be RightFoldedToFold objects or zero
  *
- * If you add to Folded values together, you always get the one on the left,
+ * If you add two Folded values together, you always get the one on the left,
  * so this forms a kind of reset of the fold.
  */
 object RightFolded {
