@@ -124,7 +124,9 @@ class OptionMonoid[T](implicit mon : Monoid[T]) extends Monoid[Option[T]] {
 class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
   extends Monoid[Either[L,R]] {
   // TODO: remove this when we add a semi-group class
-  override def zero = error("Either is a semi-group, there is no zero. Wrap with Option[Either[L,R]] to get a monoid.")
+  override def zero =
+    throw new UnsupportedOperationException("Either is a semi-group, there is no zero. " +
+      "Wrap with Option[Either[L,R]] to get a monoid.")
   override def plus(l : Either[L,R], r : Either[L,R]) = {
     if(l.isLeft) {
       // l is Left, r may or may not be:
@@ -255,7 +257,8 @@ class MapRing[K,V](implicit ring : Ring[V]) extends MapGroup[K,V]()(ring) with R
   // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
   // Then we have to manage the delta from this map as we add elements.  That said, it
   // is not actually needed in matrix multiplication, so we are punting on it for now.
-  override def one = error("multiplicative identity for Map unimplemented")
+  override def one =
+    throw new UnsupportedOperationException("multiplicative identity for Map unimplemented")
   override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
     small.foldLeft(zero) { (oldMap, kv) =>
