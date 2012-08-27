@@ -28,8 +28,11 @@ import java.util.Arrays
  * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
  */
 object HyperLogLog {
-  val md = java.security.MessageDigest.getInstance("MD5")
-  def hash(input : Array[Byte]) : Array[Byte] = md.digest(input)
+
+  def hash(input : Array[Byte]) : Array[Byte] = {
+    val md = java.security.MessageDigest.getInstance("MD5")
+    md.digest(input)
+  }
 
   implicit def int2Bytes(i : Int) = {
     val buf = new Array[Byte](4)
