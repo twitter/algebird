@@ -18,7 +18,7 @@ object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLaws[HLLInstance]
+  property("HyperLogLog is a Monoid") = monoidLaws[HLL]
 }
 
 class HyperLogLogTest extends Specification {
@@ -95,8 +95,10 @@ class HyperLogLogTest extends Specification {
      "count intersections of 4" in { testLongIntersection(10,4) }
 
      "throw error for differently sized HLL instances" in {
-        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
-        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        val bigMon = new HyperLogLogMonoid(5)
+        val smallMon = new HyperLogLogMonoid(4)
+        val larger = bigMon(1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = smallMon(1) // uses implicit int2Bytes to make 4 byte array
         (larger + smaller) must throwA[AssertionError]
      }
   }
