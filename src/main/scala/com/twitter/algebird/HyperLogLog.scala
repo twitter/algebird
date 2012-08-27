@@ -77,23 +77,64 @@ object HyperLogLog {
   }
 }
 
+sealed abstract class HLL extends java.io.Serializable {
+  def +(other : HLL) : HLL
+}
+
+case object HLLZero extends HLL {
+  def +(other : HLL) = other
+}
+
+case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
+  def +(other : HLL) = {
+    other match {
+      case HLLZero => this
+      case HLLItem(sz, oJ, oRhow) => {
+        assert(sz == size, "Must use compatible HLL size")
+        if (oJ == j) {
+          // Just keep the max
+          HLLItem(size, j, oRhow max rhow)
+        }
+        else {
+          //They are certainly different
+          val vect = Vector.fill(size)(0 : Byte)
+            .updated(oJ, oRhow)
+            .updated(j,rhow)
+          HLLInstance(vect)
+        }
+      }
+      case HLLInstance(ov) => {
+        if(ov(j) >= rhow) {
+          //No need to update
+          other
+        }
+        else {
+          //replace:
+          HLLInstance(ov.updated(j, rhow))
+        }
+      }
+    }
+  }
+}
+
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
+case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
   lazy val zeroCnt = v.count { _ == 0 }
-  lazy val isZero = zeroCnt == v.size
 
-  def +(other : HLLInstance) : HLLInstance = {
-    assert(v.size == other.v.size, "HLLInstances must use the same memory size")
-    new HLLInstance(v.view
-      .zip(other.v)
-      .map { pair => pair._1 max pair._2 }
-      .toArray)
-  }
-
-  override def equals(other: Any) = {
-    other.isInstanceOf[HLLInstance] && Arrays.equals(v, other.asInstanceOf[HLLInstance].v)
+  def +(other : HLL) : HLL = {
+    other match {
+      case HLLZero => this
+      case hit@HLLItem(_,_,_) => (hit + this) //Already implemented in HLLItem
+      case HLLInstance(ov) => {
+        assert(ov.size == v.size, "HLLInstance must have the same size")
+        HLLInstance(v.view
+          .zip(ov)
+          .map { pair => pair._1 max pair._2 }
+          .toIndexedSeq)
+      }
+    }
   }
 
   // Named from the parameter in the paper, probably never useful to anyone
@@ -101,30 +142,14 @@ case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
   lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
 }
 
-class HLLInstanceBuilder(val bits: Int) {
-  lazy val v = new Array[Byte](1 << bits)
-
-  def add(example: Array[Byte]): HLLInstanceBuilder = {
-    val hashed = HyperLogLog.hash(example)
-    val (j,rhow) = HyperLogLog.jRhoW(hashed, bits)
-    v(j) = rhow max v(j)
-    this
-  }
-
-  def build(): HLLInstance = {
-    new HLLInstance(v.clone())
-  }
-
-}
-
 /*
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
- * which means each HLLInstance is about 2^{12 + 2} = 16kb per instance.
+ * which means each HLLInstance is about 2^{12} = 4kb per instance.
  */
-class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
+class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
   import HyperLogLog._
 
-  assert(bits > 3, "Use at least 4 bits (2^(bits+2) = bytes consumed)")
+  assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
   // These parameters come from the paper
   val (alpha, memSize) = bits match {
     case 4 => (0.673, 1 << 4)
@@ -138,16 +163,14 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
 
   def apply[T <% Array[Byte]](t : T) = create(t)
 
-  protected val zeroVector = new Array[Byte](memSize)
+  val zero : HLL = HLLZero
 
-  lazy val zero : HLLInstance = new HLLInstance(zeroVector)
+  def plus(left : HLL, right : HLL) = left + right
 
-  def plus(left : HLLInstance, right : HLLInstance) = left + right
-
-  def create(example : Array[Byte]) : HLLInstance = {
+  def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)
     val (j,rhow) = jRhoW(hashed, bits)
-    new HLLInstance(zeroVector.updated(j, rhow))
+    HLLItem(memSize,j,rhow)
   }
 
   private val largeE = HyperLogLog.twopow(32)/30.0
@@ -167,7 +190,16 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   // Some constant from the algorithm:
   protected val fourBillionSome = HyperLogLog.twopow(32)
 
-  final def estimateSize(hi : HLLInstance) : Double = {
+
+  final def estimateSize(hll : HLL) : Double = {
+    hll match {
+      case HLLZero => 0.0
+      case HLLItem(_,_,_) => 1.0
+      case hi@HLLInstance(_) => estimateSizeInstance(hi)
+    }
+  }
+
+  protected def estimateSizeInstance(hi : HLLInstance) : Double = {
     val e = factor * hi.z
     // There are large and small value corrections from the paper
     if(e > largeE) {
@@ -181,8 +213,8 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
     }
   }
 
-  // The error for k items is ~ (2^{k} - 1) * error of single HLLInstance
-  final def estimateIntersectionSize(his : Seq[HLLInstance]) : Double = {
+  // The error for k items is ~ (2^{k} - 1) * error of single HLL
+  final def estimateIntersectionSize(his : Seq[HLL]) : Double = {
     his.headOption.map { head =>
       val tail = his.tail
       /*

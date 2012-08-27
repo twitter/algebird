@@ -18,7 +18,7 @@ object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLaws[HLLInstance]
+  property("HyperLogLog is a Monoid") = monoidLaws[HLL]
 }
 
 class HyperLogLogTest extends Specification {
@@ -31,12 +31,6 @@ class HyperLogLogTest extends Specification {
   def approxCount[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
     val hll = new HyperLogLogMonoid(bits)
     hll.estimateSize(hll.sum(it.map { hll(_) }))
-  }
-
-  def approxCountBuilder[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
-    val hllBuilder = it.foldLeft(new HLLInstanceBuilder(bits)) { (left, right) => left.add(right) }
-    val hll = new HyperLogLogMonoid(bits)
-    hll.estimateSize(hllBuilder.build())
   }
 
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
@@ -55,13 +49,11 @@ class HyperLogLogTest extends Specification {
     val data = (0 to 10000).map { i => r.nextInt(1000) }
     val exact = exactCount(data).toDouble
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
-    scala.math.abs(exact - approxCountBuilder(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
   def testLong(bits : Int) {
     val data = (0 to 10000).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
-    scala.math.abs(exact - approxCountBuilder(bits, data)) / exact must be_<(2.5 * aveErrorOf(bits))
   }
   def testLongIntersection(bits : Int, sets : Int) {
     val data : Seq[Iterable[Int]] = (0 until sets).map { idx =>
@@ -95,8 +87,10 @@ class HyperLogLogTest extends Specification {
      "count intersections of 4" in { testLongIntersection(10,4) }
 
      "throw error for differently sized HLL instances" in {
-        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
-        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        val bigMon = new HyperLogLogMonoid(5)
+        val smallMon = new HyperLogLogMonoid(4)
+        val larger = bigMon(1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = smallMon(1) // uses implicit int2Bytes to make 4 byte array
         (larger + smaller) must throwA[AssertionError]
      }
   }
