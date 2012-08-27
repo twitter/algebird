@@ -122,7 +122,6 @@ case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
  */
 case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
   lazy val zeroCnt = v.count { _ == 0 }
-  lazy val isZero = zeroCnt == v.size
 
   def +(other : HLL) : HLL = {
     other match {
@@ -141,26 +140,6 @@ case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
   lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
-}
-
-/* If you have a list of items to create at once and speed is absolutely of the essence
- * You can use this class which internally uses a mutable buffer.
- * Is always CUMULATIVE. Allocate a new one for each new set you are considering
- */
-class HLLInstanceBuilder(val bits: Int) {
-  lazy val v = new Array[Byte](1 << bits)
-
-  def add(example: Array[Byte]): HLLInstanceBuilder = {
-    val hashed = HyperLogLog.hash(example)
-    val (j,rhow) = HyperLogLog.jRhoW(hashed, bits)
-    v(j) = rhow max v(j)
-    this
-  }
-
-  def build(): HLLInstance = {
-    new HLLInstance(v.toIndexedSeq)
-  }
-
 }
 
 /*
