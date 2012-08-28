@@ -3,7 +3,7 @@
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Storm](https://github.com/nathanmarz/storm)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
 ## Maven
-Current version is 0.1.1. groupid="com.twitter" artifact="algebird_2.9.2".
+Current version is 0.1.2. groupid="com.twitter" artifact="algebird_2.9.2".
 
 ## Questions
 > Why not use Scalaz's [Monoid](https://github.com/scalaz/scalaz/blob/master/core/src/main/scala/scalaz/Monoid.scala) trait?
