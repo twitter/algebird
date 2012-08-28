@@ -75,6 +75,40 @@ object HyperLogLog {
     (onBits.filter { _ < bits }.map { 1 << _ }.sum,
      (onBits.filter { _ >= bits }.min - bits + 1).toByte)
   }
+
+  def toBytes(h : HLL) : Array[Byte] = {
+    h match {
+      case HLLZero => Array[Byte](0)
+      case HLLItem(sz,idx,bv) => {
+        val buf = new Array[Byte](1 + 4 + 4 + 1)
+        java.nio.ByteBuffer
+          .wrap(buf)
+          .put(1 : Byte) //Indicator of HLLItem
+          .putInt(sz)
+          .putInt(idx)
+          .put(bv)
+        buf
+      }
+      case HLLInstance(v) => (Array[Byte](2) ++ v)
+    }
+  }
+
+  def fromBytes(bytes : Array[Byte]) : HLL = {
+    // Make sure to be reversible so fromBytes(toBytes(x)) == x
+    val bb = java.nio.ByteBuffer.wrap(bytes)
+    bb.get.toInt match {
+      case 0 => HLLZero
+      case 1 => {
+        HLLItem(bb.getInt, bb.getInt, bb.get)
+      }
+      case 2 => {
+        HLLInstance(bytes.toIndexedSeq.tail)
+      }
+      case _ => {
+        throw new Exception("Unrecognized HLL type: " + bytes(0))
+      }
+    }
+  }
 }
 
 sealed abstract class HLL extends java.io.Serializable {
@@ -97,10 +131,7 @@ case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
         }
         else {
           //They are certainly different
-          val vect = Vector.fill(size)(0 : Byte)
-            .updated(oJ, oRhow)
-            .updated(j,rhow)
-          HLLInstance(vect)
+          HLLInstance(toHLLInstance.v.updated(oJ, oRhow))
         }
       }
       case HLLInstance(ov) => {
@@ -115,6 +146,8 @@ case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
       }
     }
   }
+
+  lazy val toHLLInstance = HLLInstance(Vector.fill(size)(0 : Byte).updated(j,rhow))
 }
 
 /**
@@ -136,7 +169,6 @@ case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
       }
     }
   }
-
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
   lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
