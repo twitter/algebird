@@ -78,7 +78,7 @@ class HyperLogLogTest extends Specification {
         test(7)
         testLong(7)
      }
-     "count with 10-bites" in {
+     "count with 10-bits" in {
         test(10)
         testLong(10)
      }
