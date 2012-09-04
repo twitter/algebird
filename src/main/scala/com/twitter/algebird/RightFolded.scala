@@ -30,10 +30,10 @@ object RightFolded {
 
     lazy val zero = RightFoldedZero[In,Out]()
 
-    def plus(left : RightFolded[In,Out], right : RightFolded[In,Out]) = (left, right) match {
-      case (RightFoldedValue(_), _) => left
-      case (RightFoldedZero(), _) => right
-      case (RightFoldedToFold(lList), _) => right match {
+    def plus(left : RightFolded[In,Out], right : RightFolded[In,Out]) = left match {
+      case RightFoldedValue(_) => left
+      case RightFoldedZero() => right
+      case RightFoldedToFold(lList) => right match {
         case RightFoldedZero() => RightFoldedToFold(lList)
         case RightFoldedValue(vr) => RightFoldedValue(lList.foldRight(vr)(foldfn))
         case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
