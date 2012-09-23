@@ -47,10 +47,10 @@ class CountMinSketchTest extends Specification {
      "estimate frequencies" in {
        val totalCount = 5678
        val range = 897 
-       val data = (0 to (totalCount - 1)).map { i => RAND.nextInt(range).toLong }
+       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
        val cms = createCountMinSketch(data)
        
-       (0 to 100).foreach { i =>
+       (0 to 100).foreach { _ =>
          val x = RAND.nextInt(range).toLong
          val exact = exactFrequency(data, x)
          val approx = approximateFrequency(cms, x)

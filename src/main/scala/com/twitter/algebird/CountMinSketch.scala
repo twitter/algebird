@@ -48,10 +48,10 @@ package com.twitter.algebird
  */
 
 /**
- * Monoid for adding together Count-Min sketches.
+ * Monoid for adding Count-Min sketches.
  *
- * @depth The number of hash functions used.
- * @width The number of counters per hash function.
+ * @depth Number of hash functions used.
+ * @width Number of counters per hash function.
  * @seed  A seed to initialize the random number generator used to create
  *        the pairwise independent hash functions.
  */
@@ -68,7 +68,7 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
   // so we omit it and simply use hash functions of the form
   //
   //   h_i(x) = a_i * x (mod p)
-  val hashes : Seq[CMSHash] = (0 to (depth - 1)).map { i => CMSHash(RAND.nextInt, 0, width) }
+  val hashes : Seq[CMSHash] = (0 to (depth - 1)).map { _ => CMSHash(RAND.nextInt, 0, width) }
   
   val zero : CMS = CMSZero(hashes, depth, width)
   
@@ -227,7 +227,7 @@ case class CMSCountsTable(depth : Int, width : Int) {
   }
   
   /**
-   * Adds another counts table to this one, through pairwise addition.
+   * Adds another counts table to this one, through elementwise addition.
    * This table is mutated, but the other one is not.
    */
   def destructiveAdd(other : CMSCountsTable) = {
