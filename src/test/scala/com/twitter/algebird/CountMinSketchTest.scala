@@ -7,9 +7,6 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
-import java.lang.AssertionError
-import java.util.Arrays
-
 object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperties {
   val DEPTH = 10
   val WIDTH = 30

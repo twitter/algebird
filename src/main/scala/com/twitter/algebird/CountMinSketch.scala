@@ -121,8 +121,8 @@ case class CMSZero(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS 
 }
 
 /**
- * Used for holding a single element, to avoid repeatedly adding together all elements of the counts
- * table.
+ * Used for holding a single element, to avoid repeatedly adding elements from
+ * sparse counts tables.
  */
 case class CMSItem(item : Long, hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
   var totalCount = 1L
