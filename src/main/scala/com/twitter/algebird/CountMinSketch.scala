@@ -154,7 +154,7 @@ case class CMSInstance(hashes : Seq[CMSHash], depth : Int, width : Int) extends 
       case cms@CMSZero(_, _, _) => cms + this
       case cms@CMSItem(_, _, _, _) => cms + this
       case cms@CMSInstance(_, _, _) => {
-        countsTable.destructiveAdd(cms.countsTable)
+        countsTable += cms.countsTable
         totalCount += cms.totalCount
         this
       }
@@ -228,10 +228,9 @@ case class CMSCountsTable(depth : Int, width : Int) {
   
   /**
    * Adds another counts table to this one, through elementwise addition.
-   * This table is mutated, but the other one is not.
    */
-  def destructiveAdd(other : CMSCountsTable) = {
-    assert((depth == other.depth) && (width == other.width), "Tables must have the same dimensions.")
+  def +=(other : CMSCountsTable) = {
+    assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
     
     (0 to (depth - 1)).foreach { row =>
       (0 to (width - 1)).foreach { col =>
