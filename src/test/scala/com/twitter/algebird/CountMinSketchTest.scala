@@ -27,18 +27,30 @@ class CountMinSketchTest extends Specification {
   val DEPTH = 10
   val WIDTH = 300
   val SEED = 1
-  val MONOID = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
+  
+  val CMS_MONOID = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
   val RAND = new scala.util.Random
 
   /**
    * Creates a Count-Min sketch out of the given data stream.
    */
   def createCountMinSketch(data : Seq[Long]) : CMS = {
-    data.foldLeft(MONOID.zero) { case (acc, x) => MONOID.plus(acc, MONOID.create(x)) }
+    data.foldLeft(CMS_MONOID.zero) { case (acc, x) =>
+      CMS_MONOID.plus(acc, CMS_MONOID.create(x))
+    }
   }
   
-  def exactFrequency(data : Seq[Long], x : Long) : Long = data.filter { _ == x }.size
+  /**
+   * Returns the exact frequency of {x} in {data}.
+   */
+  def exactFrequency(data : Seq[Long], x : Long) : Long = {
+    data.filter { _ == x }.size
+  }
   
+  /**
+   * Returns the estimated frequency of {x} in the given Count-Min sketch
+   * structure.
+   */
   def approximateFrequency(cms : CMS, x : Long) : Long = {
     cms.estimateFrequency(x)
   }
@@ -55,6 +67,7 @@ class CountMinSketchTest extends Specification {
          val exact = exactFrequency(data, x)
          val approx = approximateFrequency(cms, x)
          val maxError = cms.maxErrorOfFrequencyEstimate
+         
          approx must be_>=(exact)
          maxError must be_==((2.0 * totalCount) / WIDTH)
          (approx - exact).toDouble must be_<=(maxError)
@@ -62,9 +75,9 @@ class CountMinSketchTest extends Specification {
      }
      
      "exactly estimate frequencies when given a small stream" in {
-       val one = MONOID.create(1)
-       val two = MONOID.create(2)
-       val cms = MONOID.plus(MONOID.plus(one, two), two)
+       val one = CMS_MONOID.create(1)
+       val two = CMS_MONOID.create(2)
+       val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
        
        cms.estimateFrequency(1) must be_==(1)
        cms.estimateFrequency(2) must be_==(2)       

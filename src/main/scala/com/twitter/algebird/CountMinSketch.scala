@@ -154,7 +154,7 @@ case class CMSInstance(hashes : Seq[CMSHash], depth : Int, width : Int) extends 
       case cms@CMSZero(_, _, _) => cms + this
       case cms@CMSItem(_, _, _, _) => cms + this
       case cms@CMSInstance(_, _, _) => {
-        countsTable += cms.countsTable
+        countsTable ++= cms.countsTable
         totalCount += cms.totalCount
         this
       }
@@ -176,7 +176,7 @@ case class CMSInstance(hashes : Seq[CMSHash], depth : Int, width : Int) extends 
     } else {
       (0 to (depth - 1)).foreach { i =>
         val hash = hashes(i).compute(item)
-        countsTable.increment(i, hash, 1)
+        countsTable += (i, hash, 1)
       }
       totalCount += count
     }
@@ -221,20 +221,20 @@ case class CMSCountsTable(depth : Int, width : Int) {
   assert(width > 0, "Table must have at least 1 column.")
   
   val counts : Array[Array[Long]] = Array.fill(depth, width)(0L)
-  
-  def increment(row : Int, col : Int, count : Long) = { 
+
+  def +=(row : Int, col : Int, count : Long) = { 
     counts(row)(col) += count
   }
   
   /**
    * Adds another counts table to this one, through elementwise addition.
    */
-  def +=(other : CMSCountsTable) = {
+  def ++=(other : CMSCountsTable) = {
     assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
     
     (0 to (depth - 1)).foreach { row =>
       (0 to (width - 1)).foreach { col =>
-        increment(row, col, other.counts(row)(col))
+        this += (row, col, other.counts(row)(col))
       }
     }
   }
