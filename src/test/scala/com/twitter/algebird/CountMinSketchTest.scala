@@ -30,15 +30,6 @@ class CountMinSketchTest extends Specification {
   
   val CMS_MONOID = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
   val RAND = new scala.util.Random
-
-  /**
-   * Creates a Count-Min sketch out of the given data stream.
-   */
-  def createCountMinSketch(data : Seq[Long]) : CMS = {
-    data.foldLeft(CMS_MONOID.zero) { case (acc, x) =>
-      CMS_MONOID.plus(acc, CMS_MONOID.create(x))
-    }
-  }
   
   /**
    * Returns the exact frequency of {x} in {data}.
@@ -60,7 +51,7 @@ class CountMinSketchTest extends Specification {
        val totalCount = 5678
        val range = 897 
        val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
-       val cms = createCountMinSketch(data)
+       val cms = CMS_MONOID.create(data)
        
        (0 to 100).foreach { _ =>
          val x = RAND.nextInt(range).toLong

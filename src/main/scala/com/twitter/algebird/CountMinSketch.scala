@@ -56,8 +56,6 @@ package com.twitter.algebird
  *        the pairwise independent hash functions.
  */
 class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[CMS] {
-  
-  val RAND = new scala.util.Random(seed)
 
   // Typically, we would use d pairwise independent hash functions of the form
   //
@@ -68,19 +66,29 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
   // so we omit it and simply use hash functions of the form
   //
   //   h_i(x) = a_i * x (mod p)
-  val hashes : Seq[CMSHash] = (0 to (depth - 1)).map { _ => CMSHash(RAND.nextInt, 0, width) }
+  val hashes : Seq[CMSHash] = {
+    val r = new scala.util.Random(seed)
+    (0 to (depth - 1)).map { _ => CMSHash(r.nextInt, 0, width) }    
+  }
   
   val zero : CMS = CMSZero(hashes, depth, width)
   
   /**
    * We assume the Count-Min sketches on the left and right use the same hash functions.
    */
-  def plus(left : CMS, right : CMS) : CMS = left + right
+  def plus(left : CMS, right : CMS) : CMS = left ++ right
   
   /**
    * Create a Count-Min sketch out of a single item.
    */
   def create(item : Long) : CMS = CMSItem(item, hashes, depth, width)
+  
+  /**
+   * Creates a Count-Min sketch out of the given data stream.
+   */
+  def create(data : Seq[Long]) : CMS = {
+    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  }
 }
 
 /**
@@ -88,12 +96,12 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
  */
 sealed abstract class CMS extends java.io.Serializable {
   // The total number of elements seen in the data stream so far.
-  var totalCount : Long
+  def totalCount : Long
   
   def depth : Int
   def width : Int
   
-  def +(other : CMS) : CMS
+  def ++(other : CMS) : CMS
   
   /**
    * Returns an estimate of the total number of times this item has been seen
@@ -115,8 +123,8 @@ sealed abstract class CMS extends java.io.Serializable {
  * Used for initialization.
  */
 case class CMSZero(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
-  var totalCount = 0L  
-  def +(other : CMS) = other
+  def totalCount = 0L  
+  def ++(other : CMS) = other
   def estimateFrequency(item : Long) = 0L
 }
 
@@ -125,16 +133,16 @@ case class CMSZero(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS 
  * sparse counts tables.
  */
 case class CMSItem(item : Long, hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
-  var totalCount = 1L
+  def totalCount = 1L
   
-  def +(other : CMS) : CMS = {
+  def ++(other : CMS) : CMS = {
     other match {
       case CMSZero(_, _, _) => this
       case CMSItem(otherItem, _, _, _) => {
         val cms = CMSInstance(hashes, depth, width)
-        cms.add(item).add(otherItem)
+        cms + item + otherItem
       }
-      case cms@CMSInstance(_, _, _) => cms.add(item)
+      case cms@CMSInstance(_, _, _) => cms + item
     }
   }
   
@@ -143,44 +151,53 @@ case class CMSItem(item : Long, hashes : Seq[CMSHash], depth : Int, width : Int)
 
 /**
  * The general sketch structure, used for holding any number of elements.
- */
-case class CMSInstance(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
-  val countsTable = CMSCountsTable(depth, width)
+ */ 
+case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, totalCnt : Long) extends CMS {
 
-  var totalCount = 0L
+  def totalCount : Long = totalCnt
+    
+  def depth : Int = countsTable.depth
+  def width : Int = countsTable.width
   
-  def +(other : CMS) : CMS = {
+  def ++(other : CMS) : CMS = {
     other match {
-      case cms@CMSZero(_, _, _) => cms + this
-      case cms@CMSItem(_, _, _, _) => cms + this
+      case cms@CMSZero(_, _, _) => cms ++ this
+      case cms@CMSItem(_, _, _, _) => cms ++ this
       case cms@CMSInstance(_, _, _) => {
-        countsTable ++= cms.countsTable
-        totalCount += cms.totalCount
-        this
+        CMSInstance(hashes, countsTable ++ cms.countsTable, totalCount + cms.totalCount)
       }
     }
   }
   
   def estimateFrequency(item : Long) : Long = {
-    val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(hashes(i).compute(item)) }
+    val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(hashes(i)(item)) }
     estimates.min
   }
   
   /**
    * Updates the sketch with a new element from the data stream.
    */
-  def add(item : Long) : CMSInstance = add(item, 1)
-  def add(item : Long, count : Long) : CMSInstance = {
+  def +(item : Long) : CMSInstance = this + (item, 1L)
+  def +(item : Long, count : Long) : CMSInstance = {
     if (count < 0) {
       throw new Exception("Negative counts not implemented")
     } else {
-      (0 to (depth - 1)).foreach { i =>
-        val hash = hashes(i).compute(item)
-        countsTable += (i, hash, 1)
-      }
-      totalCount += count
+      val newCountsTable = 
+        (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
+          val pos = (row, hashes(row)(item))
+          table + (pos, count)
+        }
+      val newCount = totalCount + count
+      
+      CMSInstance(hashes, newCountsTable, newCount)
     }
-    this
+  }
+}
+
+object CMSInstance {
+  // Initializes a CMSInstance with all zeroes.
+  def apply(hashes : Seq[CMSHash], depth : Int, width : Int) : CMSInstance = {
+    CMSInstance(hashes, CMSCountsTable(depth, width), 0)
   }
 }
 
@@ -190,14 +207,14 @@ case class CMSInstance(hashes : Seq[CMSHash], depth : Int, width : Int) extends 
  *
  *   h(x) = [a * x + b (mod p)] (mod m)
  */
-case class CMSHash(a : Int, b : Int, width : Int) {
+case class CMSHash(a : Int, b : Int, width : Int) extends Function1[Long, Int] {
   
   val PRIME_MODULUS = (1L << 31) - 1
   
   /**
    * Returns a * x + b (mod p) (mod width)
    */
-  def compute(x : Long) : Int = {
+  def apply(x : Long) : Int = {
     val unmodded = a * x + b
     
     // Apparently a super fast way of computing x mod 2^p-1
@@ -216,26 +233,45 @@ case class CMSHash(a : Int, b : Int, width : Int) {
  * The 2-dimensional table of counters used in the Count-Min sketch.
  * Each row corresponds to a particular hash function.
  */
-case class CMSCountsTable(depth : Int, width : Int) {
+case class CMSCountsTable(counts : Vector[Vector[Long]]) {
   assert(depth > 0, "Table must have at least 1 row.")
   assert(width > 0, "Table must have at least 1 column.")
   
-  val counts : Array[Array[Long]] = Array.fill(depth, width)(0L)
+  def depth : Int = counts.size
+  def width : Int = counts(0).size
+  
+  def getCount(pos : (Int, Int)) : Long = {
+    val (row, col) = pos    
 
-  def +=(row : Int, col : Int, count : Long) = { 
-    counts(row)(col) += count
+    assert(row < depth && col < width, "Position must be within the bounds of this table.")
+
+    counts(row)(col)
+  }
+  
+  /**
+   * Updates the count of a single cell in the table.
+   */
+  def +(pos : (Int, Int), count : Long) : CMSCountsTable = { 
+    val (row, col) = pos
+    val currCount = getCount(pos)
+    val newCounts = counts.updated(row, counts(row).updated(col, currCount + count))
+    
+    CMSCountsTable(newCounts)
   }
   
   /**
    * Adds another counts table to this one, through elementwise addition.
    */
-  def ++=(other : CMSCountsTable) = {
+  def ++(other : CMSCountsTable) : CMSCountsTable = {
     assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
     
-    (0 to (depth - 1)).foreach { row =>
-      (0 to (width - 1)).foreach { col =>
-        this += (row, col, other.counts(row)(col))
-      }
+    (0 to (depth - 1)).zip(0 to (width - 1)).foldLeft(this) { 
+      case (table, pos) => table + (pos, other.getCount(pos))
     }
   }
+}
+
+object CMSCountsTable {  
+   // Creates a new CMSCountsTable with counts initialized to all zeroes.
+  def apply(depth : Int, width : Int) : CMSCountsTable = CMSCountsTable(Vector.fill[Long](depth, width)(0L))
 }
