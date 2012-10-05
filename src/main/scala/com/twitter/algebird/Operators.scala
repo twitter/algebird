@@ -20,6 +20,7 @@ object Operators {
   implicit def toMinus[T : Group](t : T) = new MinusOp(t)
   implicit def toTimes[T : Ring](t : T) = new TimesOp(t)
   implicit def toDiv[T : Field](t : T) = new DivOp(t)
+  implicit def toRichTraversable[T](t : Traversable[T]) = new RichTraversable(t)
 }
 
 class PlusOp[T : Monoid](t : T) {
@@ -36,4 +37,9 @@ class TimesOp[T : Ring](t : T) {
 
 class DivOp[T : Field](t : T) {
   def /(other : T) = implicitly[Field[T]].div(t, other)
+}
+
+class RichTraversable[T](t : Traversable[T]) {
+  def monoidSum(implicit monoid : Monoid[T]) = monoid.sum(t)
+  def ringProduct(implicit ring : Ring[T]) = ring.product(t)
 }
