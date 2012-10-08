@@ -19,7 +19,7 @@ package com.twitter.algebird
 class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   // Note that forall is true for empty lists:
-  override def isNonZero(v: IndexedSeq[T]) = (v.size > 0) && v.forall { t => mont.isNonZero(t) }
+  override def isNonZero(v: IndexedSeq[T]) = v.exists { t => mont.isNonZero(t) }
   // We append mont.zero on the shorter of the two inputs:
   def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
     // We need them to be the same length:
