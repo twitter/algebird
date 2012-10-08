@@ -39,8 +39,8 @@ trait BaseProperties {
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
-    (grp.plus(grp.negate(a), a) == grp.zero) && (grp.minus(a,a) == grp.zero) &&
-      (grp.plus(a, grp.negate(a)) == grp.zero)
+    (!grp.isNonZero(grp.plus(grp.negate(a), a))) && (!grp.isNonZero(grp.minus(a,a))) &&
+      (!grp.isNonZero(grp.plus(a, grp.negate(a))))
   }
 
   def groupLaws[T : Group : Arbitrary] = monoidLaws[T] && hasAdditiveInverses[T]
@@ -58,8 +58,8 @@ trait BaseProperties {
     val rng = implicitly[Ring[T]]
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
   }
-  def ringLaws[T : Ring : Arbitrary] = validOne[T] && isDistributive[T] &&
-    groupLaws[T] && timesIsAssociative[T]
+  def pseudoRingLaws[T:Ring:Arbitrary] = isDistributive[T] && timesIsAssociative[T] && groupLaws[T]
+  def ringLaws[T : Ring : Arbitrary] = validOne[T] && pseudoRingLaws[T]
 
   def hasMultiplicativeInverse[T : Field : Arbitrary] = forAll { (a : T) =>
     val fld = implicitly[Field[T]]
