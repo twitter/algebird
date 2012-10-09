@@ -86,6 +86,29 @@ object MomentsMonoid extends Monoid[Moments] {
 
   	Moments(countCombined, meanCombined, m2, m3, m4)
   }
+
+  def minus(a: Moments, b: Moments) : Moments ={
+    val differenceCount = a.count - b.count
+    // differenceMean should be calculated with getCombinedMean but getCombinedMean needs some
+    // altering to be able to hand a negative count properly
+    val differenceMean = (a.count * a.mean - b.count * b.mean) / differenceCount
+    val delta = b.mean - differenceMean
+
+    val m2 = a.m2 - b.m2 - math.pow(delta, 2) * differenceCount * b.count / a.count
+
+    val m3 = a.m3 - b.m3 - 
+             math.pow(delta, 3) * differenceCount * b.count * (differenceCount - b.count) / math.pow(a.count, 2) -
+             3 * delta * (differenceCount * b.m2 - b.count * m2) / a.count
+
+    val m4 = a.m4 - b.m4 -
+             math.pow(delta, 4) * differenceCount * b.count * (math.pow(differenceCount, 2) -
+             differenceCount * b.count + math.pow(b.count, 2)) / math.pow(a.count, 3) -
+             6 * math.pow(delta, 2) * (math.pow(differenceCount, 2) * b.m2 +
+             math.pow(b.count, 2) * m2) / math.pow(a.count, 2) -
+             4 * delta * (differenceCount * b.m3 - b.count * m3) / a.count
+             
+    Moments(countCombined, meanCombined, m2, m3, m4)
+  }
   
   /**
    * Given two streams of doubles A and B, with the specified counts and means,
