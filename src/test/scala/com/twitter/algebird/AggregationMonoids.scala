@@ -20,14 +20,16 @@ object AggregationMonoidSpecification extends Properties("Aggregations") with Ba
   }
 
   implicit val avgen = Arbitrary { for {
-    cnt <- choose(1L,Int.MaxValue.toLong)
+    cnt <- choose(Int.MinValue.toLong, Int.MaxValue.toLong)
     v <- choose(-1e100, 1e100) // Don't get too big and overflow
   } yield AveragedValue(cnt, v) }
 
-  property("AveragedValue Monoid laws") = monoidLawsEq[AveragedValue] { (avl, avr) =>
-    approxEq(avl.value, avr.value) && (avl.count == avr.count)
+  property("AveragedValue Group laws") = groupLawsEq[AveragedValue] { (avl, avr) =>
+    ((avl.count == 0L) && (avr.count == 0L)) || {
+      approxEq(avl.value, avr.value) && (avl.count == avr.count)
+    }
   }
-  
+
   implicit val momentsgen = Arbitrary { for {
     m0 <- choose(1L,Int.MaxValue.toLong)
     m1 <- choose(-1e50, 1e50)
@@ -38,9 +40,9 @@ object AggregationMonoidSpecification extends Properties("Aggregations") with Ba
 
   property("Moments Monoid laws") = monoidLawsEq[Moments] { (ml, mr) =>
     (ml.m0 == mr.m0) &&
-    approxEq(ml.m1, mr.m1) && 
-    approxEq(ml.m2, mr.m2) && 
-    approxEq(ml.m3, mr.m3) && 
+    approxEq(ml.m1, mr.m1) &&
+    approxEq(ml.m2, mr.m2) &&
+    approxEq(ml.m3, mr.m3) &&
     approxEq(ml.m4, mr.m4)
-  }  
+  }
 }

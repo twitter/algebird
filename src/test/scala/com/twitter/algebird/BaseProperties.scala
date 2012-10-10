@@ -5,6 +5,8 @@ import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 
 trait BaseProperties {
+  def defaultEq[T](t0 : T, t1 : T) = t0 == t1
+
   def weakZero[T : Monoid : Arbitrary] = forAll { (a : T) =>
     val mon = implicitly[Monoid[T]]
     val zero = mon.zero
@@ -12,26 +14,19 @@ trait BaseProperties {
     (mon.plus(a, zero) == mon.plus(zero, a))
   }
 
-  def validZero[T : Monoid : Arbitrary] = forAll { (a : T) =>
-    val mon = implicitly[Monoid[T]]
-    val zero = mon.zero
-   (a == mon.plus(a, zero))
-  } && weakZero[T]
-
   def validZeroEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T) =>
     val mon = implicitly[Monoid[T]]
     val zero = mon.zero
     eqfn(a, mon.plus(a, zero)) && eqfn(mon.plus(zero, a), a) && eqfn(mon.plus(a,zero),mon.plus(zero,a))
   }
+  def validZero[T : Monoid : Arbitrary] = validZeroEq[T](defaultEq _)
 
-  def isAssociative[T : Monoid : Arbitrary] = forAll { (a : T, b : T, c : T) =>
-    val mon = implicitly[Monoid[T]]
-    mon.plus(a, mon.plus(b,c)) == mon.plus(mon.plus(a,b), c)
-  }
   def isAssociativeEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T, b : T, c : T) =>
     val mon = implicitly[Monoid[T]]
     eqfn(mon.plus(a, mon.plus(b,c)), mon.plus(mon.plus(a,b), c))
   }
+  def isAssociative[T : Monoid : Arbitrary] = isAssociativeEq[T](defaultEq _)
+
   def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T]
   def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = {
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
@@ -39,9 +34,12 @@ trait BaseProperties {
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
-    (!grp.isNonZero(grp.plus(grp.negate(a), a))) && (!grp.isNonZero(grp.minus(a,a))) &&
+    (!grp.isNonZero(grp.plus(grp.negate(a), a))) &&
+      (!grp.isNonZero(grp.minus(a,a))) &&
       (!grp.isNonZero(grp.plus(a, grp.negate(a))))
   }
+
+  def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) && hasAdditiveInverses[T]
 
   def groupLaws[T : Group : Arbitrary] = monoidLaws[T] && hasAdditiveInverses[T]
 
@@ -70,4 +68,3 @@ trait BaseProperties {
   }
   def fieldLaws[T : Field : Arbitrary] = ringLaws[T] && hasMultiplicativeInverse[T]
 }
-

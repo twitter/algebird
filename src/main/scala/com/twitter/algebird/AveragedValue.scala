@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 object AveragedValue {
-  implicit val monoid = AveragedMonoid
+  implicit val group = AveragedGroup
   def apply[V <% Double](v : V) = new AveragedValue(1L, v)
   def apply[V <% Double](c : Long, v : V) = new AveragedValue(c, v)
 }
@@ -25,7 +25,7 @@ object AveragedValue {
 
 case class AveragedValue(count : Long, value : Double)
 
-object AveragedMonoid extends Monoid[AveragedValue] {
+object AveragedGroup extends Group[AveragedValue] {
   // When combining averages, if the counts sizes are too close we should use a different
   // algorithm.  This constant defines how close the ratio of the smaller to the total count
   // can be:
@@ -37,6 +37,11 @@ object AveragedMonoid extends Monoid[AveragedValue] {
    * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
    */
   val zero = AveragedValue(0L, 0.0)
+
+  override def isNonZero(av : AveragedValue) = (av.count != 0L)
+
+  override def negate(av : AveragedValue) = AveragedValue(-av.count, av.value)
+
   def plus(cntAve1 : AveragedValue, cntAve2 : AveragedValue) : AveragedValue = {
     val (big, small) = if (cntAve1.count >= cntAve2.count)
         (cntAve1, cntAve2)
@@ -44,14 +49,17 @@ object AveragedMonoid extends Monoid[AveragedValue] {
         (cntAve2, cntAve1)
     val n = big.count
     val k = small.count
-    if (k == 0L) {
+    val newCnt = n + k
+    if (newCnt == n) {
       // Handle zero without allocation
       big
+    }
+    else if (newCnt == 0L) {
+      zero
     }
     else {
       val an = big.value
       val ak = small.value
-      val newCnt = n+k
       val scaling = k.toDouble/newCnt
       // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
       val newAve = if (scaling < STABILITY_CONSTANT) (an + (ak - an)*scaling) else (n*an + k*ak)/newCnt
