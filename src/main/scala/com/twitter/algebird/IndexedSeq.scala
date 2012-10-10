@@ -16,9 +16,12 @@ limitations under the License.
 
 package com.twitter.algebird
 
+/** Note that this works similar to Monoid[Map[Int,T]] not like Monoid[List[T]]
+ * This does element-wise operations, like standard vector math, not concatenation,
+ * like Monoid[String] or Monoid[List[T]]
+ */
 class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
-  // Note that forall is true for empty lists:
   override def isNonZero(v: IndexedSeq[T]) = v.exists { t => mont.isNonZero(t) }
   // We append mont.zero on the shorter of the two inputs:
   def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
