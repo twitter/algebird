@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
+import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 
@@ -41,6 +42,10 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
   property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
   // We haven't implemented ring.one yet for the Map, so skip the one property
   property("Map is distributive") = isDistributive[Map[Int,Int]]
+  implicit def arbIndexedSeq[T:Arbitrary] : Arbitrary[IndexedSeq[T]] =
+    Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
+
+  property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
   // Either is actually a semigroup, but we don't yet have a typeclass for that:
   property("Either is semigroup") = isAssociative[Either[String,Int]]
