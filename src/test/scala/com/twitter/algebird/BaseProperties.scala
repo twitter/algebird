@@ -32,16 +32,14 @@ trait BaseProperties {
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
   }
 
-  def hasAdditiveInversesEq[T: Group : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T) =>
+  def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
-    eqfn(grp.plus(grp.negate(a), a), grp.zero) &&
-      eqfn(grp.minus(a,a), grp.zero) &&
-      eqfn(grp.plus(a, grp.negate(a)), grp.zero)
+    (!grp.isNonZero(grp.plus(grp.negate(a), a))) &&
+      (!grp.isNonZero(grp.minus(a,a))) &&
+      (!grp.isNonZero(grp.plus(a, grp.negate(a))))
   }
-  def hasAdditiveInverses[T: Group : Arbitrary] = hasAdditiveInversesEq[T](defaultEq _)
 
-  def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) &&
-    hasAdditiveInversesEq[T](eqfn)
+  def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) && hasAdditiveInverses[T]
 
   def groupLaws[T : Group : Arbitrary] = monoidLaws[T] && hasAdditiveInverses[T]
 
@@ -58,8 +56,8 @@ trait BaseProperties {
     val rng = implicitly[Ring[T]]
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
   }
-  def ringLaws[T : Ring : Arbitrary] = validOne[T] && isDistributive[T] &&
-    groupLaws[T] && timesIsAssociative[T]
+  def pseudoRingLaws[T:Ring:Arbitrary] = isDistributive[T] && timesIsAssociative[T] && groupLaws[T]
+  def ringLaws[T : Ring : Arbitrary] = validOne[T] && pseudoRingLaws[T]
 
   def hasMultiplicativeInverse[T : Field : Arbitrary] = forAll { (a : T) =>
     val fld = implicitly[Field[T]]
@@ -70,4 +68,3 @@ trait BaseProperties {
   }
   def fieldLaws[T : Field : Arbitrary] = ringLaws[T] && hasMultiplicativeInverse[T]
 }
-
