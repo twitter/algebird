@@ -40,7 +40,7 @@ case class Moments(m0 : Long, m1 : Double, m2 : Double, m3 : Double, m4 : Double
 }
 
 object Moments {
-  implicit val monoid = MomentsMonoid
+  implicit val group = MomentsGroup
   
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
@@ -53,7 +53,7 @@ object Moments {
 /**
  * A monoid to perform moment calculations.
  */
-object MomentsMonoid extends Monoid[Moments] {
+object MomentsGroup extends Group[Moments] {
 
   // When combining averages, if the counts sizes are too close we should use a different
   // algorithm. This constant defines how close the ratio of the smaller to the total count
@@ -61,13 +61,19 @@ object MomentsMonoid extends Monoid[Moments] {
   private val STABILITY_CONSTANT = 0.1
 
   val zero = Moments(0L, 0.0, 0.0, 0.0, 0.0)
+
+  override def negate(a : Moments) : Moments = {
+    Moments(-a.count, a.m1, -a.m2, -a.m3, -a.m4)
+  }
   
   // Combines the moment calculations from two streams.
   // See http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Higher-order_statistics
   // for more information on the formulas used to update the moments.
   def plus(a : Moments, b : Moments) : Moments = {
     val delta = b.mean - a.mean
-    val countCombined = a.count + b.count  
+    val countCombined = a.count + b.count
+    if(countCombined == 0)
+      return zero
   	val meanCombined = getCombinedMean(a.count, a.mean, b.count, b.mean)  
 
     val m2 = a.m2 + b.m2 + 
@@ -86,14 +92,14 @@ object MomentsMonoid extends Monoid[Moments] {
 
   	Moments(countCombined, meanCombined, m2, m3, m4)
   }
-  
+
   /**
    * Given two streams of doubles A and B, with the specified counts and means,
    * calculate the mean of the combined stream.
    */
   def getCombinedMean(countA: Long, meanA: Double, countB: Long, meanB: Double): Double = {
     val (big, small) =
-      if (countA >= countB)
+      if (math.abs(countA) >= math.abs(countB))
         ((countA, meanA), (countB, meanB))
       else
         ((countB, meanB), (countA, meanA))
@@ -107,7 +113,7 @@ object MomentsMonoid extends Monoid[Moments] {
       val countCombined = countSmall + countBig
       val scaling = countSmall.toDouble / countCombined
       val meanCombined =
-        if (scaling < STABILITY_CONSTANT)
+        if (math.abs(scaling) < STABILITY_CONSTANT)
           // This formula for the combined mean is only stable if
           // countA is not approximately countB.
           meanBig + (meanSmall - meanBig) * scaling

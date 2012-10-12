@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.specs._
 
-class MomentsMonoidTest extends Specification {
+class MomentsGroupTest extends Specification {
   noDetailedDiffs()
   
   /**
@@ -10,7 +10,7 @@ class MomentsMonoidTest extends Specification {
    * the list's central moments.
    */
   def getMoments(xs : List[Double]) : Moments = 
-    xs.foldLeft(MomentsMonoid.zero) { (m, x) => MomentsMonoid.plus(m, Moments(x)) }
+    xs.foldLeft(MomentsGroup.zero) { (m, x) => MomentsGroup.plus(m, Moments(x)) }
 
   def testApproxEq(f1 : Double, f2 : Double) {
     if (f2 == 0)
