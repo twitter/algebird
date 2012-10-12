@@ -38,7 +38,7 @@ object AggregationMonoidSpecification extends Properties("Aggregations") with Ba
     m4 <- choose(0, 1e50)
   } yield new Moments(m0, m1, m2, m3, m4) }
 
-  property("Moments Monoid laws") = groupLawsEq[Moments] { (ml, mr) =>
+  property("Moments Group laws") = groupLawsEq[Moments] { (ml, mr) =>
     (ml.m0 == mr.m0) &&
     approxEq(ml.m1, mr.m1) &&
     approxEq(ml.m2, mr.m2) &&

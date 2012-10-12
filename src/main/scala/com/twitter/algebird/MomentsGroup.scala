@@ -40,7 +40,7 @@ case class Moments(m0 : Long, m1 : Double, m2 : Double, m3 : Double, m4 : Double
 }
 
 object Moments {
-  implicit val group = MomentsMonoid
+  implicit val group = MomentsGroup
   
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
@@ -53,7 +53,7 @@ object Moments {
 /**
  * A monoid to perform moment calculations.
  */
-object MomentsMonoid extends Group[Moments] {
+object MomentsGroup extends Group[Moments] {
 
   // When combining averages, if the counts sizes are too close we should use a different
   // algorithm. This constant defines how close the ratio of the smaller to the total count
