@@ -1,7 +1,6 @@
 package com.twitter.algebird
 
 import java.nio._
-import com.google.common.hash._
 
 /**
   * Instances of MinHasher can create, combine, and compare fixed-sized signatures of
@@ -48,7 +47,7 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map{i => Hashing.murmur3_128(r.nextInt)}    
+    (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}    
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
@@ -68,24 +67,29 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
   def buckets(sig : Array[Byte]) = {
     sig.grouped(numRows*hashSize).toList.map{band =>
-      hashFunctions.head.hashBytes(band).toString
+      val (long1, long2) = hashFunctions.head(band)
+      long1
     }
   }
 
   /** Create a signature for a single Long value */
-  def init(value : Long) : Array[Byte] = init{_.hashLong(value)}
+  def init(value : Long) : Array[Byte] = init{_(value)}
 
   /** Create a signature for a single String value */
-  def init(value : String) : Array[Byte]= init{_.hashString(value)}
+  def init(value : String) : Array[Byte]= init{_(value)}
 
   /** Create a signature for an arbitrary value */
-  def init(fn : HashFunction => HashCode) : Array[Byte] = {
+  def init(fn : MurmurHash128 => (Long,Long)) : Array[Byte] = {
     val bytes = new Array[Byte](numBytes)
-    var offset = 0
+    val buffer = ByteBuffer.allocate(hashFunctions.size * 16)
+    val longBuffer = buffer.asLongBuffer
     hashFunctions.foreach{h =>
-      val hashCode = fn(h)
-      offset += hashCode.writeBytesTo(bytes, offset, numBytes - offset)
+      val (long1, long2) = fn(h)
+      longBuffer.put(long1)
+      longBuffer.put(long2)
     }
+    buffer.rewind
+    buffer.get(bytes)
     bytes
   }
 

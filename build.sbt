@@ -14,8 +14,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
-  "org.scala-tools.testing" % "specs_2.9.0-1" % "1.6.8" % "test",
-  "com.google.guava" % "guava" % "12.0"
+  "org.scala-tools.testing" % "specs_2.9.0-1" % "1.6.8" % "test"
 )
 
 parallelExecution in Test := true
