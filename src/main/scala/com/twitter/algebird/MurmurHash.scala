@@ -12,9 +12,7 @@ case class MurmurHash128(seed : Long) {
   def apply(maxBytes : Int, fn : ByteBuffer => Unit) : (Long, Long) = {
     val buffer = ByteBuffer.allocate(maxBytes)
     fn(buffer)
-    val length = buffer.position
-    buffer.rewind
-    apply(buffer, 0, length)
+    apply(buffer, 0, maxBytes)
   }
   def apply(array : Array[Char]) : (Long, Long) = apply(array.size * 2, {_.asCharBuffer.put(array)}) 
   def apply(array : Array[Short]) : (Long, Long) = apply(array.size * 2, {_.asShortBuffer.put(array)})
@@ -32,8 +30,6 @@ case class MurmurHash128(seed : Long) {
 
   def apply(string : CharSequence) : (Long, Long) = apply(string.length * 2, {buffer =>
     val charBuffer = buffer.asCharBuffer
-    var i = 0
-    while(i < string.length)
-      charBuffer.put(string.charAt(i))
+    0.to(string.length - 1).foreach{i => charBuffer.put(string.charAt(i))}
   })
 }
