@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-trait Aggregator[A,B,C] extends Function1[TraversableOnce[A], C]{
+trait Aggregator[A,B,C] extends Function1[TraversableOnce[A], C] with java.io.Serializable {
   def prepare(input : A) : B
   def reduce(l : B, r : B) : B
   def present(reduction : B) : C
