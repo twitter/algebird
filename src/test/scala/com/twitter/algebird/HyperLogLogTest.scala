@@ -18,7 +18,7 @@ object HyperLogLogLaws extends Properties("HyperLogLog") with BaseProperties {
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLaws[HLLInstance]
+  property("HyperLogLog is a Monoid") = monoidLaws[HLL]
 }
 
 class HyperLogLogTest extends Specification {
@@ -32,6 +32,7 @@ class HyperLogLogTest extends Specification {
     val hll = new HyperLogLogMonoid(bits)
     hll.estimateSize(hll.sum(it.map { hll(_) }))
   }
+
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
 
   def exactIntersect[T](it : Seq[Iterable[T]]) : Int = {
@@ -65,10 +66,6 @@ class HyperLogLogTest extends Specification {
   }
 
   "HyperLogLog" should {
-     "count with 4-bits" in {
-        test(4)
-        testLong(4)
-     }
      "count with 5-bits" in {
         test(5)
         testLong(5)
@@ -81,14 +78,26 @@ class HyperLogLogTest extends Specification {
         test(7)
         testLong(7)
      }
+     "count with 10-bits" in {
+        test(10)
+        testLong(10)
+     }
      "count intersections of 2" in { testLongIntersection(10,2) }
      "count intersections of 3" in { testLongIntersection(10,3) }
      "count intersections of 4" in { testLongIntersection(10,4) }
 
      "throw error for differently sized HLL instances" in {
-        val larger = new HLLInstance((1L << 32) + 1) // uses implicit long2Bytes to make 8 byte array
-        val smaller = new HLLInstance(2) // uses implicit int2Bytes to make 4 byte array
+        val bigMon = new HyperLogLogMonoid(5)
+        val smallMon = new HyperLogLogMonoid(4)
+        val larger = bigMon(1) // uses implicit long2Bytes to make 8 byte array
+        val smaller = smallMon(1) // uses implicit int2Bytes to make 4 byte array
         (larger + smaller) must throwA[AssertionError]
+     }
+     "Correctly serialize" in {
+       val mon = new HyperLogLogMonoid(10)
+       fromBytes(toBytes(HLLZero)) must be_==(HLLZero)
+       fromBytes(toBytes(mon(12))) must be_==(mon(12))
+       fromBytes(toBytes(mon(12) + mon(13))) must be_==(mon(12) + mon(13))
      }
   }
 }

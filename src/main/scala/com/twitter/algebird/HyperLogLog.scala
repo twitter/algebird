@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.BitSet
 
 import java.util.Arrays
@@ -27,8 +28,11 @@ import java.util.Arrays
  * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
  */
 object HyperLogLog {
-  val md = java.security.MessageDigest.getInstance("MD5")
-  def hash(input : Array[Byte]) : Array[Byte] = md.digest(input)
+
+  def hash(input : Array[Byte]) : Array[Byte] = {
+    val md = java.security.MessageDigest.getInstance("MD5")
+    md.digest(input)
+  }
 
   implicit def int2Bytes(i : Int) = {
     val buf = new Array[Byte](4)
@@ -62,27 +66,109 @@ object HyperLogLog {
       }
     }
   }
+
+  // We are computing j and \rho(w) from the paper,
+  // sorry for the name, but it allows someone to compare to the paper
+  // extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
+  def jRhoW(in : Array[Byte], bits: Int) : (Int,Byte) = {
+    val onBits = HyperLogLog.bytesToBitSet(in)
+    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
+     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
+  }
+
+  def toBytes(h : HLL) : Array[Byte] = {
+    h match {
+      case HLLZero => Array[Byte](0)
+      case HLLItem(sz,idx,bv) => {
+        val buf = new Array[Byte](1 + 4 + 4 + 1)
+        java.nio.ByteBuffer
+          .wrap(buf)
+          .put(1 : Byte) //Indicator of HLLItem
+          .putInt(sz)
+          .putInt(idx)
+          .put(bv)
+        buf
+      }
+      case HLLInstance(v) => (Array[Byte](2) ++ v)
+    }
+  }
+
+  def fromBytes(bytes : Array[Byte]) : HLL = {
+    // Make sure to be reversible so fromBytes(toBytes(x)) == x
+    val bb = java.nio.ByteBuffer.wrap(bytes)
+    bb.get.toInt match {
+      case 0 => HLLZero
+      case 1 => {
+        HLLItem(bb.getInt, bb.getInt, bb.get)
+      }
+      case 2 => {
+        HLLInstance(bytes.toIndexedSeq.tail)
+      }
+      case _ => {
+        throw new Exception("Unrecognized HLL type: " + bytes(0))
+      }
+    }
+  }
+}
+
+sealed abstract class HLL extends java.io.Serializable {
+  def +(other : HLL) : HLL
+}
+
+case object HLLZero extends HLL {
+  def +(other : HLL) = other
+}
+
+case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
+  def +(other : HLL) = {
+    other match {
+      case HLLZero => this
+      case HLLItem(sz, oJ, oRhow) => {
+        assert(sz == size, "Must use compatible HLL size")
+        if (oJ == j) {
+          // Just keep the max
+          HLLItem(size, j, oRhow max rhow)
+        }
+        else {
+          //They are certainly different
+          HLLInstance(toHLLInstance.v.updated(oJ, oRhow))
+        }
+      }
+      case HLLInstance(ov) => {
+        if(ov(j) >= rhow) {
+          //No need to update
+          other
+        }
+        else {
+          //replace:
+          HLLInstance(ov.updated(j, rhow))
+        }
+      }
+    }
+  }
+
+  lazy val toHLLInstance = HLLInstance(Vector.fill(size)(0 : Byte).updated(j,rhow))
 }
 
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
+case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
   lazy val zeroCnt = v.count { _ == 0 }
-  lazy val isZero = zeroCnt == v.size
 
-  def +(other : HLLInstance) : HLLInstance = {
-    assert(v.size == other.v.size, "HLLInstances must use the same memory size")
-    new HLLInstance(v.view
-      .zip(other.v)
-      .map { pair => pair._1 max pair._2 }
-      .toArray)
+  def +(other : HLL) : HLL = {
+    other match {
+      case HLLZero => this
+      case hit@HLLItem(_,_,_) => (hit + this) //Already implemented in HLLItem
+      case HLLInstance(ov) => {
+        assert(ov.size == v.size, "HLLInstance must have the same size")
+        HLLInstance(v.view
+          .zip(ov)
+          .map { pair => pair._1 max pair._2 }
+          .toIndexedSeq)
+      }
+    }
   }
-
-  override def equals(other: Any) = {
-    other.isInstanceOf[HLLInstance] && Arrays.equals(v, other.asInstanceOf[HLLInstance].v)
-  }
-
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
   lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
@@ -90,12 +176,12 @@ case class HLLInstance(v : Array[Byte]) extends java.io.Serializable {
 
 /*
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
- * which means each HLLInstance is about 2^{12 + 2} = 16kb per instance.
+ * which means each HLLInstance is about 2^{12} = 4kb per instance.
  */
-class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
+class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
   import HyperLogLog._
 
-  assert(bits > 3, "Use at least 4 bits (2^(bits+2) = bytes consumed)")
+  assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
   // These parameters come from the paper
   val (alpha, memSize) = bits match {
     case 4 => (0.673, 1 << 4)
@@ -109,26 +195,14 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
 
   def apply[T <% Array[Byte]](t : T) = create(t)
 
-  // We are computing j and \rho(w) from the paper,
-  // sorry for the name, but it allows someone to compare
-  // to the paper
-  // extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-  protected def jRhoW(in : Array[Byte]) : (Int,Byte) = {
-    val onBits = HyperLogLog.bytesToBitSet(in)
-    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
-     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
-  }
+  val zero : HLL = HLLZero
 
-  protected val zeroVector = new Array[Byte](memSize)
+  def plus(left : HLL, right : HLL) = left + right
 
-  lazy val zero : HLLInstance = new HLLInstance(zeroVector)
-
-  def plus(left : HLLInstance, right : HLLInstance) = left + right
-
-  def create(example : Array[Byte]) : HLLInstance = {
-    val hashed = HyperLogLog.hash(example)
-    val (j,rhow) = jRhoW(hashed)
-    new HLLInstance(zeroVector.updated(j, rhow))
+  def create(example : Array[Byte]) : HLL = {
+    val hashed = hash(example)
+    val (j,rhow) = jRhoW(hashed, bits)
+    HLLItem(memSize,j,rhow)
   }
 
   private val largeE = HyperLogLog.twopow(32)/30.0
@@ -148,7 +222,16 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
   // Some constant from the algorithm:
   protected val fourBillionSome = HyperLogLog.twopow(32)
 
-  final def estimateSize(hi : HLLInstance) : Double = {
+
+  final def estimateSize(hll : HLL) : Double = {
+    hll match {
+      case HLLZero => 0.0
+      case HLLItem(_,_,_) => 1.0
+      case hi@HLLInstance(_) => estimateSizeInstance(hi)
+    }
+  }
+
+  protected def estimateSizeInstance(hi : HLLInstance) : Double = {
     val e = factor * hi.z
     // There are large and small value corrections from the paper
     if(e > largeE) {
@@ -162,8 +245,8 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLLInstance] {
     }
   }
 
-  // The error for k items is ~ (2^{k} - 1) * error of single HLLInstance
-  final def estimateIntersectionSize(his : Seq[HLLInstance]) : Double = {
+  // The error for k items is ~ (2^{k} - 1) * error of single HLL
+  final def estimateIntersectionSize(his : Seq[HLL]) : Double = {
     his.headOption.map { head =>
       val tail = his.tail
       /*

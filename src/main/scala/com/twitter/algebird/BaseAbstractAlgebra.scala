@@ -124,7 +124,7 @@ class OptionMonoid[T](implicit mon : Monoid[T]) extends Monoid[Option[T]] {
 class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
   extends Monoid[Either[L,R]] {
   // TODO: remove this when we add a semi-group class
-  override def zero = error("Either is a semi-group, there is no zero. Wrap with Option[Either[L,R]] to get a monoid.")
+  override def zero = sys.error("Either is a semi-group, there is no zero. Wrap with Option[Either[L,R]] to get a monoid.")
   override def plus(l : Either[L,R], r : Either[L,R]) = {
     if(l.isLeft) {
       // l is Left, r may or may not be:
@@ -208,7 +208,7 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   override def zero = {
     (t : T) => t
   }
-  
+
   override def plus(f1 : Function1[T,T], f2 : Function1[T,T]) = {
     (t : T) => f1(f2(t))
   }
@@ -255,7 +255,7 @@ class MapRing[K,V](implicit ring : Ring[V]) extends MapGroup[K,V]()(ring) with R
   // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
   // Then we have to manage the delta from this map as we add elements.  That said, it
   // is not actually needed in matrix multiplication, so we are punting on it for now.
-  override def one = error("multiplicative identity for Map unimplemented")
+  override def one = sys.error("multiplicative identity for Map unimplemented")
   override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
     small.foldLeft(zero) { (oldMap, kv) =>
@@ -414,6 +414,7 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val stringMonoid : Monoid[String] = StringMonoid
   implicit def optionMonoid[T : Monoid] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
+  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
@@ -434,15 +435,16 @@ object Group extends GeneratedGroupImplicits {
   implicit val boolGroup : Group[Boolean] = BooleanField
   implicit val jboolGroup : Group[JBool] = JBoolField
   implicit val intGroup : Group[Int] = IntRing
-  implicit val jintGroup : Group[JInt] = JIntRing  
+  implicit val jintGroup : Group[JInt] = JIntRing
   implicit val shortGroup : Group[Short] = ShortRing
-  implicit val jshortGroup : Group[JShort] = JShortRing  
+  implicit val jshortGroup : Group[JShort] = JShortRing
   implicit val longGroup : Group[Long] = LongRing
   implicit val jlongGroup : Group[JLong] = JLongRing
   implicit val floatGroup : Group[Float] = FloatField
   implicit val jfloatGroup : Group[JFloat] = JFloatField
   implicit val doubleGroup : Group[Double] = DoubleField
   implicit val jdoubleGroup : Group[JDouble] = JDoubleField
+  implicit def indexedSeqGroup[T:Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
   implicit def mapGroup[K,V](implicit group : Group[V]) = new MapGroup[K,V]()(group)
   implicit def pairGroup[T,U](implicit tg : Group[T], ug : Group[U]) : Group[(T,U)] = {
     new Tuple2Group[T,U]()(tg,ug)
@@ -460,13 +462,14 @@ object Ring extends GeneratedRingImplicits {
   implicit val intRing : Ring[Int] = IntRing
   implicit val jintRing : Ring[JInt] = JIntRing
   implicit val shortRing : Ring[Short] = ShortRing
-  implicit val jshortRing : Ring[JShort] = JShortRing  
+  implicit val jshortRing : Ring[JShort] = JShortRing
   implicit val longRing : Ring[Long] = LongRing
   implicit val jlongRing : Ring[JLong] = JLongRing
   implicit val floatRing : Ring[Float] = FloatField
   implicit val jfloatRing : Ring[JFloat] = JFloatField
   implicit val doubleRing : Ring[Double] = DoubleField
   implicit val jdoubleRing : Ring[JDouble] = JDoubleField
+  implicit def indexedSeqRing[T:Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
   implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
   implicit def pairRing[T,U](implicit tr : Ring[T], ur : Ring[U]) : Ring[(T,U)] = {
     new Tuple2Ring[T,U]()(tr,ur)
