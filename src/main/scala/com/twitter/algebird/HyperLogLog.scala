@@ -29,9 +29,11 @@ import java.util.Arrays
  */
 object HyperLogLog {
 
-  def hash(input : Array[Byte]) : Array[Byte] = {
-    val md = java.security.MessageDigest.getInstance("MD5")
-    md.digest(input)
+  lazy val hash = {
+    /** This seed could be anything */
+    val seed = 123456789
+    val r = new scala.util.Random(seed)
+    MurmurHash128(r.nextLong)
   }
 
   implicit def int2Bytes(i : Int) = {
