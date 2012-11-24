@@ -57,6 +57,8 @@ trait BaseProperties {
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
   }
   def pseudoRingLaws[T:Ring:Arbitrary] = isDistributive[T] && timesIsAssociative[T] && groupLaws[T]
+  def semiringLaws[T:Ring:Arbitrary] =
+    isDistributive[T] && timesIsAssociative[T] && validOne[T] && validZero[T]
   def ringLaws[T : Ring : Arbitrary] = validOne[T] && pseudoRingLaws[T]
 
   def hasMultiplicativeInverse[T : Field : Arbitrary] = forAll { (a : T) =>
