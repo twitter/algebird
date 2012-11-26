@@ -26,11 +26,19 @@ trait BaseProperties {
     eqfn(mon.plus(a, mon.plus(b,c)), mon.plus(mon.plus(a,b), c))
   }
   def isAssociative[T : Monoid : Arbitrary] = isAssociativeEq[T](defaultEq _)
+  def isCommutativeEq[T : Monoid : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
+    val mon = implicitly[Monoid[T]]
+    eqfn(mon.plus(a,b), mon.plus(b,a))
+  }
+  def isCommutative[T : Monoid : Arbitrary] = isCommutativeEq[T](defaultEq _)
 
   def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T]
   def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = {
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
   }
+  def commutativeMonoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
+    validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
+  def commutativeMonoidLaws[T:Monoid:Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
     val grp = implicitly[Group[T]]
@@ -42,10 +50,15 @@ trait BaseProperties {
   def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) && hasAdditiveInverses[T]
 
   def groupLaws[T : Group : Arbitrary] = monoidLaws[T] && hasAdditiveInverses[T]
-
+  // Here are multiplicative properties:
   def validOne[T : Ring : Arbitrary] = forAll { (a : T) =>
     val rng = implicitly[Ring[T]]
     (rng.times(rng.one, a) == rng.times(a, rng.one)) && (a == rng.times(a, rng.one))
+  }
+  def zeroAnnihilates[T:Ring:Arbitrary] = forAll { (a:T) =>
+    val ring = implicitly[Ring[T]]
+    (!ring.isNonZero(ring.times(a, ring.zero))) &&
+      (!ring.isNonZero(ring.times(ring.zero, a)))
   }
   def isDistributive[T : Ring : Arbitrary] = forAll { (a : T, b : T, c : T) =>
     val rng = implicitly[Ring[T]]
@@ -56,7 +69,14 @@ trait BaseProperties {
     val rng = implicitly[Ring[T]]
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
   }
-  def pseudoRingLaws[T:Ring:Arbitrary] = isDistributive[T] && timesIsAssociative[T] && groupLaws[T]
+  def pseudoRingLaws[T:Ring:Arbitrary] =
+    isDistributive[T] && timesIsAssociative[T] && groupLaws[T] && isCommutative[T]
+
+  def semiringLaws[T:Ring:Arbitrary] =
+    isDistributive[T] && timesIsAssociative[T] &&
+      validOne[T] && commutativeMonoidLaws[T] &&
+      zeroAnnihilates[T]
+
   def ringLaws[T : Ring : Arbitrary] = validOne[T] && pseudoRingLaws[T]
 
   def hasMultiplicativeInverse[T : Field : Arbitrary] = forAll { (a : T) =>
