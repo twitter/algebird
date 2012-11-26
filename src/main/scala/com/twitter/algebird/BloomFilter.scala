@@ -170,28 +170,28 @@ object BFInstance{
 case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]]{
   val size = numHashes
 
-  val digester = java.security.MessageDigest.getInstance("MD5")
-
   def apply(s: String) = nextHash(s.getBytes, numHashes)
 
-  private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Byte] = Seq.empty): Stream[Int] = {
+  private def splitLong(x: Long) = {
+    val upper = math.abs(x >> 32).toInt
+    val lower = math.abs((x << 32) >> 32).toInt
+    (upper, lower)
+  }
+
+  private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
     if(k == 0)
       Stream.empty
     else{
       val d = if(digested.isEmpty){
-        // update the salt (equal to the hash "id" k)
-        digester.update(k.toByte)
-        digester.digest(bytes).toSeq
+        val (a, b) = MurmurHash128(k)(bytes)
+        val (x1, x2) = splitLong(a)
+        val (x3, x4) = splitLong(b)
+        Seq(x1, x2, x3, x4)
       }else
         digested
 
-      val Seq(x1: Byte, x2: Byte, x3: Byte, x4: Byte, rest @ _*) = d
-
-      val int32value = (((((x1 << 8) | x2) << 8) | x3) << 8) | x4
-
-      Stream.cons(math.abs(int32value % width), nextHash(bytes, k - 1, rest.asInstanceOf[Seq[Byte]]))
+      Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
     }
   }
-
 }
 
