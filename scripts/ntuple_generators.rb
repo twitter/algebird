@@ -11,7 +11,7 @@
 PACKAGE_NAME = "com.twitter.algebird"
 
 # The tuple sizes we want.
-TUPLE_SIZES = (3..22).to_a
+TUPLE_SIZES = (2..22).to_a
 
 # Each element in a product tuple is of a certain type.
 # This provides an alphabet to draw types from.

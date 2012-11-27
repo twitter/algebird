@@ -360,36 +360,6 @@ object NullGroup extends Group[Null] {
   override def plus(l : Null, r : Null) = null
 }
 
-/**
-* Combine two monoids into a product monoid
-*/
-class Tuple2Monoid[T,U](implicit tmonoid : Monoid[T], umonoid : Monoid[U]) extends Monoid[(T,U)] {
-  override def zero = (tmonoid.zero, umonoid.zero)
-  override def plus(l : (T,U), r : (T,U)) = (tmonoid.plus(l._1,r._1), umonoid.plus(l._2, r._2))
-}
-
-/**
-* Combine two groups into a product group
-*/
-class Tuple2Group[T,U](implicit tgroup : Group[T], ugroup : Group[U]) extends Group[(T,U)] {
-  override def zero = (tgroup.zero, ugroup.zero)
-  override def negate(v : (T,U)) = (tgroup.negate(v._1), ugroup.negate(v._2))
-  override def plus(l : (T,U), r : (T,U)) = (tgroup.plus(l._1,r._1), ugroup.plus(l._2, r._2))
-  override def minus(l : (T,U), r : (T,U)) = (tgroup.minus(l._1,r._1), ugroup.minus(l._2, r._2))
-}
-
-/**
-* Combine two rings into a product ring
-*/
-class Tuple2Ring[T,U](implicit tring : Ring[T], uring : Ring[U]) extends Ring[(T,U)] {
-  override def zero = (tring.zero, uring.zero)
-  override def one = (tring.one, uring.one)
-  override def negate(v : (T,U)) = (tring.negate(v._1), uring.negate(v._2))
-  override def plus(l : (T,U), r : (T,U)) = (tring.plus(l._1,r._1), uring.plus(l._2, r._2))
-  override def minus(l : (T,U), r : (T,U)) = (tring.minus(l._1,r._1), uring.minus(l._2, r._2))
-  override def times(l : (T,U), r : (T,U)) = (tring.times(l._1,r._1), uring.times(l._2, r._2))
-}
-
 object Monoid extends GeneratedMonoidImplicits {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
@@ -421,9 +391,6 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
   implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
-  implicit def pairMonoid[T,U](implicit tg : Monoid[T], ug : Monoid[U]) : Monoid[(T,U)] = {
-    new Tuple2Monoid[T,U]()(tg,ug)
-  }
   implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
   implicit def function1Monoid[T] = new Function1Monoid[T]
 }
@@ -448,9 +415,6 @@ object Group extends GeneratedGroupImplicits {
   implicit val jdoubleGroup : Group[JDouble] = JDoubleField
   implicit def indexedSeqGroup[T:Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
   implicit def mapGroup[K,V](implicit group : Group[V]) = new MapGroup[K,V]()(group)
-  implicit def pairGroup[T,U](implicit tg : Group[T], ug : Group[U]) : Group[(T,U)] = {
-    new Tuple2Group[T,U]()(tg,ug)
-  }
 }
 
 object Ring extends GeneratedRingImplicits {
@@ -473,9 +437,6 @@ object Ring extends GeneratedRingImplicits {
   implicit val jdoubleRing : Ring[JDouble] = JDoubleField
   implicit def indexedSeqRing[T:Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
   implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
-  implicit def pairRing[T,U](implicit tr : Ring[T], ur : Ring[U]) : Ring[(T,U)] = {
-    new Tuple2Ring[T,U]()(tr,ur)
-  }
 }
 
 object Field {
