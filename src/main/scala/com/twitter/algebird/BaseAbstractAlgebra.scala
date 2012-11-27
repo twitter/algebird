@@ -123,8 +123,7 @@ class OptionMonoid[T](implicit mon : Monoid[T]) extends Monoid[Option[T]] {
  */
 class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
   extends Monoid[Either[L,R]] {
-  // TODO: remove this when we add a semi-group class
-  override def zero = sys.error("Either is a semi-group, there is no zero. Wrap with Option[Either[L,R]] to get a monoid.")
+  override lazy val zero = Right(monoidr.zero)
   override def plus(l : Either[L,R], r : Either[L,R]) = {
     if(l.isLeft) {
       // l is Left, r may or may not be:
