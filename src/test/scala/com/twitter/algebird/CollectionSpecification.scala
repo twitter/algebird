@@ -47,6 +47,5 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
 
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
-  // Either is actually a semigroup, but we don't yet have a typeclass for that:
-  property("Either is semigroup") = isAssociative[Either[String,Int]]
+  property("Either is a Monoid") = monoidLaws[Either[String,Int]]
 }
