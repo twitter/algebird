@@ -96,7 +96,7 @@ trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
 
 // TODO: this actually lifts a semigroup (no zero) into a Monoid.
 // we should make a SemiGroup[T] class
-class OptionMonoid[T](implicit mon : Monoid[T]) extends Monoid[Option[T]] {
+class BaseOptionMonoid[T](fn : (T, T) => T) extends Monoid[Option[T]] {
   def zero = None
   def plus(left : Option[T], right : Option[T]) : Option[T] = {
     if(left.isEmpty) {
@@ -106,10 +106,19 @@ class OptionMonoid[T](implicit mon : Monoid[T]) extends Monoid[Option[T]] {
       left
     }
     else {
-      Some(mon.plus(left.get, right.get))
+      Some(fn(left.get, right.get))
     }
   }
 }
+
+// Some(7) + Some(3) == Some(10)
+class OptionMonoid[T](implicit mon : Monoid[T]) extends BaseOptionMonoid[T](mon.plus)
+
+// Some(7) + Some(3) == Some(7)
+class MaxMonoid[T](implicit ord : Ordering[T]) extends BaseOptionMonoid[T](ord.max)
+
+// Some(7) + Some(3) == Some(3)
+class MinMonoid[T](implicit ord : Ordering[T]) extends BaseOptionMonoid[T](ord.min)
 
 /** Either monoid is useful for error handling.
  * if everything is correct, use Right (it's right, get it?), if something goes
