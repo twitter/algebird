@@ -18,7 +18,7 @@ package com.twitter.algebird
 import scala.annotation.tailrec
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList}
+import java.util.{List => JList, Map => JMap}
 
 /**
  * Semigroup:
@@ -100,9 +100,21 @@ trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
   }
 }
 
-// TODO: this actually lifts a semigroup (no zero) into a Monoid.
-// we should make a SemiGroup[T] class
-class BaseOptionMonoid[T](fn : (T, T) => T) extends Monoid[Option[T]] {
+// a + b == max(a, b)
+class MaxSemigroup[T](implicit ord : Ordering[T]) extends Semigroup[T] {
+  def plus(l : T, r : T) = ord.max(l, r)
+}
+
+// a + b == min(a, b)
+class MinSemigroup[T](implicit ord : Ordering[T]) extends Semigroup[T] {
+  def plus(l : T, r : T) = ord.min(l, r)
+}
+
+/**
+ * Some(5) + Some(3) == Some(8)
+ * Some(5) + None == Some(5)
+ */
+class OptionMonoid[T](implicit semi : Semigroup[T]) extends Monoid[Option[T]] {
   def zero = None
   def plus(left : Option[T], right : Option[T]) : Option[T] = {
     if(left.isEmpty) {
@@ -112,33 +124,19 @@ class BaseOptionMonoid[T](fn : (T, T) => T) extends Monoid[Option[T]] {
       left
     }
     else {
-      Some(fn(left.get, right.get))
+      Some(semi.plus(left.get, right.get))
     }
   }
 }
 
-// Some(7) + Some(3) == Some(10)
-class OptionMonoid[T](implicit mon : Monoid[T]) extends BaseOptionMonoid[T](mon.plus)
-
-// Some(7) + Some(3) == Some(7)
-class MaxMonoid[T](implicit ord : Ordering[T]) extends BaseOptionMonoid[T](ord.max)
-
-// Some(7) + Some(3) == Some(3)
-class MinMonoid[T](implicit ord : Ordering[T]) extends BaseOptionMonoid[T](ord.min)
-
-/** Either monoid is useful for error handling.
+/** Either semigroup is useful for error handling.
  * if everything is correct, use Right (it's right, get it?), if something goes
  * wrong, use Left.  plus does the normal thing for plus(Right,Right), or plus(Left,Left),
  * but if exactly one is Left, we return that value (to keep the error condition).
  * Typically, the left value will be a string representing the errors.
- *
- * This actually works with a semigroup on L (we never explicitly touch zero in that group,
- * so, you can have a new Monoid[L] { def zero = sys.error("this is semigroup"); ...} and
- * everything would still work
  */
-class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
-  extends Monoid[Either[L,R]] {
-  override lazy val zero = Right(monoidr.zero)
+class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semigroup[R])
+  extends Semigroup[Either[L,R]] {
   override def plus(l : Either[L,R], r : Either[L,R]) = {
     if(l.isLeft) {
       // l is Left, r may or may not be:
@@ -148,7 +146,7 @@ class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
       }
       else {
         //combine the lefts:
-        Left(monoidl.plus(l.left.get, r.left.get))
+        Left(semigroupl.plus(l.left.get, r.left.get))
       }
     }
     else if(r.isLeft) {
@@ -157,9 +155,14 @@ class EitherMonoid[L,R](implicit monoidl : Monoid[L], monoidr : Monoid[R])
     }
     else {
       //both l and r are Right values:
-      Right(monoidr.plus(l.right.get, r.right.get))
+      Right(semigroupr.plus(l.right.get, r.right.get))
     }
   }
+}
+
+class EitherMonoid[L,R](semigroupl : Semigroup[L], monoidr : Monoid[R])
+  extends EitherSemigroup()(semigroupl, monoidr) with Monoid[Either[L,R]] {
+  override lazy val zero = Right(monoidr.zero)
 }
 
 object StringMonoid extends Monoid[String] {
@@ -376,32 +379,32 @@ object NullGroup extends Group[Null] {
 
 object Semigroup extends GeneratedSemigroupImplicits {
   // This pattern is really useful for typeclasses
-  def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
+  def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
 
   implicit val nullSemigroup : Semigroup[Null] = NullGroup
   implicit val unitSemigroup : Semigroup[Unit] = UnitGroup
-  implicit val boolMonoid : Monoid[Boolean] = BooleanField
-  implicit val jboolMonoid : Monoid[JBool] = JBoolField
-  implicit val intMonoid : Monoid[Int] = IntRing
-  implicit val jintMonoid : Monoid[JInt] = JIntRing
-  implicit val shortMonoid : Monoid[Short] = ShortRing
-  implicit val jshortMonoid : Monoid[JShort] = JShortRing
-  implicit val longMonoid : Monoid[Long] = LongRing
-  implicit val jlongMonoid : Monoid[JLong] = JLongRing
-  implicit val floatMonoid : Monoid[Float] = FloatField
-  implicit val jfloatMonoid : Monoid[JFloat] = JFloatField
-  implicit val doubleMonoid : Monoid[Double] = DoubleField
-  implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
-  implicit val stringMonoid : Monoid[String] = StringMonoid
-  implicit def optionMonoid[T : Monoid] = new OptionMonoid[T]
-  implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
-  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
-  implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
-  implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
-  implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
-  implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
-  implicit def function1Monoid[T] = new Function1Monoid[T]
+  implicit val boolSemigroup : Semigroup[Boolean] = BooleanField
+  implicit val jboolSemigroup : Semigroup[JBool] = JBoolField
+  implicit val intSemigroup : Semigroup[Int] = IntRing
+  implicit val jintSemigroup : Semigroup[JInt] = JIntRing
+  implicit val shortSemigroup : Semigroup[Short] = ShortRing
+  implicit val jshortSemigroup : Semigroup[JShort] = JShortRing
+  implicit val longSemigroup : Semigroup[Long] = LongRing
+  implicit val jlongSemigroup : Semigroup[JLong] = JLongRing
+  implicit val floatSemigroup : Semigroup[Float] = FloatField
+  implicit val jfloatSemigroup : Semigroup[JFloat] = JFloatField
+  implicit val doubleSemigroup : Semigroup[Double] = DoubleField
+  implicit val jdoubleSemigroup : Semigroup[JDouble] = JDoubleField
+  implicit val stringSemigroup : Semigroup[String] = StringMonoid
+  implicit def optionSemigroup[T : Semigroup] : Semigroup[Option[T]] = new OptionMonoid[T]
+  implicit def listSemigroup[T] : Semigroup[List[T]] = new ListMonoid[T]
+  implicit def indexedSeqSemigroup[T : Monoid]: Semigroup[IndexedSeq[T]] = new IndexedSeqMonoid[T]
+  implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
+  implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
+  implicit def mapSemigroup[K,V](implicit mon : Monoid[V]) : Semigroup[Map[K, V]] = new MapMonoid[K,V]
+  implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
+  implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
+  implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
 }
 
 object Monoid extends GeneratedMonoidImplicits {
@@ -432,9 +435,10 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
+  implicit def mapMonoid[K,V](implicit mon : Monoid[V]) = new MapMonoid[K,V]
   implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
-  implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
+  //implicit def eitherMonoid[L : Semigroup, R : Monoid] : Monoid[Either[L, R]] = new EitherMonoid[L,R]
+  implicit def eitherMonoid[L, R](implicit l : Semigroup[L], r : Monoid[R]) : Monoid[Either[L, R]] = new EitherMonoid[L,R](l, r)
   implicit def function1Monoid[T] = new Function1Monoid[T]
 }
 
