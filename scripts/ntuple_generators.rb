@@ -21,7 +21,7 @@ INDENT = "  "
 
 # This returns the comment for each product monoid/group/ring definition.
 # n is the size of the product.
-# algebraic_structure is monoid", "group", "ring", etc.
+# algebraic_structure is "monoid", "group", "ring", etc.
 #
 # Example return:
 #   "/**
