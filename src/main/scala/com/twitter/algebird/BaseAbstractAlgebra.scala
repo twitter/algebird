@@ -160,6 +160,11 @@ class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semi
   }
 }
 
+/**
+ * If I add implicit before semigroupl, scala complains:
+ * BaseAbstractAlgebra.scala:166: `implicit' modifier cannot be used for top-level object
+ * which doesn't seem to make sense
+ */
 class EitherMonoid[L,R](semigroupl : Semigroup[L], monoidr : Monoid[R])
   extends EitherSemigroup()(semigroupl, monoidr) with Monoid[Either[L,R]] {
   override lazy val zero = Right(monoidr.zero)
@@ -437,7 +442,6 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V](implicit mon : Monoid[V]) = new MapMonoid[K,V]
   implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
-  //implicit def eitherMonoid[L : Semigroup, R : Monoid] : Monoid[Either[L, R]] = new EitherMonoid[L,R]
   implicit def eitherMonoid[L, R](implicit l : Semigroup[L], r : Monoid[R]) : Monoid[Either[L, R]] = new EitherMonoid[L,R](l, r)
   implicit def function1Monoid[T] = new Function1Monoid[T]
 }
