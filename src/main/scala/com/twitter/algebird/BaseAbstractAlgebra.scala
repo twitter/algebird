@@ -19,10 +19,13 @@ import scala.annotation.tailrec
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList}
+
 /**
+ * Semigroup:
+ *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
+ *
  * Monoid (take a deep breath, and relax about the weird name):
- *   This is a class that has an additive identify (called zero), and plus method that is
- *   associative: a+(b+c) = (a+b)+c and a+0=a, 0+a=a
+ *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
  *
  * Group: this is a monoid that also has subtraction (and negation):
  *   So, you can do (a-b), or -a (which is equal to 0 - a).
@@ -40,7 +43,11 @@ import java.util.{List => JList}
  *   multiplicative identity.
  */
 
-trait Monoid[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
+trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
+  def plus(l : T, r : T) : T
+}
+
+trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def assertNotZero(v : T) {
     if(!isNonZero(v)) {
@@ -58,7 +65,6 @@ trait Monoid[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable
       None
     }
   }
-  def plus(l : T, r : T) : T
 
   // Left sum: (((a + b) + c) + d)
   def sum(iter : Traversable[T]) : T = {
@@ -368,10 +374,39 @@ object NullGroup extends Group[Null] {
   override def plus(l : Null, r : Null) = null
 }
 
+object Semigroup extends GeneratedSemigroupImplicits {
+  // This pattern is really useful for typeclasses
+  def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
+
+  implicit val nullSemigroup : Semigroup[Null] = NullGroup
+  implicit val unitSemigroup : Semigroup[Unit] = UnitGroup
+  implicit val boolMonoid : Monoid[Boolean] = BooleanField
+  implicit val jboolMonoid : Monoid[JBool] = JBoolField
+  implicit val intMonoid : Monoid[Int] = IntRing
+  implicit val jintMonoid : Monoid[JInt] = JIntRing
+  implicit val shortMonoid : Monoid[Short] = ShortRing
+  implicit val jshortMonoid : Monoid[JShort] = JShortRing
+  implicit val longMonoid : Monoid[Long] = LongRing
+  implicit val jlongMonoid : Monoid[JLong] = JLongRing
+  implicit val floatMonoid : Monoid[Float] = FloatField
+  implicit val jfloatMonoid : Monoid[JFloat] = JFloatField
+  implicit val doubleMonoid : Monoid[Double] = DoubleField
+  implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
+  implicit val stringMonoid : Monoid[String] = StringMonoid
+  implicit def optionMonoid[T : Monoid] = new OptionMonoid[T]
+  implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
+  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
+  implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
+  implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
+  implicit def mapMonoid[K,V](implicit monoid : Monoid[V]) = new MapMonoid[K,V]()(monoid)
+  implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
+  implicit def eitherMonoid[L : Monoid, R : Monoid] = new EitherMonoid[L,R]
+  implicit def function1Monoid[T] = new Function1Monoid[T]
+}
+
 object Monoid extends GeneratedMonoidImplicits {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
-  def plus[T](l : T, r : T)(implicit mon : Monoid[T]) = mon.plus(l,r)
   def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
   def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
   def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
