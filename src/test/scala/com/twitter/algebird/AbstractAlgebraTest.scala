@@ -19,10 +19,23 @@ class AbstractAlgebraTest extends Specification {
     val list = List(Some(1),None,Some(5),Some(-1),Some(7),Some(6))
     list.flatMap(x => x).sum must_== monoid.sum(list).get
   }
-  "An OptionMonoid based on the MaxSemigroup should be able to sum" in {
-    val monoid = new OptionMonoid[Int]()(new MaxSemigroup[Int])
+  "An OptionMonoid based on a Semigroup should be able to sum" in {
+    val maxMonoid = implicitly[Monoid[Option[Max[Int]]]]
+    val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
     val list = List(Some(1),None,Some(5),Some(-1),Some(7),Some(6))
-    Some(7) must_== monoid.sum(list)
+    val minList = list.map { _ match {
+        case Some(x) => Some(Min(x))
+        case None => None
+      }
+    }
+    val maxList = list.map { _ match {
+        case Some(x) => Some(Max(x))
+        case None => None
+      }
+    }
+
+    Some(Max(7)) must_== maxMonoid.sum(maxList)
+    Some(Min(-1)) must_== minMonoid.sum(minList)
   }
 
 }

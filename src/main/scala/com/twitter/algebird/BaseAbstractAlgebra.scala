@@ -100,16 +100,6 @@ trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
   }
 }
 
-// a + b == max(a, b)
-class MaxSemigroup[T](implicit ord : Ordering[T]) extends Semigroup[T] {
-  def plus(l : T, r : T) = ord.max(l, r)
-}
-
-// a + b == min(a, b)
-class MinSemigroup[T](implicit ord : Ordering[T]) extends Semigroup[T] {
-  def plus(l : T, r : T) = ord.min(l, r)
-}
-
 /**
  * Some(5) + Some(3) == Some(8)
  * Some(5) + None == Some(5)
@@ -381,6 +371,8 @@ object Semigroup extends GeneratedSemigroupImplicits {
   // This pattern is really useful for typeclasses
   def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
 
+  def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
+
   implicit val nullSemigroup : Semigroup[Null] = NullGroup
   implicit val unitSemigroup : Semigroup[Unit] = UnitGroup
   implicit val boolSemigroup : Semigroup[Boolean] = BooleanField
@@ -398,11 +390,16 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit val stringSemigroup : Semigroup[String] = StringMonoid
   implicit def optionSemigroup[T : Semigroup] : Semigroup[Option[T]] = new OptionMonoid[T]
   implicit def listSemigroup[T] : Semigroup[List[T]] = new ListMonoid[T]
+  // TODO: we could define a IndexedSeqSemigroup that only requires T : Semigroup
   implicit def indexedSeqSemigroup[T : Monoid]: Semigroup[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
+  // TODO: we could define a MapSemigroup that only requires V : Semigroup
   implicit def mapSemigroup[K,V](implicit mon : Monoid[V]) : Semigroup[Map[K, V]] = new MapMonoid[K,V]
+  // TODO: we could define a JMapSemigroup that only requires V : Semigroup
   implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
+  implicit def maxSemigroup[T : Ordering] : Semigroup[Max[T]] = new MaxSemigroup[T]
+  implicit def minSemigroup[T : Ordering] : Semigroup[Min[T]] = new MinSemigroup[T]
   implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
 }
@@ -414,6 +411,11 @@ object Monoid extends GeneratedMonoidImplicits {
   def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
   def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
   def sum[T](iter: Traversable[T])(implicit monoid: Monoid[T]) = monoid.sum(iter)
+
+  def from[T](z: => T)(associativeFn: (T,T) => T): Monoid[T] = new Monoid[T] {
+    lazy val zero = z
+    def plus(l:T, r:T) = associativeFn(l,r)
+  }
 
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
@@ -430,14 +432,14 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val doubleMonoid : Monoid[Double] = DoubleField
   implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
   implicit val stringMonoid : Monoid[String] = StringMonoid
-  implicit def optionMonoid[T : Monoid] = new OptionMonoid[T]
+  implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
   implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V](implicit mon : Monoid[V]) = new MapMonoid[K,V]
+  implicit def mapMonoid[K,V : Monoid] = new MapMonoid[K,V]
   implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
-  implicit def eitherMonoid[L, R](implicit l : Semigroup[L], r : Monoid[R]) = new EitherMonoid[L, R]
+  implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
   implicit def function1Monoid[T] = new Function1Monoid[T]
 }
 
