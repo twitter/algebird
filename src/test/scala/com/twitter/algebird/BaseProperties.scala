@@ -7,6 +7,23 @@ import org.scalacheck.Prop.forAll
 trait BaseProperties {
   def defaultEq[T](t0 : T, t1 : T) = t0 == t1
 
+  def isAssociativeEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T, b : T, c : T) =>
+    val semi = implicitly[Semigroup[T]]
+    eqfn(semi.plus(a, semi.plus(b,c)), semi.plus(semi.plus(a,b), c))
+  }
+  def isAssociative[T : Semigroup : Arbitrary] = isAssociativeEq[T](defaultEq _)
+  def isCommutativeEq[T : Semigroup : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
+    val semi = implicitly[Semigroup[T]]
+    eqfn(semi.plus(a,b), semi.plus(b,a))
+  }
+  def isCommutative[T : Semigroup : Arbitrary] = isCommutativeEq[T](defaultEq _)
+
+  def semigroupLaws[T : Semigroup : Arbitrary] = isAssociative[T]
+  def semigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = isAssociativeEq[T](eqfn)
+  def commutativeSemigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) =
+    isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
+  def commutativeSemigroupLaws[T : Semigroup : Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
+
   def weakZero[T : Monoid : Arbitrary] = forAll { (a : T) =>
     val mon = implicitly[Monoid[T]]
     val zero = mon.zero
@@ -21,21 +38,9 @@ trait BaseProperties {
   }
   def validZero[T : Monoid : Arbitrary] = validZeroEq[T](defaultEq _)
 
-  def isAssociativeEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T, b : T, c : T) =>
-    val mon = implicitly[Monoid[T]]
-    eqfn(mon.plus(a, mon.plus(b,c)), mon.plus(mon.plus(a,b), c))
-  }
-  def isAssociative[T : Monoid : Arbitrary] = isAssociativeEq[T](defaultEq _)
-  def isCommutativeEq[T : Monoid : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
-    val mon = implicitly[Monoid[T]]
-    eqfn(mon.plus(a,b), mon.plus(b,a))
-  }
-  def isCommutative[T : Monoid : Arbitrary] = isCommutativeEq[T](defaultEq _)
-
   def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T]
-  def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = {
+  def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
-  }
   def commutativeMonoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeMonoidLaws[T:Monoid:Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)

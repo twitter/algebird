@@ -7,6 +7,17 @@ import org.scalacheck.Prop.forAll
 
 object CollectionSpecification extends Properties("Collections") with BaseProperties {
 
+  implicit def arbMin[T:Arbitrary] : Arbitrary[Min[T]] =
+    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
+  implicit def arbMax[T:Arbitrary] : Arbitrary[Max[T]] =
+    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
+
+  property("MinSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Min[Int]]
+  property("MaxSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Max[Int]]
+
+  property("Either is a Semigroup") = semigroupLaws[Either[String,Int]]
+  property("Either is a Semigroup, with a Right non-monoid semigroup") = semigroupLaws[Either[String,Max[Int]]]
+
   property("Option Monoid laws") = monoidLaws[Option[Int]] && monoidLaws[Option[String]]
 
   property("List plus") = forAll { (a : List[Int], b : List[Int]) =>
