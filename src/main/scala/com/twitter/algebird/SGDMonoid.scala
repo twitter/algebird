@@ -28,7 +28,6 @@ object SGD {
     val (y, xs) = pos
     val xsPlusConst = xs :+ 1.0
     val err = dot(w,xsPlusConst) - y
-    //println("Error: " + err)
     // Here is the gradient
     xsPlusConst.map { _ * err }
   }
