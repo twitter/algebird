@@ -37,5 +37,11 @@ class AbstractAlgebraTest extends Specification {
     Some(Max(7)) must_== maxMonoid.sum(maxList)
     Some(Min(-1)) must_== minMonoid.sum(minList)
   }
+  "First/Last should work properly" in {
+    val fsg = implicitly[Semigroup[First[Int]]]
+    val lsg = implicitly[Semigroup[Last[Int]]]
+    (List(1,2,3,4,5).map { First(_) }).reduceLeft(fsg.plus _) must be_==(First(1))
+    (List(1,2,3,4,5).map { Last(_) }).reduceLeft(lsg.plus _) must be_==(Last(5))
+  }
 
 }

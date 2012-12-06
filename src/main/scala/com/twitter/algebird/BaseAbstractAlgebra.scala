@@ -338,8 +338,6 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
   // TODO: we could define a JMapSemigroup that only requires V : Semigroup
   implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
-  implicit def maxSemigroup[T : Ordering] : Semigroup[Max[T]] = new MaxSemigroup[T]
-  implicit def minSemigroup[T : Ordering] : Semigroup[Min[T]] = new MinSemigroup[T]
   implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
 }
@@ -415,6 +413,8 @@ object Ring extends GeneratedRingImplicits {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
   def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
+  def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] =
+    Monoid.from[T](ring.one)(ring.times _)
   // Left product: (((a * b) * c) * d)
   def product[T](iter : TraversableOnce[T])(implicit ring : Ring[T]) = {
     // avoid touching one unless we need to (some items are pseudo-rings)
