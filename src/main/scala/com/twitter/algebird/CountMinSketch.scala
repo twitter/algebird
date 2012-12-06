@@ -103,6 +103,10 @@ sealed abstract class CMS extends java.io.Serializable {
 
   def ++(other : CMS) : CMS
 
+  // Parameters used to bound confidence in error estimates.
+  def delta = 1.0 / scala.math.exp(depth)
+  def eps = scala.math.exp(1.0) / width
+
   /**
    * Returns an estimate of the total number of times this item has been seen
    * in the stream so far.
@@ -111,12 +115,31 @@ sealed abstract class CMS extends java.io.Serializable {
   def estimateFrequency(item : Long) : Long
 
   /**
-   * With probability p >= 1 - 0.5^depth, the Count-Min sketch estimate
-   * of the frequency of any element is within 2 * totalCount / width
-   * of the true frequency.
+   * It is always true that trueFrequency <= estimatedFrequency.
+   * With probability p >= 1 - delta, it also holds that
+   * estimatedFrequency <= trueFrequency + eps * totalCount.
    */
-  def frequencyConfidence = 1 - 1 / math.pow(2.0, depth)
-  def maxErrorOfFrequencyEstimate = (2.0 * totalCount) / width
+  def frequencyConfidence = 1 - delta
+  def maxErrorOfFrequencyEstimate = eps * totalCount
+
+  /**
+   * Returns an estimate of the inner product against another data stream.
+   *
+   * In other words, let a_i denote the number of times element i has been seen in
+   * the data stream summarized by this CMS, and let b_i denote the same for the other CMS.
+   * Then this returns an estimate of <a, b> = \sum a_i b_i
+   *
+   * Note: this can also be viewed as the join size between two relations.
+   */
+  def estimateInnerProduct(other : CMS) : Long
+
+  /**
+   * It is always true that actualInnerProduct <= estimatedInnerProduct.
+   * With probability p >= 1 - delta, it also holds that
+   * estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount
+   */
+  def innerProductConfidence(other : CMS) = 1 - delta
+  def maxErrorOfInnerProductEstimate(other : CMS) = eps * totalCount * other.totalCount
 }
 
 /**
@@ -126,6 +149,7 @@ case class CMSZero(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS 
   def totalCount = 0L
   def ++(other : CMS) = other
   def estimateFrequency(item : Long) = 0L
+  def estimateInnerProduct(other : CMS) = 0L
 }
 
 /**
@@ -147,6 +171,8 @@ case class CMSItem(item : Long, hashes : Seq[CMSHash], depth : Int, width : Int)
   }
 
   def estimateFrequency(x : Long) = if (item == x) 1L else 0L
+
+  def estimateInnerProduct(other : CMS) : Long = other.estimateFrequency(item)
 }
 
 /**
@@ -161,10 +187,10 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
 
   def ++(other : CMS) : CMS = {
     other match {
-      case cms@CMSZero(_, _, _) => cms ++ this
-      case cms@CMSItem(_, _, _, _) => cms ++ this
-      case cms@CMSInstance(_, _, _) => {
-        CMSInstance(hashes, countsTable ++ cms.countsTable, totalCount + cms.totalCount)
+      case other : CMSZero => other ++ this
+      case other : CMSItem => other ++ this
+      case other : CMSInstance => {
+        CMSInstance(hashes, countsTable ++ other.countsTable, totalCount + other.totalCount)
       }
     }
   }
@@ -172,6 +198,28 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
   def estimateFrequency(item : Long) : Long = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(hashes(i)(item)) }
     estimates.min
+  }
+
+  /**
+   * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and
+   * column k.
+   * Then the Count-Min sketch estimate of the inner product between A and B is the minimum inner product
+   * between their rows:
+   * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k])
+   */
+  def estimateInnerProduct(other : CMS) : Long = {
+    other match {
+      case other : CMSInstance => {
+        assert((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
+
+        def innerProductAtDepth(d : Int) = (0 to (width - 1)).map { w =>
+                                              countsTable.getCount(d, w) * other.countsTable.getCount(d, w)
+                                           }.sum
+
+        (0 to (depth - 1)).map { innerProductAtDepth(_) }.min
+      }
+      case _ => other.estimateInnerProduct(this)
+    }
   }
 
   /**

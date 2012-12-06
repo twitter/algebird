@@ -11,10 +11,10 @@ object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperti
   val DEPTH = 10
   val WIDTH = 30
   val SEED = 1
-  
+
   implicit val cmsMonoid = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
-  implicit val cmsGen = 
-    Arbitrary { 
+  implicit val cmsGen =
+    Arbitrary {
       for (v <- choose(0, 10000)) yield (cmsMonoid.create(v))
     }
 
@@ -24,20 +24,22 @@ object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperti
 class CountMinSketchTest extends Specification {
   noDetailedDiffs()
 
-  val DEPTH = 10
+  // The randomized tests should fail with probability less than
+  // delta = (1 - 1 / e^depth) ~ 2.98E-8
+  val DEPTH = 25
   val WIDTH = 300
   val SEED = 1
-  
+
   val CMS_MONOID = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
   val RAND = new scala.util.Random
-  
+
   /**
    * Returns the exact frequency of {x} in {data}.
    */
   def exactFrequency(data : Seq[Long], x : Long) : Long = {
     data.filter { _ == x }.size
   }
-  
+
   /**
    * Returns the estimated frequency of {x} in the given Count-Min sketch
    * structure.
@@ -46,32 +48,88 @@ class CountMinSketchTest extends Specification {
     cms.estimateFrequency(x)
   }
 
+  /**
+   * Returns the exact inner product between two data streams, when the streams
+   * are viewed as count vectors.
+   */
+  def exactInnerProduct(data1 : Seq[Long], data2 : Seq[Long]) : Long = {
+    val counts1 = data1.groupBy( x => x ).mapValues( _.size )
+    val counts2 = data2.groupBy( x => x ).mapValues( _.size )
+
+    (counts1.keys.toSet & counts2.keys.toSet).map { k => counts1(k) * counts2(k) }.sum
+  }
+
+  /**
+   * Returns the estimated inner product between two Count-Min sketch structures.
+   */
+  def approximateInnerProduct(cms1 : CMS, cms2 : CMS) : Long = {
+    cms1.estimateInnerProduct(cms2)
+  }
+
   "CountMinSketch" should {
      "estimate frequencies" in {
        val totalCount = 5678
-       val range = 897 
+       val range = 897
        val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
        val cms = CMS_MONOID.create(data)
-       
+
        (0 to 100).foreach { _ =>
          val x = RAND.nextInt(range).toLong
          val exact = exactFrequency(data, x)
          val approx = approximateFrequency(cms, x)
          val maxError = cms.maxErrorOfFrequencyEstimate
-         
+
          approx must be_>=(exact)
-         maxError must be_==((2.0 * totalCount) / WIDTH)
          (approx - exact).toDouble must be_<=(maxError)
        }
      }
-     
-     "exactly estimate frequencies when given a small stream" in {
-       val one = CMS_MONOID.create(1)
-       val two = CMS_MONOID.create(2)
-       val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
-       
-       cms.estimateFrequency(1) must be_==(1)
-       cms.estimateFrequency(2) must be_==(2)       
-     }
+
+    "exactly estimate frequencies when given a small stream" in {
+      val one = CMS_MONOID.create(1)
+      val two = CMS_MONOID.create(2)
+      val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
+
+      cms.estimateFrequency(1) must be_==(1)
+      cms.estimateFrequency(2) must be_==(2)
+    }
+
+    "estimate inner products" in {
+      val totalCount = 5234
+      val range = 1390
+      val data1 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
+      val data2 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
+      val cms1 = CMS_MONOID.create(data1)
+      val cms2 = CMS_MONOID.create(data1)
+
+      val approx = cms1.estimateInnerProduct(cms2)
+      val exact = exactInnerProduct(data1, data2)
+      val maxError = cms1.maxErrorOfInnerProductEstimate(cms2)
+
+      approx must be_==(cms2.estimateInnerProduct(cms1))
+      approx must be_>=(exact)
+      (approx - exact).toDouble must be_<=(maxError)
+    }
+
+    "exactly estimate inner products when given a small stream" in {
+      // Nothing in common.
+      val a1 = List(1L, 2L, 3L)
+      val a2 = List(4L, 5L, 6L)
+      CMS_MONOID.create(a1).estimateInnerProduct(CMS_MONOID.create(a2)) must be_==(0)
+
+      // One element in common.
+      val b1 = List(1L, 2L, 3L)
+      val b2 = List(3L, 5L, 6L)
+      CMS_MONOID.create(b1).estimateInnerProduct(CMS_MONOID.create(b2)) must be_==(1)
+
+      // Multiple, non-repeating elements in common.
+      val c1 = List(1L, 2L, 3L)
+      val c2 = List(3L, 2L, 6L)
+      CMS_MONOID.create(c1).estimateInnerProduct(CMS_MONOID.create(c2)) must be_==(2)
+
+      // Multiple, repeating elements in common.
+      val d1 = List(1L, 2L, 2L, 3L, 3L)
+      val d2 = List(2L, 3L, 3L, 6L)
+      CMS_MONOID.create(d1).estimateInnerProduct(CMS_MONOID.create(d2)) must be_==(6)
+    }
   }
 }
