@@ -16,18 +16,29 @@ limitations under the License.
 package com.twitter.algebird
 
 // To use the MaxSemigroup wrap your item in a Max object
-case class Max[T](get: T)
+case class Max[+T](get: T)
 
-class MaxSemigroup[T](implicit ord: Ordering[T]) extends Semigroup[Max[T]] {
-  def plus(l: Max[T], r: Max[T]) =
-    if(ord.gteq(l.get, r.get)) l else r
+object Max {
+  implicit def semigroup[T](implicit ord:Ordering[T]) =
+    Semigroup.from[Max[T]] { (l,r) => if(ord.gteq(l.get, r.get)) l else r }
 }
 
 // To use the MinSemigroup wrap your item in a Min object
-case class Min[T](get: T)
+case class Min[+T](get: T)
 
-class MinSemigroup[T](implicit ord: Ordering[T]) extends Semigroup[Min[T]] {
-  def plus(l: Min[T], r: Min[T]) =
-    if(ord.lteq(l.get, r.get)) l else r
+object Min {
+  implicit def semigroup[T](implicit ord:Ordering[T]) =
+    Semigroup.from[Min[T]] { (l,r) => if(ord.lteq(l.get, r.get)) l else r }
 }
 
+// Not ordered by type, but ordered by order in which we see them:
+
+case class First[+T](get: T)
+object First {
+  implicit def semigroup[T] = Semigroup.from[First[T]] { (l,r) => l }
+}
+
+case class Last[+T](get: T)
+object Last {
+  implicit def semigroup[T] = Semigroup.from[Last[T]] { (l,r) => r }
+}
