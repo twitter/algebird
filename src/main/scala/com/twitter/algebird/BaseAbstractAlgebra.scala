@@ -81,11 +81,7 @@ trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def one : T // Multiplicative identity
   def times(l : T, r : T) : T
   // Left product: (((a * b) * c) * d)
-  def product(iter : TraversableOnce[T]): T = {
-    // avoid touching one unless we need to (some items are pseudo-rings)
-    if(iter.isEmpty) one
-    else iter.reduceLeft { times(_,_) }
-  }
+  def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
 trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
@@ -417,9 +413,15 @@ object Ring extends GeneratedRingImplicits {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
   def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
-  def product[T](it : TraversableOnce[T])(implicit rng : Ring[T]) = rng.product(it)
+  // Left product: (((a * b) * c) * d)
+  def product[T](iter : TraversableOnce[T])(implicit ring : Ring[T]) = {
+    // avoid touching one unless we need to (some items are pseudo-rings)
+    if(iter.isEmpty) ring.one
+    else iter.reduceLeft(ring.times _)
+  }
+  // If the ring doesn't have a one, or you want to distinguish empty cases:
   def productOption[T](it: TraversableOnce[T])(implicit rng: Ring[T]): Option[T] =
-    it.reduceLeftOption { rng.times(_,_) }
+    it.reduceLeftOption(rng.times _)
 
   implicit val boolRing : Ring[Boolean] = BooleanField
   implicit val jboolRing : Ring[JBool] = JBoolField
