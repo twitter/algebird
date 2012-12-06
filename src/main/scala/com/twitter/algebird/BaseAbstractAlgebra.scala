@@ -44,9 +44,13 @@ import java.util.{List => JList, Map => JMap}
  */
 
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
+  // no zero in a semigroup
+  def isNonZero(v: T): Boolean = true
   def plus(l : T, r : T) : T
 }
 
+
+// TODO: break this file into Semigroup.scala, Monoid.scala, etc... and move objects next to traits
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def assertNotZero(v : T) {
@@ -55,7 +59,7 @@ trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
     }
   }
 
-  def isNonZero(v : T) = (v != zero)
+  override def isNonZero(v : T) = (v != zero)
 
   def nonZeroOption(v : T): Option[T] = {
     if (isNonZero(v)) {
@@ -65,11 +69,8 @@ trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
       None
     }
   }
-
-  // Left sum: (((a + b) + c) + d)
-  def sum(iter : Traversable[T]) : T = {
-    iter.foldLeft(zero) { (old, current) => plus(old, current) }
-  }
+  @deprecated("Just use Monoid.sum")
+  def sum(vs: TraversableOnce[T]): T = Monoid.sum(vs)(this)
 }
 
 trait Group[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
@@ -82,9 +83,7 @@ trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def one : T // Multiplicative identity
   def times(l : T, r : T) : T
   // Left product: (((a * b) * c) * d)
-  def product(iter : Traversable[T]) : T = {
-    iter.foldLeft(one) { (old, current) => times(old, current) }
-  }
+  def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
 trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
@@ -125,8 +124,8 @@ class OptionMonoid[T](implicit semi : Semigroup[T]) extends Monoid[Option[T]] {
  * but if exactly one is Left, we return that value (to keep the error condition).
  * Typically, the left value will be a string representing the errors.
  */
-class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semigroup[R])
-  extends Semigroup[Either[L,R]] {
+class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semigroup[R]) extends Semigroup[Either[L,R]] {
+
   override def plus(l : Either[L,R], r : Either[L,R]) = {
     if(l.isLeft) {
       // l is Left, r may or may not be:
@@ -150,8 +149,7 @@ class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semi
   }
 }
 
-class EitherMonoid[L,R](implicit semigroupl : Semigroup[L], monoidr : Monoid[R])
-  extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L,R]] {
+class EitherMonoid[L,R](implicit semigroupl : Semigroup[L], monoidr : Monoid[R]) extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L,R]] {
   override lazy val zero = Right(monoidr.zero)
 }
 
@@ -221,66 +219,6 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   override def plus(f1 : Function1[T,T], f2 : Function1[T,T]) = {
     (t : T) => f2(f1(t))
   }
-}
-
-/** You can think of this as a Sparse vector monoid
- */
-class MapMonoid[K,V](implicit monoid : Monoid[V]) extends Monoid[Map[K,V]] {
-  override lazy val zero = Map[K,V]()
-  override def isNonZero(x : Map[K,V]) = !x.isEmpty && x.valuesIterator.exists { v =>
-    monoid.isNonZero(v)
-  }
-  override def plus(x : Map[K,V], y : Map[K,V]) = {
-    // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
-    // This really saves computation when adding lots of small maps into big ones (common)
-    val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
-    small.foldLeft(big) { (oldMap, kv) =>
-      val newV = big
-        .get(kv._1)
-        .map { bigV => if(bigOnLeft) monoid.plus(bigV, kv._2) else monoid.plus(kv._2, bigV) }
-        .getOrElse(kv._2)
-      if (monoid.isNonZero(newV)) {
-        oldMap + (kv._1 -> newV)
-      }
-      else {
-        oldMap - kv._1
-      }
-    }
-  }
-  // This is not part of the typeclass, but it is useful:
-  def sumValues(elem : Map[K,V]) : V = elem.values.reduceLeft { monoid.plus(_,_) }
-}
-
-/** You can think of this as a Sparse vector group
- */
-class MapGroup[K,V](implicit vgrp : Group[V]) extends MapMonoid[K,V]()(vgrp) with Group[Map[K,V]] {
-  override def negate(kv : Map[K,V]) = kv.mapValues { v => vgrp.negate(v) }
-}
-
-/** You can think of this as a Sparse vector ring
- */
-class MapRing[K,V](implicit ring : Ring[V]) extends MapGroup[K,V]()(ring) with Ring[Map[K,V]] {
-  // It is possible to implement this, but we need a special "identity map" which we
-  // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
-  // Then we have to manage the delta from this map as we add elements.  That said, it
-  // is not actually needed in matrix multiplication, so we are punting on it for now.
-  override def one = sys.error("multiplicative identity for Map unimplemented")
-  override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
-    val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
-    small.foldLeft(zero) { (oldMap, kv) =>
-      val bigV = big.getOrElse(kv._1, ring.zero)
-      val newV = if(bigOnLeft) ring.times(bigV, kv._2) else ring.times(kv._2, bigV)
-      if (ring.isNonZero(newV)) {
-        oldMap + (kv._1 -> newV)
-      }
-      else {
-        oldMap - kv._1
-      }
-    }
-  }
-  // This is not part of the typeclass, but it is useful:
-  def productValues(elem : Map[K,V]) : V = elem.values.reduceLeft { ring.times(_,_) }
-  def dot(left : Map[K,V], right : Map[K,V]) : V = sumValues(times(left, right))
 }
 
 object IntRing extends Ring[Int] {
@@ -370,6 +308,9 @@ object NullGroup extends Group[Null] {
 object Semigroup extends GeneratedSemigroupImplicits {
   // This pattern is really useful for typeclasses
   def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
+  // Left sum: (((a + b) + c) + d)
+  def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
+    iter.reduceLeftOption { sg.plus(_,_) }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
 
@@ -394,8 +335,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit def indexedSeqSemigroup[T : Monoid]: Semigroup[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
-  // TODO: we could define a MapSemigroup that only requires V : Semigroup
-  implicit def mapSemigroup[K,V](implicit mon : Monoid[V]) : Semigroup[Map[K, V]] = new MapMonoid[K,V]
+  implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
   // TODO: we could define a JMapSemigroup that only requires V : Semigroup
   implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
   implicit def maxSemigroup[T : Ordering] : Semigroup[Max[T]] = new MaxSemigroup[T]
@@ -407,10 +347,16 @@ object Semigroup extends GeneratedSemigroupImplicits {
 object Monoid extends GeneratedMonoidImplicits {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
+  // strictly speaking, same as Semigroup, but most interesting examples
+  // are monoids, and code already depends on this:
+  def plus[T](l: T, r: T)(implicit monoid: Monoid[T]): T = monoid.plus(l,r)
   def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
   def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
   def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
-  def sum[T](iter: Traversable[T])(implicit monoid: Monoid[T]) = monoid.sum(iter)
+  // Left sum: (((a + b) + c) + d)
+  def sum[T](iter : TraversableOnce[T])(implicit monoid: Monoid[T]): T = {
+    Semigroup.sumOption(iter)(monoid).getOrElse(monoid.zero)
+  }
 
   def from[T](z: => T)(associativeFn: (T,T) => T): Monoid[T] = new Monoid[T] {
     lazy val zero = z
@@ -437,7 +383,7 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V : Monoid] = new MapMonoid[K,V]
+  implicit def mapMonoid[K,V: Semigroup] = new MapMonoid[K,V]
   implicit def jmapMonoid[K,V : Monoid] = new JMapMonoid[K,V]
   implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
   implicit def function1Monoid[T] = new Function1Monoid[T]
@@ -469,7 +415,15 @@ object Ring extends GeneratedRingImplicits {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
   def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
-  def product[T](it : Traversable[T])(implicit rng : Ring[T]) = rng.product(it)
+  // Left product: (((a * b) * c) * d)
+  def product[T](iter : TraversableOnce[T])(implicit ring : Ring[T]) = {
+    // avoid touching one unless we need to (some items are pseudo-rings)
+    if(iter.isEmpty) ring.one
+    else iter.reduceLeft(ring.times _)
+  }
+  // If the ring doesn't have a one, or you want to distinguish empty cases:
+  def productOption[T](it: TraversableOnce[T])(implicit rng: Ring[T]): Option[T] =
+    it.reduceLeftOption(rng.times _)
 
   implicit val boolRing : Ring[Boolean] = BooleanField
   implicit val jboolRing : Ring[JBool] = JBoolField

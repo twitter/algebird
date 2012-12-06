@@ -59,4 +59,19 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
   property("Either is a Monoid") = monoidLaws[Either[String,Int]]
+
+  property("sumByKey works") = forAll { (keys : List[Int], values: List[Int]) =>
+    import Operators._
+    val tupList = keys.zip(values)
+    tupList.sumByKey.filter { _._2 != 0 } ==
+      tupList.groupBy { _._1 }
+        .mapValues { v => v.map { _._2 }.sum }
+        .filter { _._2 != 0 }
+  }
+
+  property("MapAlgebra.dot works") = forAll { (m1: Map[Int,Int], m2: Map[Int,Int]) =>
+    // .toList below is to make sure we don't remove duplicate values
+    MapAlgebra.dot(m1, m2) ==
+      (m1.keySet ++ m2.keySet).toList.map { k => m1.getOrElse(k,0) * m2.getOrElse(k,0) }.sum
+  }
 }
