@@ -49,6 +49,8 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
   def plus(l : T, r : T) : T
 }
 
+
+// TODO: break this file into Semigroup.scala, Monoid.scala, etc... and move objects next to traits
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def assertNotZero(v : T) {
@@ -333,7 +335,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit def indexedSeqSemigroup[T : Monoid]: Semigroup[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
-  implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K, V]] = new MapMonoid[K,V]
+  implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
   // TODO: we could define a JMapSemigroup that only requires V : Semigroup
   implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
   implicit def maxSemigroup[T : Ordering] : Semigroup[Max[T]] = new MaxSemigroup[T]
