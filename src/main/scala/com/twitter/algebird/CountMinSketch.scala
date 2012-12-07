@@ -105,12 +105,11 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int) extends Mon
   }
 }
 
-object CMS {
-  def monoid(eps : Double, delta : Double, seed : Int) = new CountMinSketchMonoid(eps, delta, seed)
-  def monoid(depth : Int, width : Int, seed : Int) = {
-    new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed)
-  }
+object CountMinSketchMonoid {
+  def apply(depth : Int, width : Int, seed : Int) = new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed)
+}
 
+object CMS {
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
    * depth = ceil(ln 1/delta)
