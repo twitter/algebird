@@ -82,6 +82,10 @@ class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) wi
 }
 
 object MapAlgebra {
+  // Returns a new map with zero-value entries removed
+  def removeZeros[K,V:Monoid](m: Map[K,V]): Map[K,V] =
+    m filter { case (_,v) => Monoid.isNonZero(v) }
+
   // groupBy ks, sum all the vs
   def sumByKey[K,V:Semigroup](pairs: TraversableOnce[(K,V)]): Map[K,V] =
     Monoid.sum(pairs map { Map(_) })

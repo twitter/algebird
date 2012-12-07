@@ -60,6 +60,10 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
 
   property("Either is a Monoid") = monoidLaws[Either[String,Int]]
 
+  property("MapAlgebra.removeZeros works") = forAll { (m: Map[Int,Int]) =>
+    !MapAlgebra.removeZeros(m).values.toSet.contains(0)
+  }
+
   property("sumByKey works") = forAll { (keys : List[Int], values: List[Int]) =>
     import Operators._
     val tupList = keys.zip(values)
