@@ -291,19 +291,18 @@ object BooleanField extends Field[Boolean] {
   }
 }
 
-// Trivial group, but possibly useful to make a group of (Unit, T) for some T.
-object UnitGroup extends Group[Unit] {
-  override def zero = ()
-  override def negate(u : Unit) = ()
-  override def plus(l : Unit, r : Unit) = ()
+// Trivial group. Returns constant on any interaction.
+class ConstantGroup[T](constant: T) extends Group[T] {
+  override def zero = constant
+  override def negate(u : T) = constant
+  override def plus(l : T, r : T) = constant
 }
 
+// Trivial group, but possibly useful to make a group of (Unit, T) for some T.
+object UnitGroup extends ConstantGroup[Unit](())
+
 // similar to the above:
-object NullGroup extends Group[Null] {
-  override def zero = null
-  override def negate(u : Null) = null
-  override def plus(l : Null, r : Null) = null
-}
+object NullGroup extends ConstantGroup[Null](null)
 
 object Semigroup extends GeneratedSemigroupImplicits {
   // This pattern is really useful for typeclasses
