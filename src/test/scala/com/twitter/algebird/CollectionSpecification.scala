@@ -64,6 +64,11 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
     !MapAlgebra.removeZeros(m).values.toSet.contains(0)
   }
 
+  property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") =
+    forAll { (m: Map[Int,Int]) =>
+      Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m))
+  }
+
   property("sumByKey works") = forAll { (keys : List[Int], values: List[Int]) =>
     import Operators._
     val tupList = keys.zip(values)
