@@ -8,11 +8,11 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 
 object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperties {
-  val DEPTH = 10
-  val WIDTH = 30
+  val DELTA = 1E-10
+  val EPS = 0.001
   val SEED = 1
 
-  implicit val cmsMonoid = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
+  implicit val cmsMonoid = new CountMinSketchMonoid(EPS, DELTA, SEED)
   implicit val cmsGen =
     Arbitrary {
       for (v <- choose(0, 10000)) yield (cmsMonoid.create(v))
@@ -25,12 +25,12 @@ class CountMinSketchTest extends Specification {
   noDetailedDiffs()
 
   // The randomized tests should fail with probability less than
-  // delta = (1 - 1 / e^depth) ~ 2.98E-8
-  val DEPTH = 25
-  val WIDTH = 300
+  // delta.
+  val DELTA = 1E-10
+  val EPS = 0.001
   val SEED = 1
 
-  val CMS_MONOID = new CountMinSketchMonoid(DEPTH, WIDTH, SEED)
+  val CMS_MONOID = new CountMinSketchMonoid(EPS, DELTA, SEED)
   val RAND = new scala.util.Random
 
   /**
@@ -67,28 +67,39 @@ class CountMinSketchTest extends Specification {
   }
 
   "CountMinSketch" should {
-     "estimate frequencies" in {
-       val totalCount = 5678
-       val range = 897
-       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
-       val cms = CMS_MONOID.create(data)
 
-       (0 to 100).foreach { _ =>
-         val x = RAND.nextInt(range).toLong
-         val exact = exactFrequency(data, x)
-         val approx = approximateFrequency(cms, x)
-         val maxError = cms.maxErrorOfFrequencyEstimate
+    "count total number of elements in a stream" in {
+      val totalCount = 1243
+      val range = 234
+      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
+      val cms = CMS_MONOID.create(data)
 
-         approx must be_>=(exact)
-         (approx - exact).toDouble must be_<=(maxError)
-       }
-     }
+      cms.totalCount must be_==(totalCount)
+    }
+
+    "estimate frequencies" in {
+      val totalCount = 5678
+      val range = 897
+      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
+      val cms = CMS_MONOID.create(data)
+
+      (0 to 100).foreach { _ =>
+        val x = RAND.nextInt(range).toLong
+        val exact = exactFrequency(data, x)
+        val approx = approximateFrequency(cms, x)
+        val maxError = cms.maxErrorOfFrequencyEstimate
+
+        approx must be_>=(exact)
+        (approx - exact).toDouble must be_<=(maxError)
+      }
+    }
 
     "exactly estimate frequencies when given a small stream" in {
       val one = CMS_MONOID.create(1)
       val two = CMS_MONOID.create(2)
       val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
 
+      cms.estimateFrequency(0) must be_==(0)
       cms.estimateFrequency(1) must be_==(1)
       cms.estimateFrequency(2) must be_==(2)
     }
