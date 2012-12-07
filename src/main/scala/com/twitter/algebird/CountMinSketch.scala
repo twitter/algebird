@@ -40,7 +40,9 @@ package com.twitter.algebird
  * of the true frequency (i.e., true frequency <= estimate <= true frequency + 2N / w),
  * where N is the total size of the stream so far.
  *
- * See http://en.wikipedia.org/wiki/Count-Min_sketch for more information.
+ * See http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf for technical details,
+ * including proofs of the estimates and error bounds used in this implementation.
+ *
  * Parts of this implementation are taken from
  * https://github.com/clearspring/stream-lib/blob/master/src/main/java/com/clearspring/analytics/stream/frequency/CountMinSketch.java
  *
@@ -140,6 +142,12 @@ sealed abstract class CMS extends java.io.Serializable {
    */
   def innerProductConfidence(other : CMS) = 1 - delta
   def maxErrorOfInnerProductEstimate(other : CMS) = eps * totalCount * other.totalCount
+
+  // The first frequency moment is the total number of elements in the stream.
+  def f1 : Long = totalCount
+
+  // The second frequency moment is \sum a_i^2, where a_i is the count of the ith element.
+  def f2 : Long = estimateInnerProduct(this)
 }
 
 /**
