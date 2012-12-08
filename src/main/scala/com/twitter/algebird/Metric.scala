@@ -94,6 +94,6 @@ object Metric {
   implicit val jShortMetric = Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
   implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if(x ^ y) 1.0 else 0.0 )
 }
-trait Metric[-V] extends Function2[V, V, Double] {
+trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] {
   def apply(v1: V, v2: V): Double
 }
