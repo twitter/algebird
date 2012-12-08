@@ -26,28 +26,34 @@ object BaseMetricProperties extends Properties("Metric") with MetricProperties {
   property("long metric") = metricLaws[Long]
   property("short metric") = metricLaws[Short]
 
-  implicit val mapMetric = Metric.minkowskiMapMetric[Int, Double](1)
+  implicit val iterMetric = Metric.L1Iterable[Double]
+  property("double iterable metric") = metricLaws[List[Double]]
+
+  implicit val mapMetric = Metric.L1Map[Int, Double]
   property("int double map metric") = metricLaws[Map[Int, Double]]
 }
 
 trait MetricProperties {
   def isNonNegative[T : Metric : Arbitrary] = forAll { (a: T, b: T) =>
-    beGreaterThan(Metric(a, b), 0.0)
+    val m = Metric(a, b)
+    beGreaterThan(m, 0.0) || beCloseTo(m, 0.0)
   }
-  def isEqualIfZero[T : Metric : Arbitrary] = forAll { (a: T) =>
-    beCloseTo(Metric(a, a), 0.0)
+  def isEqualIffZero[T : Metric : Arbitrary] = forAll { (a: T, b: T) =>
+    beCloseTo(Metric(a, b), 0.0) || a != b
   }
   def isSymmetric[T : Metric : Arbitrary] = forAll { (a: T, b: T) =>
     beCloseTo(Metric(a, b), Metric(b, a))
   }
-  def satisfiesTriangleInequality[T : Metric : Arbitrary] = forAll { (a: T, b:T, c: T) =>
-    beGreaterThan(Metric(a, b) + Metric(b, c), Metric(a, c))
+  def satisfiesTriangleInequality[T : Metric : Arbitrary] = forAll { (a: T, b: T, c: T) =>
+    val m1 = Metric(a, b) + Metric(b, c)
+    val m2 = Metric(a, c)
+    beGreaterThan(m1, m2) || beCloseTo(m1, m2)
   }
 
   def metricLaws[T : Metric : Arbitrary] =
-    isNonNegative[T] && isEqualIfZero[T] && isSymmetric[T] && satisfiesTriangleInequality[T]
+    isNonNegative[T] && isEqualIffZero[T] && isSymmetric[T] && satisfiesTriangleInequality[T]
 
   // TODO: are there methods in scalacheck that can do these?
   def beCloseTo(a: Double, b: Double, eps: Double = 1e-6) =  a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
-  def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10) = a > b || (math.abs(a - b) > -1 * eps) || (a.isInfinite && b.isInfinite)
+  def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10) = a > b || a > b - eps || (a.isInfinite && b.isInfinite)
 }

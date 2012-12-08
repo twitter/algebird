@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble}
+import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 
 /**
  * A Metric[V] m is a function (V, V) => Double that satisfies the following properties:
@@ -37,10 +37,24 @@ object Metric {
   }
 
   // See http://en.wikipedia.org/wiki/Minkowski_distance
-  def minkowskiIterableMetric[V : Metric](p: Double): Metric[Iterable[V]] = Metric.from{
+  def minkowskiIterable[V : Monoid : Metric](p: Double): Metric[Iterable[V]] = Metric.from{
     (a: Iterable[V], b: Iterable[V]) =>
-      val outP = a.view
-        .zip(b)
+
+      // TODO: copied from IndexedSeq.scala
+      // We need them to be the same length:
+      val maxSize = scala.math.max(a.size, b.size)
+      def pad(v: Iterable[V]) = {
+        val diff = maxSize - v.size
+        if(diff > 0) {
+          v ++ (Iterator.fill(diff)(Monoid.zero[V]))
+        }
+        else {
+          v
+        }
+      }
+
+      val outP = pad(a).view
+        .zip(pad(b))
         .map{ case(i: V, j: V) =>
           math.pow(implicitly[Metric[V]].apply(i, j), p)
         }
@@ -48,7 +62,10 @@ object Metric {
       math.pow(outP, 1.0 / p)
   }
 
-  def minkowskiMapMetric[K, V : Monoid : Metric](p: Double): Metric[Map[K, V]] = Metric.from{
+  def L1Iterable[V : Monoid : Metric] = minkowskiIterable[V](1.0)
+  def L2Iterable[V : Monoid : Metric] = minkowskiIterable[V](2.0)
+
+  def minkowskiMap[K, V : Monoid : Metric](p: Double): Metric[Map[K, V]] = Metric.from{
     (a: Map[K, V], b: Map[K, V]) =>
       val outP = (a.keySet ++ b.keySet)
         .map{ key: K =>
@@ -60,18 +77,23 @@ object Metric {
       math.pow(outP, 1.0 / p)
   }
 
+  def L1Map[K, V : Monoid : Metric] = minkowskiMap[K, V](1.0)
+  def L2Map[K, V : Monoid : Metric] = minkowskiMap[K, V](2.0)
+
   // Implicit values
   implicit val doubleMetric = Metric.from((a: Double, b: Double) => math.abs(a - b))
   implicit val intMetric = Metric.from((a: Int, b: Int) => math.abs((a - b).toDouble))
   implicit val longMetric = Metric.from((a: Long, b: Long) => math.abs((a - b).toDouble))
-  implicit val floatMetric = Metric.from((a: Float, b: Float) => math.abs((a - b).toDouble))
+  implicit val floatMetric = Metric.from((a: Float, b: Float) => math.abs((a.toDouble - b.toDouble)))
   implicit val shortMetric = Metric.from((a: Short, b: Short) => math.abs((a - b).toDouble))
+  implicit val boolMetric = Metric.from((x: Boolean, y: Boolean) => if(x ^ y) 1.0 else 0.0 )
   implicit val jDoubleMetric = Metric.from((a: JDouble, b: JDouble) => math.abs(a - b))
   implicit val jIntMetric = Metric.from((a: JInt, b: JInt) => math.abs((a - b).toDouble))
   implicit val jLongMetric = Metric.from((a: JLong, b: JLong) => math.abs((a - b).toDouble))
-  implicit val jFloatMetric = Metric.from((a: JFloat, b: JFloat) => math.abs((a - b).toDouble))
+  implicit val jFloatMetric = Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
   implicit val jShortMetric = Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
+  implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if(x ^ y) 1.0 else 0.0 )
 }
-trait Metric[-V] {
+trait Metric[-V] extends Function2[V, V, Double] {
   def apply(v1: V, v2: V): Double
 }
