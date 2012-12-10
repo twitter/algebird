@@ -22,6 +22,20 @@ import org.scalacheck.Prop._
 object BaseScalingOperatorProperties extends Properties("ScalingOperator") with LinearScalingOperatorProperties {
   property("double scaling") = linearScalingLaws[Double](beCloseTo(_, _))
   property("float scaling") = linearScalingLaws[Float]((f1, f2) => beCloseTo(f1.toDouble, f2.toDouble))
+
+  // TODO: we won't need this when we have an Equatable trait
+  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) = {
+    (a.keySet ++ b.keySet).forall { key =>
+      (a.get(key), b.get(key)) match {
+        case (Some(aVal), Some(bVal)) => beCloseTo(aVal, bVal)
+        case (Some(aVal), None) => beCloseTo(aVal, 0.0)
+        case (None, Some(bVal)) => beCloseTo(bVal, 0.0)
+        case _ => true
+      }
+    }
+  }
+
+  property("map int double scaling") = linearScalingLaws[Map[Int, Double]](mapEqFn(_, _))
 }
 
 trait LinearScalingOperatorProperties {
