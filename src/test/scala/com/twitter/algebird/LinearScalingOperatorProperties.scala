@@ -55,8 +55,18 @@ trait LinearScalingOperatorProperties {
     eqfn(v1, v2)
   }
 
+  def identityOne[T : ScalingOperator : Monoid : Arbitrary](eqfn: (T, T) => Boolean) = forAll { (a: T) =>
+    eqfn(ScalingOperator.scale(a, 1.0), a)
+  }
+
+  def distributesOverScalarPlus[T : ScalingOperator : Monoid : Arbitrary](eqfn: (T, T) => Boolean) = forAll { (a: T, b: Double, c: Double) =>
+    val v1 = ScalingOperator.scale(a, b + c)
+    val v2 = Monoid.plus(ScalingOperator.scale(a, b), ScalingOperator.scale(a, c))
+    eqfn(v1, v2)
+  }
+
   def linearScalingLaws[T : ScalingOperator : Monoid : Arbitrary](eqfn: (T, T) => Boolean) =
-    isEqualIfZero(eqfn) && distributesWithPlus(eqfn) && isAssociative(eqfn)
+    isEqualIfZero(eqfn) && distributesWithPlus(eqfn) && isAssociative(eqfn) && identityOne(eqfn) && distributesOverScalarPlus(eqfn)
 
   def beCloseTo(a: Double, b: Double) =
     a == b || (math.abs(a - b) / math.abs(a)) < 1e-10 || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
