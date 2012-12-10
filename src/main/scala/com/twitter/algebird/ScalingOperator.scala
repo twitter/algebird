@@ -22,6 +22,14 @@ import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFlo
  * This class represents the operation of scaling by a double constant.
  *
  * Includes a bunch of common sense implicits.
+ *
+ * A ScalingOperator is the scalar multiplication part of a vector space.
+ * It is expected to satisfy the following properties:
+ * 1. scale(v, 0.0) == Monoid.zero
+ * 2. scale(scale(v, b), a) == scale(v, a * b)
+ * 3. scale(v, 1.0) == v
+ * 4. scale(v, a + b) == plus(scale(v, a), scale(v, b))
+ *
  */
 object ScalingOperator {
   def scale[T](v: T, scalar: Double)(implicit so: ScalingOperator[T]) = so.scale(v, scalar)
