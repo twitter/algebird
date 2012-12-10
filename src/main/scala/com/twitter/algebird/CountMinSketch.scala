@@ -20,7 +20,9 @@ package com.twitter.algebird
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
  *
- * It works as follows:
+ * It works as follows. Let (eps, delta) be two parameters that describe the
+ * confidence in our error estimates, and let d = ceil(ln 1/delta)
+ * and w = ceil(e / eps). Then:
  *
  * - Take d pairwise independent hash functions h_i, each of which maps
  *   onto the domain [0, w - 1].
@@ -36,11 +38,13 @@ package com.twitter.algebird
  *
  *   min_i { counts[i, h_i[x]] }
  *
- * With probability at least 1 - 0.5^d, this estimate is within 2N / w
- * of the true frequency (i.e., true frequency <= estimate <= true frequency + 2N / w),
+ * With probability at least 1 - delta, this estimate is within eps * N
+ * of the true frequency (i.e., true frequency <= estimate <= true frequency + eps * N),
  * where N is the total size of the stream so far.
  *
- * See http://en.wikipedia.org/wiki/Count-Min_sketch for more information.
+ * See http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf for technical details,
+ * including proofs of the estimates and error bounds used in this implementation.
+ *
  * Parts of this implementation are taken from
  * https://github.com/clearspring/stream-lib/blob/master/src/main/java/com/clearspring/analytics/stream/frequency/CountMinSketch.java
  *
@@ -50,12 +54,20 @@ package com.twitter.algebird
 /**
  * Monoid for adding Count-Min sketches.
  *
- * @depth Number of hash functions used.
- * @width Number of counters per hash function.
- * @seed  A seed to initialize the random number generator used to create
- *        the pairwise independent hash functions.
+ * eps and delta are parameters that bound the error of each query estimate. For example, errors in
+ * answering queries (e.g., how often has element x appeared in the stream described by the sketch?)
+ * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
+ * some factor depending on eps."
+ *
+ * @eps A parameter that bounds the error of each query estimate.
+ * @delta A bound on the probability that a query estimate does not lie within some small interval
+ *        (an interval that depends on eps) around the truth.
+ * @seed  A seed to initialize the random number generator used to create the pairwise independent
+ *        hash functions.
  */
-class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[CMS] {
+class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int) extends Monoid[CMS] {
+  assert(0 < eps && eps < 1, "eps must lie in (0, 1).")
+  assert(0 < delta && delta < 1, "delta must lie in (0, 1).")
 
   // Typically, we would use d pairwise independent hash functions of the form
   //
@@ -68,10 +80,12 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
   //   h_i(x) = a_i * x (mod p)
   val hashes : Seq[CMSHash] = {
     val r = new scala.util.Random(seed)
-    (0 to (depth - 1)).map { _ => CMSHash(r.nextInt, 0, width) }
+    val numHashes = CMS.depth(delta)
+    val numCounters = CMS.width(eps)
+    (0 to (numHashes - 1)).map { _ => CMSHash(r.nextInt, 0, numCounters) }
   }
 
-  val zero : CMS = CMSZero(hashes, depth, width)
+  val zero : CMS = CMSZero(hashes, eps, delta)
 
   /**
    * We assume the Count-Min sketches on the left and right use the same hash functions.
@@ -81,7 +95,7 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
   /**
    * Create a Count-Min sketch out of a single item.
    */
-  def create(item : Long) : CMS = CMSItem(item, hashes, depth, width)
+  def create(item : Long) : CMS = CMSItem(item, hashes, eps, delta)
 
   /**
    * Creates a Count-Min sketch out of the given data stream.
@@ -91,15 +105,36 @@ class CountMinSketchMonoid(depth : Int, width : Int, seed : Int) extends Monoid[
   }
 }
 
+object CMS {
+  def monoid(eps : Double, delta : Double, seed : Int) = new CountMinSketchMonoid(eps, delta, seed)
+  def monoid(depth : Int, width : Int, seed : Int) = {
+    new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed)
+  }
+
+  /**
+   * Functions to translate between (eps, delta) and (depth, width). The translation is:
+   * depth = ceil(ln 1/delta)
+   * width = ceil(e / eps)
+   */
+  def eps(width : Int) = scala.math.exp(1.0) / width
+  def delta(depth : Int) = 1.0 / scala.math.exp(depth)
+  def depth(delta : Double) = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+  def width(eps : Double) = scala.math.ceil(scala.math.exp(1) / eps).toInt
+}
+
 /**
  * The actual Count-Min sketch data structure.
  */
 sealed abstract class CMS extends java.io.Serializable {
-  // The total number of elements seen in the data stream so far.
-  def totalCount : Long
 
-  def depth : Int
-  def width : Int
+  // Parameters used to bound confidence in error estimates.
+  def eps : Double
+  def delta : Double
+
+  // Number of hash functions.
+  def depth : Int = CMS.depth(delta)
+  // Number of counters per hash function.
+  def width : Int = CMS.width(eps)
 
   def ++(other : CMS) : CMS
 
@@ -111,60 +146,82 @@ sealed abstract class CMS extends java.io.Serializable {
   def estimateFrequency(item : Long) : Long
 
   /**
-   * With probability p >= 1 - 0.5^depth, the Count-Min sketch estimate
-   * of the frequency of any element is within 2 * totalCount / width
-   * of the true frequency.
+   * It is always true that trueFrequency <= estimatedFrequency.
+   * With probability p >= 1 - delta, it also holds that
+   * estimatedFrequency <= trueFrequency + eps * totalCount.
    */
-  def frequencyConfidence = 1 - 1 / math.pow(2.0, depth)
-  def maxErrorOfFrequencyEstimate = (2.0 * totalCount) / width
+  def frequencyConfidence = 1 - delta
+  def maxErrorOfFrequencyEstimate = eps * totalCount
+
+  /**
+   * Returns an estimate of the inner product against another data stream.
+   *
+   * In other words, let a_i denote the number of times element i has been seen in
+   * the data stream summarized by this CMS, and let b_i denote the same for the other CMS.
+   * Then this returns an estimate of <a, b> = \sum a_i b_i
+   *
+   * Note: this can also be viewed as the join size between two relations.
+   */
+  def estimateInnerProduct(other : CMS) : Long
+
+  /**
+   * It is always true that actualInnerProduct <= estimatedInnerProduct.
+   * With probability p >= 1 - delta, it also holds that
+   * estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount
+   */
+  def innerProductConfidence(other : CMS) = 1 - delta
+  def maxErrorOfInnerProductEstimate(other : CMS) = eps * totalCount * other.totalCount
+
+  // Total number of elements seen in the data stream so far.
+  def totalCount : Long
+  // The first frequency moment is the total number of elements in the stream.
+  def f1 : Long = totalCount
+  // The second frequency moment is \sum a_i^2, where a_i is the count of the ith element.
+  def f2 : Long = estimateInnerProduct(this)
 }
 
 /**
  * Used for initialization.
  */
-case class CMSZero(hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
+case class CMSZero(hashes : Seq[CMSHash], eps : Double, delta : Double) extends CMS {
   def totalCount = 0L
   def ++(other : CMS) = other
   def estimateFrequency(item : Long) = 0L
+  def estimateInnerProduct(other : CMS) = 0L
 }
 
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from
  * sparse counts tables.
  */
-case class CMSItem(item : Long, hashes : Seq[CMSHash], depth : Int, width : Int) extends CMS {
+case class CMSItem(item : Long, hashes : Seq[CMSHash], eps : Double, delta : Double) extends CMS {
   def totalCount = 1L
 
   def ++(other : CMS) : CMS = {
     other match {
-      case CMSZero(_, _, _) => this
-      case CMSItem(otherItem, _, _, _) => {
-        val cms = CMSInstance(hashes, depth, width)
-        cms + item + otherItem
-      }
-      case cms@CMSInstance(_, _, _) => cms + item
+      case other : CMSZero => this
+      case other : CMSItem => CMSInstance(hashes, eps, delta) + item + other.item
+      case other : CMSInstance => other + item
     }
   }
 
   def estimateFrequency(x : Long) = if (item == x) 1L else 0L
+
+  def estimateInnerProduct(other : CMS) : Long = other.estimateFrequency(item)
 }
 
 /**
- * The general sketch structure, used for holding any number of elements.
+ * The general Count-Min sketch structure, used for holding any number of elements.
  */
-case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, totalCnt : Long) extends CMS {
-
-  def totalCount : Long = totalCnt
-
-  def depth : Int = countsTable.depth
-  def width : Int = countsTable.width
+case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, totalCount : Long,
+                       eps : Double, delta : Double) extends CMS {
 
   def ++(other : CMS) : CMS = {
     other match {
-      case cms@CMSZero(_, _, _) => cms ++ this
-      case cms@CMSItem(_, _, _, _) => cms ++ this
-      case cms@CMSInstance(_, _, _) => {
-        CMSInstance(hashes, countsTable ++ cms.countsTable, totalCount + cms.totalCount)
+      case other : CMSZero => other ++ this
+      case other : CMSItem => other ++ this
+      case other : CMSInstance => {
+        CMSInstance(hashes, countsTable ++ other.countsTable, totalCount + other.totalCount, eps, delta)
       }
     }
   }
@@ -172,6 +229,28 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
   def estimateFrequency(item : Long) : Long = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(hashes(i)(item)) }
     estimates.min
+  }
+
+  /**
+   * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and
+   * column k.
+   * Then the Count-Min sketch estimate of the inner product between A and B is the minimum inner product
+   * between their rows:
+   * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k])
+   */
+  def estimateInnerProduct(other : CMS) : Long = {
+    other match {
+      case other : CMSInstance => {
+        assert((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
+
+        def innerProductAtDepth(d : Int) = (0 to (width - 1)).map { w =>
+                                              countsTable.getCount(d, w) * other.countsTable.getCount(d, w)
+                                           }.sum
+
+        (0 to (depth - 1)).map { innerProductAtDepth(_) }.min
+      }
+      case _ => other.estimateInnerProduct(this)
+    }
   }
 
   /**
@@ -189,15 +268,15 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
         }
       val newCount = totalCount + count
 
-      CMSInstance(hashes, newCountsTable, newCount)
+      CMSInstance(hashes, newCountsTable, newCount, eps, delta)
     }
   }
 }
 
 object CMSInstance {
   // Initializes a CMSInstance with all zeroes.
-  def apply(hashes : Seq[CMSHash], depth : Int, width : Int) : CMSInstance = {
-    CMSInstance(hashes, CMSCountsTable(depth, width), 0)
+  def apply(hashes : Seq[CMSHash], eps : Double, delta : Double) : CMSInstance = {
+    CMSInstance(hashes, CMSCountsTable(CMS.depth(delta), CMS.width(eps)), 0, eps, delta)
   }
 }
 
