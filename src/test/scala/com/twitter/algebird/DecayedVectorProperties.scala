@@ -44,5 +44,5 @@ object DecayedVectorProperties extends Properties("DecayedVector") with BaseProp
     mapsAreClose && timesAreClose
   }
 
-  property("is a monoid") = monoidLawsEq[DecayedVector[Double, ({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
+  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[Double, ({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
 }
