@@ -33,10 +33,10 @@ object VectorSpace {
   }
 
   // Implicits
-  implicit def indexedSeqScaling[T : Field] =
+  implicit def indexedSeqSpace[T : Field] =
     from[T, IndexedSeq]{(s, seq) => seq.map(Ring.times(s, _)) }
 
-  implicit def mapScaling[K, T : Field] =
+  implicit def mapSpace[K, T : Field] =
     from[T, ({type x[a]=Map[K, a]})#x] { (s, m) => m.mapValues(Ring.times(s, _))}
 
   // TODO: add implicits for java lists, arrays, and options
