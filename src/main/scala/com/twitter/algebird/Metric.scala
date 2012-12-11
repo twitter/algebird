@@ -64,6 +64,7 @@ object Metric {
 
   def L1Iterable[V : Monoid : Metric] = minkowskiIterable[V](1.0)
   def L2Iterable[V : Monoid : Metric] = minkowskiIterable[V](2.0)
+  // TODO: Implement Linf, using an ordering on V
 
   def minkowskiMap[K, V : Monoid : Metric](p: Double): Metric[Map[K, V]] = Metric.from{
     (a: Map[K, V], b: Map[K, V]) =>
@@ -93,6 +94,10 @@ object Metric {
   implicit val jFloatMetric = Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
   implicit val jShortMetric = Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
   implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if(x ^ y) 1.0 else 0.0 )
+
+  // If you don't want to use L2 as your default metrics, you need to override these
+  implicit def iterableMetrix[V : Monoid : Metric] = L2Iterable[V]
+  implicit def mapMetrix[K, V : Monoid : Metric] = L2Map[K, V]
 }
 trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] {
   def apply(v1: V, v2: V): Double
