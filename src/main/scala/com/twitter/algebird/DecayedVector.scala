@@ -17,6 +17,9 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
+ * Represents a container class together with time.
+ * Its monoid consists of exponentially scaling the older value and summing with
+ * the newer one.
  */
 object DecayedVector {
   def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double) = {
@@ -35,7 +38,9 @@ object DecayedVector {
     }
   }
 
-  def map[K,F](m: Map[K,F], exptime: F) = DecayedVector[F,({type x[a]=Map[K, a]})#x](m,exptime)
+  def forMap[K,F](m: Map[K, F], exptime: F) = DecayedVector[F, ({type x[a]=Map[K, a]})#x](m, exptime)
+  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double) =
+    forMap(m, math.pow(2.0, time / halfLife))
 
   def mapMonoidWithEpsilon[K, F](eps: Double)
       (implicit vs: VectorSpace[F, ({type x[a]=Map[K, a]})#x], metric: Metric[Map[K, F]], ord: Ordering[F]) =
