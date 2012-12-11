@@ -23,15 +23,15 @@ import org.scalacheck.Gen.choose
 
 object DecayedVectorProperties extends Properties("DecayedVector") with BaseProperties {
 
-  implicit val mpint: Arbitrary[DecayedVector[Double, ({type x[a]=Map[Int, a]})#x]] = Arbitrary { for {
-      t <- choose(0.0, 1000.0)
+  implicit val mpint: Arbitrary[DecayedVector[({type x[a]=Map[Int, a]})#x]] = Arbitrary { for {
+      t <- choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
       m <- arbitrary[Map[Int, Double]]
     } yield DecayedVector.forMap(m, t) }
 
   // TODO: we won't need this when we have an Equatable trait
-  def decayedMapEqFn(a: DecayedVector[Double, ({type x[a]=Map[Int, a]})#x], b: DecayedVector[Double, ({type x[a]=Map[Int, a]})#x]) = {
-    def beCloseTo(a: Double, b: Double) =
-      a == b || (math.abs(a - b) / math.abs(a)) < 1e-10 || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
+  def decayedMapEqFn(a: DecayedVector[({type x[a]=Map[Int, a]})#x], b: DecayedVector[({type x[a]=Map[Int, a]})#x]) = {
+    def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =
+      a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
       (a.vector.get(key), b.vector.get(key)) match {
         case (Some(aVal), Some(bVal)) => beCloseTo(aVal, bVal)
@@ -40,9 +40,9 @@ object DecayedVectorProperties extends Properties("DecayedVector") with BaseProp
         case _ => true
       }
     }
-    val timesAreClose = beCloseTo(a.expTime, b.expTime)
+    val timesAreClose = beCloseTo(a.scaledTime, b.scaledTime)
     mapsAreClose && timesAreClose
   }
 
-  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[Double, ({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
+  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
 }

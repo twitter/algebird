@@ -96,8 +96,8 @@ object Metric {
   implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if(x ^ y) 1.0 else 0.0 )
 
   // If you don't want to use L2 as your default metrics, you need to override these
-  implicit def iterableMetrix[V : Monoid : Metric] = L2Iterable[V]
-  implicit def mapMetrix[K, V : Monoid : Metric] = L2Map[K, V]
+  implicit def iterableMetric[V : Monoid : Metric] = L2Iterable[V]
+  implicit def mapMetric[K, V : Monoid : Metric] = L2Map[K, V]
 }
 trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] {
   def apply(v1: V, v2: V): Double
