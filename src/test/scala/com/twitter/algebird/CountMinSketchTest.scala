@@ -19,6 +19,16 @@ object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperti
     }
 
   property("CountMinSketch is a Monoid") = monoidLaws[CMS]
+
+  implicit val approxGen =
+    Arbitrary {
+      for (v0 <- choose(0, 10000);
+        v1 <- choose(v0, 100001);
+        v2 <- choose(v1, 100002)
+      ) yield Approximate(v0, v1, v2, 0.9)
+    }
+
+  property("Approximate is a Monoid") = monoidLaws[Approximate[Int]]
 }
 
 class CountMinSketchTest extends Specification {
@@ -45,7 +55,7 @@ class CountMinSketchTest extends Specification {
    * structure.
    */
   def approximateFrequency(cms : CMS, x : Long) : Long = {
-    cms.estimateFrequency(x)
+    cms.frequency(x).estimate
   }
 
   /**
@@ -63,7 +73,7 @@ class CountMinSketchTest extends Specification {
    * Returns the estimated inner product between two Count-Min sketch structures.
    */
   def approximateInnerProduct(cms1 : CMS, cms2 : CMS) : Long = {
-    cms1.estimateInnerProduct(cms2)
+    cms1.innerProduct(cms2).estimate
   }
 
   "CountMinSketch" should {
@@ -87,10 +97,10 @@ class CountMinSketchTest extends Specification {
         val x = RAND.nextInt(range).toLong
         val exact = exactFrequency(data, x)
         val approx = approximateFrequency(cms, x)
-        val maxError = cms.maxErrorOfFrequencyEstimate
+        val maxError = approx - cms.frequency(x).min
 
         approx must be_>=(exact)
-        (approx - exact).toDouble must be_<=(maxError)
+        (approx - exact) must be_<=(maxError)
       }
     }
 
@@ -99,9 +109,9 @@ class CountMinSketchTest extends Specification {
       val two = CMS_MONOID.create(2)
       val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
 
-      cms.estimateFrequency(0) must be_==(0)
-      cms.estimateFrequency(1) must be_==(1)
-      cms.estimateFrequency(2) must be_==(2)
+      cms.frequency(0).estimate must be_==(0)
+      cms.frequency(1).estimate must be_==(1)
+      cms.frequency(2).estimate must be_==(2)
     }
 
     "estimate inner products" in {
@@ -112,35 +122,36 @@ class CountMinSketchTest extends Specification {
       val cms1 = CMS_MONOID.create(data1)
       val cms2 = CMS_MONOID.create(data1)
 
-      val approx = cms1.estimateInnerProduct(cms2)
+      val approxA = cms1.innerProduct(cms2)
+      val approx = approxA.estimate
       val exact = exactInnerProduct(data1, data2)
-      val maxError = cms1.maxErrorOfInnerProductEstimate(cms2)
+      val maxError = approx - approxA.min
 
-      approx must be_==(cms2.estimateInnerProduct(cms1))
+      approx must be_==(cms2.innerProduct(cms1).estimate)
       approx must be_>=(exact)
-      (approx - exact).toDouble must be_<=(maxError)
+      (approx - exact) must be_<=(maxError)
     }
 
     "exactly estimate inner products when given a small stream" in {
       // Nothing in common.
       val a1 = List(1L, 2L, 3L)
       val a2 = List(4L, 5L, 6L)
-      CMS_MONOID.create(a1).estimateInnerProduct(CMS_MONOID.create(a2)) must be_==(0)
+      CMS_MONOID.create(a1).innerProduct(CMS_MONOID.create(a2)).estimate must be_==(0)
 
       // One element in common.
       val b1 = List(1L, 2L, 3L)
       val b2 = List(3L, 5L, 6L)
-      CMS_MONOID.create(b1).estimateInnerProduct(CMS_MONOID.create(b2)) must be_==(1)
+      CMS_MONOID.create(b1).innerProduct(CMS_MONOID.create(b2)).estimate must be_==(1)
 
       // Multiple, non-repeating elements in common.
       val c1 = List(1L, 2L, 3L)
       val c2 = List(3L, 2L, 6L)
-      CMS_MONOID.create(c1).estimateInnerProduct(CMS_MONOID.create(c2)) must be_==(2)
+      CMS_MONOID.create(c1).innerProduct(CMS_MONOID.create(c2)).estimate must be_==(2)
 
       // Multiple, repeating elements in common.
       val d1 = List(1L, 2L, 2L, 3L, 3L)
       val d2 = List(2L, 3L, 3L, 6L)
-      CMS_MONOID.create(d1).estimateInnerProduct(CMS_MONOID.create(d2)) must be_==(6)
+      CMS_MONOID.create(d1).innerProduct(CMS_MONOID.create(d2)).estimate must be_==(6)
     }
   }
 }
