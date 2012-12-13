@@ -224,6 +224,9 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
   // Some constant from the algorithm:
   protected val fourBillionSome = HyperLogLog.twopow(32)
 
+
+  final def estimateSize(hll : HLL) : Double = sizeOf(hll).estimate.toDouble
+
   final def sizeOf(hll: HLL): Approximate[Long] = {
     hll match {
       case HLLZero => Approximate.exact(0L)
@@ -254,6 +257,9 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
       e
     }
   }
+
+  final def estimateIntersectionSize(his : Seq[HLL]) : Double =
+    intersectionSize(his).estimate.toDouble
 
   final def intersectionSize(his: Seq[HLL]): Approximate[Long] = {
     his.headOption.map { head =>
