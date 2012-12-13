@@ -1,6 +1,6 @@
 name := "algebird"
 
-version := "0.1.4-SNAPSHOT"
+version := "0.1.4"
 
 organization := "com.twitter"
 
