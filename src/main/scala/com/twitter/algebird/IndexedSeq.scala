@@ -53,7 +53,7 @@ class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng)
   with Ring[IndexedSeq[T]] {
 
   // TODO
-  def one = error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
+  def one = sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
 
   def times(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] =
     // We don't need to pad, because 0 * x = 0

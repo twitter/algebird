@@ -28,10 +28,15 @@ import java.util.Arrays
  * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
  */
 object HyperLogLog {
-
   def hash(input : Array[Byte]) : Array[Byte] = {
-    val md = java.security.MessageDigest.getInstance("MD5")
-    md.digest(input)
+    val seed = 12345678
+    val (l0, l1) = MurmurHash128(seed)(input)
+    val buf = new Array[Byte](16)
+    java.nio.ByteBuffer
+      .wrap(buf)
+      .putLong(l0)
+      .putLong(l1)
+    buf
   }
 
   implicit def int2Bytes(i : Int) = {
@@ -205,6 +210,8 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     HLLItem(memSize,j,rhow)
   }
 
+  def error: Double = 1.04/scala.math.sqrt(HyperLogLog.twopow(bits))
+
   private val largeE = HyperLogLog.twopow(32)/30.0
   private val smallE = 5 * memSize / 2.0
 
@@ -224,11 +231,24 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 
 
   final def estimateSize(hll : HLL) : Double = {
+    sizeOf(hll).estimate.toDouble
+  }
+
+  final def sizeOf(hll: HLL): Approximate[Long] = {
     hll match {
-      case HLLZero => 0.0
-      case HLLItem(_,_,_) => 1.0
-      case hi@HLLInstance(_) => estimateSizeInstance(hi)
+      case HLLZero => Approximate.exact(0L)
+      case HLLItem(_,_,_) => Approximate.exact(1L)
+      case hi@HLLInstance(_) => asApprox(estimateSizeInstance(hi))
     }
+  }
+
+  private def asApprox(v: Double): Approximate[Long] = {
+    val stdev = error
+    val lowerBound = math.floor(math.max(v*(1.0 - 3*stdev), 0.0)).toLong
+    val upperBound = math.ceil(v*(1.0 + 3*stdev)).toLong
+    // Lower bound. see: http://en.wikipedia.org/wiki/68-95-99.7_rule
+    val prob3StdDev = 0.9972
+    Approximate(lowerBound, v.toLong, upperBound, prob3StdDev)
   }
 
   protected def estimateSizeInstance(hi : HLLInstance) : Double = {
@@ -245,8 +265,11 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     }
   }
 
-  // The error for k items is ~ (2^{k} - 1) * error of single HLL
   final def estimateIntersectionSize(his : Seq[HLL]) : Double = {
+    intersectionSize(his).estimate.toDouble
+  }
+
+  final def intersectionSize(his: Seq[HLL]): Approximate[Long] = {
     his.headOption.map { head =>
       val tail = his.tail
       /*
@@ -256,9 +279,10 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
        * the latter we can compute with tail.map { _ + A } using the HLLInstance +
        * since + on HLLInstance creates the instance for the union.
        */
-      estimateSize(head) + estimateIntersectionSize(tail) -
-        estimateIntersectionSize(tail.map { _ + head })
+      sizeOf(head) + intersectionSize(tail) -
+        intersectionSize(tail.map { _ + head })
     }
-    .getOrElse(0.0) max 0.0
+    .map { _.withMin(0L) } //We always know the insection is >= 0
+    .getOrElse(Approximate.exact(0L)) //Empty lists have no intersection
   }
 }

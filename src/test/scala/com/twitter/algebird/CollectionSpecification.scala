@@ -7,6 +7,17 @@ import org.scalacheck.Prop.forAll
 
 object CollectionSpecification extends Properties("Collections") with BaseProperties {
 
+  implicit def arbMin[T:Arbitrary] : Arbitrary[Min[T]] =
+    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
+  implicit def arbMax[T:Arbitrary] : Arbitrary[Max[T]] =
+    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
+
+  property("MinSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Min[Int]]
+  property("MaxSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Max[Int]]
+
+  property("Either is a Semigroup") = semigroupLaws[Either[String,Int]]
+  property("Either is a Semigroup, with a Right non-monoid semigroup") = semigroupLaws[Either[String,Max[Int]]]
+
   property("Option Monoid laws") = monoidLaws[Option[Int]] && monoidLaws[Option[String]]
 
   property("List plus") = forAll { (a : List[Int], b : List[Int]) =>
@@ -47,6 +58,29 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
 
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
-  // Either is actually a semigroup, but we don't yet have a typeclass for that:
-  property("Either is semigroup") = isAssociative[Either[String,Int]]
+  property("Either is a Monoid") = monoidLaws[Either[String,Int]]
+
+  property("MapAlgebra.removeZeros works") = forAll { (m: Map[Int,Int]) =>
+    !MapAlgebra.removeZeros(m).values.toSet.contains(0)
+  }
+
+  property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") =
+    forAll { (m: Map[Int,Int]) =>
+      Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m))
+  }
+
+  property("sumByKey works") = forAll { (keys : List[Int], values: List[Int]) =>
+    import Operators._
+    val tupList = keys.zip(values)
+    tupList.sumByKey.filter { _._2 != 0 } ==
+      tupList.groupBy { _._1 }
+        .mapValues { v => v.map { _._2 }.sum }
+        .filter { _._2 != 0 }
+  }
+
+  property("MapAlgebra.dot works") = forAll { (m1: Map[Int,Int], m2: Map[Int,Int]) =>
+    // .toList below is to make sure we don't remove duplicate values
+    MapAlgebra.dot(m1, m2) ==
+      (m1.keySet ++ m2.keySet).toList.map { k => m1.getOrElse(k,0) * m2.getOrElse(k,0) }.sum
+  }
 }

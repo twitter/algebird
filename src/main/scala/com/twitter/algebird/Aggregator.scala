@@ -11,12 +11,16 @@ trait Aggregator[A,B,C] extends Function1[TraversableOnce[A], C] with java.io.Se
 
 trait MonoidAggregator[A,B,C] extends Aggregator[A,B,C] {
   def monoid : Monoid[B]
-  def reduce(l : B, r : B) : B = monoid.plus(l, r)
-  override def reduce(items : TraversableOnce[B]) : B = items.foldLeft(monoid.zero){reduce(_,_)}
+  final def reduce(l : B, r : B) : B = monoid.plus(l, r)
+  final override def reduce(items : TraversableOnce[B]) : B =
+    if(items.isEmpty) monoid.zero
+    else items.reduceLeft(reduce _)
 }
 
-object Averager extends MonoidAggregator[Double, AveragedValue, Double] {
-  val monoid = AveragedGroup
-  def prepare(value : Double) = AveragedValue(value)
-  def present(average : AveragedValue) = average.value
+trait RingAggregator[A,B,C] extends Aggregator[A,B,C] {
+  def ring: Ring[B]
+  final def reduce(l: B, r: B): B = ring.times(l,r)
+  final override def reduce(items : TraversableOnce[B]) : B =
+    if(items.isEmpty) ring.one // There are several pseudo-rings, so avoid one if you can
+    else items.reduceLeft(reduce _)
 }

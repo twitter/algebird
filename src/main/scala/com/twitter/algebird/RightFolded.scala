@@ -28,13 +28,13 @@ object RightFolded {
   def monoid[In,Out](foldfn : (In,Out) => Out) =
     new Monoid[RightFolded[In,Out]] {
 
-    lazy val zero = RightFoldedZero[In,Out]()
+    val zero = RightFoldedZero
 
     def plus(left : RightFolded[In,Out], right : RightFolded[In,Out]) = left match {
       case RightFoldedValue(_) => left
-      case RightFoldedZero() => right
+      case RightFoldedZero => right
       case RightFoldedToFold(lList) => right match {
-        case RightFoldedZero() => RightFoldedToFold(lList)
+        case RightFoldedZero => RightFoldedToFold(lList)
         case RightFoldedValue(vr) => RightFoldedValue(lList.foldRight(vr)(foldfn))
         case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
       }
@@ -42,7 +42,7 @@ object RightFolded {
   }
 }
 
-sealed abstract class RightFolded[In,Out]
-case class RightFoldedZero[In,Out]() extends RightFolded[In,Out]
-case class RightFoldedValue[In,Out](v : Out) extends RightFolded[In,Out]
-case class RightFoldedToFold[In,Out](in : List[In]) extends RightFolded[In,Out]
+sealed abstract class RightFolded[+In,+Out]
+case object RightFoldedZero extends RightFolded[Nothing,Nothing]
+case class RightFoldedValue[+Out](v : Out) extends RightFolded[Nothing,Out]
+case class RightFoldedToFold[+In](in : List[In]) extends RightFolded[In,Nothing]
