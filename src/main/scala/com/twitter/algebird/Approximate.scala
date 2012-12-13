@@ -74,7 +74,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
    def contains(v: N): ApproximateBoolean =
      ApproximateBoolean(boundsContain(v), probWithinBounds)
    /*
-    * Nhis is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
+    * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
     * and then x ~ 1.05 returns true
     */
    def ~(v:N): Boolean = boundsContain(v)
