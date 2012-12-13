@@ -216,8 +216,15 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
     }
   }
 
-  private def makeApprox(est: Long): Approximate[Long] =
-    Approximate(est - (eps * totalCount).toLong, est, est, 1 - delta)
+  private def makeApprox(est: Long): Approximate[Long] = {
+    if(est == 0L) {
+      Approximate.exact(0L)
+    }
+    else {
+      val lower = math.max(0L, est - (eps * totalCount).toLong)
+      Approximate(lower, est, est, 1 - delta)
+    }
+  }
 
   def frequency(item : Long) : Approximate[Long] = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) =>

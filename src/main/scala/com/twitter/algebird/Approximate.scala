@@ -16,11 +16,63 @@ limitations under the License.
 
 package com.twitter.algebird
 
+// This gives an answer, and a LOWER BOUND on the probability that answer is
+// correct
+case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
+
+  def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
+
+  def ^(that: ApproximateBoolean): ApproximateBoolean = {
+    // This is true with probability > withProb * that.withProb
+    // The answer is also correct if both are wrong, which is
+    val answer = isTrue ^ that.isTrue
+    ApproximateBoolean(answer, withProb * that.withProb)
+  }
+
+  def ||(that: ApproximateBoolean): ApproximateBoolean = {
+    if(isTrue || that.isTrue) {
+      //We need at least one of them to be true:
+      val newP = List(this, that)
+        .filter { _.isTrue }
+        .map { _.withProb }
+        .max
+      ApproximateBoolean(true, newP)
+    }
+    else {
+      // we need both of these to be correct to believe it is false
+      ApproximateBoolean(false, withProb * that.withProb)
+    }
+  }
+
+  def &&(that: ApproximateBoolean): ApproximateBoolean = {
+    if(isTrue && that.isTrue) {
+      //We need both to be correct:
+      ApproximateBoolean(true, withProb * that.withProb)
+    }
+    else {
+      // Our confidence is the maximum confidence of the false cases:
+      val newP = List(this, that)
+        .filterNot { _.isTrue }
+        .map { _.withProb }
+        .max
+      ApproximateBoolean(false, newP)
+    }
+  }
+}
+
+object ApproximateBoolean {
+  def exact(b: Boolean) = ApproximateBoolean(b, 1.0)
+  val exactFalse = exact(false)
+  val exactTrue = exact(true)
+}
+
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
 case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
   (implicit val numeric: Numeric[N]) {
    // is this value contained within the bounds:
    def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
+   def contains(v: N): ApproximateBoolean =
+     ApproximateBoolean(boundsContain(v), probWithinBounds)
    /*
     * Nhis is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
     * and then x ~ 1.05 returns true
@@ -37,6 +89,9 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
        n.plus(estimate, right.estimate),
        n.plus(max, right.max),
        probWithinBounds * right.probWithinBounds)
+   }
+   def -(right: Approximate[N]): Approximate[N] = {
+     this.+(right.negate)
    }
    /** This is not distributive, because:
     * a*(b+c) has two probability multiplications
@@ -64,15 +119,33 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
          ends.max, newProb)
      }
 
-   def isZero: Boolean = {
-     isExact && numeric.equiv(estimate, numeric.zero)
-   }
-   def isOne: Boolean = {
-     isExact && numeric.equiv(estimate, numeric.one)
-   }
+  def isZero: Boolean =
+    isExact && numeric.equiv(estimate, numeric.zero)
+  def isOne: Boolean =
+    isExact && numeric.equiv(estimate, numeric.one)
 
-   def negate = {
+  def negate: Approximate[N] =
     this * Approximate.exact(numeric.negate(numeric.one))
+
+  // Assert that we definitely know the lower bound is better than m
+  def withMin(m: N): Approximate[N] = {
+    require(numeric.lteq(m, max))
+    if(numeric.lteq(m, min) ) {
+      this
+    }
+    else {
+      Approximate(m, numeric.max(m, estimate), max, probWithinBounds)
+    }
+  }
+  // Assert that we definitely know the lower bound is better than m
+  def withMax(m: N): Approximate[N] = {
+    require(numeric.lteq(min, m))
+    if(numeric.lteq(max, m) ) {
+      this
+    }
+    else {
+      Approximate(min, numeric.min(m, estimate), m, probWithinBounds)
+    }
   }
 }
 

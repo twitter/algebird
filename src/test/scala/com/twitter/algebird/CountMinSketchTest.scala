@@ -22,42 +22,6 @@ object CountMinSketchLaws extends Properties("CountMinSketch") with BaseProperti
   property("CountMinSketch is a Monoid") = monoidLaws[CMS]
 }
 
-object ApproximateLaws extends Properties("Approximate") with BaseProperties {
-
-  implicit val approxGen =
-    Arbitrary {
-      for (v0 <- choose(0L, (1L << 15) - 2);
-        v1 <- choose(v0, (1L << 15) - 1);
-        v2 <- choose(v1, (1L << 15))
-      ) yield Approximate(v0, v1, v2, 0.9)
-    }
-
-  property("is a Monoid") = monoidLaws[Approximate[Long]]
-  property("always contain estimate") = forAll {
-    (ap1: Approximate[Long], ap2: Approximate[Long]) =>
-    ((ap1 + ap2) ~ (ap1.estimate + ap2.estimate)) &&
-      ((ap1 * ap2) ~ (ap1.estimate * ap2.estimate)) &&
-      ap1 ~ (ap1.estimate) &&
-      ap2 ~ (ap2.estimate) &&
-      ((ap1 + (ap1.negate)) ~ 0L)
-      ((ap2 + (ap2.negate)) ~ 0L)
-  }
-  def boundsAreOrdered[N](ap: Approximate[N]) = {
-    val n = ap.numeric
-    n.lteq(ap.min, ap.estimate) && n.lteq(ap.estimate, ap.max)
-  }
-  property("Addition/Multiplication preserves bounds") = forAll {
-    (ap1: Approximate[Long], ap2: Approximate[Long]) =>
-      (ap1 + ap2).probWithinBounds <=
-        Ordering[Double].min(ap1.probWithinBounds, ap2.probWithinBounds)
-      (ap1 * ap2).probWithinBounds <=
-        Ordering[Double].min(ap1.probWithinBounds, ap2.probWithinBounds)
-
-      boundsAreOrdered(ap1 * ap2)
-      boundsAreOrdered(ap1 + ap2)
-  }
-}
-
 class CountMinSketchTest extends Specification {
   noDetailedDiffs()
 
@@ -101,15 +65,6 @@ class CountMinSketchTest extends Specification {
    */
   def approximateInnerProduct(cms1 : CMS, cms2 : CMS) : Long = {
     cms1.innerProduct(cms2).estimate
-  }
-  "Approximate" should {
-    "Correctly identify exact" in {
-      Approximate.exact(1.0) ~ 1.0 must beTrue
-      Approximate.exact(1.0).boundsContain(1.0) must beTrue
-
-      Approximate.exact(1.0).boundsContain(1.1) must beFalse
-      Approximate.exact(1.0) ~ 1.1 must beFalse
-    }
   }
 
   "CountMinSketch" should {
