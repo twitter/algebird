@@ -28,10 +28,15 @@ import java.util.Arrays
  * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
  */
 object HyperLogLog {
-
   def hash(input : Array[Byte]) : Array[Byte] = {
-    val md = java.security.MessageDigest.getInstance("MD5")
-    md.digest(input)
+    val seed = 12345678
+    val (l0, l1) = MurmurHash128(seed)(input)
+    val buf = new Array[Byte](16)
+    java.nio.ByteBuffer
+      .wrap(buf)
+      .putLong(l0)
+      .putLong(l1)
+    buf
   }
 
   implicit def int2Bytes(i : Int) = {
