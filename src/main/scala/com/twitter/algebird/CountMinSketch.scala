@@ -142,16 +142,11 @@ sealed abstract class CMS extends java.io.Serializable {
    * Returns an estimate of the total number of times this item has been seen
    * in the stream so far.
    * Note that this estimate is an upper bound.
-   */
-  def estimateFrequency(item : Long) : Long
-
-  /**
    * It is always true that trueFrequency <= estimatedFrequency.
    * With probability p >= 1 - delta, it also holds that
    * estimatedFrequency <= trueFrequency + eps * totalCount.
    */
-  def frequencyConfidence = 1 - delta
-  def maxErrorOfFrequencyEstimate = eps * totalCount
+  def frequency(item: Long): Approximate[Long]
 
   /**
    * Returns an estimate of the inner product against another data stream.
@@ -161,23 +156,18 @@ sealed abstract class CMS extends java.io.Serializable {
    * Then this returns an estimate of <a, b> = \sum a_i b_i
    *
    * Note: this can also be viewed as the join size between two relations.
-   */
-  def estimateInnerProduct(other : CMS) : Long
-
-  /**
    * It is always true that actualInnerProduct <= estimatedInnerProduct.
    * With probability p >= 1 - delta, it also holds that
    * estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount
    */
-  def innerProductConfidence(other : CMS) = 1 - delta
-  def maxErrorOfInnerProductEstimate(other : CMS) = eps * totalCount * other.totalCount
+  def innerProduct(other: CMS): Approximate[Long]
 
   // Total number of elements seen in the data stream so far.
   def totalCount : Long
   // The first frequency moment is the total number of elements in the stream.
   def f1 : Long = totalCount
   // The second frequency moment is \sum a_i^2, where a_i is the count of the ith element.
-  def f2 : Long = estimateInnerProduct(this)
+  def f2 : Approximate[Long] = innerProduct(this)
 }
 
 /**
@@ -186,8 +176,8 @@ sealed abstract class CMS extends java.io.Serializable {
 case class CMSZero(hashes : Seq[CMSHash], eps : Double, delta : Double) extends CMS {
   def totalCount = 0L
   def ++(other : CMS) = other
-  def estimateFrequency(item : Long) = 0L
-  def estimateInnerProduct(other : CMS) = 0L
+  def frequency(item : Long) = Approximate.exact(0L)
+  def innerProduct(other : CMS) = Approximate.exact(0L)
 }
 
 /**
@@ -205,9 +195,9 @@ case class CMSItem(item : Long, hashes : Seq[CMSHash], eps : Double, delta : Dou
     }
   }
 
-  def estimateFrequency(x : Long) = if (item == x) 1L else 0L
+  def frequency(x : Long) = if (item == x) Approximate.exact(1L) else Approximate.exact(0L)
 
-  def estimateInnerProduct(other : CMS) : Long = other.estimateFrequency(item)
+  def innerProduct(other : CMS) : Approximate[Long] = other.frequency(item)
 }
 
 /**
@@ -226,9 +216,21 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
     }
   }
 
-  def estimateFrequency(item : Long) : Long = {
-    val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(hashes(i)(item)) }
-    estimates.min
+  private def makeApprox(est: Long): Approximate[Long] = {
+    if(est == 0L) {
+      Approximate.exact(0L)
+    }
+    else {
+      val lower = math.max(0L, est - (eps * totalCount).toLong)
+      Approximate(lower, est, est, 1 - delta)
+    }
+  }
+
+  def frequency(item : Long) : Approximate[Long] = {
+    val estimates = countsTable.counts.zipWithIndex.map { case (row, i) =>
+      row(hashes(i)(item))
+    }
+    makeApprox(estimates.min)
   }
 
   /**
@@ -238,7 +240,7 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
    * between their rows:
    * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k])
    */
-  def estimateInnerProduct(other : CMS) : Long = {
+  def innerProduct(other : CMS) : Approximate[Long] = {
     other match {
       case other : CMSInstance => {
         assert((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
@@ -247,9 +249,10 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
                                               countsTable.getCount(d, w) * other.countsTable.getCount(d, w)
                                            }.sum
 
-        (0 to (depth - 1)).map { innerProductAtDepth(_) }.min
+        val est = (0 to (depth - 1)).map { innerProductAtDepth(_) }.min
+        Approximate(est - (eps * totalCount * other.totalCount).toLong, est, est, 1 - delta)
       }
-      case _ => other.estimateInnerProduct(this)
+      case _ => other.innerProduct(this)
     }
   }
 
