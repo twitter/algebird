@@ -160,7 +160,7 @@ sealed abstract class HLL extends java.io.Serializable {
 
   def estimatedSize = approximateSize.estimate.toDouble
 
-  def initialEstimate = {
+  private def initialEstimate = {
 
     val e = factor * z
     // There are large and small value corrections from the paper
