@@ -83,18 +83,25 @@ object HyperLogLog {
 
   def toBytes(h : HLL) : Array[Byte] = {
     h match {
-      case HLLZero => Array[Byte](0)
-      case HLLItem(sz,idx,bv) => {
-        val buf = new Array[Byte](1 + 4 + 4 + 1)
-        java.nio.ByteBuffer
+      case SparseHLL(bits,maxRhow) =>
+        val jLen = (bits+7)/8
+        assert(jLen >= 1)
+        assert(jLen <= 3)
+        val buf = new Array[Byte](1 + 1 + (jLen+1)*maxRhow.size)
+        val byteBuf = java.nio.ByteBuffer
           .wrap(buf)
-          .put(1 : Byte) //Indicator of HLLItem
-          .putInt(sz)
-          .putInt(idx)
-          .put(bv)
+          .put(3 : Byte)
+          .put(bits.toByte)
+        maxRhow.foldLeft(byteBuf) { (bb, jrhow) =>
+          val (j,rhow) = jrhow
+          bb.put((j & 0xff).toByte)
+          if (jLen >= 2) bb.put(((j >> 8) & 0xff).toByte)
+          if (jLen >= 3) bb.put(((j >> 16) & 0xff).toByte)
+          bb.put(rhow.get)
+        }
         buf
-      }
-      case HLLInstance(v) => (Array[Byte](2) ++ v)
+
+      case DenseHLL(bits,v) => ((2 : Byte) +: bits.toByte +: v).toArray
     }
   }
 
@@ -102,81 +109,177 @@ object HyperLogLog {
     // Make sure to be reversible so fromBytes(toBytes(x)) == x
     val bb = java.nio.ByteBuffer.wrap(bytes)
     bb.get.toInt match {
-      case 0 => HLLZero
-      case 1 => {
-        HLLItem(bb.getInt, bb.getInt, bb.get)
-      }
-      case 2 => {
-        HLLInstance(bytes.toIndexedSeq.tail)
-      }
-      case _ => {
-        throw new Exception("Unrecognized HLL type: " + bytes(0))
-      }
+      case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
+      case 3 =>
+        val bits = bb.get
+        val jLen = (bits+7)/8
+        assert(bb.remaining % (jLen+1) == 0, "Invalid byte array")
+        val maxRhow = (1 to bb.remaining/(jLen+1)).map { _ =>
+          val j = jLen match {
+            case 1 => (bb.get.toInt & 0xff)
+            case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
+            case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
+          }
+          val rhow = bb.get
+          j -> Max(rhow)
+        }.toMap
+        SparseHLL(bits, maxRhow)
+      case _ => throw new Exception("Unrecognized HLL type: " + bytes(0))
     }
   }
+
+  def alpha(bits: Int) = bits match {
+
+    case 4 => 0.673
+    case 5 => 0.697
+    case 6 => 0.709
+    case _ => 0.7213 / (1.0 + 1.079/(1<<bits).toDouble)
+
+  }
+
+  def error(bits: Int): Double = 1.04/scala.math.sqrt(twopow(bits))
+
+  // Some constant from the algorithm:
+  private[algebird] val fourBillionSome = twopow(32)
+  private[algebird] val largeE = fourBillionSome/30.0
+
+  private[algebird] val sparseRhowMonoid = implicitly[Monoid[Map[Int,Max[Byte]]]]
 }
 
 sealed abstract class HLL extends java.io.Serializable {
+  import HyperLogLog._
+
+  def bits : Int
+  def size : Int
+  def zeroCnt : Int
+  def z : Double
   def +(other : HLL) : HLL
-}
+  def toDenseHLL : DenseHLL
 
-case object HLLZero extends HLL {
-  def +(other : HLL) = other
-}
+  def approximateSize = asApprox(initialEstimate)
 
-case class HLLItem(size : Int, j : Int, rhow : Byte) extends HLL {
-  def +(other : HLL) = {
-    other match {
-      case HLLZero => this
-      case HLLItem(sz, oJ, oRhow) => {
-        assert(sz == size, "Must use compatible HLL size")
-        if (oJ == j) {
-          // Just keep the max
-          HLLItem(size, j, oRhow max rhow)
-        }
-        else {
-          //They are certainly different
-          HLLInstance(toHLLInstance.v.updated(oJ, oRhow))
-        }
-      }
-      case HLLInstance(ov) => {
-        if(ov(j) >= rhow) {
-          //No need to update
-          other
-        }
-        else {
-          //replace:
-          HLLInstance(ov.updated(j, rhow))
-        }
-      }
+  def estimatedSize = approximateSize.estimate.toDouble
+
+  def initialEstimate = {
+
+    val e = factor * z
+    // There are large and small value corrections from the paper
+    if (e > largeE) {
+      -fourBillionSome * scala.math.log1p(-e/fourBillionSome)
+    }
+    else if (e <= smallE) {
+      smallEstimate(e)
+    }
+    else {
+      e
     }
   }
 
-  lazy val toHLLInstance = HLLInstance(Vector.fill(size)(0 : Byte).updated(j,rhow))
+  private def asApprox(v: Double): Approximate[Long] = {
+    val stdev = error(bits)
+    val lowerBound = math.floor(math.max(v*(1.0 - 3*stdev), 0.0)).toLong
+    val upperBound = math.ceil(v*(1.0 + 3*stdev)).toLong
+    // Lower bound. see: http://en.wikipedia.org/wiki/68-95-99.7_rule
+    val prob3StdDev = 0.9972
+    Approximate(lowerBound, v.toLong, upperBound, prob3StdDev)
+  }
+
+  private def factor = alpha(bits) * size.toDouble * size.toDouble
+
+  private def smallE = 5 * size / 2.0
+
+  private def smallEstimate(e : Double) : Double = {
+    if (zeroCnt == 0) {
+      e
+    }
+    else {
+      size * scala.math.log(size.toDouble / zeroCnt)
+    }
+  }
+}
+
+case class SparseHLL(bits : Int, maxRhow : Map[Int,Max[Byte]]) extends HLL {
+
+  assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
+
+  val size = 1 << bits
+
+  lazy val zeroCnt = size - maxRhow.size
+
+  lazy val z = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj => HyperLogLog.twopow(-mj.get) }.sum)
+
+  def +(other : HLL) = {
+
+    other match {
+
+      case sparse@SparseHLL(_, oMaxRhow) =>
+        assert(sparse.size == size, "Incompatible HLL size: " + sparse.size + " != " + size)
+        val allMaxRhow = HyperLogLog.sparseRhowMonoid.plus(maxRhow, oMaxRhow)
+        if (allMaxRhow.size * 16 <= size) {
+          SparseHLL(bits, allMaxRhow)
+        } else {
+          DenseHLL(bits, sparseMapToSequence(allMaxRhow))
+        }
+
+      case DenseHLL(bits, ov) =>
+        assert(ov.size == size, "Incompatible HLL size: " + ov.size + " != " + size)
+        if (maxRhow.forall { case (j,rhow) => ov(j) >= rhow.get} ) {
+          other
+        } else {
+          DenseHLL(bits,
+            (0 until size)
+            .zip(ov)
+            .map { case (j,rhow) => rhow max maxRhow.getOrElse(j, Max(0:Byte)).get }
+          )
+        }
+
+    }
+  }
+
+  def sparseMapToSequence(values : Map[Int,Max[Byte]]) : IndexedSeq[Byte] = {
+    val array = Array.fill[Byte](size)(0:Byte)
+    values.foreach { case (j,rhow) => array.update(j, rhow.get) }
+    array.toIndexedSeq
+  }
+
+  lazy val toDenseHLL = DenseHLL(bits, sparseMapToSequence(maxRhow))
 }
 
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class HLLInstance(v : IndexedSeq[Byte]) extends HLL {
+case class DenseHLL(bits : Int, v : IndexedSeq[Byte]) extends HLL {
+
+  assert(v.size == (1<<bits), "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
+
+  def size = v.size
+
   lazy val zeroCnt = v.count { _ == 0 }
 
-  def +(other : HLL) : HLL = {
-    other match {
-      case HLLZero => this
-      case hit@HLLItem(_,_,_) => (hit + this) //Already implemented in HLLItem
-      case HLLInstance(ov) => {
-        assert(ov.size == v.size, "HLLInstance must have the same size")
-        HLLInstance(v.view
-          .zip(ov)
-          .map { pair => pair._1 max pair._2 }
-          .toIndexedSeq)
-      }
-    }
-  }
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
-  lazy val z : Double = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
+  lazy val z = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
+
+  def +(other : HLL) : HLL = {
+
+    other match {
+
+      case SparseHLL(_,_) => (other + this)
+
+      case DenseHLL(_,ov) =>
+        assert(ov.size == v.size, "Incompatible HLL size: " + ov.size + " != " + v.size)
+        DenseHLL(bits,
+          v
+          .view
+          .zip(ov)
+          .map { case (rhow,oRhow) => rhow max oRhow }
+          .toIndexedSeq
+        )
+
+    }
+  }
+
+  val toDenseHLL = this
 }
 
 /*
@@ -187,82 +290,27 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
   import HyperLogLog._
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
-  // These parameters come from the paper
-  val (alpha, memSize) = bits match {
-    case 4 => (0.673, 1 << 4)
-    case 5 => (0.697, 1 << 5)
-    case 6 => (0.709, 1 << 6)
-    case _ => {
-      val m = 1 << bits
-      (0.7213/(1.0 + 1.079/m), m)
-    }
-  }
+
+  val size = 1 << bits
 
   def apply[T <% Array[Byte]](t : T) = create(t)
 
-  val zero : HLL = HLLZero
+  val zero : HLL = SparseHLL(bits, HyperLogLog.sparseRhowMonoid.zero)
 
   def plus(left : HLL, right : HLL) = left + right
 
   def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)
     val (j,rhow) = jRhoW(hashed, bits)
-    HLLItem(memSize,j,rhow)
+    SparseHLL(bits, Map(j -> Max(rhow)))
   }
-
-  def error: Double = 1.04/scala.math.sqrt(HyperLogLog.twopow(bits))
-
-  private val largeE = HyperLogLog.twopow(32)/30.0
-  private val smallE = 5 * memSize / 2.0
-
-  protected def smallEstimate(hi : HLLInstance, e : Double) : Double = {
-    val zeroV = hi.zeroCnt
-    if (zeroV == 0) {
-      e
-    }
-    else {
-      memSize * scala.math.log(memSize.toDouble / zeroV)
-    }
-  }
-
-  protected lazy val factor = alpha * (memSize.toDouble * memSize.toDouble)
-  // Some constant from the algorithm:
-  protected val fourBillionSome = HyperLogLog.twopow(32)
-
 
   final def estimateSize(hll : HLL) : Double = {
-    sizeOf(hll).estimate.toDouble
+    hll.estimatedSize
   }
 
   final def sizeOf(hll: HLL): Approximate[Long] = {
-    hll match {
-      case HLLZero => Approximate.exact(0L)
-      case HLLItem(_,_,_) => Approximate.exact(1L)
-      case hi@HLLInstance(_) => asApprox(estimateSizeInstance(hi))
-    }
-  }
-
-  private def asApprox(v: Double): Approximate[Long] = {
-    val stdev = error
-    val lowerBound = math.floor(math.max(v*(1.0 - 3*stdev), 0.0)).toLong
-    val upperBound = math.ceil(v*(1.0 + 3*stdev)).toLong
-    // Lower bound. see: http://en.wikipedia.org/wiki/68-95-99.7_rule
-    val prob3StdDev = 0.9972
-    Approximate(lowerBound, v.toLong, upperBound, prob3StdDev)
-  }
-
-  protected def estimateSizeInstance(hi : HLLInstance) : Double = {
-    val e = factor * hi.z
-    // There are large and small value corrections from the paper
-    if(e > largeE) {
-      -fourBillionSome * scala.math.log1p(-e/fourBillionSome)
-    }
-    else if(e <= smallE) {
-      smallEstimate(hi, e)
-    }
-    else {
-      e
-    }
+    hll.approximateSize
   }
 
   final def estimateIntersectionSize(his : Seq[HLL]) : Double = {
