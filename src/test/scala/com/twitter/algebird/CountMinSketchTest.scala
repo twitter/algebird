@@ -166,9 +166,6 @@ class CountMinSketchTest extends Specification {
       cms1.heavyHitters must be_==(Set(1L, 2L))
 
       val cms2 = cms1 ++ monoid.create(2L)
-      println(cms2.frequency(1L))
-      println(cms2.totalCount)
-      println(cms2.heavyHitters)
       cms2.heavyHitters must be_==(Set(2L))
 
       val cms3 = cms2 ++ monoid.create(1L)
