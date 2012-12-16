@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.SortedSet
+
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -65,9 +67,12 @@ package com.twitter.algebird
  * @seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
  */
-class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int) extends Monoid[CMS] {
-  assert(0 < eps && eps < 1, "eps must lie in (0, 1).")
-  assert(0 < delta && delta < 1, "delta must lie in (0, 1).")
+class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
+                           heavyHittersPct : Double = 0.01) extends Monoid[CMS] {
+
+  assert(0 < eps && eps < 1, "eps must lie in (0, 1)")
+  assert(0 < delta && delta < 1, "delta must lie in (0, 1)")
+  assert(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
   // Typically, we would use d pairwise independent hash functions of the form
   //
@@ -85,7 +90,9 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int) extends Mon
     (0 to (numHashes - 1)).map { _ => CMSHash(r.nextInt, 0, numCounters) }
   }
 
-  val zero : CMS = CMSZero(hashes, eps, delta)
+  val params = CMSParams(hashes, eps, delta, heavyHittersPct)
+
+  val zero : CMS = CMSZero(params)
 
   /**
    * We assume the Count-Min sketches on the left and right use the same hash functions.
@@ -93,23 +100,20 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int) extends Mon
   def plus(left : CMS, right : CMS) : CMS = left ++ right
 
   /**
-   * Create a Count-Min sketch out of a single item.
+   * Create a Count-Min sketch out of a single item or data stream.
    */
-  def create(item : Long) : CMS = CMSItem(item, hashes, eps, delta)
-
-  /**
-   * Creates a Count-Min sketch out of the given data stream.
-   */
+  def create(item : Long) : CMS = CMSItem(item, params)
   def create(data : Seq[Long]) : CMS = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
 }
 
 object CMS {
-  def monoid(eps : Double, delta : Double, seed : Int) = new CountMinSketchMonoid(eps, delta, seed)
-  def monoid(depth : Int, width : Int, seed : Int) = {
-    new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed)
-  }
+  def monoid(eps : Double, delta : Double, seed : Int, heavyHittersPct : Double = 0.01) =
+    new CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
+
+  def monoid(depth : Int, width : Int, seed : Int, heavyHittersPct : Double) =
+    new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed, heavyHittersPct)
 
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
@@ -162,6 +166,17 @@ sealed abstract class CMS extends java.io.Serializable {
    */
   def innerProduct(other: CMS): Approximate[Long]
 
+  /**
+   * Finds all heavy hitters, i.e., elements in the stream that appear at least
+   * (heavyHittersPct * totalCount) times.
+   *
+   * Every item that appears at least (heavyHittersPct * totalCount) times is output,
+   * and with probability p >= 1 - delta, no item whose count is less than
+   * (heavyHittersPct - eps) * totalCount is output.
+   */
+  def heavyHittersPct : Double
+  def heavyHitters : Set[Long]
+
   // Total number of elements seen in the data stream so far.
   def totalCount : Long
   // The first frequency moment is the total number of elements in the stream.
@@ -173,24 +188,33 @@ sealed abstract class CMS extends java.io.Serializable {
 /**
  * Used for initialization.
  */
-case class CMSZero(hashes : Seq[CMSHash], eps : Double, delta : Double) extends CMS {
+case class CMSZero(params : CMSParams) extends CMS {
+  def eps : Double = params.eps
+  def delta : Double = params.delta
+  def heavyHittersPct : Double = params.heavyHittersPct
+
   def totalCount = 0L
   def ++(other : CMS) = other
   def frequency(item : Long) = Approximate.exact(0L)
   def innerProduct(other : CMS) = Approximate.exact(0L)
+  def heavyHitters = Set[Long]()
 }
 
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from
  * sparse counts tables.
  */
-case class CMSItem(item : Long, hashes : Seq[CMSHash], eps : Double, delta : Double) extends CMS {
+case class CMSItem(item : Long, params : CMSParams) extends CMS {
+  def eps : Double = params.eps
+  def delta : Double = params.delta
+  def heavyHittersPct : Double = params.heavyHittersPct
+
   def totalCount = 1L
 
   def ++(other : CMS) : CMS = {
     other match {
       case other : CMSZero => this
-      case other : CMSItem => CMSInstance(hashes, eps, delta) + item + other.item
+      case other : CMSItem => CMSInstance(params) + item + other.item
       case other : CMSInstance => other + item
     }
   }
@@ -198,20 +222,28 @@ case class CMSItem(item : Long, hashes : Seq[CMSHash], eps : Double, delta : Dou
   def frequency(x : Long) = if (item == x) Approximate.exact(1L) else Approximate.exact(0L)
 
   def innerProduct(other : CMS) : Approximate[Long] = other.frequency(item)
+
+  def heavyHitters = Set(item)
 }
 
 /**
  * The general Count-Min sketch structure, used for holding any number of elements.
  */
-case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, totalCount : Long,
-                       eps : Double, delta : Double) extends CMS {
+case class CMSInstance(countsTable : CMSCountsTable, totalCount : Long,
+                       hhs : HeavyHitters, params : CMSParams) extends CMS {
+
+  def eps : Double = params.eps
+  def delta : Double = params.delta
+  def heavyHittersPct : Double = params.heavyHittersPct
 
   def ++(other : CMS) : CMS = {
     other match {
-      case other : CMSZero => other ++ this
-      case other : CMSItem => other ++ this
+      case other : CMSZero => this
+      case other : CMSItem => this + other.item
       case other : CMSInstance => {
-        CMSInstance(hashes, countsTable ++ other.countsTable, totalCount + other.totalCount, eps, delta)
+        val newTotalCount = totalCount + other.totalCount
+        val newHhs = (hhs ++ other.hhs).dropCountsBelow(params.heavyHittersPct * newTotalCount)
+        CMSInstance(countsTable ++ other.countsTable, newTotalCount, newHhs, params)
       }
     }
   }
@@ -228,7 +260,7 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
 
   def frequency(item : Long) : Approximate[Long] = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) =>
-      row(hashes(i)(item))
+      row(params.hashes(i)(item))
     }
     makeApprox(estimates.min)
   }
@@ -256,6 +288,8 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
     }
   }
 
+  def heavyHitters : Set[Long] = hhs.items
+
   /**
    * Updates the sketch with a new element from the data stream.
    */
@@ -264,22 +298,44 @@ case class CMSInstance(hashes : Seq[CMSHash], countsTable : CMSCountsTable, tota
     if (count < 0) {
       throw new Exception("Negative counts not implemented")
     } else {
+      val newHhs = updateHeavyHitters(item, count)
       val newCountsTable =
         (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
-          val pos = (row, hashes(row)(item))
+          val pos = (row, params.hashes(row)(item))
           table + (pos, count)
         }
-      val newCount = totalCount + count
 
-      CMSInstance(hashes, newCountsTable, newCount, eps, delta)
+      CMSInstance(newCountsTable, totalCount + count, newHhs, params)
     }
+  }
+
+  /**
+   * Updates the data structure of heavy hitters when a new item (with associated count)
+   * enters the stream.
+   */
+  private def updateHeavyHitters(item : Long, count : Long) : HeavyHitters = {
+    val oldItemCount = frequency(item).estimate
+    val newItemCount = oldItemCount + count
+    val newTotalCount = totalCount + count
+
+    // If the new item is a heavy hitter, add it, and remove any previous instances.
+    val newHhs =
+      if (newItemCount >= heavyHittersPct * newTotalCount) {
+        hhs - HeavyHitter(item, oldItemCount) + HeavyHitter(item, newItemCount)
+      } else {
+        hhs
+      }
+
+    // Remove any items below the new heavy hitter threshold.
+    newHhs.dropCountsBelow(heavyHittersPct * newTotalCount)
   }
 }
 
 object CMSInstance {
   // Initializes a CMSInstance with all zeroes.
-  def apply(hashes : Seq[CMSHash], eps : Double, delta : Double) : CMSInstance = {
-    CMSInstance(hashes, CMSCountsTable(CMS.depth(delta), CMS.width(eps)), 0, eps, delta)
+  def apply(params : CMSParams) : CMSInstance = {
+    val countsTable = CMSCountsTable(CMS.depth(params.delta), CMS.width(params.eps))
+    CMSInstance(countsTable, 0, HeavyHitters(), params)
   }
 }
 
@@ -356,4 +412,34 @@ case class CMSCountsTable(counts : Vector[Vector[Long]]) {
 object CMSCountsTable {
    // Creates a new CMSCountsTable with counts initialized to all zeroes.
   def apply(depth : Int, width : Int) : CMSCountsTable = CMSCountsTable(Vector.fill[Long](depth, width)(0L))
+}
+
+/**
+ * Convenience class for holding constant parameters of a Count-Min sketch.
+ */
+case class CMSParams(hashes : Seq[CMSHash], eps : Double, delta : Double, heavyHittersPct : Double)
+
+/**
+ * Containers for holding heavy hitter items and their associated counts.
+ */
+case class HeavyHitters(hhs : SortedSet[HeavyHitter] = SortedSet[HeavyHitter]()(HeavyHitterOrder)) {
+  def -(hh : HeavyHitter) = HeavyHitters(hhs - hh)
+  def +(hh : HeavyHitter) = HeavyHitters(hhs + hh)
+
+  def ++(other : HeavyHitters) = HeavyHitters(hhs ++ other.hhs)
+
+  def items : Set[Long] = hhs.map { _.item }.toSet
+
+  def dropCountsBelow(minCount : Double) : HeavyHitters = {
+    HeavyHitters(hhs.dropWhile { _.count < minCount })
+  }
+}
+
+case class HeavyHitter(item : Long, count : Long)
+object HeavyHitterOrder extends scala.math.Ordering[HeavyHitter] {
+  // Arrange heavy hitters in order of increasing counts, so that low-frequency
+  // items can be easily dropped.
+  def compare(x : HeavyHitter, y : HeavyHitter) : Int = {
+    Ordering[(Long, Long)].compare((x.count, x.item), (y.count, y.item))
+  }
 }
