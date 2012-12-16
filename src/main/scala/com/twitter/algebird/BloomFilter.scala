@@ -233,9 +233,9 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   /**
-   * sInverse(t) is the maximum likelihood value for the number of distinct
-   * inserted element when the Bloom filter has t bits set to true.
-   * This is \hat{S}^{-1}(n) in the cardinality estimation paper used above.
+   * sInverse(t) is the maximum likelihood value for the number of elements
+   * that have been inserted into the Bloom filter when it has t bits set to true.
+   * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.
    */
   private def sInverse(t : Int) : Double = {
     scala.math.log(1 - t.toDouble / width) / (numHashes * scala.math.log(1 - 1.0 / width))
