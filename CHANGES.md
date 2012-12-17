@@ -1,5 +1,9 @@
 # Algebird #
 
+### Version 0.1.5 ###
+* Make Metric serializable
+* JMap uses Semigroup
+
 ### Version 0.1.4 ###
 * Count-min-sketch (with Monoid)
 * Added Bloom Filter (with Monoid)
