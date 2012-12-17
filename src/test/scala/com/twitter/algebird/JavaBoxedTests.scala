@@ -43,9 +43,9 @@ object JavaBoxedTests extends Properties("JavaBoxed") with BaseProperties {
   }
   property("JList is a Monoid") = monoidLaws[JList[Int]]
 
-  implicit def jmap[K : Arbitrary, V : Arbitrary : Monoid] = Arbitrary {
-    val mon = implicitly[Monoid[V]]
-    implicitly[Arbitrary[Map[K,V]]].arbitrary.map { _.filter { kv => mon.isNonZero(kv._2) }.asJava }
+  implicit def jmap[K : Arbitrary, V : Arbitrary : Semigroup] = Arbitrary {
+    val semi = implicitly[Semigroup[V]]
+    implicitly[Arbitrary[Map[K,V]]].arbitrary.map { _.filter { kv => semi.isNonZero(kv._2) }.asJava }
   }
   property("JMap[String,Int] is a Monoid") = isAssociative[JMap[String,Int]] && weakZero[JMap[String,Int]]
   property("JMap[String,String] is a Monoid") = isAssociative[JMap[String,String]] && weakZero[JMap[String,String]]
