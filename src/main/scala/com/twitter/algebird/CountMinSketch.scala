@@ -66,6 +66,8 @@ import scala.collection.SortedSet
  *        (an interval that depends on eps) around the truth.
  * @seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
+ * @heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
+ *                  (heavyHittersPct * totalCount) times in the stream.
  */
 class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
                            heavyHittersPct : Double = 0.01) extends Monoid[CMS] {
@@ -144,8 +146,8 @@ sealed abstract class CMS extends java.io.Serializable {
 
   /**
    * Returns an estimate of the total number of times this item has been seen
-   * in the stream so far.
-   * Note that this estimate is an upper bound.
+   * in the stream so far. This estimate is an upper bound.
+   *
    * It is always true that trueFrequency <= estimatedFrequency.
    * With probability p >= 1 - delta, it also holds that
    * estimatedFrequency <= trueFrequency + eps * totalCount.
@@ -160,6 +162,7 @@ sealed abstract class CMS extends java.io.Serializable {
    * Then this returns an estimate of <a, b> = \sum a_i b_i
    *
    * Note: this can also be viewed as the join size between two relations.
+   *
    * It is always true that actualInnerProduct <= estimatedInnerProduct.
    * With probability p >= 1 - delta, it also holds that
    * estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount
