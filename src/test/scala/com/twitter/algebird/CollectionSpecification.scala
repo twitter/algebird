@@ -56,6 +56,15 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
   implicit def arbIndexedSeq[T:Arbitrary] : Arbitrary[IndexedSeq[T]] =
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
+  // The IndexedSeq semigroup is only defined for equal-length sequences
+  property("IndexedSeq is a semigroup") = forAll {
+      triples : IndexedSeq[(Max[Int], Max[Int], Max[Int])] =>
+    val (a : IndexedSeq[Max[Int]],
+         b : IndexedSeq[Max[Int]],
+         c : IndexedSeq[Max[Int]]) = triples.unzip3
+    Semigroup.plus(a, Semigroup.plus(b,c)) == Semigroup.plus(Semigroup.plus(a,b), c)
+  }
+
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
   property("Either is a Monoid") = monoidLaws[Either[String,Int]]
