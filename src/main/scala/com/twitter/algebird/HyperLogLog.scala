@@ -139,11 +139,9 @@ object HyperLogLog {
 
   def error(bits: Int): Double = 1.04/scala.math.sqrt(twopow(bits))
 
-  // Some constant from the algorithm:
+  // Some constants from the algorithm:
   private[algebird] val fourBillionSome = twopow(32)
   private[algebird] val largeE = fourBillionSome/30.0
-
-  private[algebird] val sparseRhowMonoid = implicitly[Monoid[Map[Int,Max[Byte]]]]
 }
 
 sealed abstract class HLL extends java.io.Serializable {
@@ -214,24 +212,23 @@ case class SparseHLL(bits : Int, maxRhow : Map[Int,Max[Byte]]) extends HLL {
 
       case sparse@SparseHLL(_, oMaxRhow) =>
         assert(sparse.size == size, "Incompatible HLL size: " + sparse.size + " != " + size)
-        val allMaxRhow = HyperLogLog.sparseRhowMonoid.plus(maxRhow, oMaxRhow)
+        val allMaxRhow = Monoid.plus(maxRhow, oMaxRhow)
         if (allMaxRhow.size * 16 <= size) {
           SparseHLL(bits, allMaxRhow)
         } else {
           DenseHLL(bits, sparseMapToSequence(allMaxRhow))
         }
 
-      case DenseHLL(bits, ov) =>
-        assert(ov.size == size, "Incompatible HLL size: " + ov.size + " != " + size)
-        if (maxRhow.forall { case (j,rhow) => ov(j) >= rhow.get} ) {
-          other
-        } else {
-          DenseHLL(bits,
-            (0 until size)
-            .zip(ov)
-            .map { case (j,rhow) => rhow max maxRhow.getOrElse(j, Max(0:Byte)).get }
-          )
+      case DenseHLL(bits, oldV) =>
+        assert(oldV.size == size, "Incompatible HLL size: " + oldV.size + " != " + size)
+        val newV = maxRhow.foldLeft(oldV) { case (v,(j,rhow)) =>
+          if (rhow.get > v(j)) {
+            v.updated(j, rhow.get)
+          } else {
+            v
+          }
         }
+        DenseHLL(bits, newV)
 
     }
   }
@@ -295,7 +292,7 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 
   def apply[T <% Array[Byte]](t : T) = create(t)
 
-  val zero : HLL = SparseHLL(bits, HyperLogLog.sparseRhowMonoid.zero)
+  val zero : HLL = SparseHLL(bits, Monoid.zero[Map[Int,Max[Byte]]])
 
   def plus(left : HLL, right : HLL) = left + right
 
