@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 // To use the MaxSemigroup wrap your item in a Max object
-case class Max[+T](get: T)
+case class Max[@specialized(Int,Long,Float,Double) +T](get: T)
 
 object Max {
   implicit def semigroup[T](implicit ord:Ordering[T]) =
@@ -24,7 +24,7 @@ object Max {
 }
 
 // To use the MinSemigroup wrap your item in a Min object
-case class Min[+T](get: T)
+case class Min[@specialized(Int,Long,Float,Double) +T](get: T)
 
 object Min {
   implicit def semigroup[T](implicit ord:Ordering[T]) =
@@ -33,12 +33,12 @@ object Min {
 
 // Not ordered by type, but ordered by order in which we see them:
 
-case class First[+T](get: T)
+case class First[@specialized(Int,Long,Float,Double) +T](get: T)
 object First {
   implicit def semigroup[T] = Semigroup.from[First[T]] { (l,r) => l }
 }
 
-case class Last[+T](get: T)
+case class Last[@specialized(Int,Long,Float,Double) +T](get: T)
 object Last {
   implicit def semigroup[T] = Semigroup.from[Last[T]] { (l,r) => r }
 }
