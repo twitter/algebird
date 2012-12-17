@@ -99,6 +99,6 @@ object Metric {
   implicit def iterableMetric[V : Monoid : Metric] = L2Iterable[V]
   implicit def mapMetric[K, V : Monoid : Metric] = L2Map[K, V]
 }
-trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] {
+trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] with java.io.Serializable {
   def apply(v1: V, v2: V): Double
 }
