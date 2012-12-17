@@ -95,14 +95,14 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  * if you use scala immutable maps, this operation is much faster
  * TODO extend this to Group, Ring
  */
-class JMapMonoid[K,V:Monoid] extends Monoid[JMap[K,V]] {
+class JMapMonoid[K,V:Semigroup] extends Monoid[JMap[K,V]] {
   override lazy val zero = new java.util.HashMap[K,V](0)
   override def isNonZero(x : JMap[K,V]) = !x.isEmpty && x.values.asScala.exists { v =>
-    implicitly[Monoid[V]].isNonZero(v)
+    implicitly[Semigroup[V]].isNonZero(v)
   }
   override def plus(x : JMap[K,V], y : JMap[K,V]) = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
-    val vmon = implicitly[Monoid[V]]
+    val vsemi = implicitly[Semigroup[V]]
     val result = new java.util.HashMap[K,V](big.size + small.size)
     result.putAll(big)
     small.entrySet.asScala.foreach { kv =>
@@ -110,8 +110,8 @@ class JMapMonoid[K,V:Monoid] extends Monoid[JMap[K,V]] {
       val smallV = kv.getValue
       if(big.containsKey(smallK)) {
         val bigV = big.get(smallK)
-        val newV = if(bigOnLeft) vmon.plus(bigV, smallV) else vmon.plus(smallV, bigV)
-        if(vmon.isNonZero(newV)) {
+        val newV = if(bigOnLeft) vsemi.plus(bigV, smallV) else vsemi.plus(smallV, bigV)
+        if(vsemi.isNonZero(newV)) {
           result.put(smallK, newV)
         }
         else {

@@ -32,7 +32,7 @@ For example, average, moving average, max/min, set
   analytics.
 
 ## Maven
-Current version is 0.1.4. groupid="com.twitter" artifact="algebird_2.9.2".
+Current version is 0.1.5. groupid="com.twitter" artifact="algebird_2.9.2".
 
 ## Questions
 > Why not use spire?
