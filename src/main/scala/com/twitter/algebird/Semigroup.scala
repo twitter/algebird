@@ -91,8 +91,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
   implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
-  // TODO: we could define a JMapSemigroup that only requires V : Semigroup
-  implicit def jmapSemigroup[K,V : Monoid] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
+  implicit def jmapSemigroup[K,V : Semigroup] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
   implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
 }
