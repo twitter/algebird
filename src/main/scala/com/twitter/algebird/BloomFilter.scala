@@ -186,7 +186,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   // Proportion of bits that are set to true.
-  private def density = bits.size.toDouble / width
+  def density = bits.size.toDouble / width
 
   /**
    * Cardinality estimates are taken from Theorem 1 on page 15 of
@@ -203,7 +203,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
    * (min, estimate, max) =
    *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
    */
-  def size : Approximate[Long] = size(approximationWidth = 0.05)
+  lazy val size : Approximate[Long] = size(approximationWidth = 0.05)
   def size(approximationWidth : Double = 0.05) : Approximate[Long] = {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
