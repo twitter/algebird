@@ -20,6 +20,28 @@ package com.twitter.algebird
  * This does element-wise operations, like standard vector math, not concatenation,
  * like Monoid[String] or Monoid[List[T]]
  */
+class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
+
+  def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
+    // We need them to be the same length; since there is no semi.zero, throw an exception
+    // if not exactly equal
+    if (left.size != right.size) {
+      throw new IllegalArgumentException(("IndexedSeqSemigroup is only defined for sequences " +
+          "of the same length, but left.size == %d and right.size == %d").format(left.size, right.size))
+    }
+
+    left
+      .view
+      .zip(right)
+      .map { tup => semi.plus(tup._1, tup._2) }
+      .toIndexedSeq
+  }
+}
+
+/** Note that this works similar to Monoid[Map[Int,T]] not like Monoid[List[T]]
+ * This does element-wise operations, like standard vector math, not concatenation,
+ * like Monoid[String] or Monoid[List[T]]
+ */
 class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) = v.exists { t => mont.isNonZero(t) }
