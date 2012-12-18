@@ -43,5 +43,22 @@ class AbstractAlgebraTest extends Specification {
     (List(1,2,3,4,5).map { First(_) }).reduceLeft(fsg.plus _) must be_==(First(1))
     (List(1,2,3,4,5).map { Last(_) }).reduceLeft(lsg.plus _) must be_==(Last(5))
   }
+  "IndexedSeq should sum" in {
+    val leftBase = IndexedSeq(Max(1),Max(2),Max(3))
+    val rightBase = IndexedSeq(Max(5),Max(1),Max(3))
+    val sumBase = IndexedSeq(Max(5),Max(2),Max(3))
+    val remainder = IndexedSeq(Max(-4))
+
+    // equal sized summands
+    Semigroup.plus(leftBase, rightBase) must_== sumBase
+
+    // when left is bigger
+    val left = leftBase ++ remainder
+    Semigroup.plus(left, rightBase) must_== sumBase ++ remainder
+
+    // when right is bigger
+    val right = rightBase ++ remainder
+    Semigroup.plus(leftBase, right) must_== sumBase ++ remainder
+  }
 
 }

@@ -16,32 +16,39 @@ limitations under the License.
 
 package com.twitter.algebird
 
-/** Note that this works similar to Monoid[Map[Int,T]] not like Monoid[List[T]]
+/** Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
  * This does element-wise operations, like standard vector math, not concatenation,
- * like Monoid[String] or Monoid[List[T]]
+ * like Semigroup[String] or Semigroup[List[T]]
+ *
+ * If l.size != r.size, then only sums the elements up to the index min(l.size, r.size); appends
+ * the remaineder to the result.
  */
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends Monoid[IndexedSeq[T]] {
+class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
+
+  def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
+    // We need summands to be the same length
+    val (leftSummand, rightSummand, remainder) = if (left.size > right.size) {
+      (left.view(0, right.size),
+       right,
+       left.view(right.size, left.size))
+    } else {
+      (left,
+      right.view(0, left.size),
+      right.view(left.size, right.size))
+    }
+
+    val sum = leftSummand
+      .zip(rightSummand)
+      .map { tup => semi.plus(tup._1, tup._2) }
+
+    (sum ++ remainder).toIndexedSeq
+  }
+}
+
+class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with
+  Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) = v.exists { t => mont.isNonZero(t) }
-  // We append mont.zero on the shorter of the two inputs:
-  def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
-    // We need them to be the same length:
-    val maxSize = scala.math.max(left.size, right.size)
-    def pad(v: IndexedSeq[T]) = {
-      val diff = maxSize - v.size
-      if(diff > 0) {
-        v ++ (Iterator.fill(diff)(mont.zero))
-      }
-      else {
-        v
-      }
-    }
-    pad(left)
-      .view
-      .zip(pad(right))
-      .map { tup => mont.plus(tup._1, tup._2) }
-      .toIndexedSeq
-  }
 }
 
 class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T]()(grp)
