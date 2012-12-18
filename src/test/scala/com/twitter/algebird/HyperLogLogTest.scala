@@ -94,10 +94,46 @@ class HyperLogLogTest extends Specification {
         (larger + smaller) must throwA[AssertionError]
      }
      "Correctly serialize" in {
-       val mon = new HyperLogLogMonoid(10)
-       fromBytes(toBytes(HLLZero)) must be_==(HLLZero)
-       fromBytes(toBytes(mon(12))) must be_==(mon(12))
-       fromBytes(toBytes(mon(12) + mon(13))) must be_==(mon(12) + mon(13))
+       (4 to 20).foreach { bits =>
+         val mon = new HyperLogLogMonoid(bits)
+         // Zero
+         fromBytes(toBytes(mon.zero)) must be_==(mon.zero)
+         // One j
+         fromBytes(toBytes(mon(12))) must be_==(mon(12))
+         // Two j's
+         fromBytes(toBytes(mon(12) + mon(13))) must be_==(mon(12) + mon(13))
+         // Many j's
+         val manyJ = Monoid.sum((1 to 1000 by 77).map(mon(_)))(mon)
+         fromBytes(toBytes(manyJ)) must be_==(manyJ)
+         // Explicitly dense
+         fromBytes(toBytes(manyJ.toDenseHLL)) must be_==(manyJ.toDenseHLL)
+       }
      }
+    "be consistent for sparse vs. dense" in {
+      val mon = new HyperLogLogMonoid(12)
+      val data = (1 to 100).map { _ => r.nextLong }
+      val partialSums = data.foldLeft(Seq(mon.zero)) { (seq,value) => seq :+ (seq.last + mon(value)) }
+      // Now the ith entry of partialSums (0-based) is an HLL structure for i underlying elements
+      partialSums.foreach { hll =>
+        hll.isInstanceOf[SparseHLL] must beTrue
+        hll.size must be_==(hll.toDenseHLL.size)
+        hll.zeroCnt must be_==(hll.toDenseHLL.zeroCnt)
+        hll.z must be_==(hll.toDenseHLL.z)
+        hll.approximateSize must be_==(hll.toDenseHLL.approximateSize)
+        hll.estimatedSize must be_==(hll.toDenseHLL.estimatedSize)
+      }
+    }
+    "properly convert to dense" in {
+      val mon = new HyperLogLogMonoid(10)
+      val data = (1 to 200).map { _ => r.nextLong }
+      val partialSums = data.foldLeft(Seq(mon.zero)) { (seq,value) => seq :+ (seq.last + mon(value)) }
+      partialSums.foreach { hll =>
+        if (hll.size - hll.zeroCnt <= 64) {
+          hll.isInstanceOf[SparseHLL] must beTrue
+        } else {
+          hll.isInstanceOf[DenseHLL] must beTrue
+        }
+      }
+    }
   }
 }
