@@ -425,7 +425,9 @@ case class CMSParams(hashes : Seq[CMSHash], eps : Double, delta : Double, heavyH
 /**
  * Containers for holding heavy hitter items and their associated counts.
  */
-case class HeavyHitters(hhs : SortedSet[HeavyHitter] = SortedSet[HeavyHitter]()(HeavyHitterOrder)) {
+case class HeavyHitters(
+  hhs : SortedSet[HeavyHitter] = SortedSet[HeavyHitter]()(HeavyHitter.ordering)) {
+
   def -(hh : HeavyHitter) = HeavyHitters(hhs - hh)
   def +(hh : HeavyHitter) = HeavyHitters(hhs + hh)
 
@@ -439,10 +441,6 @@ case class HeavyHitters(hhs : SortedSet[HeavyHitter] = SortedSet[HeavyHitter]()(
 }
 
 case class HeavyHitter(item : Long, count : Long)
-object HeavyHitterOrder extends scala.math.Ordering[HeavyHitter] {
-  // Arrange heavy hitters in order of increasing counts, so that low-frequency
-  // items can be easily dropped.
-  def compare(x : HeavyHitter, y : HeavyHitter) : Int = {
-    Ordering[(Long, Long)].compare((x.count, x.item), (y.count, y.item))
-  }
+object HeavyHitter {
+  val ordering = Ordering.by { hh : HeavyHitter => (hh.count, hh.item) }
 }
