@@ -42,7 +42,7 @@ object VectorSpace {
   // TODO: add implicits for java lists, arrays, and options
 }
 
-trait VectorSpace[F, C[_]] {
+trait VectorSpace[F, C[_]] extends java.io.Serializable {
   implicit def field: Field[F]
   implicit def group: Group[C[F]]
   def scale(v: F, c: C[F]): C[F]
