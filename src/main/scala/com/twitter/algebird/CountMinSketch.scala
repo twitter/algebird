@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.SortedSet
+import scala.collection.immutable.SortedSet
 
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
@@ -176,6 +176,10 @@ sealed abstract class CMS extends java.io.Serializable {
    * Every item that appears at least (heavyHittersPct * totalCount) times is output,
    * and with probability p >= 1 - delta, no item whose count is less than
    * (heavyHittersPct - eps) * totalCount is output.
+   *
+   * Note that the set of heavy hitters contains at most 1 / heavyHittersPct
+   * elements, so keeping track of all elements that appear more than 1% of the
+   * time in a stream requires tracking at most 100 items.
    */
   def heavyHittersPct : Double
   def heavyHitters : Set[Long]
@@ -433,7 +437,7 @@ case class HeavyHitters(
 
   def ++(other : HeavyHitters) = HeavyHitters(hhs ++ other.hhs)
 
-  def items : Set[Long] = hhs.map { _.item }.toSet
+  def items : Set[Long] = hhs.map { _.item }
 
   def dropCountsBelow(minCount : Double) : HeavyHitters = {
     HeavyHitters(hhs.dropWhile { _.count < minCount })
