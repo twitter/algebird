@@ -1,5 +1,11 @@
 # Algebird #
 
+### Version 0.1.6 ###
+
+* Adds publishing pom.
+* Add SummingQueue
+* rename Cassandra's MurmurHash.
+
 ### Version 0.1.5 ###
 * Make Metric serializable
 * JMap uses Semigroup

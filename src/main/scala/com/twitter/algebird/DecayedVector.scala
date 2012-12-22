@@ -28,7 +28,7 @@ object DecayedVector {
 
   def monoidWithEpsilon[C[_]](eps: Double)
       (implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) = new Monoid[DecayedVector[C]] {
-    override val zero = DecayedVector(vs.group.zero, 0.0)
+    override val zero = DecayedVector(vs.group.zero, Double.NegativeInfinity)
     override def plus(left: DecayedVector[C], right: DecayedVector[C]) = {
       if(left.scaledTime <= right.scaledTime) {
         scaledPlus(right, left, eps)
