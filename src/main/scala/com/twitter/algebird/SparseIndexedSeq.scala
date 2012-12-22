@@ -8,7 +8,6 @@ class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMon
     val length = len
     def merge(b : Base) : Base
     def get(idx : Int) : T
-    def updated(i : Int, v : T) = merge(Single(i, v))
     def apply(idx : Int) = {
       if(idx < len && idx >= 0)
         get(idx)
@@ -20,6 +19,8 @@ class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMon
   object Empty extends Base {
     def get(idx : Int) = tZero
     def merge(b : Base) = b
+
+    def updated(i : Int, v : T)  : IndexedSeq[T] = Single(i, v)
   }
 
   case class Single(index : Int, value : T) extends Base {
@@ -37,6 +38,13 @@ class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMon
     def mergeSingle(i : Int, v : T) = {
       if(i == index)
         Single(i, tMonoid.plus(v, value))
+      else
+        Sparse(Map(i -> v, index -> value))
+    }
+
+    def updated(i : Int, v : T) : IndexedSeq[T] = {
+      if(i == index)
+        Single(i, v)
       else
         Sparse(Map(i -> v, index -> value))
     }
@@ -75,6 +83,8 @@ class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMon
         Dense(map.foldLeft(vector){ case (vec, (i,v)) => vec.updated(i, v) })
       }
     }
+
+    def updated(i : Int, v : T)  : IndexedSeq[T] = sparseOrDense(map + (i -> v))
   }
 
   case class Dense(vec : Vector[T]) extends Base {
@@ -106,6 +116,8 @@ class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMon
     def mergeDense(other : Vector[T]) = {
       Dense(vec.zip(other).map{case (v1, v2) => tMonoid.plus(v1, v2)})
     }
+
+    def updated(i : Int, v : T)  : IndexedSeq[T] = Dense(vec.updated(i, v))
   }
 
   val monoid = new Monoid[Base] {
