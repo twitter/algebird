@@ -4,7 +4,7 @@ import java.nio._
 
 case class MurmurHash128(seed : Long) {
   def apply(buffer : ByteBuffer, offset : Int, length : Int) : (Long,Long) = {
-    val longs = org.apache.cassandra.utils.MurmurHash.hash3_x64_128(buffer, offset, length, seed)
+    val longs = CassandraMurmurHash.hash3_x64_128(buffer, offset, length, seed)
     (longs(0), longs(1))
   }
 
