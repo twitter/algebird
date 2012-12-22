@@ -1,6 +1,6 @@
 name := "algebird"
 
-version := "0.1.6-SNAPSHOT"
+version := "0.1.6"
 
 organization := "com.twitter"
 
@@ -25,8 +25,8 @@ publishMavenStyle := true
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) 
-    Some("sonatype-snapshots" at nexus + "content/repositories/snapshots") 
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("sonatype-snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("sonatype-releases"  at nexus + "service/local/staging/deploy/maven2")
 }
