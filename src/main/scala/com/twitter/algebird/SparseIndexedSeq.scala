@@ -1,21 +1,29 @@
 package com.twitter.algebird
 
-class AdaptiveSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMonoid : Monoid[T]) {
+class SparseIndexedSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMonoid : Monoid[T]) {
   val tZero = tMonoid.zero
   val sparseThreshold = len * sparseFactor
 
   sealed trait Base extends IndexedSeq[T] {
     val length = len
     def merge(b : Base) : Base
+    def get(idx : Int) : T
+    def updated(i : Int, v : T) = merge(Single(i, v))
+    def apply(idx : Int) = {
+      if(idx < len && idx >= 0)
+        get(idx)
+      else
+        throw new IndexOutOfBoundsException()
+    } 
   }
 
   object Empty extends Base {
-    def apply(idx : Int) = tZero
+    def get(idx : Int) = tZero
     def merge(b : Base) = b
   }
 
   case class Single(index : Int, value : T) extends Base {
-    def apply(idx : Int) = if(idx == index) value else tZero
+    def get(idx : Int) = if(idx == index) value else tZero
 
     def merge(b : Base) : Base = {
       b match {
@@ -36,7 +44,7 @@ class AdaptiveSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMonoid :
 
   val mapMonoid = new MapMonoid[Int,T]
   case class Sparse(map : Map[Int,T]) extends Base {
-    def apply(idx : Int) = map.getOrElse(idx, tZero)
+    def get(idx : Int) = map.getOrElse(idx, tZero)
 
     def merge(b : Base) : Base = {
       b match {
@@ -70,7 +78,8 @@ class AdaptiveSeq[T](len : Int, sparseFactor : Double = 0.25)(implicit tMonoid :
   }
 
   case class Dense(vec : Vector[T]) extends Base {
-    def apply(idx : Int) = vec(idx)
+    override def apply(idx : Int) = vec(idx)
+    def get(idx : Int) = vec(idx) 
 
     def merge(b : Base) : Base = {
       b match {
