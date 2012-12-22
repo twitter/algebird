@@ -178,8 +178,8 @@ sealed abstract class CMS extends java.io.Serializable {
    * (heavyHittersPct - eps) * totalCount is output.
    *
    * Note that the set of heavy hitters contains at most 1 / heavyHittersPct
-   * elements, so keeping track of all elements that appear more than 1% of the
-   * time in a stream requires tracking at most 100 items.
+   * elements, so keeping track of all elements that appear more than (say) 1% of the
+   * time requires tracking at most 100 items.
    */
   def heavyHittersPct : Double
   def heavyHitters : Set[Long]
