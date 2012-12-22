@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # @author Edwin Chen (@echen)
-# Automatically write product monoid, product group, and product ring
+# Automatically write product semigroup, monoid, product group, and product ring
 # classes for tuples up to size 22.
 #
 # Run it like this:
@@ -11,7 +11,7 @@
 PACKAGE_NAME = "com.twitter.algebird"
 
 # The tuple sizes we want.
-TUPLE_SIZES = (3..22).to_a
+TUPLE_SIZES = (2..22).to_a
 
 # Each element in a product tuple is of a certain type.
 # This provides an alphabet to draw types from.
@@ -131,6 +131,11 @@ def print_class_definitions
   TUPLE_SIZES.each do |tuple_size|
 
     code = <<EOS
+#{get_comment(tuple_size, "semigroup")}
+#{get_class_definition(tuple_size, "semigroup")} {
+  #{get_operation(tuple_size, "semigroup", "plus")}
+}
+
 #{get_comment(tuple_size, "monoid")}
 #{get_class_definition(tuple_size, "monoid")} {
   #{get_constant(tuple_size, "monoid", "zero")}
@@ -161,6 +166,14 @@ EOS
 end
 
 def print_implicit_definitions
+  puts "trait GeneratedSemigroupImplicits {"
+  TUPLE_SIZES.each do |n|
+    puts get_implicit_definition(n, "semigroup")
+    puts
+  end
+  puts "}"
+  puts
+
   puts "trait GeneratedMonoidImplicits {"
   TUPLE_SIZES.each do |n|
     puts get_implicit_definition(n, "monoid")
