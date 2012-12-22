@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.cassandra.utils;
+package com.twitter.algebird;
 
 import java.nio.ByteBuffer;
 
@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  * Andrzej Bialecki (ab at getopt org).
  * </p>
  */
-public class MurmurHash
+public class CassandraMurmurHash
 {
     public static int hash32(ByteBuffer data, int offset, int length, int seed)
     {
