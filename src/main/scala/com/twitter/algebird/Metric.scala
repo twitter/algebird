@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 
+import scala.annotation.implicitNotFound
 /**
  * A Metric[V] m is a function (V, V) => Double that satisfies the following properties:
  *
@@ -99,6 +100,8 @@ object Metric {
   implicit def iterableMetric[V : Monoid : Metric] = L2Iterable[V]
   implicit def mapMetric[K, V : Monoid : Metric] = L2Map[K, V]
 }
+
+@implicitNotFound(msg = "Cannot find Metric type class for ${V}")
 trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] with java.io.Serializable {
   def apply(v1: V, v2: V): Double
 }

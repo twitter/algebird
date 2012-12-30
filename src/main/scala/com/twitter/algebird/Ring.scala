@@ -18,6 +18,7 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
+import scala.annotation.implicitNotFound
 /**
  * Ring: Group + multiplication (see: http://en.wikipedia.org/wiki/Ring_%28mathematics%29)
  *  and the three elements it defines:
@@ -26,6 +27,7 @@ import java.util.{List => JList, Map => JMap}
  *  - multiplication
  */
 
+@implicitNotFound(msg = "Cannot find Ring type class for ${T}")
 trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def one : T // Multiplicative identity
   def times(l : T, r : T) : T
