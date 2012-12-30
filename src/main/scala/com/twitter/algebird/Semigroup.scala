@@ -18,11 +18,13 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
+import scala.annotation.implicitNotFound
+
 /**
  * Semigroup:
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
  */
-
+@implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
   // no zero in a semigroup
   def isNonZero(v: T): Boolean = true

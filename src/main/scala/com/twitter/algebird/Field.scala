@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.tailrec
+import scala.annotation.implicitNotFound
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
@@ -25,6 +26,7 @@ import java.util.{List => JList, Map => JMap}
  *   multiplicative identity.
  */
 
+@implicitNotFound(msg = "Cannot find Field type class for ${T}")
 trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
   // default implementation uses div YOU MUST OVERRIDE ONE OF THESE
   def inverse(v : T) : T = {

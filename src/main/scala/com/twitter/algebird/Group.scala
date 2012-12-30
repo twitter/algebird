@@ -18,11 +18,13 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
+import scala.annotation.implicitNotFound
 /**
  * Group: this is a monoid that also has subtraction (and negation):
  *   So, you can do (a-b), or -a (which is equal to 0 - a).
  */
 
+@implicitNotFound(msg = "Cannot find Group type class for ${T}")
 trait Group[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
   // must override negate or minus (or both)
   def negate(v : T) : T = minus(zero, v)

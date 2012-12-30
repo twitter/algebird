@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.tailrec
+import scala.annotation.implicitNotFound
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
@@ -25,6 +26,7 @@ import java.util.{List => JList, Map => JMap}
  *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
  */
 
+@implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def assertNotZero(v : T) {
