@@ -184,8 +184,6 @@ public class CassandraMurmurHash
 
         for(int i = 0; i < nblocks; i++)
         {
-            int i_8 = i << 4;
-
             long k1 = getblock(key, offset, i*2+0);
             long k2 = getblock(key, offset, i*2+1);
 
