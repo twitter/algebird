@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import java.nio._
+import java.nio.ByteBuffer
 import com.twitter.hashing.Hashable
 
 object MurmurHashable128 {
@@ -60,7 +60,7 @@ object MurmurHashable128 {
   def onString(seed: Long = defaultSeed): MurmurHashable128[String] = apply(seed) { s => generateBuffer(s.getBytes) }
 }
 
-class MurmurHashable128[T](seed: Long) extends Hashable[T, (Long, Long)] {
+abstract class MurmurHashable128[T](seed: Long) extends Hashable[T, (Long, Long)] {
   // The returned ByteBuffer needs to store all data from idx 0 to
   // "position".
   def getByteBuffer(t: T): ByteBuffer

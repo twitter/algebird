@@ -26,12 +26,13 @@ object SummingQueueTest extends Properties("SummingQueue") {
 
   val sb = SummingQueue[Int](3)
   property("puts are like sums") = forAll { (items: List[Int]) =>
+    sb.flush // sb is stateful! Empty before beginning test iteration.
     Semigroup.sumOption(items) ==
       (Monoid.plus(Monoid.sum(items.map { sb(_) }), sb.flush))
   }
   property("puts return None sometimes") = forAll { (items: List[Int]) =>
     // Should be: true, true, true, false, true, true, true, false
-    sb.flush
+    sb.flush // sb is stateful! Empty before beginning test iteration.
     val empties = items.map { sb.put(_).isEmpty }
     val correct = Stream
       .continually( Stream(true, true, true, false) )

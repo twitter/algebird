@@ -78,7 +78,7 @@ trait MetricProperties {
     isNonNegative[T] && isEqualIffZero[T](eqfn) && isSymmetric[T] && satisfiesTriangleInequality[T]
 
   // TODO: these are copied elsewhere in the tests. Move them to a common place
-  def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =  a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
+  def beCloseTo(a: Double, b: Double, eps: Double = 1e-6) =  a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
   def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10) = a > b - eps || (a.isInfinite && b.isInfinite)
   def defaultEqFn[T](a: T, b: T): Boolean = a == b
 }

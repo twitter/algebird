@@ -28,7 +28,6 @@ class MinHasherTest extends Specification {
     val exact = exactSimilarity(set1, set2)
     val sim = approxSimilarity(mh, set1, set2)
     val error = math.abs(exact - sim)
-    println(exact, sim, error)
     error must be_<[Double](epsilon)
   }
 
