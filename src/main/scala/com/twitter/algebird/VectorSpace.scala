@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 
+import scala.annotation.implicitNotFound
 /**
  * This class represents a vector space. For the required properties see:
  *
@@ -42,6 +43,7 @@ object VectorSpace {
   // TODO: add implicits for java lists, arrays, and options
 }
 
+@implicitNotFound(msg = "Cannot find VectorSpace type class for Container: ${C} and Field: ${F}")
 trait VectorSpace[F, C[_]] extends java.io.Serializable {
   implicit def field: Field[F]
   implicit def group: Group[C[F]]
