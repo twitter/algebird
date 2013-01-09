@@ -16,15 +16,15 @@ limitations under the License.
 package com.twitter.algebird
 
 object Operators {
-  implicit def toPlus[T : Monoid](t : T) = new PlusOp(t)
+  implicit def toPlus[T : Semigroup](t : T) = new PlusOp(t)
   implicit def toMinus[T : Group](t : T) = new MinusOp(t)
   implicit def toTimes[T : Ring](t : T) = new TimesOp(t)
   implicit def toDiv[T : Field](t : T) = new DivOp(t)
   implicit def toRichTraversable[T](t : Traversable[T]) = new RichTraversable(t)
 }
 
-class PlusOp[T : Monoid](t : T) {
-  def +(other : T) = implicitly[Monoid[T]].plus(t, other)
+class PlusOp[T : Semigroup](t : T) {
+  def +(other : T) = implicitly[Semigroup[T]].plus(t, other)
 }
 
 class MinusOp[T : Group](t : T) {
