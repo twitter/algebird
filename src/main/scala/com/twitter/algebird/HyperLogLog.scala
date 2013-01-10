@@ -16,10 +16,9 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.BitSet
 
-import java.util.Arrays
+import java.nio.ByteBuffer
 
 /** Implementation of the HyperLogLog approximate counting as a Monoid
  * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
@@ -32,7 +31,7 @@ object HyperLogLog {
     val seed = 12345678
     val (l0, l1) = MurmurHash128(seed)(input)
     val buf = new Array[Byte](16)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putLong(l0)
       .putLong(l1)
@@ -41,7 +40,7 @@ object HyperLogLog {
 
   implicit def int2Bytes(i : Int) = {
     val buf = new Array[Byte](4)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putInt(i)
     buf
@@ -49,7 +48,7 @@ object HyperLogLog {
 
   implicit def long2Bytes(i : Long) = {
     val buf = new Array[Byte](8)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putLong(i)
     buf
@@ -88,7 +87,7 @@ object HyperLogLog {
         assert(jLen >= 1)
         assert(jLen <= 3)
         val buf = new Array[Byte](1 + 1 + (jLen+1)*maxRhow.size)
-        val byteBuf = java.nio.ByteBuffer
+        val byteBuf = ByteBuffer
           .wrap(buf)
           .put(3 : Byte)
           .put(bits.toByte)
@@ -105,9 +104,10 @@ object HyperLogLog {
     }
   }
 
-  def fromBytes(bytes : Array[Byte]) : HLL = {
-    // Make sure to be reversible so fromBytes(toBytes(x)) == x
-    val bb = java.nio.ByteBuffer.wrap(bytes)
+  // Make sure to be reversible so fromBytes(toBytes(x)) == x
+  def fromBytes(bytes : Array[Byte]) : HLL = fromByteBuffer(ByteBuffer.wrap(bytes))
+
+  def fromByteBuffer(bb : ByteBuffer) : HLL = {
     bb.get.toInt match {
       case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
       case 3 =>
