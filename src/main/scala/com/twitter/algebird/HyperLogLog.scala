@@ -105,27 +105,41 @@ object HyperLogLog {
   }
 
   // Make sure to be reversible so fromBytes(toBytes(x)) == x
-  def fromBytes(bytes : Array[Byte]) : HLL = fromByteBuffer(ByteBuffer.wrap(bytes))
+  def fromBytes(bytes : Array[Byte]) : HLL = {
+    val bb = ByteBuffer.wrap(bytes)
+    bb.get.toInt match {
+      case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
+      case 3 => sparseFromByteBuffer(bb)
+      case n => throw new Exception("Unrecognized HLL type: " + n)
+    }
+  }
 
   def fromByteBuffer(bb : ByteBuffer) : HLL = {
     bb.get.toInt match {
-      case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
-      case 3 =>
+      case 2 =>
         val bits = bb.get
-        val jLen = (bits+7)/8
-        assert(bb.remaining % (jLen+1) == 0, "Invalid byte array")
-        val maxRhow = (1 to bb.remaining/(jLen+1)).map { _ =>
-          val j = jLen match {
-            case 1 => (bb.get.toInt & 0xff)
-            case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
-            case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
-          }
-          val rhow = bb.get
-          j -> Max(rhow)
-        }.toMap
-        SparseHLL(bits, maxRhow)
-      case _ => throw new Exception("Unrecognized HLL type: " + bytes(0))
+        val buf = new Array[Byte](bb.remaining)
+        bb.get(buf)
+        DenseHLL(bits, buf)
+      case 3 => sparseFromByteBuffer(bb)
+      case n => throw new Exception("Unrecognized HLL type: " + n)
     }
+  }
+
+  private def sparseFromByteBuffer(bb : ByteBuffer) : SparseHLL = {
+    val bits = bb.get
+    val jLen = (bits+7)/8
+    assert(bb.remaining % (jLen+1) == 0, "Invalid byte array")
+    val maxRhow = (1 to bb.remaining/(jLen+1)).map { _ =>
+      val j = jLen match {
+        case 1 => (bb.get.toInt & 0xff)
+        case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
+        case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
+      }
+      val rhow = bb.get
+      j -> Max(rhow)
+    }.toMap
+    SparseHLL(bits, maxRhow)
   }
 
   def alpha(bits: Int) = bits match {

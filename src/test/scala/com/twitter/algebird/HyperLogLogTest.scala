@@ -97,16 +97,16 @@ class HyperLogLogTest extends Specification {
        (4 to 20).foreach { bits =>
          val mon = new HyperLogLogMonoid(bits)
          // Zero
-         fromBytes(toBytes(mon.zero)) must be_==(mon.zero)
+         verifySerialization(mon.zero)
          // One j
-         fromBytes(toBytes(mon(12))) must be_==(mon(12))
+         verifySerialization(mon(12))
          // Two j's
-         fromBytes(toBytes(mon(12) + mon(13))) must be_==(mon(12) + mon(13))
+         verifySerialization(mon(12) + mon(13))
          // Many j's
          val manyJ = Monoid.sum((1 to 1000 by 77).map(mon(_)))(mon)
-         fromBytes(toBytes(manyJ)) must be_==(manyJ)
+         verifySerialization(manyJ)
          // Explicitly dense
-         fromBytes(toBytes(manyJ.toDenseHLL)) must be_==(manyJ.toDenseHLL)
+         verifySerialization(manyJ.toDenseHLL)
        }
      }
     "be consistent for sparse vs. dense" in {
@@ -134,6 +134,11 @@ class HyperLogLogTest extends Specification {
           hll.isInstanceOf[DenseHLL] must beTrue
         }
       }
+    }
+
+    def verifySerialization(h : HLL) {
+      fromBytes(toBytes(h)) must be_==(h)
+      fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) must be_==(h)
     }
   }
 }
