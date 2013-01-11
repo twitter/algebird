@@ -135,6 +135,14 @@ class HyperLogLogTest extends Specification {
         }
       }
     }
+    "properly do a batch create" in {
+      val mon = new HyperLogLogMonoid(10)
+      val data = (1 to 200).map { _ => r.nextLong }
+      val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq,value) => seq :+ (seq.last + mon(value)) }
+      (1 to 200).map { n =>
+        partialSums(n) must be_==(mon.batchCreate(data.slice(0, n)))
+      }
+    }
 
     def verifySerialization(h : HLL) {
       fromBytes(toBytes(h)) must be_==(h)

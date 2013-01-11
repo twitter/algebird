@@ -316,6 +316,19 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     SparseHLL(bits, Map(j -> Max(rhow)))
   }
 
+  def batchCreate[T <% Array[Byte]](instances: Iterable[T]) : HLL = {
+    val allMaxRhow = instances
+      .map { x => jRhoW(hash(x), bits) }
+      .groupBy { case (j, rhow) => j }
+      .mapValues { _.maxBy { case (j, rhow) => rhow} }
+      .mapValues { case (j, rhow) => Max(rhow) }
+    if (allMaxRhow.size * 16 <= size) {
+      SparseHLL(bits, allMaxRhow)
+    } else {
+      SparseHLL(bits, allMaxRhow).toDenseHLL
+    }
+  }
+
   final def estimateSize(hll : HLL) : Double = {
     hll.estimatedSize
   }
