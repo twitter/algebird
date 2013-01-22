@@ -17,6 +17,8 @@ libraryDependencies ++= Seq(
   "org.scala-tools.testing" % "specs_2.9.0-1" % "1.6.8" % "test"
 )
 
+libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
+
 parallelExecution in Test := true
 
 // Publishing options:

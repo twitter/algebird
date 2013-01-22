@@ -17,6 +17,27 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.BitSet
+import scala.collection.JavaConverters._
+
+import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
+
+object RichCBitSet {
+  def apply(x : Int*) = {
+    CBitSet.bitmapOf(x.sorted : _*)
+  }
+  implicit def cb2rcb(cb : CBitSet) : RichCBitSet = new RichCBitSet(cb)
+  implicit def rcb2cb(rcb : RichCBitSet) : CBitSet = rcb.cb
+}
+
+class RichCBitSet(val cb : CBitSet) {
+  def ++(b : CBitSet) : CBitSet = cb.or(b)
+
+  def &(b : CBitSet) : CBitSet = cb.and(b)
+  
+  def ==(b : CBitSet) : Boolean = cb.equals(b)
+
+  def toBitSet : BitSet = BitSet(cb.asScala.toArray[java.lang.Integer].map{_.intValue} : _*)
+}
 
 object BloomFilter{
 
@@ -114,12 +135,10 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
 
   def ++(other: BF): BF = {
     other match {
-      case BFZero(_,_) => this
-      case BFItem(otherItem,_,_) => {
-        val bf = BFInstance(hashes,width)
-        bf + item + otherItem
-      }
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item).toList ++ hashes(otherItem).toList : _*), width)
       case bf@BFInstance(_, _, _) => bf + item
+      case bf@BFSparse(_, _, _) => bf + item
     }
   }
 
@@ -128,6 +147,46 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def contains(x: String) = ApproximateBoolean.exact(item == x)
 
   def size = Approximate.exact[Long](1)
+}
+
+case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF {
+  lazy val numHashes: Int = hashes.size
+
+  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet, width)
+
+  def ++ (other: BF): BF = {
+    require(this.width == other.width)
+    require(this.numHashes == other.numHashes)
+
+    other match {
+      case bf@BFZero(_,_) => bf ++ this
+      case bf@BFItem(_,_,_) => bf ++ this
+      case bf@BFInstance(_,otherBits,_) => {
+        // assume same hashes used
+        BFInstance(hashes,
+                   dense.bits ++ otherBits,
+                   width)
+      }
+      case bf@BFSparse(_,otherBits,_) => {
+        // assume same hashes used
+        BFSparse(hashes,
+                 bits ++ otherBits,
+                 width)
+      }
+    }
+  }
+
+  def + (item: String): BF = {
+    val bitsToActivate = RichCBitSet(hashes(item) : _*)
+
+    BFSparse(hashes,
+             bits ++ bitsToActivate,
+             width)
+  }
+
+  def contains(item: String): ApproximateBoolean = dense.contains(item)
+
+  def size: Approximate[Long] = dense.size
 }
 
 /*
@@ -144,6 +203,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
     other match {
       case bf@BFZero(_,_) => bf ++ this
       case bf@BFItem(_,_,_) => bf ++ this
+      case bf@BFSparse(_,_,_) => bf ++ this
       case bf@BFInstance(_,otherBits,_) => {
         // assume same hashes used
         BFInstance(hashes,
