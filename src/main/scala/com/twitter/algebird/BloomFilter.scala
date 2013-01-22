@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.BitSet
+import scala.collection.immutable.BitSet
 import scala.collection.JavaConverters._
 
 import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
@@ -36,7 +36,11 @@ class RichCBitSet(val cb : CBitSet) {
   
   def ==(b : CBitSet) : Boolean = cb.equals(b)
 
-  def toBitSet : BitSet = BitSet(cb.asScala.toArray[java.lang.Integer].map{_.intValue} : _*)
+  def toBitSet(width : Int) : BitSet = {
+    val a = new Array[Long]((width+63)/64)
+    cb.asScala.foreach{ i : java.lang.Integer => a(i.intValue / 64) |= 1L << (i.intValue % 64) }
+    BitSet.fromArray(a)
+  }
 }
 
 object BloomFilter{
@@ -152,7 +156,7 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
 case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF {
   lazy val numHashes: Int = hashes.size
 
-  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet, width)
+  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
 
   def ++ (other: BF): BF = {
     require(this.width == other.width)
@@ -221,10 +225,13 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
                width)
   }
 
-  def contains(item: String) = {
-    val otherBits = BitSet(hashes(item) : _*)
+  // faster than == on two bitsets.
+  def bitSetContains(bs : BitSet, il : Int*) : Boolean = {
+    il.map{i : Int => bs.contains(i)}.reduce{_&&_}
+  }
 
-    if ((bits & otherBits) == otherBits) {
+  def contains(item: String) = {
+    if (bitSetContains(bits, hashes(item) : _*)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
       // p = (1 - e^(-numHashes * setCardinality / width))^numHashes
