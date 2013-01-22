@@ -27,6 +27,16 @@ object CollectionSpecification extends Properties("Collections") with BaseProper
 
   property("List Monoid laws") = monoidLaws[List[Int]]
 
+  implicit def arbSeq[T:Arbitrary] : Arbitrary[Seq[T]] =
+    Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toSeq } }
+
+  property("Seq plus") = forAll { (a : Seq[Int], b : Seq[Int]) =>
+    val mon = implicitly[Monoid[Seq[Int]]]
+    (a ++ b == mon.plus(a,b)) && (mon.zero == Seq[Int]())
+  }
+
+  property("Seq Monoid laws") = monoidLaws[Seq[Int]]
+
   property("Set plus") = forAll { (a : Set[Int], b : Set[Int]) =>
     val mon = implicitly[Monoid[Set[Int]]]
     (a ++ b == mon.plus(a,b)) && (mon.zero == Set[Int]())
