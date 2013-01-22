@@ -85,6 +85,12 @@ class ListMonoid[T] extends Monoid[List[T]] {
   override def plus(left : List[T], right : List[T]) = left ++ right
 }
 
+// equivalent to ListMonoid
+class SeqMonoid[T] extends Monoid[Seq[T]] {
+  override def zero = Seq[T]()
+  override def plus(left : Seq[T], right : Seq[T]) = left ++ right
+}
+
 /** A sorted-take List monoid (not the default, you can set:
  * implicit val sortmon = new SortedTakeListMonoid[T](10)
  * to use this instead of the standard list
@@ -176,6 +182,7 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val stringMonoid : Monoid[String] = StringMonoid
   implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
+  implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
   implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]

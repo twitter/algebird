@@ -88,6 +88,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit val stringSemigroup : Semigroup[String] = StringMonoid
   implicit def optionSemigroup[T : Semigroup] : Semigroup[Option[T]] = new OptionMonoid[T]
   implicit def listSemigroup[T] : Semigroup[List[T]] = new ListMonoid[T]
+  implicit def seqSemigroup[T] : Semigroup[Seq[T]] = new SeqMonoid[T]
   implicit def indexedSeqSemigroup[T : Semigroup]: Semigroup[IndexedSeq[T]] = new IndexedSeqSemigroup[T]
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
