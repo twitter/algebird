@@ -140,9 +140,9 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def ++(other: BF): BF = {
     other match {
       case bf@BFZero(_,_) => this
-      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item).toList ++ hashes(otherItem).toList : _*), width)
-      case bf@BFInstance(_, _, _) => bf + item
-      case bf@BFSparse(_, _, _) => bf + item
+      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item).toList ++ hashes(otherItem).toList : _*), width, 2)
+      case bf@BFInstance(_,_,_,_) => bf + item
+      case bf@BFSparse(_,_,_,_) => bf + item
     }
   }
 
@@ -153,10 +153,10 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def size = Approximate.exact[Long](1)
 }
 
-case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF {
+case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int, bsize : Int) extends BF {
   lazy val numHashes: Int = hashes.size
 
-  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
+  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width, bsize)
 
   def ++ (other: BF): BF = {
     require(this.width == other.width)
@@ -165,17 +165,17 @@ case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF
     other match {
       case bf@BFZero(_,_) => bf ++ this
       case bf@BFItem(_,_,_) => bf ++ this
-      case bf@BFInstance(_,otherBits,_) => {
+      case bf@BFInstance(_,otherBits,_,otherSize) => {
         // assume same hashes used
         BFInstance(hashes,
                    dense.bits ++ otherBits,
-                   width)
+                   width, bsize + otherSize)
       }
-      case bf@BFSparse(_,otherBits,_) => {
+      case bf@BFSparse(_,otherBits,_,otherSize) => {
         // assume same hashes used
         BFSparse(hashes,
                  bits ++ otherBits,
-                 width)
+                 width, bsize + otherSize)
       }
     }
   }
@@ -185,7 +185,7 @@ case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF
 
     BFSparse(hashes,
              bits ++ bitsToActivate,
-             width)
+             width, bsize + 1)
   }
 
   def contains(item: String): ApproximateBoolean = dense.contains(item)
@@ -196,7 +196,7 @@ case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF
 /*
  * Bloom filter with multiple values
  */
-case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
+case class BFInstance(hashes : BFHash, bits: BitSet, width: Int, bsize : Int) extends BF {
 
   lazy val numHashes: Int = hashes.size
 
@@ -207,12 +207,12 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
     other match {
       case bf@BFZero(_,_) => bf ++ this
       case bf@BFItem(_,_,_) => bf ++ this
-      case bf@BFSparse(_,_,_) => bf ++ this
-      case bf@BFInstance(_,otherBits,_) => {
+      case bf@BFSparse(_,_,_,_) => bf ++ this
+      case bf@BFInstance(_,otherBits,_,otherSize) => {
         // assume same hashes used
         BFInstance(hashes,
                    bits ++ otherBits,
-                   width)
+                   width, bsize + otherSize)
       }
     }
   }
@@ -222,7 +222,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
 
     BFInstance(hashes,
                bits ++ bitsToActivate,
-               width)
+               width, bsize + 1)
   }
 
   // faster than == on two bitsets.
@@ -253,7 +253,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   // Proportion of bits that are set to true.
-  def density = bits.size.toDouble / width
+  def density = bsize.toDouble / width
 
   /**
    * Cardinality estimates are taken from Theorem 1 on page 15 of
@@ -275,7 +275,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
     // Variable names correspond to those used in the paper.
-    val t = bits.size
+    val t = bsize
     val n = sInverse(t).round.toInt
     // Take the min and max because the probability formula assumes
     // nl <= sInverse(t - 1) and sInverse(t + 1) <= nr
@@ -312,7 +312,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
 
 object BFInstance{
   def apply(hashes: BFHash, width: Int): BFInstance =
-    BFInstance(hashes, BitSet.empty, width)
+    BFInstance(hashes, BitSet.empty, width, 0)
 }
 
 case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]]{
