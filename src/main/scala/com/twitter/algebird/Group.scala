@@ -32,6 +32,8 @@ trait Group[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
 }
 
 // Trivial group. Returns constant on any interaction.
+// The contract is that T be a singleton type (that is, t1 == t2 returns true
+// for all instances t1,t2 of type T).
 class ConstantGroup[T](constant: T) extends Group[T] {
   override def zero = constant
   override def negate(u : T) = constant
