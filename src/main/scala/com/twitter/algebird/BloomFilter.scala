@@ -253,7 +253,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   // Proportion of bits that are set to true.
-  def density = numBits / width
+  def density = numBits.toDouble / width
 
   /**
    * Cardinality estimates are taken from Theorem 1 on page 15 of
