@@ -36,6 +36,8 @@ class RichCBitSet(val cb : CBitSet) {
   
   def ==(b : CBitSet) : Boolean = cb.equals(b)
 
+  def ==(b : RichCBitSet) : Boolean = cb.equals(b.cb)
+
   def toBitSet(width : Int) : BitSet = {
     val a = new Array[Long]((width+63)/64)
     cb.asScala.foreach{ i : java.lang.Integer => a(i.intValue / 64) |= 1L << (i.intValue % 64) }
