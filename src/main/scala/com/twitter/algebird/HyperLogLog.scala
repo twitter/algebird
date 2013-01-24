@@ -16,10 +16,9 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.BitSet
 
-import java.util.Arrays
+import java.nio.ByteBuffer
 
 /** Implementation of the HyperLogLog approximate counting as a Monoid
  * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
@@ -32,7 +31,7 @@ object HyperLogLog {
     val seed = 12345678
     val (l0, l1) = MurmurHash128(seed)(input)
     val buf = new Array[Byte](16)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putLong(l0)
       .putLong(l1)
@@ -41,7 +40,7 @@ object HyperLogLog {
 
   implicit def int2Bytes(i : Int) = {
     val buf = new Array[Byte](4)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putInt(i)
     buf
@@ -49,7 +48,7 @@ object HyperLogLog {
 
   implicit def long2Bytes(i : Long) = {
     val buf = new Array[Byte](8)
-    java.nio.ByteBuffer
+    ByteBuffer
       .wrap(buf)
       .putLong(i)
     buf
@@ -88,7 +87,7 @@ object HyperLogLog {
         assert(jLen >= 1)
         assert(jLen <= 3)
         val buf = new Array[Byte](1 + 1 + (jLen+1)*maxRhow.size)
-        val byteBuf = java.nio.ByteBuffer
+        val byteBuf = ByteBuffer
           .wrap(buf)
           .put(3 : Byte)
           .put(bits.toByte)
@@ -105,27 +104,42 @@ object HyperLogLog {
     }
   }
 
+  // Make sure to be reversible so fromBytes(toBytes(x)) == x
   def fromBytes(bytes : Array[Byte]) : HLL = {
-    // Make sure to be reversible so fromBytes(toBytes(x)) == x
-    val bb = java.nio.ByteBuffer.wrap(bytes)
+    val bb = ByteBuffer.wrap(bytes)
     bb.get.toInt match {
       case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
-      case 3 =>
-        val bits = bb.get
-        val jLen = (bits+7)/8
-        assert(bb.remaining % (jLen+1) == 0, "Invalid byte array")
-        val maxRhow = (1 to bb.remaining/(jLen+1)).map { _ =>
-          val j = jLen match {
-            case 1 => (bb.get.toInt & 0xff)
-            case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
-            case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
-          }
-          val rhow = bb.get
-          j -> Max(rhow)
-        }.toMap
-        SparseHLL(bits, maxRhow)
-      case _ => throw new Exception("Unrecognized HLL type: " + bytes(0))
+      case 3 => sparseFromByteBuffer(bb)
+      case n => throw new Exception("Unrecognized HLL type: " + n)
     }
+  }
+
+  def fromByteBuffer(bb : ByteBuffer) : HLL = {
+    bb.get.toInt match {
+      case 2 =>
+        val bits = bb.get
+        val buf = new Array[Byte](bb.remaining)
+        bb.get(buf)
+        DenseHLL(bits, buf)
+      case 3 => sparseFromByteBuffer(bb)
+      case n => throw new Exception("Unrecognized HLL type: " + n)
+    }
+  }
+
+  private def sparseFromByteBuffer(bb : ByteBuffer) : SparseHLL = {
+    val bits = bb.get
+    val jLen = (bits+7)/8
+    assert(bb.remaining % (jLen+1) == 0, "Invalid byte array")
+    val maxRhow = (1 to bb.remaining/(jLen+1)).map { _ =>
+      val j = jLen match {
+        case 1 => (bb.get.toInt & 0xff)
+        case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
+        case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
+      }
+      val rhow = bb.get
+      j -> Max(rhow)
+    }.toMap
+    SparseHLL(bits, maxRhow)
   }
 
   def alpha(bits: Int) = bits match {
@@ -300,6 +314,19 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     val hashed = hash(example)
     val (j,rhow) = jRhoW(hashed, bits)
     SparseHLL(bits, Map(j -> Max(rhow)))
+  }
+
+  def batchCreate[T <% Array[Byte]](instances: Iterable[T]) : HLL = {
+    val allMaxRhow = instances
+      .map { x => jRhoW(hash(x), bits) }
+      .groupBy { case (j, rhow) => j }
+      .mapValues { _.maxBy { case (j, rhow) => rhow} }
+      .mapValues { case (j, rhow) => Max(rhow) }
+    if (allMaxRhow.size * 16 <= size) {
+      SparseHLL(bits, allMaxRhow)
+    } else {
+      SparseHLL(bits, allMaxRhow).toDenseHLL
+    }
   }
 
   final def estimateSize(hll : HLL) : Double = {
