@@ -16,7 +16,31 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.BitSet
+import scala.collection.immutable.BitSet
+import scala.collection.JavaConverters._
+
+import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
+
+object RichCBitSet {
+  def apply(x : Int*) = {
+    CBitSet.bitmapOf(x.sorted : _*)
+  }
+  implicit def cb2rcb(cb : CBitSet) : RichCBitSet = new RichCBitSet(cb)
+}
+
+// An enrichment to give some scala-like operators to the compressed
+// bit set.
+class RichCBitSet(val cb : CBitSet) {
+  def ++(b : CBitSet) : CBitSet = cb.or(b)
+
+  def ==(b : CBitSet) : Boolean = cb.equals(b)
+
+  def toBitSet(width : Int) : BitSet = {
+    val a = new Array[Long]((width+63)/64)
+    cb.asScala.foreach{ i : java.lang.Integer => a(i.intValue / 64) |= 1L << (i.intValue % 64) }
+    BitSet.fromArray(a)
+  }
+}
 
 object BloomFilter{
 
@@ -114,12 +138,9 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
 
   def ++(other: BF): BF = {
     other match {
-      case BFZero(_,_) => this
-      case BFItem(otherItem,_,_) => {
-        val bf = BFInstance(hashes,width)
-        bf + item + otherItem
-      }
-      case bf@BFInstance(_, _, _) => bf + item
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item) : _*),width) + otherItem
+      case _ => other + item
     }
   }
 
@@ -130,20 +151,59 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def size = Approximate.exact[Long](1)
 }
 
+case class BFSparse(hashes : BFHash, bits : CBitSet, width : Int) extends BF {
+  import RichCBitSet._
+
+  lazy val numHashes: Int = hashes.size
+
+  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
+
+  def ++ (other: BF): BF = {
+    require(this.width == other.width)
+    require(this.numHashes == other.numHashes)
+
+    other match {
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(item,_,_) => this + item
+      case bf@BFSparse(_,otherBits,_) => {
+        // assume same hashes used
+        BFSparse(hashes,
+                 bits ++ otherBits,
+                 width)
+      }
+      case _ => other ++ this
+    }
+  }
+
+  def + (item: String): BF = {
+    val bitsToActivate = RichCBitSet(hashes(item) : _*)
+
+    BFSparse(hashes,
+             bits ++ bitsToActivate,
+             width)
+  }
+
+  def contains(item: String): ApproximateBoolean = dense.contains(item)
+
+  def size: Approximate[Long] = dense.size
+}
+
 /*
  * Bloom filter with multiple values
  */
 case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
 
   lazy val numHashes: Int = hashes.size
+  lazy val numBits: Int = bits.size
 
   def ++ (other: BF) = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 
     other match {
-      case bf@BFZero(_,_) => bf ++ this
-      case bf@BFItem(_,_,_) => bf ++ this
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(item,_,_) => this + item
+      case bf@BFSparse(_,_,_) => this ++ bf.dense
       case bf@BFInstance(_,otherBits,_) => {
         // assume same hashes used
         BFInstance(hashes,
@@ -161,10 +221,12 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
                width)
   }
 
-  def contains(item: String) = {
-    val otherBits = BitSet(hashes(item) : _*)
+  def bitSetContains(bs : BitSet, il : Int*) : Boolean = {
+    il.map{i : Int => bs.contains(i)}.reduce{_&&_}
+  }
 
-    if ((bits & otherBits) == otherBits) {
+  def contains(item: String) = {
+    if (bitSetContains(bits, hashes(item) : _*)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
       // p = (1 - e^(-numHashes * setCardinality / width))^numHashes
@@ -186,7 +248,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   // Proportion of bits that are set to true.
-  def density = bits.size.toDouble / width
+  def density = numBits.toDouble / width
 
   /**
    * Cardinality estimates are taken from Theorem 1 on page 15 of
@@ -208,7 +270,7 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
     // Variable names correspond to those used in the paper.
-    val t = bits.size
+    val t = numBits
     val n = sInverse(t).round.toInt
     // Take the min and max because the probability formula assumes
     // nl <= sInverse(t - 1) and sInverse(t + 1) <= nr
