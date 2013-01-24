@@ -26,17 +26,14 @@ object RichCBitSet {
     CBitSet.bitmapOf(x.sorted : _*)
   }
   implicit def cb2rcb(cb : CBitSet) : RichCBitSet = new RichCBitSet(cb)
-  implicit def rcb2cb(rcb : RichCBitSet) : CBitSet = rcb.cb
 }
 
+// An enrichment to give some scala-like operators to the compressed
+// bit set.
 class RichCBitSet(val cb : CBitSet) {
   def ++(b : CBitSet) : CBitSet = cb.or(b)
 
-  def &(b : CBitSet) : CBitSet = cb.and(b)
-  
   def ==(b : CBitSet) : Boolean = cb.equals(b)
-
-  def ==(b : RichCBitSet) : Boolean = cb.equals(b.cb)
 
   def toBitSet(width : Int) : BitSet = {
     val a = new Array[Long]((width+63)/64)
@@ -142,9 +139,8 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def ++(other: BF): BF = {
     other match {
       case bf@BFZero(_,_) => this
-      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item).toList ++ hashes(otherItem).toList : _*), width)
-      case bf@BFInstance(_,_,_) => bf + item
-      case bf@BFSparse(_,_,_) => bf + item
+      case bf@BFItem(otherItem,_,_) => BFSparse(hashes,RichCBitSet(hashes(item) : _*),width) + otherItem
+      case _ => other + item
     }
   }
 
@@ -155,7 +151,9 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   def size = Approximate.exact[Long](1)
 }
 
-case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF {
+case class BFSparse(hashes : BFHash, bits : CBitSet, width : Int) extends BF {
+  import RichCBitSet._
+
   lazy val numHashes: Int = hashes.size
 
   lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
@@ -165,20 +163,15 @@ case class BFSparse(hashes : BFHash, bits : RichCBitSet, width : Int) extends BF
     require(this.numHashes == other.numHashes)
 
     other match {
-      case bf@BFZero(_,_) => bf ++ this
-      case bf@BFItem(_,_,_) => bf ++ this
-      case bf@BFInstance(_,otherBits,_) => {
-        // assume same hashes used
-        BFInstance(hashes,
-                   dense.bits ++ otherBits,
-                   width)
-      }
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(item,_,_) => this + item
       case bf@BFSparse(_,otherBits,_) => {
         // assume same hashes used
         BFSparse(hashes,
                  bits ++ otherBits,
                  width)
       }
+      case _ => other ++ this
     }
   }
 
@@ -208,9 +201,9 @@ case class BFInstance(hashes : BFHash, bits: BitSet, width: Int) extends BF {
     require(this.numHashes == other.numHashes)
 
     other match {
-      case bf@BFZero(_,_) => bf ++ this
-      case bf@BFItem(_,_,_) => bf ++ this
-      case bf@BFSparse(_,_,_) => bf ++ this
+      case bf@BFZero(_,_) => this
+      case bf@BFItem(item,_,_) => this + item
+      case bf@BFSparse(_,_,_) => this ++ bf.dense
       case bf@BFInstance(_,otherBits,_) => {
         // assume same hashes used
         BFInstance(hashes,
