@@ -57,7 +57,7 @@ class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
 }
 
 class EventuallyMonoid[L,R](convert: R => L)(mustConvert: R => Boolean)
-  (implicit lMonoid: Monoid[L], rMonoid: Monoid[R]) extends EventuallySemigroup[L,R](convert)(mustConvert)
+  (implicit lSemigroup: Semigroup[L], rMonoid: Monoid[R]) extends EventuallySemigroup[L,R](convert)(mustConvert)
   with Monoid[Either[L,R]] {
 
   override def zero = Right(Monoid.zero[R])
