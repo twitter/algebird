@@ -52,6 +52,10 @@ object Monad {
     def apply[T](v: T) = Option(v);
     def flatMap[T,U](m: Option[T])(fn: (T) => Option[U]) = m.flatMap(fn)
   }
+  implicit val some: Monad[Some] = new Monad[Some] {
+    def apply[T](v: T) = Some(v);
+    def flatMap[T,U](m: Some[T])(fn: (T) => Some[U]) = fn(m.get)
+  }
   implicit val vector: Monad[Vector] = new Monad[Vector] {
     def apply[T](v: T) = Vector(v);
     def flatMap[T,U](m: Vector[T])(fn: (T) => Vector[U]) = m.flatMap(fn)
@@ -91,3 +95,36 @@ class MonadOperators[A,M[A]](m: M[A])(implicit monad: Monad[M]) {
   def map[U](fn: (A) => U): M[U] = flatMap { (a: A) => monad(fn(a)) }
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
 }
+
+class MonadSemigroup[T,M[_]](implicit monad: Monad[M], sg: Semigroup[T])
+  extends Semigroup[M[T]] {
+  import Monad.operators
+  def plus(l: M[T], r: M[T]) = for(lv <- l; rv <- r) yield sg.plus(lv, rv)
+}
+
+class MonadMonoid[T,M[_]](implicit monad: Monad[M], mon: Monoid[T])
+  extends MonadSemigroup[T,M] with Monoid[M[T]] {
+  lazy val zero = monad(mon.zero)
+}
+
+class MonadGroup[T,M[_]](implicit monad: Monad[M], grp: Group[T])
+  extends MonadMonoid[T,M] with Group[M[T]] {
+  import Monad.operators
+  override def negate(v: M[T]) = v.map { grp.negate(_) }
+  override def minus(l: M[T], r: M[T]) = for(lv <- l; rv <- r) yield grp.minus(lv, rv)
+}
+
+class MonadRing[T,M[_]](implicit monad: Monad[M], ring: Ring[T])
+  extends MonadGroup[T,M] with Ring[M[T]] {
+  import Monad.operators
+  lazy val one = monad(ring.one)
+  def times(l: M[T], r: M[T]) = for(lv <- l; rv <- r) yield ring.times(lv, rv)
+}
+
+class MonadField[T,M[_]](implicit monad: Monad[M], fld: Field[T])
+  extends MonadRing[T,M] with Field[M[T]] {
+  import Monad.operators
+  override def inverse(v: M[T]) = v.map { fld.inverse(_) }
+  override def div(l: M[T], r: M[T]) = for(lv <- l; rv <- r) yield fld.div(lv, rv)
+}
+

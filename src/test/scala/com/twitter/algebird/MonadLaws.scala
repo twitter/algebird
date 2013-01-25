@@ -24,7 +24,7 @@ import org.scalacheck.Prop.forAll
 
 import Monad.{pureOp, operators}
 
-object MonadLaws extends Properties("Monad") {
+object MonadLaws extends Properties("Monad") with BaseProperties {
   def defaultEq[T] = {(t0: T, t1: T) => (t0 == t1)}
 
   def leftIdentity[M[_],T,U](eq: (M[U],M[U]) => Boolean = defaultEq[M[U]])
@@ -64,10 +64,38 @@ object MonadLaws extends Properties("Monad") {
   implicit def seqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[Seq[T]] =
     Arbitrary { arbl.arbitrary.map { l => Seq(l: _*) } }
 
+  implicit def someA[T](implicit arbl: Arbitrary[T]): Arbitrary[Some[T]] =
+    Arbitrary { arbl.arbitrary.map { l => Some(l) } }
+
   property("list") = monadLaws[List, Int, String, Long]()
   property("option") = monadLaws[Option, Int, String, Long]()
   property("indexedseq") = monadLaws[IndexedSeq, Int, String, Long]()
   property("vector") = monadLaws[Vector, Int, String, Long]()
   property("set") = monadLaws[Set, Int, String, Long]()
   property("seq") = monadLaws[Seq, Int, String, Long]()
+
+  // Monad algebras:
+  property("Monad Semigroup") = {
+    implicit val optSg = new MonadSemigroup[Int, Option]
+    implicit val listSg = new MonadSemigroup[String, List]
+    semigroupLaws[Option[Int]] && semigroupLaws[List[String]]
+  }
+  property("Monad Monoid") = {
+    implicit val optSg = new MonadMonoid[Int, Option]
+    implicit val listSg = new MonadMonoid[String, List]
+    monoidLaws[Option[Int]] && monoidLaws[List[String]]
+  }
+  // These laws work for only "non-empty" monads
+  property("Monad Group") = {
+    implicit val optSg = new MonadGroup[Int, Some]
+    groupLaws[Some[Int]]
+  }
+  property("Monad Ring") = {
+    implicit val optSg = new MonadRing[Int, Some]
+    ringLaws[Some[Int]]
+  }
+  property("Monad Field") = {
+    implicit val optSg = new MonadField[Boolean, Some]
+    fieldLaws[Some[Boolean]]
+  }
 }
