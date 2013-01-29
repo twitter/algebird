@@ -102,16 +102,20 @@ class MonadOperators[A,M[A]](m: M[A])(implicit monad: Monad[M]) {
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
 }
 
+// This is a Semigroup, for all Monads.
 class MonadSemigroup[T,M[_]](implicit monad: Monad[M], sg: Semigroup[T])
   extends Semigroup[M[T]] {
   import Monad.operators
   def plus(l: M[T], r: M[T]) = for(lv <- l; rv <- r) yield sg.plus(lv, rv)
 }
 
+// This is a Monoid, for all Monads.
 class MonadMonoid[T,M[_]](implicit monad: Monad[M], mon: Monoid[T])
   extends MonadSemigroup[T,M] with Monoid[M[T]] {
   lazy val zero = monad(mon.zero)
 }
+
+// Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your Monad.
 
 class MonadGroup[T,M[_]](implicit monad: Monad[M], grp: Group[T])
   extends MonadMonoid[T,M] with Group[M[T]] {
