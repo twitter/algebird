@@ -28,6 +28,7 @@ trait Monad[M[_]] {
   // constructs a Monad instance from the given value, e.g. List(1)
   def apply[T](v: T): M[T]
   def flatMap[T,U](m: M[T])(fn: (T) => M[U]): M[U]
+  def map[T,U](m: M[T])(fn: (T) => U): M[U] = flatMap(m)((t: T) => apply(fn(t)))
   // Laws these must follow are:
   // identities:
   //  flatMap(apply(x))(fn) == fn(a)
@@ -36,12 +37,17 @@ trait Monad[M[_]] {
   //  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
 }
 
+/** For use from Java/minimizing code bloat in scala
+ */
+abstract class AbstractMonad[M[_]] extends Monad[M]
+
 /** Follows the type-class pattern for the Monad trait
  */
 object Monad {
   /** Get the Monad for a type, e.g: Monad[List] */
   def apply[M[_]](implicit monad: Monad[M]): Monad[M] = monad
   def flatMap[M[_],T,U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) = monad.flatMap(m)(fn)
+  def map[M[_],T,U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) = monad.map(m)(fn)
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {
@@ -92,7 +98,7 @@ class PureOp[A](a: A) {
  */
 class MonadOperators[A,M[A]](m: M[A])(implicit monad: Monad[M]) {
   // This is called fmap in haskell (and in Functor, not Monad)
-  def map[U](fn: (A) => U): M[U] = flatMap { (a: A) => monad(fn(a)) }
+  def map[U](fn: (A) => U): M[U] = monad.map(m)(fn)
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
 }
 
