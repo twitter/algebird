@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.tailrec
+import scala.annotation.implicitNotFound
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
@@ -25,6 +26,7 @@ import java.util.{List => JList, Map => JMap}
  *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
  */
 
+@implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def assertNotZero(v : T) {
@@ -81,6 +83,12 @@ object StringMonoid extends Monoid[String] {
 class ListMonoid[T] extends Monoid[List[T]] {
   override def zero = List[T]()
   override def plus(left : List[T], right : List[T]) = left ++ right
+}
+
+// equivalent to ListMonoid
+class SeqMonoid[T] extends Monoid[Seq[T]] {
+  override def zero = Seq[T]()
+  override def plus(left : Seq[T], right : Seq[T]) = left ++ right
 }
 
 /** A sorted-take List monoid (not the default, you can set:
@@ -174,6 +182,7 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val stringMonoid : Monoid[String] = StringMonoid
   implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
+  implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
   implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]

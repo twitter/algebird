@@ -1,5 +1,13 @@
 # Algebird #
 
+### Version 0.1.7 ###
+
+* SummingQueue works with capacity of 0, just passes through
+* adds compressed bitset (RichCBitSet)
+* Add `BFSparse`
+* Heavy hitters in countminsketch
+* Monad typeclass
+
 ### Version 0.1.6 ###
 
 * Adds publishing pom.

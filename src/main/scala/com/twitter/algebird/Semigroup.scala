@@ -18,11 +18,13 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
+import scala.annotation.implicitNotFound
+
 /**
  * Semigroup:
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
  */
-
+@implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
   // no zero in a semigroup
   def isNonZero(v: T): Boolean = true
@@ -86,6 +88,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit val stringSemigroup : Semigroup[String] = StringMonoid
   implicit def optionSemigroup[T : Semigroup] : Semigroup[Option[T]] = new OptionMonoid[T]
   implicit def listSemigroup[T] : Semigroup[List[T]] = new ListMonoid[T]
+  implicit def seqSemigroup[T] : Semigroup[Seq[T]] = new SeqMonoid[T]
   implicit def indexedSeqSemigroup[T : Semigroup]: Semigroup[IndexedSeq[T]] = new IndexedSeqSemigroup[T]
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]

@@ -31,6 +31,7 @@ package com.twitter.algebird
  * @author Oscar Boykin
  */
 
+import java.io.Serializable
 import java.util.concurrent.ArrayBlockingQueue
 
 import scala.collection.JavaConverters._
@@ -40,32 +41,38 @@ object SummingQueue {
   def apply[V:Semigroup](cap: Int): SummingQueue[V] = new SummingQueue(cap)
 }
 
-class SummingQueue[V:Semigroup] private (capacity: Int)
-  extends java.io.Serializable with Function1[V,Option[V]] {
+class SummingQueue[V:Semigroup] private (capacity: Int) extends (V => Option[V]) with Serializable {
 
-  private val queue = new ArrayBlockingQueue[V](capacity, true)
+  private val queueOption: Option[ArrayBlockingQueue[V]] =
+    if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
 
   /** puts an item to the queue, optionally sums up the queue and returns value
-   * This never blocks interally. It uses offer.  If the queue is full, we drain,
+   * This never blocks interally. It uses offer. If the queue is full, we drain,
    * sum the queue.
    */
   final def put(item: V): Option[V] =
-    if(!queue.offer(item)) {
-      // Queue is full, do the work:
-      Monoid.plus(flush, Some(item))
-    }
-    else {
-      // We are in the queue
-      None
-    }
+    if (queueOption.isDefined) {
+      queueOption.flatMap { queue =>
+        if(!queue.offer(item)) {
+          // Queue is full, do the work:
+          Monoid.plus(flush, Some(item))
+        }
+        else {
+          // We are in the queue
+          None
+        }
+      }
+    } else { Some(item) }
 
   def apply(v: V): Option[V] = put(v)
 
   /** drain the queue and return the sum. If empty, return None
    */
   def flush: Option[V] = {
-    val toSum = ListBuffer[V]()
-    queue.drainTo(toSum.asJava)
-    Semigroup.sumOption(toSum)
+    queueOption.flatMap { queue =>
+      val toSum = ListBuffer[V]()
+      queue.drainTo(toSum.asJava)
+      Semigroup.sumOption(toSum)
+    }
   }
 }

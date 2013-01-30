@@ -23,8 +23,14 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.Gen.choose
 
 object SummingQueueTest extends Properties("SummingQueue") {
+  val zeroCapQueue = SummingQueue[Int](0) // passes all through
 
-  val sb = SummingQueue[Int](3)
+  property("0 capacity always returns") = forAll { i: Int =>
+    zeroCapQueue(i) == Some(i)
+  }
+
+  val sb = SummingQueue[Int](3) // buffers three at a time
+
   property("puts are like sums") = forAll { (items: List[Int]) =>
     Semigroup.sumOption(items) ==
       (Monoid.plus(Monoid.sum(items.map { sb(_) }), sb.flush))

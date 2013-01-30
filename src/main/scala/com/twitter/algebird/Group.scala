@@ -18,11 +18,13 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
+import scala.annotation.implicitNotFound
 /**
  * Group: this is a monoid that also has subtraction (and negation):
  *   So, you can do (a-b), or -a (which is equal to 0 - a).
  */
 
+@implicitNotFound(msg = "Cannot find Group type class for ${T}")
 trait Group[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
   // must override negate or minus (or both)
   def negate(v : T) : T = minus(zero, v)
@@ -30,6 +32,8 @@ trait Group[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
 }
 
 // Trivial group. Returns constant on any interaction.
+// The contract is that T be a singleton type (that is, t1 == t2 returns true
+// for all instances t1,t2 of type T).
 class ConstantGroup[T](constant: T) extends Group[T] {
   override def zero = constant
   override def negate(u : T) = constant

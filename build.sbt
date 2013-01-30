@@ -1,6 +1,6 @@
 name := "algebird"
 
-version := "0.1.6"
+version := "0.1.7"
 
 organization := "com.twitter"
 
@@ -16,6 +16,8 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
   "org.scala-tools.testing" % "specs_2.9.0-1" % "1.6.8" % "test"
 )
+
+libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
 
 parallelExecution in Test := true
 
