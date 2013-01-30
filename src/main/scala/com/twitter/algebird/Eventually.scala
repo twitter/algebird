@@ -36,11 +36,11 @@ class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
   override def plus(x: Either[L,R], y: Either[L,R]) = {
     x match {
       case Left(xl) => y match {
-        case Left(yl) => Left(Semigroup.plus(xl, yl))
-        case Right(yr) => Left(Semigroup.plus(xl, convert(yr)))
+        case Left(yl) => left(Semigroup.plus(xl, yl))
+        case Right(yr) => left(Semigroup.plus(xl, convert(yr)))
       }
       case Right(xr) => y match {
-        case Left(yl) => Left(Semigroup.plus(convert(xr), yl))
+        case Left(yl) => left(Semigroup.plus(convert(xr), yl))
         case Right(yr) => conditionallyConvert(Semigroup.plus(xr, yr))
       }
     }
@@ -53,6 +53,9 @@ class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
       Right(r)
     }
   }
+
+  // Overriden by EventuallyGroup to ensure that the group laws are obeyed.
+  def left(l: L): Either[L,R] = Left(l)
 
 }
 
@@ -71,9 +74,11 @@ class EventuallyGroup[L,R](convert: R => L)(mustConvert: R => Boolean)
   override def negate(x: Either[L,R]) = {
     x match {
       case Left(xl) => Left(Group.negate(xl))
-      case Right(xr) => conditionallyConvert(Group.negate(xr))
+      case Right(xr) => Right(Group.negate(xr))
     }
   }
+
+  override def left(l: L) = if (l.equals(Monoid.zero[L])) zero else Left(l)
 
 }
 
@@ -81,7 +86,7 @@ class EventuallyRing[L,R](convert: R => L)(mustConvert: R => Boolean)
   (implicit lRing: Ring[L], rRing: Ring[R]) extends EventuallyGroup[L,R](convert)(mustConvert)
   with Ring[Either[L,R]] {
 
-  override def one = conditionallyConvert(Ring.one[R])
+  override def one = Right(Ring.one[R])
 
   override def times(x: Either[L,R], y: Either[L,R]) = {
     x match {
