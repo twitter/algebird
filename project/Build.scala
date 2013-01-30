@@ -67,6 +67,16 @@ object StorehausBuild extends Build {
   ).aggregate(algebirdTesting,
               algebirdCore)
 
+  lazy val algebirdCore = Project(
+    id = "algebird-core",
+    base = file("algebird-core"),
+    settings = sharedSettings
+  ).settings(
+    test := { }, // All tests reside in algebirdTesting
+    name := "algebird-core",
+    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
+  )
+
   lazy val algebirdTesting = Project(
     id = "algebird-testing",
     base = file("algebird-testing"),
@@ -78,13 +88,4 @@ object StorehausBuild extends Build {
       "org.scala-tools.testing" % "specs_2.9.1" % "1.6.9"
     )
   ).dependsOn(algebirdCore % "compile->compile")
-
-  lazy val algebirdCore = Project(
-    id = "algebird-core",
-    base = file("algebird-core"),
-    settings = sharedSettings
-  ).settings(
-    name := "algebird-core",
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
-  ).dependsOn(algebirdTesting % "test->test")
 }
