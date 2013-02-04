@@ -48,6 +48,7 @@ object NullGroup extends ConstantGroup[Null](null)
 
 object Group extends GeneratedGroupImplicits {
   // This pattern is really useful for typeclasses
+  def negate[T](x : T)(implicit grp : Group[T]) = grp.negate(x)
   def minus[T](l : T, r : T)(implicit grp : Group[T]) = grp.minus(l,r)
 
   implicit val nullGroup : Group[Null] = NullGroup
