@@ -4,7 +4,8 @@ import org.scalacheck.{Arbitrary, Properties}
 import org.scalacheck.Gen._
 import org.specs.Specification
 
-object EventuallyRingLaws extends Properties("EventuallyRing") with BaseProperties {
+object EventuallyRingLaws extends Properties("EventuallyRing") {
+  import BaseProperties._
 
   val eventuallyRing = new EventuallyRing[Long,Int](_.asInstanceOf[Long])(_ > 10000)
   val lGen = for (v <- choose(0L, 1L << 30L)) yield Left(v)
@@ -15,7 +16,8 @@ object EventuallyRingLaws extends Properties("EventuallyRing") with BaseProperti
 }
 
 // A lossy one:
-object EventuallyMonoidLaws extends Properties("EventuallyMonoid") with BaseProperties {
+object EventuallyMonoidLaws extends Properties("EventuallyMonoid") {
+  import BaseProperties._
 
   val eventuallyMonoid = new EventuallyMonoid[Int,String](_.length)(_.length > 100)
   val lGen = for (v <- choose(0, 1 << 14)) yield Left(v)
