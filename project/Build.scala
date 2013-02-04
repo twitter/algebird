@@ -64,7 +64,7 @@ object StorehausBuild extends Build {
     base = file(".")
     ).settings(
     test := { }
-  ).aggregate(algebirdTesting,
+  ).aggregate(algebirdTest,
               algebirdCore)
 
   lazy val algebirdCore = Project(
@@ -72,20 +72,20 @@ object StorehausBuild extends Build {
     base = file("algebird-core"),
     settings = sharedSettings
   ).settings(
-    test := { }, // All tests reside in algebirdTesting
+    test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
   )
 
-  lazy val algebirdTesting = Project(
-    id = "algebird-testing",
-    base = file("algebird-testing"),
+  lazy val algebirdTest = Project(
+    id = "algebird-test",
+    base = file("algebird-test"),
     settings = sharedSettings
   ).settings(
-    name := "algebird-testing",
+    name := "algebird-test",
     libraryDependencies ++= Seq(
       "org.scalacheck" %% "scalacheck" % "1.10.0",
       "org.scala-tools.testing" % "specs_2.9.1" % "1.6.9"
     )
-  ).dependsOn(algebirdCore % "compile->compile")
+  ).dependsOn(algebirdCore)
 }
