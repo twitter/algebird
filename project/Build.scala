@@ -1,10 +1,10 @@
 import sbt._
 import Keys._
 
-object StorehausBuild extends Build {
+object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
-    version := "0.1.8-SNAPSHOT",
+    version := "0.1.8",
     scalaVersion := "2.9.2",
 
     resolvers ++= Seq(
