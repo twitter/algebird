@@ -61,7 +61,8 @@ object StorehausBuild extends Build {
 
   lazy val algebird = Project(
     id = "algebird",
-    base = file(".")
+    base = file("."),
+    settings = sharedSettings
     ).settings(
     test := { }
   ).aggregate(algebirdTest,
