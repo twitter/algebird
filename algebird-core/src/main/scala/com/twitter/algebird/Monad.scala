@@ -31,7 +31,7 @@ trait Monad[M[_]] {
   def map[T,U](m: M[T])(fn: (T) => U): M[U] = flatMap(m)((t: T) => apply(fn(t)))
   // Laws these must follow are:
   // identities:
-  //  flatMap(apply(x))(fn) == fn(a)
+  //  flatMap(apply(x))(fn) == fn(x)
   //  flatMap(m)(apply _) == m
   // associativity on flatMap (you can either flatMap f first, or f to g:
   //  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
