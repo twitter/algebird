@@ -28,61 +28,28 @@ import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 object SummingIterator {
-  def apply[K,V:Semigroup](maxKeysInMemory: Int, it: Iterator[(K,V)]): SummingIterator[K,V] =
-    new SummingIterator(maxKeysInMemory, it)
+  def apply[V](summer: StatefulSummer[V], it: Iterator[V]): SummingIterator[V] =
+    new SummingIterator(summer, it)
 }
 
-/**
- * doesn't preserve any ordering on the keys, but values are summed in the order
- * they are seen
- */
-class SummingIterator[K,V:Semigroup] private (capacity: Int, it: Iterator[(K,V)])
-  extends java.io.Serializable with Iterator[(K,V)] {
+class SummingIterator[V](summer: StatefulSummer[V], it: Iterator[V])
+  extends java.io.Serializable with Iterator[V] {
 
-  require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
-
-  // It's always cheap to check cache.size, do it first
-  def hasNext: Boolean = (cache.size > 0) || it.hasNext
+  def hasNext: Boolean = it.hasNext || (summer.isFlushed == false)
   def next = nextInternal
 
   @tailrec
-  private def nextInternal: (K,V) = {
+  private def nextInternal: V = {
     if(it.hasNext) {
-      put(it.next) match {
+      summer.put(it.next) match {
         case None => nextInternal
-        case Some(tup) => tup
+        case Some(v) => v
       }
     }
     else {
-      // Just take one from the cache
-      val head = cache.head
-      cache -= head._1
-      head
+      // if you call nextInternal and we have no more to put, and no more to flush
+      // this is an error
+      summer.flush.get
     }
   }
-
-  protected def put(tup: (K,V)): Option[(K,V)] = {
-    val newV = cache.get(tup._1)
-      .map { v => Semigroup.plus(v, tup._2) }
-      .getOrElse { tup._2 }
-
-    cache += tup._1 -> newV
-    val ret = lastEvicted
-    // Rest this var
-    lastEvicted = None
-    ret
-  }
-  protected var lastEvicted: Option[(K,V)] = None
-  // TODO fancier caches will give better performance:
-  protected lazy val cache: MMap[K,V] = (new JLinkedHashMap[K,V](capacity + 1, 0.75f, true) {
-      override protected def removeEldestEntry(eldest : JMap.Entry[K, V]) =
-        if(super.size > capacity) {
-          lastEvicted = Some(eldest.getKey, eldest.getValue)
-          true
-        }
-        else {
-          lastEvicted = None
-          false
-        }
-    }).asScala
 }
