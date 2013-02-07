@@ -35,21 +35,21 @@ object SummingIterator {
 class SummingIterator[V](summer: StatefulSummer[V], it: Iterator[V])
   extends java.io.Serializable with Iterator[V] {
 
-  def hasNext: Boolean = it.hasNext || (summer.isFlushed == false)
+  // This has to be lazy because it shouldn't be touched until the val it is exhausted
+  protected lazy val tailIter = summer.flush.iterator
+  def hasNext: Boolean = it.hasNext || tailIter.hasNext
   def next = nextInternal
 
   @tailrec
   private def nextInternal: V = {
-    if(it.hasNext) {
+    if (it.hasNext) {
       summer.put(it.next) match {
         case None => nextInternal
         case Some(v) => v
       }
     }
     else {
-      // if you call nextInternal and we have no more to put, and no more to flush
-      // this is an error
-      summer.flush.get
+      tailIter.next
     }
   }
 }
