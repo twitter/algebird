@@ -33,3 +33,19 @@ trait StatefulSummer[V] extends java.io.Serializable {
   def flush: Option[V]
   def isFlushed: Boolean
 }
+
+/** Sum the entire iterator one item at a time. Only emits on flush
+*/
+class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
+  var summed: Option[V] = None
+  def put(item: V) = {
+    summed = Semigroup.plus(summed, Some(item))
+    None
+  }
+  def flush = {
+    val res = summed
+    summed = None
+    res
+  }
+  def isFlushed = summed.isEmpty
+}

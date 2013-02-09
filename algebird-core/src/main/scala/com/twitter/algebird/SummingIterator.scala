@@ -27,9 +27,21 @@ import scala.collection.mutable.{Map => MMap}
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
+/** Creates an Iterator that emits partial sums of an input Iterator[V].
+ * Generally this is useful to change from processing individiual V's to
+ * possibly blocks of V @see SummingQueue or a cache of recent Keys in
+ * a V=Map[K,W] case: @see SummingCache
+ */
 object SummingIterator {
   def apply[V](summer: StatefulSummer[V], it: Iterator[V]): SummingIterator[V] =
     new SummingIterator(summer, it)
+
+  implicit def enrich[V](it: Iterator[V]): Enriched[V] = new Enriched(it)
+  /** Here to add enrichments to Iterator
+   */
+  class Enriched[V](it: Iterator[V]) {
+    def sumWith(summer: StatefulSummer[V]): SummingIterator[V] = SummingIterator(summer, it)
+  }
 }
 
 class SummingIterator[V](summer: StatefulSummer[V], it: Iterator[V])
