@@ -41,7 +41,8 @@ object SummingQueue {
   def apply[V:Semigroup](cap: Int): SummingQueue[V] = new SummingQueue(cap)
 }
 
-class SummingQueue[V:Semigroup] private (capacity: Int) extends (V => Option[V]) with Serializable {
+class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: Semigroup[V])
+  extends (V => Option[V]) with StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
@@ -75,4 +76,5 @@ class SummingQueue[V:Semigroup] private (capacity: Int) extends (V => Option[V])
       Semigroup.sumOption(toSum)
     }
   }
+  def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
 }
