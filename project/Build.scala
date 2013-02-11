@@ -42,7 +42,7 @@ object AlgebirdBuild extends Build {
         </license>
       </licenses>
       <scm>
-        <url>git@github.com:twitter/scalding.git</url>
+        <url>git@github.com:twitter/algebird.git</url>
         <connection>scm:git:git@github.com:twitter/algebird.git</connection>
       </scm>
       <developers>
