@@ -1,5 +1,13 @@
 # Algebird #
 
+### Version 0.1.9 ###
+
+* Build `algebird` against scala 2.9.2 and 2.10.0
+
+### Version 0.1.8 ###
+
+* Break out `algebird-core` and `algebird-test` into separate jars
+
 ### Version 0.1.7 ###
 
 * SummingQueue works with capacity of 0, just passes through
