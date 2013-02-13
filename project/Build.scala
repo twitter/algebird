@@ -5,7 +5,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     version := "0.1.9-SNAPSHOT",
-    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.2", "2.10.0"),
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -86,7 +86,7 @@ object AlgebirdBuild extends Build {
     name := "algebird-test",
     libraryDependencies ++= Seq(
       "org.scalacheck" %% "scalacheck" % "1.10.0",
-      "org.scala-tools.testing" % "specs_2.9.1" % "1.6.9"
+      "org.scala-tools.testing" %% "specs" % "1.6.9"
     )
   ).dependsOn(algebirdCore)
 }
