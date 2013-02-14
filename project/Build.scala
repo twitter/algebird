@@ -99,7 +99,6 @@ object AlgebirdBuild extends Build {
     settings = sharedSettings
   ).settings(
     name := "algebird-util",
-    resolvers += "Twitter Maven" at "http://maven.twttr.com",
-    libraryDependencies += "com.twitter" % "util-core" % "5.3.15"
+    libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
 }
