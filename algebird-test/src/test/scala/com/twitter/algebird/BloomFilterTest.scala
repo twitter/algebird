@@ -58,7 +58,7 @@ class BloomFilterTest extends Specification {
 
               val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
 
-              val entries = RAND.shuffle(0 until 1000).take(numEntries + 1).map(_.toString)
+              val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
               val bf = bfMonoid.create(entries.drop(1): _*)
 
               if(bf.contains(entries(0)).isTrue) 1.0 else 0.0
