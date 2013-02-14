@@ -21,11 +21,13 @@ import com.twitter.util.{ Future, Return, Try }
 
 object UtilAlgebras {
   implicit val futureMonad: Monad[Future] = new Monad[Future] {
-    def apply[T](v: T) = Future.value(v);
+    def apply[T](v: T) = Future.value(v)
+    override def map[T, U](m: Future[T])(fn: T => U) = m.map(fn)
     def flatMap[T, U](m: Future[T])(fn: T => Future[U]) = m.flatMap(fn)
   }
   implicit val tryMonad: Monad[Try] = new Monad[Try] {
-    def apply[T](v: T) = Return(v);
+    def apply[T](v: T) = Return(v)
+    override def map[T, U](m: Try[T])(fn: T => U) = m.map(fn)
     def flatMap[T,U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)
   }
 
