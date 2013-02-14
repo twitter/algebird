@@ -3,6 +3,7 @@
 ### Version 0.1.9 ###
 
 * Build `algebird` against scala 2.9.2 and 2.10.0
+* `algebird-util` with Future and Try algebras.
 
 ### Version 0.1.8 ###
 
