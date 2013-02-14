@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>com.twitter.algebird.CassandraMurmurHash</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body onload="sh_highlightDocument('../lib/', '.min.js');" class="value">
+      <div id="definition">
+        <a title="Go to companion" href="CassandraMurmurHash.html"><img src="../../../lib/object_to_class_big.png" /></a>
+        <p id="owner"><a name="com" class="extype" href="../../package.html">com</a>.<a name="com.twitter" class="extype" href="../package.html">twitter</a>.<a name="com.twitter.algebird" class="extype" href="package.html">algebird</a></p>
+        <h1><a title="Go to companion" href="CassandraMurmurHash.html">CassandraMurmurHash</a></h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CassandraMurmurHash</span><span class="result"> extends </span>
+      </span>
+      </h4>
+      
+      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/java/com/twitter/algebird/CassandraMurmurHash.java.scala">CassandraMurmurHash.java</a></dd></dl></div>
+    
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="prt" name="com.twitter.algebird.CassandraMurmurHash#fmix" data-isabs="false">
+      <a id="fmix(Long):Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fmix</span><span class="params">(<span name="k">k: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Long" class="extype">Long</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="com.twitter.algebird" class="extype" href="package.html">algebird</a>] </dd></dl></div>
+    </li><li visbl="prt" name="com.twitter.algebird.CassandraMurmurHash#getblock" data-isabs="false">
+      <a id="getblock(ByteBuffer,Int,Int):Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getblock</span><span class="params">(<span name="key">key: <span name="java.nio.ByteBuffer" class="extype">ByteBuffer</span></span>, <span name="offset">offset: <span name="scala.Int" class="extype">Int</span></span>, <span name="index">index: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Long" class="extype">Long</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="com.twitter.algebird" class="extype" href="package.html">algebird</a>] </dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.CassandraMurmurHash#hash2_64" data-isabs="false">
+      <a id="hash2_64(ByteBuffer,Int,Int,Long):Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hash2_64</span><span class="params">(<span name="key">key: <span name="java.nio.ByteBuffer" class="extype">ByteBuffer</span></span>, <span name="offset">offset: <span name="scala.Int" class="extype">Int</span></span>, <span name="length">length: <span name="scala.Int" class="extype">Int</span></span>, <span name="seed">seed: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Long" class="extype">Long</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CassandraMurmurHash#hash32" data-isabs="false">
+      <a id="hash32(ByteBuffer,Int,Int,Int):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hash32</span><span class="params">(<span name="data">data: <span name="java.nio.ByteBuffer" class="extype">ByteBuffer</span></span>, <span name="offset">offset: <span name="scala.Int" class="extype">Int</span></span>, <span name="length">length: <span name="scala.Int" class="extype">Int</span></span>, <span name="seed">seed: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CassandraMurmurHash#hash3_x64_128" data-isabs="false">
+      <a id="hash3_x64_128(ByteBuffer,Int,Int,Long):Array[Long]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hash3_x64_128</span><span class="params">(<span name="key">key: <span name="java.nio.ByteBuffer" class="extype">ByteBuffer</span></span>, <span name="offset">offset: <span name="scala.Int" class="extype">Int</span></span>, <span name="length">length: <span name="scala.Int" class="extype">Int</span></span>, <span name="seed">seed: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Long" class="extype">Long</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="prt" name="com.twitter.algebird.CassandraMurmurHash#rotl64" data-isabs="false">
+      <a id="rotl64(Long,Int):Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">rotl64</span><span class="params">(<span name="v">v: <span name="scala.Long" class="extype">Long</span></span>, <span name="n">n: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Long" class="extype">Long</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="com.twitter.algebird" class="extype" href="package.html">algebird</a>] </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

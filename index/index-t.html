@@ -1,0 +1,337 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title></title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../lib/ref-index.css" />
+      <script type="text/javascript" src="../lib/jquery.js"></script>
+    
+        </head>
+        <body><div class="entry">
+      <div class="name">tailIter</div>
+      <div class="occurrences"><a name="com.twitter.algebird.SummingIterator" class="extype" href="../com/twitter/algebird/SummingIterator.html">SummingIterator</a> </div>
+    </div><div class="entry">
+      <div class="name">times</div>
+      <div class="occurrences"><a name="com.twitter.algebird.BooleanField" class="extype" href="../com/twitter/algebird/BooleanField$.html">BooleanField</a> <a name="com.twitter.algebird.DoubleField" class="extype" href="../com/twitter/algebird/DoubleField$.html">DoubleField</a> <a name="com.twitter.algebird.EventuallyRing" class="extype" href="../com/twitter/algebird/EventuallyRing.html">EventuallyRing</a> <a name="com.twitter.algebird.FloatField" class="extype" href="../com/twitter/algebird/FloatField$.html">FloatField</a> <a name="com.twitter.algebird.IndexedSeqRing" class="extype" href="../com/twitter/algebird/IndexedSeqRing.html">IndexedSeqRing</a> <a name="com.twitter.algebird.IntRing" class="extype" href="../com/twitter/algebird/IntRing$.html">IntRing</a> <a name="com.twitter.algebird.JBoolField" class="extype" href="../com/twitter/algebird/JBoolField$.html">JBoolField</a> <a name="com.twitter.algebird.JDoubleField" class="extype" href="../com/twitter/algebird/JDoubleField$.html">JDoubleField</a> <a name="com.twitter.algebird.JFloatField" class="extype" href="../com/twitter/algebird/JFloatField$.html">JFloatField</a> <a name="com.twitter.algebird.JIntRing" class="extype" href="../com/twitter/algebird/JIntRing$.html">JIntRing</a> <a name="com.twitter.algebird.JLongRing" class="extype" href="../com/twitter/algebird/JLongRing$.html">JLongRing</a> <a name="com.twitter.algebird.JShortRing" class="extype" href="../com/twitter/algebird/JShortRing$.html">JShortRing</a> <a name="com.twitter.algebird.LongRing" class="extype" href="../com/twitter/algebird/LongRing$.html">LongRing</a> <a name="com.twitter.algebird.MapRing" class="extype" href="../com/twitter/algebird/MapRing.html">MapRing</a> <a name="com.twitter.algebird.MinPlusSemiring" class="extype" href="../com/twitter/algebird/MinPlusSemiring.html">MinPlusSemiring</a> <a name="com.twitter.algebird.MonadRing" class="extype" href="../com/twitter/algebird/MonadRing.html">MonadRing</a> <a name="com.twitter.algebird.Ring" class="extype" href="../com/twitter/algebird/Ring.html">Ring</a> <a name="com.twitter.algebird.ShortRing" class="extype" href="../com/twitter/algebird/ShortRing$.html">ShortRing</a> <a name="com.twitter.algebird.Tuple10Ring" class="extype" href="../com/twitter/algebird/Tuple10Ring.html">Tuple10Ring</a> <a name="com.twitter.algebird.Tuple11Ring" class="extype" href="../com/twitter/algebird/Tuple11Ring.html">Tuple11Ring</a> <a name="com.twitter.algebird.Tuple12Ring" class="extype" href="../com/twitter/algebird/Tuple12Ring.html">Tuple12Ring</a> <a name="com.twitter.algebird.Tuple13Ring" class="extype" href="../com/twitter/algebird/Tuple13Ring.html">Tuple13Ring</a> <a name="com.twitter.algebird.Tuple14Ring" class="extype" href="../com/twitter/algebird/Tuple14Ring.html">Tuple14Ring</a> <a name="com.twitter.algebird.Tuple15Ring" class="extype" href="../com/twitter/algebird/Tuple15Ring.html">Tuple15Ring</a> <a name="com.twitter.algebird.Tuple16Ring" class="extype" href="../com/twitter/algebird/Tuple16Ring.html">Tuple16Ring</a> <a name="com.twitter.algebird.Tuple17Ring" class="extype" href="../com/twitter/algebird/Tuple17Ring.html">Tuple17Ring</a> <a name="com.twitter.algebird.Tuple18Ring" class="extype" href="../com/twitter/algebird/Tuple18Ring.html">Tuple18Ring</a> <a name="com.twitter.algebird.Tuple19Ring" class="extype" href="../com/twitter/algebird/Tuple19Ring.html">Tuple19Ring</a> <a name="com.twitter.algebird.Tuple20Ring" class="extype" href="../com/twitter/algebird/Tuple20Ring.html">Tuple20Ring</a> <a name="com.twitter.algebird.Tuple21Ring" class="extype" href="../com/twitter/algebird/Tuple21Ring.html">Tuple21Ring</a> <a name="com.twitter.algebird.Tuple22Ring" class="extype" href="../com/twitter/algebird/Tuple22Ring.html">Tuple22Ring</a> <a name="com.twitter.algebird.Tuple2Ring" class="extype" href="../com/twitter/algebird/Tuple2Ring.html">Tuple2Ring</a> <a name="com.twitter.algebird.Tuple3Ring" class="extype" href="../com/twitter/algebird/Tuple3Ring.html">Tuple3Ring</a> <a name="com.twitter.algebird.Tuple4Ring" class="extype" href="../com/twitter/algebird/Tuple4Ring.html">Tuple4Ring</a> <a name="com.twitter.algebird.Tuple5Ring" class="extype" href="../com/twitter/algebird/Tuple5Ring.html">Tuple5Ring</a> <a name="com.twitter.algebird.Tuple6Ring" class="extype" href="../com/twitter/algebird/Tuple6Ring.html">Tuple6Ring</a> <a name="com.twitter.algebird.Tuple7Ring" class="extype" href="../com/twitter/algebird/Tuple7Ring.html">Tuple7Ring</a> <a name="com.twitter.algebird.Tuple8Ring" class="extype" href="../com/twitter/algebird/Tuple8Ring.html">Tuple8Ring</a> <a name="com.twitter.algebird.Tuple9Ring" class="extype" href="../com/twitter/algebird/Tuple9Ring.html">Tuple9Ring</a> </div>
+    </div><div class="entry">
+      <div class="name">timesIsAssociative</div>
+      <div class="occurrences"><a name="com.twitter.algebird.BaseProperties" class="extype" href="../com/twitter/algebird/BaseProperties$.html">BaseProperties</a> </div>
+    </div><div class="entry">
+      <div class="name">TimesOp</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">toBitSet</div>
+      <div class="occurrences"><a name="com.twitter.algebird.RichCBitSet" class="extype" href="../com/twitter/algebird/RichCBitSet.html">RichCBitSet</a> </div>
+    </div><div class="entry">
+      <div class="name">toBytes</div>
+      <div class="occurrences"><a name="com.twitter.algebird.HyperLogLog" class="extype" href="../com/twitter/algebird/HyperLogLog$.html">HyperLogLog</a> </div>
+    </div><div class="entry">
+      <div class="name">toDenseHLL</div>
+      <div class="occurrences"><a name="com.twitter.algebird.DenseHLL" class="extype" href="../com/twitter/algebird/DenseHLL.html">DenseHLL</a> <a name="com.twitter.algebird.HLL" class="extype" href="../com/twitter/algebird/HLL.html">HLL</a> <a name="com.twitter.algebird.SparseHLL" class="extype" href="../com/twitter/algebird/SparseHLL.html">SparseHLL</a> </div>
+    </div><div class="entry">
+      <div class="name">toDiv</div>
+      <div class="occurrences"><a name="com.twitter.algebird.Operators" class="extype" href="../com/twitter/algebird/Operators$.html">Operators</a> </div>
+    </div><div class="entry">
+      <div class="name">toFn</div>
+      <div class="occurrences"><a name="com.twitter.algebird.AffineFunction" class="extype" href="../com/twitter/algebird/AffineFunction.html">AffineFunction</a> </div>
+    </div><div class="entry">
+      <div class="name">toFold</div>
+      <div class="occurrences"><a name="com.twitter.algebird.RightFolded2Monoid" class="extype" href="../com/twitter/algebird/RightFolded2Monoid.html">RightFolded2Monoid</a> </div>
+    </div><div class="entry">
+      <div class="name">toMinus</div>
+      <div class="occurrences"><a name="com.twitter.algebird.Operators" class="extype" href="../com/twitter/algebird/Operators$.html">Operators</a> </div>
+    </div><div class="entry">
+      <div class="name">toPlus</div>
+      <div class="occurrences"><a name="com.twitter.algebird.Operators" class="extype" href="../com/twitter/algebird/Operators$.html">Operators</a> </div>
+    </div><div class="entry">
+      <div class="name">toRichTraversable</div>
+      <div class="occurrences"><a name="com.twitter.algebird.Operators" class="extype" href="../com/twitter/algebird/Operators$.html">Operators</a> </div>
+    </div><div class="entry">
+      <div class="name">toString</div>
+      <div class="occurrences"><a name="com.twitter.algebird.AffineFunction" class="extype" href="../com/twitter/algebird/AffineFunction.html">AffineFunction</a> <a name="com.twitter.algebird.Approximate" class="extype" href="../com/twitter/algebird/Approximate.html">Approximate</a> <a name="com.twitter.algebird.ApproximateBoolean" class="extype" href="../com/twitter/algebird/ApproximateBoolean.html">ApproximateBoolean</a> <a name="com.twitter.algebird.AveragedValue" class="extype" href="../com/twitter/algebird/AveragedValue.html">AveragedValue</a> <a name="com.twitter.algebird.BFInstance" class="extype" href="../com/twitter/algebird/BFInstance.html">BFInstance</a> <a name="com.twitter.algebird.BFItem" class="extype" href="../com/twitter/algebird/BFItem.html">BFItem</a> <a name="com.twitter.algebird.BFSparse" class="extype" href="../com/twitter/algebird/BFSparse.html">BFSparse</a> <a name="com.twitter.algebird.BFZero" class="extype" href="../com/twitter/algebird/BFZero.html">BFZero</a> <a name="com.twitter.algebird.BloomFilterMonoid" class="extype" href="../com/twitter/algebird/BloomFilterMonoid.html">BloomFilterMonoid</a> <a name="com.twitter.algebird.CMSCountsTable" class="extype" href="../com/twitter/algebird/CMSCountsTable.html">CMSCountsTable</a> <a name="com.twitter.algebird.CMSInstance" class="extype" href="../com/twitter/algebird/CMSInstance.html">CMSInstance</a> <a name="com.twitter.algebird.CMSItem" class="extype" href="../com/twitter/algebird/CMSItem.html">CMSItem</a> <a name="com.twitter.algebird.CMSParams" class="extype" href="../com/twitter/algebird/CMSParams.html">CMSParams</a> <a name="com.twitter.algebird.CMSZero" class="extype" href="../com/twitter/algebird/CMSZero.html">CMSZero</a> <a name="com.twitter.algebird.DecayedValue" class="extype" href="../com/twitter/algebird/DecayedValue.html">DecayedValue</a> <a name="com.twitter.algebird.DecayedVector" class="extype" href="../com/twitter/algebird/DecayedVector.html">DecayedVector</a> <a name="com.twitter.algebird.DenseHLL" class="extype" href="../com/twitter/algebird/DenseHLL.html">DenseHLL</a> <a name="com.twitter.algebird.First" class="extype" href="../com/twitter/algebird/First.html">First</a> <a name="com.twitter.algebird.HeavyHitter" class="extype" href="../com/twitter/algebird/HeavyHitter.html">HeavyHitter</a> <a name="com.twitter.algebird.HeavyHitters" class="extype" href="../com/twitter/algebird/HeavyHitters.html">HeavyHitters</a> <a name="com.twitter.algebird.Last" class="extype" href="../com/twitter/algebird/Last.html">Last</a> <a name="com.twitter.algebird.Max" class="extype" href="../com/twitter/algebird/Max.html">Max</a> <a name="com.twitter.algebird.Min" class="extype" href="../com/twitter/algebird/Min.html">Min</a> <a name="com.twitter.algebird.MinPlusValue" class="extype" href="../com/twitter/algebird/MinPlusValue.html">MinPlusValue</a> <a name="com.twitter.algebird.MinPlusZero" class="extype" href="../com/twitter/algebird/MinPlusZero$.html">MinPlusZero</a> <a name="com.twitter.algebird.Moments" class="extype" href="../com/twitter/algebird/Moments.html">Moments</a> <a name="com.twitter.algebird.MurmurHash128" class="extype" href="../com/twitter/algebird/MurmurHash128.html">MurmurHash128</a> <a name="com.twitter.algebird.RightFoldedToFold" class="extype" href="../com/twitter/algebird/RightFoldedToFold.html">RightFoldedToFold</a> <a name="com.twitter.algebird.RightFoldedToFold2" class="extype" href="../com/twitter/algebird/RightFoldedToFold2.html">RightFoldedToFold2</a> <a name="com.twitter.algebird.RightFoldedValue" class="extype" href="../com/twitter/algebird/RightFoldedValue.html">RightFoldedValue</a> <a name="com.twitter.algebird.RightFoldedValue2" class="extype" href="../com/twitter/algebird/RightFoldedValue2.html">RightFoldedValue2</a> <a name="com.twitter.algebird.RightFoldedZero" class="extype" href="../com/twitter/algebird/RightFoldedZero$.html">RightFoldedZero</a> <a name="com.twitter.algebird.RightFoldedZero2" class="extype" href="../com/twitter/algebird/RightFoldedZero2$.html">RightFoldedZero2</a> <a name="com.twitter.algebird.SGDPos" class="extype" href="../com/twitter/algebird/SGDPos.html">SGDPos</a> <a name="com.twitter.algebird.SGDWeights" class="extype" href="../com/twitter/algebird/SGDWeights.html">SGDWeights</a> <a name="com.twitter.algebird.SGDZero" class="extype" href="../com/twitter/algebird/SGDZero$.html">SGDZero</a> <a name="com.twitter.algebird.SparseHLL" class="extype" href="../com/twitter/algebird/SparseHLL.html">SparseHLL</a> </div>
+    </div><div class="entry">
+      <div class="name">totalCount</div>
+      <div class="occurrences"><a name="com.twitter.algebird.CMS" class="extype" href="../com/twitter/algebird/CMS.html">CMS</a> <a name="com.twitter.algebird.CMSInstance" class="extype" href="../com/twitter/algebird/CMSInstance.html">CMSInstance</a> <a name="com.twitter.algebird.CMSItem" class="extype" href="../com/twitter/algebird/CMSItem.html">CMSItem</a> <a name="com.twitter.algebird.CMSZero" class="extype" href="../com/twitter/algebird/CMSZero.html">CMSZero</a> </div>
+    </div><div class="entry">
+      <div class="name">toTimes</div>
+      <div class="occurrences"><a name="com.twitter.algebird.Operators" class="extype" href="../com/twitter/algebird/Operators$.html">Operators</a> </div>
+    </div><div class="entry">
+      <div class="name">tryField</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">tryGroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">tryMonad</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">tryMonoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">tryRing</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">trySemigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird.util.UtilAlgebras" class="extype" href="../com/twitter/algebird/util/UtilAlgebras$.html">UtilAlgebras</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple10Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple10Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple10Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple10Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple11Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple11Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple11Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple11Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple12Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple12Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple12Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple12Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple13Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple13Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple13Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple13Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple14Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple14Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple14Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple14Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple15Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple15Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple15Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple15Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple16Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple16Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple16Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple16Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple17Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple17Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple17Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple17Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple18Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple18Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple18Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple18Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple19Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple19Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple19Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple19Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple20Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple20Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple20Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple20Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple21Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple21Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple21Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple21Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple22Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple22Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple22Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple22Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple2Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple2Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple2Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple2Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple3Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple3Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple3Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple3Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple4Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple4Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple4Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple4Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple5Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple5Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple5Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple5Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple6Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple6Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple6Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple6Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple7Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple7Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple7Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple7Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple8Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple8Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple8Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple8Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple9Group</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple9Monoid</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple9Ring</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">Tuple9Semigroup</div>
+      <div class="occurrences"><a name="com.twitter.algebird" class="extype" href="../com/twitter/algebird/package.html">algebird</a> </div>
+    </div><div class="entry">
+      <div class="name">twitter</div>
+      <div class="occurrences"><a name="com" class="extype" href="../com/package.html">com</a> </div>
+    </div><div class="entry">
+      <div class="name">twopow</div>
+      <div class="occurrences"><a name="com.twitter.algebird.HyperLogLog" class="extype" href="../com/twitter/algebird/HyperLogLog$.html">HyperLogLog</a> </div>
+    </div></body>
+      </html>

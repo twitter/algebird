@@ -1,0 +1,3223 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>com.twitter.algebird</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body onload="sh_highlightDocument('../lib/', '.min.js');" class="value">
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <p id="owner"><a name="com" class="extype" href="../../package.html">com</a>.<a name="com.twitter" class="extype" href="../package.html">twitter</a></p>
+        <h1>algebird</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">algebird</span>
+      </span>
+      </h4>
+      
+      <div class="fullcommenttop" id="comment"></div>
+    
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" name="com.twitter.algebird.AbstractMonad" data-isabs="true">
+      <a id="AbstractMonad:AbstractMonad[M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractMonad.html"><span class="name">AbstractMonad</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends Monad[M]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">For use from Java/minimizing code bloat in scala
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.AffineFunction" data-isabs="false">
+      <a id="AffineFunction:AffineFunction[R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AffineFunction.html"><span class="name">AffineFunction</span></a><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="slope">slope: R</span>, <span name="intercept">intercept: R</span>)</span><span class="result"> extends Serializable with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Represents functions of the kind:
+f(x) = slope * x + intercept
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.AffineFunctionMonoid" data-isabs="false">
+      <a id="AffineFunctionMonoid:AffineFunctionMonoid[R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AffineFunctionMonoid.html"><span class="name">AffineFunctionMonoid</span></a><span class="tparams">[<span name="R">R</span>]</span><span class="result"> extends Monoid[AffineFunction[R]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This feeds the value in on the LEFT!!!  This may seem counter intuitive, but
+with this approach, a stream/iterator which is summed will have the same output
+as applying the function one at a time in order to the input.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator" data-isabs="true">
+      <a id="Aggregator:Aggregator[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Aggregator.html"><span class="name">Aggregator</span></a><span class="tparams">[<span name="A">-A</span>, <span name="B">B</span>, <span name="C">+C</span>]</span><span class="result"> extends (TraversableOnce[A]) ⇒ C with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Approximate" data-isabs="false">
+      <a id="Approximate:Approximate[N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Approximate.html"><span class="name">Approximate</span></a><span class="tparams">[<span name="N">N</span>]</span><span class="params">(<span name="min">min: N</span>, <span name="estimate">estimate: N</span>, <span name="max">max: N</span>, <span name="probWithinBounds">probWithinBounds: Double</span>, <span name="numeric">numeric: Numeric[N]</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ApproximateBoolean" data-isabs="false">
+      <a id="ApproximateBoolean:ApproximateBoolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ApproximateBoolean.html"><span class="name">ApproximateBoolean</span></a><span class="params">(<span name="isTrue">isTrue: Boolean</span>, <span name="withProb">withProb: Double</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AveragedValue" data-isabs="false">
+      <a id="AveragedValue:AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AveragedValue.html"><span class="name">AveragedValue</span></a><span class="params">(<span name="count">count: Long</span>, <span name="value">value: Double</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BF" data-isabs="true">
+      <a id="BF:BF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BF.html"><span class="name">BF</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Bloom Filter data structure
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BFHash" data-isabs="false">
+      <a id="BFHash:BFHash"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BFHash.html"><span class="name">BFHash</span></a><span class="params">(<span name="numHashes">numHashes: Int</span>, <span name="width">width: Int</span>, <span name="seed">seed: Long</span>)</span><span class="result"> extends (String) ⇒ Iterable[Int] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BFInstance" data-isabs="false">
+      <a id="BFInstance:BFInstance"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BFInstance.html"><span class="name">BFInstance</span></a><span class="params">(<span name="hashes">hashes: BFHash</span>, <span name="bits">bits: BitSet</span>, <span name="width">width: Int</span>)</span><span class="result"> extends BF with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BFItem" data-isabs="false">
+      <a id="BFItem:BFItem"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BFItem.html"><span class="name">BFItem</span></a><span class="params">(<span name="item">item: String</span>, <span name="hashes">hashes: BFHash</span>, <span name="width">width: Int</span>)</span><span class="result"> extends BF with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Bloom Filter with 1 value.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BFSparse" data-isabs="false">
+      <a id="BFSparse:BFSparse"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BFSparse.html"><span class="name">BFSparse</span></a><span class="params">(<span name="hashes">hashes: BFHash</span>, <span name="bits">bits: EWAHCompressedBitmap</span>, <span name="width">width: Int</span>)</span><span class="result"> extends BF with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BFZero" data-isabs="false">
+      <a id="BFZero:BFZero"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BFZero.html"><span class="name">BFZero</span></a><span class="params">(<span name="hashes">hashes: BFHash</span>, <span name="width">width: Int</span>)</span><span class="result"> extends BF with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Empty bloom filter.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BloomFilterMonoid" data-isabs="false">
+      <a id="BloomFilterMonoid:BloomFilterMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BloomFilterMonoid.html"><span class="name">BloomFilterMonoid</span></a><span class="params">(<span name="numHashes">numHashes: Int</span>, <span name="width">width: Int</span>, <span name="seed">seed: Int</span>)</span><span class="result"> extends Monoid[BF] with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Bloom Filter - a probabilistic data structure to test presence of an element.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMS" data-isabs="true">
+      <a id="CMS:CMS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMS.html"><span class="name">CMS</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">The actual Count-Min sketch data structure.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSCountsTable" data-isabs="false">
+      <a id="CMSCountsTable:CMSCountsTable"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSCountsTable.html"><span class="name">CMSCountsTable</span></a><span class="params">(<span name="counts">counts: Vector[Vector[Long]]</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">The 2-dimensional table of counters used in the Count-Min sketch.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSHash" data-isabs="false">
+      <a id="CMSHash:CMSHash"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSHash.html"><span class="name">CMSHash</span></a><span class="params">(<span name="a">a: Int</span>, <span name="b">b: Int</span>, <span name="width">width: Int</span>)</span><span class="result"> extends (Long) ⇒ Int with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">The Count-Min sketch uses pairwise independent hash functions drawn from
+a universal hashing family of the form</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSInstance" data-isabs="false">
+      <a id="CMSInstance:CMSInstance"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSInstance.html"><span class="name">CMSInstance</span></a><span class="params">(<span name="countsTable">countsTable: CMSCountsTable</span>, <span name="totalCount">totalCount: Long</span>, <span name="hhs">hhs: HeavyHitters</span>, <span name="params">params: CMSParams</span>)</span><span class="result"> extends CMS with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">The general Count-Min sketch structure, used for holding any number of elements.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSItem" data-isabs="false">
+      <a id="CMSItem:CMSItem"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSItem.html"><span class="name">CMSItem</span></a><span class="params">(<span name="item">item: Long</span>, <span name="params">params: CMSParams</span>)</span><span class="result"> extends CMS with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Used for holding a single element, to avoid repeatedly adding elements from
+sparse counts tables.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSParams" data-isabs="false">
+      <a id="CMSParams:CMSParams"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSParams.html"><span class="name">CMSParams</span></a><span class="params">(<span name="hashes">hashes: Seq[CMSHash]</span>, <span name="eps">eps: Double</span>, <span name="delta">delta: Double</span>, <span name="heavyHittersPct">heavyHittersPct: Double</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Convenience class for holding constant parameters of a Count-Min sketch.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CMSZero" data-isabs="false">
+      <a id="CMSZero:CMSZero"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSZero.html"><span class="name">CMSZero</span></a><span class="params">(<span name="params">params: CMSParams</span>)</span><span class="result"> extends CMS with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Used for initialization.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.CassandraMurmurHash" data-isabs="false">
+      <a id="CassandraMurmurHash:CassandraMurmurHash"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CassandraMurmurHash.html"><span class="name">CassandraMurmurHash</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ConstantGroup" data-isabs="false">
+      <a id="ConstantGroup:ConstantGroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ConstantGroup.html"><span class="name">ConstantGroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Group[T]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CountMinSketchMonoid" data-isabs="false">
+      <a id="CountMinSketchMonoid:CountMinSketchMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountMinSketchMonoid.html"><span class="name">CountMinSketchMonoid</span></a><span class="result"> extends Monoid[CMS]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Monoid for adding Count-Min sketches.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.DecayedValue" data-isabs="false">
+      <a id="DecayedValue:DecayedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="DecayedValue.html"><span class="name">DecayedValue</span></a><span class="params">(<span name="value">value: Double</span>, <span name="scaledTime">scaledTime: Double</span>)</span><span class="result"> extends Ordered[DecayedValue] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.DecayedVector" data-isabs="false">
+      <a id="DecayedVector:DecayedVector[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="DecayedVector.html"><span class="name">DecayedVector</span></a><span class="tparams">[<span name="C">C<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="vector">vector: C[Double]</span>, <span name="scaledTime">scaledTime: Double</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.DenseHLL" data-isabs="false">
+      <a id="DenseHLL:DenseHLL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="DenseHLL.html"><span class="name">DenseHLL</span></a><span class="params">(<span name="bits">bits: Int</span>, <span name="v">v: IndexedSeq[Byte]</span>)</span><span class="result"> extends HLL with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">These are the individual instances which the Monoid knows how to add
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.DivOp" data-isabs="false">
+      <a id="DivOp:DivOp[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DivOp.html"><span class="name">DivOp</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.EitherMonoid" data-isabs="false">
+      <a id="EitherMonoid:EitherMonoid[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EitherMonoid.html"><span class="name">EitherMonoid</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends EitherSemigroup[L, R] with Monoid[Either[L, R]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.EitherSemigroup" data-isabs="false">
+      <a id="EitherSemigroup:EitherSemigroup[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EitherSemigroup.html"><span class="name">EitherSemigroup</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends Semigroup[Either[L, R]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Either semigroup is useful for error handling.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.EventuallyGroup" data-isabs="false">
+      <a id="EventuallyGroup:EventuallyGroup[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallyGroup.html"><span class="name">EventuallyGroup</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends EventuallyMonoid[L, R] with Group[Either[L, R]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.EventuallyMonoid" data-isabs="false">
+      <a id="EventuallyMonoid:EventuallyMonoid[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallyMonoid.html"><span class="name">EventuallyMonoid</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends EventuallySemigroup[L, R] with Monoid[Either[L, R]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.EventuallyRing" data-isabs="false">
+      <a id="EventuallyRing:EventuallyRing[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallyRing.html"><span class="name">EventuallyRing</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends EventuallyGroup[L, R] with Ring[Either[L, R]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.EventuallySemigroup" data-isabs="false">
+      <a id="EventuallySemigroup:EventuallySemigroup[L, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallySemigroup.html"><span class="name">EventuallySemigroup</span></a><span class="tparams">[<span name="L">L</span>, <span name="R">R</span>]</span><span class="result"> extends Semigroup[Either[L, R]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Field" data-isabs="true">
+      <a id="Field:Field[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Field.html"><span class="name">Field</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Ring[T]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Field: Ring + division.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.First" data-isabs="false">
+      <a id="First:First[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="First.html"><span class="name">First</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Function1Monoid" data-isabs="false">
+      <a id="Function1Monoid:Function1Monoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Function1Monoid.html"><span class="name">Function1Monoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[(T) ⇒ T]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Function1 monoid.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedGroupImplicits" data-isabs="true">
+      <a id="GeneratedGroupImplicits:GeneratedGroupImplicits"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedGroupImplicits.html"><span class="name">GeneratedGroupImplicits</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedMonoidImplicits" data-isabs="true">
+      <a id="GeneratedMonoidImplicits:GeneratedMonoidImplicits"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedMonoidImplicits.html"><span class="name">GeneratedMonoidImplicits</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedRingImplicits" data-isabs="true">
+      <a id="GeneratedRingImplicits:GeneratedRingImplicits"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedRingImplicits.html"><span class="name">GeneratedRingImplicits</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedSemigroupImplicits" data-isabs="true">
+      <a id="GeneratedSemigroupImplicits:GeneratedSemigroupImplicits"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedSemigroupImplicits.html"><span class="name">GeneratedSemigroupImplicits</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Group" data-isabs="true">
+      <a id="Group:Group[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Group.html"><span class="name">Group</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[T]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Group: this is a monoid that also has subtraction (and negation):
+  So, you can do (a-b), or -a (which is equal to 0 - a).</p>
+    </li><li visbl="pub" name="com.twitter.algebird.HLL" data-isabs="true">
+      <a id="HLL:HLL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="HLL.html"><span class="name">HLL</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.HeavyHitter" data-isabs="false">
+      <a id="HeavyHitter:HeavyHitter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHitter.html"><span class="name">HeavyHitter</span></a><span class="params">(<span name="item">item: Long</span>, <span name="count">count: Long</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.HeavyHitters" data-isabs="false">
+      <a id="HeavyHitters:HeavyHitters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHitters.html"><span class="name">HeavyHitters</span></a><span class="params">(<span name="hhs">hhs: SortedSet[HeavyHitter]</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Containers for holding heavy hitter items and their associated counts.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.HyperLogLogMonoid" data-isabs="false">
+      <a id="HyperLogLogMonoid:HyperLogLogMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperLogLogMonoid.html"><span class="name">HyperLogLogMonoid</span></a><span class="result"> extends Monoid[HLL]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.IndexedSeqGroup" data-isabs="false">
+      <a id="IndexedSeqGroup:IndexedSeqGroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexedSeqGroup.html"><span class="name">IndexedSeqGroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends IndexedSeqMonoid[T] with Group[IndexedSeq[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.IndexedSeqMonoid" data-isabs="false">
+      <a id="IndexedSeqMonoid:IndexedSeqMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexedSeqMonoid.html"><span class="name">IndexedSeqMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends IndexedSeqSemigroup[T] with Monoid[IndexedSeq[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.IndexedSeqRing" data-isabs="false">
+      <a id="IndexedSeqRing:IndexedSeqRing[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexedSeqRing.html"><span class="name">IndexedSeqRing</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends IndexedSeqGroup[T] with Ring[IndexedSeq[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.IndexedSeqSemigroup" data-isabs="false">
+      <a id="IndexedSeqSemigroup:IndexedSeqSemigroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexedSeqSemigroup.html"><span class="name">IndexedSeqSemigroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Semigroup[IndexedSeq[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
+This does element-wise operations, like standard vector math, not concatenation,
+like Semigroup[String] or Semigroup[List[T]]</p>
+    </li><li visbl="pub" name="com.twitter.algebird.JListMonoid" data-isabs="false">
+      <a id="JListMonoid:JListMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="JListMonoid.html"><span class="name">JListMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[List[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Since Lists are mutable, this always makes a full copy.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.JMapMonoid" data-isabs="false">
+      <a id="JMapMonoid:JMapMonoid[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="JMapMonoid.html"><span class="name">JMapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends Monoid[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Since maps are mutable, this always makes a full copy.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Last" data-isabs="false">
+      <a id="Last:Last[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Last.html"><span class="name">Last</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ListMonoid" data-isabs="false">
+      <a id="ListMonoid:ListMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ListMonoid.html"><span class="name">ListMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[List[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">List concatenation monoid.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MapGroup" data-isabs="false">
+      <a id="MapGroup:MapGroup[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MapGroup.html"><span class="name">MapGroup</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends MapMonoid[K, V] with Group[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">You can think of this as a Sparse vector group
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid" data-isabs="false">
+      <a id="MapMonoid:MapMonoid[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MapMonoid.html"><span class="name">MapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends Monoid[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">You can think of this as a Sparse vector monoid
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MapRing" data-isabs="false">
+      <a id="MapRing:MapRing[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MapRing.html"><span class="name">MapRing</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends MapGroup[K, V] with Ring[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">You can think of this as a Sparse vector ring
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Max" data-isabs="false">
+      <a id="Max:Max[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Max.html"><span class="name">Max</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Metric" data-isabs="true">
+      <a id="Metric:Metric[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Metric.html"><span class="name">Metric</span></a><span class="tparams">[<span name="V">-V</span>]</span><span class="result"> extends (V, V) ⇒ Double with Serializable</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span name="&quot;Cannot find Metric type class for ${V}&quot;" class="defval">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Min" data-isabs="false">
+      <a id="Min:Min[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Min.html"><span class="name">Min</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinHasher" data-isabs="true">
+      <a id="MinHasher:MinHasher[H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinHasher.html"><span class="name">MinHasher</span></a><span class="tparams">[<span name="H">H</span>]</span><span class="result"> extends Monoid[Array[Byte]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Instances of MinHasher can create, combine, and compare fixed-sized signatures of
+arbitrarily sized sets.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MinHasher16" data-isabs="false">
+      <a id="MinHasher16:MinHasher16"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinHasher16.html"><span class="name">MinHasher16</span></a><span class="result"> extends MinHasher[Char]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinHasher32" data-isabs="false">
+      <a id="MinHasher32:MinHasher32"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinHasher32.html"><span class="name">MinHasher32</span></a><span class="result"> extends MinHasher[Int]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinPlus" data-isabs="true">
+      <a id="MinPlus:MinPlus[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinPlus.html"><span class="name">MinPlus</span></a><span class="tparams">[<span name="V">+V</span>]</span><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinPlusSemiring" data-isabs="false">
+      <a id="MinPlusSemiring:MinPlusSemiring[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinPlusSemiring.html"><span class="name">MinPlusSemiring</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends Ring[MinPlus[V]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinPlusValue" data-isabs="false">
+      <a id="MinPlusValue:MinPlusValue[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinPlusValue.html"><span class="name">MinPlusValue</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="get">get: V</span>)</span><span class="result"> extends MinPlus[V] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinusOp" data-isabs="false">
+      <a id="MinusOp:MinusOp[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinusOp.html"><span class="name">MinusOp</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Moments" data-isabs="false">
+      <a id="Moments:Moments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Moments.html"><span class="name">Moments</span></a><span class="params">(<span name="m0">m0: Long</span>, <span name="m1">m1: Double</span>, <span name="m2">m2: Double</span>, <span name="m3">m3: Double</span>, <span name="m4">m4: Double</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A class to calculate the first five central moments over a sequence of Doubles.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Monad" data-isabs="true">
+      <a id="Monad:Monad[M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Monad.html"><span class="name">Monad</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Simple implementation of a Monad type-class
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MonadField" data-isabs="false">
+      <a id="MonadField:MonadField[T, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadField.html"><span class="name">MonadField</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends MonadRing[T, M] with Field[M[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MonadGroup" data-isabs="false">
+      <a id="MonadGroup:MonadGroup[T, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadGroup.html"><span class="name">MonadGroup</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends MonadMonoid[T, M] with Group[M[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MonadMonoid" data-isabs="false">
+      <a id="MonadMonoid:MonadMonoid[T, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadMonoid.html"><span class="name">MonadMonoid</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends MonadSemigroup[T, M] with Monoid[M[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MonadOperators" data-isabs="false">
+      <a id="MonadOperators:MonadOperators[A, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadOperators.html"><span class="name">MonadOperators</span></a><span class="tparams">[<span name="A">A</span>, <span name="M">M<span class="tparams">[<span name="A">A</span>]</span></span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This enrichment allows us to use our Monad instances in for expressions:
+if (import Monad.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MonadRing" data-isabs="false">
+      <a id="MonadRing:MonadRing[T, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadRing.html"><span class="name">MonadRing</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends MonadGroup[T, M] with Ring[M[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MonadSemigroup" data-isabs="false">
+      <a id="MonadSemigroup:MonadSemigroup[T, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadSemigroup.html"><span class="name">MonadSemigroup</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends Semigroup[M[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid" data-isabs="true">
+      <a id="Monoid:Monoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Monoid.html"><span class="name">Monoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Semigroup[T]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Monoid (take a deep breath, and relax about the weird name):
+  This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MonoidAggregator" data-isabs="true">
+      <a id="MonoidAggregator:MonoidAggregator[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonoidAggregator.html"><span class="name">MonoidAggregator</span></a><span class="tparams">[<span name="A">-A</span>, <span name="B">B</span>, <span name="C">+C</span>]</span><span class="result"> extends Aggregator[A, B, C]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MurmurHash128" data-isabs="false">
+      <a id="MurmurHash128:MurmurHash128"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MurmurHash128.html"><span class="name">MurmurHash128</span></a><span class="params">(<span name="seed">seed: Long</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.OptionMonoid" data-isabs="false">
+      <a id="OptionMonoid:OptionMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="OptionMonoid.html"><span class="name">OptionMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[Option[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Some(5) + Some(3) == Some(8)
+Some(5) + None == Some(5)
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.PlusOp" data-isabs="false">
+      <a id="PlusOp:PlusOp[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PlusOp.html"><span class="name">PlusOp</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.PureOp" data-isabs="false">
+      <a id="PureOp:PureOp[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PureOp.html"><span class="name">PureOp</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RichCBitSet" data-isabs="false">
+      <a id="RichCBitSet:RichCBitSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RichCBitSet.html"><span class="name">RichCBitSet</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RichTraversable" data-isabs="false">
+      <a id="RichTraversable:RichTraversable[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RichTraversable.html"><span class="name">RichTraversable</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFolded" data-isabs="true">
+      <a id="RightFolded:RightFolded[In, Out]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFolded.html"><span class="name">RightFolded</span></a><span class="tparams">[<span name="In">+In</span>, <span name="Out">+Out</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFolded2" data-isabs="true">
+      <a id="RightFolded2:RightFolded2[In, Out, Acc]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFolded2.html"><span class="name">RightFolded2</span></a><span class="tparams">[<span name="In">+In</span>, <span name="Out">+Out</span>, <span name="Acc">+Acc</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFolded2Monoid" data-isabs="false">
+      <a id="RightFolded2Monoid:RightFolded2Monoid[In, Out, Acc]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFolded2Monoid.html"><span class="name">RightFolded2Monoid</span></a><span class="tparams">[<span name="In">In</span>, <span name="Out">Out</span>, <span name="Acc">Acc</span>]</span><span class="result"> extends Monoid[RightFolded2[In, Out, Acc]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedToFold" data-isabs="false">
+      <a id="RightFoldedToFold:RightFoldedToFold[In]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedToFold.html"><span class="name">RightFoldedToFold</span></a><span class="tparams">[<span name="In">+In</span>]</span><span class="params">(<span name="in">in: List[In]</span>)</span><span class="result"> extends RightFolded[In, Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedToFold2" data-isabs="false">
+      <a id="RightFoldedToFold2:RightFoldedToFold2[In]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedToFold2.html"><span class="name">RightFoldedToFold2</span></a><span class="tparams">[<span name="In">+In</span>]</span><span class="params">(<span name="in">in: List[In]</span>)</span><span class="result"> extends RightFolded2[In, Nothing, Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedValue" data-isabs="false">
+      <a id="RightFoldedValue:RightFoldedValue[Out]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedValue.html"><span class="name">RightFoldedValue</span></a><span class="tparams">[<span name="Out">+Out</span>]</span><span class="params">(<span name="v">v: Out</span>)</span><span class="result"> extends RightFolded[Nothing, Out] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedValue2" data-isabs="false">
+      <a id="RightFoldedValue2:RightFoldedValue2[In, Out, Acc]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedValue2.html"><span class="name">RightFoldedValue2</span></a><span class="tparams">[<span name="In">+In</span>, <span name="Out">+Out</span>, <span name="Acc">+Acc</span>]</span><span class="params">(<span name="v">v: Out</span>, <span name="acc">acc: Acc</span>, <span name="rvals">rvals: List[In]</span>)</span><span class="result"> extends RightFolded2[In, Out, Acc] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Ring" data-isabs="true">
+      <a id="Ring:Ring[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Ring.html"><span class="name">Ring</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Group[T]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Ring: Group + multiplication (see: http://en.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.RingAggregator" data-isabs="true">
+      <a id="RingAggregator:RingAggregator[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RingAggregator.html"><span class="name">RingAggregator</span></a><span class="tparams">[<span name="A">-A</span>, <span name="B">B</span>, <span name="C">+C</span>]</span><span class="result"> extends Aggregator[A, B, C]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGD" data-isabs="true">
+      <a id="SGD:SGD[Pos]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SGD.html"><span class="name">SGD</span></a><span class="tparams">[<span name="Pos">+Pos</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGDMonoid" data-isabs="false">
+      <a id="SGDMonoid:SGDMonoid[Pos]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDMonoid.html"><span class="name">SGDMonoid</span></a><span class="tparams">[<span name="Pos">Pos</span>]</span><span class="result"> extends Monoid[SGD[Pos]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Basically a specific implementation of the RightFoldedMonoid
+gradient is the gradient of the function to be minimized
+To use this, you need to insert an initial weight SGDWeights
+before you start adding SGDPos objects.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SGDPos" data-isabs="false">
+      <a id="SGDPos:SGDPos[Pos]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDPos.html"><span class="name">SGDPos</span></a><span class="tparams">[<span name="Pos">+Pos</span>]</span><span class="params">(<span name="pos">pos: List[Pos]</span>)</span><span class="result"> extends SGD[Pos] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGDWeights" data-isabs="false">
+      <a id="SGDWeights:SGDWeights"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDWeights.html"><span class="name">SGDWeights</span></a><span class="params">(<span name="count">count: Long</span>, <span name="weights">weights: IndexedSeq[Double]</span>)</span><span class="result"> extends SGD[Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Semigroup" data-isabs="true">
+      <a id="Semigroup:Semigroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Semigroup.html"><span class="name">Semigroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Semigroup:
+  This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SeqMonoid" data-isabs="false">
+      <a id="SeqMonoid:SeqMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SeqMonoid.html"><span class="name">SeqMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[Seq[T]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SetMonoid" data-isabs="false">
+      <a id="SetMonoid:SetMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SetMonoid.html"><span class="name">SetMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[Set[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Set union monoid.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SortedTakeListMonoid" data-isabs="false">
+      <a id="SortedTakeListMonoid:SortedTakeListMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SortedTakeListMonoid.html"><span class="name">SortedTakeListMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[List[T]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A sorted-take List monoid (not the default, you can set:
+implicit val sortmon = new SortedTakeListMonoid[T](10)
+to use this instead of the standard list
+This returns the k least values:
+equivalent to: (left ++ right).</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SparseHLL" data-isabs="false">
+      <a id="SparseHLL:SparseHLL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SparseHLL.html"><span class="name">SparseHLL</span></a><span class="params">(<span name="bits">bits: Int</span>, <span name="maxRhow">maxRhow: Map[Int, Max[Byte]]</span>)</span><span class="result"> extends HLL with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.StatefulSummer" data-isabs="true">
+      <a id="StatefulSummer:StatefulSummer[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StatefulSummer.html"><span class="name">StatefulSummer</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A Stateful summer is something that is potentially more efficient
+(a buffer, a cache, etc.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SumAll" data-isabs="false">
+      <a id="SumAll:SumAll[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SumAll.html"><span class="name">SumAll</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends StatefulSummer[V]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Sum the entire iterator one item at a time.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SummingCache" data-isabs="false">
+      <a id="SummingCache:SummingCache[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingCache.html"><span class="name">SummingCache</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends StatefulSummer[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A Stateful Summer on Map[K,V] that keeps a cache of recent keys
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SummingIterator" data-isabs="false">
+      <a id="SummingIterator:SummingIterator[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingIterator.html"><span class="name">SummingIterator</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends Serializable with Iterator[V]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SummingQueue" data-isabs="false">
+      <a id="SummingQueue:SummingQueue[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingQueue.html"><span class="name">SummingQueue</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends (V) ⇒ Option[V] with StatefulSummer[V]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.TimesOp" data-isabs="false">
+      <a id="TimesOp:TimesOp[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TimesOp.html"><span class="name">TimesOp</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple10Group" data-isabs="false">
+      <a id="Tuple10Group:Tuple10Group[A, B, C, D, E, F, G, H, I, J]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple10Group.html"><span class="name">Tuple10Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 10 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple10Monoid" data-isabs="false">
+      <a id="Tuple10Monoid:Tuple10Monoid[A, B, C, D, E, F, G, H, I, J]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple10Monoid.html"><span class="name">Tuple10Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 10 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple10Ring" data-isabs="false">
+      <a id="Tuple10Ring:Tuple10Ring[A, B, C, D, E, F, G, H, I, J]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple10Ring.html"><span class="name">Tuple10Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 10 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple10Semigroup" data-isabs="false">
+      <a id="Tuple10Semigroup:Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple10Semigroup.html"><span class="name">Tuple10Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 10 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple11Group" data-isabs="false">
+      <a id="Tuple11Group:Tuple11Group[A, B, C, D, E, F, G, H, I, J, K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple11Group.html"><span class="name">Tuple11Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 11 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple11Monoid" data-isabs="false">
+      <a id="Tuple11Monoid:Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple11Monoid.html"><span class="name">Tuple11Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 11 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple11Ring" data-isabs="false">
+      <a id="Tuple11Ring:Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple11Ring.html"><span class="name">Tuple11Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 11 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple11Semigroup" data-isabs="false">
+      <a id="Tuple11Semigroup:Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple11Semigroup.html"><span class="name">Tuple11Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 11 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple12Group" data-isabs="false">
+      <a id="Tuple12Group:Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple12Group.html"><span class="name">Tuple12Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 12 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple12Monoid" data-isabs="false">
+      <a id="Tuple12Monoid:Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple12Monoid.html"><span class="name">Tuple12Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 12 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple12Ring" data-isabs="false">
+      <a id="Tuple12Ring:Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple12Ring.html"><span class="name">Tuple12Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 12 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple12Semigroup" data-isabs="false">
+      <a id="Tuple12Semigroup:Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple12Semigroup.html"><span class="name">Tuple12Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 12 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple13Group" data-isabs="false">
+      <a id="Tuple13Group:Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple13Group.html"><span class="name">Tuple13Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 13 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple13Monoid" data-isabs="false">
+      <a id="Tuple13Monoid:Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple13Monoid.html"><span class="name">Tuple13Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 13 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple13Ring" data-isabs="false">
+      <a id="Tuple13Ring:Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple13Ring.html"><span class="name">Tuple13Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 13 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple13Semigroup" data-isabs="false">
+      <a id="Tuple13Semigroup:Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple13Semigroup.html"><span class="name">Tuple13Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 13 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple14Group" data-isabs="false">
+      <a id="Tuple14Group:Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple14Group.html"><span class="name">Tuple14Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 14 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple14Monoid" data-isabs="false">
+      <a id="Tuple14Monoid:Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple14Monoid.html"><span class="name">Tuple14Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 14 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple14Ring" data-isabs="false">
+      <a id="Tuple14Ring:Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple14Ring.html"><span class="name">Tuple14Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 14 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple14Semigroup" data-isabs="false">
+      <a id="Tuple14Semigroup:Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple14Semigroup.html"><span class="name">Tuple14Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 14 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple15Group" data-isabs="false">
+      <a id="Tuple15Group:Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple15Group.html"><span class="name">Tuple15Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 15 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple15Monoid" data-isabs="false">
+      <a id="Tuple15Monoid:Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple15Monoid.html"><span class="name">Tuple15Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 15 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple15Ring" data-isabs="false">
+      <a id="Tuple15Ring:Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple15Ring.html"><span class="name">Tuple15Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 15 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple15Semigroup" data-isabs="false">
+      <a id="Tuple15Semigroup:Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple15Semigroup.html"><span class="name">Tuple15Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 15 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple16Group" data-isabs="false">
+      <a id="Tuple16Group:Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple16Group.html"><span class="name">Tuple16Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 16 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple16Monoid" data-isabs="false">
+      <a id="Tuple16Monoid:Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple16Monoid.html"><span class="name">Tuple16Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 16 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple16Ring" data-isabs="false">
+      <a id="Tuple16Ring:Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple16Ring.html"><span class="name">Tuple16Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 16 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple16Semigroup" data-isabs="false">
+      <a id="Tuple16Semigroup:Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple16Semigroup.html"><span class="name">Tuple16Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 16 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple17Group" data-isabs="false">
+      <a id="Tuple17Group:Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple17Group.html"><span class="name">Tuple17Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 17 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple17Monoid" data-isabs="false">
+      <a id="Tuple17Monoid:Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple17Monoid.html"><span class="name">Tuple17Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 17 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple17Ring" data-isabs="false">
+      <a id="Tuple17Ring:Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple17Ring.html"><span class="name">Tuple17Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 17 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple17Semigroup" data-isabs="false">
+      <a id="Tuple17Semigroup:Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple17Semigroup.html"><span class="name">Tuple17Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 17 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple18Group" data-isabs="false">
+      <a id="Tuple18Group:Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple18Group.html"><span class="name">Tuple18Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 18 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple18Monoid" data-isabs="false">
+      <a id="Tuple18Monoid:Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple18Monoid.html"><span class="name">Tuple18Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 18 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple18Ring" data-isabs="false">
+      <a id="Tuple18Ring:Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple18Ring.html"><span class="name">Tuple18Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 18 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple18Semigroup" data-isabs="false">
+      <a id="Tuple18Semigroup:Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple18Semigroup.html"><span class="name">Tuple18Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 18 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple19Group" data-isabs="false">
+      <a id="Tuple19Group:Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple19Group.html"><span class="name">Tuple19Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 19 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple19Monoid" data-isabs="false">
+      <a id="Tuple19Monoid:Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple19Monoid.html"><span class="name">Tuple19Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 19 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple19Ring" data-isabs="false">
+      <a id="Tuple19Ring:Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple19Ring.html"><span class="name">Tuple19Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 19 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple19Semigroup" data-isabs="false">
+      <a id="Tuple19Semigroup:Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple19Semigroup.html"><span class="name">Tuple19Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 19 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple20Group" data-isabs="false">
+      <a id="Tuple20Group:Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple20Group.html"><span class="name">Tuple20Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 20 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple20Monoid" data-isabs="false">
+      <a id="Tuple20Monoid:Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple20Monoid.html"><span class="name">Tuple20Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 20 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple20Ring" data-isabs="false">
+      <a id="Tuple20Ring:Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple20Ring.html"><span class="name">Tuple20Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 20 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple20Semigroup" data-isabs="false">
+      <a id="Tuple20Semigroup:Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple20Semigroup.html"><span class="name">Tuple20Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 20 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple21Group" data-isabs="false">
+      <a id="Tuple21Group:Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple21Group.html"><span class="name">Tuple21Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 21 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple21Monoid" data-isabs="false">
+      <a id="Tuple21Monoid:Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple21Monoid.html"><span class="name">Tuple21Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 21 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple21Ring" data-isabs="false">
+      <a id="Tuple21Ring:Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple21Ring.html"><span class="name">Tuple21Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 21 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple21Semigroup" data-isabs="false">
+      <a id="Tuple21Semigroup:Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple21Semigroup.html"><span class="name">Tuple21Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 21 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple22Group" data-isabs="false">
+      <a id="Tuple22Group:Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple22Group.html"><span class="name">Tuple22Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>, <span name="V">V</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 22 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple22Monoid" data-isabs="false">
+      <a id="Tuple22Monoid:Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple22Monoid.html"><span class="name">Tuple22Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>, <span name="V">V</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 22 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple22Ring" data-isabs="false">
+      <a id="Tuple22Ring:Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple22Ring.html"><span class="name">Tuple22Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>, <span name="V">V</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 22 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple22Semigroup" data-isabs="false">
+      <a id="Tuple22Semigroup:Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple22Semigroup.html"><span class="name">Tuple22Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>, <span name="M">M</span>, <span name="N">N</span>, <span name="O">O</span>, <span name="P">P</span>, <span name="Q">Q</span>, <span name="R">R</span>, <span name="S">S</span>, <span name="T">T</span>, <span name="U">U</span>, <span name="V">V</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 22 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple2Group" data-isabs="false">
+      <a id="Tuple2Group:Tuple2Group[A, B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple2Group.html"><span class="name">Tuple2Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends Group[(A, B)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 2 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple2Monoid" data-isabs="false">
+      <a id="Tuple2Monoid:Tuple2Monoid[A, B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple2Monoid.html"><span class="name">Tuple2Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends Monoid[(A, B)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 2 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple2Ring" data-isabs="false">
+      <a id="Tuple2Ring:Tuple2Ring[A, B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple2Ring.html"><span class="name">Tuple2Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends Ring[(A, B)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 2 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple2Semigroup" data-isabs="false">
+      <a id="Tuple2Semigroup:Tuple2Semigroup[A, B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple2Semigroup.html"><span class="name">Tuple2Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends Semigroup[(A, B)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 2 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple3Group" data-isabs="false">
+      <a id="Tuple3Group:Tuple3Group[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple3Group.html"><span class="name">Tuple3Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result"> extends Group[(A, B, C)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 3 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple3Monoid" data-isabs="false">
+      <a id="Tuple3Monoid:Tuple3Monoid[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple3Monoid.html"><span class="name">Tuple3Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result"> extends Monoid[(A, B, C)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 3 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple3Ring" data-isabs="false">
+      <a id="Tuple3Ring:Tuple3Ring[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple3Ring.html"><span class="name">Tuple3Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result"> extends Ring[(A, B, C)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 3 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple3Semigroup" data-isabs="false">
+      <a id="Tuple3Semigroup:Tuple3Semigroup[A, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple3Semigroup.html"><span class="name">Tuple3Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result"> extends Semigroup[(A, B, C)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 3 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple4Group" data-isabs="false">
+      <a id="Tuple4Group:Tuple4Group[A, B, C, D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple4Group.html"><span class="name">Tuple4Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="result"> extends Group[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 4 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple4Monoid" data-isabs="false">
+      <a id="Tuple4Monoid:Tuple4Monoid[A, B, C, D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple4Monoid.html"><span class="name">Tuple4Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="result"> extends Monoid[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 4 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple4Ring" data-isabs="false">
+      <a id="Tuple4Ring:Tuple4Ring[A, B, C, D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple4Ring.html"><span class="name">Tuple4Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="result"> extends Ring[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 4 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple4Semigroup" data-isabs="false">
+      <a id="Tuple4Semigroup:Tuple4Semigroup[A, B, C, D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple4Semigroup.html"><span class="name">Tuple4Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="result"> extends Semigroup[(A, B, C, D)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 4 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple5Group" data-isabs="false">
+      <a id="Tuple5Group:Tuple5Group[A, B, C, D, E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple5Group.html"><span class="name">Tuple5Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="result"> extends Group[(A, B, C, D, E)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 5 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple5Monoid" data-isabs="false">
+      <a id="Tuple5Monoid:Tuple5Monoid[A, B, C, D, E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple5Monoid.html"><span class="name">Tuple5Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 5 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple5Ring" data-isabs="false">
+      <a id="Tuple5Ring:Tuple5Ring[A, B, C, D, E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple5Ring.html"><span class="name">Tuple5Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="result"> extends Ring[(A, B, C, D, E)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 5 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple5Semigroup" data-isabs="false">
+      <a id="Tuple5Semigroup:Tuple5Semigroup[A, B, C, D, E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple5Semigroup.html"><span class="name">Tuple5Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 5 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple6Group" data-isabs="false">
+      <a id="Tuple6Group:Tuple6Group[A, B, C, D, E, F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple6Group.html"><span class="name">Tuple6Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 6 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple6Monoid" data-isabs="false">
+      <a id="Tuple6Monoid:Tuple6Monoid[A, B, C, D, E, F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple6Monoid.html"><span class="name">Tuple6Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 6 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple6Ring" data-isabs="false">
+      <a id="Tuple6Ring:Tuple6Ring[A, B, C, D, E, F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple6Ring.html"><span class="name">Tuple6Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 6 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple6Semigroup" data-isabs="false">
+      <a id="Tuple6Semigroup:Tuple6Semigroup[A, B, C, D, E, F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple6Semigroup.html"><span class="name">Tuple6Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 6 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple7Group" data-isabs="false">
+      <a id="Tuple7Group:Tuple7Group[A, B, C, D, E, F, G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple7Group.html"><span class="name">Tuple7Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 7 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple7Monoid" data-isabs="false">
+      <a id="Tuple7Monoid:Tuple7Monoid[A, B, C, D, E, F, G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple7Monoid.html"><span class="name">Tuple7Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 7 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple7Ring" data-isabs="false">
+      <a id="Tuple7Ring:Tuple7Ring[A, B, C, D, E, F, G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple7Ring.html"><span class="name">Tuple7Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 7 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple7Semigroup" data-isabs="false">
+      <a id="Tuple7Semigroup:Tuple7Semigroup[A, B, C, D, E, F, G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple7Semigroup.html"><span class="name">Tuple7Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 7 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple8Group" data-isabs="false">
+      <a id="Tuple8Group:Tuple8Group[A, B, C, D, E, F, G, H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple8Group.html"><span class="name">Tuple8Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 8 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple8Monoid" data-isabs="false">
+      <a id="Tuple8Monoid:Tuple8Monoid[A, B, C, D, E, F, G, H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple8Monoid.html"><span class="name">Tuple8Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 8 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple8Ring" data-isabs="false">
+      <a id="Tuple8Ring:Tuple8Ring[A, B, C, D, E, F, G, H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple8Ring.html"><span class="name">Tuple8Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 8 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple8Semigroup" data-isabs="false">
+      <a id="Tuple8Semigroup:Tuple8Semigroup[A, B, C, D, E, F, G, H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple8Semigroup.html"><span class="name">Tuple8Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 8 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple9Group" data-isabs="false">
+      <a id="Tuple9Group:Tuple9Group[A, B, C, D, E, F, G, H, I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple9Group.html"><span class="name">Tuple9Group</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="result"> extends Group[(A, B, C, D, E, F, G, H, I)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 9 groups into a product group</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple9Monoid" data-isabs="false">
+      <a id="Tuple9Monoid:Tuple9Monoid[A, B, C, D, E, F, G, H, I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple9Monoid.html"><span class="name">Tuple9Monoid</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="result"> extends Monoid[(A, B, C, D, E, F, G, H, I)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 9 monoids into a product monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple9Ring" data-isabs="false">
+      <a id="Tuple9Ring:Tuple9Ring[A, B, C, D, E, F, G, H, I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple9Ring.html"><span class="name">Tuple9Ring</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="result"> extends Ring[(A, B, C, D, E, F, G, H, I)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 9 rings into a product ring</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Tuple9Semigroup" data-isabs="false">
+      <a id="Tuple9Semigroup:Tuple9Semigroup[A, B, C, D, E, F, G, H, I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Tuple9Semigroup.html"><span class="name">Tuple9Semigroup</span></a><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="result"> extends Semigroup[(A, B, C, D, E, F, G, H, I)]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Combine 9 semigroups into a product semigroup</p>
+    </li><li visbl="pub" name="com.twitter.algebird.VectorSpace" data-isabs="true">
+      <a id="VectorSpace:VectorSpace[F, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorSpace.html"><span class="name">VectorSpace</span></a><span class="tparams">[<span name="F">F</span>, <span name="C">C<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span name="&quot;Cannot find VectorSpace type class for Container: ${C} and Field: ${F}&quot;" class="defval">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" name="com.twitter.algebird.AffineFunction" data-isabs="false">
+      <a id="AffineFunction:AffineFunction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AffineFunction$.html"><span class="name">AffineFunction</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Approximate" data-isabs="false">
+      <a id="Approximate:Approximate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Approximate$.html"><span class="name">Approximate</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ApproximateBoolean" data-isabs="false">
+      <a id="ApproximateBoolean:ApproximateBoolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ApproximateBoolean$.html"><span class="name">ApproximateBoolean</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AveragedGroup" data-isabs="false">
+      <a id="AveragedGroup:AveragedGroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AveragedGroup$.html"><span class="name">AveragedGroup</span></a><span class="result"> extends Group[AveragedValue]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AveragedValue" data-isabs="false">
+      <a id="AveragedValue:AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AveragedValue$.html"><span class="name">AveragedValue</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Averager" data-isabs="false">
+      <a id="Averager:Averager"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Averager$.html"><span class="name">Averager</span></a><span class="result"> extends MonoidAggregator[Double, AveragedValue, Double]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BFInstance" data-isabs="false">
+      <a id="BFInstance:BFInstance"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BFInstance$.html"><span class="name">BFInstance</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BaseProperties" data-isabs="false">
+      <a id="BaseProperties:BaseProperties"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BaseProperties$.html"><span class="name">BaseProperties</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Base properties useful for all tests using Algebird's typeclasses.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BaseVectorSpaceProperties" data-isabs="false">
+      <a id="BaseVectorSpaceProperties:BaseVectorSpaceProperties"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BaseVectorSpaceProperties$.html"><span class="name">BaseVectorSpaceProperties</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Base properties for VectorSpace tests.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BloomFilter" data-isabs="false">
+      <a id="BloomFilter:BloomFilter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BloomFilter$.html"><span class="name">BloomFilter</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BooleanField" data-isabs="false">
+      <a id="BooleanField:BooleanField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BooleanField$.html"><span class="name">BooleanField</span></a><span class="result"> extends Field[Boolean]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CMS" data-isabs="false">
+      <a id="CMS:CMS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CMS$.html"><span class="name">CMS</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CMSCountsTable" data-isabs="false">
+      <a id="CMSCountsTable:CMSCountsTable"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSCountsTable$.html"><span class="name">CMSCountsTable</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CMSInstance" data-isabs="false">
+      <a id="CMSInstance:CMSInstance"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CMSInstance$.html"><span class="name">CMSInstance</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.CassandraMurmurHash" data-isabs="false">
+      <a id="CassandraMurmurHash:CassandraMurmurHash"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="CassandraMurmurHash$.html"><span class="name">CassandraMurmurHash</span></a><span class="result"> extends </span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.DecayedValue" data-isabs="false">
+      <a id="DecayedValue:DecayedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DecayedValue$.html"><span class="name">DecayedValue</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.DecayedVector" data-isabs="false">
+      <a id="DecayedVector:DecayedVector"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DecayedVector$.html"><span class="name">DecayedVector</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Represents a container class together with time.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.DoubleField" data-isabs="false">
+      <a id="DoubleField:DoubleField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DoubleField$.html"><span class="name">DoubleField</span></a><span class="result"> extends Field[Double]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Field" data-isabs="false">
+      <a id="Field:Field"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Field$.html"><span class="name">Field</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.First" data-isabs="false">
+      <a id="First:First"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="First$.html"><span class="name">First</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.FloatField" data-isabs="false">
+      <a id="FloatField:FloatField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FloatField$.html"><span class="name">FloatField</span></a><span class="result"> extends Field[Float]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Group" data-isabs="false">
+      <a id="Group:Group"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Group$.html"><span class="name">Group</span></a><span class="result"> extends GeneratedGroupImplicits with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.HeavyHitter" data-isabs="false">
+      <a id="HeavyHitter:HeavyHitter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHitter$.html"><span class="name">HeavyHitter</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.HyperLogLog" data-isabs="false">
+      <a id="HyperLogLog:HyperLogLog"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperLogLog$.html"><span class="name">HyperLogLog</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Implementation of the HyperLogLog approximate counting as a Monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.IntRing" data-isabs="false">
+      <a id="IntRing:IntRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IntRing$.html"><span class="name">IntRing</span></a><span class="result"> extends Ring[Int]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JBoolField" data-isabs="false">
+      <a id="JBoolField:JBoolField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JBoolField$.html"><span class="name">JBoolField</span></a><span class="result"> extends Field[Boolean]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JDoubleField" data-isabs="false">
+      <a id="JDoubleField:JDoubleField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JDoubleField$.html"><span class="name">JDoubleField</span></a><span class="result"> extends Field[Double]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JFloatField" data-isabs="false">
+      <a id="JFloatField:JFloatField"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JFloatField$.html"><span class="name">JFloatField</span></a><span class="result"> extends Field[Float]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JIntRing" data-isabs="false">
+      <a id="JIntRing:JIntRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JIntRing$.html"><span class="name">JIntRing</span></a><span class="result"> extends Ring[Integer]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JLongRing" data-isabs="false">
+      <a id="JLongRing:JLongRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JLongRing$.html"><span class="name">JLongRing</span></a><span class="result"> extends Ring[Long]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.JShortRing" data-isabs="false">
+      <a id="JShortRing:JShortRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JShortRing$.html"><span class="name">JShortRing</span></a><span class="result"> extends Ring[Short]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Last" data-isabs="false">
+      <a id="Last:Last"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Last$.html"><span class="name">Last</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.LongRing" data-isabs="false">
+      <a id="LongRing:LongRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LongRing$.html"><span class="name">LongRing</span></a><span class="result"> extends Ring[Long]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra" data-isabs="false">
+      <a id="MapAlgebra:MapAlgebra"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MapAlgebra$.html"><span class="name">MapAlgebra</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Max" data-isabs="false">
+      <a id="Max:Max"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Max$.html"><span class="name">Max</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Metric" data-isabs="false">
+      <a id="Metric:Metric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Metric$.html"><span class="name">Metric</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A Metric[V] m is a function (V, V) =&gt; Double that satisfies the following properties:</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Min" data-isabs="false">
+      <a id="Min:Min"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Min$.html"><span class="name">Min</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinPlus" data-isabs="false">
+      <a id="MinPlus:MinPlus"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MinPlus$.html"><span class="name">MinPlus</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinPlusZero" data-isabs="false">
+      <a id="MinPlusZero:MinPlusZero"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MinPlusZero$.html"><span class="name">MinPlusZero</span></a><span class="result"> extends MinPlus[Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Moments" data-isabs="false">
+      <a id="Moments:Moments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Moments$.html"><span class="name">Moments</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MomentsGroup" data-isabs="false">
+      <a id="MomentsGroup:MomentsGroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MomentsGroup$.html"><span class="name">MomentsGroup</span></a><span class="result"> extends Group[Moments]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A monoid to perform moment calculations.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Monad" data-isabs="false">
+      <a id="Monad:Monad"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Monad$.html"><span class="name">Monad</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Follows the type-class pattern for the Monad trait
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MonadLaws" data-isabs="false">
+      <a id="MonadLaws:MonadLaws"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadLaws$.html"><span class="name">MonadLaws</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Basic Monad laws, useful for testing any monad.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid" data-isabs="false">
+      <a id="Monoid:Monoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Monoid$.html"><span class="name">Monoid</span></a><span class="result"> extends GeneratedMonoidImplicits with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.NullGroup" data-isabs="false">
+      <a id="NullGroup:NullGroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NullGroup$.html"><span class="name">NullGroup</span></a><span class="result"> extends ConstantGroup[Null]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Operators" data-isabs="false">
+      <a id="Operators:Operators"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Operators$.html"><span class="name">Operators</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RichCBitSet" data-isabs="false">
+      <a id="RichCBitSet:RichCBitSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RichCBitSet$.html"><span class="name">RichCBitSet</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFolded" data-isabs="false">
+      <a id="RightFolded:RightFolded"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFolded$.html"><span class="name">RightFolded</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This is an associative, but not commutative monoid
+Also, you must start on the right, with a value, and all subsequent RightFolded must
+be RightFoldedToFold objects or zero</p>
+    </li><li visbl="pub" name="com.twitter.algebird.RightFolded2" data-isabs="false">
+      <a id="RightFolded2:RightFolded2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFolded2$.html"><span class="name">RightFolded2</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This monoid takes a list of values of type In or Out,
+and folds to the right all the Ins into Out values, leaving
+you with a list of Out values, then finally, maps those outs
+onto Acc, where there is a group, and adds all the Accs up.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedZero" data-isabs="false">
+      <a id="RightFoldedZero:RightFoldedZero"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedZero$.html"><span class="name">RightFoldedZero</span></a><span class="result"> extends RightFolded[Nothing, Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.RightFoldedZero2" data-isabs="false">
+      <a id="RightFoldedZero2:RightFoldedZero2"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RightFoldedZero2$.html"><span class="name">RightFoldedZero2</span></a><span class="result"> extends RightFolded2[Nothing, Nothing, Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Ring" data-isabs="false">
+      <a id="Ring:Ring"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Ring$.html"><span class="name">Ring</span></a><span class="result"> extends GeneratedRingImplicits with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGD" data-isabs="false">
+      <a id="SGD:SGD"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SGD$.html"><span class="name">SGD</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGDPos" data-isabs="false">
+      <a id="SGDPos:SGDPos"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDPos$.html"><span class="name">SGDPos</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGDWeights" data-isabs="false">
+      <a id="SGDWeights:SGDWeights"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDWeights$.html"><span class="name">SGDWeights</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SGDZero" data-isabs="false">
+      <a id="SGDZero:SGDZero"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SGDZero$.html"><span class="name">SGDZero</span></a><span class="result"> extends SGD[Nothing] with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Semigroup" data-isabs="false">
+      <a id="Semigroup:Semigroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Semigroup$.html"><span class="name">Semigroup</span></a><span class="result"> extends GeneratedSemigroupImplicits with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ShortRing" data-isabs="false">
+      <a id="ShortRing:ShortRing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ShortRing$.html"><span class="name">ShortRing</span></a><span class="result"> extends Ring[Short]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.StatefulSummerLaws" data-isabs="false">
+      <a id="StatefulSummerLaws:StatefulSummerLaws"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StatefulSummerLaws$.html"><span class="name">StatefulSummerLaws</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.StringMonoid" data-isabs="false">
+      <a id="StringMonoid:StringMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StringMonoid$.html"><span class="name">StringMonoid</span></a><span class="result"> extends Monoid[String]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SummingCache" data-isabs="false">
+      <a id="SummingCache:SummingCache"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingCache$.html"><span class="name">SummingCache</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.SummingIterator" data-isabs="false">
+      <a id="SummingIterator:SummingIterator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingIterator$.html"><span class="name">SummingIterator</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Creates an Iterator that emits partial sums of an input Iterator[V].</p>
+    </li><li visbl="pub" name="com.twitter.algebird.SummingQueue" data-isabs="false">
+      <a id="SummingQueue:SummingQueue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingQueue$.html"><span class="name">SummingQueue</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.UnitGroup" data-isabs="false">
+      <a id="UnitGroup:UnitGroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="UnitGroup$.html"><span class="name">UnitGroup</span></a><span class="result"> extends ConstantGroup[Unit]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.VectorSpace" data-isabs="false">
+      <a id="VectorSpace:VectorSpace"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorSpace$.html"><span class="name">VectorSpace</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This class represents a vector space.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.util" data-isabs="false">
+      <a id="util:util"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="util/package.html"><span class="name">util</span></a>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
