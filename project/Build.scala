@@ -3,24 +3,7 @@ package algebird
 import sbt._
 import Keys._
 
-import com.typesafe.sbt.SbtSite.{ site, SiteKeys }
-import com.typesafe.sbt.SbtGhPages.ghpages
-import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
-
 object AlgebirdBuild extends Build {
-  lazy val unidocSettings: Seq[sbt.Setting[_]] =
-    site.includeScaladoc("target/site") ++ Seq(
-      scalacOptions in doc <++= (version, baseDirectory in LocalProject("algebird")).map { (v, rootBase) =>
-        val tagOrBranch = if (v.endsWith("-SNAPSHOT")) "develop" else v
-        val docSourceUrl = "https://github.com/twitter/algebird/tree/" + tagOrBranch + "€{FILE_PATH}.scala"
-        Seq("-sourcepath", rootBase.getAbsolutePath, "-doc-source-url", docSourceUrl)
-      },
-      Unidoc.unidocDirectory <<= target/ "site",
-      gitRemoteRepo := "git@github.com:twitter/algebird.git"
-    )
-
-  lazy val publishSettings = site.settings ++ Unidoc.settings ++ ghpages.settings ++ unidocSettings
-
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     version := "0.1.9-SNAPSHOT",
@@ -82,7 +65,7 @@ object AlgebirdBuild extends Build {
   lazy val algebird = Project(
     id = "algebird",
     base = file("."),
-    settings = sharedSettings ++ publishSettings
+    settings = sharedSettings ++ DocGen.publishSettings
     ).settings(
     test := { }
   ).aggregate(algebirdTest,
