@@ -66,7 +66,8 @@ object AlgebirdBuild extends Build {
     ).settings(
     test := { }
   ).aggregate(algebirdTest,
-              algebirdCore)
+              algebirdCore,
+              algebirdUtil)
 
   lazy val algebirdCore = Project(
     id = "algebird-core",
@@ -89,4 +90,14 @@ object AlgebirdBuild extends Build {
       "org.scala-tools.testing" %% "specs" % "1.6.9"
     )
   ).dependsOn(algebirdCore)
+
+  lazy val algebirdUtil = Project(
+    id = "algebird-util",
+    base = file("algebird-util"),
+    settings = sharedSettings
+  ).settings(
+    name := "algebird-util",
+    resolvers += "Twitter Maven" at "http://maven.twttr.com",
+    libraryDependencies += "com.twitter" % "util-core" % "5.3.15"
+  ).dependsOn(algebirdCore, algebirdTest % "compile->test")
 }
