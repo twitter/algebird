@@ -64,7 +64,9 @@ object AlgebirdBuild extends Build {
     base = file("."),
     settings = sharedSettings
     ).settings(
-    test := { }
+    test := { },
+    publish := { }, // skip publishing for this root project.
+    publishLocal := { }
   ).aggregate(algebirdTest,
               algebirdCore,
               algebirdUtil)
