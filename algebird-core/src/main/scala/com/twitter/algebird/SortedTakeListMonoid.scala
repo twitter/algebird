@@ -23,25 +23,26 @@ import scala.annotation.tailrec
  * This returns the k least values:
  * equivalent to: (left ++ right).sorted.take(k)
  * but doesn't do a total sort
+ * NOTE!!!! This assumes the inputs are already sorted! resorting each time kills speed
  */
 class SortedTakeListMonoid[T](k : Int)(implicit ord : Ordering[T]) extends Monoid[List[T]] {
   override def zero = List[T]()
   override def plus(left : List[T], right : List[T]) : List[T] = {
     //This is the internal loop that does one comparison:
     @tailrec
-    def mergeSortR(acc : List[T], list1 : List[T], list2 : List[T], k : Int) : List[T] = {
-      (list1, list2, k) match {
-        case (_,_,0) => acc
+    def mergeSortR(acc : List[T], list1 : List[T], list2 : List[T], cnt : Int) : List[T] = {
+      (list1, list2, cnt) match {
+        case (_, _, 0) => acc
         case (x1 :: t1, x2 :: t2, _) => {
           if( ord.lt(x1,x2) ) {
-            mergeSortR(x1 :: acc, t1, list2, k-1)
+            mergeSortR(x1 :: acc, t1, list2, cnt-1)
           }
           else {
-            mergeSortR(x2 :: acc, list1, t2, k-1)
+            mergeSortR(x2 :: acc, list1, t2, cnt-1)
           }
         }
-        case (x1 :: t1, Nil, _) => mergeSortR(x1 :: acc, t1, Nil, k-1)
-        case (Nil, x2 :: t2, _) => mergeSortR(x2 :: acc, Nil, t2, k-1)
+        case (x1 :: t1, Nil, _) => mergeSortR(x1 :: acc, t1, Nil, cnt-1)
+        case (Nil, x2 :: t2, _) => mergeSortR(x2 :: acc, Nil, t2, cnt-1)
         case (Nil, Nil, _) => acc
       }
     }
