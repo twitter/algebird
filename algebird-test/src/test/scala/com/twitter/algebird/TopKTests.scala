@@ -64,4 +64,15 @@ object TopKTests extends Properties("TopKTests") {
     q2l(Monoid.sum(items.map { l => qmonoid.build(l) } )) == correct
   }
   property("PriorityQueueMonoid is a Monoid") = monoidLawsEq[PriorityQueue[Int]](eqFn)
+
+  implicit def tkmonoid = new TopKMonoid[Int](SIZE)
+  implicit def topkArb = Arbitrary {
+    implicitly[Arbitrary[List[Int]]].arbitrary.map { tkmonoid.build(_) }
+  }
+  property("TopKMonoid works") = forAll { (its: List[List[Int]]) =>
+    val correct = its.flatten.sorted.take(SIZE)
+    // Have to do this last since this monoid is mutating inputs
+    Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) } ).items, correct)
+  }
+  property("TopKMonoid is a Monoid") = monoidLawsEq[PriorityQueue[Int]](eqFn)
 }

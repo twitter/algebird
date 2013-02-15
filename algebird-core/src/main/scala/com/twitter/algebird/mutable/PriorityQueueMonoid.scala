@@ -31,7 +31,7 @@ import java.util.PriorityQueue
 class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
   Monoid[PriorityQueue[K]] {
 
-  require(max > 0)
+  require(max > 0, "PriorityQueueMonoid requires keeping at least 1 item")
   // Java throws if you try to make a queue size 0
   protected val MINQUEUESIZE = 1
   def build(k: K): PriorityQueue[K] = {
