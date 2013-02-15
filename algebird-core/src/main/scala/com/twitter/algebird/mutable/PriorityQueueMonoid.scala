@@ -35,7 +35,7 @@ class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
   // Java throws if you try to make a queue size 0
   protected val MINQUEUESIZE = 1
   def build(k: K): PriorityQueue[K] = {
-    val q = new PriorityQueue(1, ord.reverse);
+    val q = new PriorityQueue[K](1, ord.reverse);
     q.add(k)
     q
   }
