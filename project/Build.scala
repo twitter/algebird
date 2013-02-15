@@ -2,11 +2,11 @@ package algebird
 
 import sbt._
 import Keys._
+import sbtgitflow.ReleasePlugin._
 
 object AlgebirdBuild extends Build {
-  val sharedSettings = Project.defaultSettings ++ Seq(
+  val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
     organization := "com.twitter",
-    version := "0.1.9-SNAPSHOT",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0"),
 
