@@ -91,38 +91,6 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
   override def plus(left : Seq[T], right : Seq[T]) = left ++ right
 }
 
-/** A sorted-take List monoid (not the default, you can set:
- * implicit val sortmon = new SortedTakeListMonoid[T](10)
- * to use this instead of the standard list
- * This returns the k least values:
- * equivalent to: (left ++ right).sorted.take(k)
- * but doesn't do a total sort
- */
-class SortedTakeListMonoid[T](k : Int)(implicit ord : Ordering[T]) extends Monoid[List[T]] {
-  override def zero = List[T]()
-  override def plus(left : List[T], right : List[T]) : List[T] = {
-    //This is the internal loop that does one comparison:
-    @tailrec
-    def mergeSortR(acc : List[T], list1 : List[T], list2 : List[T], k : Int) : List[T] = {
-      (list1, list2, k) match {
-        case (_,_,0) => acc
-        case (x1 :: t1, x2 :: t2, _) => {
-          if( ord.lt(x1,x2) ) {
-            mergeSortR(x1 :: acc, t1, list2, k-1)
-          }
-          else {
-            mergeSortR(x2 :: acc, list1, t2, k-1)
-          }
-        }
-        case (x1 :: t1, Nil, _) => mergeSortR(x1 :: acc, t1, Nil, k-1)
-        case (Nil, x2 :: t2, _) => mergeSortR(x2 :: acc, Nil, t2, k-1)
-        case (Nil, Nil, _) => acc
-      }
-    }
-    mergeSortR(Nil, left, right, k).reverse
-  }
-}
-
 /** Set union monoid.
  * plus means union, zero is empty set
  */
