@@ -1,5 +1,28 @@
 # Algebird #
 
+### Version 0.1.9 ###
+
+* Build `algebird` against scala 2.9.2 and 2.10.0
+* `algebird-util` with Future and Try algebras.
+
+### Version 0.1.8 ###
+
+* Break out `algebird-core` and `algebird-test` into separate jars
+
+### Version 0.1.7 ###
+
+* SummingQueue works with capacity of 0, just passes through
+* adds compressed bitset (RichCBitSet)
+* Add `BFSparse`
+* Heavy hitters in countminsketch
+* Monad typeclass
+
+### Version 0.1.6 ###
+
+* Adds publishing pom.
+* Add SummingQueue
+* rename Cassandra's MurmurHash.
+
 ### Version 0.1.5 ###
 * Make Metric serializable
 * JMap uses Semigroup
