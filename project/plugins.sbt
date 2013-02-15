@@ -6,3 +6,5 @@ resolvers ++= Seq(
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.0")
 
 addSbtPlugin("com.twitter" % "sbt-gitflow" % "0.1.0")
+
+addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
