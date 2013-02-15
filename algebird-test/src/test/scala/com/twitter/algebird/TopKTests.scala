@@ -64,17 +64,4 @@ object TopKTests extends Properties("TopKTests") {
     q2l(Monoid.sum(items.map { l => qmonoid.build(l) } )) == correct
   }
   property("PriorityQueueMonoid is a Monoid") = monoidLawsEq[PriorityQueue[Int]](eqFn)
-/*
-  import scala.collection.SortedSet
-  implicit def smonoid: Monoid[SortedSet[Int]] = new SortedSetMonoid[Int](SIZE)
-  implicit def setArb = Arbitrary {
-    implicitly[Arbitrary[List[Int]]].arbitrary.map { l => SortedSet(l : _*) }
-  }
-  property("SortedSetMonoid works") = forAll { (items: List[SortedSet[Int]]) =>
-    val correct = items.map { _.toList }.flatten.sorted.take(SIZE)
-    // Have to do this last since this monoid is mutating inputs
-    Monoid.sum(items) == SortedSet(correct : _*)
-  }
-  property("SortedSetMonoid is a Monoid") = monoidLaws[SortedSet[Int]]
-  */
 }
