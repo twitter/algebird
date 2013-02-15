@@ -1,3 +1,5 @@
+package algebird
+
 import sbt._
 import Keys._
 
@@ -5,6 +7,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     version := "0.1.9-SNAPSHOT",
+    scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0"),
 
     resolvers ++= Seq(
@@ -62,7 +65,7 @@ object AlgebirdBuild extends Build {
   lazy val algebird = Project(
     id = "algebird",
     base = file("."),
-    settings = sharedSettings
+    settings = sharedSettings ++ DocGen.publishSettings
     ).settings(
     test := { },
     publish := { }, // skip publishing for this root project.
