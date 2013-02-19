@@ -29,6 +29,21 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
   // no zero in a semigroup
   def isNonZero(v: T): Boolean = true
   def plus(l : T, r : T) : T
+
+  def assertNotZero(v : T) {
+    if(!isNonZero(v)) {
+      throw new java.lang.IllegalArgumentException("argument should not be zero")
+    }
+  }
+
+  def nonZeroOption(v : T): Option[T] = {
+    if (isNonZero(v)) {
+      Some(v)
+    }
+    else {
+      None
+    }
+  }
 }
 
 /** Either semigroup is useful for error handling.
@@ -68,6 +83,10 @@ object Semigroup extends GeneratedSemigroupImplicits {
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
     iter.reduceLeftOption { sg.plus(_,_) }
+
+  def assertNotZero[T](t: T)(implicit sg: Semigroup[T]) = sg.assertNotZero(t)
+  def isNonZero[T](t: T)(implicit sg: Semigroup[T]) = sg.isNonZero(t)
+  def nonZeroOption[T](t: T)(implicit sg: Semigroup[T]) = sg.nonZeroOption(t)
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
 

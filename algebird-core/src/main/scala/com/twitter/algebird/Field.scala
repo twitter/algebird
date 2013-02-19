@@ -85,6 +85,7 @@ object BooleanField extends Field[Boolean] {
 
 object Field {
   // This pattern is really useful for typeclasses
+  def inverse[T](t: T)(implicit fld : Field[T]) = fld.inverse(t)
   def div[T](l : T, r : T)(implicit fld : Field[T]) = fld.div(l,r)
 
   implicit val boolField : Field[Boolean] = BooleanField

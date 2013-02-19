@@ -31,8 +31,8 @@ class HyperLogLogTest extends Specification {
 
   def exactCount[T](it : Iterable[T]) : Int = it.toSet.size
   def approxCount[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
-    val hll = new HyperLogLogMonoid(bits)
-    hll.sizeOf(hll.sum(it.map { hll(_) })).estimate.toDouble
+    implicit val hll = new HyperLogLogMonoid(bits)
+    hll.sizeOf(Monoid.sum(it.map { hll(_) })).estimate.toDouble
   }
 
   def aveErrorOf(bits : Int) : Double = 1.04/scala.math.sqrt(1 << bits)
@@ -41,9 +41,9 @@ class HyperLogLogTest extends Specification {
     it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
   }
   def approxIntersect[T <% Array[Byte]](bits : Int, it : Seq[Iterable[T]]) : Double = {
-    val hll = new HyperLogLogMonoid(bits)
+    implicit val hll = new HyperLogLogMonoid(bits)
     //Map each iterable to a HLL instance:
-    val seqHlls = it.map { iter => hll.sum(iter.view.map { hll(_) }) }
+    val seqHlls = it.map { iter => Monoid.sum(iter.view.map { hll(_) }) }
     hll.intersectionSize(seqHlls).estimate.toDouble
   }
 
