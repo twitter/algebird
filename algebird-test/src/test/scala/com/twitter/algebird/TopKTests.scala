@@ -38,6 +38,7 @@ object TopKTests extends Properties("TopKTests") {
     }
     monoidLaws[List[Int]]
   }
+
   property("SortedTakeListMonoid works") = {
     implicit val listMonoid = new SortedTakeListMonoid[Int](SIZE)
     implicit val queueArb = Arbitrary {

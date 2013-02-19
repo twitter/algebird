@@ -65,9 +65,8 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
     }
     val chunks = chunk(l)(notIsVal)
 
-    val grp = implicitly[Group[Acc]]
-    val vals = chunks.map { fold(_)(foldfn).map(mapfn).getOrElse(grp.zero) }
-    grp.sum(vals)
+    val vals = chunks.map { fold(_)(foldfn).map(mapfn).getOrElse(Monoid.zero) }
+    Monoid.sum[Acc](vals)
   }
 
   def accOf[In,Out,Acc](rfv: RightFolded2[In,Out,Acc]): Option[Acc] = {
@@ -78,7 +77,7 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
   }
 
   property("RightFolded2 sum works as expected") = forAll { (ls : List[RightFolded2[Int,Long,Long]]) =>
-    val accSum = accOf(rightFoldedMonoid.sum(ls)).getOrElse(0L)
+    val accSum = accOf(Monoid.sum(ls)).getOrElse(0L)
     (sum(ls)(monFold)(mapFn) == accSum)
   }
 }
