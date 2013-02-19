@@ -65,7 +65,7 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
     }
     val chunks = chunk(l)(notIsVal)
 
-    val vals = chunks.map { fold(_)(foldfn).map(mapfn).getOrElse(Monoid.zero) }
+    val vals = chunks.map { fold(_)(foldfn).map(mapfn).getOrElse(Monoid.zero[Acc]) }
     Monoid.sum[Acc](vals)
   }
 
