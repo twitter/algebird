@@ -31,6 +31,10 @@ object AdjoinedUnit {
 class AdjoinedUnitRing[T](implicit ring: Ring[T]) extends Ring[AdjoinedUnit[T]] {
   val one = AdjoinedUnit[T](BigInt(1), ring.zero)
   val zero = AdjoinedUnit[T](ring.zero)
+
+  override def isNonZero(it: AdjoinedUnit[T]) =
+    (it.ones != 0) && (ring.isNonZero(it.get))
+
   def plus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) =
     AdjoinedUnit(left.ones + right.ones, ring.plus(left.get, right.get))
 
