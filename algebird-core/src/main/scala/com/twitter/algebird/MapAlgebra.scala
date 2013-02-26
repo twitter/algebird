@@ -101,7 +101,6 @@ object MapAlgebra {
 
   /** Reverses a graph losslessly
    * None key is for v's with no sources.
-   * Note, that is all v's have sources, res(None) == Set[K]()
    */
   def invertExact[K,V](m: Map[Option[K], Set[V]]): Map[Option[V], Set[K]] = {
     def nonEmptyIter[T](i: Iterable[T]): Iterable[Option[T]] =
