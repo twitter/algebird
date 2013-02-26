@@ -17,6 +17,7 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 import scala.annotation.implicitNotFound
+import scala.math.Equiv
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
@@ -131,6 +132,13 @@ object Monoid extends GeneratedMonoidImplicits {
   def from[T](z: => T)(associativeFn: (T,T) => T): Monoid[T] = new Monoid[T] {
     lazy val zero = z
     def plus(l:T, r:T) = associativeFn(l,r)
+  }
+
+  /** Return an Equiv[T] that uses isNonZero to return equality for all zeros
+   * useful for Maps/Vectors that have many equivalent in memory representations of zero
+   */
+  def zeroEquiv[T:Equiv:Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
+    (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a,b)
   }
 
   /** Same as v + v + v .. + v (i times in total)
