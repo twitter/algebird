@@ -95,4 +95,16 @@ object CollectionSpecification extends Properties("Collections") {
     MapAlgebra.dot(m1, m2) ==
       (m1.keySet ++ m2.keySet).toList.map { k => m1.getOrElse(k,0) * m2.getOrElse(k,0) }.sum
   }
+  property("MapAlgebra.toGraph is correct") = forAll { (l: Set[(Int,Int)]) =>
+    MapAlgebra.toGraph(l).toIterable.flatMap { case (k,sv) => sv.map { v => (k,v) } }.toSet == l
+  }
+  property("MapAlgebra.invert works") = forAll { (m : Map[Int,Int]) =>
+    val m2 = MapAlgebra.invert(m)
+    val m3 = Monoid.sum( for((v,ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
+    m3 == m
+  }
+  property("MapAlgebra.invertExact works") = forAll { (m : Map[Option[Int],Set[Int]]) =>
+    MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m
+  }
+
 }
