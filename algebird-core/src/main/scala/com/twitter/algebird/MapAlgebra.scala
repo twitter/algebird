@@ -94,6 +94,7 @@ object MapAlgebra {
   def toGraph[K,V](pairs: TraversableOnce[(K,V)]): Map[K, Set[V]] =
     Monoid.sum(pairs.map { case (k,v) => Map(k -> Set(v)) })
 
+  /** join the keys of two maps (similar to outer-join in a DB) */
   def join[K,V,W](map1: Map[K,V], map2: Map[K,W]): Map[K,(Option[V],Option[W])] =
     Monoid.plus(map1.mapValues { v => (List(v), List[W]()) },
       map2.mapValues { w => (List[V](), List(w)) })
