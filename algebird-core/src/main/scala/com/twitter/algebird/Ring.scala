@@ -62,6 +62,15 @@ object LongRing extends Ring[Long] {
   override def times(l : Long, r : Long) = l * r
 }
 
+object BigIntRing extends Ring[BigInt] {
+  override val zero = BigInt(0)
+  override val one = BigInt(1)
+  override def negate(v : BigInt) = -v
+  override def plus(l : BigInt, r : BigInt) = l + r
+  override def minus(l : BigInt, r : BigInt) = l - r
+  override def times(l : BigInt, r : BigInt) = l * r
+}
+
 object Ring extends GeneratedRingImplicits {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
@@ -85,6 +94,7 @@ object Ring extends GeneratedRingImplicits {
   implicit val shortRing : Ring[Short] = ShortRing
   implicit val jshortRing : Ring[JShort] = JShortRing
   implicit val longRing : Ring[Long] = LongRing
+  implicit val bigIntRing : Ring[BigInt] = BigIntRing
   implicit val jlongRing : Ring[JLong] = JLongRing
   implicit val floatRing : Ring[Float] = FloatField
   implicit val jfloatRing : Ring[JFloat] = JFloatField

@@ -45,7 +45,7 @@ trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
       None
     }
   }
-  @deprecated("Just use Monoid.sum")
+  // Override this if there is a more efficient means to implement this
   def sum(vs: TraversableOnce[T]): T = Monoid.sum(vs)(this)
 }
 
@@ -133,6 +133,19 @@ object Monoid extends GeneratedMonoidImplicits {
     def plus(l:T, r:T) = associativeFn(l,r)
   }
 
+  /** Same as v + v + v .. + v (i times in total)
+   * requires i >= 0, wish we had NonnegativeBigInt as a class
+   */
+  def intTimes[T](i: BigInt, v: T)(implicit mon: Monoid[T]): T = {
+    require(i >= 0, "Cannot do negative products with a Monoid, try Group.intTimes")
+    if (i == 0) {
+      mon.zero
+    }
+    else {
+      Semigroup.intTimes(i, v)(mon)
+    }
+  }
+
   implicit val nullMonoid : Monoid[Null] = NullGroup
   implicit val unitMonoid : Monoid[Unit] = UnitGroup
   implicit val boolMonoid : Monoid[Boolean] = BooleanField
@@ -141,6 +154,7 @@ object Monoid extends GeneratedMonoidImplicits {
   implicit val jintMonoid : Monoid[JInt] = JIntRing
   implicit val shortMonoid : Monoid[Short] = ShortRing
   implicit val jshortMonoid : Monoid[JShort] = JShortRing
+  implicit val bigIntMonoid : Monoid[BigInt] = BigIntRing
   implicit val longMonoid : Monoid[Long] = LongRing
   implicit val jlongMonoid : Monoid[JLong] = JLongRing
   implicit val floatMonoid : Monoid[Float] = FloatField

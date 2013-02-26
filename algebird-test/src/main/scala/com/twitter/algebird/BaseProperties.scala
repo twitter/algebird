@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Properties }
 import org.scalacheck.Prop.forAll
-
+import scala.math.Equiv
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
@@ -43,6 +43,17 @@ object BaseProperties {
     isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeSemigroupLaws[T : Semigroup : Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
 
+  def isNonZeroWorksMonoid[T:Monoid:Arbitrary:Equiv] = forAll { (a: T, b: T) =>
+    val aIsLikeZero = Equiv[T].equiv(Monoid.plus(a,b), b)
+    Monoid.isNonZero(a) || aIsLikeZero
+  }
+
+  def isNonZeroWorksRing[T:Ring:Arbitrary] = forAll { (a: T, b: T) =>
+    implicit val monT: Monoid[T] = implicitly[Ring[T]]
+    val prodZero = !monT.isNonZero(Ring.times(a,b))
+    (Monoid.isNonZero(a) && Monoid.isNonZero(b)) || prodZero
+  }
+
   def weakZero[T : Monoid : Arbitrary] = forAll { (a : T) =>
     val mon = implicitly[Monoid[T]]
     val zero = mon.zero
@@ -57,7 +68,7 @@ object BaseProperties {
   }
   def validZero[T : Monoid : Arbitrary] = validZeroEq[T](defaultEq _)
 
-  def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T]
+  def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T] && isNonZeroWorksMonoid[T]
   def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
     validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
   def commutativeMonoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
@@ -94,12 +105,14 @@ object BaseProperties {
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
   }
   def pseudoRingLaws[T:Ring:Arbitrary] =
-    isDistributive[T] && timesIsAssociative[T] && groupLaws[T] && isCommutative[T]
+    isDistributive[T] && timesIsAssociative[T] && groupLaws[T] && isCommutative[T] &&
+    isNonZeroWorksRing[T]
 
   def semiringLaws[T:Ring:Arbitrary] =
     isDistributive[T] && timesIsAssociative[T] &&
       validOne[T] && commutativeMonoidLaws[T] &&
-      zeroAnnihilates[T]
+      zeroAnnihilates[T] &&
+      isNonZeroWorksRing[T]
 
   def ringLaws[T : Ring : Arbitrary] = validOne[T] && pseudoRingLaws[T]
 
