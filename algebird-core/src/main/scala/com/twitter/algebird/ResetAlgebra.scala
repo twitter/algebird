@@ -35,7 +35,7 @@ class ResetStateMonoid[A](implicit monoid: Monoid[A]) extends Monoid[ResetState[
     (left, right) match {
       case (SetValue(l), SetValue(r)) => SetValue(monoid.plus(l, r))
       case (ResetValue(l), SetValue(r)) => ResetValue(monoid.plus(l, r))
-      case (_, ResetValue(r)) => ResetValue(r)
+      case (_, ResetValue(r)) => right
     }
   }
 }
