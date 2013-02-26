@@ -19,6 +19,7 @@ import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFlo
 import java.util.{List => JList, Map => JMap}
 
 import scala.annotation.implicitNotFound
+import scala.math.Equiv
 /**
  * Group: this is a monoid that also has subtraction (and negation):
  *   So, you can do (a-b), or -a (which is equal to 0 - a).
@@ -50,6 +51,19 @@ object Group extends GeneratedGroupImplicits {
   // This pattern is really useful for typeclasses
   def negate[T](x : T)(implicit grp : Group[T]) = grp.negate(x)
   def minus[T](l : T, r : T)(implicit grp : Group[T]) = grp.minus(l,r)
+  // nonZero and subtraction give an equiv, useful for Map[K,V]
+  def equiv[T](implicit grp: Group[T]): Equiv[T] = Equiv.fromFunction[T] { (a, b) =>
+    !grp.isNonZero(grp.minus(a, b))
+  }
+  /** Same as v + v + v .. + v (i times in total) */
+  def intTimes[T](i: BigInt, v: T)(implicit grp: Group[T]): T =
+    if(i < 0) {
+      Monoid.intTimes(-i, grp.negate(v))
+    }
+    else {
+      Monoid.intTimes(i, v)(grp)
+    }
+
 
   implicit val nullGroup : Group[Null] = NullGroup
   implicit val unitGroup : Group[Unit] = UnitGroup
@@ -60,6 +74,7 @@ object Group extends GeneratedGroupImplicits {
   implicit val shortGroup : Group[Short] = ShortRing
   implicit val jshortGroup : Group[JShort] = JShortRing
   implicit val longGroup : Group[Long] = LongRing
+  implicit val bigIntGroup : Group[BigInt] = BigIntRing
   implicit val jlongGroup : Group[JLong] = JLongRing
   implicit val floatGroup : Group[Float] = FloatField
   implicit val jfloatGroup : Group[JFloat] = JFloatField
