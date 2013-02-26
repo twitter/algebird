@@ -94,7 +94,12 @@ object MapAlgebra {
   def toGraph[K,V](pairs: TraversableOnce[(K,V)]): Map[K, Set[V]] =
     Monoid.sum(pairs.map { case (k,v) => Map(k -> Set(v)) })
 
-  /** Reverses a graph loselessly
+  def join[K,V,W](map1: Map[K,V], map2: Map[K,W]): Map[K,(Option[V],Option[W])] =
+    Monoid.plus(map1.mapValues { v => (List(v), List[W]()) },
+      map2.mapValues { w => (List[V](), List(w)) })
+      .mapValues { case (v,w) => (v.headOption, w.headOption) }
+
+  /** Reverses a graph losslessly
    * None key is for v's with no sources.
    * Note, that is all v's have sources, res(None) == Set[K]()
    */

@@ -106,5 +106,11 @@ object CollectionSpecification extends Properties("Collections") {
   property("MapAlgebra.invertExact works") = forAll { (m : Map[Option[Int],Set[Int]]) =>
     MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m
   }
+  property("MapAlgebra.join works") = forAll { (m1: Map[Int, Int], m2: Map[Int,Int]) =>
+    val m3 = MapAlgebra.join(m1, m2)
+    val m1after = m3.mapValues { vw => vw._1 }.filter { _._2.isDefined }.mapValues { _.get }
+    val m2after = m3.mapValues { vw => vw._2 }.filter { _._2.isDefined }.mapValues { _.get }
+    (m1after == m1) && (m2after == m2) && (m3.keySet == (m1.keySet | m2.keySet))
+  }
 
 }
