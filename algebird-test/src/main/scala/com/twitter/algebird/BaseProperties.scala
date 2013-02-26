@@ -44,7 +44,7 @@ object BaseProperties {
   def commutativeSemigroupLaws[T : Semigroup : Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
 
   def isNonZeroWorksMonoid[T:Monoid:Arbitrary:Equiv] = forAll { (a: T, b: T) =>
-    val aIsLikeZero = Equiv[T].equiv(Monoid.plus(a,b), b)
+    val aIsLikeZero = Monoid.zeroEquiv[T].equiv(Monoid.plus(a,b), b)
     Monoid.isNonZero(a) || aIsLikeZero
   }
 
