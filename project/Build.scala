@@ -15,6 +15,8 @@ object AlgebirdBuild extends Build {
       "releases"  at "http://oss.sonatype.org/content/repositories/releases"
     ),
 
+    javacOptions ++= Seq("-target 1.6 -source 1.6"),
+
     parallelExecution in Test := true,
 
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
@@ -82,7 +84,7 @@ object AlgebirdBuild extends Build {
     test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
-  )
+  ).dependsOn(algebirdHash)
 
   lazy val algebirdTest = Project(
     id = "algebird-test",
@@ -104,4 +106,12 @@ object AlgebirdBuild extends Build {
     name := "algebird-util",
     libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
+
+  lazy val algebirdHash = Project(
+    id = "algebird-hash",
+    base = file("algebird-hash"),
+    settings = sharedSettings
+  ).settings(
+    name := "algebird-hash"
+  )
 }
