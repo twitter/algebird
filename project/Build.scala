@@ -21,6 +21,8 @@ object AlgebirdBuild extends Build {
 
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
+    javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
+
     // Publishing options:
     publishMavenStyle := true,
 
