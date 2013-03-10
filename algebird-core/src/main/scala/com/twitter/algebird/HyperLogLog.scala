@@ -16,9 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.BitSet
+import com.twitter.algebird.hash.Murmur
 
 import java.nio.ByteBuffer
+
+import scala.collection.BitSet
 
 /** Implementation of the HyperLogLog approximate counting as a Monoid
  * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
@@ -29,7 +31,7 @@ import java.nio.ByteBuffer
 object HyperLogLog {
   def hash(input : Array[Byte]) : Array[Byte] = {
     val seed = 12345678
-    val (l0, l1) = MurmurHash128(seed)(input)
+    val (l0, l1) = Murmur.hash3(seed)(ByteBuffer.wrap(input))
     val buf = new Array[Byte](16)
     ByteBuffer
       .wrap(buf)

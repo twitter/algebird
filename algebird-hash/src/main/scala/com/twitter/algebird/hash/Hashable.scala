@@ -162,6 +162,13 @@ object Hashable extends LowPriorityHashable {
     }
     override def toString = "MD5"
   }
+  val MD5LongLong = new Hashable[Array[Byte], (Long,Long)] {
+    def apply(key: Array[Byte]) = {
+      val buffer = ByteBuffer.wrap(MD5(key))
+      (buffer.getLong, buffer.getLong)
+    }
+    override def toString = "MD5LongLong"
+  }
 
   /**
    * The default memcache hash algorithm is the ITU-T variant of CRC-32.

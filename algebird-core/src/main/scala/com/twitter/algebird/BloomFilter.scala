@@ -19,7 +19,11 @@ package com.twitter.algebird
 import scala.collection.immutable.BitSet
 import scala.collection.JavaConverters._
 
+import com.twitter.algebird.hash.Murmur
+
 import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
+
+import java.nio.ByteBuffer
 
 object RichCBitSet {
   def apply(x : Int*) = {
@@ -326,7 +330,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
       Stream.empty
     else{
       val d = if(digested.isEmpty){
-        val (a, b) = MurmurHash128(k)(bytes)
+        val (a, b) = Murmur.hash3(k)(ByteBuffer.wrap(bytes))
         val (x1, x2) = splitLong(a)
         val (x3, x4) = splitLong(b)
         Seq(x1, x2, x3, x4)

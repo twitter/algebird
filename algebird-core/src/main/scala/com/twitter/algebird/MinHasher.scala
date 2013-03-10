@@ -1,6 +1,8 @@
 package com.twitter.algebird
 
-import java.nio._
+import java.nio.ByteBuffer
+
+import com.twitter.algebird.hash.{Hashable, Murmur}
 
 /**
   * Instances of MinHasher can create, combine, and compare fixed-sized signatures of
@@ -14,7 +16,7 @@ import java.nio._
   * You can also use a combination of the above to estimate the size of the intersection of
   * two sets from their signatures.
   * The more bytes in the signature, the more accurate all of the above will be.
-  * 
+  *
   * You can also use these signatures to quickly find similar sets without doing
   * n^2 comparisons. Each signature is assigned to several buckets; sets whose signatures
   * end up in the same bucket are likely to be similar. The targetThreshold controls
@@ -27,6 +29,8 @@ import java.nio._
   *
   * This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
   * http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
+  *
+  * TODO: make a wrapper class, MinHashSignature, so this Monoid is not on a raw type (Array[Byte]).
 **/
 abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n : Numeric[H]) extends Monoid[Array[Byte]] {
   /** the number of bytes used for each hash in the signature */
@@ -44,10 +48,10 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   /** We always use a 128 bit hash function, so the number of hash functions is different
     * (and usually smaller) than the number of hashes in the signature.
   **/
-  val hashFunctions = {
+  val hashFunctions: Seq[Hashable[ByteBuffer, (Long,Long)]] = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}    
+    (1 to numHashFunctions).map{i => Murmur.hash3(r.nextLong)}
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
@@ -57,34 +61,54 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   def plus(left : Array[Byte], right : Array[Byte]) = {
     buildArray(left, right){(l,r) => n.min(l, r)}
   }
-  
+
   /** Esimate jaccard similarity (size of union / size of intersection) */
   def similarity(left : Array[Byte], right : Array[Byte]) = {
     val matching = buildArray(left,right){(l,r) => if(l == r) n.one else n.zero}
     matching.map{_.toDouble}.sum / numHashes
-  } 
+  }
 
-  /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
-  def buckets(sig : Array[Byte]) = {
+  /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing
+   *
+   * Check other signatures who collide in at least one bucket for high similarity
+   * Put another way: sigs: Iterable[MinHashSignature] =>
+   *   sigs.flatMap(s => buckets(s).map { (_, s)} )
+   *     .groupBy { _._1 }
+   *     .mapValues { candidates: Iterable[(Long, MinHashSignature)] =>
+   *       val sigs = candidates.view.map { _._2 }
+   *       for(c1 <- sigs;
+   *           c2 <- sigs;
+   *           if Ordering[MinHashSignature].lt(c1, c2)
+   *           if jaccardSimilarity(c1, c2) >= query)
+   *        yield (c1, c2)
+   *     }
+   *  But you probably want to do the above calculation in map-reduce
+   */
+  def buckets(sig : Array[Byte]): Seq[Long] = {
     sig.grouped(numRows*hashSize).toList.map{band =>
-      val (long1, long2) = hashFunctions.head(band)
+      val (long1, long2) = hashFunctions.head(ByteBuffer.wrap(band))
       long1
     }
   }
 
   /** Create a signature for a single Long value */
-  def init(value : Long) : Array[Byte] = init{_(value)}
+  def init(value : Long) : Array[Byte] = init {
+    val buf = ByteBuffer.allocate(8)
+    buf.putLong(value)
+    buf.rewind
+    buf
+  }
 
   /** Create a signature for a single String value */
-  def init(value : String) : Array[Byte]= init{_(value)}
+  def init(value : String) : Array[Byte]= init(ByteBuffer.wrap(value.getBytes))
 
   /** Create a signature for an arbitrary value */
-  def init(fn : MurmurHash128 => (Long,Long)) : Array[Byte] = {
+  def init(serialized: ByteBuffer) : Array[Byte] = {
     val bytes = new Array[Byte](numBytes)
     val buffer = ByteBuffer.allocate(hashFunctions.size * 16)
     val longBuffer = buffer.asLongBuffer
     hashFunctions.foreach{h =>
-      val (long1, long2) = fn(h)
+      val (long1, long2) = h(serialized)
       longBuffer.put(long1)
       longBuffer.put(long2)
     }
@@ -93,10 +117,20 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
     bytes
   }
 
-  /** useful for understanding the effects of numBands and numRows */
+  /** useful for understanding the effects of numBands and numRows
+   *
+   * For the LSH, the probability of becoming a candidate a sigmoid with max
+   * slope at this value of jaccard similarity,
+   * put another way, this is where d(probabilityOfInclusion(s))/ds is at its max
+   */
   val estimatedThreshold = math.pow(1.0/numBands, 1.0/numRows)
 
-  /** useful for understanding the effects of numBands and numRows */
+  /** useful for understanding the effects of numBands and numRows
+   *
+   * This is the probability that two MinHashSignature objects will end up in at least
+   * one of the same buckets for consideration GIVEN that their true similarity
+   * is sim
+   */
   def probabilityOfInclusion(sim : Double) = 1.0 - math.pow(1.0 - math.pow(sim, numRows), numBands)
 
   /** numerically solve the inverse of estimatedThreshold, given numBands*numRows */
@@ -119,10 +153,10 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
 }
 
 class MinHasher32(t : Double, n : Int) extends MinHasher[Int](t,n) {
-  def hashSize = 4  
+  def hashSize = 4
   def maxHash = Int.MaxValue
   def buildArray(fn: => Int) : Array[Byte] = {
-    val byteBuffer = ByteBuffer.allocate(numBytes)    
+    val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asIntBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
@@ -143,10 +177,10 @@ class MinHasher32(t : Double, n : Int) extends MinHasher[Int](t,n) {
 }
 
 class MinHasher16(t : Double, n : Int) extends MinHasher[Char](t,n) {
-  def hashSize = 2  
+  def hashSize = 2
   def maxHash = Char.MaxValue
   def buildArray(fn: => Char) : Array[Byte] = {
-    val byteBuffer = ByteBuffer.allocate(numBytes)    
+    val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asCharBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
