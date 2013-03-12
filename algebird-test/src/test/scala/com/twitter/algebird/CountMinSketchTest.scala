@@ -97,6 +97,13 @@ class CountMinSketchTest extends Specification {
       cms.frequency(0).estimate must be_==(0)
       cms.frequency(1).estimate must be_==(1)
       cms.frequency(2).estimate must be_==(2)
+
+      val three = CMS_MONOID.create(Seq(1L, 1L, 1L))
+      three.frequency(1L).estimate must be_==(3)
+      val four = CMS_MONOID.create(Seq(1L, 1L, 1L, 1L))
+      four.frequency(1L).estimate must be_==(4)
+      val cms2 = CMS_MONOID.plus(four, three)
+      cms2.frequency(1L).estimate must be_==(7)
     }
 
     "estimate inner products" in {
