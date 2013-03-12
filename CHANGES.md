@@ -1,5 +1,8 @@
 # Algebird #
 
+### Version 0.1.10 ###
+* Fix compiler flag issue
+
 ### Version 0.1.9 ###
 
 * Build `algebird` against scala 2.9.2 and 2.10.0
