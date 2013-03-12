@@ -377,6 +377,7 @@ case class CMSHash(a : Int, b : Int, width : Int) extends Function1[Long, Int] {
 /**
  * The 2-dimensional table of counters used in the Count-Min sketch.
  * Each row corresponds to a particular hash function.
+ * TODO: implement a dense matrix type, and use it here
  */
 case class CMSCountsTable(counts : Vector[Vector[Long]]) {
   assert(depth > 0, "Table must have at least 1 row.")
@@ -409,10 +410,14 @@ case class CMSCountsTable(counts : Vector[Vector[Long]]) {
    */
   def ++(other : CMSCountsTable) : CMSCountsTable = {
     assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
-
-    (0 to (depth - 1)).zip(0 to (width - 1)).foldLeft(this) {
-      case (table, pos) => table + (pos, other.getCount(pos))
+    val iil = Monoid.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
+    def toVector[V](is: IndexedSeq[V]): Vector[V] = {
+      is match {
+        case v: Vector[V] => v
+        case _ => Vector(is: _*)
+      }
     }
+    CMSCountsTable(toVector(iil.map { toVector(_) }))
   }
 }
 
