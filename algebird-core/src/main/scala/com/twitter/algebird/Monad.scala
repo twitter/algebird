@@ -36,12 +36,6 @@ trait Monad[M[_]] {
   //  flatMap(m)(apply _) == m
   // associativity on flatMap (you can either flatMap f first, or f to g:
   //  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
-  
-  def foldM[T,U](fn: (T,U) => M[T])(acc: T)(xs: GenTraversable[U]) : M[T] = 
-    if(xs.isEmpty) 
-      apply(acc)
-    else 
-      flatMap(fn(acc,xs.head)){t: T => foldM[T,U](fn)(t)(xs.tail)}
 }
 
 
@@ -56,8 +50,11 @@ object Monad {
   def apply[M[_]](implicit monad: Monad[M]): Monad[M] = monad
   def flatMap[M[_],T,U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) = monad.flatMap(m)(fn)
   def map[M[_],T,U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) = monad.map(m)(fn)
-  def foldM[M[_],T,U](fn: (T,U)=>M[T])(acc: T)(xs: GenTraversable[U])(implicit monad: Monad[M]) = 
-    monad.foldM(fn)(acc)(xs)
+  def foldM[M[_],T,U](acc: T, xs: GenTraversable[U])(fn: (T,U)=>M[T])(implicit monad: Monad[M]) : M[T] =
+    if(xs.isEmpty) 
+      monad.apply(acc)
+    else 
+      monad.flatMap(fn(acc,xs.head)){t: T => foldM(t, xs.tail)(fn)} 
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {
