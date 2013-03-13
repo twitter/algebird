@@ -2,6 +2,25 @@ package com.twitter.algebird
 
 import java.nio._
 
+object MinHasher {
+
+  /** numerically solve the inverse of estimatedThreshold, given numBands*numRows */
+  def pickBands(threshold : Double, hashes : Int) = {
+    val target = hashes * -1 * math.log(threshold)
+    var bands = 1
+    while(bands * math.log(bands) < target)
+      bands += 1
+    bands
+  }
+
+  def pickHashesAndBands(threshold : Double, maxHashes : Int) = {
+    val bands = pickBands(threshold, maxHashes)
+    val hashes = (maxHashes / bands) * bands
+    (hashes, bands)
+  }
+  
+}
+
 /**
   * Instances of MinHasher can create, combine, and compare fixed-sized signatures of
   * arbitrarily sized sets.
@@ -28,50 +47,47 @@ import java.nio._
   * This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
   * http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
 **/
-abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n : Numeric[H]) extends Monoid[Array[Byte]] {
+abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n : Numeric[H]) extends Monoid[Array[Byte]] {
+
   /** the number of bytes used for each hash in the signature */
   def hashSize : Int
 
   /** For explanation of the "bands" and "rows" see Ullman and Rajaraman */
-  val numBands = pickBands(targetThreshold, maxBytes / hashSize)
-  val numRows = maxBytes / numBands / hashSize
-  val numHashes = numRows * numBands
   val numBytes = numHashes * hashSize
+  val numRows = numHashes / numBands
 
   /** This seed could be anything */
-  val seed = 123456789
+  private val seed = 123456789
 
   /** We always use a 128 bit hash function, so the number of hash functions is different
     * (and usually smaller) than the number of hashes in the signature.
   **/
-  val hashFunctions = {
+  private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
     (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}    
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
-  val zero = buildArray{maxHash}
+  val zero : Array[Byte] = buildArray{maxHash}
 
   /** Set union */
-  def plus(left : Array[Byte], right : Array[Byte]) = {
-    buildArray(left, right){(l,r) => n.min(l, r)}
+  def plus(left : Array[Byte], right : Array[Byte]) : Array[Byte] =
+    buildArray(left, right){(l, r) => n.min(l, r)
   }
   
   /** Esimate jaccard similarity (size of union / size of intersection) */
-  def similarity(left : Array[Byte], right : Array[Byte]) = {
-    val matching = buildArray(left,right){(l,r) => if(l == r) n.one else n.zero}
-    matching.map{_.toDouble}.sum / numHashes
-  } 
+  def similarity(left : Array[Byte], right : Array[Byte]) : Double =
+    buildArray(left,right){(l,r) => if(l == r) n.one else n.zero}
+      .map{_.toDouble}.sum / numHashes
 
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
-  def buckets(sig : Array[Byte]) = {
-    sig.grouped(numRows*hashSize).toList.map{band =>
-      val (long1, long2) = hashFunctions.head(band)
-      long1
-    }
-  }
-
+  def buckets(sig : Array[Byte]) : List[Long] =
+    sig.grouped(numRows * hashSize)
+      .filter{_.size == numRows * hashSize}
+      .map{hashFunctions.head(_)._1}
+      .toList
+  
   /** Create a signature for a single Long value */
   def init(value : Long) : Array[Byte] = init{_(value)}
 
@@ -99,15 +115,6 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   /** useful for understanding the effects of numBands and numRows */
   def probabilityOfInclusion(sim : Double) = 1.0 - math.pow(1.0 - math.pow(sim, numRows), numBands)
 
-  /** numerically solve the inverse of estimatedThreshold, given numBands*numRows */
-  def pickBands(threshold : Double, hashes : Int) = {
-    val target = hashes * -1 * math.log(threshold)
-    var bands = 1
-    while(bands * math.log(bands) < target)
-      bands += 1
-    bands
-  }
-
   /** Maximum value the hash can take on (not 2*hashSize because of signed types) */
   def maxHash : H
 
@@ -115,12 +122,19 @@ abstract class MinHasher[H](targetThreshold : Double, maxBytes : Int)(implicit n
   def buildArray(fn: => H) : Array[Byte]
 
   /** Decode two signatures into hash values, combine them somehow, and produce a new array */
-  def buildArray(left : Array[Byte], right : Array[Byte])(fn: (H,H) => H) : Array[Byte]
+  def buildArray(left : Array[Byte], right : Array[Byte])(fn: (H, H) => H) : Array[Byte]
 }
 
-class MinHasher32(t : Double, n : Int) extends MinHasher[Int](t,n) {
+class MinHasher32(numHashes : Int, numBands : Int) extends MinHasher[Int](numHashes, numBands) {
+
+  private def this(x : (Int, Int)) = this(x._1, x._2)
+
+  def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 4))
+
   def hashSize = 4  
+
   def maxHash = Int.MaxValue
+
   def buildArray(fn: => Int) : Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)    
     val writeBuffer = byteBuffer.asIntBuffer
@@ -142,9 +156,16 @@ class MinHasher32(t : Double, n : Int) extends MinHasher[Int](t,n) {
   }
 }
 
-class MinHasher16(t : Double, n : Int) extends MinHasher[Char](t,n) {
+class MinHasher16(numHashes : Int, numBands : Int) extends MinHasher[Char](numHashes, numBands) {
+
+  private def this(x : (Int, Int)) = this(x._1, x._2)
+
+  def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 2))
+
   def hashSize = 2  
+
   def maxHash = Char.MaxValue
+
   def buildArray(fn: => Char) : Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)    
     val writeBuffer = byteBuffer.asCharBuffer
