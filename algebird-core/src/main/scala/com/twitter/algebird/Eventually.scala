@@ -48,7 +48,7 @@ class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
 
   def conditionallyConvert(r: R) = {
     if (mustConvert(r)) {
-      Left(convert(r))
+      left(convert(r))
     } else {
       Right(r)
     }
@@ -73,12 +73,12 @@ class EventuallyGroup[L,R](convert: R => L)(mustConvert: R => Boolean)
 
   override def negate(x: Either[L,R]) = {
     x match {
-      case Left(xl) => Left(Group.negate(xl))
+      case Left(xl) => left(Group.negate(xl))
       case Right(xr) => Right(Group.negate(xr))
     }
   }
 
-  override def left(l: L) = if (l.equals(Monoid.zero[L])) zero else Left(l)
+  override def left(l: L) = if (Monoid.isNonZero(l)) Left(l) else zero
 
 }
 
@@ -91,11 +91,11 @@ class EventuallyRing[L,R](convert: R => L)(mustConvert: R => Boolean)
   override def times(x: Either[L,R], y: Either[L,R]) = {
     x match {
       case Left(xl) => y match {
-        case Left(yl) => Left(Ring.times(xl, yl))
-        case Right(yr) => Left(Ring.times(xl, convert(yr)))
+        case Left(yl) => left(Ring.times(xl, yl))
+        case Right(yr) => left(Ring.times(xl, convert(yr)))
       }
       case Right(xr) => y match {
-        case Left(yl) => Left(Ring.times(convert(xr), yl))
+        case Left(yl) => left(Ring.times(convert(xr), yl))
         case Right(yr) => conditionallyConvert(Ring.times(xr, yr))
       }
     }
