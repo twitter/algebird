@@ -68,6 +68,8 @@ object CollectionSpecification extends Properties("Collections") {
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
   property("IndexedSeq (of a Semigroup) is a semigroup") = semigroupLaws[IndexedSeq[Max[Int]]]
+  // TODO: this test fails sometimes due to the equiv not doing the right thing.
+  // Fix by defining and Equiv and having all the properties use an implicit Equiv
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
   property("Either is a Monoid") = monoidLaws[Either[String,Int]]
