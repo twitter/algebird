@@ -71,6 +71,8 @@ object CollectionSpecification extends Properties("Collections") {
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
   property("IndexedSeq (of a Semigroup) is a semigroup") = semigroupLaws[IndexedSeq[Max[Int]]]
+  // TODO: this test fails sometimes due to the equiv not doing the right thing.
+  // Fix by defining and Equiv and having all the properties use an implicit Equiv
   property("IndexedSeq is a pseudoRing") = pseudoRingLaws[IndexedSeq[Int]]
 
   property("Either is a Monoid") = monoidLaws[Either[String,Int]]
@@ -115,5 +117,17 @@ object CollectionSpecification extends Properties("Collections") {
     val m2after = m3.mapValues { vw => vw._2 }.filter { _._2.isDefined }.mapValues { _.get }
     (m1after == m1) && (m2after == m2) && (m3.keySet == (m1.keySet | m2.keySet))
   }
+
+  implicit def arbAV[T:Arbitrary:Monoid] : Arbitrary[AdaptiveVector[T]] =
+    Arbitrary {
+      Arbitrary.arbitrary[List[T]]
+        .map { l =>
+        AdaptiveVector.fromVector(Vector(l :_*), Monoid.zero[T])
+      }
+    }
+  property("AdaptiveVector[Int] has a semigroup") = semigroupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  property("AdaptiveVector[Int] has a monoid") = monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  property("AdaptiveVector[Int] has a group") = groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  property("AdaptiveVector[String] has a monoid") = monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
 
 }
