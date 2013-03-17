@@ -15,6 +15,9 @@ object CollectionSpecification extends Properties("Collections") {
 
   property("MinSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Min[Int]]
   property("MaxSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Max[Int]]
+  property("Min[Int] is a monoid") = monoidLaws[Min[Int]]
+  property("Max[String] is a monoid") = monoidLaws[Max[String]]
+  property("Max[List[Int]] is a monoid") = monoidLaws[Max[List[Int]]]
 
   property("Either is a Semigroup") = semigroupLaws[Either[String,Int]]
   property("Either is a Semigroup, with a Right non-monoid semigroup") = semigroupLaws[Either[String,Max[Int]]]
