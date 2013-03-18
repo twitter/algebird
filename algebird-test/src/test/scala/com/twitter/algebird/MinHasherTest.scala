@@ -15,10 +15,10 @@ object MinHasherTest extends Properties("MinHasher") {
   implicit val mhMonoid = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary { for(
       v <- choose(0,10000)
-    ) yield (mhMonoid.init(v))
+    ) yield (MinHashSignature(mhMonoid.init(v)))
   }
 
-  property("MinHasher is a Monoid") = monoidLawsEq[Array[Byte]]{(a,b) => a.toList == b.toList}
+  property("MinHasher is a Monoid") = monoidLawsEq[MinHashSignature]{(a,b) => a.bytes.toList == b.bytes.toList}
 }
 
 class MinHasherTest extends Specification {

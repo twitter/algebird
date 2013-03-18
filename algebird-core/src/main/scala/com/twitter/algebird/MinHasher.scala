@@ -2,6 +2,13 @@ package com.twitter.algebird
 
 import java.nio._
 
+/**
+ * MinHasher as a Monoid operates on this class to avoid the too generic Array[Byte].
+ * The bytes are assumed to be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is
+ * because a ByteBuffer is used internally in MinHasher and it can wrap Array[Byte].
+ */
+case class MinHashSignature(bytes: Array[Byte])
+
 object MinHasher {
 
   /** numerically solve the inverse of estimatedThreshold, given numBands*numRows */
@@ -47,7 +54,7 @@ object MinHasher {
   * This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
   * http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
 **/
-abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n : Numeric[H]) extends Monoid[Array[Byte]] {
+abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n : Numeric[H]) extends Monoid[MinHashSignature] {
 
   /** the number of bytes used for each hash in the signature */
   def hashSize : Int
@@ -69,12 +76,15 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
-  val zero : Array[Byte] = buildArray{maxHash}
+  val zero : MinHashSignature = MinHashSignature(buildArray{maxHash})
 
   /** Set union */
   def plus(left : Array[Byte], right : Array[Byte]) : Array[Byte] =
     buildArray(left, right){(l, r) => n.min(l, r)
   }
+
+  def plus(left : MinHashSignature, right : MinHashSignature) : MinHashSignature =
+    MinHashSignature(plus(left.bytes, right.bytes))
   
   /** Esimate jaccard similarity (size of union / size of intersection) */
   def similarity(left : Array[Byte], right : Array[Byte]) : Double =
@@ -119,10 +129,10 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   def maxHash : H
 
   /** Initialize a byte array by generating hash values */
-  def buildArray(fn: => H) : Array[Byte]
+  protected def buildArray(fn: => H) : Array[Byte]
 
   /** Decode two signatures into hash values, combine them somehow, and produce a new array */
-  def buildArray(left : Array[Byte], right : Array[Byte])(fn: (H, H) => H) : Array[Byte]
+  protected def buildArray(left : Array[Byte], right : Array[Byte])(fn: (H, H) => H) : Array[Byte]
 }
 
 class MinHasher32(numHashes : Int, numBands : Int) extends MinHasher[Int](numHashes, numBands) {
@@ -131,18 +141,18 @@ class MinHasher32(numHashes : Int, numBands : Int) extends MinHasher[Int](numHas
 
   def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 4))
 
-  def hashSize = 4  
+  override def hashSize = 4  
 
-  def maxHash = Int.MaxValue
+  override def maxHash = Int.MaxValue
 
-  def buildArray(fn: => Int) : Array[Byte] = {
+  override protected def buildArray(fn: => Int) : Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)    
     val writeBuffer = byteBuffer.asIntBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
   }
 
-  def buildArray(left : Array[Byte], right : Array[Byte])(fn: (Int,Int) => Int) : Array[Byte] = {
+  override protected def buildArray(left : Array[Byte], right : Array[Byte])(fn: (Int,Int) => Int) : Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asIntBuffer
     val rightBuffer = ByteBuffer.wrap(right).asIntBuffer
     buildArray{fn(leftBuffer.get, rightBuffer.get)}
@@ -162,18 +172,18 @@ class MinHasher16(numHashes : Int, numBands : Int) extends MinHasher[Char](numHa
 
   def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 2))
 
-  def hashSize = 2  
+  override def hashSize = 2  
 
-  def maxHash = Char.MaxValue
+  override def maxHash = Char.MaxValue
 
-  def buildArray(fn: => Char) : Array[Byte] = {
+  override protected def buildArray(fn: => Char) : Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)    
     val writeBuffer = byteBuffer.asCharBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
   }
 
-  def buildArray(left : Array[Byte], right : Array[Byte])(fn: (Char,Char) => Char) : Array[Byte] = {
+  override protected def buildArray(left : Array[Byte], right : Array[Byte])(fn: (Char,Char) => Char) : Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asCharBuffer
     val rightBuffer = ByteBuffer.wrap(right).asCharBuffer
     buildArray{fn(leftBuffer.get, rightBuffer.get)}
