@@ -3,6 +3,8 @@ package algebird
 import sbt._
 import Keys._
 import sbtgitflow.ReleasePlugin._
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
@@ -64,7 +66,7 @@ object AlgebirdBuild extends Build {
           <url>http://twitter.com/sritchie</url>
         </developer>
       </developers>)
-  )
+  ) ++ mimaDefaultSettings
 
   lazy val algebird = Project(
     id = "algebird",
@@ -85,6 +87,7 @@ object AlgebirdBuild extends Build {
   ).settings(
     test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
+    previousArtifact := Some("com.twitter" % "algebird-core_2.9.2" % "0.1.11"),
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
   )
 
@@ -94,6 +97,7 @@ object AlgebirdBuild extends Build {
     settings = sharedSettings
   ).settings(
     name := "algebird-test",
+    previousArtifact := Some("com.twitter" % "algebird-test_2.9.2" % "0.1.11"),
     libraryDependencies ++= Seq(
       "org.scalacheck" %% "scalacheck" % "1.10.0",
       "org.scala-tools.testing" %% "specs" % "1.6.9"
@@ -106,6 +110,7 @@ object AlgebirdBuild extends Build {
     settings = sharedSettings
   ).settings(
     name := "algebird-util",
+    previousArtifact := Some("com.twitter" % "algebird-util_2.9.2" % "0.1.11"),
     libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
 }
