@@ -68,6 +68,10 @@ object AlgebirdBuild extends Build {
       </developers>)
   ) ++ mimaDefaultSettings
 
+  // This returns the youngest jar we released that is compatible with the current
+  def youngestForwardCompatible(subProj: String) =
+    Some("com.twitter" % ("algebird-" + subProj + "_2.9.2") % "0.1.11")
+
   lazy val algebird = Project(
     id = "algebird",
     base = file("."),
@@ -87,7 +91,7 @@ object AlgebirdBuild extends Build {
   ).settings(
     test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
-    previousArtifact := Some("com.twitter" % "algebird-core_2.9.2" % "0.1.11"),
+    previousArtifact := youngestForwardCompatible("core"),
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
   )
 
@@ -97,7 +101,7 @@ object AlgebirdBuild extends Build {
     settings = sharedSettings
   ).settings(
     name := "algebird-test",
-    previousArtifact := Some("com.twitter" % "algebird-test_2.9.2" % "0.1.11"),
+    previousArtifact := youngestForwardCompatible("test"),
     libraryDependencies ++= Seq(
       "org.scalacheck" %% "scalacheck" % "1.10.0",
       "org.scala-tools.testing" %% "specs" % "1.6.9"
@@ -110,7 +114,7 @@ object AlgebirdBuild extends Build {
     settings = sharedSettings
   ).settings(
     name := "algebird-util",
-    previousArtifact := Some("com.twitter" % "algebird-util_2.9.2" % "0.1.11"),
+    previousArtifact := youngestForwardCompatible("util"),
     libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
 }
