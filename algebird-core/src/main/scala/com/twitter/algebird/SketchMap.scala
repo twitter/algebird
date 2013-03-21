@@ -51,7 +51,7 @@ extends Monoid[SketchMap[K, V]] {
   /**
    * All Sketch Maps created with this monoid will have the same parameter configuration.
    */
-  val params: SketchMapParams[K, V] = SketchMapParams[K, V](hashes, width, depth, heavyHittersCount)
+  val params: SketchMapParams[K] = SketchMapParams[K](hashes, width, depth, heavyHittersCount)
 
   /**
    * A zero Sketch Map is one with zero elements.
@@ -82,13 +82,13 @@ extends Monoid[SketchMap[K, V]] {
 /**
  * Convenience class for holding constant parameters of a Sketch Map.
  */
-case class SketchMapParams[K, V](hashes: Seq[K => Int], width: Int, depth: Int, heavyHittersCount: Int) {
+case class SketchMapParams[K](hashes: Seq[K => Int], width: Int, depth: Int, heavyHittersCount: Int) {
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
   assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
 
-  val eps = SketchMap.eps(width)
-  val delta = SketchMap.delta(depth)
+  def eps = SketchMap.eps(width)
+  def delta = SketchMap.delta(depth)
 }
 
 
@@ -131,7 +131,7 @@ object SketchMap {
 }
 
 case class SketchMap[K, V](
-  val params: SketchMapParams[K, V],
+  val params: SketchMapParams[K],
   val valuesTable: AdaptiveMatrix[V],
   val heavyHitterKeys: List[K],
   val totalValue: V
@@ -170,7 +170,7 @@ case class SketchMap[K, V](
    * Calculates the frequency for a key given a values table.
    */
   private def frequency(key: K, table: AdaptiveMatrix[V]): V = {
-    val estimates = table.contents.zipWithIndex.map { case (row, i) =>
+    val estimates = table.rowsByColumns.zipWithIndex.map { case (row, i) =>
       row(params.hashes(i)(key))
     }
 

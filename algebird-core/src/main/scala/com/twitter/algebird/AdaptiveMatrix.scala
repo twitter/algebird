@@ -37,20 +37,21 @@ object AdaptiveMatrix {
 
     override def zero: AdaptiveMatrix[V] = AdaptiveMatrix[V](matrixMonoid.zero)
     override def plus(left: AdaptiveMatrix[V], right: AdaptiveMatrix[V]): AdaptiveMatrix[V] = {
-      AdaptiveMatrix[V](matrixMonoid.plus(left.contents, right.contents))
+      AdaptiveMatrix[V](matrixMonoid.plus(left.rowsByColumns, right.rowsByColumns))
     }
   }
 }
 
-case class AdaptiveMatrix[V](contents: AdaptiveVector[AdaptiveVector[V]]) {
-  def rows: Int = contents.size
-  def columns: Int = contents(0).size
+case class AdaptiveMatrix[V](rowsByColumns: AdaptiveVector[AdaptiveVector[V]]) {
+  /** Rows are the outer vectors, and columns are the inner vectors. */
+  def rows: Int = rowsByColumns.size
+  def columns: Int = rowsByColumns(0).size
 
-  def getValue(position: (Int, Int)): V = contents(position._1)(position._2)
+  def getValue(position: (Int, Int)): V = rowsByColumns(position._1)(position._2)
 
   def updated(position: (Int, Int), value: V): AdaptiveMatrix[V] = {
     val (row, col) = position
-    AdaptiveMatrix[V](contents.updated(row, contents(row).updated(col, value)))
+    AdaptiveMatrix[V](rowsByColumns.updated(row, rowsByColumns(row).updated(col, value)))
   }
 }
 
