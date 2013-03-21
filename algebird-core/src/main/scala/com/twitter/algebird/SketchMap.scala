@@ -272,7 +272,9 @@ case class SketchMapValuesTable[V](values: AdaptiveVector[AdaptiveVector[V]])(im
   def ++(other: SketchMapValuesTable[V]): SketchMapValuesTable[V] = {
     assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
 
-    val result = Monoid.plus(values, other.values)
+    implicit val innerMonoid: Monoid[AdaptiveVector[V]] = AdaptiveVector.monoid[V]
+    val vectorMonoid: Monoid[AdaptiveVector[AdaptiveVector[V]]] = AdaptiveVector.monoid[AdaptiveVector[V]]
+    val result = vectorMonoid.plus(values, other.values)
 
     SketchMapValuesTable[V](result)
   }
