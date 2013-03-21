@@ -22,26 +22,36 @@ package com.twitter.algebird
  * Sketch Map can approximate the sums of any summable value that has a monoid.
  */
 
+
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
+class SketchMapMonoid[K, V](width: Int, depth: Int, seed: Int, heavyHittersCount: Int)
                            (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V])
 extends Monoid[SketchMap[K, V]] {
+  /**
+   * Hashes an arbitrary key type to one that the Sketch Map can use.
+   */
+  private case class SketchMapHash(hasher: CMSHash, seed: Int) extends Function1[K, Int] {
+    def apply(obj: K): Int = {
+      val (first, second) = MurmurHash128(seed)(serialization(obj))
+      hasher(first ^ second)
+    }
+  }
 
   val hashes: Seq[K => Int] = {
     val r = new scala.util.Random(seed)
-    val numHashes = SketchMap.depth(delta)
-    val numCounters = SketchMap.width(eps)
+    val numHashes = depth
+    val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
-      SketchMapHash[K](CMSHash(r.nextInt, 0, numCounters), seed)
+      SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)
     }
   }
 
   /**
    * All Sketch Maps created with this monoid will have the same parameter configuration.
    */
-  val params: SketchMapParams[K, V] = SketchMapParams[K, V](hashes, SketchMap.width(eps), SketchMap.depth(delta), heavyHittersCount)
+  val params: SketchMapParams[K, V] = SketchMapParams[K, V](hashes, width, depth, heavyHittersCount)
 
   /**
    * A zero Sketch Map is one with zero elements.
@@ -69,26 +79,16 @@ extends Monoid[SketchMap[K, V]] {
 }
 
 
-object SketchMap {
-  /**
-   * Functions to translate between (eps, delta) and (depth, width). The translation is:
-   * depth = ceil(ln 1/delta)
-   * width = ceil(e / eps)
-   */
-  def eps(width: Int): Double = scala.math.exp(1.0) / width
-  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
-  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
-  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
+/**
+ * Convenience class for holding constant parameters of a Sketch Map.
+ */
+case class SketchMapParams[K, V](hashes: Seq[K => Int], width: Int, depth: Int, heavyHittersCount: Int) {
+  assert(0 < width, "width must be greater than 0")
+  assert(0 < depth, "depth must be greater than 0")
+  assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
 
-  /**
-   * Generates a monoid used to create SketchMap instances. Requires a
-   * serialization from K to Array[Byte] for hashing, an ordering for V, and a
-   * monoid for V.
-   */
-  def monoid[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
-                  (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
-    new SketchMapMonoid(eps, delta, seed, heavyHittersCount)(serialization, valueOrdering, monoid)
-  }
+  val eps = SketchMap.eps(width)
+  val delta = SketchMap.delta(depth)
 }
 
 
@@ -107,6 +107,29 @@ object SketchMap {
  *
  * Use SketchMapMonoid to create instances of this class.
  */
+
+object SketchMap {
+  /**
+   * Functions to translate between (eps, delta) and (depth, width). The translation is:
+   * depth = ceil(ln 1/delta)
+   * width = ceil(e / eps)
+   */
+  def eps(width: Int): Double = scala.math.exp(1.0) / width
+  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
+  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
+
+  /**
+   * Generates a monoid used to create SketchMap instances. Requires a
+   * serialization from K to Array[Byte] for hashing, an ordering for V, and a
+   * monoid for V.
+   */
+  def monoid[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
+                  (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
+    new SketchMapMonoid(width(eps), depth(delta), seed, heavyHittersCount)(serialization, valueOrdering, monoid)
+  }
+}
+
 case class SketchMap[K, V](
   val params: SketchMapParams[K, V],
   val valuesTable: AdaptiveMatrix[V],
@@ -125,6 +148,9 @@ case class SketchMap[K, V](
    */
   private implicit val keyValueOrdering: Ordering[K] = Ordering.by[K, V] { heavyHittersMapping(_) } reverse
 
+  /**
+   * These are not 100% accurate because of rounding.
+   */
   def eps: Double = params.eps
   def delta: Double = params.delta
 
@@ -196,34 +222,6 @@ case class SketchMap[K, V](
     val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
 
     hitters.sorted(specificOrdering).take(params.heavyHittersCount).toList
-  }
-}
-
-
-/**
- * Convenience class for holding constant parameters of a Sketch Map.
- */
-case class SketchMapParams[K, V](hashes: Seq[K => Int], width: Int, depth: Int, heavyHittersCount: Int) {
-  assert(0 < width, "width must be greater than 0")
-  assert(0 < depth, "depth must be greater than 0")
-  assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
-
-  val eps = SketchMap.eps(width)
-  val delta = SketchMap.delta(depth)
-}
-
-
-/**
- * Hashes an arbitrary key type to one that the Sketch Map can use.
- */
-case class SketchMapHash[T](hasher: CMSHash, seed: Int)
-                           (implicit serialization: T => Array[Byte]) extends Function1[T, Int] {
-  def apply(obj: T): Int = {
-    val hashKey: Long = MurmurHash128(seed)(serialization(obj)) match {
-      case (first: Long, second: Long) => (first ^ second)
-    }
-
-    hasher(hashKey)
   }
 }
 
