@@ -85,10 +85,10 @@ class SketchMapTest extends Specification {
     "exactly compute heavy hitters in a small stream" in {
       val data = Seq((1, 1L), (2, 2L), (3, 3L), (4, 4L), (5, 5L))
 
-      val sm1 = (SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 5)).create(data)
-      val sm2 = (SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 3)).create(data)
-      val sm3 = (SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 1)).create(data)
-      val sm4 = (SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 0)).create(data)
+      val sm1 = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 5).create(data)
+      val sm2 = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 3).create(data)
+      val sm3 = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 1).create(data)
+      val sm4 = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 0).create(data)
 
       sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
       sm2.heavyHitterKeys must be_==(List(5, 4, 3))
