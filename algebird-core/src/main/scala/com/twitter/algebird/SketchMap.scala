@@ -138,6 +138,12 @@ case class SketchMap[K, V](
 )(implicit ordering: Ordering[V], monoid: Monoid[V]) extends java.io.Serializable {
 
   /**
+   * Redefine the AdaptiveMatrix Monoid so it takes the implicit Monoid from
+   * the SketchMap.
+   */
+  private implicit val valuesTableMonoid: Monoid[AdaptiveMatrix[V]] = AdaptiveMatrix.monoid[V]
+
+  /**
    * All of the Heavy Hitter frequencies calculated all at once.
    */
   private val heavyHittersMapping: Map[K, V] = calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
