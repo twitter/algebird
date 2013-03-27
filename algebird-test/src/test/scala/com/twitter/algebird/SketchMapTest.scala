@@ -95,5 +95,40 @@ class SketchMapTest extends Specification {
       sm3.heavyHitterKeys must be_==(List(5))
       sm4.heavyHitterKeys must be_==(List.empty[Int])
     }
+
+    "use custom monoid" in {
+      // Monoid that takes the smaller number.
+      val smallerMonoid: Monoid[Long] = new Monoid[Long] {
+        override def zero: Long = Long.MaxValue
+        override def plus(first: Long, second: Long): Long = {
+          if (first < second) {
+            first
+          } else {
+            second
+          }
+        }
+      }
+
+      // Ordering that orders from biggest to smallest (so that HeavyHitters
+      // are the smallest numbers).
+      val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
+
+      val monoid = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, 5)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
+
+      val sm1 = monoid.create((100, 10L))
+      sm1.heavyHitters must be_==(List((100, 10L)))
+
+      // Summing should yield the smaller number, via smallerMonoid.
+      val sm2 = monoid.plus(sm1, monoid.create((100, 5L)))
+      sm2.heavyHitters must be_==(List((100, 5L)))
+
+      // Summing a bigger number should not affect the data structure.
+      val sm3 = monoid.plus(sm2, monoid.create((100, 100L)))
+      sm3.heavyHitters must be_==(List((100, 5L)))
+
+      // Try more than one at a time.
+      val sm4 = monoid.plus(sm3, monoid.create(Seq((100, 100L), (200, 30L), (200, 20L), (200, 10L))))
+      sm4.heavyHitters must be_==(List((100, 5L), (200, 10L)))
+    }
   }
 }
