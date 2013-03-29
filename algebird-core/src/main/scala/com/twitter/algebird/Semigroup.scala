@@ -63,7 +63,7 @@ class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semi
   }
 }
 
-object Semigroup extends GeneratedSemigroupImplicits {
+object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   // This pattern is really useful for typeclasses
   def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
   // Left sum: (((a + b) + c) + d)
