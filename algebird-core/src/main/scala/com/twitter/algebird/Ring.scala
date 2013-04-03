@@ -71,7 +71,7 @@ object BigIntRing extends Ring[BigInt] {
   override def times(l : BigInt, r : BigInt) = l * r
 }
 
-object Ring extends GeneratedRingImplicits {
+object Ring extends GeneratedRingImplicits with ProductRings {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng : Ring[T]) = rng.one
   def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
