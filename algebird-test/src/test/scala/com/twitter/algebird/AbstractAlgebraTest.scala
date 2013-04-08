@@ -1,8 +1,12 @@
 package com.twitter.algebird
 
 import org.specs._
+import com.twitter.algebird.BaseProperties._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import scala.Some
 
-class AbstractAlgebraTest extends Specification {
+class AbstractAlgebraTest extends Specification with ScalaCheck {
   noDetailedDiffs()
   "A Monoid should be able to sum" in {
     val monoid = implicitly[Monoid[Int]]
@@ -61,4 +65,18 @@ class AbstractAlgebraTest extends Specification {
     Semigroup.plus(leftBase, right) must_== sumBase ++ remainder
   }
 
+
+  "a user-defined product monoid should work" in {
+
+    case class Metrics(count: Int, largestValue: Option[Max[Int]])
+    implicit val MetricsMonoid = Monoid(Metrics.apply _, Metrics.unapply _)
+    implicit val metricsGen = Arbitrary {
+        for {
+          count <- Gen.choose(0,10000)
+          largest <- Gen.oneOf(None, Gen.choose(1, 100).map(n => Some(Max(n))))
+        } yield Metrics(count, largest)
+      }
+
+    commutativeMonoidLaws[Metrics] must pass
+  }
 }

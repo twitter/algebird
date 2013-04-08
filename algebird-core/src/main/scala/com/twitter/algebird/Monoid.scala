@@ -115,7 +115,7 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   }
 }
 
-object Monoid extends GeneratedMonoidImplicits {
+object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples

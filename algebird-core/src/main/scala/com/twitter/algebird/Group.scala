@@ -47,7 +47,7 @@ object UnitGroup extends ConstantGroup[Unit](())
 // similar to the above:
 object NullGroup extends ConstantGroup[Null](null)
 
-object Group extends GeneratedGroupImplicits {
+object Group extends GeneratedGroupImplicits with ProductGroups {
   // This pattern is really useful for typeclasses
   def negate[T](x : T)(implicit grp : Group[T]) = grp.negate(x)
   def minus[T](l : T, r : T)(implicit grp : Group[T]) = grp.minus(l,r)
