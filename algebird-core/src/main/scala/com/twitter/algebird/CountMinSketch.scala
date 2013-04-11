@@ -413,7 +413,7 @@ case class CMSCountsTable(counts : Vector[Vector[Long]]) {
     val iil = Monoid.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
     def toVector[V](is: IndexedSeq[V]): Vector[V] = {
       is match {
-        case v: Vector[V] => v
+        case v: Vector[_] => v
         case _ => Vector(is: _*)
       }
     }

@@ -18,7 +18,8 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
-import scala.annotation.implicitNotFound
+import scala.collection.mutable.{Map => MMap}
+import scala.annotation.{implicitNotFound, tailrec}
 
 /**
  * Semigroup:
@@ -62,7 +63,7 @@ class EitherSemigroup[L,R](implicit semigroupl : Semigroup[L], semigroupr : Semi
   }
 }
 
-object Semigroup extends GeneratedSemigroupImplicits {
+object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   // This pattern is really useful for typeclasses
   def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
   // Left sum: (((a + b) + c) + d)
@@ -70,6 +71,57 @@ object Semigroup extends GeneratedSemigroupImplicits {
     iter.reduceLeftOption { sg.plus(_,_) }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
+
+  /** Same as v + v + v .. + v (i times in total)
+   * requires i > 0, wish we had PositiveBigInt as a class
+   */
+  def intTimes[T](i: BigInt, v: T)(implicit sg: Semigroup[T]): T = {
+    require(i > 0, "Cannot do non-positive products with a Semigroup, try Monoid/Group.intTimes")
+    intTimesRec(i-1, v, 0, (v, Vector[T]()))
+  }
+
+  @tailrec
+  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T,Vector[T]))(implicit sg: Semigroup[T]): T = {
+    if(i == 0) {
+      vaccMemo._1
+    }
+    else {
+      /* i2 = i % 2
+       * 2^pow(i*v) + acc == 2^(pow+1)((i/2)*v) + (acc + 2^pow i2 * v)
+       */
+      val half = i / 2
+      val rem = i % 2
+      val newAccMemo = if (rem == 0) vaccMemo else {
+        val (res, newMemo) = timesPow2(pow, v, vaccMemo._2)
+        (sg.plus(vaccMemo._1, res), newMemo)
+      }
+      intTimesRec(half, v, pow + 1, newAccMemo)
+    }
+  }
+
+  // Returns (2^power) * v = (2^(power - 1) v + 2^(power - 1) v)
+  private def timesPow2[T](power: Int, v: T, memo: Vector[T])(implicit sg: Semigroup[T]): (T, Vector[T]) = {
+    val size = memo.size
+    require(power >= 0, "power cannot be negative")
+    if(power == 0) {
+      (v, memo)
+    }
+    else if (power <= size) {
+      (memo(power-1), memo)
+    }
+    else {
+      var item = if(size == 0) v else memo.last
+      var pow = size
+      var newMemo = memo
+      while(pow < power) {
+        // x = 2*x
+        item = sg.plus(item, item)
+        pow += 1
+        newMemo = newMemo :+ item
+      }
+      (item, newMemo)
+    }
+  }
 
   implicit val nullSemigroup : Semigroup[Null] = NullGroup
   implicit val unitSemigroup : Semigroup[Unit] = UnitGroup
@@ -80,6 +132,7 @@ object Semigroup extends GeneratedSemigroupImplicits {
   implicit val shortSemigroup : Semigroup[Short] = ShortRing
   implicit val jshortSemigroup : Semigroup[JShort] = JShortRing
   implicit val longSemigroup : Semigroup[Long] = LongRing
+  implicit val bigIntSemigroup : Semigroup[BigInt] = BigIntRing
   implicit val jlongSemigroup : Semigroup[JLong] = JLongRing
   implicit val floatSemigroup : Semigroup[Float] = FloatField
   implicit val jfloatSemigroup : Semigroup[JFloat] = JFloatField

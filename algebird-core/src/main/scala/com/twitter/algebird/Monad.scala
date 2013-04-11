@@ -19,6 +19,7 @@ import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFlo
 import java.util.{List => JList, Map => JMap}
 
 import scala.annotation.implicitNotFound
+import collection.GenTraversable
 /**
  * Simple implementation of a Monad type-class
  */
@@ -37,6 +38,7 @@ trait Monad[M[_]] {
   //  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
 }
 
+
 /** For use from Java/minimizing code bloat in scala
  */
 abstract class AbstractMonad[M[_]] extends Monad[M]
@@ -48,6 +50,11 @@ object Monad {
   def apply[M[_]](implicit monad: Monad[M]): Monad[M] = monad
   def flatMap[M[_],T,U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) = monad.flatMap(m)(fn)
   def map[M[_],T,U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) = monad.map(m)(fn)
+  def foldM[M[_],T,U](acc: T, xs: GenTraversable[U])(fn: (T,U)=>M[T])(implicit monad: Monad[M]) : M[T] =
+    if(xs.isEmpty) 
+      monad.apply(acc)
+    else 
+      monad.flatMap(fn(acc,xs.head)){t: T => foldM(t, xs.tail)(fn)} 
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {
