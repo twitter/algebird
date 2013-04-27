@@ -1,8 +1,24 @@
+/*
+Copyright 2013 Twitter, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.twitter.algebird
 
 /**
- * A QTree provides an approximate Map[Double,A:Semigroup] suitable for range queries, quantile queries,
- * and combinations of these (for example, if you use a numeric A, you can derive the inner-quartile mean).
+ * A QTree provides an approximate Map[Double,A:Monoid] suitable for range queries, quantile queries,
+ * and combinations of these (for example, if you use a numeric A, you can derive the inter-quartile mean).
  *
  * It is loosely related to the Q-Digest data structure from http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf,
  * but using an immutable tree structure, and carrying a generalized sum (of type A) at each node instead of just a count.
