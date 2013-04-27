@@ -43,7 +43,7 @@ class QTreeTest extends Specification {
   }
 
   def buildQTree(k : Int, list : Seq[Double]) = {
-    val qtSemigroup = new QTreeSemigroup[Double](6)
+    val qtSemigroup = new QTreeSemigroup[Double](k)
     list.map{QTree(_)}.reduce{qtSemigroup.plus(_,_)}
   }
 
@@ -78,10 +78,10 @@ class QTreeTest extends Specification {
           truth must be_>=(lower)
           truth must be_<=(upper)
        }
-       "have < 256 nodes" in {
+       "have size bounded by 2^(k+2)" in {
          val list = randomList(100000)
          val qt = buildQTree(k, list)
-         qt.size must be_<=(256)
+         qt.size must be_<=(1<<(k+2))
        }
      }
 }
