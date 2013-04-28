@@ -39,6 +39,7 @@ artifact=`"algebird-core_2.10"`
 
 ## Questions
 > Why not use spire?
+
 We didn't know about it when we started this code, but it seems like we're more focused on
 large scale analytics.
 
