@@ -81,7 +81,7 @@ case class QTree[A](
   def lowerBound : Double = range * offset
   def upperBound : Double = range * (offset + 1)
 
-  def extendToLevel(n : Int) : QTree[A] = {
+  private def extendToLevel(n : Int) : QTree[A] = {
     if(n <= level)
       this
     else {
@@ -97,8 +97,14 @@ case class QTree[A](
     }
   }
 
-  def commonAncestorLevel(other : QTree[A]) = {
-    //TODO: somehow make this code less opaque
+  /**
+  *
+  * Find the smallest dyadic interval that contains the dyadic interval
+  * for this tree's root and the other tree's root, and return its
+  * level (that is, the power of 2 for the interval).
+  **/
+
+  private def commonAncestorLevel(other : QTree[A]) = {
     val minLevel = level.min(other.level)
     val leftOffset = offset << (level - minLevel)
     val rightOffset = other.offset << (other.level - minLevel)
@@ -118,7 +124,7 @@ case class QTree[A](
     left.mergeWithPeer(right)
   }
 
-  def mergeWithPeer(other : QTree[A]) : QTree[A] = {
+  private def mergeWithPeer(other : QTree[A]) : QTree[A] = {
     assert(other.lowerBound == lowerBound, "lowerBound " + other.lowerBound + " != " + lowerBound)
     assert(other.level == level, "level " + other.level + " != " + level)
 
@@ -128,7 +134,7 @@ case class QTree[A](
          upperChild = mergeOptions(upperChild, other.upperChild))
   }
 
-  def mergeOptions(a : Option[QTree[A]], b : Option[QTree[A]]) : Option[QTree[A]] = {
+  private def mergeOptions(a : Option[QTree[A]], b : Option[QTree[A]]) : Option[QTree[A]] = {
     val merged = for(l <- a; r <- b) yield l.mergeWithPeer(r)
     merged.orElse(a.orElse(b))
   }
@@ -138,7 +144,7 @@ case class QTree[A](
     (findRankLowerBound(rank).get, findRankUpperBound(rank).get)
   }
 
-  def findRankLowerBound(rank : Long) : Option[Double] = {
+  private def findRankLowerBound(rank : Long) : Option[Double] = {
     if(rank > count)
       None
     else {
@@ -154,7 +160,7 @@ case class QTree[A](
     }
   }
 
-  def findRankUpperBound(rank : Long) : Option[Double] = {
+  private def findRankUpperBound(rank : Long) : Option[Double] = {
     if(rank > count)
       None
     else {
@@ -198,7 +204,7 @@ case class QTree[A](
     newTree
   }
 
-  def pruneChildrenWhere(fn : QTree[A] => Boolean) : (QTree[A], Boolean) = {
+  private def pruneChildrenWhere(fn : QTree[A] => Boolean) : (QTree[A], Boolean) = {
     if(fn(this)) {
       (copy(sum = totalSum, lowerChild = None, upperChild = None), true)
     } else {
@@ -211,7 +217,7 @@ case class QTree[A](
     }
   }
 
-  def pruneChildWhere(child : Option[QTree[A]], fn : QTree[A] => Boolean) : (Option[QTree[A]], Boolean) = {
+  private def pruneChildWhere(child : Option[QTree[A]], fn : QTree[A] => Boolean) : (Option[QTree[A]], Boolean) = {
     val result = child.map{_.pruneChildrenWhere(fn)}
     (result.map{_._1}, result.map{_._2}.getOrElse(false))
   }
@@ -226,12 +232,12 @@ case class QTree[A](
     monoid.plus(sum, monoid.plus(childSums._1, childSums._2))
   }
 
-  def mapChildrenWithDefault[T](default : T)(fn : QTree[A] => T) : (T,T) = {
+  private def mapChildrenWithDefault[T](default : T)(fn : QTree[A] => T) : (T,T) = {
     (lowerChild.map(fn).getOrElse(default),
      upperChild.map(fn).getOrElse(default))
   }
 
-  def parentCount = {
+  private def parentCount = {
     val childCounts = mapChildrenWithDefault(0L){_.count}
     count - childCounts._1 - childCounts._2
   }
