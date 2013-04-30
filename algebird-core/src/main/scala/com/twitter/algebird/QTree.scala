@@ -135,8 +135,11 @@ case class QTree[A](
   }
 
   private def mergeOptions(a : Option[QTree[A]], b : Option[QTree[A]]) : Option[QTree[A]] = {
-    val merged = for(l <- a; r <- b) yield l.mergeWithPeer(r)
-    merged.orElse(a.orElse(b))
+    (a,b) match {
+      case (Some(qa), Some(qb)) => Some(qa.mergeWithPeer(qb))
+      case (None, _) => b
+      case (_, None) => a
+    }
   }
 
   def quantileBounds(p : Double) : (Double, Double) = {
