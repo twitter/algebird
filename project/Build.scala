@@ -70,7 +70,7 @@ object AlgebirdBuild extends Build {
 
   // This returns the youngest jar we released that is compatible with the current
   def youngestForwardCompatible(subProj: String) =
-    Some("com.twitter" % ("algebird-" + subProj + "_2.9.2") % "0.1.11")
+    Some("com.twitter" % ("algebird-" + subProj + "_2.9.2") % "0.1.12")
 
   lazy val algebird = Project(
     id = "algebird",
