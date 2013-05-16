@@ -1,5 +1,11 @@
 # Algebird #
 
+### Version 0.1.13 ###
+* Adds QTree monoid for range queries
+
+### Version 0.1.12 ###
+* Adds hashing trick monoid for dimensionality reduction
+
 ### Version 0.1.10 ###
 * Fix compiler flag issue
 
