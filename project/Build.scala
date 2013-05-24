@@ -82,7 +82,8 @@ object AlgebirdBuild extends Build {
     publishLocal := { }
   ).aggregate(algebirdTest,
               algebirdCore,
-              algebirdUtil)
+              algebirdUtil,
+              algebirdBufferable)
 
   lazy val algebirdCore = Project(
     id = "algebird-core",
@@ -117,4 +118,15 @@ object AlgebirdBuild extends Build {
     previousArtifact := youngestForwardCompatible("util"),
     libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
+
+  lazy val algebirdBufferable = Project(
+    id = "algebird-bufferable",
+    base = file("algebird-bufferable"),
+    settings = sharedSettings
+  ).settings(
+    name := "algebird-bufferable",
+    previousArtifact := youngestForwardCompatible("bufferable"),
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.4.0"
+  ).dependsOn(algebirdCore)
+
 }
