@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 // This gives an answer, and a LOWER BOUND on the probability that answer is
 // correct
-case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
+case class ApproximateBoolean(isTrue: Boolean, withProb: Double) { self =>
 
   def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
 
@@ -32,7 +32,7 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
   def ||(that: ApproximateBoolean): ApproximateBoolean = {
     if(isTrue || that.isTrue) {
       //We need at least one of them to be true:
-      val newP = List(this, that)
+      val newP = List(self, that)
         .filter { _.isTrue }
         .map { _.withProb }
         .max
@@ -51,12 +51,18 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
     }
     else {
       // Our confidence is the maximum confidence of the false cases:
-      val newP = List(this, that)
+      val newP = List(self, that)
         .filterNot { _.isTrue }
         .map { _.withProb }
         .max
       ApproximateBoolean(false, newP)
     }
+  }
+
+  def is(b: Boolean) = new {
+    def withProbAtLeast(prob: Double): Boolean =
+      (self.isTrue == b && self.withProb <= prob) ||
+      (self.isTrue != b && self.withProb <= (1 - prob))
   }
 }
 
