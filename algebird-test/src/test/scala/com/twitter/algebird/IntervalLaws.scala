@@ -24,7 +24,7 @@ object IntervalLaws extends Properties("Interval") {
 
   property("[x, x + 1) contains x") =
     forAll { y: Int => 
-      x = y.asInstanceOf[Long]
+      val x = y.asInstanceOf[Long]
       Interval.leftClosedRightOpen(x, x + 1).contains(x) 
     }
 
