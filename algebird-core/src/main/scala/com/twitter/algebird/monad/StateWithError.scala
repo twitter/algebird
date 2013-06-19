@@ -50,8 +50,6 @@ final case class StateFn[S,F,T](fn: S => Either[F, (S, T)]) extends StateWithErr
   def run(state: S) = fn(state)
 }
 /** A Trampolining instance that should prevent stack overflow at the expense of performance
- * This code is designed to be used at plan time, not at run time. It may not be fast enough
- * for real-time operation
  */
 final case class FlatMappedState[S,F,T,U](start: StateWithError[S,F,T], fn: T => StateWithError[S, F, U]) extends StateWithError[S,F,U] {
   def run(state: S): Either[F, (S, U)] = {

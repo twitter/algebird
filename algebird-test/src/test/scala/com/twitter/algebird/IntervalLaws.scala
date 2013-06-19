@@ -14,22 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.twitter.algebird.monad
+package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Properties }
-import org.scalacheck.Prop._
-
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import org.scalacheck.Properties
 
 object IntervalLaws extends Properties("Interval") {
   import Generators._
 
-  property("[batch, batch.next) contains itself") =
-    forAll { batch: BatchID => Interval.leftClosedRightOpen(batch, batch.next).contains(batch) }
+  property("[x, x + 1) contains itself") =
+    forAll { x: Int => Interval.leftClosedRightOpen(x, x + 1).contains(x) }
 
-  property("[batch, batch.next) does not contain next") =
-    forAll { batch: BatchID => ! Interval.leftClosedRightOpen(batch, batch.next).contains(batch.next) }
+  property("[x, x + 1) does not contain x + 1") =
+    forAll { x: Int => ! Interval.leftClosedRightOpen(x, x + 1).contains(x + 1) }
 
   property("[x, x) is empty") =
     forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }

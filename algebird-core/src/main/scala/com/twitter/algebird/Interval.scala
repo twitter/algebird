@@ -14,7 +14,7 @@
  limitations under the License.
  */
 
-package com.twitter.algebird.monad
+package com.twitter.algebird
 
 import com.twitter.algebird.Monoid
 

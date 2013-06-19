@@ -20,7 +20,7 @@ import com.twitter.algebird.Monad
 import org.scalacheck.{ Arbitrary, Properties }
 import org.scalacheck.Prop._
 
-object MonadLaws extends Properties("Monad") {
+object MonadInstanceLaws extends Properties("Monad") {
 
   // Mutually recursive functions
   def ping(todo: Int, acc: Int): Trampoline[Int] =
