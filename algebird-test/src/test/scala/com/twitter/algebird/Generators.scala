@@ -31,12 +31,4 @@ object Generators {
         u <- Arbitrary.arbitrary[T]
       } yield Interval.leftClosedRightOpen(l, u)
     }
-
-  case class SmallLong(get: Long)
-  implicit val smallLong: Arbitrary[SmallLong] =
-    Arbitrary {
-      for {
-        v <- Gen.choose(-100L, 100L)
-      } yield SmallLong(v)
-    }
 }
