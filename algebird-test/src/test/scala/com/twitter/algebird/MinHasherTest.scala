@@ -18,7 +18,7 @@ object MinHasherTest extends Properties("MinHasher") {
     ) yield (mhMonoid.init(v))
   }
 
-  property("MinHasher is a Monoid") = monoidLawsEq[Array[Byte]]{(a,b) => a.toList == b.toList}
+  property("MinHasher is a Monoid") = monoidLawsEq[MinHashSignature]{(a,b) => a.bytes.toList == b.bytes.toList}
 }
 
 class MinHasherTest extends Specification {
