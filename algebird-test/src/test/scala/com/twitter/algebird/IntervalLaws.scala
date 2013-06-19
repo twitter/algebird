@@ -23,8 +23,8 @@ object IntervalLaws extends Properties("Interval") {
   import Generators._
 
   property("[x, x + 1) contains x") =
-    forAll { x: Int => 
-      x.asInstanceOf[Long]
+    forAll { y: Int => 
+      x = y.asInstanceOf[Long]
       Interval.leftClosedRightOpen(x, x + 1).contains(x) 
     }
 
