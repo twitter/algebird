@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import com.twitter.algebird.Generators._
 import org.scalacheck.Properties
 import org.scalacheck.Prop._
 
 object IntervalLaws extends Properties("Interval") {
+  import Generators._
 
   property("[x, x + 1) contains itself") =
     forAll { x: Int => Interval.leftClosedRightOpen(x, x + 1).contains(x) }

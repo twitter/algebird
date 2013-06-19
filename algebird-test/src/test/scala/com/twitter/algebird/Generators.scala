@@ -17,7 +17,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
 
 /**
   * Generators useful in testing Inteval
