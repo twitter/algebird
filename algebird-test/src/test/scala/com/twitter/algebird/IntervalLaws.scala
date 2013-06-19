@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import com.twitter.algebird.Generators._
 import org.scalacheck.Properties
+import org.scalacheck.Prop._
 
 object IntervalLaws extends Properties("Interval") {
 
