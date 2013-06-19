@@ -22,11 +22,14 @@ import org.scalacheck.Prop._
 object IntervalLaws extends Properties("Interval") {
   import Generators._
 
-  property("[x - 1, x) contains x - 1") =
-    forAll { x: Int => Interval.leftClosedRightOpen(x - 1, x).contains(x - 1) }
+  property("[x, x + 1) contains x") =
+    forAll { x: Int => 
+      x.asInstanceOf[Long]
+      Interval.leftClosedRightOpen(x, x + 1).contains(x) 
+    }
 
-  property("[x - 1, x) does not contain x") =
-    forAll { x: Int => ! Interval.leftClosedRightOpen(x - 1, x).contains(x) }
+  property("[x, x + 1) does not contain x") =
+    forAll { x: Int => ! Interval.leftClosedRightOpen(x, x + 1).contains(x + 1) }
 
   property("[x, x) is empty") =
     forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }
