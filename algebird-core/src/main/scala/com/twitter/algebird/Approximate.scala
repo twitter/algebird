@@ -59,11 +59,13 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) { self =>
     }
   }
 
-  def is(b: Boolean) = new {
-    def withProbAtLeast(prob: Double): Boolean =
-      (self.isTrue == b && self.withProb <= prob) ||
-      (self.isTrue != b && self.withProb <= (1 - prob))
-  }
+  def is(b: Boolean) = WithProb(self, b)
+}
+
+case class WithProb(self: ApproximateBoolean, b: Boolean) {
+  def withProbAtLeast(prob: Double): Boolean =
+    (self.isTrue == b && self.withProb <= prob) ||
+    (self.isTrue != b && self.withProb <= (1 - prob))
 }
 
 object ApproximateBoolean {
