@@ -79,33 +79,30 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   val zero : MinHashSignature = MinHashSignature(buildArray{maxHash})
 
   /** Set union */
-  def plus(left : Array[Byte], right : Array[Byte]) : Array[Byte] =
-    buildArray(left, right){(l, r) => n.min(l, r)
-  }
-
-  def plus(left : MinHashSignature, right : MinHashSignature) : MinHashSignature =
-    MinHashSignature(plus(left.bytes, right.bytes))
+  def plus(left : MinHashSignature, right : MinHashSignature) : MinHashSignature = MinHashSignature(
+    buildArray(left.bytes, right.bytes){(l, r) => n.min(l, r)}
+  )
   
   /** Esimate jaccard similarity (size of union / size of intersection) */
-  def similarity(left : Array[Byte], right : Array[Byte]) : Double =
-    buildArray(left,right){(l,r) => if(l == r) n.one else n.zero}
+  def similarity(left : MinHashSignature, right : MinHashSignature) : Double =
+    buildArray(left.bytes,right.bytes){(l,r) => if(l == r) n.one else n.zero}
       .map{_.toDouble}.sum / numHashes
 
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
-  def buckets(sig : Array[Byte]) : List[Long] =
-    sig.grouped(numRows * hashSize)
+  def buckets(sig : MinHashSignature) : List[Long] =
+    sig.bytes.grouped(numRows * hashSize)
       .filter{_.size == numRows * hashSize}
       .map{hashFunctions.head(_)._1}
       .toList
   
   /** Create a signature for a single Long value */
-  def init(value : Long) : Array[Byte] = init{_(value)}
+  def init(value : Long) : MinHashSignature = init{_(value)}
 
   /** Create a signature for a single String value */
-  def init(value : String) : Array[Byte]= init{_(value)}
+  def init(value : String) : MinHashSignature = init{_(value)}
 
   /** Create a signature for an arbitrary value */
-  def init(fn : MurmurHash128 => (Long,Long)) : Array[Byte] = {
+  def init(fn : MurmurHash128 => (Long,Long)) : MinHashSignature = {
     val bytes = new Array[Byte](numBytes)
     val buffer = ByteBuffer.allocate(hashFunctions.size * 16)
     val longBuffer = buffer.asLongBuffer
@@ -116,7 +113,7 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
     }
     buffer.rewind
     buffer.get(bytes)
-    bytes
+    MinHashSignature(bytes)
   }
 
   /** useful for understanding the effects of numBands and numRows */
