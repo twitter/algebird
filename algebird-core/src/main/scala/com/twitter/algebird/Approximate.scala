@@ -64,12 +64,10 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) { self =>
 
 case class WithProb(self: ApproximateBoolean, b: Boolean) {
   def withProbAtLeast(prob: Double): Boolean =
-    if(self.isTrue == b) self.withProb <= prob
-    else self.not.mustBe(b).withProbAtMost(1 - prob)
+    (self.isTrue == b) && (self.withProb <= prob)
 
   def withProbAtMost(prob: Double): Boolean =
-    if(self.isTrue == b) self.withProb >= prob
-    else self.not.mustBe(b).withProbAtLeast(1 - prob)
+    (self.isTrue != b) && (self.withProb < (1 - prob))
 }
 
 object ApproximateBoolean {
