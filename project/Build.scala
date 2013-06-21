@@ -92,7 +92,10 @@ object AlgebirdBuild extends Build {
     test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
     previousArtifact := youngestForwardCompatible("core"),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
+    libraryDependencies ++= Seq(
+      "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+      "com.googlecode.efficient-java-matrix-library" % "ejml" % "0.22"
+    )
   )
 
   lazy val algebirdTest = Project(
