@@ -35,7 +35,7 @@ trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
-class NumericRing[@specialized(Int,Long,Float,Double) T](implicit num: Numeric[T]) extends Ring[T] {
+class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
   override def zero = num.zero
   override def one = num.one
   override def negate(t: T) = num.negate(t)
@@ -44,9 +44,33 @@ class NumericRing[@specialized(Int,Long,Float,Double) T](implicit num: Numeric[T
   override def times(l: T, r: T) = num.times(l, r)
 }
 
-object IntRing extends NumericRing[Int]
-object ShortRing extends NumericRing[Short]
-object LongRing extends NumericRing[Long]
+object IntRing extends Ring[Int] {
+  override def zero = 0
+  override def one = 1
+  override def negate(v : Int) = -v
+  override def plus(l : Int, r : Int) = l + r
+  override def minus(l : Int, r : Int) = l - r
+  override def times(l : Int, r : Int) = l * r
+}
+
+object ShortRing extends Ring[Short] {
+  override def zero = 0.toShort
+  override def one = 1.toShort
+  override def negate(v : Short) = (-v).toShort
+  override def plus(l : Short, r : Short) = (l + r).toShort
+  override def minus(l : Short, r : Short) = (l - r).toShort
+  override def times(l : Short, r : Short) = (l * r).toShort
+}
+
+object LongRing extends Ring[Long] {
+  override def zero = 0L
+  override def one = 1L
+  override def negate(v : Long) = -v
+  override def plus(l : Long, r : Long) = l + r
+  override def minus(l : Long, r : Long) = l - r
+  override def times(l : Long, r : Long) = l * r
+}
+
 object BigIntRing extends NumericRing[BigInt]
 
 object Ring extends GeneratedRingImplicits with ProductRings {
