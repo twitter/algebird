@@ -91,6 +91,9 @@ object AlgebirdBuild extends Build {
   ).settings(
     test := { }, // All tests reside in algebirdTest
     name := "algebird-core",
+    initialCommands := """
+                       import com.twitter.algebird._
+                       """.stripMargin('|'),
     previousArtifact := youngestForwardCompatible("core"),
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
   )
