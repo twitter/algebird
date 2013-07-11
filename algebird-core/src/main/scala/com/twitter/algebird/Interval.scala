@@ -73,6 +73,38 @@ case class InclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) exten
   }
   def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] = InclusiveLower(fn(lower))
 }
+case class ExclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Lower[T] {
+  def contains(t: T): Boolean = ordering.lt(lower, t)
+  def intersect(that: Interval[T]): Interval[T] = that match {
+    case Universe() => this
+    case Empty() => that
+    case ub@ExclusiveUpper(upper) =>
+      if (ub.ordering.lteq(upper, lower)) Empty() else Intersection[T](this, ub)
+    case ub@InclusiveUpper(upper) =>
+      if (ub.ordering.lteq(upper, lower)) Empty() else Intersection[T](this, ub)
+    case lb@InclusiveLower(thatlb) => if (lb.ordering.gteq(lower, thatlb)) this else that
+    case lb@ExclusiveLower(thatlb) => if (lb.ordering.gteq(lower, thatlb)) this else that
+    case Intersection(thatL, thatU) => (this && thatL) && thatU
+  }
+  def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] = ExclusiveLower(fn(lower))
+}
+case class InclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Upper[T] {
+  def contains(t: T): Boolean = ordering.lteq(t, upper)
+  def intersect(that: Interval[T]): Interval[T] = that match {
+    case Universe() => this
+    case Empty() => that
+    case lb@InclusiveLower(lower) =>
+      if (lb.ordering.lteq(upper, lower)) Empty() else Intersection[T](lb, this)
+    case lb@ExclusiveLower(lower) =>
+      if (lb.ordering.lteq(upper, lower)) Empty() else Intersection[T](lb, this)
+    case ub@InclusiveUpper(thatub) =>
+      if (ub.ordering.lt(upper, thatub)) this else that
+    case ub@ExclusiveUpper(thatub) =>
+      if (ub.ordering.lt(upper, thatub)) this else that
+    case Intersection(thatL, thatU) => thatL && (this && thatU)
+  }
+  def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] = InclusiveUpper(fn(upper))
+}
 case class ExclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Upper[T] {
   def contains(t: T): Boolean = ordering.lt(t, upper)
   def intersect(that: Interval[T]): Interval[T] = that match {
