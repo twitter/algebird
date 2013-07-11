@@ -54,6 +54,8 @@ object Interval extends java.io.Serializable {
 
   def leftClosedRightOpen[T:Ordering](lower: T, upper: T): Interval[T] =
     InclusiveLower(lower) && ExclusiveUpper(upper)
+  def leftOpenRightClosed[T:Ordering](lower: T, upper: T): Interval[T] =
+    ExclusiveLower(lower) && InclusiveUpper(upper)
 }
 
 // Marker traits to keep lower on the left in Intersection
