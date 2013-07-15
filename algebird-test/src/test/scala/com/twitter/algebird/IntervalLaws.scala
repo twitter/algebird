@@ -28,8 +28,17 @@ object IntervalLaws extends Properties("Interval") {
       Interval.leftClosedRightOpen(x, x + 1).contains(x) 
     }
 
-  property("[x, x + 1) does not contain x") =
+  property("(x, x + 1] contains x + 1") =
+    forAll { y: Int => 
+      val x = y.asInstanceOf[Long]
+      Interval.leftOpenRightClosed(x, x + 1).contains(x + 1) 
+    }
+
+  property("[x, x + 1) does not contain x + 1") =
     forAll { x: Int => ! Interval.leftClosedRightOpen(x, x + 1).contains(x + 1) }
+
+  property("(x, x + 1] does not contain x") =
+    forAll { x: Int => ! Interval.leftOpenRightClosed(x, x + 1).contains(x) }
 
   property("[x, x) is empty") =
     forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }

@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
+import org.scalacheck.Gen._
 
 /**
   * Generators useful in testing Inteval
@@ -24,10 +25,37 @@ import org.scalacheck.Arbitrary
 object Generators {
 
   implicit def intervalArb[T:Arbitrary:Ordering]: Arbitrary[Interval[T]] =
-    Arbitrary {
+    Arbitrary(oneOf(genUniverse, genEmpty, genInclusiveLower, genExclusiveLower, genInclusiveUpper, genExclusiveUpper))
+
+  def genUniverse[T:Arbitrary:Ordering] =
+      for {
+        u <- Unit
+      }
+      yield Universe[T]()
+
+  def genEmpty[T:Arbitrary:Ordering] =
+      for {
+        u <- Unit
+      }
+      yield Empty[T]()
+
+  def genInclusiveLower[T:Arbitrary:Ordering] =
       for {
         l <- Arbitrary.arbitrary[T]
+      } yield InclusiveLower(l)
+
+  def genExclusiveLower[T:Arbitrary:Ordering] =
+      for {
+        l <- Arbitrary.arbitrary[T]
+      } yield ExclusiveLower(l)
+
+  def genInclusiveUpper[T:Arbitrary:Ordering] =
+      for {
         u <- Arbitrary.arbitrary[T]
-      } yield Interval.leftClosedRightOpen(l, u)
-    }
+      } yield InclusiveUpper(u)
+
+  def genExclusiveUpper[T:Arbitrary:Ordering] =
+      for {
+        u <- Arbitrary.arbitrary[T]
+      } yield ExclusiveUpper(u)
 }
