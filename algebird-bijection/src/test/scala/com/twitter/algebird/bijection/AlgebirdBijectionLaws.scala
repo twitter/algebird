@@ -16,10 +16,9 @@
 
 package com.twitter.algebird.bijection
 
-import com.twitter.bijection.{ BaseProperties, Bijection }
 import org.scalacheck.{ Arbitrary, Properties }
 
-object AlgebirdBijectionLaws extends Properties("AlgebirdBijections") with BaseProperties {
+object AlgebirdBijectionLaws extends Properties("AlgebirdBijections") {
   // TODO: Fill in tests. Ideally we'd publish an algebird-testing
   // module before merging this in.
 }

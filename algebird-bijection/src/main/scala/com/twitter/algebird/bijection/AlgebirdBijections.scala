@@ -28,7 +28,8 @@ import Conversion.asMethod // "as" syntax
  *  @author Sam Ritchie
  */
 
-class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], val bij: ImplicitBijection[T, U]) extends Semigroup[U] {
+class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], bij: ImplicitBijection[T, U]) extends Semigroup[U] {
+  def bijection: Bijection[U, T] = bij.bijection.inverse
   override def plus(l: U, r: U): U = sg.plus(l.as[T], r.as[T]).as[U]
 }
 
