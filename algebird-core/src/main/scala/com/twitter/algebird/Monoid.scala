@@ -30,13 +30,12 @@ import java.util.{List => JList, Map => JMap}
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
   def zero : T //additive identity
+  def isNonZero(v: T)(implicit eq: Equiv[T]): Boolean = !eq.equiv(v, zero)
   def assertNotZero(v : T) {
     if(!isNonZero(v)) {
       throw new java.lang.IllegalArgumentException("argument should not be zero")
     }
   }
-
-  override def isNonZero(v : T) = (v != zero)
 
   def nonZeroOption(v : T): Option[T] = {
     if (isNonZero(v)) {
