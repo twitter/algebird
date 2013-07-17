@@ -48,7 +48,7 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
 class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with
   Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
-  override def isNonZero(v: IndexedSeq[T])(implicit eq: Equiv[IndexedSeq[T]]) =
+  override def isNonZero(v: IndexedSeq[T]) =
     v.exists { t => mont.isNonZero(t) }
 }
 
