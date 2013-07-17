@@ -20,10 +20,18 @@ import scala.annotation.tailrec
 /** You can think of this as a Sparse vector monoid
  */
 class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
-
-  override def isNonZero(x : Map[K,V]) = !x.isEmpty && x.valuesIterator.exists { v =>
-    semigroup.isNonZero(v)
+  val nonZero: (V => Boolean) = semigroup match {
+    case mon: Monoid[_] => mon.isNonZero(_)
+    case _ => (_ => true)
   }
+
+  override def isNonZero(x : Map[K,V]) =
+    !x.isEmpty && (semigroup match {
+      case mon: Monoid[_] => x.valuesIterator.exists { v =>
+        mon.isNonZero(v)
+      }
+      case _ => true
+    })
 
   override lazy val zero = Map[K,V]()
 
@@ -35,18 +43,16 @@ class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,
       val newV = big
         .get(kv._1)
         .map { bigV =>
-          if(bigOnLeft)
+        if(bigOnLeft)
             semigroup.plus(bigV, kv._2)
           else
             semigroup.plus(kv._2, bigV)
         }
         .getOrElse(kv._2)
-      if (semigroup.isNonZero(newV)) {
+      if (nonZero(newV))
         oldMap + (kv._1 -> newV)
-      }
-      else {
+      else
         oldMap - kv._1
-      }
     }
   }
 }
@@ -82,6 +88,26 @@ class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) wi
 }
 
 object MapAlgebra {
+  def rightContainsLeft[K,V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
+    l.forall { case (k, v) =>
+      r.get(k).exists(Equiv[V].equiv(_, v))
+    }
+
+  implicit def sparseEquiv[K,V: Monoid: Equiv]: Equiv[Map[K, V]] = {
+    Equiv.fromFunction { (m1, m2) =>
+      val cleanM1 = removeZeros(m1)
+      val cleanM2 = removeZeros(m2)
+      rightContainsLeft(cleanM1, cleanM2) && rightContainsLeft(cleanM2, cleanM1)
+    }
+  }
+
+  def mergeLookup[T, U, V: Monoid](keys: TraversableOnce[T])(lookup: T => Option[V])(present: T => U): Map[U, V] =
+    sumByKey {
+      keys.map { k =>
+        present(k) -> lookup(k).getOrElse(Monoid.zero[V])
+      }
+    }
+
   // Returns a new map with zero-value entries removed
   def removeZeros[K,V:Monoid](m: Map[K,V]): Map[K,V] =
     m filter { case (_,v) => Monoid.isNonZero(v) }

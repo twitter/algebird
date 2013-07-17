@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
@@ -103,6 +103,18 @@ object CollectionSpecification extends Properties("Collections") {
   property("MapAlgebra.toGraph is correct") = forAll { (l: Set[(Int,Int)]) =>
     MapAlgebra.toGraph(l).toIterable.flatMap { case (k,sv) => sv.map { v => (k,v) } }.toSet == l
   }
+
+  property("MapAlgebra.sparseEquiv is correct") =
+    forAll { (l: Map[Int, String], empties: Set[Int]) =>
+      (!empties.isEmpty) ==> {
+        val mapEq = MapAlgebra.sparseEquiv[Int, String]
+        mapEq.equiv(l -- empties, l ++ empties.map(_ -> "").toMap) && !mapEq.equiv(
+          l -- empties,
+          l ++ empties.map(_ -> "not empty").toMap
+        )
+      }
+    }
+
   property("MapAlgebra.invert works") = forAll { (m : Map[Int,Int]) =>
     val m2 = MapAlgebra.invert(m)
     val m3 = Monoid.sum( for((v,ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
@@ -117,6 +129,24 @@ object CollectionSpecification extends Properties("Collections") {
     val m2after = m3.mapValues { vw => vw._2 }.filter { _._2.isDefined }.mapValues { _.get }
     (m1after == m1) && (m2after == m2) && (m3.keySet == (m1.keySet | m2.keySet))
   }
+
+  def square(x: Int) = if (x % 2 == 0) Some(x * x) else None
+  def mapEq[K] = MapAlgebra.sparseEquiv[K, Int]
+
+  property("MapAlgebra.mergeLookup works") =
+    forAll { (items: Set[Int]) =>
+      mapEq.equiv(
+        MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
+        Map(
+          (None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0)))
+        )
+      ) && mapEq.equiv(
+        MapAlgebra.mergeLookup[Int, Int, Int](items)(square)(identity),
+        MapAlgebra.sumByKey(
+          items.map(x => x -> square(x).getOrElse(0))
+        )
+      )
+    }
 
   implicit def arbAV[T:Arbitrary:Monoid] : Arbitrary[AdaptiveVector[T]] =
     Arbitrary {

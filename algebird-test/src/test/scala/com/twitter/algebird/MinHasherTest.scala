@@ -18,10 +18,11 @@ object MinHasherTest extends Properties("MinHasher") {
     ) yield (mhMonoid.init(v))
   }
 
-  property("MinHasher is a Monoid") = monoidLawsEq[Array[Byte]]{(a,b) => a.toList == b.toList}
+  property("MinHasher is a Monoid") =
+    monoidLawsEq[MinHashSignature]{(a,b) => a.bytes.toList == b.bytes.toList}
 }
 
-class MinHasherTest extends Specification {
+class MinHasherSpec extends Specification {
   val r = new java.util.Random
 
   def test[H](mh : MinHasher[H], similarity : Double, epsilon : Double) = {
@@ -30,7 +31,6 @@ class MinHasherTest extends Specification {
     val exact = exactSimilarity(set1, set2)
     val sim = approxSimilarity(mh, set1, set2)
     val error = math.abs(exact - sim)
-    println(exact, sim, error)
     error must be_<[Double](epsilon)
   }
 

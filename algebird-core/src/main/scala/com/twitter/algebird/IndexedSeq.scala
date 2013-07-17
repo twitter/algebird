@@ -48,7 +48,8 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
 class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with
   Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
-  override def isNonZero(v: IndexedSeq[T]) = v.exists { t => mont.isNonZero(t) }
+  override def isNonZero(v: IndexedSeq[T]) =
+    v.exists { t => mont.isNonZero(t) }
 }
 
 class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T]()(grp)
@@ -69,4 +70,3 @@ class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng)
       .map { tup => rng.times(tup._1, tup._2) }
       .toIndexedSeq
 }
-

@@ -34,8 +34,21 @@ For example, average, moving average, max/min, set
   analytics.
 
 ## Maven
-Current version is `0.1.13`. groupid=`"com.twitter"` artifact=`"algebird-core_2.9.2"` or
-artifact=`"algebird-core_2.10"`
+
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.2.0`.
+
+Current published artifacts are
+
+* `algebird-core_2.9.3`
+* `algebird-core_2.10`
+* `algebird-test_2.9.3`
+* `algebird-test_2.10`
+* `algebird-util_2.9.3`
+* `algebird-util_2.10`
+* `algebird-bijection_2.9.3`
+* `algebird-bijection_2.10`
+
+The suffix denotes the scala version.
 
 ## Questions
 > Why not use spire?
