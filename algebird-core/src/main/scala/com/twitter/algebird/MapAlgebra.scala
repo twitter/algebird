@@ -83,8 +83,8 @@ class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) wi
 
 object MapAlgebra {
   def rightContainsLeft[K,V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
-    l.forall { pair =>
-      r.get(pair._1).map { Equiv[V].equiv(_, pair._2) }.getOrElse(true)
+    l.forall { case (k, v) =>
+      r.get(k).exists(Equiv[V].equiv(_, v))
     }
 
   implicit def sparseEquiv[K,V: Monoid: Equiv]: Equiv[Map[K, V]] = {

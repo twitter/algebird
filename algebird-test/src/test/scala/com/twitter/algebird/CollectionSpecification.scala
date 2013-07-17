@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
@@ -106,10 +106,13 @@ object CollectionSpecification extends Properties("Collections") {
 
   property("MapAlgebra.sparseEquiv is correct") =
     forAll { (l: Map[Int, String], empties: Set[Int]) =>
-      MapAlgebra.sparseEquiv[Int, String].equiv(
-        l,
-        l ++ empties.map(_ -> "").toMap
-      )
+      (!empties.isEmpty) ==> {
+        val mapEq = MapAlgebra.sparseEquiv[Int, String]
+        mapEq.equiv(l -- empties, l ++ empties.map(_ -> "").toMap) && !mapEq.equiv(
+          l -- empties,
+          l ++ empties.map(_ -> "not empty").toMap
+        )
+      }
     }
 
   property("MapAlgebra.invert works") = forAll { (m : Map[Int,Int]) =>
