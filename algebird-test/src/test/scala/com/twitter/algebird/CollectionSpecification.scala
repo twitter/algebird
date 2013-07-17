@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
@@ -103,6 +103,18 @@ object CollectionSpecification extends Properties("Collections") {
   property("MapAlgebra.toGraph is correct") = forAll { (l: Set[(Int,Int)]) =>
     MapAlgebra.toGraph(l).toIterable.flatMap { case (k,sv) => sv.map { v => (k,v) } }.toSet == l
   }
+
+  property("MapAlgebra.sparseEquiv is correct") =
+    forAll { (l: Map[Int, String], empties: Set[Int]) =>
+      (!empties.isEmpty) ==> {
+        val mapEq = MapAlgebra.sparseEquiv[Int, String]
+        mapEq.equiv(l -- empties, l ++ empties.map(_ -> "").toMap) && !mapEq.equiv(
+          l -- empties,
+          l ++ empties.map(_ -> "not empty").toMap
+        )
+      }
+    }
+
   property("MapAlgebra.invert works") = forAll { (m : Map[Int,Int]) =>
     val m2 = MapAlgebra.invert(m)
     val m3 = Monoid.sum( for((v,ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))

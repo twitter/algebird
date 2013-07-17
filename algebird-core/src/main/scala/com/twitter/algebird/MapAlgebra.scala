@@ -82,6 +82,19 @@ class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) wi
 }
 
 object MapAlgebra {
+  def rightContainsLeft[K,V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
+    l.forall { case (k, v) =>
+      r.get(k).exists(Equiv[V].equiv(_, v))
+    }
+
+  implicit def sparseEquiv[K,V: Monoid: Equiv]: Equiv[Map[K, V]] = {
+    Equiv.fromFunction { (m1, m2) =>
+      val cleanM1 = removeZeros(m1)
+      val cleanM2 = removeZeros(m2)
+      rightContainsLeft(cleanM1, cleanM2) && rightContainsLeft(cleanM2, cleanM1)
+    }
+  }
+
   // Returns a new map with zero-value entries removed
   def removeZeros[K,V:Monoid](m: Map[K,V]): Map[K,V] =
     m filter { case (_,v) => Monoid.isNonZero(v) }
