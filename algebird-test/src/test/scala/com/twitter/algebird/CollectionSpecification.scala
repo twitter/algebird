@@ -103,6 +103,15 @@ object CollectionSpecification extends Properties("Collections") {
   property("MapAlgebra.toGraph is correct") = forAll { (l: Set[(Int,Int)]) =>
     MapAlgebra.toGraph(l).toIterable.flatMap { case (k,sv) => sv.map { v => (k,v) } }.toSet == l
   }
+
+  property("MapAlgebra.sparseEquiv is correct") =
+    forAll { (l: Map[Int, String], empties: Set[Int]) =>
+      MapAlgebra.sparseEquiv[Int, String].equiv(
+        l,
+        l ++ empties.map(_ -> "").toMap
+      )
+    }
+
   property("MapAlgebra.invert works") = forAll { (m : Map[Int,Int]) =>
     val m2 = MapAlgebra.invert(m)
     val m3 = Monoid.sum( for((v,ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
