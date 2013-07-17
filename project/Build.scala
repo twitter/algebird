@@ -17,7 +17,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
-    crossScalaVersions := Seq("2.9.3", "2.10.0", "2.10.1"),
+    crossScalaVersions := Seq("2.9.3", "2.10.0"),
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -75,9 +75,16 @@ object AlgebirdBuild extends Build {
       </developers>)
   ) ++ mimaDefaultSettings
 
-  // This returns the youngest jar we released that is compatible with the current
+  /**
+    * This returns the youngest jar we released that is compatible with
+    * the current.
+    */
+  val unreleasedModules = Set[String]()
+
   def youngestForwardCompatible(subProj: String) =
-    Some("com.twitter" % ("algebird-" + subProj + "_2.9.2") % "0.1.12")
+    Some(subProj)
+      .filterNot(unreleasedModules.contains(_))
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.2") % "0.2.0" }
 
   lazy val algebird = Project(
     id = "algebird",
