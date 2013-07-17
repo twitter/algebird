@@ -7,10 +7,17 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 object AlgebirdBuild extends Build {
+  def withCross(dep: ModuleID) =
+    dep cross CrossVersion.binaryMapped {
+      case "2.9.3" => "2.9.2" // TODO: hack because twitter hasn't built things against 2.9.3
+      case version if version startsWith "2.10" => "2.10" // TODO: hack because sbt is broken
+      case x => x
+    }
+
   val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
     organization := "com.twitter",
-    scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.0", "2.10.1"),
+    scalaVersion := "2.9.3",
+    crossScalaVersions := Seq("2.9.3", "2.10.0", "2.10.1"),
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -83,47 +90,38 @@ object AlgebirdBuild extends Build {
   ).aggregate(
     algebirdTest,
     algebirdCore,
-    algebirdUtil
+    algebirdUtil,
+    algebirdBijection
   )
 
-  lazy val algebirdCore = Project(
-    id = "algebird-core",
-    base = file("algebird-core"),
-    settings = sharedSettings
-  ).settings(
+  def module(name: String) = {
+    val id = "algebird-%s".format(name)
+    Project(id = id, base = file(id), settings = sharedSettings ++ Seq(
+      Keys.name := id,
+      previousArtifact := youngestForwardCompatible(name))
+    )
+  }
+
+  lazy val algebirdCore = module("core").settings(
     test := { }, // All tests reside in algebirdTest
-    name := "algebird-core",
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    previousArtifact := youngestForwardCompatible("core"),
     libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
   )
 
-  lazy val algebirdTest = Project(
-    id = "algebird-test",
-    base = file("algebird-test"),
-    settings = sharedSettings
-  ).settings(
-    name := "algebird-test",
-    previousArtifact := youngestForwardCompatible("test"),
+  lazy val algebirdTest = module("test").settings(
     libraryDependencies ++= Seq(
       "org.scalacheck" %% "scalacheck" % "1.10.0",
       "org.scala-tools.testing" %% "specs" % "1.6.9"
     )
   ).dependsOn(algebirdCore)
 
-  lazy val algebirdUtil = Project(
-    id = "algebird-util",
-    base = file("algebird-util"),
-    settings = sharedSettings
-  ).settings(
-    name := "algebird-util",
-    previousArtifact := youngestForwardCompatible("util"),
-    libraryDependencies += "com.twitter" %% "util-core" % "6.3.0" cross CrossVersion.binaryMapped {
-      case "2.9.3" => "2.9.2" // TODO: hack because twitter hasn't built things against 2.9.3
-      case version if version startsWith "2.10" => "2.10" // TODO: hack because sbt is broken
-      case x => x
-    }
-  ).dependsOn(algebirdCore, algebirdTest % "compile->test")
+  lazy val algebirdUtil = module("util").settings(
+    libraryDependencies += withCross("com.twitter" %% "util-core" % "6.3.0")
+  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+
+  lazy val algebirdBijection = module("bijection").settings(
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.5.2"
+  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
