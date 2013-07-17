@@ -30,7 +30,7 @@
       </h4>
       
       <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Follows the type-class pattern for the Monad trait
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Monad.scala">Monad.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/Monad.scala">Monad.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -211,6 +211,18 @@
       </span>
       <span class="symbol">
         <span class="name">flatMap</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="params">(<span name="m">m: M[T]</span>)</span><span class="params">(<span name="fn">fn: (T) ⇒ M[U]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="monad">monad: <a name="com.twitter.algebird.Monad" class="extype" href="Monad.html">Monad</a>[M]</span>)</span><span class="result">: M[U]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.Monad#foldM" data-isabs="false">
+      <a id="foldM[M, T, U](T,GenTraversable[U])((T, U) ⇒ M[T])(Monad[M]):M[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldM</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="T">T</span>, <span name="U">U</span>]</span><span class="params">(<span name="acc">acc: T</span>, <span name="xs">xs: <span name="scala.collection.GenTraversable" class="extype">GenTraversable</span>[U]</span>)</span><span class="params">(<span name="fn">fn: (T, U) ⇒ M[T]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="monad">monad: <a name="com.twitter.algebird.Monad" class="extype" href="Monad.html">Monad</a>[M]</span>)</span><span class="result">: M[T]</span>
       </span>
       </h4>
       

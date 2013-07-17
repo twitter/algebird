@@ -14,9 +14,9 @@
         </head>
         <body onload="sh_highlightDocument('../lib/', '.min.js');" class="type">
       <div id="definition">
-        <img src="../../../lib/class_big.png" />
+        <a title="Go to companion" href="MinHasher$.html"><img src="../../../lib/class_to_object_big.png" /></a>
         <p id="owner"><a name="com" class="extype" href="../../package.html">com</a>.<a name="com.twitter" class="extype" href="../package.html">twitter</a>.<a name="com.twitter.algebird" class="extype" href="package.html">algebird</a></p>
-        <h1>MinHasher</h1>
+        <h1><a title="Go to companion" href="MinHasher$.html">MinHasher</a></h1>
       </div>
 
       <h4 class="signature" id="signature">
@@ -25,7 +25,7 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">MinHasher</span><span class="tparams">[<span name="H">H</span>]</span><span class="result"> extends <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]]</span>
+        <span class="name">MinHasher</span><span class="tparams">[<span name="H">H</span>]</span><span class="result"> extends <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</span>
       </span>
       </h4>
       
@@ -45,9 +45,9 @@ you can find all the similar sets.</p><p>This abstract superclass is generic wit
 Depending on the number of unique values in the domain of the sets, you may want
 a MinHasher16, a MinHasher32, or a new custom subclass.</p><p>This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
 http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/MinHasher.scala">MinHasher.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/MinHasher.scala">MinHasher.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+          <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
           <div class="subClasses hiddenContent"><a name="com.twitter.algebird.MinHasher16" class="extype" href="MinHasher16.html">MinHasher16</a>, <a name="com.twitter.algebird.MinHasher32" class="extype" href="MinHasher32.html">MinHasher32</a></div>
@@ -84,7 +84,7 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MinHasher</span><span class="params">(<span name="targetThreshold">targetThreshold: <span name="scala.Double" class="extype">Double</span></span>, <span name="maxBytes">maxBytes: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="n">n: Numeric[H]</span>)</span>
+        <span class="name">MinHasher</span><span class="params">(<span name="numHashes">numHashes: <span name="scala.Int" class="extype">Int</span></span>, <span name="numBands">numBands: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="n">n: Numeric[H]</span>)</span>
       </span>
       </h4>
       
@@ -95,7 +95,7 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
 
         <div class="values members" id="values">
               <h3>Abstract Value Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.MinHasher#buildArray" data-isabs="true">
+              <ol><li visbl="prt" name="com.twitter.algebird.MinHasher#buildArray" data-isabs="true">
       <a id="buildArray(Array[Byte],Array[Byte])((H, H) ⇒ H):Array[Byte]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -106,8 +106,8 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
         <span class="name">buildArray</span><span class="params">(<span name="left">left: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>, <span name="right">right: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="params">(<span name="fn">fn: (H, H) ⇒ H</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
       </span>
       </h4>
-      <p class="shortcomment cmt">Decode two signatures into hash values, combine them somehow, and produce a new array</p>
-    </li><li visbl="pub" name="com.twitter.algebird.MinHasher#buildArray" data-isabs="true">
+      <p class="shortcomment cmt">Decode two signatures into hash values, combine them somehow, and produce a new array</p><div class="fullcomment"><div class="comment cmt"><p>Decode two signatures into hash values, combine them somehow, and produce a new array</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li visbl="prt" name="com.twitter.algebird.MinHasher#buildArray" data-isabs="true">
       <a id="buildArray(⇒ H):Array[Byte]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -118,7 +118,7 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
         <span class="name">buildArray</span><span class="params">(<span name="fn">fn: ⇒ H</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
       </span>
       </h4>
-      <p class="shortcomment cmt">Initialize a byte array by generating hash values</p>
+      <p class="shortcomment cmt">Initialize a byte array by generating hash values</p><div class="fullcomment"><div class="comment cmt"><p>Initialize a byte array by generating hash values</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#hashSize" data-isabs="true">
       <a id="hashSize:Int"></a>
       <h4 class="signature">
@@ -221,26 +221,26 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Monoid#assertNotZero" data-isabs="false">
-      <a id="assertNotZero(Array[Byte]):Unit"></a>
+      <a id="assertNotZero(MinHashSignature):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">assertNotZero</span><span class="params">(<span name="v">v: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+        <span class="name">assertNotZero</span><span class="params">(<span name="v">v: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#buckets" data-isabs="false">
-      <a id="buckets(Array[Byte]):List[Long]"></a>
+      <a id="buckets(MinHashSignature):List[Long]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">buckets</span><span class="params">(<span name="sig">sig: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.collection.immutable.List" class="extype">List</span>[<span name="scala.Long" class="extype">Long</span>]</span>
+        <span class="name">buckets</span><span class="params">(<span name="sig">sig: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: List[<span name="scala.Long" class="extype">Long</span>]</span>
       </span>
       </h4>
       <p class="shortcomment cmt">Bucket keys to use for quickly finding other similar items via locality sensitive hashing</p>
@@ -334,52 +334,39 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li visbl="pub" name="com.twitter.algebird.MinHasher#hashFunctions" data-isabs="false">
-      <a id="hashFunctions:IndexedSeq[MurmurHash128]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hashFunctions</span><span class="result">: <span name="scala.collection.immutable.IndexedSeq" class="extype">IndexedSeq</span>[<a name="com.twitter.algebird.MurmurHash128" class="extype" href="MurmurHash128.html">MurmurHash128</a>]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">We always use a 128 bit hash function, so the number of hash functions is different
-(and usually smaller) than the number of hashes in the signature.</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#init" data-isabs="false">
-      <a id="init((MurmurHash128) ⇒ (Long, Long)):Array[Byte]"></a>
+      <a id="init((MurmurHash128) ⇒ (Long, Long)):MinHashSignature"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">init</span><span class="params">(<span name="fn">fn: (<a name="com.twitter.algebird.MurmurHash128" class="extype" href="MurmurHash128.html">MurmurHash128</a>) ⇒ (<span name="scala.Long" class="extype">Long</span>, <span name="scala.Long" class="extype">Long</span>)</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+        <span class="name">init</span><span class="params">(<span name="fn">fn: (<a name="com.twitter.algebird.MurmurHash128" class="extype" href="MurmurHash128.html">MurmurHash128</a>) ⇒ (<span name="scala.Long" class="extype">Long</span>, <span name="scala.Long" class="extype">Long</span>)</span>)</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Create a signature for an arbitrary value</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#init" data-isabs="false">
-      <a id="init(String):Array[Byte]"></a>
+      <a id="init(String):MinHashSignature"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">init</span><span class="params">(<span name="value">value: String</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+        <span class="name">init</span><span class="params">(<span name="value">value: String</span>)</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Create a signature for a single String value</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#init" data-isabs="false">
-      <a id="init(Long):Array[Byte]"></a>
+      <a id="init(Long):MinHashSignature"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">init</span><span class="params">(<span name="value">value: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+        <span class="name">init</span><span class="params">(<span name="value">value: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Create a signature for a single Long value</p>
@@ -396,17 +383,17 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Monoid#isNonZero" data-isabs="false">
-      <a id="isNonZero(Array[Byte]):Boolean"></a>
+      <a id="isNonZero(MinHashSignature):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isNonZero</span><span class="params">(<span name="v">v: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+        <span class="name">isNonZero</span><span class="params">(<span name="v">v: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -420,14 +407,14 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Monoid#nonZeroOption" data-isabs="false">
-      <a id="nonZeroOption(Array[Byte]):Option[Array[Byte]]"></a>
+      <a id="nonZeroOption(MinHashSignature):Option[MinHashSignature]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">nonZeroOption</span><span class="params">(<span name="v">v: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]]</span>
+        <span class="name">nonZeroOption</span><span class="params">(<span name="v">v: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</span>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
@@ -466,7 +453,7 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
         <span class="name">numBands</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
       </span>
       </h4>
-      <p class="shortcomment cmt">For explanation of the &quot;bands&quot; and &quot;rows&quot; see Ullman and Rajaraman</p>
+      
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#numBytes" data-isabs="false">
       <a id="numBytes:Int"></a>
       <h4 class="signature">
@@ -478,7 +465,7 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
         <span class="name">numBytes</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">For explanation of the &quot;bands&quot; and &quot;rows&quot; see Ullman and Rajaraman</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#numHashes" data-isabs="false">
       <a id="numHashes:Int"></a>
       <h4 class="signature">
@@ -503,27 +490,15 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </span>
       </h4>
       
-    </li><li visbl="pub" name="com.twitter.algebird.MinHasher#pickBands" data-isabs="false">
-      <a id="pickBands(Double,Int):Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">pickBands</span><span class="params">(<span name="threshold">threshold: <span name="scala.Double" class="extype">Double</span></span>, <span name="hashes">hashes: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">numerically solve the inverse of estimatedThreshold, given numBands*numRows</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#plus" data-isabs="false">
-      <a id="plus(Array[Byte],Array[Byte]):Array[Byte]"></a>
+      <a id="plus(MinHashSignature,MinHashSignature):MinHashSignature"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">plus</span><span class="params">(<span name="left">left: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>, <span name="right">right: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+        <span class="name">plus</span><span class="params">(<span name="left">left: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>, <span name="right">right: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Set union</p><div class="fullcomment"><div class="comment cmt"><p>Set union</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MinHasher" class="extype" href="">MinHasher</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
@@ -539,30 +514,30 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </span>
       </h4>
       <p class="shortcomment cmt">useful for understanding the effects of numBands and numRows</p>
-    </li><li visbl="pub" name="com.twitter.algebird.MinHasher#seed" data-isabs="false">
-      <a id="seed:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">seed</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">This seed could be anything</p>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#similarity" data-isabs="false">
-      <a id="similarity(Array[Byte],Array[Byte]):Double"></a>
+      <a id="similarity(MinHashSignature,MinHashSignature):Double"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">similarity</span><span class="params">(<span name="left">left: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>, <span name="right">right: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>)</span><span class="result">: <span name="scala.Double" class="extype">Double</span></span>
+        <span class="name">similarity</span><span class="params">(<span name="left">left: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>, <span name="right">right: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>)</span><span class="result">: <span name="scala.Double" class="extype">Double</span></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Esimate jaccard similarity (size of union / size of intersection)</p>
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
+      <a id="sum(TraversableOnce[MinHashSignature]):MinHashSignature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</span>)</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -633,46 +608,28 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
               
         </dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.MinHasher#zero" data-isabs="false">
-      <a id="zero:Array[Byte]"></a>
+      <a id="zero:MinHashSignature"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">zero</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
+        <span class="name">zero</span><span class="result">: <a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a></span>
       </span>
       </h4>
       <p class="shortcomment cmt">Signature for empty set, needed to be a proper Monoid</p><div class="fullcomment"><div class="comment cmt"><p>Signature for empty set, needed to be a proper Monoid</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MinHasher" class="extype" href="">MinHasher</a> → <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li></ol>
             </div>
 
-        <div class="values members" id="values">
-              <h3>Deprecated Value Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
-      <a id="sum(TraversableOnce[Array[Byte]]):Array[Byte]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name deprecated" title="Deprecated: (Since version scala.this.deprecated.init$default$2) Just use Monoid.sum">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]]</span>)</span><span class="result">: <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd><dt>Annotations</dt><dd>
-                <span class="name">@deprecated</span>
-              
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version scala.this.deprecated.init$default$2)</i> Just use Monoid.sum</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
         </div>
 
         <div id="inheritedMembers">
         <div name="com.twitter.algebird.Monoid" class="parent">
-              <h3>Inherited from <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]]</h3>
+              <h3>Inherited from <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</h3>
             </div><div name="com.twitter.algebird.Semigroup" class="parent">
-              <h3>Inherited from <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]]</h3>
+              <h3>Inherited from <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</h3>
             </div><div name="java.io.Serializable" class="parent">
               <h3>Inherited from <span name="java.io.Serializable" class="extype">Serializable</span></h3>
             </div><div name="scala.AnyRef" class="parent">

@@ -29,7 +29,7 @@
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/MapAlgebra.scala">MapAlgebra.scala</a></dd></dl><div class="toggleContainer block">
+      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/MapAlgebra.scala">MapAlgebra.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -225,6 +225,32 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#invert" data-isabs="false">
+      <a id="invert[K, V](Map[K, V]):Map[V, Set[K]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">invert</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="m">m: Map[K, V]</span>)</span><span class="result">: Map[V, Set[K]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Invert the Common case of exactly one value for each key
+</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#invertExact" data-isabs="false">
+      <a id="invertExact[K, V](Map[Option[K], Set[V]]):Map[Option[V], Set[K]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">invertExact</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="m">m: Map[<span name="scala.Option" class="extype">Option</span>[K], Set[V]]</span>)</span><span class="result">: Map[<span name="scala.Option" class="extype">Option</span>[V], Set[K]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Reverses a graph losslessly
+None key is for v's with no sources.</p>
     </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <h4 class="signature">
@@ -237,6 +263,30 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#join" data-isabs="false">
+      <a id="join[K, V, W](Map[K, V],Map[K, W]):Map[K, (Option[V], Option[W])]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">join</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>, <span name="W">W</span>]</span><span class="params">(<span name="map1">map1: Map[K, V]</span>, <span name="map2">map2: Map[K, W]</span>)</span><span class="result">: Map[K, (<span name="scala.Option" class="extype">Option</span>[V], <span name="scala.Option" class="extype">Option</span>[W])]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">join the keys of two maps (similar to outer-join in a DB)</p>
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#mergeLookup" data-isabs="false">
+      <a id="mergeLookup[T, U, V](TraversableOnce[T])((T) ⇒ Option[V])((T) ⇒ U)(Monoid[V]):Map[U, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mergeLookup</span><span class="tparams">[<span name="T">T</span>, <span name="U">U</span>, <span name="V">V</span>]</span><span class="params">(<span name="keys">keys: TraversableOnce[T]</span>)</span><span class="params">(<span name="lookup">lookup: (T) ⇒ <span name="scala.Option" class="extype">Option</span>[V]</span>)</span><span class="params">(<span name="present">present: (T) ⇒ U</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[V]</span>)</span><span class="result">: Map[U, V]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -285,6 +335,30 @@
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#rightContainsLeft" data-isabs="false">
+      <a id="rightContainsLeft[K, V](Map[K, V],Map[K, V])(Equiv[V]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">rightContainsLeft</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="l">l: Map[K, V]</span>, <span name="r">r: Map[K, V]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Equiv[V]</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#sparseEquiv" data-isabs="false">
+      <a id="sparseEquiv[K, V](Monoid[V],Equiv[V]):Equiv[Map[K, V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sparseEquiv</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[V]</span>, <span name="arg1">arg1: Equiv[V]</span>)</span><span class="result">: Equiv[Map[K, V]]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#sumByKey" data-isabs="false">
       <a id="sumByKey[K, V](TraversableOnce[(K, V)])(Semigroup[V]):Map[K, V]"></a>
       <h4 class="signature">
@@ -309,6 +383,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapAlgebra#toGraph" data-isabs="false">
+      <a id="toGraph[K, V](TraversableOnce[(K, V)]):Map[K, Set[V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toGraph</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="pairs">pairs: TraversableOnce[(K, V)]</span>)</span><span class="result">: Map[K, Set[V]]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
       <a id="toString():String"></a>
       <h4 class="signature">

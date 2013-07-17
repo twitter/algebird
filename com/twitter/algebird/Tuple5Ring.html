@@ -29,7 +29,7 @@
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Combine 5 rings into a product ring</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/GeneratedAbstractAlgebra.scala">GeneratedAbstractAlgebra.scala</a></dd></dl><div class="toggleContainer block">
+      <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Combine 5 rings into a product ring</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/GeneratedAbstractAlgebra.scala">GeneratedAbstractAlgebra.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Ring" class="extype" href="Ring.html">Ring</a>[(A, B, C, D, E)], <a name="com.twitter.algebird.Group" class="extype" href="Group.html">Group</a>[(A, B, C, D, E)], <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[(A, B, C, D, E)], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A, B, C, D, E)], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -263,7 +263,7 @@
         <span class="name">isNonZero</span><span class="params">(<span name="v">v: (A, B, C, D, E)</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Tuple5Ring#minus" data-isabs="false">
       <a id="minus((A, B, C, D, E),(A, B, C, D, E)):(A, B, C, D, E)"></a>
       <h4 class="signature">
@@ -372,6 +372,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Ring" class="extype" href="Ring.html">Ring</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
+      <a id="sum(TraversableOnce[(A, B, C, D, E)]):(A, B, C, D, E)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[(A, B, C, D, E)]</span>)</span><span class="result">: (A, B, C, D, E)</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -468,25 +480,7 @@
     </li></ol>
             </div>
 
-        <div class="values members" id="values">
-              <h3>Deprecated Value Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
-      <a id="sum(TraversableOnce[(A, B, C, D, E)]):(A, B, C, D, E)"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name deprecated" title="Deprecated: (Since version scala.this.deprecated.init$default$2) Just use Monoid.sum">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[(A, B, C, D, E)]</span>)</span><span class="result">: (A, B, C, D, E)</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd><dt>Annotations</dt><dd>
-                <span class="name">@deprecated</span>
-              
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version scala.this.deprecated.init$default$2)</i> Just use Monoid.sum</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
         </div>
 
         <div id="inheritedMembers">

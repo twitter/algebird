@@ -31,7 +31,7 @@
       
       <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Since Lists are mutable, this always makes a full copy. Prefer scala immutable Lists
 if you use scala immutable lists, the tail of the result of plus is always the right argument
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/JavaMonoids.scala">JavaMonoids.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/JavaMonoids.scala">JavaMonoids.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<span name="java.util.List" class="extype">List</span>[T]], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<span name="java.util.List" class="extype">List</span>[T]], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -265,7 +265,7 @@ if you use scala immutable lists, the tail of the result of plus is always the r
         <span class="name">isNonZero</span><span class="params">(<span name="x">x: <span name="java.util.List" class="extype">List</span>[T]</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.JListMonoid" class="extype" href="">JListMonoid</a> → <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.JListMonoid" class="extype" href="">JListMonoid</a> → <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -326,6 +326,18 @@ if you use scala immutable lists, the tail of the result of plus is always the r
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.JListMonoid" class="extype" href="">JListMonoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
+      <a id="sum(TraversableOnce[List[T]]):List[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[<span name="java.util.List" class="extype">List</span>[T]]</span>)</span><span class="result">: <span name="java.util.List" class="extype">List</span>[T]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -410,25 +422,7 @@ if you use scala immutable lists, the tail of the result of plus is always the r
     </li></ol>
             </div>
 
-        <div class="values members" id="values">
-              <h3>Deprecated Value Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
-      <a id="sum(TraversableOnce[List[T]]):List[T]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name deprecated" title="Deprecated: (Since version scala.this.deprecated.init$default$2) Just use Monoid.sum">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[<span name="java.util.List" class="extype">List</span>[T]]</span>)</span><span class="result">: <span name="java.util.List" class="extype">List</span>[T]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd><dt>Annotations</dt><dd>
-                <span class="name">@deprecated</span>
-              
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version scala.this.deprecated.init$default$2)</i> Just use Monoid.sum</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
         </div>
 
         <div id="inheritedMembers">

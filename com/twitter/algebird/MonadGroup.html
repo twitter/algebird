@@ -29,7 +29,7 @@
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Monad.scala">Monad.scala</a></dd></dl><div class="toggleContainer block">
+      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/Monad.scala">Monad.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Group" class="extype" href="Group.html">Group</a>[M[T]], <a name="com.twitter.algebird.MonadMonoid" class="extype" href="MonadMonoid.html">MonadMonoid</a>[T, M], <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[M[T]], <a name="com.twitter.algebird.MonadSemigroup" class="extype" href="MonadSemigroup.html">MonadSemigroup</a>[T, M], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[M[T]], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
@@ -266,7 +266,7 @@
         <span class="name">isNonZero</span><span class="params">(<span name="v">v: M[T]</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.MonadGroup#minus" data-isabs="false">
       <a id="minus(M[T],M[T]):M[T]"></a>
       <h4 class="signature">
@@ -351,6 +351,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MonadSemigroup" class="extype" href="MonadSemigroup.html">MonadSemigroup</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
+      <a id="sum(TraversableOnce[M[T]]):M[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[M[T]]</span>)</span><span class="result">: M[T]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -435,25 +447,7 @@
     </li></ol>
             </div>
 
-        <div class="values members" id="values">
-              <h3>Deprecated Value Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
-      <a id="sum(TraversableOnce[M[T]]):M[T]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name deprecated" title="Deprecated: (Since version scala.this.deprecated.init$default$2) Just use Monoid.sum">sum</span><span class="params">(<span name="vs">vs: TraversableOnce[M[T]]</span>)</span><span class="result">: M[T]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd><dt>Annotations</dt><dd>
-                <span class="name">@deprecated</span>
-              
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version scala.this.deprecated.init$default$2)</i> Just use Monoid.sum</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
         </div>
 
         <div id="inheritedMembers">
