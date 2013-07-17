@@ -1,5 +1,13 @@
 # Algebird #
 
+### Version 0.2.0 ###
+
+* Adds algebird-bijection module: https://github.com/twitter/algebird/pull/181
+* Build cleanups: https://github.com/twitter/algebird/pull/180
+* MapAlgebra.sparseEquiv: https://github.com/twitter/algebird/pull/182
+* Remove isNonZero from Semigroup, add to Monoid: https://github.com/twitter/algebird/pull/183
+* add MapAlgebra.mergeLookup: https://github.com/twitter/algebird/pull/185
+
 ### Version 0.1.13 ###
 * Adds QTree monoid for range queries
 

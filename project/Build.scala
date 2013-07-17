@@ -75,9 +75,16 @@ object AlgebirdBuild extends Build {
       </developers>)
   ) ++ mimaDefaultSettings
 
-  // This returns the youngest jar we released that is compatible with the current
+  /**
+    * This returns the youngest jar we released that is compatible with
+    * the current.
+    */
+  val unreleasedModules = Set[String]()
+
   def youngestForwardCompatible(subProj: String) =
-    Some("com.twitter" % ("algebird-" + subProj + "_2.9.2") % "0.1.12")
+    Some(subProj)
+      .filterNot(unreleasedModules.contains(_))
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.2") % "0.2.0" }
 
   lazy val algebird = Project(
     id = "algebird",
