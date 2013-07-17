@@ -54,12 +54,11 @@ object Metric {
         }
       }
 
-      val outP = pad(a).view
+    val outP = pad(a).view
         .zip(pad(b))
-        .map{ case(i: V, j: V) =>
+        .map { case(i, j) =>
           math.pow(implicitly[Metric[V]].apply(i, j), p)
-        }
-        .sum
+        }.sum
       math.pow(outP, 1.0 / p)
   }
 

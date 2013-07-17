@@ -27,8 +27,6 @@ import scala.annotation.{implicitNotFound, tailrec}
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
-  // no zero in a semigroup
-  def isNonZero(v: T): Boolean = true
   def plus(l : T, r : T) : T
 }
 

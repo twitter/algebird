@@ -17,11 +17,12 @@ limitations under the License.
 package com.twitter.algebird
 
 object StatefulSummerLaws {
+  import BaseProperties.isNonZero
+
   // Law1:
   def zeroEquiv[V:Semigroup:Equiv](v0: Option[V], v1: Option[V]): Boolean = {
-    val sg = implicitly[Semigroup[V]]
-    val v0NonZero = v0.map { v => sg.isNonZero(v) }.getOrElse(false)
-    val v1NonZero = v1.map { v => sg.isNonZero(v) }.getOrElse(false)
+    val v0NonZero = v0.exists(isNonZero(_))
+    val v1NonZero = v1.exists(isNonZero(_))
     if (!(v0NonZero||v1NonZero)) {
       // neither are non-zero
       true
