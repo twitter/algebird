@@ -39,13 +39,13 @@ Algebird modules are available on maven central. The current groupid and version
 
 Current published artifacts are
 
-* `algebird-core_2.9.2`
+* `algebird-core_2.9.3`
 * `algebird-core_2.10`
-* `algebird-test_2.9.2`
+* `algebird-test_2.9.3`
 * `algebird-test_2.10`
-* `algebird-util_2.9.2`
+* `algebird-util_2.9.3`
 * `algebird-util_2.10`
-* `algebird-bijection_2.9.2`
+* `algebird-bijection_2.9.3`
 * `algebird-bijection_2.10`
 
 The suffix denotes the scala version.
