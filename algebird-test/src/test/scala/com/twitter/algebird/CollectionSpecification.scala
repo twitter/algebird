@@ -130,6 +130,24 @@ object CollectionSpecification extends Properties("Collections") {
     (m1after == m1) && (m2after == m2) && (m3.keySet == (m1.keySet | m2.keySet))
   }
 
+  def square(x: Int) = if (x % 2 == 0) Some(x * x) else None
+  def mapEq[K] = MapAlgebra.sparseEquiv[K, Int]
+
+  property("MapAlgebra.mergeLookup works") =
+    forAll { (items: Set[Int]) =>
+      mapEq.equiv(
+        MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
+        Map(
+          (None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0)))
+        )
+      ) && mapEq.equiv(
+        MapAlgebra.mergeLookup[Int, Int, Int](items)(square)(identity),
+        MapAlgebra.sumByKey(
+          items.map(x => x -> square(x).getOrElse(0))
+        )
+      )
+    }
+
   implicit def arbAV[T:Arbitrary:Monoid] : Arbitrary[AdaptiveVector[T]] =
     Arbitrary {
       Arbitrary.arbitrary[List[T]]

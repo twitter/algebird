@@ -95,6 +95,13 @@ object MapAlgebra {
     }
   }
 
+  def mergeLookup[T, U, V: Monoid](keys: TraversableOnce[T])(lookup: T => Option[V])(present: T => U): Map[U, V] =
+    sumByKey {
+      keys.map { k =>
+        present(k) -> lookup(k).getOrElse(Monoid.zero[V])
+      }
+    }
+
   // Returns a new map with zero-value entries removed
   def removeZeros[K,V:Monoid](m: Map[K,V]): Map[K,V] =
     m filter { case (_,v) => Monoid.isNonZero(v) }
