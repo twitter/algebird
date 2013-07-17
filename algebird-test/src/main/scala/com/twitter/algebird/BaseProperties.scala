@@ -26,6 +26,11 @@ import scala.math.Equiv
 object BaseProperties {
   def defaultEq[T](t0 : T, t1 : T) = t0 == t1
 
+  def isNonZero[V: Semigroup](v: V) = implicitly[Semigroup[V]] match {
+    case mon: Monoid[_] => mon.isNonZero(v)
+    case _ => true
+  }
+
   def isAssociativeEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T, b : T, c : T) =>
     val semi = implicitly[Semigroup[T]]
     eqfn(semi.plus(a, semi.plus(b,c)), semi.plus(semi.plus(a,b), c))
