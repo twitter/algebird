@@ -20,6 +20,11 @@ import scala.annotation.tailrec
 /** You can think of this as a Sparse vector monoid
  */
 class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
+  val nonZero: (V => Boolean) = semigroup match {
+    case mon: Monoid[_] => mon.isNonZero(_)
+    case _ => (_ => true)
+  }
+
   override def isNonZero(x : Map[K,V]) =
     !x.isEmpty && (semigroup match {
       case mon: Monoid[_] => x.valuesIterator.exists { v =>
@@ -44,14 +49,10 @@ class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,
             semigroup.plus(kv._2, bigV)
         }
         .getOrElse(kv._2)
-      semigroup match {
-        case mon: Monoid[_] =>
-          if (mon.isNonZero(newV))
-            oldMap + (kv._1 -> newV)
-          else
-            oldMap - kv._1
-        case _ => oldMap + (kv._1 -> newV)
-      }
+      if (nonZero(newV))
+        oldMap + (kv._1 -> newV)
+      else
+        oldMap - kv._1
     }
   }
 }

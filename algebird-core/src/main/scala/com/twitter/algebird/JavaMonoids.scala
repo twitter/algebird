@@ -97,6 +97,12 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  */
 class JMapMonoid[K,V:Semigroup] extends Monoid[JMap[K,V]] {
   override lazy val zero = new java.util.HashMap[K,V](0)
+
+  val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
+    case mon: Monoid[_] => mon.isNonZero(_)
+    case _ => (_ => true)
+  }
+
   override def isNonZero(x : JMap[K,V]) =
     !x.isEmpty && (implicitly[Semigroup[V]] match {
       case mon: Monoid[_] =>
@@ -116,16 +122,11 @@ class JMapMonoid[K,V:Semigroup] extends Monoid[JMap[K,V]] {
       if(big.containsKey(smallK)) {
         val bigV = big.get(smallK)
         val newV = if(bigOnLeft) vsemi.plus(bigV, smallV) else vsemi.plus(smallV, bigV)
-        vsemi match {
-          case mon: Monoid[_] =>
-            if(mon.isNonZero(newV))
-              result.put(smallK, newV)
-            else
-              result.remove(smallK)
-          case _ => result.put(smallK, newV)
-        }
-      }
-      else {
+        if (nonZero(newV))
+          result.put(smallK, newV)
+        else
+          result.remove(smallK)
+      } else {
         // No need to explicitly add with zero on V, just put in the small value
         result.put(smallK, smallV)
       }
