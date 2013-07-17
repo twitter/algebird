@@ -80,9 +80,11 @@ object AlgebirdBuild extends Build {
     test := { },
     publish := { }, // skip publishing for this root project.
     publishLocal := { }
-  ).aggregate(algebirdTest,
-              algebirdCore,
-              algebirdUtil)
+  ).aggregate(
+    algebirdTest,
+    algebirdCore,
+    algebirdUtil
+  )
 
   lazy val algebirdCore = Project(
     id = "algebird-core",
@@ -118,6 +120,10 @@ object AlgebirdBuild extends Build {
   ).settings(
     name := "algebird-util",
     previousArtifact := youngestForwardCompatible("util"),
-    libraryDependencies += "com.twitter" %% "util-core" % "6.2.0"
+    libraryDependencies += "com.twitter" %% "util-core" % "6.3.0" cross CrossVersion.binaryMapped {
+      case "2.9.3" => "2.9.2" // TODO: hack because twitter hasn't built things against 2.9.3
+      case version if version startsWith "2.10" => "2.10" // TODO: hack because sbt is broken
+      case x => x
+    }
   ).dependsOn(algebirdCore, algebirdTest % "compile->test")
 }
