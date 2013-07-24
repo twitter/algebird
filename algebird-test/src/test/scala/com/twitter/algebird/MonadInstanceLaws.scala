@@ -19,6 +19,7 @@ package com.twitter.algebird.monad
 import com.twitter.algebird.Monad
 import org.scalacheck.{ Arbitrary, Properties }
 import org.scalacheck.Prop._
+import scala.util.{ Try, Success, Failure }
 
 object MonadInstanceLaws extends Properties("Monad") {
 
@@ -41,17 +42,25 @@ object MonadInstanceLaws extends Properties("Monad") {
       oldState <- StateWithError.swapState[Int](start * 2)
     } yield oldState
 
-    fn(i) == Right((2 * i, i))
+    fn(i) == Success((2 * i, i))
   }
 
-  property("State behaves correctly") = forAll { (in: Int, head: Long, fns: List[(Int) => Either[String, (Int, Long)]]) =>
-    val mons = fns.map { StateWithError(_) }
-    val init = StateWithError.const[Int, Long](head) : StateWithError[Int,String,Long]
+  case class FailString(s: String) extends Throwable
+
+  property("State behaves correctly") = forAll { (in: Int, head: Long, eitherFns: List[(Int) => Either[String, (Int, Long)]]) =>
+    val fns: List[Int => Try[(Int, Long)]] = eitherFns.map(fn => { i: Int =>
+      fn(i) match {
+        case Left(s) => Failure(FailString(s))
+        case Right(r) => Success(r)
+      }
+    })
+    val mons = fns.map(StateWithError(_))
+    val init = StateWithError.const[Int, Long](head) : StateWithError[Int, Long]
     val comp = mons.foldLeft(init) { (old, fn) =>
       old.flatMap { x => fn } // just bind
     }
-    comp(in) == (fns.foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
-      oldState.right.flatMap { case (s, v) => fn(s) }
+    comp(in) == (fns.foldLeft(Success((in, head)): Try[(Int, Long)]) { (oldState, fn) =>
+      oldState.flatMap { case (s, v) => fn(s) }
     })
   }
 
