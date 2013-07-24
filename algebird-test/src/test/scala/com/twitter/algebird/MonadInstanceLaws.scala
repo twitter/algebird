@@ -45,10 +45,12 @@ object MonadInstanceLaws extends Properties("Monad") {
     fn(i) == Success((2 * i, i))
   }
 
+  case class FailString(s: String) extends Throwable
+
   property("State behaves correctly") = forAll { (in: Int, head: Long, eitherFns: List[(Int) => Either[String, (Int, Long)]]) =>
     val fns: List[Int => Try[(Int, Long)]] = eitherFns.map(fn => { i: Int =>
       fn(i) match {
-        case Left(s) => Failure(new RuntimeException(s))
+        case Left(s) => Failure(FailString(s))
         case Right(r) => Success(r)
       }
     })
