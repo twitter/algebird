@@ -74,6 +74,11 @@ object ApproximateLaws extends Properties("Approximate") {
     (a.not).isTrue == (!(a.isTrue)) &&
     (a.not.withProb) == a.withProb
   }
+
+  property("complement works") = forAll{ (a: ApproximateBoolean) =>
+    (! a.isTrue == a.complement.isTrue) &&
+    ( a.withProb == (1 - a.complement.withProb))
+  }
 }
 
 class ApproximateTest extends Specification {
