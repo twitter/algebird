@@ -358,3 +358,17 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     .getOrElse(Approximate.exact(0L)) //Empty lists have no intersection
   }
 }
+
+object HyperLogLogAggregator {
+  def apply(bits: Int) = {
+    val monoid = new HyperLogLogMonoid(bits)
+    new HyperLogLogAggregator(monoid)
+  }
+}
+
+case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {
+  val monoid = hllMonoid
+
+  def prepare(value: Array[Byte]) = monoid.create(value)
+  def present(hll: HLL) = hll
+}

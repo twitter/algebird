@@ -146,6 +146,17 @@ class HyperLogLogTest extends Specification {
       }
     }
 
+    "work as an Aggregator" in {
+      List(5, 7, 10).foreach(bits => {
+        val aggregator = HyperLogLogAggregator(bits)
+        val data = (0 to 10000).map { i => r.nextInt(1000) }
+        val exact = exactCount(data).toDouble
+      
+        val approxCount = aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
+        scala.math.abs(exact - approxCount) / exact must be_<(3.5 * aveErrorOf(bits))
+      })
+    }
+
     def verifySerialization(h : HLL) {
       fromBytes(toBytes(h)) must be_==(h)
       fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) must be_==(h)

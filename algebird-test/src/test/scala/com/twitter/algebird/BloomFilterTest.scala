@@ -84,5 +84,20 @@ class BloomFilterTest extends Specification {
         size.max must be_>=(size.estimate)
       }
     }
+
+    "work as an Aggregator" in {
+      (0 to 10).foreach{
+        _ => {
+          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
+          val numEntries = 5
+          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+          val bf = aggregator(entries)
+
+          entries.foreach{
+            i => bf.contains(i.toString).isTrue must be_==(true)
+          }
+        }
+      }
+    }
   }
 }
