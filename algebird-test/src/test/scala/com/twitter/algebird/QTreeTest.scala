@@ -65,7 +65,7 @@ class QTreeTest extends Specification {
           val quantile = math.random
           val (lower, upper) = qt.quantileBounds(quantile)
           val truth = trueQuantile(list, quantile)
-          lower must be_>=(lower)
+          truth must be_>=(lower)
           truth must be_<=(upper)
        }
        "always contain the true range sum within its bounds" in {
