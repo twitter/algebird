@@ -39,7 +39,7 @@ To learn more and find links to tutorials and information around the web, check 
 
 The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
 
-Discussion occurs primarily on the [Algebird mailing list](http://librelist.com/browser/algebird/). To join the mailing list, email [algebird@librelist.com](mailto:algebird@librelist.com). The same address is used for posting once you've joined. Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
+Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 ## Maven
 
