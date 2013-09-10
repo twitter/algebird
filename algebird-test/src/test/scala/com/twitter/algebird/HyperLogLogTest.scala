@@ -152,8 +152,8 @@ class HyperLogLogTest extends Specification {
         val data = (0 to 10000).map { i => r.nextInt(1000) }
         val exact = exactCount(data).toDouble
       
-        val approxCount = aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
-        scala.math.abs(exact - approxCount) / exact must be_<(3.5 * aveErrorOf(bits))
+        val estimate = aggregator(data.map(int2Bytes(_)))
+        scala.math.abs(exact - estimate) / exact must be_<(3.5 * aveErrorOf(bits))
       })
     }
 
