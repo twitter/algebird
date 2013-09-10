@@ -128,6 +128,11 @@ object SketchMap {
                   (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
     new SketchMapMonoid(width(eps), depth(delta), seed, heavyHittersCount)(serialization, valueOrdering, monoid)
   }
+
+  def aggregator[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
+                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+    SketchMapAggregator(SketchMap.monoid(eps, delta, seed, heavyHittersCount))
+  }
 }
 
 case class SketchMap[K, V](
@@ -225,3 +230,13 @@ case class SketchMap[K, V](
   }
 }
 
+/**
+  * An Aggregator for the SketchMap.
+  * Can be created using SketchMap.aggregator
+  */
+case class SketchMapAggregator[K, V](skmMonoid : SketchMapMonoid[K, V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+  val monoid = skmMonoid
+
+  def prepare(value: (K,V)) = monoid.create(value)
+  def present(skm: SketchMap[K, V]) = skm
+}
