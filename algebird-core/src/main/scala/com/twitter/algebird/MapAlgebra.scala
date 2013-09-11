@@ -32,8 +32,8 @@ object GenericMapMonoid {
       case _ => true
     })
 
-  def plus[K, V](x : ScMap[K,V], y : ScMap[K,V], nonZeroFn: (V => Boolean))
-      (implicit semigroup: Semigroup[V]): ScMap[K,V] = {
+  def plus[K, V](x : ScMap[K, V], y : ScMap[K, V], nonZeroFn: (V => Boolean))
+      (implicit semigroup: Semigroup[V]): ScMap[K, V] = {
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
@@ -62,9 +62,12 @@ class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,
   override def plus(x : Map[K,V], y : Map[K,V]) = GenericMapMonoid.plus(x, y, nonZeroFn).asInstanceOf[Map[K,V]]
 }
 
-/*class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
-
-}*/
+class ScMapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[ScMap[K,V]] {
+  val nonZeroFn: (V => Boolean) = GenericMapMonoid.nonZeroFunctor
+  override def isNonZero(x : ScMap[K,V]) = GenericMapMonoid.isNonZero(x)
+  override lazy val zero = ScMap[K,V]()
+  override def plus(x : ScMap[K,V], y : ScMap[K,V]) = GenericMapMonoid.plus(x, y, nonZeroFn)
+}
 
 /** You can think of this as a Sparse vector group
  */
