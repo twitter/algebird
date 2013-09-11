@@ -16,16 +16,15 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.tailrec
+import scala.collection.{Map => ScMap}
 
-/** You can think of this as a Sparse vector monoid
- */
-class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
-  val nonZero: (V => Boolean) = semigroup match {
+object GenericMapMonoid {
+  def nonZeroFunctor[V](implicit semigroup: Semigroup[V]): (V => Boolean) = semigroup match {
     case mon: Monoid[_] => mon.isNonZero(_)
     case _ => (_ => true)
   }
 
-  override def isNonZero(x : Map[K,V]) =
+  def isNonZero[K, V](x : ScMap[K,V])(implicit semigroup: Semigroup[V]) =
     !x.isEmpty && (semigroup match {
       case mon: Monoid[_] => x.valuesIterator.exists { v =>
         mon.isNonZero(v)
@@ -33,9 +32,8 @@ class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,
       case _ => true
     })
 
-  override lazy val zero = Map[K,V]()
-
-  override def plus(x : Map[K,V], y : Map[K,V]) = {
+  def plus[K, V](x : ScMap[K,V], y : ScMap[K,V], nonZeroFn: (V => Boolean))
+      (implicit semigroup: Semigroup[V]): ScMap[K,V] = {
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
@@ -49,13 +47,24 @@ class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,
             semigroup.plus(kv._2, bigV)
         }
         .getOrElse(kv._2)
-      if (nonZero(newV))
+      if (nonZeroFn(newV))
         oldMap + (kv._1 -> newV)
       else
         oldMap - kv._1
     }
   }
 }
+
+class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
+  val nonZeroFn: (V => Boolean) = GenericMapMonoid.nonZeroFunctor
+  override def isNonZero(x : Map[K,V]) = GenericMapMonoid.isNonZero(x)
+  override lazy val zero = Map[K,V]()
+  override def plus(x : Map[K,V], y : Map[K,V]) = GenericMapMonoid.plus(x, y, nonZeroFn).asInstanceOf[Map[K,V]]
+}
+
+/*class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
+
+}*/
 
 /** You can think of this as a Sparse vector group
  */
