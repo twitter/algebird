@@ -114,6 +114,17 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   }
 }
 
+// To use the FlagMonoid wrap your boolean in a Flag object
+case class Flag(get: Boolean)
+
+/** Boolean flag monoid.
+ * plus means logical OR, zero is false.
+ */
+object FlagMonoid extends Monoid[Flag] {
+  override def zero = Flag(false)
+  override def plus(l: Flag, r: Flag) = if (l.get) l else r
+}
+
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
@@ -169,6 +180,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit val doubleMonoid : Monoid[Double] = DoubleField
   implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
   implicit val stringMonoid : Monoid[String] = StringMonoid
+  implicit val flagMonoid : Monoid[Flag] = FlagMonoid
   implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
