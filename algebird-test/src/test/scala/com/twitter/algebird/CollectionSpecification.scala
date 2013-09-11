@@ -12,12 +12,15 @@ object CollectionSpecification extends Properties("Collections") {
     Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
   implicit def arbMax[T:Arbitrary] : Arbitrary[Max[T]] =
     Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
-  implicit def arbFlag: Arbitrary[Flag] =
-    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => Flag(b) } }
+  implicit def arbOrVal: Arbitrary[OrVal] =
+    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => OrVal(b) } }
+  implicit def arbAndVal: Arbitrary[AndVal] =
+    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => AndVal(b) } }
 
   property("MinSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Min[Int]]
   property("MaxSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Max[Int]]
-  property("Flag is a commutative monoid") = commutativeMonoidLaws[Flag]
+  property("OrValMonoid is a commutative monoid") = commutativeMonoidLaws[OrVal]
+  property("AndValMonoid is a commutative monoid") = commutativeMonoidLaws[AndVal]
   property("Min[Int] is a monoid") = monoidLaws[Min[Int]]
   property("Max[String] is a monoid") = monoidLaws[Max[String]]
   property("Max[List[Int]] is a monoid") = monoidLaws[Max[List[Int]]]

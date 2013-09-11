@@ -114,15 +114,40 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   }
 }
 
-// To use the FlagMonoid wrap your boolean in a Flag object
-case class Flag(get: Boolean)
+// To use the OrValMonoid wrap your item in a OrVal object
+case class OrVal(get: Boolean)
 
-/** Boolean flag monoid.
+object OrVal {
+  implicit def monoid: Monoid[OrVal] = OrValMonoid
+}
+
+/** Boolean OR monoid.
  * plus means logical OR, zero is false.
  */
-object FlagMonoid extends Monoid[Flag] {
-  override def zero = Flag(false)
-  override def plus(l: Flag, r: Flag) = if (l.get) l else r
+object OrValMonoid extends Monoid[OrVal] {
+  override def zero = OrVal(false)
+  override def plus(l: OrVal, r: OrVal) = if (l.get) l else r
+}
+
+// To use the AndValMonoid wrap your item in a AndVal object
+case class AndVal(get: Boolean)
+
+object AndVal {
+  implicit def monoid: Monoid[AndVal] = AndValMonoid
+}
+
+/** Boolean AND monoid.
+ * plus means logical AND, zero is true.
+ */
+object AndValMonoid extends Monoid[AndVal] {
+  override def zero = AndVal(true)
+  override def plus(l: AndVal, r: AndVal) = if (l.get && r.get) {
+    l // true
+  } else if (l.get) {
+    r // false
+  } else {
+    l // false
+  }
 }
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
@@ -180,7 +205,6 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit val doubleMonoid : Monoid[Double] = DoubleField
   implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
   implicit val stringMonoid : Monoid[String] = StringMonoid
-  implicit val flagMonoid : Monoid[Flag] = FlagMonoid
   implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
