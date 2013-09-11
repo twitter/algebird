@@ -141,13 +141,7 @@ object AndVal {
  */
 object AndValMonoid extends Monoid[AndVal] {
   override def zero = AndVal(true)
-  override def plus(l: AndVal, r: AndVal) = if (l.get && r.get) {
-    l // true
-  } else if (l.get) {
-    r // false
-  } else {
-    l // false
-  }
+  override def plus(l: AndVal, r: AndVal) = if(l.get) r else l
 }
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
