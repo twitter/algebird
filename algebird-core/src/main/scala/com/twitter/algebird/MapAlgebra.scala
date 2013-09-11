@@ -18,13 +18,20 @@ package com.twitter.algebird
 import scala.annotation.tailrec
 import scala.collection.{Map => ScMap}
 
-object GenericMapMonoid {
-  def nonZeroFunctor[V](implicit semigroup: Semigroup[V]): (V => Boolean) = semigroup match {
+trait MapOperations[K, V, M <: ScMap[K, V]] {
+  def add(oldMap: M, kv: (K,V)): M
+  def remove(oldMap: M, k: K): M
+}
+
+abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: Semigroup[V])
+    extends Monoid[M] with MapOperations[K, V, M] {
+
+  val nonZero: (V => Boolean) = semigroup match {
     case mon: Monoid[_] => mon.isNonZero(_)
     case _ => (_ => true)
   }
 
-  def isNonZero[K, V](x : ScMap[K,V])(implicit semigroup: Semigroup[V]) =
+  override def isNonZero(x : M) =
     !x.isEmpty && (semigroup match {
       case mon: Monoid[_] => x.valuesIterator.exists { v =>
         mon.isNonZero(v)
@@ -32,13 +39,11 @@ object GenericMapMonoid {
       case _ => true
     })
 
-  def plus[K, V, M <: ScMap[K, V]]
-      (x : M, y : M, nonZeroFn: (V => Boolean))(add: (M, K, V) => M)(remove: (M, K) => M)
-      (implicit semigroup: Semigroup[V]): M = {  
+  override def plus(x : M, y : M) = {
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
-    small.foldLeft(big) { (oldMap: M, kv) =>
+    small.foldLeft(big) { (oldMap, kv) =>
       val newV = big
         .get(kv._1)
         .map { bigV =>
@@ -48,36 +53,24 @@ object GenericMapMonoid {
             semigroup.plus(kv._2, bigV)
         }
         .getOrElse(kv._2)
-      if (nonZeroFn(newV))
-        add(oldMap, kv._1, newV)
+      if (nonZero(newV))
+        add(oldMap, (kv._1 -> newV))
       else
         remove(oldMap, kv._1)
     }
   }
 }
 
-class MapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[Map[K,V]] {
-  val nonZeroFn: (V => Boolean) = GenericMapMonoid.nonZeroFunctor
-  override def isNonZero(x : Map[K,V]) = GenericMapMonoid.isNonZero(x)
+class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, Map[K,V]] {
   override lazy val zero = Map[K,V]()
-  override def plus(x : Map[K,V], y : Map[K,V]) =
-    GenericMapMonoid.plus[K, V, Map[K, V]](x, y, nonZeroFn) {
-        (oldMap: Map[K,V], k: K, v: V) => oldMap + (k-> v)
-      } {
-        (oldMap: Map[K,V], k: K) => oldMap - k
-      }
+  override def add(oldMap: Map[K,V], kv: (K, V))  = oldMap + kv
+  override def remove(oldMap: Map[K,V], k: K) = oldMap - k
 }
 
-class ScMapMonoid[K,V](implicit val semigroup: Semigroup[V]) extends Monoid[ScMap[K,V]] {
-  val nonZeroFn: (V => Boolean) = GenericMapMonoid.nonZeroFunctor
-  override def isNonZero(x : ScMap[K,V]) = GenericMapMonoid.isNonZero(x)
+class ScMapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K,V]] {
   override lazy val zero = ScMap[K,V]()
-  override def plus(x : ScMap[K,V], y : ScMap[K,V]) =
-    GenericMapMonoid.plus[K, V, ScMap[K, V]](x, y, nonZeroFn) {
-        (oldMap: ScMap[K,V], k: K, v: V) => oldMap + (k-> v)
-      } {
-        (oldMap: ScMap[K,V], k: K) => oldMap - k
-      }
+  override def add(oldMap: ScMap[K,V], kv: (K, V))  = oldMap + kv
+  override def remove(oldMap: ScMap[K,V], k: K) = oldMap - k
 }
 
 /** You can think of this as a Sparse vector group
@@ -87,28 +80,38 @@ class MapGroup[K,V](implicit val group : Group[V]) extends MapMonoid[K,V]()(grou
   override def negate(kv : Map[K,V]) = kv.mapValues { v => group.negate(v) }
 }
 
+class ScMapGroup[K,V](implicit val group : Group[V]) extends ScMapMonoid[K,V]()(group)
+  with Group[ScMap[K,V]] {
+  override def negate(kv : ScMap[K,V]) = kv.mapValues { v => group.negate(v) }
+}
+
 /** You can think of this as a Sparse vector ring
  */
-class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) with Ring[Map[K,V]] {
+trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Ring[M] with MapOperations[K, V, M] {
+
+  implicit val ring : Ring[V]
+
   // It is possible to implement this, but we need a special "identity map" which we
   // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
   // Then we have to manage the delta from this map as we add elements.  That said, it
   // is not actually needed in matrix multiplication, so we are punting on it for now.
   override def one = sys.error("multiplicative identity for Map unimplemented")
-  override def times(x : Map[K,V], y : Map[K,V]) : Map[K,V] = {
+  override def times(x : M, y : M) : M = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
     small.foldLeft(zero) { (oldMap, kv) =>
       val bigV = big.getOrElse(kv._1, ring.zero)
       val newV = if(bigOnLeft) ring.times(bigV, kv._2) else ring.times(kv._2, bigV)
       if (ring.isNonZero(newV)) {
-        oldMap + (kv._1 -> newV)
+        add(oldMap, (kv._1 -> newV))
       }
       else {
-        oldMap - kv._1
+        remove(oldMap, kv._1)
       }
     }
   }
 }
+
+class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) with GenericMapRing[K, V, Map[K, V]]
 
 object MapAlgebra {
   def rightContainsLeft[K,V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
