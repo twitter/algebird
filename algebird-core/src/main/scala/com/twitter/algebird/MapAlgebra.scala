@@ -89,7 +89,7 @@ class ScMapGroup[K,V](implicit val group : Group[V]) extends ScMapMonoid[K,V]()(
  */
 trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Ring[M] with MapOperations[K, V, M] {
 
-  implicit val ring : Ring[V]
+  implicit def ring : Ring[V]
 
   // It is possible to implement this, but we need a special "identity map" which we
   // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
