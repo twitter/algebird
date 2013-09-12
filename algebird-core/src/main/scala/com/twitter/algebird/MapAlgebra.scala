@@ -111,7 +111,11 @@ trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Ring[M] with MapOperations[
   }
 }
 
-class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring) with GenericMapRing[K, V, Map[K, V]]
+class MapRing[K,V](implicit val ring : Ring[V]) extends MapGroup[K,V]()(ring)
+  with GenericMapRing[K, V, Map[K, V]]
+
+class ScMapRing[K,V](implicit val ring : Ring[V]) extends ScMapGroup[K,V]()(ring)
+  with GenericMapRing[K, V, ScMap[K, V]]
 
 object MapAlgebra {
   def rightContainsLeft[K,V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
