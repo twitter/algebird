@@ -45,7 +45,7 @@ object AggregatorLaws extends Properties("Aggregator") {
   }
   property("composing two Aggregators is correct") = forAll { (in: List[Int], ag1: Aggregator[Int,Int,Int], ag2:
     Aggregator[Int,Double,String]) =>
-    val c = Aggregator.compose(ag1, ag2)
+    val c = GeneratedTupleAggregator.from2(ag1, ag2)
     in.isEmpty || c(in) == (ag1(in), ag2(in))
   }
 }

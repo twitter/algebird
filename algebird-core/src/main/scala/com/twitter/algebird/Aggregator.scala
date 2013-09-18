@@ -1,13 +1,13 @@
 package com.twitter.algebird
 
+/**
+ * Aggregators compose well.
+ *
+ * To create a parallel aggregator that operates on a single
+ * input in parallel, use:
+ * GeneratedTupleAggregator.from2((agg1, agg2))
+ */
 object Aggregator extends java.io.Serializable {
-  /** We could autogenerate 22 of these, and if find ourselves using them we should.
-   * in the mean time, if you need 3, then compose twice: ((C1,C2),C3) and
-   * use andThenPresent to map to (C1, C2, C3)
-   */
-  def compose[A,B1,C1,B2,C2](agg1: Aggregator[A,B1,C1], agg2: Aggregator[A,B2,C2]): Aggregator[A,(B1,B2),(C1,C2)] =
-    new Aggregator2(agg1, agg2)
-
   /** Using Aggregator.prepare,present you can add to this aggregator
    */
   def fromReduce[T](red: (T,T) => T): Aggregator[T,T,T] = new Aggregator[T,T,T] {
@@ -31,19 +31,6 @@ object Aggregator extends java.io.Serializable {
     def ring = rng
     def present(reduction : T) = reduction
   }
-}
-
-/** We make a non-anonymous class with public access to the underlying aggregators as
- * they may be useful for a runtime optimization
- */
-class Aggregator2[A,B1,B2,C1,C2](val agg1: Aggregator[A,B1,C1], val agg2: Aggregator[A,B2,C2]) extends Aggregator[A,(B1,B2),(C1,C2)] {
-  def prepare(input : A) = (agg1.prepare(input), agg2.prepare(input))
-  def reduce(l : (B1,B2), r : (B1,B2)) = {
-    val b1next = agg1.reduce(l._1, r._1)
-    val b2next = agg2.reduce(l._2, r._2)
-    (b1next, b2next)
-  }
-  def present(reduction : (B1,B2)) = (agg1.present(reduction._1), agg2.present(reduction._2))
 }
 
 trait Aggregator[-A,B,+C] extends Function1[TraversableOnce[A], C] with java.io.Serializable { self =>
