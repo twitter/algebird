@@ -206,6 +206,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V: Semigroup] = new MapMonoid[K,V]
+  implicit def scMapMonoid[K,V: Semigroup] = new ScMapMonoid[K,V]
   implicit def jmapMonoid[K,V : Semigroup] = new JMapMonoid[K,V]
   implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
   implicit def function1Monoid[T] = new Function1Monoid[T]

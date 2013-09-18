@@ -5,6 +5,8 @@ import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
 import org.scalacheck.Prop._
 
+import scala.collection.{Map => ScMap}
+
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
 
@@ -60,19 +62,32 @@ object CollectionSpecification extends Properties("Collections") {
       .map { _.filter { kv => mv.isNonZero(kv._2) } }
   }
 
-  property("Map plus/times keys") = forAll { (a : Map[Int,Int], b : Map[Int,Int]) =>
-    val rng = implicitly[Ring[Map[Int,Int]]]
-    (rng.zero == Map[Int,Int]()) &&
-    // Subsets because zeros are removed from the times/plus values
-    (rng.times(a,b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
-      (rng.plus(a,b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
-      (rng.plus(a,a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys)
+  implicit def scMapArb[K : Arbitrary, V : Arbitrary : Monoid] = Arbitrary {
+    mapArb[K, V]
+      .arbitrary
+      .map { map: Map[K,V] => map: ScMap[K,V] }
   }
+
+  def mapPlusTimesKeys[M <: ScMap[Int, Int]]
+      (implicit rng: Ring[M], arbMap: Arbitrary[M]) =
+    forAll { (a: M, b: M) =>
+      // Subsets because zeros are removed from the times/plus values
+      (rng.times(a,b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
+        (rng.plus(a,b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
+        (rng.plus(a,a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys)
+    }
+
+  property("Map plus/times keys") = mapPlusTimesKeys[Map[Int, Int]]
+  property("ScMap plus/times keys") = mapPlusTimesKeys[ScMap[Int, Int]]
   property("Map[Int,Int] Monoid laws") = isAssociative[Map[Int,Int]] && weakZero[Map[Int,Int]]
+  property("ScMap[Int,Int] Monoid laws") = isAssociative[ScMap[Int,Int]] && weakZero[ScMap[Int,Int]]
   property("Map[Int,Int] has -") = hasAdditiveInverses[Map[Int,Int]]
+  property("ScMap[Int,Int] has -") = hasAdditiveInverses[ScMap[Int,Int]]
   property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
+  property("ScMap[Int,String] Monoid laws") = isAssociative[ScMap[Int,String]] && weakZero[ScMap[Int,String]]
   // We haven't implemented ring.one yet for the Map, so skip the one property
   property("Map is distributive") = isDistributive[Map[Int,Int]]
+  property("ScMap is distributive") = isDistributive[ScMap[Int,Int]]
   implicit def arbIndexedSeq[T:Arbitrary] : Arbitrary[IndexedSeq[T]] =
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
