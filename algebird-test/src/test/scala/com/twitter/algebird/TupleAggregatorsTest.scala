@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.specs._
 
 class TupleAggregatorsTest extends Specification {
-  import GeneratedTupleAggregators._
+  import GeneratedTupleAggregator._
 
   val data = List(1, 3, 2, 0, 5, 6)
   val MinAgg = new Aggregator[Int, Int, Int] {
