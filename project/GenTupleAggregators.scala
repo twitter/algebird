@@ -8,9 +8,9 @@ object GenTupleAggregators {
     IO.write(place,
 """package com.twitter.algebird
 
-object GeneratedTupleAggregators extends GeneratedTupleAggregators
+object GeneratedTupleAggregator extends GeneratedTupleAggregator
 
-trait GeneratedTupleAggregators {
+trait GeneratedTupleAggregator {
 """ + genAggregators(22) + "\n" + "}")
 
     Seq(place)
@@ -29,15 +29,15 @@ trait GeneratedTupleAggregators {
       val tupleTs = "Tuple%d[%s]".format(i, ts)
 
       """
-implicit def Tuple%dAggregator[A, %s, %s](aggs: Tuple%d[%s]): Aggregator[A, %s, %s] = {
+implicit def from%d[A, %s, %s](aggs: Tuple%d[%s]): Aggregator[A, %s, %s] = {
   new Aggregator[A, %s, %s] {
     def prepare(v: A) = (%s)
     def reduce(v1: %s, v2: %s) = (%s)
     def present(v: %s) = (%s)
   }
 }""".format(i, vs, ts, i, aggs, tupleVs, tupleTs,
-            tupleVs, tupleTs, 
-            prepares, 
+            tupleVs, tupleTs,
+            prepares,
             tupleVs, tupleVs, reduces,
             tupleVs, present)
     }).mkString("\n")
