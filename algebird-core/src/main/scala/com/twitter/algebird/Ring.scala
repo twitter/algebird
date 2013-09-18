@@ -105,4 +105,5 @@ object Ring extends GeneratedRingImplicits with ProductRings {
   implicit val jdoubleRing : Ring[JDouble] = JDoubleField
   implicit def indexedSeqRing[T:Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
   implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
+  implicit def scMapRing[K,V](implicit ring : Ring[V]) = new ScMapRing[K,V]()(ring)
 }

@@ -114,6 +114,36 @@ class Function1Monoid[T] extends Monoid[Function1[T,T]] {
   }
 }
 
+// To use the OrValMonoid wrap your item in a OrVal object
+case class OrVal(get: Boolean)
+
+object OrVal {
+  implicit def monoid: Monoid[OrVal] = OrValMonoid
+}
+
+/** Boolean OR monoid.
+ * plus means logical OR, zero is false.
+ */
+object OrValMonoid extends Monoid[OrVal] {
+  override def zero = OrVal(false)
+  override def plus(l: OrVal, r: OrVal) = if (l.get) l else r
+}
+
+// To use the AndValMonoid wrap your item in a AndVal object
+case class AndVal(get: Boolean)
+
+object AndVal {
+  implicit def monoid: Monoid[AndVal] = AndValMonoid
+}
+
+/** Boolean AND monoid.
+ * plus means logical AND, zero is true.
+ */
+object AndValMonoid extends Monoid[AndVal] {
+  override def zero = AndVal(true)
+  override def plus(l: AndVal, r: AndVal) = if(l.get) r else l
+}
+
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon : Monoid[T]) = mon.zero
@@ -176,6 +206,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K,V: Semigroup] = new MapMonoid[K,V]
+  implicit def scMapMonoid[K,V: Semigroup] = new ScMapMonoid[K,V]
   implicit def jmapMonoid[K,V : Semigroup] = new JMapMonoid[K,V]
   implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
   implicit def function1Monoid[T] = new Function1Monoid[T]

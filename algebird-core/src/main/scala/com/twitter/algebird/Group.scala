@@ -82,4 +82,5 @@ object Group extends GeneratedGroupImplicits with ProductGroups {
   implicit val jdoubleGroup : Group[JDouble] = JDoubleField
   implicit def indexedSeqGroup[T:Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
   implicit def mapGroup[K,V](implicit group : Group[V]) = new MapGroup[K,V]()(group)
+  implicit def scMapGroup[K,V](implicit group : Group[V]) = new ScMapGroup[K,V]()(group)
 }
