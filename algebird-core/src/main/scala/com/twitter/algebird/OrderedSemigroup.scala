@@ -28,7 +28,7 @@ object Max {
   def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Max[T]] =
      Monoid.from(Max(zero)) { (l,r) => if(ord.gteq(l.get, r.get)) l else r }
 
-  def aggregator[T](implicit ord:Ordering[T]) = MaxAggregator()(ord)
+  def aggregator[T](implicit ord:Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)
 
   implicit def intMonoid: Monoid[Max[Int]] = monoid(Int.MinValue)
   implicit def longMonoid: Monoid[Max[Long]] = monoid(Long.MinValue)
@@ -63,7 +63,7 @@ object Min {
   def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
      Monoid.from(Min(zero)) { (l,r) => if(ord.lteq(l.get, r.get)) l else r }
 
-  def aggregator[T](implicit ord:Ordering[T]) = MinAggregator()(ord)
+  def aggregator[T](implicit ord:Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
 
   implicit def intMonoid: Monoid[Min[Int]] = monoid(Int.MaxValue)
   implicit def longMonoid: Monoid[Min[Long]] = monoid(Long.MaxValue)

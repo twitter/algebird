@@ -111,18 +111,18 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
 }
 
 object CMS {
-  def monoid(eps : Double, delta : Double, seed : Int, heavyHittersPct : Double = 0.01) =
+  def monoid(eps : Double, delta : Double, seed : Int, heavyHittersPct : Double = 0.01): CountMinSketchMonoid =
     new CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
 
-  def monoid(depth : Int, width : Int, seed : Int, heavyHittersPct : Double) =
+  def monoid(depth : Int, width : Int, seed : Int, heavyHittersPct : Double): CountMinSketchMonoid =
     new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed, heavyHittersPct)
 
-  def aggregator(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01) = {
+  def aggregator(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01): CountMinSketchAggregator = {
     val monoid = new CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
     new CountMinSketchAggregator(monoid)
   }
 
-  def aggregator(depth : Int, width : Int, seed : Int, heavyHittersPct : Double) = {
+  def aggregator(depth : Int, width : Int, seed : Int, heavyHittersPct : Double): CountMinSketchAggregator = {
     val monoid = new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed, heavyHittersPct)
     new CountMinSketchAggregator(monoid)
   }

@@ -360,15 +360,19 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 }
 
 object HyperLogLogAggregator {
-  def apply(bits: Int) = {
+  def apply(bits: Int): HyperLogLogAggregator = {
     val monoid = new HyperLogLogMonoid(bits)
     new HyperLogLogAggregator(monoid)
   }
+
+  def sizeAggregator(bits: Int): Aggregator[Array[Byte], HLL, Double] = {
+    apply(bits).andThenPresent(_.estimatedSize)
+  }
 }
 
-case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, Double] {
+case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {
   val monoid = hllMonoid
 
   def prepare(value: Array[Byte]) = monoid.create(value)
-  def present(hll: HLL) = hll.estimatedSize
+  def present(hll: HLL) = hll
 }
