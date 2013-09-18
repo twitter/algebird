@@ -7,7 +7,7 @@ See the [current API documentation](http://twitter.github.com/algebird) for more
 ## What can you do with this code?
 
 ```scala
-Welcome to Scala version 2.9.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
+Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -32,6 +32,14 @@ For example, average, moving average, max/min, set
   HyperLogLog and CountMinSketch. These allow you to think of these sophisticated operations like
   you might numbers, and add them up in hadoop or online to produce powerful statistics and
   analytics.
+
+## Community and Documentation
+
+To learn more and find links to tutorials and information around the web, check out the [Algebird Wiki](https://github.com/twitter/algebird/wiki).
+
+The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
+
+Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 ## Maven
 
