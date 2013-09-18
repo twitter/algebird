@@ -19,6 +19,7 @@ import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFlo
 import java.util.{List => JList, Map => JMap}
 
 import scala.collection.mutable.{Map => MMap}
+import scala.collection.{Map => ScMap}
 import scala.annotation.{implicitNotFound, tailrec}
 
 /**
@@ -144,6 +145,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
   implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
+  implicit def scMapSemigroup[K,V:Semigroup]: Semigroup[ScMap[K,V]] = new ScMapMonoid[K,V]
   implicit def jmapSemigroup[K,V : Semigroup] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
   implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
