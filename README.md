@@ -71,7 +71,6 @@ The answer is a mix of the following:
 * We needed this to work in scala 2.8, and it appeared that Scalaz 7 didn't support 2.8. We've since moved to 2.9, though.
 * We also needed Ring and Field, and those are not (as of the writing of the code) in Scalaz.
 * If you want to interop, it is trivial to define implicit conversions to and from Scalaz Monoid.
-* Scalaz is big and scary for some people. We have enough trouble with adoption without scaring people with [Cokleisli star operators](https://github.com/scalaz/scalaz/blob/master/core/src/main/scala/scalaz/Cokleisli.scala#L19).
 
 ## Authors
 
