@@ -76,4 +76,44 @@ object CombinatorTest extends Properties("Combinator") {
     }
   property("MonoidCombinator with top-K forms a Monoid") = monoidLaws[(Map[Int, Int],Set[Int])]
 
+
+  /**
+   * Threshold crossing logic can also be done with one sum on
+   * the following combined Semigroup:
+   */
+  property("Threshold combinator works") = {
+    val threshold = 10000L
+
+    implicit val orSemi = Semigroup.from[Boolean](_ || _)
+    implicit val andSemi = Semigroup.from[Option[Boolean]] { (l, r) =>
+      (l, r) match {
+        case (None, _) => r
+        case (_, None) => l
+        case (Some(lb), Some(rb)) => Some(lb && rb)
+      }
+    }
+    implicit val thresh: Semigroup[(Long, (Boolean, Option[Boolean]))] =
+      new SemigroupCombinator({ (sum: Long, doneCross: (Boolean, Option[Boolean])) =>
+        val (done, cross) = doneCross
+        if(done) (true, Some(false))
+        else {
+          // just crossed
+          if(sum >= threshold && doneCross._2.isEmpty) (true, Some(true))
+          else (false, None) // not yet crossed
+        }
+      })
+    semigroupLaws[(Long, (Boolean, Option[Boolean]))] && {
+    // thresholds could be implemented as so:
+    //
+      def sumCrosses(l: List[Long], t: Long) =
+        !(l.scanLeft(0L)(_ + _).filter( _ >= t).isEmpty)
+      forAll { (t: List[Long]) =>
+        sumCrosses(t, threshold) ==
+          (Semigroup.sumOption((0L :: t).map { (_, (false, None:Option[Boolean])) })
+             .headOption
+             .map { _._2._1 }
+             .getOrElse(false))
+      }
+    }
+  }
 }
