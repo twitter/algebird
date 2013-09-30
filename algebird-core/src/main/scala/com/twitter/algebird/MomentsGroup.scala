@@ -41,7 +41,8 @@ case class Moments(m0 : Long, m1 : Double, m2 : Double, m3 : Double, m4 : Double
 
 object Moments {
   implicit val group = MomentsGroup
-  
+  implicit val aggregator = MomentsAggregator
+
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
   def apply[V <% Double](value : V) = new Moments(1L, value, 0, 0, 0)
@@ -125,4 +126,11 @@ object MomentsGroup extends Group[Moments] {
       meanCombined
     }
   }
+}
+
+object MomentsAggregator extends MonoidAggregator[Double, Moments, Moments] {
+  val monoid = MomentsGroup
+
+  def prepare(input: Double): Moments = Moments(input)
+  def present(m: Moments) = m
 }
