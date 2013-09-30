@@ -27,25 +27,35 @@ import scala.annotation.tailrec
 object TakeTest extends Properties("TakeSemigroup") {
   import BaseProperties._
 
-  implicit def arbTake[T](implicit tarb: Arbitrary[T]): Arbitrary[TakeState[T]] = Arbitrary( for {
+  implicit def arbTake[T](implicit tarb: Arbitrary[T]): Arbitrary[TakeState[(T, Long)]] = Arbitrary( for {
     s <- tarb.arbitrary
     c <- Gen.choose(0L, 100000L)
     b <- Gen.oneOf(true, false)
-  } yield TakeState(s, c, b))
+  } yield TakeState((s, c), b))
 
-  implicit val takeSemi = new TakeSemigroup[Int](100)
+  implicit def takeSemi[T:Semigroup] = new TakeSemigroup[T](100)
 
-  property("Take is a semigroup") = semigroupLaws[TakeState[Int]]
+  implicit def arbLast[T](implicit tarb: Arbitrary[T]): Arbitrary[Last[T]] =
+    Arbitrary(tarb.arbitrary.map(Last(_)))
+
+  property("Take is a semigroup") = semigroupLaws[TakeState[(Last[Int], Long)]]
+  property("Take while summing is a semigroup") = semigroupLaws[TakeState[(Int, Long)]]
 
   def take[T](t: List[T], cnt: Long): List[T] = {
-    implicit val takes = new TakeSemigroup[T](cnt)
-    t.map(item => Option(TakeState(item)))
-      .scanLeft(None: Option[TakeState[T]])(Monoid.plus[Option[TakeState[T]]](_, _))
-      .collect { case Some(TakeState(item, _, false)) => item }
+    implicit val takes: Semigroup[TakeState[(Last[T], Long)]] = new TakeSemigroup[Last[T]](cnt)
+    t.map(item => Option(TakeState((Last(item), 1L))))
+      .scanLeft(None: Option[TakeState[(Last[T], Long)]])(Monoid.plus[Option[TakeState[(Last[T], Long)]]](_, _))
+      .collect { case Some(TakeState((Last(item), _), false)) => item }
   }
 
   property("Take works as expected") = forAll { (t: List[Int]) =>
     val posCnt = Gen.choose(1, 2 * t.size + 2).sample.get
     t.take(posCnt) == take(t, posCnt)
   }
+
+  implicit val arbTakeD: Arbitrary[TakeState[BigInt]] =
+    Arbitrary(Arbitrary.arbitrary[BigInt].map(b => TakeState(b.abs)))
+
+  implicit val threshold: Semigroup[TakeState[BigInt]] = TakeWhileSemigroup[BigInt](_ < 100L)
+  property("Takewhile sum < 100 is a semigroup") = semigroupLaws[TakeState[BigInt]]
 }
