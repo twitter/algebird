@@ -196,5 +196,18 @@ class CountMinSketchTest extends Specification {
       cms3.heavyHitters must be_==(Set(5L))
       cms4.heavyHitters must be_==(Set[Long]())
     }
+
+    "work as an Aggregator" in {
+      val data1 = Seq(1L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 5L)
+      val cms1 = CMS.aggregator(EPS, DELTA, SEED, 0.01).apply(data1)
+      val cms2 = CMS.aggregator(EPS, DELTA, SEED, 0.1).apply(data1)
+      val cms3 = CMS.aggregator(EPS, DELTA, SEED, 0.3).apply(data1)
+      val cms4 = CMS.aggregator(EPS, DELTA, SEED, 0.9).apply(data1)
+
+      cms1.heavyHitters must be_==(Set(1L, 2L, 3L, 4L, 5L))
+      cms2.heavyHitters must be_==(Set(2L, 3L, 4L, 5L))
+      cms3.heavyHitters must be_==(Set(5L))
+      cms4.heavyHitters must be_==(Set[Long]())
+    }
   }
 }

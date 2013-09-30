@@ -111,11 +111,21 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
 }
 
 object CMS {
-  def monoid(eps : Double, delta : Double, seed : Int, heavyHittersPct : Double = 0.01) =
+  def monoid(eps : Double, delta : Double, seed : Int, heavyHittersPct : Double = 0.01): CountMinSketchMonoid =
     new CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
 
-  def monoid(depth : Int, width : Int, seed : Int, heavyHittersPct : Double) =
+  def monoid(depth : Int, width : Int, seed : Int, heavyHittersPct : Double): CountMinSketchMonoid =
     new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed, heavyHittersPct)
+
+  def aggregator(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01): CountMinSketchAggregator = {
+    val monoid = new CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
+    new CountMinSketchAggregator(monoid)
+  }
+
+  def aggregator(depth : Int, width : Int, seed : Int, heavyHittersPct : Double): CountMinSketchAggregator = {
+    val monoid = new CountMinSketchMonoid(CMS.eps(width), CMS.delta(depth), seed, heavyHittersPct)
+    new CountMinSketchAggregator(monoid)
+  }
 
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
@@ -452,4 +462,15 @@ case class HeavyHitters(
 case class HeavyHitter(item : Long, count : Long)
 object HeavyHitter {
   val ordering = Ordering.by { hh : HeavyHitter => (hh.count, hh.item) }
+}
+
+/**
+  * An Aggregator for the CountMinSketch.
+  * Can be created using CMS.aggregator
+  */
+case class CountMinSketchAggregator(cmsMonoid : CountMinSketchMonoid) extends MonoidAggregator[Long, CMS, CMS] {
+  val monoid = cmsMonoid
+
+  def prepare(value : Long) = monoid.create(value)
+  def present(cms : CMS) = cms
 }
