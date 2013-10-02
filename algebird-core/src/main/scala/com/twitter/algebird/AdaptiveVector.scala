@@ -87,6 +87,30 @@ object AdaptiveVector {
           fromMap(Semigroup.plus(toMap(left), toMap(right)), left.sparseValue, maxSize)
       }
     }
+    override def sumOption(items: TraversableOnce[AdaptiveVector[V]]): Option[AdaptiveVector[V]] =
+      if(items.isEmpty) None
+      else {
+        /**
+         * This is worth optimizing, so we use some local mutables
+         */
+        val buffer = scala.collection.mutable.Map[Int, V]()
+        var size = 0
+        var sparseVal: Option[V] = None
+        items.foreach { vector =>
+          sparseVal.foreach { sv =>
+            assert(sv == vector.sparseValue,
+              "incompatible sparseValue: %s != %s".format(sv, vector.sparseValue))
+          }
+          sparseVal = Some(vector.sparseValue)
+          vector.denseIterator.foreach { case (idx, v) =>
+            val oldV = buffer.get(idx).orElse(sparseVal).get
+            val newV = Semigroup.plus(oldV, v)
+            buffer += idx -> newV
+          }
+          size = size max (vector.size)
+        }
+        Some(fromMap(buffer.toMap, sparseVal.get, size))
+      }
   }
   private class AVMonoid[V:Monoid] extends AVSemigroup[V] with Monoid[AdaptiveVector[V]] {
     val zero = AdaptiveVector.fill[V](0)(Monoid.zero[V])
