@@ -81,7 +81,7 @@ class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[
   override lazy val zero = Map[K,V]()
   override def add(oldMap: Map[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: Map[K,V], k: K) = oldMap - k
-  override def fromMutable(mut: MMap[K, V]) = mut.toMap
+  override def fromMutable(mut: MMap[K, V]) = Map(mut.toSeq: _*)
 }
 
 class ScMapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K,V]] {

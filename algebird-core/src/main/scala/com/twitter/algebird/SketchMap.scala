@@ -83,7 +83,7 @@ extends Monoid[SketchMap[K, V]] {
         if(buffer.size > maxBuffer) sumBuffer
         buffer += sm
       }
-      sumBuffer
+      if(buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
       Some(buffer(0))
     }
 
@@ -195,7 +195,7 @@ case class SketchMap[K, V](
   /**
    * All of the Heavy Hitter frequencies calculated all at once.
    */
-  private lazy val heavyHittersMapping: Map[K, V] = params.calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
+  private val heavyHittersMapping: Map[K, V] = params.calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
 
   /**
    * Ordering used to sort keys by its value. We use the reverse implicit

@@ -1,8 +1,7 @@
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen, Properties}
 import org.scalacheck.Gen.choose
-import org.scalacheck.Properties
 import org.scalacheck.Prop._
 
 import scala.collection.{Map => ScMap}
@@ -169,16 +168,31 @@ object CollectionSpecification extends Properties("Collections") {
       )
     }
 
-  implicit def arbAV[T:Arbitrary:Monoid] : Arbitrary[AdaptiveVector[T]] =
-    Arbitrary {
-      Arbitrary.arbitrary[List[T]]
-        .map { l =>
-        AdaptiveVector.fromVector(Vector(l :_*), Monoid.zero[T])
-      }
-    }
-  property("AdaptiveVector[Int] has a semigroup") = semigroupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[Int] has a monoid") = monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[Int] has a group") = groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[String] has a monoid") = monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+  def arbAV[T:Arbitrary](sparse: T): Gen[AdaptiveVector[T]] =
+      Gen.oneOf(
+        for {
+         l <- Arbitrary.arbitrary[List[T]]
+        } yield AdaptiveVector.fromVector(Vector(l :_*), sparse),
+        for {
+         m <- Arbitrary.arbitrary[Map[Int, T]]
+         } yield AdaptiveVector.fromMap(m.filter{case (k, _) => (k < 1000) && (k >= 0)},
+           sparse, 1000)
+      )
 
+  property("AdaptiveVector[Int] has a semigroup") = {
+    implicit val arb = Arbitrary(arbAV(2))
+    semigroupLawsEquiv[AdaptiveVector[Int]]
+  }
+  property("AdaptiveVector[Int] has a monoid") = {
+    implicit val arb = Arbitrary(arbAV(0))
+    monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  }
+  property("AdaptiveVector[Int] has a group") = {
+    implicit val arb = Arbitrary(arbAV(1))
+    groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  }
+  property("AdaptiveVector[String] has a monoid") = {
+    implicit val arb = Arbitrary(arbAV(""))
+    monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+  }
 }

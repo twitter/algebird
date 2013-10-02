@@ -113,7 +113,7 @@ class SetMonoid[T] extends Monoid[Set[T]] {
     if(items.isEmpty) None
     else {
       val mutable = scala.collection.mutable.Set[T]()
-      items.foreach { s => s.foreach { i => mutable += i } }
+      items.foreach { s => mutable ++= s }
       Some(mutable.toSet)
     }
 }

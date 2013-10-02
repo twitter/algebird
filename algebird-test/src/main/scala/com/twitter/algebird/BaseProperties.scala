@@ -57,16 +57,8 @@ object BaseProperties {
     semigroupLawsEquiv[T]
   }
 
-  def semigroupLawsEquiv[T : Semigroup : Arbitrary: Equiv] = {
-    // Don't let these lists get too long
-    implicit val list: Arbitrary[List[T]] = Arbitrary {
-      val tgen = Arbitrary.arbitrary[T]
-      Gen.oneOf(Gen.listOfN(0, tgen),
-        Gen.listOfN(1, tgen),
-        (0 to 5).map(Gen.listOfN(_, tgen)): _*)
-    }
+  def semigroupLawsEquiv[T : Semigroup : Arbitrary: Equiv] =
     isAssociativeEq[T](Equiv[T].equiv _) && semigroupSumWorks[T]
-  }
 
   def commutativeSemigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) =
     isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
