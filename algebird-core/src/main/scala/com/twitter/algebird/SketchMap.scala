@@ -195,7 +195,7 @@ case class SketchMap[K, V](
   /**
    * All of the Heavy Hitter frequencies calculated all at once.
    */
-  private val heavyHittersMapping: Map[K, V] = params.calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
+  private lazy val heavyHittersMapping: Map[K, V] = params.calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
 
   /**
    * Ordering used to sort keys by its value. We use the reverse implicit
