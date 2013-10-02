@@ -31,6 +31,8 @@ import Conversion.asMethod // "as" syntax
 class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], bij: ImplicitBijection[T, U]) extends Semigroup[U] {
   def bijection: Bijection[U, T] = bij.bijection.inverse
   override def plus(l: U, r: U): U = sg.plus(l.as[T], r.as[T]).as[U]
+  override def sumOption(iter: TraversableOnce[U]): Option[U] =
+    sg.sumOption(iter.map { _.as[T] }).as[Option[U]]
 }
 
 class BijectedMonoid[T, U](implicit val monoid: Monoid[T], bij: ImplicitBijection[T, U]) extends BijectedSemigroup[T, U] with Monoid[U] {
@@ -43,7 +45,7 @@ class BijectedGroup[T, U](implicit val group: Group[T], bij: ImplicitBijection[T
 }
 
 class BijectedRing[T, U](implicit val ring: Ring[T], bij: ImplicitBijection[T, U]) extends BijectedGroup[T, U] with Ring[U] {
-  override def one: U = ring.one
+  override def one: U = ring.one.as[U]
   override def times(l: U, r: U): U = ring.times(l.as[T], r.as[T]).as[U]
   override def product(iter: TraversableOnce[U]): U =
     ring.product(iter map { _.as[T] }).as[U]

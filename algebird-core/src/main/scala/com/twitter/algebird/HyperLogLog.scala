@@ -208,6 +208,10 @@ sealed abstract class HLL extends java.io.Serializable {
       size * scala.math.log(size.toDouble / zeroCnt)
     }
   }
+  /**
+   * Set each item in the given buffer to the max of this and the buffer
+   */
+  def updateInto(buffer: Array[Byte]): Unit
 }
 
 case class SparseHLL(bits : Int, maxRhow : Map[Int,Max[Byte]]) extends HLL {
@@ -254,6 +258,12 @@ case class SparseHLL(bits : Int, maxRhow : Map[Int,Max[Byte]]) extends HLL {
   }
 
   lazy val toDenseHLL = DenseHLL(bits, sparseMapToSequence(maxRhow))
+  def updateInto(buffer: Array[Byte]): Unit = {
+    assert(buffer.length == size, "Length mismatch")
+    maxRhow.foreach { case (idx, maxb) =>
+      buffer.update(idx, buffer(idx) max (maxb.get))
+    }
+  }
 }
 
 /**
@@ -291,6 +301,14 @@ case class DenseHLL(bits : Int, v : IndexedSeq[Byte]) extends HLL {
   }
 
   val toDenseHLL = this
+  def updateInto(buffer: Array[Byte]): Unit = {
+    assert(buffer.length == size, "Length mismatch")
+    var idx = 0
+    v.foreach { maxb =>
+      buffer.update(idx, (buffer(idx)) max maxb)
+      idx += 1
+    }
+  }
 }
 
 /*
@@ -309,6 +327,14 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
   val zero : HLL = SparseHLL(bits, Monoid.zero[Map[Int,Max[Byte]]])
 
   def plus(left : HLL, right : HLL) = left + right
+
+  override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
+    if(items.isEmpty) None
+    else {
+      val buffer = new Array[Byte](size)
+      items.foreach { _.updateInto(buffer) }
+      Some(DenseHLL(bits, buffer.toIndexedSeq))
+    }
 
   def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)

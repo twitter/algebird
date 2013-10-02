@@ -61,8 +61,7 @@ trait MonoidAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   def monoid : Monoid[B]
   final def reduce(l : B, r : B) : B = monoid.plus(l, r)
   final override def reduce(items : TraversableOnce[B]) : B =
-    if(items.isEmpty) monoid.zero
-    else items.reduceLeft(reduce _)
+    monoid.sum(items)
 }
 
 trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
