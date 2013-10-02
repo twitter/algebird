@@ -39,6 +39,8 @@ object AdaptiveMatrix {
     override def plus(left: AdaptiveMatrix[V], right: AdaptiveMatrix[V]): AdaptiveMatrix[V] = {
       AdaptiveMatrix[V](matrixMonoid.plus(left.rowsByColumns, right.rowsByColumns))
     }
+    override def sumOption(items: TraversableOnce[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] =
+      matrixMonoid.sumOption(items.map(_.rowsByColumns)).map(AdaptiveMatrix[V](_))
   }
 }
 

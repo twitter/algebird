@@ -35,6 +35,9 @@ trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
+// For Java interop so they get the default methods
+abstract class AbstractRing[T] extends Ring[T]
+
 class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
   override def zero = num.zero
   override def one = num.one

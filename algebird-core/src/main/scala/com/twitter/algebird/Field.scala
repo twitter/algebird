@@ -40,6 +40,9 @@ trait Field[@specialized(Int,Long,Float,Double) T] extends Ring[T] {
   }
 }
 
+// For Java interop so they get the default methods
+abstract class AbstractField[T] extends Field[T]
+
 object FloatField extends Field[Float] {
   override def one = 1.0f
   override def zero = 0.0f

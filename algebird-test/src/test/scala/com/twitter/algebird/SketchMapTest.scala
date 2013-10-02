@@ -9,7 +9,7 @@ import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
 object SketchMapTestImplicits {
-  val DELTA = 1E-10
+  val DELTA = 1E-8
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10

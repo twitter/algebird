@@ -11,8 +11,8 @@ import org.scalacheck.Prop.forAll
 object CountMinSketchLaws extends Properties("CountMinSketch") {
   import BaseProperties._
 
-  val DELTA = 1E-10
-  val EPS = 0.001
+  val DELTA = 1E-8
+  val EPS = 0.005
   val SEED = 1
 
   implicit val cmsMonoid = new CountMinSketchMonoid(EPS, DELTA, SEED)
