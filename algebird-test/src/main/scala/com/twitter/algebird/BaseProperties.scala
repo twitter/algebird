@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Properties }
+import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalacheck.Prop.forAll
 import scala.math.Equiv
 /**
@@ -36,14 +36,30 @@ object BaseProperties {
     eqfn(semi.plus(a, semi.plus(b,c)), semi.plus(semi.plus(a,b), c))
   }
   def isAssociative[T : Semigroup : Arbitrary] = isAssociativeEq[T](defaultEq _)
+
+  def semigroupSumWorks[T:Semigroup:Arbitrary:Equiv] = forAll { (in: List[T]) =>
+    Equiv[Option[T]].equiv(Semigroup.sumOption(in), in.reduceLeftOption(Semigroup.plus(_,_)))
+  }
+
   def isCommutativeEq[T : Semigroup : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
     val semi = implicitly[Semigroup[T]]
     eqfn(semi.plus(a,b), semi.plus(b,a))
   }
   def isCommutative[T : Semigroup : Arbitrary] = isCommutativeEq[T](defaultEq _)
 
-  def semigroupLaws[T : Semigroup : Arbitrary] = isAssociative[T]
-  def semigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = isAssociativeEq[T](eqfn)
+  def semigroupLaws[T : Semigroup : Arbitrary] = {
+    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    semigroupLawsEquiv[T]
+  }
+
+  def semigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = {
+    implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
+    semigroupLawsEquiv[T]
+  }
+
+  def semigroupLawsEquiv[T : Semigroup : Arbitrary: Equiv] =
+    isAssociativeEq[T](Equiv[T].equiv _) && semigroupSumWorks[T]
+
   def commutativeSemigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) =
     isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeSemigroupLaws[T : Semigroup : Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)

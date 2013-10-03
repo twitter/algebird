@@ -35,6 +35,9 @@ trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
   def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
+// For Java interop so they get the default methods
+abstract class AbstractRing[T] extends Ring[T]
+
 class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
   override def zero = num.zero
   override def one = num.one
@@ -105,4 +108,5 @@ object Ring extends GeneratedRingImplicits with ProductRings {
   implicit val jdoubleRing : Ring[JDouble] = JDoubleField
   implicit def indexedSeqRing[T:Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
   implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
+  implicit def scMapRing[K,V](implicit ring : Ring[V]) = new ScMapRing[K,V]()(ring)
 }

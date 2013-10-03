@@ -71,20 +71,47 @@ object AdaptiveVector {
     Vector( buf :_* )
   }
 
+  def toVector[V](v: AdaptiveVector[V]): Vector[V] =
+    v match {
+      case DenseVector(is, sv, _) => is
+      case SparseVector(m, v, sz) => toVector(m, v, sz)
+    }
+
+  private def withSparse[V](v: AdaptiveVector[V], sv: V): AdaptiveVector[V] =
+    if(v.sparseValue == sv) v
+    else fromVector(toVector(v), sv)
+
   private class AVSemigroup[V:Semigroup] extends Semigroup[AdaptiveVector[V]] {
+    private def valueIsNonZero(v: V): Boolean = implicitly[Semigroup[V]] match {
+      case m: Monoid[_] => m.isNonZero(v)
+      case _ => true
+    }
+
     def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) = {
-      // TODO you could imagine just normalizing to the sparsest input
-      assert(left.sparseValue == right.sparseValue, "incompatible sparse values")
-      val maxSize = Ordering[Int].max(left.size, right.size)
-      (left, right) match {
-        case (DenseVector(lv, ls, ld), DenseVector(rv, rs, rd)) =>
-          val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
-            case v: Vector[_] => v.asInstanceOf[Vector[V]]
-            case notV => Vector(notV : _*)
-          }
-          fromVector(vec, ls)
-        case _ =>
-          fromMap(Semigroup.plus(toMap(left), toMap(right)), left.sparseValue, maxSize)
+      if(left.sparseValue != right.sparseValue) {
+        if(left.denseCount > right.denseCount) plus(withSparse(left, right.sparseValue), right)
+        else plus(left, withSparse(right, left.sparseValue))
+      }
+      else {
+        // they have the same sparse value
+        val maxSize = Ordering[Int].max(left.size, right.size)
+        (left, right) match {
+          case (DenseVector(lv, ls, ld), DenseVector(rv, rs, rd)) =>
+            val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
+              case v: Vector[_] => v.asInstanceOf[Vector[V]]
+              case notV => Vector(notV : _*)
+            }
+            fromVector(vec, ls)
+
+          case _ if valueIsNonZero(left.sparseValue) =>
+            fromVector(Vector(Semigroup.plus(toVector(left):IndexedSeq[V],
+                                      toVector(right):IndexedSeq[V]):_*),
+              left.sparseValue)
+          case _ => // sparse is zero:
+            fromMap(Semigroup.plus(toMap(left), toMap(right)),
+              left.sparseValue,
+              maxSize)
+        }
       }
     }
   }
@@ -99,12 +126,8 @@ object AdaptiveVector {
     }
   }
   private class AVGroup[V:Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
-    override def negate(v: AdaptiveVector[V]) = {
-      v match {
-        case DenseVector(is, sv, dc) => fromVector(is.map { Group.negate[V](_) }, sv)
-        case SparseVector(m, sv, sz) => fromMap(m.mapValues { Group.negate[V](_) }, sv, sz)
-      }
-    }
+    override def negate(v: AdaptiveVector[V]) =
+      fromVector(toVector(v).map(Group.negate(_)), Group.negate(v.sparseValue))
   }
 
   implicit def semigroup[V:Semigroup]: Semigroup[AdaptiveVector[V]] = new AVSemigroup[V]
@@ -130,6 +153,12 @@ object AdaptiveVector {
       }
     Equiv[V].equiv(l.sparseValue, r.sparseValue) && iteq
   }
+
+  implicit def equiv[V:Equiv]: Equiv[AdaptiveVector[V]] =
+    Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
+      (l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
+        toVector(l).view.zip(toVector(r)).forall { case (lv, rv) => Equiv[V].equiv(lv, rv) })
+    }
 }
 
 /** An IndexedSeq that automatically switches representation between dense and sparse depending on sparsity

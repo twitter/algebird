@@ -6,6 +6,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
+import java.io.{ObjectOutputStream, ByteArrayOutputStream}
 
 object BloomFilterLaws extends Properties("BloomFilter") {
   import BaseProperties._
@@ -83,6 +84,40 @@ class BloomFilterTest extends Specification {
         size.min must be_<=(size.estimate)
         size.max must be_>=(size.estimate)
       }
+    }
+
+    "work as an Aggregator" in {
+      (0 to 10).foreach{
+        _ => {
+          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
+          val numEntries = 5
+          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+          val bf = aggregator(entries)
+
+          entries.foreach{
+            i => bf.contains(i.toString).isTrue must be_==(true)
+          }
+        }
+      }
+    }
+
+    "not serialize BFInstance" in {
+      def serialize(bf: BF) = {
+        val stream = new ByteArrayOutputStream()
+        val out = new ObjectOutputStream(stream)
+        out.writeObject(bf)
+        out.close()
+        stream.close()
+        stream.toByteArray
+      }
+
+      val items = (1 until 10).map { _.toString }
+      val bf = BloomFilter(10, 0.1, SEED).create(items: _*)
+      val bytesBeforeSizeCalled = new String(serialize(bf))
+      bf.size
+      bf.contains("1").isTrue must be_==(true)
+      val bytesAfterSizeCalled = new String(serialize(bf))
+      bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
     }
   }
 }

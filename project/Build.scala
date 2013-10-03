@@ -84,7 +84,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.2") % "0.2.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.2.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -114,7 +114,10 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6"
+    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
+      GenTupleAggregators.gen(outDir)
+    }
   )
 
   lazy val algebirdTest = module("test").settings(

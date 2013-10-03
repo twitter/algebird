@@ -1,5 +1,12 @@
 # Algebird #
 
+### Version 0.3.0 ###
+* Optimize lots of the Monoids/Semigroups when summing many items: see Semigroup.sumOption https://github.com/twitter/algebird/pull/206
+* Add many Aggregators for more convenient aggregation: https://github.com/twitter/algebird/pull/194
+* Aggregators compose: https://github.com/twitter/algebird/pull/188
+* Added scala.collection.Map (not just immutable.Map) algebras: https://github.com/twitter/algebird/pull/199
+* Added Boolean monoids (Or and And): https://github.com/twitter/algebird/pull/198
+
 ### Version 0.2.0 ###
 
 * Adds algebird-bijection module: https://github.com/twitter/algebird/pull/181

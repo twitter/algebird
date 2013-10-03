@@ -34,17 +34,9 @@ final case class Done[A](override val get: A) extends Trampoline[A] {
 }
 
 final case class FlatMapped[C, A](start: Trampoline[C], fn: C => Trampoline[A]) extends Trampoline[A] {
-  private val finished = new java.util.concurrent.atomic.AtomicReference[AnyRef](null)
   def map[B](fn: A => B) = FlatMapped(this, { (a: A) => Done(fn(a)) })
   def flatMap[B](fn: A => Trampoline[B]) = FlatMapped(this, fn)
-  def get = {
-    val res = finished.get
-    (if(res == null) {
-      val computed = Trampoline.run(this).asInstanceOf[AnyRef]
-      if (finished.compareAndSet(null, computed)) computed else finished.get
-    }
-    else res).asInstanceOf[A]
-  }
+  lazy val get = Trampoline.run(this)
 }
 
 object Trampoline {

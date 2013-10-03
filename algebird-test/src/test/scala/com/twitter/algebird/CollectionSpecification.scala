@@ -1,9 +1,10 @@
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen, Properties}
 import org.scalacheck.Gen.choose
-import org.scalacheck.Properties
 import org.scalacheck.Prop._
+
+import scala.collection.{Map => ScMap}
 
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
@@ -12,9 +13,15 @@ object CollectionSpecification extends Properties("Collections") {
     Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
   implicit def arbMax[T:Arbitrary] : Arbitrary[Max[T]] =
     Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
+  implicit def arbOrVal: Arbitrary[OrVal] =
+    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => OrVal(b) } }
+  implicit def arbAndVal: Arbitrary[AndVal] =
+    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => AndVal(b) } }
 
   property("MinSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Min[Int]]
   property("MaxSemigroup is a commutative semigroup") = commutativeSemigroupLaws[Max[Int]]
+  property("OrValMonoid is a commutative monoid") = commutativeMonoidLaws[OrVal]
+  property("AndValMonoid is a commutative monoid") = commutativeMonoidLaws[AndVal]
   property("Min[Int] is a monoid") = monoidLaws[Min[Int]]
   property("Max[String] is a monoid") = monoidLaws[Max[String]]
   property("Max[List[Int]] is a monoid") = monoidLaws[Max[List[Int]]]
@@ -54,19 +61,32 @@ object CollectionSpecification extends Properties("Collections") {
       .map { _.filter { kv => mv.isNonZero(kv._2) } }
   }
 
-  property("Map plus/times keys") = forAll { (a : Map[Int,Int], b : Map[Int,Int]) =>
-    val rng = implicitly[Ring[Map[Int,Int]]]
-    (rng.zero == Map[Int,Int]()) &&
-    // Subsets because zeros are removed from the times/plus values
-    (rng.times(a,b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
-      (rng.plus(a,b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
-      (rng.plus(a,a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys)
+  implicit def scMapArb[K : Arbitrary, V : Arbitrary : Monoid] = Arbitrary {
+    mapArb[K, V]
+      .arbitrary
+      .map { map: Map[K,V] => map: ScMap[K,V] }
   }
+
+  def mapPlusTimesKeys[M <: ScMap[Int, Int]]
+      (implicit rng: Ring[M], arbMap: Arbitrary[M]) =
+    forAll { (a: M, b: M) =>
+      // Subsets because zeros are removed from the times/plus values
+      (rng.times(a,b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
+        (rng.plus(a,b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
+        (rng.plus(a,a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys)
+    }
+
+  property("Map plus/times keys") = mapPlusTimesKeys[Map[Int, Int]]
+  property("ScMap plus/times keys") = mapPlusTimesKeys[ScMap[Int, Int]]
   property("Map[Int,Int] Monoid laws") = isAssociative[Map[Int,Int]] && weakZero[Map[Int,Int]]
+  property("ScMap[Int,Int] Monoid laws") = isAssociative[ScMap[Int,Int]] && weakZero[ScMap[Int,Int]]
   property("Map[Int,Int] has -") = hasAdditiveInverses[Map[Int,Int]]
+  property("ScMap[Int,Int] has -") = hasAdditiveInverses[ScMap[Int,Int]]
   property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
+  property("ScMap[Int,String] Monoid laws") = isAssociative[ScMap[Int,String]] && weakZero[ScMap[Int,String]]
   // We haven't implemented ring.one yet for the Map, so skip the one property
   property("Map is distributive") = isDistributive[Map[Int,Int]]
+  property("ScMap is distributive") = isDistributive[ScMap[Int,Int]]
   implicit def arbIndexedSeq[T:Arbitrary] : Arbitrary[IndexedSeq[T]] =
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
@@ -148,16 +168,31 @@ object CollectionSpecification extends Properties("Collections") {
       )
     }
 
-  implicit def arbAV[T:Arbitrary:Monoid] : Arbitrary[AdaptiveVector[T]] =
-    Arbitrary {
-      Arbitrary.arbitrary[List[T]]
-        .map { l =>
-        AdaptiveVector.fromVector(Vector(l :_*), Monoid.zero[T])
-      }
-    }
-  property("AdaptiveVector[Int] has a semigroup") = semigroupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[Int] has a monoid") = monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[Int] has a group") = groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
-  property("AdaptiveVector[String] has a monoid") = monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+  def arbAV[T:Arbitrary](sparse: T): Gen[AdaptiveVector[T]] =
+      Gen.oneOf(
+        for {
+         l <- Arbitrary.arbitrary[List[T]]
+        } yield AdaptiveVector.fromVector(Vector(l :_*), sparse),
+        for {
+         m <- Arbitrary.arbitrary[Map[Int, T]]
+         } yield AdaptiveVector.fromMap(m.filter{case (k, _) => (k < 1000) && (k >= 0)},
+           sparse, 1000)
+      )
 
+  property("AdaptiveVector[Int] has a semigroup") = {
+    implicit val arb = Arbitrary(arbAV(2))
+    semigroupLawsEquiv[AdaptiveVector[Int]]
+  }
+  property("AdaptiveVector[Int] has a monoid") = {
+    implicit val arb = Arbitrary(arbAV(0))
+    monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  }
+  property("AdaptiveVector[Int] has a group") = {
+    implicit val arb = Arbitrary(arbAV(1))
+    groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+  }
+  property("AdaptiveVector[String] has a monoid") = {
+    implicit val arb = Arbitrary(arbAV(""))
+    monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+  }
 }

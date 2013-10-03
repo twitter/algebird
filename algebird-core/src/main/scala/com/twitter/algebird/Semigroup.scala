@@ -19,6 +19,7 @@ import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFlo
 import java.util.{List => JList, Map => JMap}
 
 import scala.collection.mutable.{Map => MMap}
+import scala.collection.{Map => ScMap}
 import scala.annotation.{implicitNotFound, tailrec}
 
 /**
@@ -28,7 +29,15 @@ import scala.annotation.{implicitNotFound, tailrec}
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
   def plus(l : T, r : T) : T
+  /**
+   * override this if there is a faster way to do this sum than reduceLeftOption on plus
+   */
+  def sumOption(iter: TraversableOnce[T]): Option[T] =
+    iter.reduceLeftOption { plus(_, _) }
 }
+
+// For Java interop so they get the default sumOption
+abstract class AbstractSemigroup[T] extends Semigroup[T]
 
 /** Either semigroup is useful for error handling.
  * if everything is correct, use Right (it's right, get it?), if something goes
@@ -66,7 +75,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   def plus[T](l : T, r : T)(implicit semi : Semigroup[T]) = semi.plus(l,r)
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
-    iter.reduceLeftOption { sg.plus(_,_) }
+    sg.sumOption(iter)
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
 
@@ -144,6 +153,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   implicit def jlistSemigroup[T] : Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T] : Semigroup[Set[T]] = new SetMonoid[T]
   implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
+  implicit def scMapSemigroup[K,V:Semigroup]: Semigroup[ScMap[K,V]] = new ScMapMonoid[K,V]
   implicit def jmapSemigroup[K,V : Semigroup] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
   implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]

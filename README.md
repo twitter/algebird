@@ -7,7 +7,7 @@ See the [current API documentation](http://twitter.github.com/algebird) for more
 ## What can you do with this code?
 
 ```scala
-Welcome to Scala version 2.9.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
+Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -33,9 +33,17 @@ For example, average, moving average, max/min, set
   you might numbers, and add them up in hadoop or online to produce powerful statistics and
   analytics.
 
+## Community and Documentation
+
+To learn more and find links to tutorials and information around the web, check out the [Algebird Wiki](https://github.com/twitter/algebird/wiki).
+
+The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
+
+Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
+
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.2.0`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.3.0`.
 
 Current published artifacts are
 
@@ -63,7 +71,6 @@ The answer is a mix of the following:
 * We needed this to work in scala 2.8, and it appeared that Scalaz 7 didn't support 2.8. We've since moved to 2.9, though.
 * We also needed Ring and Field, and those are not (as of the writing of the code) in Scalaz.
 * If you want to interop, it is trivial to define implicit conversions to and from Scalaz Monoid.
-* Scalaz is big and scary for some people. We have enough trouble with adoption without scaring people with [Cokleisli star operators](https://github.com/scalaz/scalaz/blob/master/core/src/main/scala/scalaz/Cokleisli.scala#L19).
 
 ## Authors
 

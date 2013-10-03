@@ -9,7 +9,7 @@ import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
 object SketchMapTestImplicits {
-  val DELTA = 1E-10
+  val DELTA = 1E-8
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10
@@ -129,6 +129,20 @@ class SketchMapTest extends Specification {
       // Try more than one at a time.
       val sm4 = monoid.plus(sm3, monoid.create(Seq((100, 100L), (200, 30L), (200, 20L), (200, 10L))))
       sm4.heavyHitters must be_==(List((100, 5L), (200, 10L)))
+    }
+
+    "work as an Aggregator" in {
+      val data = Seq((1, 1L), (2, 2L), (3, 3L), (4, 4L), (5, 5L))
+
+      val sm1 = SketchMap.aggregator[Int, Long](EPS, DELTA, SEED, 5).apply(data)
+      val sm2 = SketchMap.aggregator[Int, Long](EPS, DELTA, SEED, 3).apply(data)
+      val sm3 = SketchMap.aggregator[Int, Long](EPS, DELTA, SEED, 1).apply(data)
+      val sm4 = SketchMap.aggregator[Int, Long](EPS, DELTA, SEED, 0).apply(data)
+
+      sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
+      sm2.heavyHitterKeys must be_==(List(5, 4, 3))
+      sm3.heavyHitterKeys must be_==(List(5))
+      sm4.heavyHitterKeys must be_==(List.empty[Int])
     }
   }
 }

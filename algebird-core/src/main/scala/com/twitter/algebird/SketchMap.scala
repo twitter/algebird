@@ -16,12 +16,13 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.breakOut
+
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
  * approximation of Map[K, V] that stores reference to top heavy hitters. The
  * Sketch Map can approximate the sums of any summable value that has a monoid.
  */
-
 
 /**
  * Responsible for creating instances of SketchMap.
@@ -61,7 +62,30 @@ extends Monoid[SketchMap[K, V]] {
   /**
    * We assume the Sketch Map on the left and right use the same hash functions.
    */
-  def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = left ++ right
+  override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = left ++ right
+
+  override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
+    if(items.isEmpty) None
+    else {
+      val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
+      val maxBuffer = 1000
+      def sumBuffer: Unit = {
+        val bview = buffer.view
+        val params = buffer(0).params
+        val tab = Monoid.sum(bview.map(_.valuesTable))
+        val hhset = Monoid.sum(bview.map(_.heavyHitterKeys.toSet))
+        val tot = Monoid.sum(bview.map(_.totalValue))
+        buffer.clear()
+        buffer += SketchMap(params, tab, params.updatedHeavyHitters(hhset.toSeq, tab), tot)
+      }
+
+      items.foreach { sm =>
+        if(buffer.size > maxBuffer) sumBuffer
+        buffer += sm
+      }
+      if(buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
+      Some(buffer(0))
+    }
 
   /**
    * Create a Sketch Map sketch out of a single key/value pair.
@@ -89,6 +113,32 @@ case class SketchMapParams[K](hashes: Seq[K => Int], width: Int, depth: Int, hea
 
   def eps = SketchMap.eps(width)
   def delta = SketchMap.delta(depth)
+
+  /**
+   * Calculates the frequencies for every heavy hitter.
+   */
+  def calculateHeavyHittersMapping[V:Ordering](keys: Iterable[K], table: AdaptiveMatrix[V]): Map[K, V] =
+    keys.map { (item: K) => (item, frequency(item, table)) }(breakOut)
+
+  /**
+   * Calculates the frequency for a key given a values table.
+   */
+  def frequency[V:Ordering](key: K, table: AdaptiveMatrix[V]): V =
+    hashes
+      .view
+      .zip(table.rowsByColumns)
+      .map { case (hash, row) => row(hash(key)) }
+      .min
+  /**
+   * Returns a new set of sorted and concatenated heavy hitters given an
+   * arbitrary list of keys.
+   */
+  def updatedHeavyHitters[V:Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
+    val mapping = calculateHeavyHittersMapping(hitters, table)
+    val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
+
+    hitters.sorted(specificOrdering).take(heavyHittersCount).toList
+  }
 }
 
 
@@ -128,6 +178,11 @@ object SketchMap {
                   (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
     new SketchMapMonoid(width(eps), depth(delta), seed, heavyHittersCount)(serialization, valueOrdering, monoid)
   }
+
+  def aggregator[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
+                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+    SketchMapAggregator(SketchMap.monoid(eps, delta, seed, heavyHittersCount))
+  }
 }
 
 case class SketchMap[K, V](
@@ -140,13 +195,13 @@ case class SketchMap[K, V](
   /**
    * All of the Heavy Hitter frequencies calculated all at once.
    */
-  private val heavyHittersMapping: Map[K, V] = calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
+  private lazy val heavyHittersMapping: Map[K, V] = params.calculateHeavyHittersMapping(heavyHitterKeys, valuesTable)
 
   /**
    * Ordering used to sort keys by its value. We use the reverse implicit
    * ordering on V because we want the hold the "largest" values.
    */
-  private implicit val keyValueOrdering: Ordering[K] = Ordering.by[K, V] { heavyHittersMapping(_) } reverse
+  private implicit def keyValueOrdering: Ordering[K] = Ordering.by[K, V](heavyHittersMapping).reverse
 
   /**
    * These are not 100% accurate because of rounding.
@@ -160,31 +215,12 @@ case class SketchMap[K, V](
   def heavyHitters: List[(K, V)] = heavyHitterKeys.map { item => (item, heavyHittersMapping(item)) }
 
   /**
-   * Calculates the frequencies for every heavy hitter.
-   */
-  private def calculateHeavyHittersMapping(keys: Iterable[K], table: AdaptiveMatrix[V]): Map[K, V] = {
-    keys.map { item: K => (item, frequency(item, table)) } toMap
-  }
-
-  /**
-   * Calculates the frequency for a key given a values table.
-   */
-  private def frequency(key: K, table: AdaptiveMatrix[V]): V = {
-    val estimates = table.rowsByColumns.zipWithIndex.map { case (row, i) =>
-      row(params.hashes(i)(key))
-    }
-
-    estimates.min
-  }
-
-  /**
    * Calculates the approximate frequency for any key.
    */
-  def frequency(key: K): V = {
+  def frequency(key: K): V =
     // If the key is a heavy hitter, then use the precalculated heavy hitters mapping.
     // Otherwise, calculate it normally.
-    heavyHittersMapping.get(key).getOrElse(frequency(key, valuesTable))
-  }
+    heavyHittersMapping.getOrElse(key, params.frequency(key, valuesTable))
 
   /**
    * Returns a new Sketch Map with a key value pair added.
@@ -199,7 +235,10 @@ case class SketchMap[K, V](
       table.updated(pos, Monoid.plus(currValue, value))
     }
 
-    SketchMap(params, newValuesTable, updatedHeavyHitters(newHeavyHitters, newValuesTable), Monoid.plus(totalValue, value))
+    SketchMap(params,
+      newValuesTable,
+      params.updatedHeavyHitters(newHeavyHitters, newValuesTable),
+      Monoid.plus(totalValue, value))
   }
 
   /**
@@ -208,20 +247,22 @@ case class SketchMap[K, V](
    */
   def ++(other: SketchMap[K, V]): SketchMap[K, V] = {
     val newValuesTable = Monoid.plus(valuesTable, other.valuesTable)
-    val newHeavyHitters = (heavyHitterKeys ++ other.heavyHitterKeys).distinct
+    val newHeavyHitters = heavyHitterKeys.toSet ++ other.heavyHitterKeys
 
-    SketchMap(params, newValuesTable, updatedHeavyHitters(newHeavyHitters, newValuesTable), Monoid.plus(totalValue, other.totalValue))
-  }
-
-  /**
-   * Returns a new set of sorted and concatenated heavy hitters given an
-   * arbitrary list of keys.
-   */
-  private def updatedHeavyHitters(hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
-    val mapping = calculateHeavyHittersMapping(hitters, table)
-    val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
-
-    hitters.sorted(specificOrdering).take(params.heavyHittersCount).toList
+    SketchMap(params,
+      newValuesTable,
+      params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
+      Monoid.plus(totalValue, other.totalValue))
   }
 }
 
+/**
+  * An Aggregator for the SketchMap.
+  * Can be created using SketchMap.aggregator
+  */
+case class SketchMapAggregator[K, V](skmMonoid : SketchMapMonoid[K, V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+  val monoid = skmMonoid
+
+  def prepare(value: (K,V)) = monoid.create(value)
+  def present(skm: SketchMap[K, V]) = skm
+}
