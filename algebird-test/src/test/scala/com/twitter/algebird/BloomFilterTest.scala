@@ -6,6 +6,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
+import java.io.{ObjectOutputStream, ByteArrayOutputStream}
 
 object BloomFilterLaws extends Properties("BloomFilter") {
   import BaseProperties._
@@ -98,6 +99,25 @@ class BloomFilterTest extends Specification {
           }
         }
       }
+    }
+
+    "not serialize BFInstance" in {
+      def serialize(bf: BF) = {
+        val stream = new ByteArrayOutputStream()
+        val out = new ObjectOutputStream(stream)
+        out.writeObject(bf)
+        out.close()
+        stream.close()
+        stream.toByteArray
+      }
+
+      val items = (1 until 10).map { _.toString }
+      val bf = BloomFilter(10, 0.1, SEED).create(items: _*)
+      val bytesBeforeSizeCalled = new String(serialize(bf))
+      bf.size
+      bf.contains("1").isTrue must be_==(true)
+      val bytesAfterSizeCalled = new String(serialize(bf))
+      bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
     }
   }
 }
