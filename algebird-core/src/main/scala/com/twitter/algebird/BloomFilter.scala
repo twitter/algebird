@@ -156,7 +156,7 @@ case class BFSparse(hashes : BFHash, bits : CBitSet, width : Int) extends BF {
 
   lazy val numHashes: Int = hashes.size
 
-  lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
+  @transient lazy val dense : BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
 
   def ++ (other: BF): BF = {
     require(this.width == other.width)
