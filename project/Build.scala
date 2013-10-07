@@ -114,7 +114,10 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    libraryDependencies ++= Seq(
+      "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+      withCross("com.twitter" %% "util-core" % "6.3.0")
+    ),
     sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
       GenTupleAggregators.gen(outDir)
     }
