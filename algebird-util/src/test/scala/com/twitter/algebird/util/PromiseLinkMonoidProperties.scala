@@ -21,10 +21,10 @@ import scala.util.Random
 import org.scalacheck.{ Arbitrary, Properties }
 import scala.annotation.tailrec
 
-object IncrementingTunnelMonoidProperties extends Properties("IncrementingTunnelMonoids") {
+object PromiseLinkMonoidProperties extends Properties("PromiseLinkMonoids") {
 	property("associative") = {
-    def makeTunnel(seed:Int) = PromiseLink.toPromiseLink(seed)
-    def collapseFinalValues(finalTunnel:PromiseLink[Int], tunnels:Seq[PromiseLink[Int]], toFeed:Int) = {
+    def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
+    def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
       finalTunnel.completeWithStartingValue(toFeed)
       finalTunnel.promise +: tunnels.map { _.promise }
     }

@@ -24,7 +24,7 @@ import com.twitter.util.Promise
  * for TunnelMonoid for general motivation. NOTE: the Promise will be fulfilled with
  * the value just before the PromiseLink is calculated.
  */
-class IncrementingTunnelMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { //TODo(jcoveney) rename PromiseLink
+class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { //TODo(jcoveney) rename PromiseLink
 	def zero = PromiseLink(new Promise, monoid.zero)
 
   def plus(older: PromiseLink[V], newer: PromiseLink[V]): PromiseLink[V] = {
@@ -34,6 +34,8 @@ class IncrementingTunnelMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[
     }
     PromiseLink(p2, monoid.plus(v1, v2))
   }
+
+  override def isNonZero(v: PromiseLink[V]) = monoid.isNonZero(v.value) 
 }
 
 /**
@@ -42,14 +44,14 @@ class IncrementingTunnelMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[
  */
 case class PromiseLink[V](promise: Promise[V], value: V) {
   def completeWithStartingValue(startingV: V)(implicit monoid: Monoid[V]):V = {
-    Tunnel.properPromiseUpdate(promise, value)
+    Tunnel.properPromiseUpdate(promise, startingV)
     monoid.plus(startingV, value)
   }
 }
 
 object PromiseLink {
-  implicit def monoid[V](implicit innerMonoid: Monoid[V]): IncrementingTunnelMonoid[V] =
-    new IncrementingTunnelMonoid[V](innerMonoid)
+  implicit def monoid[V](implicit innerMonoid: Monoid[V]): PromiseLinkMonoid[V] =
+    new PromiseLinkMonoid[V](innerMonoid)
 
 	def toPromiseLink[V](value:V) = PromiseLink(new Promise, value)
 }

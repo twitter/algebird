@@ -30,14 +30,14 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
   def testTunnelMonoid[I, V](makeRandomInput: Int => I,
                              makeTunnel: I => V,
                              collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])
-                            (implicit monoid:Monoid[I],
-                             superMonoid:Monoid[V]) = {
+                            (implicit monoid: Monoid[I],
+                             superMonoid: Monoid[V]) = {
     val r = new Random
     val numbers = (1 to 40).map { _ => makeRandomInput(r.nextInt) }
-    def helper(seeds:Seq[I], toFeed:I) = {
+    def helper(seeds: Seq[I], toFeed: I) = {
       val tunnels = seeds.map(makeTunnel)
       @tailrec
-      def process(tunnels:Seq[V]):V = {
+      def process(tunnels: Seq[V]):V = {
         val size = tunnels.size
         if (size > 2) {
           val (tun1, tun2) = tunnels.splitAt(r.nextInt(size - 2))
@@ -64,8 +64,8 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
   }
 
 	property("associative") = {
-    def makeTunnel(seed:Int) = Tunnel.toIncrement(seed)
-    def collapseFinalValues(finalTunnel:Tunnel[Int], tunnels:Seq[Tunnel[Int]], toFeed:Int) =
+    def makeTunnel(seed: Int) = Tunnel.toIncrement(seed)
+    def collapseFinalValues(finalTunnel: Tunnel[Int], tunnels: Seq[Tunnel[Int]], toFeed: Int) =
       finalTunnel(toFeed) +: tunnels.map { _.future }
 
     testTunnelMonoid[Int, Tunnel[Int]](identity, makeTunnel, collapseFinalValues)
