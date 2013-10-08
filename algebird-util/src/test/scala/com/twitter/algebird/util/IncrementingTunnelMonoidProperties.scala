@@ -23,39 +23,12 @@ import scala.annotation.tailrec
 
 object IncrementingTunnelMonoidProperties extends Properties("IncrementingTunnelMonoids") {
 	property("associative") = {
-    implicit val monoid = new Monoid[Int] {
-      val zero = 0
-      def plus(older:Int, newer:Int):Int = older + newer
-    }
-    val r = new Random
-    val numbers = (1 to 40).map { _ => r.nextInt }
-    def helper(seeds:Seq[Int], toFeed:Int) = {
-      val tunnels = seeds.map { PromiseLink.toPromiseLink(_) }
-      @tailrec
-      def process(tunnels:Seq[PromiseLink[Int]]):PromiseLink[Int] = {
-        val size = tunnels.size
-        if (size > 2) {
-          val (tun1, tun2) = tunnels.splitAt(r.nextInt(size - 2))
-          val (of2, rest) = tun2.splitAt(2)
-          process(tun1 ++ (Monoid.plus(of2.head, of2.tail.head) +: rest))
-        } else if (size == 2) {
-          Monoid.plus(tunnels.head, tunnels.tail.head)
-        } else {
-          tunnels.head
-        }
-      }
-      val finalTunnel = process(tunnels)
+    def makeTunnel(seed:Int) = PromiseLink.toPromiseLink(seed)
+    def collapseFinalValues(finalTunnel:PromiseLink[Int], tunnels:Seq[PromiseLink[Int]], toFeed:Int) = {
       finalTunnel.completeWithStartingValue(toFeed)
       finalTunnel.promise +: tunnels.map { _.promise }
     }
-    numbers.forall { num =>
-      val finalResults = helper(numbers, num) zip helper(numbers, num) map {
-        case (f1, f2) => for {
-          b1 <- f1
-          b2 <- f2
-        } yield b1 == b2
-      }
-      Await.result(Future.collect(finalResults).map { _.forall(identity) })
-    }
+
+    TunnelMonoidProperties.testTunnelMonoid(identity, makeTunnel, collapseFinalValues)
   }
 }

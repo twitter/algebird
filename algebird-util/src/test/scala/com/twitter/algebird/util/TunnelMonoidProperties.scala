@@ -22,17 +22,22 @@ import org.scalacheck.{ Arbitrary, Properties }
 import scala.annotation.tailrec
 
 object TunnelMonoidProperties extends Properties("TunnelMonoids") {
-	property("associative") = {
-    implicit val monoid = new Monoid[Int] {
+  implicit val monoid = new Monoid[Int] {
       val zero = 0
       def plus(older:Int, newer:Int):Int = older + newer
     }
+
+  def testTunnelMonoid[I, V](makeRandomInput: Int => I,
+                             makeTunnel: I => V,
+                             collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])
+                            (implicit monoid:Monoid[I],
+                             superMonoid:Monoid[V]) = {
     val r = new Random
-    val numbers = (1 to 40).map { _ => r.nextInt }
-    def helper(seeds:Seq[Int], toFeed:Int) = {
-      val tunnels = seeds.map { Tunnel.toIncrement(_) }
+    val numbers = (1 to 40).map { _ => makeRandomInput(r.nextInt) }
+    def helper(seeds:Seq[I], toFeed:I) = {
+      val tunnels = seeds.map(makeTunnel)
       @tailrec
-      def process(tunnels:Seq[Tunnel[Int]]):Tunnel[Int] = {
+      def process(tunnels:Seq[V]):V = {
         val size = tunnels.size
         if (size > 2) {
           val (tun1, tun2) = tunnels.splitAt(r.nextInt(size - 2))
@@ -44,10 +49,11 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
           tunnels.head
         }
       }
-      process(tunnels)(toFeed) +: tunnels.map { _.future }
+      collapseFinalValues(process(tunnels), tunnels, toFeed) 
     }
-    numbers.forall { num =>
-      val finalResults = helper(numbers, num) zip helper(numbers, num) map {
+    numbers.forall { _ =>
+      val toFeed = makeRandomInput(r.nextInt)
+      val finalResults = helper(numbers, toFeed) zip helper(numbers, toFeed) map {
         case (f1, f2) => for {
           b1 <- f1
           b2 <- f2
@@ -55,5 +61,13 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
       }
       Await.result(Future.collect(finalResults).map { _.forall(identity) })
     }
+  }
+
+	property("associative") = {
+    def makeTunnel(seed:Int) = Tunnel.toIncrement(seed)
+    def collapseFinalValues(finalTunnel:Tunnel[Int], tunnels:Seq[Tunnel[Int]], toFeed:Int) =
+      finalTunnel(toFeed) +: tunnels.map { _.future }
+
+    testTunnelMonoid[Int, Tunnel[Int]](identity, makeTunnel, collapseFinalValues)
   }
 }
