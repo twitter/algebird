@@ -26,13 +26,15 @@ import com.twitter.util.{ Future, Promise, Return}
  * elements (in this case, Tunnel objects) to depend on the result
  * of the Monoid's computation. Note that this code does not depend
  * on any particular Monoid -- that dependency is strictly when the Tunnel
- * objects are created.
+ * objects are created. This is the async analogue of Function1Monoid.
  */
 class TunnelMonoid[V] extends Monoid[Tunnel[V]] {
 	def zero = {
     val promise = new Promise[V]
     Tunnel(promise, promise)
   }
+
+  override def isNonZero(v: Tunnel[V]) = !(v.promise eq v.future)
 
 	def plus(older:Tunnel[V], newer:Tunnel[V]):Tunnel[V] = {
     val (Tunnel(f1, p1), Tunnel(f2, p2)) = (older, newer)
