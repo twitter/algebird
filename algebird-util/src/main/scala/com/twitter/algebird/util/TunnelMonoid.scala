@@ -93,6 +93,7 @@ object Tunnel {
     }
   }
 
+
   def from[V](fn: V => V): Tunnel[V] = {
     val prom = new Promise[V]
     Tunnel(prom.map(fn), prom)
