@@ -26,7 +26,10 @@ object UtilAlgebraProperties extends Properties("UtilAlgebras") {
   import UtilAlgebras._
 
   def toOption[T](f: Future[T]): Option[T] =
-    if (f.isReturn) Some(f.get) else None
+    f.poll match {
+      case Some(Return(r)) => Some(r)
+      case _ => None
+    }
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
