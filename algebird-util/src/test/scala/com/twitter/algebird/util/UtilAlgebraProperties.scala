@@ -25,11 +25,7 @@ import Arbitrary.arbitrary
 object UtilAlgebraProperties extends Properties("UtilAlgebras") {
   import UtilAlgebras._
 
-  def toOption[T](f: Future[T]): Option[T] =
-    f.poll match {
-      case Some(Return(r)) => Some(r)
-      case _ => None
-    }
+  def toOption[T](f: Future[T]): Option[T] = Some(Await.result(f))
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
