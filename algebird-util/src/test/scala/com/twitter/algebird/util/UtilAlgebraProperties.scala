@@ -17,7 +17,7 @@
 package com.twitter.algebird.util
 
 import com.twitter.algebird.MonadLaws.monadLaws
-import com.twitter.util.{ Future, Throw, Return, Try }
+import com.twitter.util.{ Await, Future, Throw, Return, Try }
 import org.scalacheck.{ Arbitrary, Properties }
 
 import Arbitrary.arbitrary
@@ -26,7 +26,11 @@ object UtilAlgebraProperties extends Properties("UtilAlgebras") {
   import UtilAlgebras._
 
   def toOption[T](f: Future[T]): Option[T] =
-    if (f.isReturn) Some(f.get) else None
+    try {
+      Some(Await.result(f))
+    } catch {
+      case _:Exception => None
+    }
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
