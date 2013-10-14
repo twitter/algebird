@@ -58,13 +58,9 @@ case class DecayedValue(value : Double, scaledTime : Double) extends Ordered[Dec
     scaledTime.compareTo(that.scaledTime)
   }
 
-  def valueNow(value: DecayedValue, halfLife: Double): Double = {
-    valueAsOf(value, halfLife, System.currentTimeMillis)
-  }
-
   // Returns value if timestamp is less than value's timestamp
-  def valueAsOf(value: DecayedValue, halfLife: Double, timestamp: Double): Double = {
+  def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double, eps : Double = 1e-3): Double = {
     val asOfValue = DecayedValue.build(0, timestamp, halfLife)
-    DecayedValue.monoidWithEpsilon(1e-3).plus(asOfValue, value).value
+    DecayedValue.monoidWithEpsilon(eps).plus(asOfValue, value).value
   }
 }
