@@ -13,9 +13,8 @@ object BloomFilterLaws extends Properties("BloomFilter") {
 
   val NUM_HASHES = 6
   val WIDTH = 32
-  val SEED = 1
 
-  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH, SEED)
+  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH)
   implicit val bfGen =
     Arbitrary {
       for (v <- choose(0, 10000)) yield (bfMonoid.create(v.toString))
@@ -28,7 +27,6 @@ object BloomFilterLaws extends Properties("BloomFilter") {
 class BloomFilterTest extends Specification {
   noDetailedDiffs()
 
-  val SEED = 1
   val RAND = new scala.util.Random
 
   "BloomFilter" should {
@@ -36,7 +34,7 @@ class BloomFilterTest extends Specification {
     "identify all true positives" in {
       (0 to 100).foreach{
         _ => {
-          val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
+          val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5)+1, RAND.nextInt(64)+32)
           val numEntries = 5
           val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
           val bf = bfMonoid.create(entries: _*)
@@ -57,7 +55,7 @@ class BloomFilterTest extends Specification {
             _ => {
               val numEntries = RAND.nextInt(10) + 1
 
-              val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
+              val bfMonoid = BloomFilter(numEntries, fpProb)
 
               val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
               val bf = bfMonoid.create(entries.drop(1): _*)
@@ -74,7 +72,7 @@ class BloomFilterTest extends Specification {
     }
 
     "approximate cardinality" in {
-      val bfMonoid = BloomFilterMonoid(10, 100000, SEED)
+      val bfMonoid = BloomFilterMonoid(10, 100000)
       Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
         val items = (1 until exactCardinality).map { _.toString }
         val bf = bfMonoid.create(items: _*)
@@ -89,7 +87,7 @@ class BloomFilterTest extends Specification {
     "work as an Aggregator" in {
       (0 to 10).foreach{
         _ => {
-          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
+          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32)
           val numEntries = 5
           val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
           val bf = aggregator(entries)
@@ -112,7 +110,7 @@ class BloomFilterTest extends Specification {
       }
 
       val items = (1 until 10).map { _.toString }
-      val bf = BloomFilter(10, 0.1, SEED).create(items: _*)
+      val bf = BloomFilter(10, 0.1).create(items: _*)
       val bytesBeforeSizeCalled = new String(serialize(bf))
       bf.size
       bf.contains("1").isTrue must be_==(true)
