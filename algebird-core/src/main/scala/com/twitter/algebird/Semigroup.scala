@@ -40,7 +40,7 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
     if (iter.size <= blockSize || blockSize <= 1) {
       Future(sumOption(iter))
     } else {
-      val partitions = iter.toIterable.sliding(blockSize, blockSize)
+      val partitions = iter.toIterable.grouped(blockSize)
       val sums = partitions map { partition =>
         Future(sumOption(partition))
       } toIterable
