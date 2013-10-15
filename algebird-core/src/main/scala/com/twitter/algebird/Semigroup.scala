@@ -20,8 +20,7 @@ import java.util.{List => JList, Map => JMap}
 
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.annotation.{implicitNotFound, tailrec}
 
 /**
@@ -38,7 +37,7 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
     iter.reduceLeftOption { plus(_, _) }
   def parSumOption(iter: TraversableOnce[T], blockSize: Int)
                   (implicit executionContext: ExecutionContext): Future[Option[T]] = {
-    if (iter.size <= blockSize) {
+    if (iter.size <= blockSize || blockSize <= 1) {
       Future(sumOption(iter))
     } else {
       val partitions = iter.toIterable.sliding(blockSize, blockSize)
