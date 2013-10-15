@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalacheck.Prop._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.Equiv
