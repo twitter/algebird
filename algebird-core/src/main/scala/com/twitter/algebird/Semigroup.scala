@@ -36,6 +36,19 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
+  def parSumOption(iter: TraversableOnce[T], blockSize: Int)
+                  (implicit executionContext: ExecutionContext): Future[Option[T]] = {
+    if (iter.size <= blockSize) {
+      Future(sumOption(iter))
+    } else {
+      val partitions = iter.toIterable.sliding(blockSize, blockSize)
+      val sums = partitions map { partition =>
+        Future(sumOption(partition))
+      } toIterable
+      val flatSums = Future.sequence(sums).map(_.flatten)
+      flatSums.flatMap { parSumOption(_, blockSize) }
+    }
+  }
 }
 
 // For Java interop so they get the default sumOption
@@ -80,21 +93,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
     sg.sumOption(iter)
   def parSumOption[T](iter: TraversableOnce[T], blockSize: Int)
                      (implicit sg: Semigroup[T], executionContext: ExecutionContext): Future[Option[T]] =  {
-
-    def helper(items: Iterable[T]): Future[Option[T]] = {
-      if (items.size <= blockSize) {
-        Future(sg.sumOption(items))
-      } else {
-        val partitions = items.sliding(blockSize, blockSize)
-        val sums = partitions map { partition =>
-          Future { sg.sumOption(partition) }
-        } toList
-        val flatSums = Future.sequence(sums).map(_.flatten)
-        flatSums.flatMap { helper(_) }
-      }
-    }
-
-    helper(iter.toIterable)
+    sg.parSumOption(iter, blockSize)
   }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }

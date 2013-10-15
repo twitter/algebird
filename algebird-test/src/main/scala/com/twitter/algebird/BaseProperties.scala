@@ -18,7 +18,10 @@ package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalacheck.Prop.forAll
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.Equiv
+
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
@@ -39,6 +42,10 @@ object BaseProperties {
 
   def semigroupSumWorks[T:Semigroup:Arbitrary:Equiv] = forAll { (in: List[T]) =>
     Equiv[Option[T]].equiv(Semigroup.sumOption(in), in.reduceLeftOption(Semigroup.plus(_,_)))
+  }
+
+  def semigroupParSumWorks[T: Semigroup:Arbitrary:Equiv] = forAll { (in: List[T], blockSize: Int) =>
+    Equiv[Future[Option[T]]].equiv(Semigroup.parSumOption(in, blockSize), Future(Semigroup.sumOption(in)))
   }
 
   def isCommutativeEq[T : Semigroup : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
