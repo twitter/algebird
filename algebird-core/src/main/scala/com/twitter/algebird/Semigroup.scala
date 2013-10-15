@@ -20,6 +20,8 @@ import java.util.{List => JList, Map => JMap}
 
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
 import scala.annotation.{implicitNotFound, tailrec}
 
 /**
@@ -76,6 +78,24 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
     sg.sumOption(iter)
+  def parSumOption[T](iter: TraversableOnce[T], blockSize: Int)
+                     (implicit sg: Semigroup[T], executionContext: ExecutionContext): Future[Option[T]] =  {
+
+    def helper(items: Iterable[T]): Future[Option[T]] = {
+      if (items.size <= blockSize) {
+        Future(sg.sumOption(items))
+      } else {
+        val partitions = items.sliding(blockSize, blockSize)
+        val sums = partitions map { partition =>
+          Future { sg.sumOption(partition) }
+        } toList
+        val flatSums = Future.sequence(sums).map(_.flatten)
+        flatSums.flatMap { helper(_) }
+      }
+    }
+
+    helper(iter.toIterable)
+  }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
 
