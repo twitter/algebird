@@ -18,7 +18,7 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{Map => MMap, ArrayBuffer}
+import scala.collection.mutable.{Map => MMap, UnrolledBuffer}
 import scala.collection.{Map => ScMap}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.annotation.{implicitNotFound, tailrec}
@@ -43,7 +43,7 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
     } else {
       val partitions = items.toIterator.grouped(blockSize)
       var newSize = 0
-      val sumsBuffer = new ArrayBuffer[Future[Option[T]]]
+      val sumsBuffer = new UnrolledBuffer[Future[Option[T]]]
       partitions.foreach { partition =>
         newSize += 1
         sumsBuffer += Future(sumOption(partition));
