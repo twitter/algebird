@@ -50,17 +50,16 @@ object DecayedValue extends java.io.Serializable {
         scale(left, right, eps)
       }
     }
+
+    // Returns value if timestamp is less than value's timestamp
+    def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double): Double = {
+      plus(DecayedValue.build(0, timestamp, halfLife), value).value
+    }
   }
 }
 
 case class DecayedValue(value : Double, scaledTime : Double) extends Ordered[DecayedValue] {
   def compare(that : DecayedValue) : Int = {
     scaledTime.compareTo(that.scaledTime)
-  }
-
-  // Returns value if timestamp is less than value's timestamp
-  def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double, eps : Double = 1e-3): Double = {
-    val asOfValue = DecayedValue.build(0, timestamp, halfLife)
-    DecayedValue.monoidWithEpsilon(eps).plus(asOfValue, value).value
   }
 }
