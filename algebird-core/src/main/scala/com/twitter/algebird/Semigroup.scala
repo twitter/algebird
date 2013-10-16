@@ -18,7 +18,7 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{Map => MMap, ArrayBuffer}
 import scala.collection.{Map => ScMap}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.annotation.{implicitNotFound, tailrec}
@@ -35,17 +35,24 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
-  def parSumOption(iter: TraversableOnce[T], blockSize: Int)
+  def parSumOption(items: TraversableOnce[T], blockSize: Int)
                   (implicit executionContext: ExecutionContext): Future[Option[T]] = {
-    if (iter.size <= blockSize || blockSize <= 1) {
-      Future(sumOption(iter))
+    /* If blockSize is nonsensical, default to sumOption */
+    if (blockSize <= 1) {
+      Future(sumOption(items))
     } else {
-      val partitions = iter.toIterable.grouped(blockSize)
-      val sums = partitions map { partition =>
-        Future(sumOption(partition))
-      } toIterable
+      var newSums = 0
+      val partitions = iter.toIterator.grouped(blockSize)
+      val sums = partitions.map { partition =>
+        newSums += 1
+        Future(sumOption(partition));
+      }
       val flatSums = Future.sequence(sums).map(_.flatten)
-      flatSums.flatMap { parSumOption(_, blockSize) }
+      if (newSize <= blockSize) {
+        flatSums.map { sumOption(_) }
+      } else {
+        flatSums.flatMap { parSumOption(_, blockSize) }
+      }
     }
   }
 }
