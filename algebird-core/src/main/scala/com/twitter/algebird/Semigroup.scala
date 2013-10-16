@@ -41,12 +41,14 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
     if (blockSize <= 1) {
       Future(sumOption(items))
     } else {
-      var newSums = 0
-      val partitions = iter.toIterator.grouped(blockSize)
-      val sums = partitions.map { partition =>
-        newSums += 1
-        Future(sumOption(partition));
+      val partitions = items.toIterator.grouped(blockSize)
+      var newSize = 0
+      val sumsBuffer = new ArrayBuffer[Future[Option[T]]]
+      partitions.foreach { partition =>
+        newSize += 1
+        sumsBuffer += Future(sumOption(partition));
       }
+      val sums = sumsBuffer.toTraversable
       val flatSums = Future.sequence(sums).map(_.flatten)
       if (newSize <= blockSize) {
         flatSums.map { sumOption(_) }
