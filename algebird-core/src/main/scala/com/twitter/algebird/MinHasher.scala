@@ -63,16 +63,15 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   val numBytes = numHashes * hashSize
   val numRows = numHashes / numBands
 
-  /** This seed could be anything */
-  private val seed = 123456789
-
   /** We always use a 128 bit hash function, so the number of hash functions is different
     * (and usually smaller) than the number of hashes in the signature.
+    * We use the index of hashfcuntion as the seed for murmurhash, so the hash function is repeatable
+    * As long as the user provide the same parameter for constructing the monoid, the hash functions
+    * should be consistent
   **/
   private val hashFunctions = {
-    val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}    
+    (1 to numHashFunctions).map{i => MurmurHash128(i)}
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
