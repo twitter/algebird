@@ -35,28 +35,6 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
-  def parSumOption(items: TraversableOnce[T], blockSize: Int)
-                  (implicit executionContext: ExecutionContext): Future[Option[T]] = {
-    /* If blockSize is nonsensical, default to sumOption */
-    if (blockSize <= 1) {
-      Future(sumOption(items))
-    } else {
-      val partitions = items.toIterator.grouped(blockSize)
-      var newSize = 0
-      val sumsBuffer = new UnrolledBuffer[Future[Option[T]]]
-      partitions.foreach { partition =>
-        newSize += 1
-        sumsBuffer += Future(sumOption(partition));
-      }
-      val sums = sumsBuffer.toTraversable
-      val flatSums = Future.sequence(sums).map(_.flatten)
-      if (newSize <= blockSize) {
-        flatSums.map { sumOption(_) }
-      } else {
-        flatSums.flatMap { parSumOption(_, blockSize) }
-      }
-    }
-  }
 }
 
 // For Java interop so they get the default sumOption
@@ -99,9 +77,48 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
     sg.sumOption(iter)
-  def parSumOption[T](iter: TraversableOnce[T], blockSize: Int)
-                     (implicit sg: Semigroup[T], executionContext: ExecutionContext): Future[Option[T]] =  {
-    sg.parSumOption(iter, blockSize)
+  def parSumOption[T](items: TraversableOnce[T], blockSize: Int)
+                  (implicit sg: Semigroup[T], ec: ExecutionContext): Future[Option[T]] = {
+
+    @tailrec
+    def helper(items: Iterator[Future[Option[T]]]): Future[Option[T]] = {
+      if (items.isEmpty) {
+        Future(None) /* Maybe an error should actually be thrown here */
+      } else {
+        val partitions = items.grouped(blockSize)
+        val bufferedPartitions = partitions.buffered
+        if (bufferedPartitions.head.size < blockSize) {
+          Future.sequence(bufferedPartitions.head).map { _.flatten }.flatMap { headPart =>
+            Future(sg.sumOption(headPart))
+          }
+        } else {
+          val sums = bufferedPartitions map { partition: Iterable[Future[Option[T]]] =>
+            val txfPartition: Future[Iterable[T]] = Future.sequence(partition).map { _.flatten }
+            txfPartition.flatMap { innerItems =>
+              Future(sg.sumOption(innerItems))
+            }
+          }
+          helper(sums)
+        }
+      }
+    }
+
+    /* If the first partition's size is strictly less than blockSize, implying there is exactly one
+       partition, or if blockSize is nonsensical, just default to sumOption. */
+    if (blockSize <= 1 || items.isEmpty) {
+      Future(sg.sumOption(items))
+    } else {
+      val partitions = items.toIterator.grouped(blockSize)
+      val bufferedPartitions = partitions.buffered
+      if (bufferedPartitions.head.size < blockSize) {
+        Future(sg.sumOption(bufferedPartitions.head))
+      } else {
+        val sums = bufferedPartitions.map { partition =>
+          Future(sg.sumOption(partition))
+        }
+        helper(sums)
+      }
+    }
   }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
