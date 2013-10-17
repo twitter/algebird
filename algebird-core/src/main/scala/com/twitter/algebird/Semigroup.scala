@@ -96,12 +96,10 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
             sg.sumOption(innerItems.flatten)
           }
         }
+        helper(sums)
       }
-      helper(sums)
     }
 
-    /* If the first partition's size is strictly less than blockSize, implying there is exactly one
-       partition, or if blockSize is nonsensical, just default to sumOption. */
     if (items.isEmpty) {
       Future(sg.sumOption(items))
     } else {
