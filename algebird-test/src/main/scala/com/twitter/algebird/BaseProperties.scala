@@ -46,7 +46,7 @@ object BaseProperties {
   }
 
   def semigroupParSumWorks[T: Semigroup:Arbitrary:Equiv] = forAll { (in: List[T], blockSize: Int) =>
-    Seq(-2, 0, 1, 5, 10, 100, 1000).forall { blockSize =>
+    Seq(2, 5, 10, 100, 1000).forall { blockSize =>
       Equiv[Option[T]].equiv(Await.result(Semigroup.parSumOption(in, blockSize), Duration.Inf), Semigroup.sumOption(in))
     }
   }

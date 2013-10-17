@@ -80,44 +80,32 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   def parSumOption[T](items: TraversableOnce[T], blockSize: Int)
                   (implicit sg: Semigroup[T], ec: ExecutionContext): Future[Option[T]] = {
 
+    require(blockSize > 1, "blockSize must be greater than 1")
+
     @tailrec
     def helper(items: Iterator[Future[Option[T]]]): Future[Option[T]] = {
-      if (items.isEmpty) {
-        Future(None) /* Maybe an error should actually be thrown here */
-      } else {
-        val partitions = items.grouped(blockSize)
-        val bufferedPartitions = partitions.buffered
-        if (bufferedPartitions.head.size < blockSize) {
-          Future.sequence(bufferedPartitions.head).map { _.flatten }.flatMap { headPart =>
-            Future(sg.sumOption(headPart))
-          }
-        } else {
-          val sums = bufferedPartitions map { partition: Iterable[Future[Option[T]]] =>
-            val txfPartition: Future[Iterable[T]] = Future.sequence(partition).map { _.flatten }
-            txfPartition.flatMap { innerItems =>
-              Future(sg.sumOption(innerItems))
-            }
-          }
-          helper(sums)
+      val partitions = items.grouped(blockSize).buffered
+      val head = partitions.head
+      if (head.size < blockSize) {
+        Future.sequence(head).map { innerItems: Iterable[Option[T]] =>
+          sg.sumOption(innerItems.flatten)
         }
+      } else {
+        val sums = partitions map { partition =>
+          Future.sequence(partition).map { innerItems: Iterable[Option[T]] =>
+            sg.sumOption(innerItems.flatten)
+          }
+        }
+        helper(sums)
       }
     }
 
     /* If the first partition's size is strictly less than blockSize, implying there is exactly one
        partition, or if blockSize is nonsensical, just default to sumOption. */
-    if (blockSize <= 1 || items.isEmpty) {
+    if (items.isEmpty) {
       Future(sg.sumOption(items))
     } else {
-      val partitions = items.toIterator.grouped(blockSize)
-      val bufferedPartitions = partitions.buffered
-      if (bufferedPartitions.head.size < blockSize) {
-        Future(sg.sumOption(bufferedPartitions.head))
-      } else {
-        val sums = bufferedPartitions.map { partition =>
-          Future(sg.sumOption(partition))
-        }
-        helper(sums)
-      }
+      helper(items.toIterator.map { item => Future(Some(item)) } )
     }
   }
 
