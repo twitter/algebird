@@ -83,27 +83,23 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
     require(blockSize > 1, "blockSize must be greater than 1")
 
     @tailrec
-    def helper(items: Iterator[Future[Option[T]]]): Future[Option[T]] = {
+    def helper(items: Iterator[Future[T]]): Future[T] = {
       val partitions = items.grouped(blockSize).buffered
       val head = partitions.head
       if (head.size < blockSize) {
-        Future.sequence(head).map { innerItems: Iterable[Option[T]] =>
-          sg.sumOption(innerItems.flatten)
-        }
+        Future.sequence(head).map { sg.sumOption(_).get } /* OK since |head| should be >= 1 */
       } else {
         val sums = partitions map { partition =>
-          Future.sequence(partition).map { innerItems: Iterable[Option[T]] =>
-            sg.sumOption(innerItems.flatten)
-          }
+          Future.sequence(partition).map { sg.sumOption(_).get } /* OK since |partition| should be >= 1 */
         }
         helper(sums)
       }
     }
 
     if (items.isEmpty) {
-      Future(sg.sumOption(items))
+      Future.successful(None)
     } else {
-      helper(items.toIterator.map { item => Future(Some(item)) } )
+      helper(items.toIterator.map { item => Future.successful(item) }).map { Some(_) }
     }
   }
 
