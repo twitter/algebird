@@ -82,15 +82,20 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
 
     require(blockSize > 1, "blockSize must be greater than 1")
 
+    def sumFutures(futures: Seq[Future[T]]): Future[T] = {
+      require(futures.size > 0, "sumFutures expects a non-empty sequence")
+      Future.sequence(futures).map { sg.sumOption(_).get }
+    }
+
     @tailrec
     def helper(items: Iterator[Future[T]]): Future[T] = {
       val partitions = items.grouped(blockSize).buffered
       val head = partitions.head
       if (head.size < blockSize) {
-        Future.sequence(head).map { sg.sumOption(_).get } /* OK since |head| should be >= 1 */
+        sumFutures(head)
       } else {
         val sums = partitions map { partition =>
-          Future.sequence(partition).map { sg.sumOption(_).get } /* OK since |partition| should be >= 1 */
+          sumFutures(partition)
         }
         helper(sums)
       }
