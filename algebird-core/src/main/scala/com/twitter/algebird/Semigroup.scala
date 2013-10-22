@@ -18,8 +18,9 @@ package com.twitter.algebird
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{Map => MMap, UnrolledBuffer}
 import scala.collection.{Map => ScMap}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.annotation.{implicitNotFound, tailrec}
 
 /**
@@ -76,6 +77,36 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]) : Option[T] =
     sg.sumOption(iter)
+  def parSumOption[T](items: TraversableOnce[T], blockSize: Int)
+                  (implicit sg: Semigroup[T], ec: ExecutionContext): Future[Option[T]] = {
+
+    require(blockSize > 1, "blockSize must be greater than 1")
+
+    def sumFutures(futures: Seq[Future[T]]): Future[T] = {
+      require(futures.size > 0, "sumFutures expects a non-empty sequence")
+      Future.sequence(futures).map { sg.sumOption(_).get }
+    }
+
+    @tailrec
+    def helper(items: Iterator[Future[T]]): Future[T] = {
+      val partitions = items.grouped(blockSize).buffered
+      val head = partitions.head
+      if (head.size < blockSize) {
+        sumFutures(head)
+      } else {
+        val sums = partitions map { partition =>
+          sumFutures(partition)
+        }
+        helper(sums)
+      }
+    }
+
+    if (items.isEmpty) {
+      Future.successful(None)
+    } else {
+      helper(items.toIterator.map { item => Future.successful(item) }).map { Some(_) }
+    }
+  }
 
   def from[T](associativeFn: (T,T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l,r) }
 

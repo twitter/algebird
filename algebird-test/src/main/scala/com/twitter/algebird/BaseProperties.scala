@@ -17,8 +17,12 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Gen, Properties }
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.Equiv
+
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
@@ -41,6 +45,12 @@ object BaseProperties {
     Equiv[Option[T]].equiv(Semigroup.sumOption(in), in.reduceLeftOption(Semigroup.plus(_,_)))
   }
 
+  def semigroupParSumWorks[T: Semigroup:Arbitrary:Equiv] = forAll { (in: List[T], blockSize: Int) =>
+    Seq(2, 5, 10, 100, 1000).forall { blockSize =>
+      Equiv[Option[T]].equiv(Await.result(Semigroup.parSumOption(in, blockSize), Duration.Inf), Semigroup.sumOption(in))
+    }
+  }
+
   def isCommutativeEq[T : Semigroup : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
     val semi = implicitly[Semigroup[T]]
     eqfn(semi.plus(a,b), semi.plus(b,a))
@@ -58,7 +68,7 @@ object BaseProperties {
   }
 
   def semigroupLawsEquiv[T : Semigroup : Arbitrary: Equiv] =
-    isAssociativeEq[T](Equiv[T].equiv _) && semigroupSumWorks[T]
+    isAssociativeEq[T](Equiv[T].equiv _) && semigroupSumWorks[T] && semigroupParSumWorks[T]
 
   def commutativeSemigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) =
     isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
