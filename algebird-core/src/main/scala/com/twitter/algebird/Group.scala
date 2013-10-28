@@ -54,33 +54,16 @@ object NullGroup extends ConstantGroup[Null](null)
  * Some(5) - Some(3) == Some(2)
  * Some(5) - Some(5) == None
  * negate Some(5) == Some(-5)
+ * Note: Some(0) and None are equivalent under this Group
  */
 class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
     with Group[Option[T]] {
 
-  override def plus(left : Option[T], right : Option[T]) : Option[T] =
-    if(left.isEmpty) {
-      if (right.isEmpty || !group.isNonZero(right.get)) {
-        None
-      } else {
-        right
-      }
-    } else if (right.isEmpty) {
-      if (group.isNonZero(left.get)) {
-        left
-      } else {
-        None
-      }
-    } else {
-      val sum = group.plus(left.get, right.get)
-      if (group.isNonZero(sum)) {
-        Some(sum)
-      } else {
-        None
-      }
-    }
+  override def isNonZero(opt: Option[T]): Boolean =
+    opt != None && group.isNonZero(opt.get)
 
-  override def negate(opt: Option[T]) = opt.map{ v => group.negate(v) }
+  override def negate(opt: Option[T]) =
+    opt.map{ v => group.negate(v) }
 }
 
 object Group extends GeneratedGroupImplicits with ProductGroups {

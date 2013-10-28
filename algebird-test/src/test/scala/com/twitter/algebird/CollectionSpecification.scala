@@ -30,13 +30,16 @@ object CollectionSpecification extends Properties("Collections") {
   property("Either is a Semigroup, with a Right non-monoid semigroup") = semigroupLaws[Either[String,Max[Int]]]
 
   property("Option Monoid laws") = monoidLaws[Option[Int]] && monoidLaws[Option[String]]
-  property("Map Group laws") = groupLaws[Map[String, Int]]
+  property("Option Group laws") = groupLaws[Option[Int]] && groupLawsEq[Map[String, Option[Int]]]{
+      (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
+    val keys: Set[String] = a.keySet | b.keySet
+    keys.forall { key: String =>
+      val v1:Int = a.get(key).map{ _.getOrElse(0) }.getOrElse(0)
+      val v2:Int = b.get(key).map{ _.getOrElse(0) }.getOrElse(0)
+      v1 == v2
+    }
+  }
 
-  /*property("Option Group laws1") = groupLawsEq[Option[Int]]{}
-  property("Option Group laws2") = validZero[Option[Map[String, Option[Int]]]](implicitly[Group[Option[Map[String, Option[Int]]]]], implicitly[Arbitrary[Option[Map[String, Option[Int]]]]])
-  property("Option Group laws3") = isAssociative[Option[Map[String, Option[Int]]]](implicitly[Group[Option[Map[String, Option[Int]]]]], implicitly[Arbitrary[Option[Map[String, Option[Int]]]]])
-  property("Option Group laws4") = isNonZeroWorksMonoid[Option[Map[String, Option[Int]]]](implicitly[Group[Option[Map[String, Option[Int]]]]], implicitly[Arbitrary[Option[Map[String, Option[Int]]]]], implicitly[Equiv[Option[Map[String, Option[Int]]]]])
-*/
   property("List plus") = forAll { (a : List[Int], b : List[Int]) =>
     val mon = implicitly[Monoid[List[Int]]]
     (a ++ b == mon.plus(a,b)) && (mon.zero == List[Int]())
