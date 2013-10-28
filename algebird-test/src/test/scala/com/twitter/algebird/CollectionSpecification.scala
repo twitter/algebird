@@ -34,8 +34,8 @@ object CollectionSpecification extends Properties("Collections") {
       (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
     val keys: Set[String] = a.keySet | b.keySet
     keys.forall { key: String =>
-      val v1:Int = a.get(key).map{ _.getOrElse(0) }.getOrElse(0)
-      val v2:Int = b.get(key).map{ _.getOrElse(0) }.getOrElse(0)
+      val v1:Int = a.getOrElse(key, None).getOrElse(0)
+      val v2:Int = b.getOrElse(key, None).getOrElse(0)
       v1 == v2
     }
   }

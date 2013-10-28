@@ -60,7 +60,7 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
     with Group[Option[T]] {
 
   override def isNonZero(opt: Option[T]): Boolean =
-    opt != None && group.isNonZero(opt.get)
+    opt.exists{ group.isNonZero(_) }
 
   override def negate(opt: Option[T]) =
     opt.map{ v => group.negate(v) }
