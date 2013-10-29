@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -25,7 +25,7 @@ object CountMinSketchLaws extends Properties("CountMinSketch") {
 }
 
 class CountMinSketchTest extends Specification {
-  noDetailedDiffs()
+
 
   val DELTA = 1E-10
   val EPS = 0.001
