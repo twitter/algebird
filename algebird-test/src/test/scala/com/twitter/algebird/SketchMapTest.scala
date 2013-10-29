@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -34,7 +34,7 @@ class SketchMapTest extends Specification {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  noDetailedDiffs()
+
 
   val MONOID = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, HEAVY_HITTERS_COUNT)
   val RAND = new scala.util.Random

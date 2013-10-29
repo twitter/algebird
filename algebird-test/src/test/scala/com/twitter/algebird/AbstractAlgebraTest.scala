@@ -1,13 +1,16 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
+import org.scalacheck._
+import org.specs2.ScalaCheck
+import org.scalacheck.Prop
 import com.twitter.algebird.BaseProperties._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import scala.Some
 
 class AbstractAlgebraTest extends Specification with ScalaCheck {
-  noDetailedDiffs()
+
   "A Monoid should be able to sum" in {
     val monoid = implicitly[Monoid[Int]]
     val list = List(1,5,6,6,4,5)
@@ -77,6 +80,6 @@ class AbstractAlgebraTest extends Specification with ScalaCheck {
         } yield Metrics(count, largest)
       }
 
-    commutativeMonoidLaws[Metrics] must pass
+    Prop.all(commutativeMonoidLaws[Metrics])
   }
 }

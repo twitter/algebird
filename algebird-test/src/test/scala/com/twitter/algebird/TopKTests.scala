@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
 
 import org.scalacheck.{Arbitrary, Properties}
 import org.scalacheck.Gen._
-import org.specs.Specification
+import org.specs2.mutable._
 import org.scalacheck.Prop.forAll
 
 object TopKTests extends Properties("TopKTests") {

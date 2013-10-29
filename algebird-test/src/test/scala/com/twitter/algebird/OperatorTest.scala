@@ -1,11 +1,11 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 import Operators._
 
 class OperatorTest extends Specification {
-  noDetailedDiffs()
+
 
   "Operators" should {
      "allow plus" in {

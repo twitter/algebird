@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 class MinMaxAggregatorTest extends Specification {
   val data = List(1, 3, 5, 0, 7, 6)
