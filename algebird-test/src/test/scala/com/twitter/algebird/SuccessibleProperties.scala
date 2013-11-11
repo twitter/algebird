@@ -26,10 +26,9 @@ object SuccessibleProperties extends Properties("Successibles") {
   import BaseProperties._
   import Successible._
 
-  def alwaysIncreasing[T: Successible] = {
+  def alwaysIncreasing[T: Successible](start: T) = {
     val r = new Random
     val incrementable = implicitly[Successible[T]]
-    val start = incrementable.zero
     val ord = incrementable.ordering
     1.to(100).foldLeft((start, true)) { case ((oldVal, hasBeenGreater), _) =>
       val newVal = incrementable.next(oldVal)
@@ -37,8 +36,8 @@ object SuccessibleProperties extends Properties("Successibles") {
     }._2
   }
 
-  def successibleLaws[T: Successible: Arbitrary] = monoidLaws[T] && alwaysIncreasing[T]
+  def successibleLaws[T: Successible: Arbitrary](start: T) = alwaysIncreasing[T](start)
 
-  property("Successible[Int] is an Successible") = successibleLaws[Int]
-  property("Successible[Long] is an Successible") = successibleLaws[Long]
+  property("Successible[Int] is a Successible") = successibleLaws[Int](0)
+  property("Successible[Long] is a Successible") = successibleLaws[Long](0L)
 }

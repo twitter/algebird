@@ -19,22 +19,18 @@ package com.twitter.algebird
  * This is a monoid to represent things which increase. Note that it is important
  * that a value after being incremented is always larger than it was before.
  */
-trait Successible[@specialized(Int,Long,Float,Double) T] extends Monoid[T] {
+trait Successible[@specialized(Int,Long,Float,Double) T] {
   def next(old: T): T
   def ordering: Ordering[T]
 }
 
 object Successible {
   implicit val intSuccessible = new Successible[Int]  {
-    val zero = Monoid.intMonoid.zero
-    def plus(left: Int, right: Int) = Monoid.intMonoid.plus(left, right)
     def next(old: Int) = old + 1
     val ordering = Ordering.Int
   }
 
   implicit val longSuccessible = new Successible[Long] {
-    val zero = Monoid.longMonoid.zero
-    def plus(left: Long, right: Long) = Monoid.longMonoid.plus(left, right)
     def next(old: Long) = old + 1
     val ordering = Ordering.Long
   }
