@@ -36,7 +36,7 @@ Also, if B is List[T], and (l:A,r:List[T]) = r.sortBy(fn(l))
 this works as well (due to the associativity on A, and the fact that the list never looses data).</p><p>For approximate lists (like top-K applications) this might work (or be close enough to associative
 that for approximation algorithms it is fine), and in fact, that is the main motivation of this code:
 Produce some ordering in A, and use it to do sorted-topK on the list in B.</p><p>Seems like an open topic here.... you are obliged to think on your own about this.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/Combinator.scala">Combinator.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/Combinator.scala">Combinator.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[(A, B)], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
@@ -298,6 +298,20 @@ Produce some ordering in A, and use it to do sorted-topK on the list in B.</p><p
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.SemigroupCombinator" class="extype" href="">SemigroupCombinator</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Semigroup#sumOption" data-isabs="false">
+      <a id="sumOption(TraversableOnce[(A, B)]):Option[(A, B)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sumOption</span><span class="params">(<span name="iter">iter: TraversableOnce[(A, B)]</span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[(A, B)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">

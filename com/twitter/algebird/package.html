@@ -48,7 +48,31 @@
 
         <div class="types members" id="types">
               <h3>Type Members</h3>
-              <ol><li visbl="pub" name="com.twitter.algebird.AbstractMonad" data-isabs="true">
+              <ol><li visbl="pub" name="com.twitter.algebird.AbstractField" data-isabs="true">
+      <a id="AbstractField:AbstractField[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractField.html"><span class="name">AbstractField</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Field[T]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AbstractGroup" data-isabs="true">
+      <a id="AbstractGroup:AbstractGroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractGroup.html"><span class="name">AbstractGroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Group[T]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AbstractMonad" data-isabs="true">
       <a id="AbstractMonad:AbstractMonad[M]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -61,6 +85,42 @@
       </h4>
       <p class="comment cmt">For use from Java/minimizing code bloat in scala
 </p>
+    </li><li visbl="pub" name="com.twitter.algebird.AbstractMonoid" data-isabs="true">
+      <a id="AbstractMonoid:AbstractMonoid[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractMonoid.html"><span class="name">AbstractMonoid</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Monoid[T]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AbstractRing" data-isabs="true">
+      <a id="AbstractRing:AbstractRing[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractRing.html"><span class="name">AbstractRing</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Ring[T]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AbstractSemigroup" data-isabs="true">
+      <a id="AbstractSemigroup:AbstractSemigroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractSemigroup.html"><span class="name">AbstractSemigroup</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends Semigroup[T]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.AdaptiveMatrix" data-isabs="false">
       <a id="AdaptiveMatrix:AdaptiveMatrix[V]"></a>
       <h4 class="signature">
@@ -148,6 +208,18 @@ as applying the function one at a time in order to the input.</p>
       </span>
       <span class="symbol">
         <a href="Aggregator.html"><span class="name">Aggregator</span></a><span class="tparams">[<span name="A">-A</span>, <span name="B">B</span>, <span name="C">+C</span>]</span><span class="result"> extends (TraversableOnce[A]) ⇒ C with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AndVal" data-isabs="false">
+      <a id="AndVal:AndVal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AndVal.html"><span class="name">AndVal</span></a><span class="params">(<span name="get">get: Boolean</span>)</span><span class="result"> extends Product with Serializable</span>
       </span>
       </h4>
       
@@ -260,6 +332,18 @@ as applying the function one at a time in order to the input.</p>
       </span>
       </h4>
       <p class="comment cmt">Empty bloom filter.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.BloomFilterAggregator" data-isabs="false">
+      <a id="BloomFilterAggregator:BloomFilterAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BloomFilterAggregator.html"><span class="name">BloomFilterAggregator</span></a><span class="params">(<span name="bfMonoid">bfMonoid: BloomFilterMonoid</span>)</span><span class="result"> extends MonoidAggregator[String, BF, BF] with Product with Serializable</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.BloomFilterMonoid" data-isabs="false">
       <a id="BloomFilterMonoid:BloomFilterMonoid"></a>
       <h4 class="signature">
@@ -382,6 +466,18 @@ sparse counts tables.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.CountMinSketchAggregator" data-isabs="false">
+      <a id="CountMinSketchAggregator:CountMinSketchAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountMinSketchAggregator.html"><span class="name">CountMinSketchAggregator</span></a><span class="params">(<span name="cmsMonoid">cmsMonoid: CountMinSketchMonoid</span>)</span><span class="result"> extends MonoidAggregator[Long, CMS, CMS] with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">An Aggregator for the CountMinSketch.</p>
     </li><li visbl="pub" name="com.twitter.algebird.CountMinSketchMonoid" data-isabs="false">
       <a id="CountMinSketchMonoid:CountMinSketchMonoid"></a>
       <h4 class="signature">
@@ -647,6 +743,43 @@ sparse counts tables.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedTupleAggregator" data-isabs="true">
+      <a id="GeneratedTupleAggregator:GeneratedTupleAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedTupleAggregator.html"><span class="name">GeneratedTupleAggregator</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapMonoid" data-isabs="true">
+      <a id="GenericMapMonoid:GenericMapMonoid[K, V, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="GenericMapMonoid.html"><span class="name">GenericMapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>, <span name="M">M &lt;: Map[K, V]</span>]</span><span class="result"> extends Monoid[M] with MapOperations[K, V, M]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapRing" data-isabs="true">
+      <a id="GenericMapRing:GenericMapRing[K, V, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="GenericMapRing.html"><span class="name">GenericMapRing</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>, <span name="M">M &lt;: Map[K, V]</span>]</span><span class="result"> extends Ring[M] with MapOperations[K, V, M]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">You can think of this as a Sparse vector ring
+</p>
     </li><li visbl="pub" name="com.twitter.algebird.Group" data-isabs="true">
       <a id="Group:Group[T]"></a>
       <h4 class="signature">
@@ -708,6 +841,18 @@ sparse counts tables.</p>
       </span>
       </h4>
       <p class="comment cmt">Containers for holding heavy hitter items and their associated counts.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.HyperLogLogAggregator" data-isabs="false">
+      <a id="HyperLogLogAggregator:HyperLogLogAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperLogLogAggregator.html"><span class="name">HyperLogLogAggregator</span></a><span class="params">(<span name="hllMonoid">hllMonoid: HyperLogLogMonoid</span>)</span><span class="result"> extends MonoidAggregator[Array[Byte], HLL, HLL] with Product with Serializable</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.HyperLogLogMonoid" data-isabs="false">
       <a id="HyperLogLogMonoid:HyperLogLogMonoid"></a>
       <h4 class="signature">
@@ -900,11 +1045,22 @@ like Semigroup[String] or Semigroup[List[T]]</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="MapMonoid.html"><span class="name">MapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends Monoid[Map[K, V]]</span>
+        <a href="MapMonoid.html"><span class="name">MapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends GenericMapMonoid[K, V, Map[K, V]]</span>
       </span>
       </h4>
-      <p class="comment cmt">You can think of this as a Sparse vector monoid
-</p>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MapOperations" data-isabs="true">
+      <a id="MapOperations:MapOperations[K, V, M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MapOperations.html"><span class="name">MapOperations</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>, <span name="M">M &lt;: Map[K, V]</span>]</span><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.MapRing" data-isabs="false">
       <a id="MapRing:MapRing[K, V]"></a>
       <h4 class="signature">
@@ -913,11 +1069,10 @@ like Semigroup[String] or Semigroup[List[T]]</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="MapRing.html"><span class="name">MapRing</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends MapGroup[K, V] with Ring[Map[K, V]]</span>
+        <a href="MapRing.html"><span class="name">MapRing</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends MapGroup[K, V] with GenericMapRing[K, V, Map[K, V]]</span>
       </span>
       </h4>
-      <p class="comment cmt">You can think of this as a Sparse vector ring
-</p>
+      
     </li><li visbl="pub" name="com.twitter.algebird.Max" data-isabs="false">
       <a id="Max:Max[T]"></a>
       <h4 class="signature">
@@ -927,6 +1082,18 @@ like Semigroup[String] or Semigroup[List[T]]</p>
       </span>
       <span class="symbol">
         <a href="Max.html"><span class="name">Max</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MaxAggregator" data-isabs="false">
+      <a id="MaxAggregator:MaxAggregator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MaxAggregator.html"><span class="name">MaxAggregator</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="ord">ord: Ordering[T]</span>)</span><span class="result"> extends Aggregator[T, T, T] with Product with Serializable</span>
       </span>
       </h4>
       
@@ -957,6 +1124,18 @@ like Semigroup[String] or Semigroup[List[T]]</p>
       </span>
       <span class="symbol">
         <a href="Min.html"><span class="name">Min</span></a><span class="tparams">[<span name="T">+T</span>]</span><span class="params">(<span name="get">get: T</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.MinAggregator" data-isabs="false">
+      <a id="MinAggregator:MinAggregator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinAggregator.html"><span class="name">MinAggregator</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="ord">ord: Ordering[T]</span>)</span><span class="result"> extends Aggregator[T, T, T] with Product with Serializable</span>
       </span>
       </h4>
       
@@ -1231,6 +1410,18 @@ if (import Monad.</p>
       <p class="comment cmt">Some(5) + Some(3) == Some(8)
 Some(5) + None == Some(5)
 </p>
+    </li><li visbl="pub" name="com.twitter.algebird.OrVal" data-isabs="false">
+      <a id="OrVal:OrVal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="OrVal.html"><span class="name">OrVal</span></a><span class="params">(<span name="get">get: Boolean</span>)</span><span class="result"> extends Product with Serializable</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.PlusOp" data-isabs="false">
       <a id="PlusOp:PlusOp[T]"></a>
       <h4 class="signature">
@@ -2559,6 +2750,42 @@ before you start adding SGDPos objects.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.ScMapGroup" data-isabs="false">
+      <a id="ScMapGroup:ScMapGroup[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScMapGroup.html"><span class="name">ScMapGroup</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends ScMapMonoid[K, V] with Group[Map[K, V]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ScMapMonoid" data-isabs="false">
+      <a id="ScMapMonoid:ScMapMonoid[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScMapMonoid.html"><span class="name">ScMapMonoid</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends GenericMapMonoid[K, V, Map[K, V]]</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.ScMapRing" data-isabs="false">
+      <a id="ScMapRing:ScMapRing[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScMapRing.html"><span class="name">ScMapRing</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends ScMapGroup[K, V] with GenericMapRing[K, V, Map[K, V]]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.Semigroup" data-isabs="true">
       <a id="Semigroup:Semigroup[T]"></a>
       <h4 class="signature">
@@ -2634,6 +2861,18 @@ This will not be valid for all fold functions.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.SketchMapAggregator" data-isabs="false">
+      <a id="SketchMapAggregator:SketchMapAggregator[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SketchMapAggregator.html"><span class="name">SketchMapAggregator</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="skmMonoid">skmMonoid: SketchMapMonoid[K, V]</span>)</span><span class="result"> extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] with Product with Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">An Aggregator for the SketchMap.</p>
     </li><li visbl="pub" name="com.twitter.algebird.SketchMapMonoid" data-isabs="false">
       <a id="SketchMapMonoid:SketchMapMonoid[K, V]"></a>
       <h4 class="signature">
@@ -3904,6 +4143,42 @@ some useful functions.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator" data-isabs="false">
+      <a id="Aggregator:Aggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Aggregator$.html"><span class="name">Aggregator</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Aggregators compose well.</p>
+    </li><li visbl="pub" name="com.twitter.algebird.AndVal" data-isabs="false">
+      <a id="AndVal:AndVal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AndVal$.html"><span class="name">AndVal</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.AndValMonoid" data-isabs="false">
+      <a id="AndValMonoid:AndValMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AndValMonoid$.html"><span class="name">AndValMonoid</span></a><span class="result"> extends Monoid[AndVal]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Boolean AND monoid.</p>
     </li><li visbl="pub" name="com.twitter.algebird.Approximate" data-isabs="false">
       <a id="Approximate:Approximate"></a>
       <h4 class="signature">
@@ -4021,6 +4296,18 @@ some useful functions.</p>
       </span>
       <span class="symbol">
         <a href="BloomFilter$.html"><span class="name">BloomFilter</span></a><span class="result"> extends AnyRef</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.BloomFilterAggregator" data-isabs="false">
+      <a id="BloomFilterAggregator:BloomFilterAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BloomFilterAggregator$.html"><span class="name">BloomFilterAggregator</span></a><span class="result"> extends Serializable</span>
       </span>
       </h4>
       
@@ -4156,6 +4443,18 @@ some useful functions.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.GeneratedTupleAggregator" data-isabs="false">
+      <a id="GeneratedTupleAggregator:GeneratedTupleAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GeneratedTupleAggregator$.html"><span class="name">GeneratedTupleAggregator</span></a><span class="result"> extends GeneratedTupleAggregator</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.Group" data-isabs="false">
       <a id="Group:Group"></a>
       <h4 class="signature">
@@ -4192,6 +4491,18 @@ some useful functions.</p>
       </span>
       </h4>
       <p class="comment cmt">Implementation of the HyperLogLog approximate counting as a Monoid</p>
+    </li><li visbl="pub" name="com.twitter.algebird.HyperLogLogAggregator" data-isabs="false">
+      <a id="HyperLogLogAggregator:HyperLogLogAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperLogLogAggregator$.html"><span class="name">HyperLogLogAggregator</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.IntRing" data-isabs="false">
       <a id="IntRing:IntRing"></a>
       <h4 class="signature">
@@ -4408,6 +4719,18 @@ some useful functions.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.MomentsAggregator" data-isabs="false">
+      <a id="MomentsAggregator:MomentsAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MomentsAggregator$.html"><span class="name">MomentsAggregator</span></a><span class="result"> extends MonoidAggregator[Double, Moments, Moments]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="com.twitter.algebird.MomentsGroup" data-isabs="false">
       <a id="MomentsGroup:MomentsGroup"></a>
       <h4 class="signature">
@@ -4481,6 +4804,30 @@ some useful functions.</p>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="com.twitter.algebird.OrVal" data-isabs="false">
+      <a id="OrVal:OrVal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="OrVal$.html"><span class="name">OrVal</span></a><span class="result"> extends Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="com.twitter.algebird.OrValMonoid" data-isabs="false">
+      <a id="OrValMonoid:OrValMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="OrValMonoid$.html"><span class="name">OrValMonoid</span></a><span class="result"> extends Monoid[OrVal]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Boolean OR monoid.</p>
     </li><li visbl="pub" name="com.twitter.algebird.QTree" data-isabs="false">
       <a id="QTree:QTree"></a>
       <h4 class="signature">

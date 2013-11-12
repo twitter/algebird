@@ -29,12 +29,12 @@
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/Aggregator.scala">Aggregator.scala</a></dd></dl><div class="toggleContainer block">
+      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/Aggregator.scala">Aggregator.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Aggregator" class="extype" href="Aggregator.html">Aggregator</a>[A, B, C], <span name="java.io.Serializable" class="extype">Serializable</span>, (TraversableOnce[A]) ⇒ C, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
-          <div class="subClasses hiddenContent"><a name="com.twitter.algebird.Averager" class="extype" href="Averager$.html">Averager</a>, <a name="com.twitter.algebird.mutable.PriorityQueueAggregator" class="extype" href="mutable/PriorityQueueAggregator.html">PriorityQueueAggregator</a>, <a name="com.twitter.algebird.mutable.PriorityQueueToListAggregator" class="extype" href="mutable/PriorityQueueToListAggregator.html">PriorityQueueToListAggregator</a></div>
+          <div class="subClasses hiddenContent"><a name="com.twitter.algebird.Averager" class="extype" href="Averager$.html">Averager</a>, <a name="com.twitter.algebird.BloomFilterAggregator" class="extype" href="BloomFilterAggregator.html">BloomFilterAggregator</a>, <a name="com.twitter.algebird.CountMinSketchAggregator" class="extype" href="CountMinSketchAggregator.html">CountMinSketchAggregator</a>, <a name="com.twitter.algebird.HyperLogLogAggregator" class="extype" href="HyperLogLogAggregator.html">HyperLogLogAggregator</a>, <a name="com.twitter.algebird.MomentsAggregator" class="extype" href="MomentsAggregator$.html">MomentsAggregator</a>, <a name="com.twitter.algebird.mutable.PriorityQueueAggregator" class="extype" href="mutable/PriorityQueueAggregator.html">PriorityQueueAggregator</a>, <a name="com.twitter.algebird.mutable.PriorityQueueToListAggregator" class="extype" href="mutable/PriorityQueueToListAggregator.html">PriorityQueueToListAggregator</a>, <a name="com.twitter.algebird.SketchMapAggregator" class="extype" href="SketchMapAggregator.html">SketchMapAggregator</a></div>
         </div></div>
     
 
@@ -177,6 +177,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator#andThenPresent" data-isabs="false">
+      <a id="andThenPresent[D]((C) ⇒ D):Aggregator[A, B, D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">andThenPresent</span><span class="tparams">[<span name="D">D</span>]</span><span class="params">(<span name="present2">present2: (C) ⇒ D</span>)</span><span class="result">: <a name="com.twitter.algebird.Aggregator" class="extype" href="Aggregator.html">Aggregator</a>[A, B, D]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like calling andThen on the present function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling andThen on the present function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Aggregator" class="extype" href="Aggregator.html">Aggregator</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Aggregator#apply" data-isabs="false">
       <a id="apply(TraversableOnce[A]):C"></a>
       <h4 class="signature">
@@ -228,6 +240,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator#composePrepare" data-isabs="false">
+      <a id="composePrepare[A1]((A1) ⇒ A):Aggregator[A1, B, C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">composePrepare</span><span class="tparams">[<span name="A1">A1</span>]</span><span class="params">(<span name="prepare2">prepare2: (A1) ⇒ A</span>)</span><span class="result">: <a name="com.twitter.algebird.Aggregator" class="extype" href="Aggregator.html">Aggregator</a>[A1, B, C]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like calling compose on the prepare function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling compose on the prepare function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Aggregator" class="extype" href="Aggregator.html">Aggregator</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
       <a id="eq(AnyRef):Boolean"></a>
       <h4 class="signature">

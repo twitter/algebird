@@ -36,7 +36,7 @@ values inserted to the Sketch Map.</p><p>The data structure stores top non-zero 
 values are sorted by an implicit reverse ordering for the value, and the
 number of heavy hitters stored is based on the heavyHittersCount set in
 params.</p><p>Use SketchMapMonoid to create instances of this class.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span name="scala.Serializable" class="extype">Serializable</span>, <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -130,6 +130,18 @@ params.</p><p>Use SketchMapMonoid to create instances of this class.
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.SketchMap#aggregator" data-isabs="false">
+      <a id="aggregator[K, V](Double,Double,Int,Int)((K) ⇒ Array[Byte],Ordering[V],Monoid[V]):SketchMapAggregator[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aggregator</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="eps">eps: <span name="scala.Double" class="extype">Double</span></span>, <span name="delta">delta: <span name="scala.Double" class="extype">Double</span></span>, <span name="seed">seed: <span name="scala.Int" class="extype">Int</span></span>, <span name="heavyHittersCount">heavyHittersCount: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="serialization">serialization: (K) ⇒ <span name="scala.Array" class="extype">Array</span>[<span name="scala.Byte" class="extype">Byte</span>]</span>, <span name="valueOrdering">valueOrdering: Ordering[V]</span>, <span name="monoid">monoid: <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[V]</span>)</span><span class="result">: <a name="com.twitter.algebird.SketchMapAggregator" class="extype" href="SketchMapAggregator.html">SketchMapAggregator</a>[K, V]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
       <a id="asInstanceOf[T0]:T0"></a>
       <h4 class="signature">

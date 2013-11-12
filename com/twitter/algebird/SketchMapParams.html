@@ -30,7 +30,7 @@
       </h4>
       
       <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Convenience class for holding constant parameters of a Sketch Map.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span name="scala.Serializable" class="extype">Serializable</span>, <span name="java.io.Serializable" class="extype">Serializable</span>, <span name="scala.Product" class="extype">Product</span>, <span name="scala.Equals" class="extype">Equals</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -151,6 +151,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.SketchMapParams#calculateHeavyHittersMapping" data-isabs="false">
+      <a id="calculateHeavyHittersMapping[V](Iterable[K],AdaptiveMatrix[V])(Ordering[V]):Map[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">calculateHeavyHittersMapping</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="keys">keys: Iterable[K]</span>, <span name="table">table: <a name="com.twitter.algebird.AdaptiveMatrix" class="extype" href="AdaptiveMatrix.html">AdaptiveMatrix</a>[V]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Ordering[V]</span>)</span><span class="result">: Map[K, V]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Calculates the frequencies for every heavy hitter.</p>
     </li><li visbl="pub" name="com.twitter.algebird.SketchMapParams#canEqual" data-isabs="false">
       <a id="canEqual(Any):Boolean"></a>
       <h4 class="signature">
@@ -253,6 +265,18 @@
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.SketchMapParams#frequency" data-isabs="false">
+      <a id="frequency[V](K,AdaptiveMatrix[V])(Ordering[V]):V"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">frequency</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="key">key: K</span>, <span name="table">table: <a name="com.twitter.algebird.AdaptiveMatrix" class="extype" href="AdaptiveMatrix.html">AdaptiveMatrix</a>[V]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Ordering[V]</span>)</span><span class="result">: V</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Calculates the frequency for a key given a values table.</p>
     </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
       <a id="getClass():java.lang.Class[_]"></a>
       <h4 class="signature">
@@ -421,6 +445,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.SketchMapParams" class="extype" href="">SketchMapParams</a> → AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.SketchMapParams#updatedHeavyHitters" data-isabs="false">
+      <a id="updatedHeavyHitters[V](Seq[K],AdaptiveMatrix[V])(Ordering[V]):List[K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updatedHeavyHitters</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="hitters">hitters: Seq[K]</span>, <span name="table">table: <a name="com.twitter.algebird.AdaptiveMatrix" class="extype" href="AdaptiveMatrix.html">AdaptiveMatrix</a>[V]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Ordering[V]</span>)</span><span class="result">: List[K]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns a new set of sorted and concatenated heavy hitters given an
+arbitrary list of keys.</p>
     </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
       <a id="wait():Unit"></a>
       <h4 class="signature">

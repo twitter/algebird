@@ -45,7 +45,7 @@ you can find all the similar sets.</p><p>This abstract superclass is generic wit
 Depending on the number of unique values in the domain of the sets, you may want
 a MinHasher16, a MinHasher32, or a new custom subclass.</p><p>This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
 http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/MinHasher.scala">MinHasher.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/MinHasher.scala">MinHasher.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
@@ -538,6 +538,20 @@ http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Semigroup#sumOption" data-isabs="false">
+      <a id="sumOption(TraversableOnce[MinHashSignature]):Option[MinHashSignature]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sumOption</span><span class="params">(<span name="iter">iter: TraversableOnce[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<a name="com.twitter.algebird.MinHashSignature" class="extype" href="MinHashSignature.html">MinHashSignature</a>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
