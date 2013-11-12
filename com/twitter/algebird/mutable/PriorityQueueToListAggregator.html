@@ -30,7 +30,7 @@
       </h4>
       
       <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Should probably be your default Top-K implementation
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/mutable/PriorityQueueAggregator.scala">PriorityQueueAggregator.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/mutable/PriorityQueueAggregator.scala">PriorityQueueAggregator.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="com.twitter.algebird.mutable.PriorityQueueAggregator" class="extype" href="PriorityQueueAggregator.html">PriorityQueueAggregator</a>[A, List[A]], <a name="com.twitter.algebird.MonoidAggregator" class="extype" href="../MonoidAggregator.html">MonoidAggregator</a>[A, <span name="java.util.PriorityQueue" class="extype">PriorityQueue</span>[A], List[A]], <a name="com.twitter.algebird.Aggregator" class="extype" href="../Aggregator.html">Aggregator</a>[A, <span name="java.util.PriorityQueue" class="extype">PriorityQueue</span>[A], List[A]], <span name="java.io.Serializable" class="extype">Serializable</span>, (TraversableOnce[A]) ⇒ List[A], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
@@ -151,6 +151,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator#andThenPresent" data-isabs="false">
+      <a id="andThenPresent[D]((List[A]) ⇒ D):Aggregator[A, PriorityQueue[A], D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">andThenPresent</span><span class="tparams">[<span name="D">D</span>]</span><span class="params">(<span name="present2">present2: (List[A]) ⇒ D</span>)</span><span class="result">: <a name="com.twitter.algebird.Aggregator" class="extype" href="../Aggregator.html">Aggregator</a>[A, <span name="java.util.PriorityQueue" class="extype">PriorityQueue</span>[A], D]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like calling andThen on the present function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling andThen on the present function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Aggregator" class="extype" href="../Aggregator.html">Aggregator</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Aggregator#apply" data-isabs="false">
       <a id="apply(TraversableOnce[A]):List[A]"></a>
       <h4 class="signature">
@@ -202,6 +214,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Function1</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.Aggregator#composePrepare" data-isabs="false">
+      <a id="composePrepare[A1]((A1) ⇒ A):Aggregator[A1, PriorityQueue[A], List[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">composePrepare</span><span class="tparams">[<span name="A1">A1</span>]</span><span class="params">(<span name="prepare2">prepare2: (A1) ⇒ A</span>)</span><span class="result">: <a name="com.twitter.algebird.Aggregator" class="extype" href="../Aggregator.html">Aggregator</a>[A1, <span name="java.util.PriorityQueue" class="extype">PriorityQueue</span>[A], List[A]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like calling compose on the prepare function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling compose on the prepare function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Aggregator" class="extype" href="../Aggregator.html">Aggregator</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
       <a id="eq(AnyRef):Boolean"></a>
       <h4 class="signature">

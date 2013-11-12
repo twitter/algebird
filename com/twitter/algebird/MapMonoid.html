@@ -25,14 +25,13 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">MapMonoid</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[Map[K, V]]</span>
+        <span class="name">MapMonoid</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a>[K, V, Map[K, V]]</span>
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>You can think of this as a Sparse vector monoid
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.2.0/algebird-core/src/main/scala/com/twitter/algebird/MapAlgebra.scala">MapAlgebra.scala</a></dd></dl><div class="toggleContainer block">
+      <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Source</dt><dd><a target="_blank" href="https://github.com/twitter/algebird/tree/0.3.0/algebird-core/src/main/scala/com/twitter/algebird/MapAlgebra.scala">MapAlgebra.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[Map[K, V]], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[Map[K, V]], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+          <div class="superTypes hiddenContent"><a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a>[K, V, Map[K, V]], <a name="com.twitter.algebird.MapOperations" class="extype" href="MapOperations.html">MapOperations</a>[K, V, Map[K, V]], <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[Map[K, V]], <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[Map[K, V]], <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
           <div class="subClasses hiddenContent"><a name="com.twitter.algebird.MapGroup" class="extype" href="MapGroup.html">MapGroup</a>, <a name="com.twitter.algebird.MapRing" class="extype" href="MapRing.html">MapRing</a></div>
@@ -49,7 +48,7 @@
               <span class="filtertype">Inherited</span>
               <ol><li class="hideall out"><span>Hide All</span></li>
               <li class="showall in"><span>Show all</span></li></ol>
-              <ol id="linearization"><li name="com.twitter.algebird.MapMonoid" class="in"><span>MapMonoid</span></li><li name="com.twitter.algebird.Monoid" class="in"><span>Monoid</span></li><li name="com.twitter.algebird.Semigroup" class="in"><span>Semigroup</span></li><li name="java.io.Serializable" class="in"><span>Serializable</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              <ol id="linearization"><li name="com.twitter.algebird.MapMonoid" class="in"><span>MapMonoid</span></li><li name="com.twitter.algebird.GenericMapMonoid" class="in"><span>GenericMapMonoid</span></li><li name="com.twitter.algebird.MapOperations" class="in"><span>MapOperations</span></li><li name="com.twitter.algebird.Monoid" class="in"><span>Monoid</span></li><li name="com.twitter.algebird.Semigroup" class="in"><span>Semigroup</span></li><li name="java.io.Serializable" class="in"><span>Serializable</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
             </div>
         <div id="visbl">
             <span class="filtertype">Visibility</span>
@@ -142,6 +141,18 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#add" data-isabs="false">
+      <a id="add(Map[K, V],(K, V)):Map[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">add</span><span class="params">(<span name="oldMap">oldMap: Map[K, V]</span>, <span name="kv">kv: (K, V)</span>)</span><span class="result">: <span name="scala.collection.immutable.Map" class="extype">Map</span>[K, V]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MapMonoid" class="extype" href="">MapMonoid</a> → <a name="com.twitter.algebird.MapOperations" class="extype" href="MapOperations.html">MapOperations</a></dd></dl></div>
     </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
       <a id="asInstanceOf[T0]:T0"></a>
       <h4 class="signature">
@@ -220,6 +231,18 @@
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#fromMutable" data-isabs="false">
+      <a id="fromMutable(Map[K, V]):Map[K, V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromMutable</span><span class="params">(<span name="mut">mut: <span name="scala.collection.mutable.Map" class="extype">Map</span>[K, V]</span>)</span><span class="result">: <span name="scala.collection.immutable.Map" class="extype">Map</span>[K, V]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MapMonoid" class="extype" href="">MapMonoid</a> → <a name="com.twitter.algebird.MapOperations" class="extype" href="MapOperations.html">MapOperations</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
       <a id="getClass():java.lang.Class[_]"></a>
       <h4 class="signature">
@@ -256,7 +279,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#isNonZero" data-isabs="false">
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapMonoid#isNonZero" data-isabs="false">
       <a id="isNonZero(Map[K, V]):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -267,7 +290,7 @@
         <span class="name">isNonZero</span><span class="params">(<span name="x">x: Map[K, V]</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MapMonoid" class="extype" href="">MapMonoid</a> → <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a> → <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -280,7 +303,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#nonZero" data-isabs="false">
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapMonoid#nonZero" data-isabs="false">
       <a id="nonZero:(V) ⇒ Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -291,7 +314,7 @@
         <span class="name">nonZero</span><span class="result">: (V) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Monoid#nonZeroOption" data-isabs="false">
       <a id="nonZeroOption(Map[K, V]):Option[Map[K, V]]"></a>
       <h4 class="signature">
@@ -328,7 +351,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#plus" data-isabs="false">
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapMonoid#plus" data-isabs="false">
       <a id="plus(Map[K, V],Map[K, V]):Map[K, V]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -339,19 +362,19 @@
         <span class="name">plus</span><span class="params">(<span name="x">x: Map[K, V]</span>, <span name="y">y: Map[K, V]</span>)</span><span class="result">: Map[K, V]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MapMonoid" class="extype" href="">MapMonoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
-    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#semigroup" data-isabs="false">
-      <a id="semigroup:Semigroup[V]"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.MapMonoid#remove" data-isabs="false">
+      <a id="remove(Map[K, V],K):Map[K, V]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
+        <span class="modifier"></span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">semigroup</span><span class="result">: <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[V]</span>
+        <span class="name">remove</span><span class="params">(<span name="oldMap">oldMap: Map[K, V]</span>, <span name="k">k: K</span>)</span><span class="result">: <span name="scala.collection.immutable.Map" class="extype">Map</span>[K, V]</span>
       </span>
       </h4>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.MapMonoid" class="extype" href="">MapMonoid</a> → <a name="com.twitter.algebird.MapOperations" class="extype" href="MapOperations.html">MapOperations</a></dd></dl></div>
     </li><li visbl="pub" name="com.twitter.algebird.Monoid#sum" data-isabs="false">
       <a id="sum(TraversableOnce[Map[K, V]]):Map[K, V]"></a>
       <h4 class="signature">
@@ -364,6 +387,20 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a></dd></dl></div>
+    </li><li visbl="pub" name="com.twitter.algebird.GenericMapMonoid#sumOption" data-isabs="false">
+      <a id="sumOption(TraversableOnce[Map[K, V]]):Option[Map[K, V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sumOption</span><span class="params">(<span name="items">items: TraversableOnce[Map[K, V]]</span>)</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[Map[K, V]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a> → <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -452,7 +489,11 @@
         </div>
 
         <div id="inheritedMembers">
-        <div name="com.twitter.algebird.Monoid" class="parent">
+        <div name="com.twitter.algebird.GenericMapMonoid" class="parent">
+              <h3>Inherited from <a name="com.twitter.algebird.GenericMapMonoid" class="extype" href="GenericMapMonoid.html">GenericMapMonoid</a>[K, V, Map[K, V]]</h3>
+            </div><div name="com.twitter.algebird.MapOperations" class="parent">
+              <h3>Inherited from <a name="com.twitter.algebird.MapOperations" class="extype" href="MapOperations.html">MapOperations</a>[K, V, Map[K, V]]</h3>
+            </div><div name="com.twitter.algebird.Monoid" class="parent">
               <h3>Inherited from <a name="com.twitter.algebird.Monoid" class="extype" href="Monoid.html">Monoid</a>[Map[K, V]]</h3>
             </div><div name="com.twitter.algebird.Semigroup" class="parent">
               <h3>Inherited from <a name="com.twitter.algebird.Semigroup" class="extype" href="Semigroup.html">Semigroup</a>[Map[K, V]]</h3>
