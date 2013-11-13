@@ -30,7 +30,6 @@ trait Successible[@specialized(Int,Long,Float,Double) T] {
   def ordering(implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
     def compare(left: Option[T], right: Option[T]) = {
       (left, right) match {
-        //case (Some(l), Some(r)) => innerOrdering.compare(l, r)
         case (Some(l), Some(r)) => ord.compare(l, r)
         case (Some(l), None) => -1
         case (None, Some(r)) => 1
