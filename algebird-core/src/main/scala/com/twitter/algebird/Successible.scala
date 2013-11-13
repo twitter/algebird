@@ -35,14 +35,13 @@ object Successible {
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
   def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] = succ.next(t)
 
-  implicit val intSuccessible = new NumericSuccessible[Int]
-  implicit val longSuccessible = new NumericSuccessible[Long]
+  implicit def numSucc[N: Numeric]: Successible[N] = new NumericSuccessible[N]
 
   /**
    * The difference between this and the default ordering on Option[T] is that it treats None
    * as the max value, instead of the minimum value.
    */
-  def optionOrdering[@specialized(Int,Long,Float,Double) T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
+  def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
     def compare(left: Option[T], right: Option[T]) =
       (left, right) match {
         case (Some(l), Some(r)) => ord.compare(l, r)
