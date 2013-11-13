@@ -45,7 +45,7 @@ object DecayedValue extends java.io.Serializable {
 
 case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
   override val zero = DecayedValue(0.0, Double.NegativeInfinity)
-  override def plus(left : DecayedValue, right : DecayedValue) = {
+  override def plus(left : DecayedValue, right : DecayedValue) =
     if (left < right) {
       //left is older:
       DecayedValue.scale(right, left, eps)
@@ -55,10 +55,9 @@ case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
       DecayedValue.scale(left, right, eps)
     }
 
-    // Returns value if timestamp is less than value's timestamp
-    def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double): Double = {
-      plus(DecayedValue.build(0, timestamp, halfLife), value).value
-    }
+  // Returns value if timestamp is less than value's timestamp
+  def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double): Double = {
+    plus(DecayedValue.build(0, timestamp, halfLife), value).value
   }
 }
 
