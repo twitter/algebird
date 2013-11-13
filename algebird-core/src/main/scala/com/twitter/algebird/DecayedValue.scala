@@ -54,6 +54,11 @@ case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
       // right is older
       DecayedValue.scale(left, right, eps)
     }
+
+    // Returns value if timestamp is less than value's timestamp
+    def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double): Double = {
+      plus(DecayedValue.build(0, timestamp, halfLife), value).value
+    }
   }
 }
 
