@@ -17,21 +17,43 @@ package com.twitter.algebird
 
 /**
  * This is a monoid to represent things which increase. Note that it is important
- * that a value after being incremented is always larger than it was before.
+ * that a value after being incremented is always larger than it was before. Note
+ * that next returns Option because this class comes with the notion of the "greatest"
+ * key, which is None. Ints, for example, will cycle if next(java.lang.Integer.MAX_VALUE)
+ * is called, therefore we need a notion of what happens when we hit the bounds at
+ * which our ordering is violating. This is also useful for closed sets which have a fixed
+ * progression.
  */
 trait Successible[@specialized(Int,Long,Float,Double) T] {
-  def next(old: T): T
-  def ordering: Ordering[T]
+  def next(old: T): Option[T]
+  def next(old: Option[T]): Option[T] = old flatMap next
+  def ordering(implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
+    def compare(left: Option[T], right: Option[T]) = {
+      (left, right) match {
+        //case (Some(l), Some(r)) => innerOrdering.compare(l, r)
+        case (Some(l), Some(r)) => ord.compare(l, r)
+        case (Some(l), None) => -1
+        case (None, Some(r)) => 1
+        case (None, None) => 0
+      }
+    }
+  }
 }
 
 object Successible {
-  implicit val intSuccessible = new Successible[Int]  {
-    def next(old: Int) = old + 1
-    val ordering = Ordering.Int
-  }
+  implicit val intSuccessible = new NumericSuccessible[Int]
+  implicit val longSuccessible = new NumericSuccessible[Long]
+}
 
-  implicit val longSuccessible = new Successible[Long] {
-    def next(old: Long) = old + 1
-    val ordering = Ordering.Long
+class NumericSuccessible[@specialized(Int,Long,Float,Double) T:Numeric:Ordering] extends Successible[T] {
+  def next(old: T) = {
+    val numeric = implicitly[Numeric[T]]
+    val ord = implicitly[Ordering[T]]
+    val newV = numeric.plus(old, numeric.one)
+    if (ord.compare(newV, old) <= 0) {
+      None
+    } else {
+      Some(newV)
+    }
   }
 }
