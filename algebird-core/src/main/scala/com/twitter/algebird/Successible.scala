@@ -38,15 +38,14 @@ object Successible {
    * The difference between this and the default ordering on Option[T] is that it treats None
    * as the max value, instead of the minimum value.
    */
-  def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
-    def compare(left: Option[T], right: Option[T]) = {
+  def optionOrdering[@specialized(Int,Long,Float,Double) T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
+    def compare(left: Option[T], right: Option[T]) =
       (left, right) match {
         case (Some(l), Some(r)) => ord.compare(l, r)
         case (Some(l), None) => -1
         case (None, Some(r)) => 1
         case (None, None) => 0
       }
-    }
   }
 }
 
