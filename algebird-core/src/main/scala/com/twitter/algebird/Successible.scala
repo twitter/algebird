@@ -31,6 +31,10 @@ trait Successible[@specialized(Int,Long,Float,Double) T] {
 }
 
 object Successible {
+  // enables: Successible.next(2) == Some(3)
+  def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
+  def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] = succ.next(t)
+
   implicit val intSuccessible = new NumericSuccessible[Int]
   implicit val longSuccessible = new NumericSuccessible[Long]
 
