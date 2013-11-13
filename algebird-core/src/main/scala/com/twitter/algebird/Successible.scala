@@ -27,7 +27,18 @@ package com.twitter.algebird
 trait Successible[@specialized(Int,Long,Float,Double) T] {
   def next(old: T): Option[T]
   def next(old: Option[T]): Option[T] = old flatMap next
-  def ordering(implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
+  def ordering: Ordering[T]
+}
+
+object Successible {
+  implicit val intSuccessible = new NumericSuccessible[Int]
+  implicit val longSuccessible = new NumericSuccessible[Long]
+
+  /**
+   * The difference between this and the default ordering on Option[T] is that it treats None
+   * as the max value, instead of the minimum value.
+   */
+  def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
     def compare(left: Option[T], right: Option[T]) = {
       (left, right) match {
         case (Some(l), Some(r)) => ord.compare(l, r)
@@ -39,20 +50,16 @@ trait Successible[@specialized(Int,Long,Float,Double) T] {
   }
 }
 
-object Successible {
-  implicit val intSuccessible = new NumericSuccessible[Int]
-  implicit val longSuccessible = new NumericSuccessible[Long]
-}
-
 class NumericSuccessible[@specialized(Int,Long,Float,Double) T:Numeric:Ordering] extends Successible[T] {
   def next(old: T) = {
     val numeric = implicitly[Numeric[T]]
-    val ord = implicitly[Ordering[T]]
     val newV = numeric.plus(old, numeric.one)
-    if (ord.compare(newV, old) <= 0) {
+    if (ordering.compare(newV, old) <= 0) {
       None
     } else {
       Some(newV)
     }
   }
+
+  def ordering = implicitly[Ordering[T]]
 }

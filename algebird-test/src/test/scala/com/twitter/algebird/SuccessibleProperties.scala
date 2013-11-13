@@ -29,7 +29,7 @@ object SuccessibleProperties extends Properties("Successibles") {
   def alwaysIncreasing[T: Successible: Ordering](start: T) = {
     val r = new Random
     val incrementable = implicitly[Successible[T]]
-    val ord = incrementable.ordering
+    val ord = optionOrdering[T]
     1.to(100).foldLeft((Some(start):Option[T], true)) { case ((oldVal, hasBeenGreater), _) =>
       val newVal = incrementable.next(oldVal)
       (newVal, hasBeenGreater && ord.compare(oldVal, newVal) < 0)
