@@ -20,7 +20,7 @@ object HyperLogLogLaws extends Properties("HyperLogLog") {
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLaws[HLL]
+  property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{_.toDenseHLL == _.toDenseHLL}
 }
 
 class HyperLogLogTest extends Specification {
