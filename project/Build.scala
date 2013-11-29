@@ -2,7 +2,6 @@ package algebird
 
 import sbt._
 import Keys._
-import sbtgitflow.ReleasePlugin._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
@@ -14,7 +13,7 @@ object AlgebirdBuild extends Build {
       case x => x
     }
 
-  val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
+  val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
     crossScalaVersions := Seq("2.9.3", "2.10.0"),
