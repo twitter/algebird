@@ -13,6 +13,11 @@ object AlgebirdBuild extends Build {
       case x => x
     }
 
+  def specs2Import(scalaVersion: String) = scalaVersion match {
+      case version if version startsWith "2.9" => "org.specs2" %% "specs2" % "1.12.4.1" % "test"
+      case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
+  }
+
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
@@ -121,9 +126,9 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdTest = module("test").settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.10.0",
-      "org.scala-tools.testing" %% "specs" % "1.6.9"
-    )
+      "org.scalacheck" %% "scalacheck" % "1.10.0"
+    ),
+    libraryDependencies <+= scalaVersion(specs2Import(_))
   ).dependsOn(algebirdCore)
 
   lazy val algebirdUtil = module("util").settings(
