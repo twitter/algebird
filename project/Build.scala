@@ -88,7 +88,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.2.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.3.1" }
 
   lazy val algebird = Project(
     id = "algebird",
