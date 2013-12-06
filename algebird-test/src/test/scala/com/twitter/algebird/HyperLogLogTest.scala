@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -20,11 +20,11 @@ object HyperLogLogLaws extends Properties("HyperLogLog") {
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLaws[HLL]
+  property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{_.toDenseHLL == _.toDenseHLL}
 }
 
 class HyperLogLogTest extends Specification {
-  noDetailedDiffs()
+
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 
   val r = new java.util.Random

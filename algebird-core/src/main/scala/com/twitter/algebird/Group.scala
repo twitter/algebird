@@ -50,6 +50,22 @@ object UnitGroup extends ConstantGroup[Unit](())
 // similar to the above:
 object NullGroup extends ConstantGroup[Null](null)
 
+/**
+ * Some(5) - Some(3) == Some(2)
+ * Some(5) - Some(5) == None
+ * negate Some(5) == Some(-5)
+ * Note: Some(0) and None are equivalent under this Group
+ */
+class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
+    with Group[Option[T]] {
+
+  override def isNonZero(opt: Option[T]): Boolean =
+    opt.exists{ group.isNonZero(_) }
+
+  override def negate(opt: Option[T]) =
+    opt.map{ v => group.negate(v) }
+}
+
 object Group extends GeneratedGroupImplicits with ProductGroups {
   // This pattern is really useful for typeclasses
   def negate[T](x : T)(implicit grp : Group[T]) = grp.negate(x)
@@ -83,6 +99,7 @@ object Group extends GeneratedGroupImplicits with ProductGroups {
   implicit val jfloatGroup : Group[JFloat] = JFloatField
   implicit val doubleGroup : Group[Double] = DoubleField
   implicit val jdoubleGroup : Group[JDouble] = JDoubleField
+  implicit def optionGroup[T:Group] = new OptionGroup[T]
   implicit def indexedSeqGroup[T:Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
   implicit def mapGroup[K,V](implicit group : Group[V]) = new MapGroup[K,V]()(group)
   implicit def scMapGroup[K,V](implicit group : Group[V]) = new ScMapGroup[K,V]()(group)

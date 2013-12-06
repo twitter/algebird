@@ -2,7 +2,6 @@ package algebird
 
 import sbt._
 import Keys._
-import sbtgitflow.ReleasePlugin._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
@@ -14,7 +13,12 @@ object AlgebirdBuild extends Build {
       case x => x
     }
 
-  val sharedSettings = Project.defaultSettings ++ releaseSettings ++ Seq(
+  def specs2Import(scalaVersion: String) = scalaVersion match {
+      case version if version startsWith "2.9" => "org.specs2" %% "specs2" % "1.12.4.1" % "test"
+      case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
+  }
+
+  val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
     crossScalaVersions := Seq("2.9.3", "2.10.0"),
@@ -84,7 +88,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.2.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.3.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -122,9 +126,9 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdTest = module("test").settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.10.0",
-      "org.scala-tools.testing" %% "specs" % "1.6.9"
-    )
+      "org.scalacheck" %% "scalacheck" % "1.10.0"
+    ),
+    libraryDependencies <+= scalaVersion(specs2Import(_))
   ).dependsOn(algebirdCore)
 
   lazy val algebirdUtil = module("util").settings(
@@ -132,6 +136,6 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.5.2"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.0"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }

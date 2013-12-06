@@ -27,9 +27,11 @@ object DecayedValue extends java.io.Serializable {
     DecayedValue(value, time * scala.math.log(2.0)/halfLife)
   }
   val zero = DecayedValue(0.0, Double.NegativeInfinity)
+
+
   def scale(newv : DecayedValue, oldv : DecayedValue, eps : Double) = {
     val newValue = newv.value +
-        scala.math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
+      scala.math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
     if( scala.math.abs(newValue) > eps ) {
       DecayedValue(newValue, newv.scaledTime)
     }
@@ -38,18 +40,25 @@ object DecayedValue extends java.io.Serializable {
     }
   }
 
-  def monoidWithEpsilon(eps : Double) = new Monoid[DecayedValue] {
-    override val zero = DecayedValue(0.0, Double.NegativeInfinity)
-    override def plus(left : DecayedValue, right : DecayedValue) = {
-      if (left < right) {
-        //left is older:
-        scale(right, left, eps)
-      }
-      else {
-        // right is older
-        scale(left, right, eps)
-      }
+  def monoidWithEpsilon(eps : Double): Monoid[DecayedValue]
+    = new DecayedValueMonoid(eps)
+}
+
+case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
+  override val zero = DecayedValue(0.0, Double.NegativeInfinity)
+  override def plus(left : DecayedValue, right : DecayedValue) =
+    if (left < right) {
+      //left is older:
+      DecayedValue.scale(right, left, eps)
     }
+    else {
+      // right is older
+      DecayedValue.scale(left, right, eps)
+    }
+
+  // Returns value if timestamp is less than value's timestamp
+  def valueAsOf(value : DecayedValue, halfLife : Double, timestamp : Double): Double = {
+    plus(DecayedValue.build(0, timestamp, halfLife), value).value
   }
 }
 

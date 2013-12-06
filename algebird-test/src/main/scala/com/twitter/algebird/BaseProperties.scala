@@ -38,7 +38,9 @@ object BaseProperties {
   def isAssociative[T : Semigroup : Arbitrary] = isAssociativeEq[T](defaultEq _)
 
   def semigroupSumWorks[T:Semigroup:Arbitrary:Equiv] = forAll { (in: List[T]) =>
-    Equiv[Option[T]].equiv(Semigroup.sumOption(in), in.reduceLeftOption(Semigroup.plus(_,_)))
+    in.isEmpty || {
+      Equiv[T].equiv(Semigroup.sumOption(in).get, in.reduceLeft(Semigroup.plus(_,_)))
+    }
   }
 
   def isCommutativeEq[T : Semigroup : Arbitrary](eqfn: (T,T) => Boolean) = forAll { (a:T,b:T)=>
@@ -89,11 +91,12 @@ object BaseProperties {
   }
   def validZero[T : Monoid : Arbitrary] = validZeroEq[T](defaultEq _)
 
-  def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && isAssociative[T] && isNonZeroWorksMonoid[T]
+  def monoidLaws[T : Monoid : Arbitrary] = validZero[T] && semigroupLaws[T] && isNonZeroWorksMonoid[T]
   def monoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
-    validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn)
+    validZeroEq[T](eqfn) && semigroupLawsEq[T](eqfn)
+
   def commutativeMonoidLawsEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) =
-    validZeroEq[T](eqfn) && isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
+    monoidLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeMonoidLaws[T:Monoid:Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)
 
   def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>

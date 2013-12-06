@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -26,7 +26,12 @@ object SketchMapLaws extends Properties("SketchMap") {
     for (key: Int <- choose(0, 10000)) yield (smMonoid.create(key, 1L))
   }
 
-  property("SketchMap is a Monoid") = monoidLaws[SketchMap[Int, Long]]
+  // TODO: SketchMap's heavy hitters are not strictly associative (approximately they are)
+  property("SketchMap is a Monoid") = commutativeMonoidLawsEq[SketchMap[Int, Long]] { (left, right) =>
+    (left.valuesTable == right.valuesTable) &&
+      (left.params == right.params) &&
+      (left.totalValue == right.totalValue)
+  }
 }
 
 
@@ -34,7 +39,7 @@ class SketchMapTest extends Specification {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  noDetailedDiffs()
+
 
   val MONOID = SketchMap.monoid[Int, Long](EPS, DELTA, SEED, HEAVY_HITTERS_COUNT)
   val RAND = new scala.util.Random

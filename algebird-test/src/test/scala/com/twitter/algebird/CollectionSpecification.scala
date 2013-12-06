@@ -30,6 +30,15 @@ object CollectionSpecification extends Properties("Collections") {
   property("Either is a Semigroup, with a Right non-monoid semigroup") = semigroupLaws[Either[String,Max[Int]]]
 
   property("Option Monoid laws") = monoidLaws[Option[Int]] && monoidLaws[Option[String]]
+  property("Option Group laws") = groupLaws[Option[Int]] && groupLawsEq[Map[String, Option[Int]]]{
+      (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
+    val keys: Set[String] = a.keySet | b.keySet
+    keys.forall { key: String =>
+      val v1:Int = a.getOrElse(key, None).getOrElse(0)
+      val v2:Int = b.getOrElse(key, None).getOrElse(0)
+      v1 == v2
+    }
+  }
 
   property("List plus") = forAll { (a : List[Int], b : List[Int]) =>
     val mon = implicitly[Monoid[List[Int]]]

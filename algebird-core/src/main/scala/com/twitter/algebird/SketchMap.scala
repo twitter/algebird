@@ -96,9 +96,19 @@ extends Monoid[SketchMap[K, V]] {
    * Create a Sketch Map sketch from a sequence of pairs.
    */
   def create(data: Seq[(K, V)]): SketchMap[K, V] = {
-    data.foldLeft(zero) { case (acc, (key, value)) =>
-      plus(acc, create(key, value))
+    val heavyHitters = data.map { _._1 }
+    val totalValue = Monoid.sum(data.map { _._2 })
+    val initTable = AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
+    /* For each row, update the table for each K,V pair */
+    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
+      data.foldLeft(table) { case (innerTable, (key, value)) =>
+        val pos = (row, params.hashes(row)(key))
+        val currValue: V = innerTable.getValue(pos)
+        innerTable.updated(pos, Monoid.plus(currValue, value))
+      }
     }
+
+    SketchMap(params, newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
   }
 }
 
