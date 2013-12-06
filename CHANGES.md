@@ -1,5 +1,14 @@
 # Algebird #
 
+### Version 0.3.1 ###
+* Make a field transient in BloomFilter serialization: https://github.com/twitter/algebird/pull/209
+* Add the TunnelMonoid to Util (like async function monoid): https://github.com/twitter/algebird/pull/213
+* Make DecayedValueMonoid a class: https://github.com/twitter/algebird/pull/223
+* SketchMap performance improvements: https://github.com/twitter/algebird/pull/227
+* Add the Option group: https://github.com/twitter/algebird/pull/230
+* Add Successible Typeclass: https://github.com/twitter/algebird/pull/234
+* sumOption support on generated tuple Semigroups: https://github.com/twitter/algebird/pull/242
+
 ### Version 0.3.0 ###
 * Optimize lots of the Monoids/Semigroups when summing many items: see Semigroup.sumOption https://github.com/twitter/algebird/pull/206
 * Add many Aggregators for more convenient aggregation: https://github.com/twitter/algebird/pull/194

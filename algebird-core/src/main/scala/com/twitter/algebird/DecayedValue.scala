@@ -40,7 +40,8 @@ object DecayedValue extends java.io.Serializable {
     }
   }
 
-  def monoidWithEpsilon(eps : Double) = new DecayedValueMonoid(eps)
+  def monoidWithEpsilon(eps : Double): Monoid[DecayedValue]
+    = new DecayedValueMonoid(eps)
 }
 
 case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
