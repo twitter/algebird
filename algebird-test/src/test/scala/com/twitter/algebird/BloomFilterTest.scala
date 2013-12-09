@@ -178,18 +178,18 @@ class BloomFilterTest extends Specification {
       val bytesAfterSizeCalled = new String(serialize(bf))
       bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
     }
-    
+
     /**
      * this test failed before the fix for https://github.com/twitter/algebird/issues/229 
      */
     "not have negative hash values" in {
-	  val NUM_HASHES = 2
+      val NUM_HASHES = 2
       val WIDTH = 4752800
       val bfHash = BFHash(NUM_HASHES, WIDTH, SEED)
       val s = "7024497610539761509"
       val index = bfHash.apply(s).head
 
       index must be_>=(0)
-	}
+    }
   }
 }
