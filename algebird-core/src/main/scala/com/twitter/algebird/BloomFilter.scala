@@ -333,7 +333,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
       }else
         digested
 
-      Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
+      Stream.cons(math.abs(d(0) % width), nextHash(bytes, k - 1, d.drop(1)))
     }
   }
 }
