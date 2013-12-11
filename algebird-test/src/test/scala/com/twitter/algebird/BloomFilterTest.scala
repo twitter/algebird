@@ -32,19 +32,18 @@ object BFHashIndices extends Properties("BFHash") {
   
   val SEED = 1
 
-  implicit val bfHashIndices: Arbitrary[Stream[Int]] =
+  implicit val bfHash: Arbitrary[BFHash] =
     Arbitrary {
       for {
         hashes <- choose(1, 10)
         width <- choose(100, 5000000)
-        v <- choose(0, 100000)
-      } yield {BFHash(hashes, width, SEED).apply(v.toString)}
+      } yield BFHash(hashes, width, SEED)
     }
    
-  property("Indices are non negative") = forAll{ hashIndices: Stream[Int] => hashIndices.forall(_ >= 0)} 
+  property("Indices are non negative") = forAll{ (hash: BFHash, v: Long) => hash.apply(v.toString).forall(_ >= 0) } 
    
   /**
-   *   This is the version of the BFHash before the negative values fix 
+   *   This is the version of the BFHash as of before the "negative values fix" 
    */
   case class NegativeBFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]]{
     val size = numHashes
@@ -74,14 +73,22 @@ object BFHashIndices extends Properties("BFHash") {
     }
   }
   
-  val negativeBFHash = NegativeBFHash(NUM_HASHES, WIDTH, SEED)
-  val bfHash = BFHash(NUM_HASHES, WIDTH, SEED)
+  implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
+    Arbitrary {
+      for {
+        hashes <- choose(1, 10)
+        width <- choose(100, 5000000)
+      } yield (BFHash(hashes, width, SEED), NegativeBFHash(hashes, width, SEED))
+    }
 
-  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") = forAll{ long: Long =>
-    val s = long.toString
-    val indices = negativeBFHash.apply(s)
-    indices == bfHash.apply(s) || indices.exists(_ < 0)
-  }
+  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") = 
+    forAll{
+      (pair: (BFHash, NegativeBFHash), v: Long) =>
+        val s = v.toString
+        val (hash, negativeHash) = pair
+        val indices = negativeHash.apply(s)
+        indices == hash.apply(s) || indices.exists(_ < 0)
+    }
 }
 
 
