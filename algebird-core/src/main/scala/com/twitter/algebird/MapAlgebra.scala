@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import scala.annotation.tailrec
 import scala.collection.{Map => ScMap}
 import scala.collection.mutable.{Map => MMap}
 
@@ -45,6 +44,16 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
+    small match {
+      // Mutable maps create new copies of the underlying data on add so don't use the
+      // handleImmutable method.
+      // Cannot have a None so 'get' is safe here.
+      case mmap: MMap[_,_] => sumOption(Seq(big, small)).get
+      case _ => handleImmutable(big, small, bigOnLeft)
+    }
+  }
+
+  private def handleImmutable(big: M, small:M, bigOnLeft: Boolean) = {
     small.foldLeft(big) { (oldMap, kv) =>
       val newV = big
         .get(kv._1)
@@ -70,7 +79,10 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
           val oldVOpt = mutable.get(k)
           // sorry for the micro optimization here: avoiding a closure
           val newV = if(oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
-          mutable.update(k, newV)
+          if (nonZero(newV))
+            mutable.update(k, newV)
+          else
+            mutable.remove(k)
         }
       }
       Some(fromMutable(mutable))

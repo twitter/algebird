@@ -1,10 +1,10 @@
 package com.twitter.algebird
 
 import org.scalacheck.{Arbitrary, Gen, Properties}
-import org.scalacheck.Gen.choose
 import org.scalacheck.Prop._
 
 import scala.collection.{Map => ScMap}
+import scala.collection.mutable.{Map => MMap}
 
 object CollectionSpecification extends Properties("Collections") {
   import BaseProperties._
@@ -76,8 +76,14 @@ object CollectionSpecification extends Properties("Collections") {
       .map { map: Map[K,V] => map: ScMap[K,V] }
   }
 
+  implicit def mMapArb[K : Arbitrary, V : Arbitrary : Monoid] = Arbitrary {
+    mapArb[K, V]
+      .arbitrary
+      .map { map: Map[K,V] => MMap(map.toSeq: _*): MMap[K,V] }
+  }
+
   def mapPlusTimesKeys[M <: ScMap[Int, Int]]
-      (implicit rng: Ring[M], arbMap: Arbitrary[M]) =
+      (implicit rng: Ring[ScMap[Int,Int]], arbMap: Arbitrary[M]) =
     forAll { (a: M, b: M) =>
       // Subsets because zeros are removed from the times/plus values
       (rng.times(a,b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
@@ -87,15 +93,20 @@ object CollectionSpecification extends Properties("Collections") {
 
   property("Map plus/times keys") = mapPlusTimesKeys[Map[Int, Int]]
   property("ScMap plus/times keys") = mapPlusTimesKeys[ScMap[Int, Int]]
+  property("MMap plus/times keys") = mapPlusTimesKeys[MMap[Int, Int]]
   property("Map[Int,Int] Monoid laws") = isAssociative[Map[Int,Int]] && weakZero[Map[Int,Int]]
   property("ScMap[Int,Int] Monoid laws") = isAssociative[ScMap[Int,Int]] && weakZero[ScMap[Int,Int]]
+  property("MMap[Int,Int] Monoid laws") = isAssociativeDifferentTypes[ScMap[Int,Int], MMap[Int,Int]] && weakZeroDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]
   property("Map[Int,Int] has -") = hasAdditiveInverses[Map[Int,Int]]
   property("ScMap[Int,Int] has -") = hasAdditiveInverses[ScMap[Int,Int]]
+  property("MMap[Int,Int] has -") = hasAdditiveInversesDiffentTypes[ScMap[Int,Int], MMap[Int,Int]]
   property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
   property("ScMap[Int,String] Monoid laws") = isAssociative[ScMap[Int,String]] && weakZero[ScMap[Int,String]]
+  property("MMap[Int,String] Monoid laws") = isAssociativeDifferentTypes[ScMap[Int,Int], MMap[Int,Int]] && weakZeroDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]
   // We haven't implemented ring.one yet for the Map, so skip the one property
   property("Map is distributive") = isDistributive[Map[Int,Int]]
   property("ScMap is distributive") = isDistributive[ScMap[Int,Int]]
+  property("MMap is distributive") = isDistributiveDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]
   implicit def arbIndexedSeq[T:Arbitrary] : Arbitrary[IndexedSeq[T]] =
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
