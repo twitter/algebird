@@ -99,7 +99,7 @@ object CollectionSpecification extends Properties("Collections") {
   property("MMap[Int,Int] Monoid laws") = isAssociativeDifferentTypes[ScMap[Int,Int], MMap[Int,Int]] && weakZeroDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]
   property("Map[Int,Int] has -") = hasAdditiveInverses[Map[Int,Int]]
   property("ScMap[Int,Int] has -") = hasAdditiveInverses[ScMap[Int,Int]]
-  property("MMap[Int,Int] has -") = hasAdditiveInversesDiffentTypes[ScMap[Int,Int], MMap[Int,Int]]
+  property("MMap[Int,Int] has -") = hasAdditiveInversesDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]
   property("Map[Int,String] Monoid laws") = isAssociative[Map[Int,String]] && weakZero[Map[Int,String]]
   property("ScMap[Int,String] Monoid laws") = isAssociative[ScMap[Int,String]] && weakZero[ScMap[Int,String]]
   property("MMap[Int,String] Monoid laws") = isAssociativeDifferentTypes[ScMap[Int,Int], MMap[Int,Int]] && weakZeroDifferentTypes[ScMap[Int,Int], MMap[Int,Int]]

@@ -107,14 +107,14 @@ object BaseProperties {
     monoidLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeMonoidLaws[T:Monoid:Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)
 
-  def hasAdditiveInversesDiffentTypes[T: Group, U<: T: Arbitrary] = forAll { (a : U) =>
+  def hasAdditiveInversesDifferentTypes[T: Group, U<: T: Arbitrary] = forAll { (a : U) =>
     val grp = implicitly[Group[T]]
     (!grp.isNonZero(grp.plus(grp.negate(a), a))) &&
       (!grp.isNonZero(grp.minus(a,a))) &&
       (!grp.isNonZero(grp.plus(a, grp.negate(a))))
   }
 
-  def hasAdditiveInverses[T: Group : Arbitrary] = hasAdditiveInversesDiffentTypes[T, T]
+  def hasAdditiveInverses[T: Group : Arbitrary] = hasAdditiveInversesDifferentTypes[T, T]
 
   def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) && hasAdditiveInverses[T]
 
