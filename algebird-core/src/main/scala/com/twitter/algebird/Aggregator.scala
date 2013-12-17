@@ -20,14 +20,18 @@ object Aggregator extends java.io.Serializable {
     def reduce(l : T, r : T) = sg.plus(l, r)
     def present(reduction : T) = reduction
   }
-  def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T,T,T] = new MonoidAggregator[T,T,T] {
-    def prepare(input : T) = input
+  def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T,T,T] = fromMonoid[T,T](mon,identity[T])
+  // Uses the product from the ring
+  def fromRing[T](implicit rng: Ring[T]): RingAggregator[T,T,T] = fromRing[T,T](rng,identity[T])
+
+  def fromMonoid[F,T](implicit mon: Monoid[T],f:F=>T): MonoidAggregator[F,T,T] = new MonoidAggregator[F,T,T] {
+    def prepare(input : F) = f(input)
     def monoid = mon
     def present(reduction : T) = reduction
   }
   // Uses the product from the ring
-  def fromRing[T](implicit rng: Ring[T]): RingAggregator[T,T,T] = new RingAggregator[T,T,T] {
-    def prepare(input : T) = input
+  def fromRing[F,T](implicit rng: Ring[T],f:F=>T): RingAggregator[F,T,T] = new RingAggregator[F,T,T] {
+    def prepare(input : F) = f(input)
     def ring = rng
     def present(reduction : T) = reduction
   }
@@ -62,6 +66,9 @@ trait MonoidAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   final def reduce(l : B, r : B) : B = monoid.plus(l, r)
   final override def reduce(items : TraversableOnce[B]) : B =
     monoid.sum(items)
+
+  def append(l:B,r:A):B=reduce(l,prepare(r))
+  def append(items:TraversableOnce[A]):B=items.foldLeft(monoid.zero)(append)
 }
 
 trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
@@ -70,4 +77,7 @@ trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   final override def reduce(items : TraversableOnce[B]) : B =
     if(items.isEmpty) ring.one // There are several pseudo-rings, so avoid one if you can
     else items.reduceLeft(reduce _)
+
+  def fold(l:B,r:A):B=reduce(l,prepare(r))
+  def fold(items:TraversableOnce[A]):B=items.foldLeft(ring.zero)(fold)
 }
