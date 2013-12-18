@@ -45,6 +45,11 @@ trait Aggregator[-A,B,+C] extends Function1[TraversableOnce[A], C] with java.io.
   def reduce(items : TraversableOnce[B]) : B = items.reduce{reduce(_,_)}
   def apply(inputs : TraversableOnce[A]) : C = present(reduce(inputs.map{prepare(_)}))
 
+  def append(l: B,r: A): B=reduce(l,prepare(r))
+
+  def appendAll(old: B, items: TraversableOnce[A]): B =
+    if (items.isEmpty) old else reduce(old, reduce(items.map(prepare)))
+
   /** Like calling andThen on the present function */
   def andThenPresent[D](present2: C => D): Aggregator[A,B,D] =
     new Aggregator[A,B,D] {
@@ -67,8 +72,7 @@ trait MonoidAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   final override def reduce(items : TraversableOnce[B]) : B =
     monoid.sum(items)
 
-  def append(l: B,r: A) :B=reduce(l,prepare(r))
-  def append(items:TraversableOnce[A]): B=items.foldLeft(monoid.zero)(append)
+  def appendAll(items:TraversableOnce[A]): B=appendAll(monoid.zero,items)
 }
 
 trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
@@ -78,6 +82,5 @@ trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
     if(items.isEmpty) ring.one // There are several pseudo-rings, so avoid one if you can
     else items.reduceLeft(reduce _)
 
-  def append(l: B,r: A): B=reduce(l,prepare(r))
-  def append(items:TraversableOnce[A]):B=items.foldLeft(ring.one)(append)
+  def appendAll(items:TraversableOnce[A]): B=appendAll(ring.one,items)
 }
