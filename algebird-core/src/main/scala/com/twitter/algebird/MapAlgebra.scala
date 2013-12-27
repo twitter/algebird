@@ -93,14 +93,24 @@ class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[
   override lazy val zero = Map[K,V]()
   override def add(oldMap: Map[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: Map[K,V], k: K) = oldMap - k
-  override def fromMutable(mut: MMap[K, V]) = Map(mut.toSeq: _*)
+  override def fromMutable(mut: MMap[K, V]): Map[K,V] = new MutableBackedMap(mut)
 }
 
 class ScMapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K,V]] {
   override lazy val zero = ScMap[K,V]()
   override def add(oldMap: ScMap[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: ScMap[K,V], k: K) = oldMap - k
-  override def fromMutable(mut: MMap[K, V]) = mut.toMap
+  override def fromMutable(mut: MMap[K, V]): ScMap[K,V] = new MutableBackedMap(mut)
+}
+
+private[this] class MutableBackedMap[K,V](val backingMap: MMap[K,V]) extends Map[K,V] {
+  def get(key: K) = backingMap.get(key)
+
+  def iterator = backingMap.iterator
+
+  def +[B1 >: V](kv: (K, B1)) = backingMap.toMap + kv
+
+  def -(key: K) = backingMap.toMap - key
 }
 
 /** You can think of this as a Sparse vector group
