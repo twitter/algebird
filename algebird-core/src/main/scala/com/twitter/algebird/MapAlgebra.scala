@@ -21,6 +21,7 @@ import scala.collection.mutable.{Map => MMap}
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K,V)): M
   def remove(oldMap: M, k: K): M
+  def fromMutable(mut: MMap[K, V]): M
 }
 
 abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: Semigroup[V])
@@ -72,19 +73,19 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
   override def sumOption(items: TraversableOnce[M]): Option[M] =
     if(items.isEmpty) None
     else {
-      var res = zero
+      val mutable = MMap[K,V]()
       items.foreach { m =>
         m.foreach { case (k, v) =>
-          val oldVOpt = res.get(k)
+          val oldVOpt = mutable.get(k)
           // sorry for the micro optimization here: avoiding a closure
           val newV = if(oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
           if (nonZero(newV))
-            res = add(res, (k, newV))
+            mutable.update(k, newV)
           else
-            res = remove(res, k)
+            mutable.remove(k)
         }
       }
-      Some(res)
+      Some(fromMutable(mutable))
     }
 }
 
@@ -92,12 +93,14 @@ class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[
   override lazy val zero = Map[K,V]()
   override def add(oldMap: Map[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: Map[K,V], k: K) = oldMap - k
+  override def fromMutable(mut: MMap[K, V]) = Map(mut.toSeq: _*)
 }
 
 class ScMapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K,V]] {
   override lazy val zero = ScMap[K,V]()
   override def add(oldMap: ScMap[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: ScMap[K,V], k: K) = oldMap - k
+  override def fromMutable(mut: MMap[K, V]) = mut.toMap
 }
 
 /** You can think of this as a Sparse vector group
