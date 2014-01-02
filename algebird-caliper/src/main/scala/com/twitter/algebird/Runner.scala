@@ -1,6 +1,7 @@
 package com.twiter.algebird.caliper
 
-/* Adapted from {@link https://github.com/sirthias/scala-benchmarking-template/blob/master/src/main/scala/org/example/Runner.scala} */
+/** Adapted from @link https://github.com/sirthias/scala-benchmarking-template/blob/master/src/main/scala/org/example/Runner.scala 
+ */
 import com.google.caliper.{Benchmark, Runner => CaliperRunner}
 import com.google.common.collect.ObjectArrays.concat
 
