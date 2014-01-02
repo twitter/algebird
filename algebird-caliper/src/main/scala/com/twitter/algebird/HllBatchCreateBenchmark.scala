@@ -31,7 +31,7 @@ class HllBatchCreateBenchmark extends SimpleScalaBenchmark {
 
   }
 
-  def timeWithBitSet(reps: Int): Int = repeat(reps) {
+  def timeWithBitSet(reps: Int): Int = {
     val hllMonoid = new HyperLogLogMonoid(bits)
     var dummy = 0
     while (dummy < reps) {
@@ -41,7 +41,7 @@ class HllBatchCreateBenchmark extends SimpleScalaBenchmark {
     dummy
   }
 
-  def timeWithBitSetWrapper(reps: Int): Int = repeat(reps) {
+  def timeWithBitSetWrapper(reps: Int): Int = {
     val hllMonoid = new HyperLogLogMonoid2(bits)
     var dummy = 0
     while (dummy < reps) {
