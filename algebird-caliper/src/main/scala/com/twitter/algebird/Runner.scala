@@ -13,6 +13,8 @@ object Runner {
   def main(args: Array[String]) {
     val outWriter = new PrintWriter(System.out, true)
     val errWriter = new PrintWriter(System.err, true)
+    /* We should probably call to the Caliper command line
+    tool if we want to scale up? */
     CaliperRunner.main(classOf[HllBatchCreateBenchmark], args)
   }
 
