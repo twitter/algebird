@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.BitSet
+import scala.util.control.Breaks._
 
 import java.nio.ByteBuffer
 
@@ -383,6 +384,72 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     .map { _.withMin(0L) } //We always know the insection is >= 0
     .getOrElse(Approximate.exact(0L)) //Empty lists have no intersection
   }
+}
+
+class HyperLogLogMonoid2(bits: Int) extends HyperLogLogMonoid(bits) {
+  import HyperLogLog.hash
+
+  /* A super lightweight (hopefully) version of BitSet */
+  case class BitSetWrapper(in: Array[Byte]) {
+    def contains(x: Int): Boolean = {
+      /* Assume in is big endian. So smallest byte is at idx 15 */
+      val arrayIdx = x/8 /* Get the byte from the end */
+      val remainder = x%8 /* Index into the byte */
+      ((in(arrayIdx) >> (7 - remainder)) & 1) == 1
+    }
+  }
+
+  def j(bsw: BitSetWrapper, bits: Int): Int = {
+    var accum = 0
+    var i = 0
+    while (i < bits) {
+      if (bsw.contains(i)) {
+        accum += (1 << i)
+      }
+      i += 1
+    }
+    accum
+  }
+
+  def rhoW(bsw: BitSetWrapper, bits: Int): Byte = {
+    var consecutiveZeroes: Int = 1
+    var flag: Boolean = true
+    var i = bits
+    while(i < 16*8) {
+      if (bsw.contains(i)) {
+        i = (16*8+1) /* Ugly hack to not use breakable */
+      } else {
+        consecutiveZeroes += 1
+      }
+      i += 1
+    }
+    consecutiveZeroes.toByte
+  }
+
+  def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {
+    val onBits = BitSetWrapper(in)
+    (j(onBits, bits), rhoW(onBits, bits))
+  }
+
+  override def create(example : Array[Byte]) : HLL = {
+    val hashed = hash(example)
+    val (j,rhow) = jRhoW(hashed, bits)
+    SparseHLL(bits, Map(j -> Max(rhow)))
+  }
+
+  override def batchCreate[T <% Array[Byte]](instances: Iterable[T]) : HLL = {
+    val allMaxRhow = instances
+      .map { x => jRhoW(hash(x), bits) }
+      .groupBy { case (j, rhow) => j }
+      .mapValues { _.maxBy { case (j, rhow) => rhow} }
+      .mapValues { case (j, rhow) => Max(rhow) }
+    if (allMaxRhow.size * 16 <= size) {
+      SparseHLL(bits, allMaxRhow)
+    } else {
+      SparseHLL(bits, allMaxRhow).toDenseHLL
+    }
+  }
+
 }
 
 object HyperLogLogAggregator {
