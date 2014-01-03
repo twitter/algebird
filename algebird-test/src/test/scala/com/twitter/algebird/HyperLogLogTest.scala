@@ -3,9 +3,11 @@ package com.twitter.algebird
 import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Arbitrary.{arbitrary, arbByte}
 import org.scalacheck.{Prop, Properties}
-import org.scalacheck.Gen.choose
+import org.scalacheck.Prop.forAll
+import org.scalacheck.Gen
+import org.scalacheck.Gen.{choose, containerOfN}
 
 import java.lang.AssertionError
 import java.util.Arrays
@@ -24,35 +26,17 @@ object HyperLogLogLaws extends Properties("HyperLogLog") {
   property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{_.toDenseHLL == _.toDenseHLL}
 }
 
-/* Ensure HyperLogLog2 matches HLL laws also */
-object HyperLogLog2Laws extends Properties("HyperLogLogMonoid2") {
-  import BaseProperties._
+/* Ensure jRhoW matches referenceJRhoW */
+object jRhoWMatchTest extends Properties("jRhoWMatch") {
   import HyperLogLog._
 
-  implicit val hllMonoid = new HyperLogLogMonoid2(5) //5 bits
+  implicit val hashGen = Arbitrary { containerOfN[Array, Byte](16, arbitrary[Byte]) }
+  /* For some reason choose in this version of scalacheck
+  is bugged so I need the suchThat clause */
+  implicit val bitsGen = Arbitrary { choose(4, 31) suchThat (x => x >= 4 && x <= 31) }
 
-  implicit val hllGen = Arbitrary { for(
-      v <- choose(0,10000)
-    ) yield (hllMonoid(v))
-  }
-
-  property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{_.toDenseHLL == _.toDenseHLL}
-
-}
-
-/* Ensure HyperLogLogMonoid2 create matches HyperLogLogMonoid */
-object HyperLogLogMatchTest extends Properties("HyperLogLogMonoidMatch") {
-  import Prop.forAll
-  import HyperLogLog._
-  val hllMonoid1 = new HyperLogLogMonoid(5)
-  val hllMonoid2 = new HyperLogLogMonoid2(5)
-  implicit val hllGenPair =  Arbitrary { for(
-      v <- choose(0,10000)
-    ) yield (hllMonoid1(v), hllMonoid2(v))
-  }
-
-  property("HyperLogLogMonoid and HyperLogLogMonoid2 equivalent") = forAll { pair: (HLL, HLL) =>
-    pair._1 == pair._2
+  property("jRhoW matches referenceJRhoW") = forAll { (in: Array[Byte], bits: Int) =>
+    jRhoW(in, bits) == referenceJRhoW(in, bits)
   }
 }
 
