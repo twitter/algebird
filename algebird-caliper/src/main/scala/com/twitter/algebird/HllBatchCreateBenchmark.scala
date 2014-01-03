@@ -35,5 +35,4 @@ class HllBatchCreateBenchmark extends SimpleBenchmark {
     }
     dummy
   }
-
 }
