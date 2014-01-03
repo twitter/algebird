@@ -71,7 +71,7 @@ object HyperLogLog {
 
   def twopow(i : Int) : Double = scala.math.pow(2.0, i)
 
-  /** the value 'j' is equal to <w_0, w_1 ... w_(bits-)> */
+  /** the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> */
   def j(bsw: BitSetLite, bits: Int): Int = {
     var accum = 0
     var i = 0
@@ -104,7 +104,7 @@ object HyperLogLog {
   /** We are computing j and \rho(w) from the paper,
    *  sorry for the name, but it allows someone to compare to the paper extremely low probability 
    *  rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-)> and 
+   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and 
    *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */ 
