@@ -24,9 +24,11 @@ import java.nio.ByteBuffer
 /** A super lightweight (hopefully) version of BitSet */
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
-    /* Assume in is big endian. So smallest byte is at idx 15 */
-    val arrayIdx = x/8 /* Get the byte from the end */
-    val remainder = x%8 /* Index into the byte */
+    /** Pretend 'in' is little endian so that the bitstring b0b1b2b3 is such that if b0 == 1, then
+     *  0 is in the bitset, if b1 == 1, then 1 is in the bitset.
+     */
+    val arrayIdx = x/8
+    val remainder = x%8
     ((in(arrayIdx) >> (7 - remainder)) & 1) == 1
   }
 }
