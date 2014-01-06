@@ -17,7 +17,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.BitSet
-import scala.util.control.Breaks._
 
 import java.nio.ByteBuffer
 
@@ -109,33 +108,12 @@ object HyperLogLog {
    *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and 
    *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
-   */ 
+   */
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {
     val onBits = BitSetLite(in)
     (j(onBits, bits), rhoW(onBits, bits))
   }
 
-  /** Reference implementation of jRhoW */
-  def bytesToBitSet(in : Array[Byte]) : BitSet = {
-    BitSet(in.zipWithIndex.map { bi => (bi._1, bi._2 * 8) }
-      .flatMap { byteToIndicator(_) } : _*)
-  }
-  def byteToIndicator(bi : (Byte,Int)) : Seq[Int] = {
-    (0 to 7).flatMap { i =>
-      if (((bi._1 >> (7 - i)) & 1) == 1) {
-        Vector(bi._2 + i)
-      }
-      else {
-        Vector[Int]()
-      }
-    }
-  }
-
-  def referenceJRhoW(in : Array[Byte], bits: Int) : (Int,Byte) = {
-    val onBits = HyperLogLog.bytesToBitSet(in)
-    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
-     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
-  }
 
   def toBytes(h : HLL) : Array[Byte] = {
     h match {
