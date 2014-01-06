@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.BitSet
 
 import java.nio.ByteBuffer
 
@@ -72,34 +71,32 @@ object HyperLogLog {
 
   def twopow(i : Int) : Double = scala.math.pow(2.0, i)
 
-  /** the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> */
-  def j(bsw: BitSetLite, bits: Int): Int = {
-    var accum = 0
-    var i = 0
-    while (i < bits) {
-      if (bsw.contains(i)) {
-        accum += (1 << i)
+  /** the value 'j' is equal to <w_0, w_1 ... w_(bits-1)>
+   *  TODO: We could read in a byte at a time.
+   */
+  def j(bsl: BitSetLite, bits: Int): Int = {
+    @annotation.tailrec
+    def loop(pos: Int, accum: Int): Int = {
+      if (pos >= bits) {
+        accum
+      } else if (bsl.contains(pos)) {
+        loop(pos + 1, accum + (1 << pos))
+      } else {
+        loop(pos + 1, accum)
       }
-      i += 1
     }
-    accum
+    loop(0, 0)
   }
 
   /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
-  def rhoW(bsw: BitSetLite, bits: Int): Byte = {
-    var consecutiveZeroes: Int = 1
-    var i = bits
-    while(i < hashSize) {
-      if (bsw.contains(i)) {
-        i = hashSize + 1 /* Hack to break out of loop */
-      } else {
-        consecutiveZeroes += 1
-      }
-      i += 1
-    }
-    consecutiveZeroes.toByte
+  def rhoW(bsl: BitSetLite, bits: Int): Byte = {
+    @annotation.tailrec
+    def loop(pos: Int, zeros: Int): Int =
+      if (bsl.contains(pos)) zeros
+      else loop(pos + 1, zeros + 1)
+    loop(bits, 1).toByte
   }
 
   /** We are computing j and \rho(w) from the paper,
