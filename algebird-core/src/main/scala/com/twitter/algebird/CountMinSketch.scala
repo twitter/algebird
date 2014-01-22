@@ -70,7 +70,7 @@ import scala.collection.immutable.SortedSet
  *                  (heavyHittersPct * totalCount) times in the stream.
  */
 class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
-                           heavyHittersPct : Double = 0.01) extends Monoid[CMS] {
+                           heavyHittersPct : Double = 0.01) extends Monoid[CMS] with Creatable[Long, CMS] {
 
   assert(0 < eps && eps < 1, "eps must lie in (0, 1)")
   assert(0 < delta && delta < 1, "delta must lie in (0, 1)")
@@ -108,6 +108,9 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
   def create(data : Seq[Long]) : CMS = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
+
+  override def createCreatable(i: Long): CMS = create(i)
+  def batchCreateCreatable(is: Seq[Long]): CMS = create(is)
 }
 
 object CMS {

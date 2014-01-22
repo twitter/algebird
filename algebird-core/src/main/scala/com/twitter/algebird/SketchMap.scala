@@ -29,7 +29,7 @@ import scala.collection.breakOut
  */
 class SketchMapMonoid[K, V](width: Int, depth: Int, seed: Int, heavyHittersCount: Int)
                            (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V])
-extends Monoid[SketchMap[K, V]] {
+extends Monoid[SketchMap[K, V]] with Creatable[(K,V), SketchMap[K,V]] {
   /**
    * Hashes an arbitrary key type to one that the Sketch Map can use.
    */
@@ -86,6 +86,9 @@ extends Monoid[SketchMap[K, V]] {
       if(buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
       Some(buffer(0))
     }
+
+  override def createCreatable(i: (K,V)): SketchMap[K, V] = create(i)
+  def batchCreateCreatable(is: Seq[(K,V)]): SketchMap[K, V] = create(is)
 
   /**
    * Create a Sketch Map sketch out of a single key/value pair.

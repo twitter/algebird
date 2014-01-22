@@ -66,6 +66,14 @@ trait Aggregator[-A,B,+C] extends Function1[TraversableOnce[A], C] with java.io.
     }
 }
 
+/**
+  * Factory trait for creating instances of O
+  */
+trait Creatable[I, O] {
+  def createCreatable(i: I): O = batchCreateCreatable(Seq(i))
+  def batchCreateCreatable(is: Seq[I]): O
+}
+
 trait MonoidAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   def monoid : Monoid[B]
   final def reduce(l : B, r : B) : B = monoid.plus(l, r)
