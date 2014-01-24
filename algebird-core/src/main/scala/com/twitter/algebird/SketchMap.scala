@@ -30,24 +30,12 @@ import scala.collection.breakOut
 class SketchMapMonoid[K, V](width: Int, depth: Int, seed: Int, heavyHittersCount: Int)
                            (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V])
 extends Monoid[SketchMap[K, V]] {
-  /**
-   * Hashes an arbitrary key type to one that the Sketch Map can use.
-   */
-  private case class SketchMapHash(hasher: CMSHash, seed: Int) extends Function1[K, Int] {
-    def apply(obj: K): Int = {
-      val (first, second) = MurmurHash128(seed)(serialization(obj))
-      hasher(first ^ second)
-    }
-  }
 
-  val hashes: Seq[K => Int] = {
-    val r = new scala.util.Random(seed)
-    val numHashes = depth
-    val numCounters = width
-    (0 to (numHashes - 1)).map { _ =>
-      SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)
-    }
-  }
+  def eps = SketchMapParams1.eps(width)
+  def delta = SketchMapParams1.delta(depth)
+  val params1 = SketchMapParams1(seed, eps, delta, heavyHittersCount)(serialization)
+  val hashes = params1.hashes
+  val skmMonoid1 = new SketchMapMonoid1(params1)
 
   /**
    * All Sketch Maps created with this monoid will have the same parameter configuration.
@@ -57,12 +45,16 @@ extends Monoid[SketchMap[K, V]] {
   /**
    * A zero Sketch Map is one with zero elements.
    */
-  val zero: SketchMap[K, V] = SketchMap[K, V](params, AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
+  val zero: SketchMap[K, V] = SketchMap.sketchMap1ToSketchMap(skmMonoid1.zero, params)
 
   /**
    * We assume the Sketch Map on the left and right use the same hash functions.
    */
-  override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = left ++ right
+  override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] =
+    SketchMap.sketchMap1ToSketchMap(
+      skmMonoid1.plus(SketchMap.sketchMapToSketchMap1(left),
+                      SketchMap.sketchMapToSketchMap1(right)),
+      params)
 
   override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
     if(items.isEmpty) None
@@ -90,26 +82,12 @@ extends Monoid[SketchMap[K, V]] {
   /**
    * Create a Sketch Map sketch out of a single key/value pair.
    */
-  def create(pair: (K, V)): SketchMap[K, V] = zero + pair
+  def create(pair: (K, V)): SketchMap[K, V] = SketchMap.sketchMap1ToSketchMap(skmMonoid1.create(pair), params)
 
   /**
    * Create a Sketch Map sketch from a sequence of pairs.
    */
-  def create(data: Seq[(K, V)]): SketchMap[K, V] = {
-    val heavyHitters = data.map { _._1 }
-    val totalValue = Monoid.sum(data.map { _._2 })
-    val initTable = AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
-    /* For each row, update the table for each K,V pair */
-    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
-      data.foldLeft(table) { case (innerTable, (key, value)) =>
-        val pos = (row, params.hashes(row)(key))
-        val currValue: V = innerTable.getValue(pos)
-        innerTable.updated(pos, Monoid.plus(currValue, value))
-      }
-    }
-
-    SketchMap(params, newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
-  }
+  def create(data: Seq[(K, V)]): SketchMap[K, V] = SketchMap.sketchMap1ToSketchMap(skmMonoid1.create(data), params)
 }
 
 
@@ -174,10 +152,10 @@ object SketchMap {
    * depth = ceil(ln 1/delta)
    * width = ceil(e / eps)
    */
-  def eps(width: Int): Double = scala.math.exp(1.0) / width
-  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
-  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
-  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
+  def eps(width: Int): Double = SketchMapParams1.eps(width)
+  def delta(depth: Int): Double = SketchMapParams1.delta(depth)
+  def depth(delta: Double): Int = SketchMapParams1.depth(delta)
+  def width(eps: Double): Int = SketchMapParams1.width(eps)
 
   /**
    * Generates a monoid used to create SketchMap instances. Requires a
@@ -192,6 +170,15 @@ object SketchMap {
   def aggregator[K, V](eps: Double, delta: Double, seed: Int, heavyHittersCount: Int)
                       (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
     SketchMapAggregator(SketchMap.monoid(eps, delta, seed, heavyHittersCount))
+  }
+
+  def sketchMap1ToSketchMap[K, V](sm: SketchMap1[K, V], params: SketchMapParams[K])
+                                 (implicit ordering: Ordering[V], monoid: Monoid[V]): SketchMap[K, V] = {
+    SketchMap(params, sm.valuesTable, sm.heavyHitterKeys, sm.totalValue)
+  }
+
+  def sketchMapToSketchMap1[K, V](sm: SketchMap[K, V]): SketchMap1[K, V] = {
+    SketchMap1(sm.valuesTable, sm.heavyHitterKeys, sm.totalValue)
   }
 }
 
