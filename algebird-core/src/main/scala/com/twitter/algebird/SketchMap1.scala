@@ -93,7 +93,7 @@ class SketchMapMonoid1[K, V](params: SketchMapParams1[K])
   /**
    * All of the Heavy Hitter frequencies calculated all at once.
    */
-  private def heavyHittersMapping(sm: SketchMap1[K,V]): Map[K, V] =
+  def heavyHittersMapping(sm: SketchMap1[K,V]): Map[K, V] =
     params.calculateHeavyHittersMapping(sm.heavyHitterKeys, sm.valuesTable)
 
   /**
