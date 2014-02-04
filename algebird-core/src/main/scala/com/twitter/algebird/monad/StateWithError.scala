@@ -16,7 +16,7 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.Monad
+import com.twitter.algebird.{Monad, Semigroup}
 
 /** Monad to handle mutating input state and possible failures.
  * This is used to interact in the planning phase with existing
@@ -25,11 +25,14 @@ import com.twitter.algebird.Monad
  */
 sealed trait StateWithError[S,+F,+T] {
   def join[F1 >: F, U](that: StateWithError[S,F1,U], mergeErr: (F1,F1) => F1, mergeState: (S,S) => S):
-  // TODO: deep joins could blow the stack, not yet using trampoline here
-  StateWithError[S,F1,(T,U)] = StateFn( { (requested: S) =>
+    StateWithError[S,F1,(T,U)] = join(that)(Semigroup.from(mergeErr), Semigroup.from(mergeState))
+
+  def join[F1 >: F, U](that: StateWithError[S,F1,U])(implicit sgf: Semigroup[F1], sgs: Semigroup[S]):
+    // TODO: deep joins could blow the stack, not yet using trampoline here
+    StateWithError[S,F1,(T,U)] = StateFn( { (requested: S) =>
       (run(requested), that.run(requested)) match {
-        case (Right((s1, r1)), Right((s2, r2))) => Right((mergeState(s1, s2), (r1, r2)))
-        case (Left(err1), Left(err2)) => Left(mergeErr(err1, err2)) // Our earlier is not ready
+        case (Right((s1, r1)), Right((s2, r2))) => Right((sgs.plus(s1, s2), (r1, r2)))
+        case (Left(err1), Left(err2)) => Left(sgf.plus(err1, err2)) // Our earlier is not ready
         case (Left(err), _) => Left(err)
         case (_, Left(err)) => Left(err)
       }
