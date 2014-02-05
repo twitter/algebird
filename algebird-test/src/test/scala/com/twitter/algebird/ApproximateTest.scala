@@ -64,6 +64,12 @@ object ApproximateLaws extends Properties("Approximate") {
     // Make sure when it is true, we don't lose precision:
     (a || ApproximateBoolean(true, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
   }
+  property("Boolean: mustBe b withProbAtLeast/AtMost n") = forAll { (a: ApproximateBoolean) =>
+    val epsilon = 0.01
+    (a mustBe a.isTrue withProbAtLeast a.withProb) &&
+    (a mustBe a.isTrue withProbAtLeast (a.withProb + epsilon)) &&
+    (a mustBe !a.isTrue withProbAtMost (1 - a.withProb - epsilon))
+  }
   property("logic works") = forAll { (a: ApproximateBoolean, b: ApproximateBoolean) =>
     (a ^ b).isTrue == (a.isTrue ^ b.isTrue) &&
     (a^b).withProb >= (a.withProb * b.withProb) &&
