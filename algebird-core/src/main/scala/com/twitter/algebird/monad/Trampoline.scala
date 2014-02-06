@@ -21,7 +21,7 @@ import com.twitter.algebird.Monad
 // A simple trampoline implementation which we copied for the State monad
 sealed trait Trampoline[+A] {
   def map[B](fn: A => B): Trampoline[B]
-  def flatMap[B](fn: A => Trampoline[B]): Trampoline[B]
+  def flatMap[B](fn: A => Trampoline[B]): Trampoline[B] = FlatMapped(this, fn)
   /**
    * get triggers the computation which is run exactly once
    */
@@ -30,12 +30,10 @@ sealed trait Trampoline[+A] {
 
 final case class Done[A](override val get: A) extends Trampoline[A] {
   def map[B](fn: A => B) = Done(fn(get))
-  def flatMap[B](fn: A => Trampoline[B]) = FlatMapped(this, fn)
 }
 
 final case class FlatMapped[C, A](start: Trampoline[C], fn: C => Trampoline[A]) extends Trampoline[A] {
   def map[B](fn: A => B) = FlatMapped(this, { (a: A) => Done(fn(a)) })
-  def flatMap[B](fn: A => Trampoline[B]) = FlatMapped(this, fn)
   lazy val get = Trampoline.run(this)
 }
 

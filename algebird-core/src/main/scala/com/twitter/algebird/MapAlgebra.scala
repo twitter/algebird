@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import scala.annotation.tailrec
 import scala.collection.{Map => ScMap}
 import scala.collection.mutable.{Map => MMap}
 
@@ -45,6 +44,16 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
+    small match {
+      // Mutable maps create new copies of the underlying data on add so don't use the
+      // handleImmutable method.
+      // Cannot have a None so 'get' is safe here.
+      case mmap: MMap[_,_] => sumOption(Seq(big, small)).get
+      case _ => handleImmutable(big, small, bigOnLeft)
+    }
+  }
+
+  private def handleImmutable(big: M, small:M, bigOnLeft: Boolean) = {
     small.foldLeft(big) { (oldMap, kv) =>
       val newV = big
         .get(kv._1)
@@ -70,7 +79,10 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
           val oldVOpt = mutable.get(k)
           // sorry for the micro optimization here: avoiding a closure
           val newV = if(oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
-          mutable.update(k, newV)
+          if (nonZero(newV))
+            mutable.update(k, newV)
+          else
+            mutable.remove(k)
         }
       }
       Some(fromMutable(mutable))
@@ -81,14 +93,24 @@ class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[
   override lazy val zero = Map[K,V]()
   override def add(oldMap: Map[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: Map[K,V], k: K) = oldMap - k
-  override def fromMutable(mut: MMap[K, V]) = Map(mut.toSeq: _*)
+  override def fromMutable(mut: MMap[K, V]): Map[K,V] = new MutableBackedMap(mut)
 }
 
 class ScMapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K,V]] {
   override lazy val zero = ScMap[K,V]()
   override def add(oldMap: ScMap[K,V], kv: (K, V))  = oldMap + kv
   override def remove(oldMap: ScMap[K,V], k: K) = oldMap - k
-  override def fromMutable(mut: MMap[K, V]) = mut.toMap
+  override def fromMutable(mut: MMap[K, V]): ScMap[K,V] = new MutableBackedMap(mut)
+}
+
+private[this] class MutableBackedMap[K,V](val backingMap: MMap[K,V]) extends Map[K,V] {
+  def get(key: K) = backingMap.get(key)
+
+  def iterator = backingMap.iterator
+
+  def +[B1 >: V](kv: (K, B1)) = backingMap.toMap + kv
+
+  def -(key: K) = backingMap.toMap - key
 }
 
 /** You can think of this as a Sparse vector group

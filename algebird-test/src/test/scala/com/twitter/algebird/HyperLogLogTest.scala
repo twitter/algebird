@@ -3,24 +3,71 @@ package com.twitter.algebird
 import org.specs2.mutable._
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalacheck.Arbitrary.{arbitrary, arbByte}
+import org.scalacheck.{Prop, Properties}
+import org.scalacheck.Prop.forAll
+import org.scalacheck.Gen
+import org.scalacheck.Gen.{choose, containerOfN}
+
+import scala.collection.BitSet
 
 import java.lang.AssertionError
 import java.util.Arrays
+
+
+object ReferenceHyperLogLog {
+
+  /** Reference implementation of jRhoW to compare optimizations against */
+  def bytesToBitSet(in : Array[Byte]) : BitSet = {
+    BitSet(in.zipWithIndex.map { bi => (bi._1, bi._2 * 8) }
+      .flatMap { byteToIndicator(_) } : _*)
+  }
+  def byteToIndicator(bi : (Byte,Int)) : Seq[Int] = {
+    (0 to 7).flatMap { i =>
+      if (((bi._1 >> (7 - i)) & 1) == 1) {
+        Vector(bi._2 + i)
+      }
+      else {
+        Vector[Int]()
+      }
+    }
+  }
+
+  def jRhoW(in : Array[Byte], bits: Int) : (Int,Byte) = {
+    val onBits = bytesToBitSet(in)
+    (onBits.filter { _ < bits }.map { 1 << _ }.sum,
+     (onBits.filter { _ >= bits }.min - bits + 1).toByte)
+  }
+
+}
+
 
 object HyperLogLogLaws extends Properties("HyperLogLog") {
   import BaseProperties._
   import HyperLogLog._
 
   implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
+
   implicit val hllGen = Arbitrary { for(
       v <- choose(0,10000)
     ) yield (hllMonoid(v))
   }
 
   property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{_.toDenseHLL == _.toDenseHLL}
+}
+
+/* Ensure jRhoW matches referenceJRhoW */
+object jRhoWMatchTest extends Properties("jRhoWMatch") {
+  import HyperLogLog._
+
+  implicit val hashGen = Arbitrary { containerOfN[Array, Byte](16, arbitrary[Byte]) }
+  /* For some reason choose in this version of scalacheck
+  is bugged so I need the suchThat clause */
+  implicit val bitsGen = Arbitrary { choose(4, 31) suchThat (x => x >= 4 && x <= 31) }
+
+  property("jRhoW matches referenceJRhoW") = forAll { (in: Array[Byte], bits: Int) =>
+    jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits)
+  }
 }
 
 class HyperLogLogTest extends Specification {

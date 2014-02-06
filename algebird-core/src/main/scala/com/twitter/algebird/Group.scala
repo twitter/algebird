@@ -42,6 +42,9 @@ class ConstantGroup[T](constant: T) extends Group[T] {
   override def zero = constant
   override def negate(u : T) = constant
   override def plus(l : T, r : T) = constant
+  override def sumOption(iter: TraversableOnce[T]): Option[T] =
+    if(iter.isEmpty) None
+    else Some(constant)
 }
 
 // Trivial group, but possibly useful to make a group of (Unit, T) for some T.

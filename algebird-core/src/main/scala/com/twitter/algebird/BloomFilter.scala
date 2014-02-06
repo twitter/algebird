@@ -316,8 +316,13 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
   def apply(s: String) = nextHash(s.getBytes, numHashes)
 
   private def splitLong(x: Long) = {
-    val upper = math.abs(x >> 32).toInt
-    val lower = math.abs((x << 32) >> 32).toInt
+    def toNonNegativeInt(x: Long) = {
+      val y = math.abs(x).toInt // y may be negative (Interger.MIN_VALUE)
+      y & 0x7fffffff // no change for positive numbers, converts Interger.MIN_VALUE to positive number
+    }
+	
+    val upper = toNonNegativeInt(x >> 32)
+    val lower = toNonNegativeInt((x << 32) >> 32)
     (upper, lower)
   }
 

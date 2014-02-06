@@ -15,12 +15,11 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import scala.annotation.tailrec
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList, Map => JMap}
+import java.util.{List => JList}
 
 /**
  * Monoid (take a deep breath, and relax about the weird name):

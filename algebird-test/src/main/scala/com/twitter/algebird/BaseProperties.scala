@@ -31,11 +31,17 @@ object BaseProperties {
     case _ => true
   }
 
-  def isAssociativeEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T, b : T, c : T) =>
-    val semi = implicitly[Semigroup[T]]
-    eqfn(semi.plus(a, semi.plus(b,c)), semi.plus(semi.plus(a,b), c))
+  def isAssociativeEq[T: Semigroup, U <:T: Arbitrary](eqfn : (T,T) => Boolean) = {
+    forAll { (a : U, b : U, c : U) =>
+      val semi = implicitly[Semigroup[T]]
+      eqfn(semi.plus(a, semi.plus(b,c)), semi.plus(semi.plus(a,b), c))
+    }
   }
-  def isAssociative[T : Semigroup : Arbitrary] = isAssociativeEq[T](defaultEq _)
+
+  def isAssociativeDifferentTypes[T : Semigroup, U<: T :Arbitrary] =
+    isAssociativeEq[T, U](defaultEq _)
+
+  def isAssociative[T : Semigroup :Arbitrary] = isAssociativeDifferentTypes[T, T]
 
   def semigroupSumWorks[T:Semigroup:Arbitrary:Equiv] = forAll { (in: List[T]) =>
     in.isEmpty || {
@@ -60,10 +66,10 @@ object BaseProperties {
   }
 
   def semigroupLawsEquiv[T : Semigroup : Arbitrary: Equiv] =
-    isAssociativeEq[T](Equiv[T].equiv _) && semigroupSumWorks[T]
+    isAssociativeEq[T,T](Equiv[T].equiv _) && semigroupSumWorks[T]
 
   def commutativeSemigroupLawsEq[T : Semigroup : Arbitrary](eqfn : (T,T) => Boolean) =
-    isAssociativeEq[T](eqfn) && isCommutativeEq[T](eqfn)
+    isAssociativeEq[T,T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeSemigroupLaws[T : Semigroup : Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
 
   def isNonZeroWorksMonoid[T:Monoid:Arbitrary:Equiv] = forAll { (a: T, b: T) =>
@@ -77,12 +83,14 @@ object BaseProperties {
     (Monoid.isNonZero(a) && Monoid.isNonZero(b)) || prodZero
   }
 
-  def weakZero[T : Monoid : Arbitrary] = forAll { (a : T) =>
+  def weakZeroDifferentTypes[T : Monoid, U<: T :Arbitrary] = forAll { (a : U) =>
     val mon = implicitly[Monoid[T]]
     val zero = mon.zero
     // Some types, e.g. Maps, are not totally equal for all inputs (i.e. zero values removed)
     (mon.plus(a, zero) == mon.plus(zero, a))
   }
+
+  def weakZero[T : Monoid : Arbitrary] = weakZeroDifferentTypes[T,T]
 
   def validZeroEq[T : Monoid : Arbitrary](eqfn : (T,T) => Boolean) = forAll { (a : T) =>
     val mon = implicitly[Monoid[T]]
@@ -99,12 +107,14 @@ object BaseProperties {
     monoidLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeMonoidLaws[T:Monoid:Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)
 
-  def hasAdditiveInverses[T: Group : Arbitrary] = forAll { (a : T) =>
+  def hasAdditiveInversesDifferentTypes[T: Group, U<: T: Arbitrary] = forAll { (a : U) =>
     val grp = implicitly[Group[T]]
     (!grp.isNonZero(grp.plus(grp.negate(a), a))) &&
       (!grp.isNonZero(grp.minus(a,a))) &&
       (!grp.isNonZero(grp.plus(a, grp.negate(a))))
   }
+
+  def hasAdditiveInverses[T: Group : Arbitrary] = hasAdditiveInversesDifferentTypes[T, T]
 
   def groupLawsEq[T : Group : Arbitrary](eqfn : (T,T) => Boolean) = monoidLawsEq[T](eqfn) && hasAdditiveInverses[T]
 
@@ -119,11 +129,13 @@ object BaseProperties {
     (!ring.isNonZero(ring.times(a, ring.zero))) &&
       (!ring.isNonZero(ring.times(ring.zero, a)))
   }
-  def isDistributive[T : Ring : Arbitrary] = forAll { (a : T, b : T, c : T) =>
+  def isDistributiveDifferentTypes[T: Ring,U<: T: Arbitrary] = forAll { (a : U, b : U, c : U) =>
     val rng = implicitly[Ring[T]]
     (rng.times(a, rng.plus(b,c)) == rng.plus(rng.times(a,b), rng.times(a,c))) &&
       (rng.times(rng.plus(b,c),a) == rng.plus(rng.times(b,a), rng.times(c,a)))
   }
+  def isDistributive[T : Ring : Arbitrary] = isDistributiveDifferentTypes[T, T]
+
   def timesIsAssociative[T : Ring : Arbitrary] = forAll { (a : T, b : T, c : T) =>
     val rng = implicitly[Ring[T]]
     rng.times(a, rng.times(b,c)) == rng.times(rng.times(a,b),c)
