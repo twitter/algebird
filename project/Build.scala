@@ -88,7 +88,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.3.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.4.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -145,6 +145,6 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.0"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
