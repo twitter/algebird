@@ -8,43 +8,43 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
-object SketchMapTestImplicits1 {
+object SketchMapTestImplicits {
   val DELTA = 1E-8
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10
 }
 
-object SketchMap1Laws extends Properties("SketchMap1") {
+object SketchMapLaws extends Properties("SketchMap") {
   import BaseProperties._
-  import SketchMapTestImplicits1._
+  import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  val params = SketchMapParams1[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
-  implicit val smMonoid = SketchMap1.monoid[Int, Long](params)
+  val params = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
+  implicit val smMonoid = SketchMap.monoid[Int, Long](params)
   implicit val smGen = Arbitrary {
     for (key: Int <- choose(0, 10000)) yield (smMonoid.create((key, 1L)))
   }
 
   // TODO: SketchMap's heavy hitters are not strictly associative (approximately they are)
-  property("SketchMap1 is a Monoid") = commutativeMonoidLawsEq[SketchMap1[Int, Long]] { (left, right) =>
+  property("SketchMap is a Monoid") = commutativeMonoidLawsEq[SketchMap[Int, Long]] { (left, right) =>
     (left.valuesTable == right.valuesTable) &&
       (left.totalValue == right.totalValue)
   }
 }
 
 
-class SketchMap1Test extends Specification {
-  import SketchMapTestImplicits1._
+class SketchMapTest extends Specification {
+  import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
 
 
-  val PARAMS = SketchMapParams1[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
-  val MONOID = SketchMap1.monoid[Int, Long](PARAMS)
+  val PARAMS = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
+  val MONOID = SketchMap.monoid[Int, Long](PARAMS)
   val RAND = new scala.util.Random
 
-  "SketchMap1" should {
+  "SketchMap" should {
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
@@ -72,8 +72,8 @@ class SketchMap1Test extends Specification {
     }
 
     "drop old heavy hitters when new heavy hitters replace them" in {
-      val params = SketchMapParams1[Int](SEED, EPS, DELTA, 1)
-      val monoid = SketchMap1.monoid[Int, Long](params)
+      val params = SketchMapParams[Int](SEED, EPS, DELTA, 1)
+      val monoid = SketchMap.monoid[Int, Long](params)
 
       val sm1 = monoid.create(Seq((1, 5L), (2, 4L)))
       monoid.heavyHitters(sm1) must be_==(List((1, 5L)))
@@ -91,17 +91,17 @@ class SketchMap1Test extends Specification {
     "exactly compute heavy hitters in a small stream" in {
       val data = Seq((1, 1L), (2, 2L), (3, 3L), (4, 4L), (5, 5L))
 
-      val params1 = SketchMapParams1[Int](SEED, EPS, DELTA, 5)
-      val monoid1 = SketchMap1.monoid[Int, Long](params1)
+      val params1 = SketchMapParams[Int](SEED, EPS, DELTA, 5)
+      val monoid1 = SketchMap.monoid[Int, Long](params1)
       val sm1 = monoid1.create(data)
-      val params2 = SketchMapParams1[Int](SEED, EPS, DELTA, 3)
-      val monoid2 = SketchMap1.monoid[Int, Long](params2)
+      val params2 = SketchMapParams[Int](SEED, EPS, DELTA, 3)
+      val monoid2 = SketchMap.monoid[Int, Long](params2)
       val sm2 = monoid2.create(data)
-      val params3 = SketchMapParams1[Int](SEED, EPS, DELTA, 1)
-      val monoid3 = SketchMap1.monoid[Int, Long](params3)
+      val params3 = SketchMapParams[Int](SEED, EPS, DELTA, 1)
+      val monoid3 = SketchMap.monoid[Int, Long](params3)
       val sm3 = monoid3.create(data)
-      val params4 = SketchMapParams1[Int](SEED, EPS, DELTA, 0)
-      val monoid4 = SketchMap1.monoid[Int, Long](params4)
+      val params4 = SketchMapParams[Int](SEED, EPS, DELTA, 0)
+      val monoid4 = SketchMap.monoid[Int, Long](params4)
       val sm4 = monoid4.create(data)
 
       sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
@@ -127,7 +127,7 @@ class SketchMap1Test extends Specification {
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
 
-      val monoid = SketchMap1.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
+      val monoid = SketchMap.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
       monoid.heavyHitters(sm1) must be_==(List((100, 10L)))
@@ -148,14 +148,14 @@ class SketchMap1Test extends Specification {
     "work as an Aggregator" in {
       val data = Seq((1, 1L), (2, 2L), (3, 3L), (4, 4L), (5, 5L))
 
-      val params1 = SketchMapParams1[Int](SEED, EPS, DELTA, 5)
-      val params2 = SketchMapParams1[Int](SEED, EPS, DELTA, 3)
-      val params3 = SketchMapParams1[Int](SEED, EPS, DELTA, 1)
-      val params4 = SketchMapParams1[Int](SEED, EPS, DELTA, 0)
-      val sm1 = SketchMap1.aggregator[Int, Long](params1).apply(data)
-      val sm2 = SketchMap1.aggregator[Int, Long](params2).apply(data)
-      val sm3 = SketchMap1.aggregator[Int, Long](params3).apply(data)
-      val sm4 = SketchMap1.aggregator[Int, Long](params4).apply(data)
+      val params1 = SketchMapParams[Int](SEED, EPS, DELTA, 5)
+      val params2 = SketchMapParams[Int](SEED, EPS, DELTA, 3)
+      val params3 = SketchMapParams[Int](SEED, EPS, DELTA, 1)
+      val params4 = SketchMapParams[Int](SEED, EPS, DELTA, 0)
+      val sm1 = SketchMap.aggregator[Int, Long](params1).apply(data)
+      val sm2 = SketchMap.aggregator[Int, Long](params2).apply(data)
+      val sm3 = SketchMap.aggregator[Int, Long](params3).apply(data)
+      val sm4 = SketchMap.aggregator[Int, Long](params4).apply(data)
 
       sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
       sm2.heavyHitterKeys must be_==(List(5, 4, 3))
