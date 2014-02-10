@@ -225,4 +225,5 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit def jmapMonoid[K,V : Semigroup] = new JMapMonoid[K,V]
   implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
   implicit def function1Monoid[T] = new Function1Monoid[T]
+  implicit def streamSummaryMonoid[T]: Monoid[StreamSummary[T]] = new StreamSummaryMonoid[T]
 }
