@@ -22,9 +22,9 @@ sealed abstract class StreamSummary[T] private[algebird] () {
   import StreamSummary.ordering
 
   /**
-    * Maximum number of counters to keep.
+    * Maximum number of counters to keep (parameter "m" in the research paper).
     */
-  def m: Int
+  def capacity: Int
 
   /**
     * Current lowest value for count
@@ -63,7 +63,7 @@ sealed abstract class StreamSummary[T] private[algebird] () {
     * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
     */
   def topK(k: Int): Seq[(T, Approximate[Long], Boolean)] = {
-    require(k < m)
+    require(k < capacity)
     val si = counters
       .toList
       .sorted(ordering)
@@ -83,7 +83,7 @@ sealed abstract class StreamSummary[T] private[algebird] () {
 
 class SSZero[T] private[algebird] () extends StreamSummary[T] with Serializable {
 
-  def m = -1
+  def capacity = -1
 
   def min = 0L
 
@@ -93,8 +93,8 @@ class SSZero[T] private[algebird] () extends StreamSummary[T] with Serializable 
 
 }
 
-class SSOne[T] private[algebird] (val m: Int, val item: T) extends StreamSummary[T] {
-  require(m > 1)
+class SSOne[T] private[algebird] (val capacity: Int, val item: T) extends StreamSummary[T] {
+  require(capacity > 1)
 
   def min = 0L
 
@@ -109,24 +109,24 @@ class SSOne[T] private[algebird] (val m: Int, val item: T) extends StreamSummary
 }
 
 object SSMany {
-  private[algebird] def apply[T](one: SSOne[T]): SSMany[T] = new SSMany(one.m, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
+  private[algebird] def apply[T](one: SSOne[T]): SSMany[T] = new SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-class SSMany[T] private (val m: Int, val counters: Map[T, (Long, Long)], private val bucketsOption: Option[SortedMap[Long, Set[T]]]) extends StreamSummary[T] {
+class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], private val bucketsOption: Option[SortedMap[Long, Set[T]]]) extends StreamSummary[T] {
   //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
 
-  private[algebird] def this(m: Int, counters: Map[T, (Long, Long)]) = this(m, counters, None)
+  private[algebird] def this(capacity: Int, counters: Map[T, (Long, Long)]) = this(capacity, counters, None)
 
-  private def this(m: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) = this(m, counters, Some(buckets))
+  private def this(capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) = this(capacity, counters, Some(buckets))
 
   lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
     case Some(buckets) => buckets
     case None => SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
   }
 
-  private val exact: Boolean = counters.size < m
+  private val exact: Boolean = counters.size < capacity
 
-  lazy val min = if (counters.size < m) 0L else buckets.firstKey
+  lazy val min = if (counters.size < capacity) 0L else buckets.firstKey
 
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
@@ -139,7 +139,7 @@ class SSMany[T] private (val m: Int, val counters: Map[T, (Long, Long)], private
       else // remove item from current bucket
         buckets + (count -> (currBucket - item))
     } + (count + 1L -> (buckets.getOrElse(count + 1L, Set()) + item))
-    new SSMany(m, counters1, buckets1)
+    new SSMany(capacity, counters1, buckets1)
   }
 
   // lose one item to meet capacity constraint
@@ -151,19 +151,19 @@ class SSMany[T] private (val m: Int, val counters: Map[T, (Long, Long)], private
       buckets - min
     else
       buckets + (min -> (firstBucket - itemToLose))
-    new SSMany(m, counters1, buckets1)
+    new SSMany(capacity, counters1, buckets1)
   }
 
   // introduce new item
   private def introduce(item: T, count: Long, err: Long) = {
     val counters1 = counters + (item -> (count, err))
     val buckets1 = buckets + (count -> (buckets.getOrElse(count, Set()) + item))
-    new SSMany(m, counters1, buckets1)
+    new SSMany(capacity, counters1, buckets1)
   }
 
   // add a single element
   private[algebird] def add(x: SSOne[T]): SSMany[T] = {
-    require(x.m == m)
+    require(x.capacity == capacity)
     if (counters.contains(x.item))
       bump(x.item)
     else
@@ -173,20 +173,18 @@ class SSMany[T] private (val m: Int, val counters: Map[T, (Long, Long)], private
   // merge two stream summaries
   // defer the creation of buckets since more pairwise merges might be necessary and buckets are not used for those
   private def merge(x: SSMany[T]): SSMany[T] = {
-    require(x.m == m)
+    require(x.capacity == capacity)
     val counters1 = Map() ++
       (counters.keySet ++ x.counters.keySet)
       .toList
       .map { key =>
-        {
-          val (count1, err1) = counters.getOrElse(key, (min, min))
-          val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
-          (key -> (count1 + count2, err1 + err2))
-        }
+        val (count1, err1) = counters.getOrElse(key, (min, min))
+        val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
+        (key -> (count1 + count2, err1 + err2))
       }
       .sorted(StreamSummary.ordering)
-      .take(m)
-    new SSMany(m, counters1)
+      .take(capacity)
+    new SSMany(capacity, counters1)
   }
 
   def ++(other: StreamSummary[T]): StreamSummary[T] = other match {
