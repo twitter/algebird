@@ -2,11 +2,11 @@ package com.twitter.algebird
 
 import scala.collection.immutable.SortedMap
 
-object StreamSummary {
+object SpaceSaver {
   /**
-    * Construct StreamSummary with maximum size of m containing a single item.
+    * Construct SpaceSaver with maximum size of m containing a single item.
     */
-  def apply[T](m: Int, item: T): StreamSummary[T] = new SSOne(m, item)
+  def apply[T](m: Int, item: T): SpaceSaver[T] = new SSOne(m, item)
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 }
@@ -15,11 +15,12 @@ object StreamSummary {
   * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
   * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
   * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
+  * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
   * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
   * or preserve the guarantees or benefits of the algorithm.
   */
-sealed abstract class StreamSummary[T] private[algebird] () {
-  import StreamSummary.ordering
+sealed abstract class SpaceSaver[T] private[algebird] () {
+  import SpaceSaver.ordering
 
   /**
     * Maximum number of counters to keep (parameter "m" in the research paper).
@@ -36,7 +37,7 @@ sealed abstract class StreamSummary[T] private[algebird] () {
     */
   def counters: Map[T, (Long, Long)]
 
-  def ++(other: StreamSummary[T]): StreamSummary[T]
+  def ++(other: SpaceSaver[T]): SpaceSaver[T]
 
   /**
     * returns the frequency estimate for the item
@@ -74,14 +75,14 @@ sealed abstract class StreamSummary[T] private[algebird] () {
   }
 
   /**
-    * Check consistency with other StreamSummary, useful for testing.
+    * Check consistency with other SpaceSaver, useful for testing.
     * Returns boolean indicating if they are consistent
     */
-  def consistentWith(that: StreamSummary[T]): Boolean = 
+  def consistentWith(that: SpaceSaver[T]): Boolean = 
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
-class SSZero[T] private[algebird] () extends StreamSummary[T] with Serializable {
+class SSZero[T] private[algebird] () extends SpaceSaver[T] with Serializable {
 
   def capacity = -1
 
@@ -89,18 +90,18 @@ class SSZero[T] private[algebird] () extends StreamSummary[T] with Serializable 
 
   def counters = Map[T, (Long, Long)]()
 
-  def ++(other: StreamSummary[T]): StreamSummary[T] = other
+  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other
 
 }
 
-class SSOne[T] private[algebird] (val capacity: Int, val item: T) extends StreamSummary[T] {
+class SSOne[T] private[algebird] (val capacity: Int, val item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
   def min = 0L
 
   def counters = Map(item -> (1L, 1L))
 
-  def ++(other: StreamSummary[T]): StreamSummary[T] = other match {
+  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSZero[_] => this
     case other: SSOne[_] => SSMany(this).add(other)
     case other: SSMany[_] => other.add(this)
@@ -112,7 +113,7 @@ object SSMany {
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] = new SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], private val bucketsOption: Option[SortedMap[Long, Set[T]]]) extends StreamSummary[T] {
+class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], private val bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
   //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
 
   private[algebird] def this(capacity: Int, counters: Map[T, (Long, Long)]) = this(capacity, counters, None)
@@ -182,12 +183,12 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
         val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
         (key -> (count1 + count2, err1 + err2))
       }
-      .sorted(StreamSummary.ordering)
+      .sorted(SpaceSaver.ordering)
       .take(capacity)
     new SSMany(capacity, counters1)
   }
 
-  def ++(other: StreamSummary[T]): StreamSummary[T] = other match {
+  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSZero[_] => this
     case other: SSOne[_] => add(other)
     case other: SSMany[_] => merge(other)
@@ -195,10 +196,10 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
 
 }
 
-class StreamSummaryMonoid[T] extends Monoid[StreamSummary[T]] {
+class SpaceSaverMonoid[T] extends Monoid[SpaceSaver[T]] {
 
   override val zero = new SSZero[T]()
 
-  override def plus(x: StreamSummary[T], y: StreamSummary[T]): StreamSummary[T] = x ++ y
+  override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
 
 }
