@@ -25,7 +25,16 @@ import org.scalacheck.Gen._
 object Generators {
 
   implicit def intervalArb[T:Arbitrary:Ordering]: Arbitrary[Interval[T]] =
-    Arbitrary(oneOf(genUniverse, genEmpty, genInclusiveLower, genExclusiveLower, genInclusiveUpper, genExclusiveUpper))
+    Arbitrary(oneOf(genUniverse, genEmpty, genInclusiveLower, genExclusiveLower, genInclusiveUpper, genExclusiveUpper, genIntersection))
+
+  implicit def lowerIntArb[T:Arbitrary:Ordering]: Arbitrary[Lower[T]] =
+    Arbitrary(oneOf(genInclusiveLower, genExclusiveLower))
+
+  implicit def upperIntArb[T:Arbitrary:Ordering]: Arbitrary[Upper[T]] =
+    Arbitrary(oneOf(genInclusiveUpper, genExclusiveUpper))
+
+  implicit def intersectionArb[T:Arbitrary:Ordering]: Arbitrary[Intersection[T]] =
+    Arbitrary(genIntersection)
 
   def genUniverse[T:Arbitrary:Ordering] =
       for {
@@ -58,4 +67,10 @@ object Generators {
       for {
         u <- Arbitrary.arbitrary[T]
       } yield ExclusiveUpper(u)
+
+  def genIntersection[T:Arbitrary:Ordering] =
+      for {
+        l <- Arbitrary.arbitrary[Lower[T]]
+        u <- Arbitrary.arbitrary[Upper[T]] if ((l && u) != Empty[T]())
+      } yield Intersection(l, u)
 }

@@ -27,6 +27,17 @@ package com.twitter.algebird
 trait Successible[@specialized(Int,Long,Float,Double) T] {
   def next(old: T): Option[T]
   def next(old: Option[T]): Option[T] = old flatMap next
+  def iterateNext(old: T): Iterable[T] = {
+    val self = this
+    // TODO in scala 2.11, there is an AbstractIterable which should be used here
+    // to reduce generated class size due to all the methods in Iterable.
+    new AbstractIterable[T] {
+      def iterator =
+        Iterator.iterate[Option[T]](Some(old)) { self.next(_) }
+         .takeWhile(_.isDefined)
+         .map(_.get)
+    }
+  }
   def ordering: Ordering[T]
 }
 
@@ -34,6 +45,8 @@ object Successible {
   // enables: Successible.next(2) == Some(3)
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
   def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] = succ.next(t)
+  def iterateNext[T](old: T)(implicit succ: Successible[T]): Iterable[T] =
+    succ.iterateNext(old)
 
   implicit def numSucc[N: Numeric]: Successible[N] = new NumericSuccessible[N]
 
@@ -52,6 +65,7 @@ object Successible {
   }
 }
 
+// TODO Remove Ordering. It is unused. Note Numeric and Integral extend ordering
 class NumericSuccessible[@specialized(Int,Long,Float,Double) T:Numeric:Ordering] extends Successible[T] {
   def next(old: T) = {
     val numeric = implicitly[Numeric[T]]
@@ -63,5 +77,5 @@ class NumericSuccessible[@specialized(Int,Long,Float,Double) T:Numeric:Ordering]
     }
   }
 
-  def ordering = implicitly[Ordering[T]]
+  def ordering: Ordering[T] = implicitly[Numeric[T]]
 }
