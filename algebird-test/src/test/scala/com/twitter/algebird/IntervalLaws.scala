@@ -52,9 +52,8 @@ object IntervalLaws extends Properties("Interval") {
     forAll { (lower: Lower[Long]) =>
       (for {
         le <- lower.least
-        nle <- Successible.next(le)
         ple <- Predecessible.prev(le)
-      } yield (lower.contains(nle) && !lower.contains(ple)))
+      } yield (lower.contains(le) && !lower.contains(ple)))
         .getOrElse {
           lower match {
             case InclusiveLower(l) => l == Long.MinValue
@@ -68,8 +67,7 @@ object IntervalLaws extends Properties("Interval") {
       (for {
         gr <- upper.greatest
         ngr <- Successible.next(gr)
-        pgr <- Predecessible.prev(gr)
-      } yield (upper.contains(pgr) && !upper.contains(ngr)))
+      } yield (upper.contains(gr) && !upper.contains(ngr)))
         .getOrElse {
           upper match {
             case InclusiveUpper(l) => l == Long.MaxValue
