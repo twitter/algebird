@@ -212,7 +212,7 @@ case class Intersection[T](lower: Lower[T], upper: Upper[T]) extends Interval[T]
    * it this way, it does not mean it is empty or universe, etc... (there
    * are other cases).
    */
-  def toLeftClosedRightOpen(implicit p: Predecessible[T], s: Successible[T]): Option[(T, T)] =
+  def toLeftClosedRightOpen(implicit s: Successible[T]): Option[(T, T)] =
     for {
       l <- lower.least
       g <- upper.strictUpperBound
