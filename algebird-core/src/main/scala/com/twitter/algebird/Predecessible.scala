@@ -23,11 +23,12 @@ package com.twitter.algebird
  */
 trait Predecessible[T] extends java.io.Serializable {
   def prev(old: T): Option[T]
-  def prev(old: Option[T]): Option[T] = old flatMap prev
+  def prev(old: Option[T]): Option[T] = old.flatMap(prev)
   def iteratePrev(old: T): Iterable[T] = {
     val self = this
     // TODO in scala 2.11, there is an AbstractIterable which should be used here
     // to reduce generated class size due to all the methods in Iterable.
+    // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.prev(_) }
@@ -46,7 +47,7 @@ object Predecessible extends java.io.Serializable {
   def iteratePrev[T](first: T)(implicit p: Predecessible[T]): Iterable[T] =
     p.iteratePrev(first)
 
-  implicit def intergalPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
+  implicit def integralPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
 }
 
 class IntegralPredecessible[T:Integral] extends Predecessible[T] {

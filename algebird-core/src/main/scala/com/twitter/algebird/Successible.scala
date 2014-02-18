@@ -31,6 +31,7 @@ trait Successible[@specialized(Int,Long,Float,Double) T] {
     val self = this
     // TODO in scala 2.11, there is an AbstractIterable which should be used here
     // to reduce generated class size due to all the methods in Iterable.
+    // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.next(_) }

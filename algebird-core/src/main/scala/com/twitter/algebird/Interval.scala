@@ -20,6 +20,7 @@ package com.twitter.algebird
 
 /** Represents a single interval on a T with an Ordering
  * TODO remove T => Boolean. it ruins toString and doesn't help anything
+ * https://github.com/twitter/algebird/issues/261
  */
 sealed trait Interval[T] extends (T => Boolean) with java.io.Serializable {
   def contains(t: T): Boolean
