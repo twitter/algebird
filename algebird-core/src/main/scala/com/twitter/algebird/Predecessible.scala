@@ -46,12 +46,12 @@ object Predecessible extends java.io.Serializable {
   def iteratePrev[T](first: T)(implicit p: Predecessible[T]): Iterable[T] =
     p.iteratePrev(first)
 
-  implicit def numPrev[N: Numeric]: Predecessible[N] = new NumericPredecessible[N]
+  implicit def intergalPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
 }
 
-class NumericPredecessible[@specialized(Int,Long,Float,Double) T:Numeric] extends Predecessible[T] {
+class IntegralPredecessible[T:Integral] extends Predecessible[T] {
   def prev(old: T) = {
-    val numeric = implicitly[Numeric[T]]
+    val numeric = implicitly[Integral[T]]
     val newV = numeric.minus(old, numeric.one)
     if (ordering.compare(newV, old) >= 0) {
       // We wrapped around
@@ -61,5 +61,5 @@ class NumericPredecessible[@specialized(Int,Long,Float,Double) T:Numeric] extend
     }
   }
 
-  def ordering: Ordering[T] = implicitly[Numeric[T]]
+  def ordering: Ordering[T] = implicitly[Integral[T]]
 }
