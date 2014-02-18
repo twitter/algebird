@@ -48,6 +48,13 @@ object IntervalLaws extends Properties("Interval") {
       (i1 && i2).contains(item) == (i1(item) && i2(item))
     }
 
+  property("toLeftClosedRightOpen is an Injection") =
+    forAll { (intr: Intersection[Long], tests: List[Long]) =>
+      intr.toLeftClosedRightOpen.map { case (low, high) =>
+        val intr2 = Interval.leftClosedRightOpen(low, high)
+        tests.forall { t => intr(t) == intr2(t) }
+      }.getOrElse(true) // none means this can't be expressed as this kind of interval
+    }
   property("least is the smallest") =
     forAll { (lower: Lower[Long]) =>
       (for {
