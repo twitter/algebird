@@ -39,7 +39,7 @@ case class SketchMapHash[K](hasher: CMSHash, seed: Int)
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](params: SketchMapParams[K])
+class SketchMapMonoid[K, V](val params: SketchMapParams[K])
                             (implicit valueOrdering: Ordering[V], monoid: Monoid[V])
                             extends Monoid[SketchMap[K, V]] {
 
