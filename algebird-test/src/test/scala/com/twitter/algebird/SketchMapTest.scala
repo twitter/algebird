@@ -26,11 +26,7 @@ object SketchMapLaws extends Properties("SketchMap") {
     for (key: Int <- choose(0, 10000)) yield (smMonoid.create((key, 1L)))
   }
 
-  // TODO: SketchMap's heavy hitters are not strictly associative (approximately they are)
-  property("SketchMap is a Monoid") = commutativeMonoidLawsEq[SketchMap[Int, Long]] { (left, right) =>
-    (left.valuesTable == right.valuesTable) &&
-      (left.totalValue == right.totalValue)
-  }
+  property("SketchMap is a Monoid") = commutativeMonoidLaws[SketchMap[Int, Long]]
 }
 
 
@@ -126,8 +122,9 @@ class SketchMapTest extends Specification {
       // Ordering that orders from biggest to smallest (so that HeavyHitters
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
+      val smallerIntOrdering: Ordering[Int] = Ordering.by[Int, Int] { -_ }
 
-      val monoid = SketchMap.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
+      val monoid = SketchMap.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerIntOrdering, smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
       monoid.heavyHitters(sm1) must be_==(List((100, 10L)))

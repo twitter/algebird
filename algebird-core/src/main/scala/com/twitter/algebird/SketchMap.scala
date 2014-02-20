@@ -39,8 +39,8 @@ case class SketchMapHash[K](hasher: CMSHash, seed: Int)
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](val params: SketchMapParams[K])
-                            (implicit valueOrdering: Ordering[V], monoid: Monoid[V])
+class SketchMapMonoid[K, V](params: SketchMapParams[K])
+                            (implicit keyOrdering: Ordering[K], valueOrdering: Ordering[V], monoid: Monoid[V])
                             extends Monoid[SketchMap[K, V]] {
 
   /**
@@ -108,7 +108,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
  * Convenience class for holding constant parameters of a Sketch Map.
  */
 case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
-                              (implicit serialization: K => Array[Byte]) {
+                              (implicit serialization: K => Array[Byte], keyOrdering: Ordering[K]) {
   def width = SketchMapParams.width(eps)
   def depth = SketchMapParams.depth(delta)
 
@@ -147,7 +147,7 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
    */
   def updatedHeavyHitters[V:Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping = calculateHeavyHittersMapping(hitters, table)
-    val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
+    val specificOrdering = Ordering.by[K, (V, K)] { key => (mapping(key), key) } reverse
 
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
   }
@@ -189,12 +189,12 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
-    new SketchMapMonoid(params)(valueOrdering, monoid)
+  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: K => Array[Byte], keyOrdering: Ordering[K], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
+    new SketchMapMonoid(params)(keyOrdering, valueOrdering, monoid)
   }
 
   def aggregator[K, V](params: SketchMapParams[K])
-                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+                      (implicit serialization: K => Array[Byte], keyOrdering: Ordering[K], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
     SketchMapAggregator(params, SketchMap.monoid(params))
   }
 }
