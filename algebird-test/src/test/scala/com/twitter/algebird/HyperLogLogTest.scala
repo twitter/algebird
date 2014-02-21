@@ -14,6 +14,9 @@ import scala.collection.BitSet
 import java.lang.AssertionError
 import java.util.Arrays
 
+import com.twitter.bijection._
+import Conversion.asMethod
+
 
 object ReferenceHyperLogLog {
 
@@ -77,7 +80,7 @@ class HyperLogLogTest extends Specification {
   val r = new java.util.Random
 
   def exactCount[T](it : Iterable[T]) : Int = it.toSet.size
-  def approxCount[T <% Array[Byte]](bits : Int, it : Iterable[T]) = {
+  def approxCount[T](bits : Int, it : Iterable[T])(implicit inj: Codec[T]) = {
     val hll = new HyperLogLogMonoid(bits)
     hll.sizeOf(hll.sum(it.map { hll(_) })).estimate.toDouble
   }
@@ -87,10 +90,10 @@ class HyperLogLogTest extends Specification {
   def exactIntersect[T](it : Seq[Iterable[T]]) : Int = {
     it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
   }
-  def approxIntersect[T <% Array[Byte]](bits : Int, it : Seq[Iterable[T]]) : Double = {
+  def approxIntersect[T](bits : Int, it : Seq[Iterable[T]])(implicit inj: Codec[T]) : Double = {
     val hll = new HyperLogLogMonoid(bits)
     //Map each iterable to a HLL instance:
-    val seqHlls = it.map { iter => hll.sum(iter.view.map { hll(_) }) }
+    val seqHlls = it.map { iter => hll.sum(iter.view.map { t => hll(t.as[Array[Byte]]) }) }
     hll.intersectionSize(seqHlls).estimate.toDouble
   }
 
@@ -199,7 +202,7 @@ class HyperLogLogTest extends Specification {
         val data = (0 to 10000).map { i => r.nextInt(1000) }
         val exact = exactCount(data).toDouble
 
-        val approxCount = aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
+        val approxCount = aggregator(data.map(_.as[Array[Byte]])).approximateSize.estimate.toDouble
         scala.math.abs(exact - approxCount) / exact must be_<(3.5 * aveErrorOf(bits))
       })
     }
@@ -210,7 +213,7 @@ class HyperLogLogTest extends Specification {
         val data = (0 to 10000).map { i => r.nextInt(1000) }
         val exact = exactCount(data).toDouble
 
-        val estimate = aggregator(data.map(int2Bytes(_)))
+        val estimate = aggregator(data.map(_.as[Array[Byte]]))
         scala.math.abs(exact - estimate) / exact must be_<(3.5 * aveErrorOf(bits))
       })
     }

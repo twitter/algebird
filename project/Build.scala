@@ -6,6 +6,8 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 
 object AlgebirdBuild extends Build {
+  val bijectionVersion = "0.6.2"
+
   def withCross(dep: ModuleID) =
     dep cross CrossVersion.binaryMapped {
       case "2.9.3" => "2.9.2" // TODO: hack because twitter hasn't built things against 2.9.3
@@ -118,7 +120,10 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    libraryDependencies ++= Seq(
+      "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+      "com.twitter" %% "bijection-core" % bijectionVersion
+      ),
     sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
       GenTupleAggregators.gen(outDir)
     }
@@ -145,6 +150,6 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
+    libraryDependencies += "com.twitter" %% "bijection-core" % bijectionVersion
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }

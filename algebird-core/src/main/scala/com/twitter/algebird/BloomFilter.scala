@@ -320,7 +320,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
       val y = math.abs(x).toInt // y may be negative (Interger.MIN_VALUE)
       y & 0x7fffffff // no change for positive numbers, converts Interger.MIN_VALUE to positive number
     }
-	
+
     val upper = toNonNegativeInt(x >> 32)
     val lower = toNonNegativeInt((x << 32) >> 32)
     (upper, lower)
@@ -331,7 +331,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
       Stream.empty
     else{
       val d = if(digested.isEmpty){
-        val (a, b) = MurmurHash128(k)(bytes)
+        val Hash128((a, b)) = Hash.murmur128(k)(bytes)
         val (x1, x2) = splitLong(a)
         val (x3, x4) = splitLong(b)
         Seq(x1, x2, x3, x4)

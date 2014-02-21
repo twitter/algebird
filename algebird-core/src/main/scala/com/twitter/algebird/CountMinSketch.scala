@@ -18,6 +18,8 @@ package com.twitter.algebird
 
 import scala.collection.immutable.SortedSet
 
+import com.twitter.bijection.Injection
+
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -85,11 +87,11 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
   // so we omit it and simply use hash functions of the form
   //
   //   h_i(x) = a_i * x (mod p)
-  val hashes : Seq[CMSHash] = {
+  val hashes : Seq[Injection[Long, Hash32]] = {
     val r = new scala.util.Random(seed)
     val numHashes = CMS.depth(delta)
     val numCounters = CMS.width(eps)
-    (0 to (numHashes - 1)).map { _ => CMSHash(r.nextInt, 0, numCounters) }
+    (0 to (numHashes - 1)).map { _ => Hash.universal(r.nextInt, 0, numCounters) }
   }
 
   val params = CMSParams(hashes, eps, delta, heavyHittersPct)
@@ -277,7 +279,7 @@ case class CMSInstance(countsTable : CMSCountsTable, totalCount : Long,
 
   def frequency(item : Long) : Approximate[Long] = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) =>
-      row(params.hashes(i)(item))
+      row(params.hashes(i)(item).get)
     }
     makeApprox(estimates.min)
   }
@@ -318,7 +320,7 @@ case class CMSInstance(countsTable : CMSCountsTable, totalCount : Long,
       val newHhs = updateHeavyHitters(item, count)
       val newCountsTable =
         (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
-          val pos = (row, params.hashes(row)(item))
+          val pos = (row, params.hashes(row)(item).get)
           table + (pos, count)
         }
 
@@ -353,34 +355,6 @@ object CMSInstance {
   def apply(params : CMSParams) : CMSInstance = {
     val countsTable = CMSCountsTable(CMS.depth(params.delta), CMS.width(params.eps))
     CMSInstance(countsTable, 0, HeavyHitters(), params)
-  }
-}
-
-/**
- * The Count-Min sketch uses pairwise independent hash functions drawn from
- * a universal hashing family of the form
- *
- *   h(x) = [a * x + b (mod p)] (mod m)
- */
-case class CMSHash(a : Int, b : Int, width : Int) extends Function1[Long, Int] {
-
-  val PRIME_MODULUS = (1L << 31) - 1
-
-  /**
-   * Returns a * x + b (mod p) (mod width)
-   */
-  def apply(x : Long) : Int = {
-    val unmodded = a * x + b
-
-    // Apparently a super fast way of computing x mod 2^p-1
-    // See page 149 of
-    // http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
-    // after Proposition 7.
-    val modded = (unmodded + (unmodded >> 32)) & PRIME_MODULUS
-
-    // Modulo-ing integers is apparently twice as fast as
-    // modulo-ing Longs.
-    modded.toInt % width
   }
 }
 
@@ -439,7 +413,7 @@ object CMSCountsTable {
 /**
  * Convenience class for holding constant parameters of a Count-Min sketch.
  */
-case class CMSParams(hashes : Seq[CMSHash], eps : Double, delta : Double, heavyHittersPct : Double)
+case class CMSParams(hashes : Seq[Injection[Long, Hash32]], eps : Double, delta : Double, heavyHittersPct : Double)
 
 /**
  * Containers for holding heavy hitter items and their associated counts.

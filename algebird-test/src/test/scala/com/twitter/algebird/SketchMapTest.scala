@@ -8,17 +8,20 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
+import com.twitter.bijection.Injection
+
 object SketchMapTestImplicits {
   val DELTA = 1E-8
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10
+
+  implicit val intInjection: Injection[Int, Hash64] = SketchMapParams.hash(0)
 }
 
 object SketchMapLaws extends Properties("SketchMap") {
   import BaseProperties._
   import SketchMapTestImplicits._
-  import HyperLogLog.int2Bytes
 
   val params = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
   implicit val smMonoid = SketchMap.monoid[Int, Long](params)
@@ -36,9 +39,6 @@ object SketchMapLaws extends Properties("SketchMap") {
 
 class SketchMapTest extends Specification {
   import SketchMapTestImplicits._
-  import HyperLogLog.int2Bytes
-
-
 
   val PARAMS = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
   val MONOID = SketchMap.monoid[Int, Long](PARAMS)
@@ -127,7 +127,7 @@ class SketchMapTest extends Specification {
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
 
-      val monoid = SketchMap.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
+      val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
       monoid.heavyHitters(sm1) must be_==(List((100, 10L)))

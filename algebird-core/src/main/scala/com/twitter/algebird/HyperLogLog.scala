@@ -19,6 +19,8 @@ package com.twitter.algebird
 
 import java.nio.ByteBuffer
 
+import com.twitter.bijection._
+
 /** A super lightweight (hopefully) version of BitSet */
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
@@ -44,28 +46,12 @@ object HyperLogLog {
 
   def hash(input : Array[Byte]) : Array[Byte] = {
     val seed = 12345678
-    val (l0, l1) = MurmurHash128(seed)(input)
+    val Hash128((l0, l1)) = Hash.murmur128(seed)(input)
     val buf = new Array[Byte](16)
     ByteBuffer
       .wrap(buf)
       .putLong(l0)
       .putLong(l1)
-    buf
-  }
-
-  implicit def int2Bytes(i : Int) = {
-    val buf = new Array[Byte](4)
-    ByteBuffer
-      .wrap(buf)
-      .putInt(i)
-    buf
-  }
-
-  implicit def long2Bytes(i : Long) = {
-    val buf = new Array[Byte](8)
-    ByteBuffer
-      .wrap(buf)
-      .putLong(i)
     buf
   }
 
@@ -88,7 +74,7 @@ object HyperLogLog {
     loop(0, 0)
   }
 
-  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def rhoW(bsl: BitSetLite, bits: Int): Byte = {
@@ -100,10 +86,10 @@ object HyperLogLog {
   }
 
   /** We are computing j and \rho(w) from the paper,
-   *  sorry for the name, but it allows someone to compare to the paper extremely low probability 
+   *  sorry for the name, but it allows someone to compare to the paper extremely low probability
    *  rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and 
-   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and
+   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {
@@ -354,7 +340,7 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 
   val size = 1 << bits
 
-  def apply[T <% Array[Byte]](t : T) = create(t)
+  def apply[T](t : T)(implicit inj: Codec[T]) = create(inj(t))
 
   val zero : HLL = SparseHLL(bits, Monoid.zero[Map[Int,Max[Byte]]])
 
@@ -374,9 +360,9 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
     SparseHLL(bits, Map(j -> Max(rhow)))
   }
 
-  def batchCreate[T <% Array[Byte]](instances: Iterable[T]) : HLL = {
+  def batchCreate[T](instances: Iterable[T])(implicit inj: Codec[T]) : HLL = {
     val allMaxRhow = instances
-      .map { x => jRhoW(hash(x), bits) }
+      .map { x => jRhoW(hash(inj(x)), bits) }
       .groupBy { case (j, rhow) => j }
       .mapValues { _.maxBy { case (j, rhow) => rhow} }
       .mapValues { case (j, rhow) => Max(rhow) }
