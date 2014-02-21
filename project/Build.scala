@@ -118,7 +118,10 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    libraryDependencies ++= Seq(
+      "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+      "com.twitter" %% "bijection-core" % "0.6.2"
+      ),
     sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
       GenTupleAggregators.gen(outDir)
     }
@@ -144,7 +147,5 @@ object AlgebirdBuild extends Build {
     libraryDependencies += withCross("com.twitter" %% "util-core" % "6.3.0")
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
-  lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  lazy val algebirdBijection = module("bijection").dependsOn(algebirdCore, algebirdTest % "test->compile")
 }

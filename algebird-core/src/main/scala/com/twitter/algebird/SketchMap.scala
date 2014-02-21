@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.breakOut
+import com.twitter.bijection.Injection
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
@@ -28,7 +29,7 @@ import scala.collection.breakOut
  * Hashes an arbitrary key type to one that the Sketch Map can use.
  */
 case class SketchMapHash[K](hasher: CMSHash, seed: Int)
-                            (implicit serialization: K => Array[Byte])
+                            (implicit serialization: Injection[K, Array[Byte]])
                             extends Function1[K, Int] {
   def apply(obj: K): Int = {
     val (first, second) = MurmurHash128(seed)(serialization(obj))
@@ -108,7 +109,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
  * Convenience class for holding constant parameters of a Sketch Map.
  */
 case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
-                              (implicit serialization: K => Array[Byte]) {
+                              (implicit serialization: Injection[K, Array[Byte]]) {
   def width = SketchMapParams.width(eps)
   def depth = SketchMapParams.depth(delta)
 
@@ -189,12 +190,12 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
+  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: Injection[K, Array[Byte]], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
     new SketchMapMonoid(params)(valueOrdering, monoid)
   }
 
   def aggregator[K, V](params: SketchMapParams[K])
-                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+                      (implicit serialization: Injection[K, Array[Byte]], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
     SketchMapAggregator(params, SketchMap.monoid(params))
   }
 }

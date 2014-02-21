@@ -221,7 +221,7 @@ case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, overri
 
   def denseCount: Int = map.size
   def apply(idx: Int) = {
-    require(idx >= 0 && idx < size, "Index out of range")
+    require(idx >= 0 && idx < size, "Index " + idx + " out of range " + size)
     map.getOrElse(idx, sparseValue)
   }
   def updated(idx: Int, v: V): AdaptiveVector[V] = {
