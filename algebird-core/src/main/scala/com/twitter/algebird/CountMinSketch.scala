@@ -85,11 +85,11 @@ class CountMinSketchMonoid(eps : Double, delta : Double, seed : Int,
   // so we omit it and simply use hash functions of the form
   //
   //   h_i(x) = a_i * x (mod p)
-  val hashes : Seq[CMSHash] = {
+  val hashes : Seq[Injection[Long, Hash32]] = {
     val r = new scala.util.Random(seed)
     val numHashes = CMS.depth(delta)
     val numCounters = CMS.width(eps)
-    (0 to (numHashes - 1)).map { _ => CMSHash(r.nextInt, 0, numCounters) }
+    (0 to (numHashes - 1)).map { _ => Hash.universal(r.nextInt, 0, numCounters) }
   }
 
   val params = CMSParams(hashes, eps, delta, heavyHittersPct)
@@ -357,34 +357,6 @@ object CMSInstance {
 }
 
 /**
- * The Count-Min sketch uses pairwise independent hash functions drawn from
- * a universal hashing family of the form
- *
- *   h(x) = [a * x + b (mod p)] (mod m)
- */
-case class CMSHash(a : Int, b : Int, width : Int) extends Function1[Long, Int] {
-
-  val PRIME_MODULUS = (1L << 31) - 1
-
-  /**
-   * Returns a * x + b (mod p) (mod width)
-   */
-  def apply(x : Long) : Int = {
-    val unmodded = a * x + b
-
-    // Apparently a super fast way of computing x mod 2^p-1
-    // See page 149 of
-    // http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
-    // after Proposition 7.
-    val modded = (unmodded + (unmodded >> 32)) & PRIME_MODULUS
-
-    // Modulo-ing integers is apparently twice as fast as
-    // modulo-ing Longs.
-    modded.toInt % width
-  }
-}
-
-/**
  * The 2-dimensional table of counters used in the Count-Min sketch.
  * Each row corresponds to a particular hash function.
  * TODO: implement a dense matrix type, and use it here
@@ -439,7 +411,7 @@ object CMSCountsTable {
 /**
  * Convenience class for holding constant parameters of a Count-Min sketch.
  */
-case class CMSParams(hashes : Seq[CMSHash], eps : Double, delta : Double, heavyHittersPct : Double)
+case class CMSParams(hashes : Seq[Injection[Long, Hash32]], eps : Double, delta : Double, heavyHittersPct : Double)
 
 /**
  * Containers for holding heavy hitter items and their associated counts.

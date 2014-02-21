@@ -44,7 +44,7 @@ object HyperLogLog {
 
   def hash(input : Array[Byte]) : Array[Byte] = {
     val seed = 12345678
-    val (l0, l1) = MurmurHash128(seed)(input)
+    val (l0, l1) = Hash.murmur128(seed)(input)
     val buf = new Array[Byte](16)
     ByteBuffer
       .wrap(buf)
@@ -88,7 +88,7 @@ object HyperLogLog {
     loop(0, 0)
   }
 
-  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def rhoW(bsl: BitSetLite, bits: Int): Byte = {
@@ -100,10 +100,10 @@ object HyperLogLog {
   }
 
   /** We are computing j and \rho(w) from the paper,
-   *  sorry for the name, but it allows someone to compare to the paper extremely low probability 
+   *  sorry for the name, but it allows someone to compare to the paper extremely low probability
    *  rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and 
-   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and
+   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {

@@ -19,7 +19,7 @@ package com.twitter.algebird
 class HashingTrickMonoid[V:Group](bits : Int, seed : Int = 123456) extends Monoid[AdaptiveVector[V]] {
 	val vectorSize = 1 << bits
 	val bitMask = vectorSize - 1
-	val hash = MurmurHash128(seed)
+	val hash = Hash.murmur128(seed)
 
 	val zero = AdaptiveVector.fill[V](vectorSize)(Monoid.zero[V])
 

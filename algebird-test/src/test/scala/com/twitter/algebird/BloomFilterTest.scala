@@ -26,10 +26,10 @@ object BloomFilterLaws extends Properties("BloomFilter") {
 
 object BFHashIndices extends Properties("BFHash") {
   import org.scalacheck.Prop.forAll
-  
+
   val NUM_HASHES = 10
   val WIDTH = 4752800
-  
+
   val SEED = 1
 
   implicit val bfHash: Arbitrary[BFHash] =
@@ -39,11 +39,11 @@ object BFHashIndices extends Properties("BFHash") {
         width <- choose(100, 5000000)
       } yield BFHash(hashes, width, SEED)
     }
-   
-  property("Indices are non negative") = forAll{ (hash: BFHash, v: Long) => hash.apply(v.toString).forall(_ >= 0) } 
-   
+
+  property("Indices are non negative") = forAll{ (hash: BFHash, v: Long) => hash.apply(v.toString).forall(_ >= 0) }
+
   /**
-   *   This is the version of the BFHash as of before the "negative values fix" 
+   *   This is the version of the BFHash as of before the "negative values fix"
    */
   case class NegativeBFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]]{
     val size = numHashes
@@ -61,7 +61,7 @@ object BFHashIndices extends Properties("BFHash") {
         Stream.empty
       else{
         val d = if(digested.isEmpty){
-          val (a, b) = MurmurHash128(k)(bytes)
+          val (a, b) = Hash.murmur128(k)(bytes)
           val (x1, x2) = splitLong(a)
           val (x3, x4) = splitLong(b)
           Seq(x1, x2, x3, x4)
@@ -72,7 +72,7 @@ object BFHashIndices extends Properties("BFHash") {
       }
     }
   }
-  
+
   implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
     Arbitrary {
       for {
@@ -81,7 +81,7 @@ object BFHashIndices extends Properties("BFHash") {
       } yield (BFHash(hashes, width, SEED), NegativeBFHash(hashes, width, SEED))
     }
 
-  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") = 
+  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") =
     forAll{
       (pair: (BFHash, NegativeBFHash), v: Long) =>
         val s = v.toString
@@ -187,7 +187,7 @@ class BloomFilterTest extends Specification {
     }
 
     /**
-     * this test failed before the fix for https://github.com/twitter/algebird/issues/229 
+     * this test failed before the fix for https://github.com/twitter/algebird/issues/229
      */
     "not have negative hash values" in {
       val NUM_HASHES = 2

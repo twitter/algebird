@@ -25,18 +25,6 @@ import scala.collection.breakOut
  */
 
 /**
- * Hashes an arbitrary key type to one that the Sketch Map can use.
- */
-case class SketchMapHash[K](hasher: CMSHash, seed: Int)
-                            (implicit serialization: K => Array[Byte])
-                            extends Function1[K, Int] {
-  def apply(obj: K): Int = {
-    val (first, second) = MurmurHash128(seed)(serialization(obj))
-    hasher(first ^ second)
-  }
-}
-
-/**
  * Responsible for creating instances of SketchMap.
  */
 class SketchMapMonoid[K, V](val params: SketchMapParams[K])
@@ -108,7 +96,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
  * Convenience class for holding constant parameters of a Sketch Map.
  */
 case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
-                              (implicit serialization: K => Array[Byte]) {
+    (implicit hash: Injection[K, Hash64]) {
+
   def width = SketchMapParams.width(eps)
   def depth = SketchMapParams.depth(delta)
 
@@ -116,13 +105,11 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
   assert(0 < depth, "depth must be greater than 0")
   assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
 
-  lazy val hashes: Seq[K => Int] = {
+  lazy val hashes: Seq[Injection[K, Hash32]] = {
     val r = new scala.util.Random(seed)
     val numHashes = depth
     val numCounters = width
-    (0 to (numHashes - 1)).map { _ =>
-      SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)(serialization)
-    }
+    (0 to (numHashes - 1)).map { _ => hash andThen Hash.universal(r.nextInt, 0, numCounters) }
   }
 
   /**
