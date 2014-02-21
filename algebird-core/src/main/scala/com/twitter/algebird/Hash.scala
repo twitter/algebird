@@ -2,14 +2,16 @@ package com.twitter.algebird
 
 import java.nio._
 
-import com.twitter.bijection.Injection
+import com.twitter.bijection._
 
 //TODO consider making a type alias for Injection[K, Hash32] and so on
 object Hash {
   case class OneWayFunction[A, B](f: A => B) extends Injection[A, B] {
-    override def apply(v: A): B = f(a)
-    override def invert(v: B): Try[A] =
-      throw new UnsupportedOperationException("Cannot call invert on a one way injection")
+    override def apply(v: A): B = f(v)
+    override def invert(v: B) = throw new UnsupportedOperationException("Cannot call invert on a one way injection")
+  }
+  object OneWayFunction {
+    implicit def fromInjection[A, B](inj: Injection[A, B]): OneWayFunction[A, B] = OneWayFunction(inj.apply)
   }
 
   private val PRIME_MODULUS = (1L << 31) - 1
@@ -41,16 +43,44 @@ object Hash {
     Hash32(modded.toInt % width)
   }
 
-  def murmur128(seed: Long): OneWayFunction[Array[Byte], Hash128] = {
-    val murmur = MurmurHash128(seed)
-    Hash { bytes => Hash128(murmur(bytes)) }
+  case class MurmurByteBufferArgs(buffer: ByteBuffer, offset: Int, length: Int)
+  object MurmurByteBufferArgs {
+    implicit def fromBytes(bytes: Array[Byte]): MurmurByteBufferArgs =
+      MurmurByteBufferArgs(ByteBuffer.wrap(bytes), 0, bytes.length)
   }
+
+  def murmur128ByteBuffer(seed: Long): OneWayFunction[MurmurByteBufferArgs, Hash128] =
+    Hash { case MurmurByteBufferArgs(buffer, offset, length) =>
+      val longs = CassandraMurmurHash.hash3_x64_128(buffer, offset, length, seed)
+      Hash128(longs(0), longs(1))
+    }
+
+  def murmur128(seed: Long): OneWayFunction[Array[Byte], Hash128] =
+    OneWayFunction { bytes: Array[Byte] =>
+      MurmurByteBufferArgs(ByteBuffer.wrap(bytes), 0, bytes.length)
+    } andThen murmur128ByteBuffer(seed)
+
+  val string2murmurargs: OneWayFunction[CharSequence, MurmurByteBufferArgs] =
+    OneWayFunction { string =>
+      val maxBytes = string.length * 2
+      val buffer = ByteBuffer.allocate(maxBytes)
+      val view = buffer.asCharBuffer
+      0.to(string.length - 1).foreach { i => view.put(string.charAt(i)) }
+      MurmurByteBufferArgs(buffer, 0, maxBytes)
+    }
+
+  val long2murmurargs: OneWayFunction[Long, MurmurByteBufferArgs] =
+    OneWayFunction { long =>
+      val buffer = ByteBuffer.allocate(8)
+      buffer.asLongBuffer.put(long)
+      MurmurByteBufferArgs(buffer, 0, 8)
+    }
 }
 
 sealed trait Hash
-case class Hash32(v: Int)
-case class Hash64(v: Long)
-case class Hash128(v: (Long, Long))
+case class Hash32(get: Int) extends Hash
+case class Hash64(get: Long) extends Hash
+case class Hash128(get: (Long, Long)) extends Hash
 
 //TODO do we just get rid of this?
 case class MurmurHash128(seed :  Long) {

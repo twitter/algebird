@@ -61,7 +61,7 @@ object BFHashIndices extends Properties("BFHash") {
         Stream.empty
       else{
         val d = if(digested.isEmpty){
-          val (a, b) = Hash.murmur128(k)(bytes)
+          val Hash128((a, b)) = Hash.murmur128(k)(bytes)
           val (x1, x2) = splitLong(a)
           val (x3, x4) = splitLong(b)
           Seq(x1, x2, x3, x4)

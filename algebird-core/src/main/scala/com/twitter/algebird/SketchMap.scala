@@ -18,6 +18,8 @@ package com.twitter.algebird
 
 import scala.collection.breakOut
 
+import com.twitter.bijection.Injection
+
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
  * approximation of Map[K, V] that stores reference to top heavy hitters. The
@@ -61,7 +63,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
     /* For each row, update the table for each K,V pair */
     val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
       data.foldLeft(table) { case (innerTable, (key, value)) =>
-        val pos = (row, params.hashes(row)(key))
+        val pos = (row, params.hashes(row)(key).get)
         val currValue: V = innerTable.getValue(pos)
         innerTable.updated(pos, Monoid.plus(currValue, value))
       }
@@ -109,7 +111,10 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
     val r = new scala.util.Random(seed)
     val numHashes = depth
     val numCounters = width
-    (0 to (numHashes - 1)).map { _ => hash andThen Hash.universal(r.nextInt, 0, numCounters) }
+    (0 to (numHashes - 1)).map { _ =>
+      val universal = Hash.universal(r.nextInt, 0, numCounters)
+      Hash { obj: K => universal(hash(obj).get) }
+    }
   }
 
   /**
@@ -125,7 +130,7 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
     hashes
       .view
       .zip(table.rowsByColumns)
-      .map { case (hash, row) => row(hash(key)) }
+      .map { case (hash, row) => row(hash(key).get) }
       .min
 
   /**
@@ -150,6 +155,13 @@ object SketchMapParams {
   def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
   def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
   def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+
+  /**
+   * This is a hash function that can be useful if you have a way to serialize the object, but do not
+   * have a more direct way to hash it.
+   */
+  def hash[K](seed: Int)(implicit inj: Injection[K, Array[Byte]]): Injection[K, Hash64] =
+    inj andThen Hash.murmur128(seed) andThen Hash.hash128to64
 }
 
 
@@ -176,14 +188,13 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
+  def monoid[K, V](params: SketchMapParams[K])
+                  (implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] =
     new SketchMapMonoid(params)(valueOrdering, monoid)
-  }
 
   def aggregator[K, V](params: SketchMapParams[K])
-                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+                      (implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
-  }
 }
 
 case class SketchMap[K, V](

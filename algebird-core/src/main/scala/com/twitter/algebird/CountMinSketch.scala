@@ -18,6 +18,8 @@ package com.twitter.algebird
 
 import scala.collection.immutable.SortedSet
 
+import com.twitter.bijection.Injection
+
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -277,7 +279,7 @@ case class CMSInstance(countsTable : CMSCountsTable, totalCount : Long,
 
   def frequency(item : Long) : Approximate[Long] = {
     val estimates = countsTable.counts.zipWithIndex.map { case (row, i) =>
-      row(params.hashes(i)(item))
+      row(params.hashes(i)(item).get)
     }
     makeApprox(estimates.min)
   }
@@ -318,7 +320,7 @@ case class CMSInstance(countsTable : CMSCountsTable, totalCount : Long,
       val newHhs = updateHeavyHitters(item, count)
       val newCountsTable =
         (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
-          val pos = (row, params.hashes(row)(item))
+          val pos = (row, params.hashes(row)(item).get)
           table + (pos, count)
         }
 

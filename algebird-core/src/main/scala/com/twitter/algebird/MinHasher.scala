@@ -2,6 +2,9 @@ package com.twitter.algebird
 
 import java.nio._
 
+import com.twitter.bijection.Injection
+import com.twitter.algebird.Hash.MurmurByteBufferArgs
+
 /**
  * MinHasher as a Monoid operates on this class to avoid the too generic Array[Byte].
  * The bytes are assumed to be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is
@@ -72,7 +75,7 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map { _ => Hash.murmur128(r.nextLong) }
+    (1 to numHashFunctions).map { _ => Hash.murmur128ByteBuffer(r.nextLong) }
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
@@ -92,22 +95,22 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   def buckets(sig : MinHashSignature) : List[Long] =
     sig.bytes.grouped(numRows * hashSize)
       .filter{_.size == numRows * hashSize}
-      .map{hashFunctions.head(_)._1}
+      .map{hashFunctions.head(_).get._1}
       .toList
 
   /** Create a signature for a single Long value */
-  def init(value : Long) : MinHashSignature = init{_(value)}
+  def init(value : Long) : MinHashSignature = init{ Hash.long2murmurargs(value) }
 
   /** Create a signature for a single String value */
-  def init(value : String) : MinHashSignature = init{_(value)}
+  def init(value : String) : MinHashSignature = init { Hash.string2murmurargs(value) }
 
   /** Create a signature for an arbitrary value */
-  def init(fn : Injection[Array[Byte], Hash64]) : MinHashSignature = {
+  def init(murmurArgs: MurmurByteBufferArgs) : MinHashSignature = {
     val bytes = new Array[Byte](numBytes)
     val buffer = ByteBuffer.allocate(hashFunctions.size * 16)
     val longBuffer = buffer.asLongBuffer
     hashFunctions.foreach{h =>
-      val (long1, long2) = fn(h)
+      val Hash128((long1, long2)) = h(murmurArgs)
       longBuffer.put(long1)
       longBuffer.put(long2)
     }
