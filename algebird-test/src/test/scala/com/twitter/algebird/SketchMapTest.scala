@@ -127,7 +127,7 @@ class SketchMapTest extends Specification {
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
 
-      val monoid = SketchMap.monoid[Int, Long](PARAMS)(implicitly[Int => Array[Byte]], smallerOrdering, smallerMonoid)
+      val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
       monoid.heavyHitters(sm1) must be_==(List((100, 10L)))
