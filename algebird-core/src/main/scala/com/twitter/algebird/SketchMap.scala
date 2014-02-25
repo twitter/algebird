@@ -28,8 +28,7 @@ import scala.collection.breakOut
  * Hashes an arbitrary key type to one that the Sketch Map can use.
  */
 case class SketchMapHash[K](hasher: CMSHash, seed: Int)
-                            (implicit serialization: K => Array[Byte])
-                            extends Function1[K, Int] {
+                            (implicit serialization: K => Array[Byte]) {
   def apply(obj: K): Int = {
     val (first, second) = MurmurHash128(seed)(serialization(obj))
     hasher(first ^ second)
@@ -121,7 +120,8 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
     val numHashes = depth
     val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
-      SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)(serialization)
+      val smhash: SketchMapHash[K] = SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)(serialization)
+      new (K => Int) { override def apply(k: K) = smhash(k) }
     }
   }
 
