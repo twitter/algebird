@@ -4,9 +4,9 @@ import scala.collection.immutable.SortedMap
 
 object SpaceSaver {
   /**
-    * Construct SpaceSaver with maximum size of m containing a single item.
+    * Construct SpaceSaver with given capacity containing a single item.
     */
-  def apply[T](m: Int, item: T): SpaceSaver[T] = new SSOne(m, item)
+  def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 }
@@ -19,7 +19,7 @@ object SpaceSaver {
   * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
   * or preserve the guarantees or benefits of the algorithm.
   */
-sealed abstract class SpaceSaver[T] private[algebird] () {
+sealed abstract class SpaceSaver[T] {
   import SpaceSaver.ordering
 
   /**
@@ -68,9 +68,8 @@ sealed abstract class SpaceSaver[T] private[algebird] () {
     val si = counters
       .toList
       .sorted(ordering)
-      .iterator
-    val siK = si.take(k).toList
-    val countKPlus1 = if (si.hasNext) si.next()._2._1 else 0
+    val siK = si.take(k)
+    val countKPlus1 = si.drop(k).headOption.map(_._2._1).getOrElse(0L)
     siK.map { case (item, (count, err)) => (item, Approximate(count - err, count, count, 1.0), countKPlus1 < count - err) }
   }
 
@@ -82,27 +81,14 @@ sealed abstract class SpaceSaver[T] private[algebird] () {
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
-class SSZero[T] private[algebird] () extends SpaceSaver[T] with Serializable {
-
-  def capacity = -1
-
-  def min = 0L
-
-  def counters = Map[T, (Long, Long)]()
-
-  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other
-
-}
-
-class SSOne[T] private[algebird] (val capacity: Int, val item: T) extends SpaceSaver[T] {
+case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
-  def min = 0L
+  def min: Long = 0L
 
-  def counters = Map(item -> (1L, 1L))
+  def counters: Map[T, (Long, Long)] = Map(item -> (1L, 1L))
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
-    case other: SSZero[_] => this
     case other: SSOne[_] => SSMany(this).add(other)
     case other: SSMany[_] => other.add(this)
   }
@@ -110,15 +96,18 @@ class SSOne[T] private[algebird] (val capacity: Int, val item: T) extends SpaceS
 }
 
 object SSMany {
-  private[algebird] def apply[T](one: SSOne[T]): SSMany[T] = new SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
+  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]): SSMany[T] =
+    SSMany(capacity, counters, Some(buckets))
+
+  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
+    SSMany(capacity, counters, None)
+
+  private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
+    SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], private val bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
+case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
   //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
-
-  private[algebird] def this(capacity: Int, counters: Map[T, (Long, Long)]) = this(capacity, counters, None)
-
-  private def this(capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) = this(capacity, counters, Some(buckets))
 
   lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
     case Some(buckets) => buckets
@@ -127,7 +116,7 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
 
   private val exact: Boolean = counters.size < capacity
 
-  lazy val min = if (counters.size < capacity) 0L else buckets.firstKey
+  lazy val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
 
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
@@ -140,7 +129,7 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
       else // remove item from current bucket
         buckets + (count -> (currBucket - item))
     } + (count + 1L -> (buckets.getOrElse(count + 1L, Set()) + item))
-    new SSMany(capacity, counters1, buckets1)
+    SSMany(capacity, counters1, buckets1)
   }
 
   // lose one item to meet capacity constraint
@@ -152,14 +141,14 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
       buckets - min
     else
       buckets + (min -> (firstBucket - itemToLose))
-    new SSMany(capacity, counters1, buckets1)
+    SSMany(capacity, counters1, buckets1)
   }
 
   // introduce new item
   private def introduce(item: T, count: Long, err: Long) = {
     val counters1 = counters + (item -> (count, err))
     val buckets1 = buckets + (count -> (buckets.getOrElse(count, Set()) + item))
-    new SSMany(capacity, counters1, buckets1)
+    SSMany(capacity, counters1, buckets1)
   }
 
   // add a single element
@@ -185,20 +174,17 @@ class SSMany[T] private (val capacity: Int, val counters: Map[T, (Long, Long)], 
       }
       .sorted(SpaceSaver.ordering)
       .take(capacity)
-    new SSMany(capacity, counters1)
+    SSMany(capacity, counters1)
   }
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
-    case other: SSZero[_] => this
     case other: SSOne[_] => add(other)
     case other: SSMany[_] => merge(other)
   }
 
 }
 
-class SpaceSaverMonoid[T] extends Monoid[SpaceSaver[T]] {
-
-  override val zero = new SSZero[T]()
+class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
 
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
 
