@@ -8,6 +8,8 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
+import scala.collection.SortedSet
+
 object SketchMapTestImplicits {
   val DELTA = 1E-8
   val EPS = 0.001
@@ -76,16 +78,16 @@ class SketchMapTest extends Specification {
       val monoid = SketchMap.monoid[Int, Long](params)
 
       val sm1 = monoid.create(Seq((1, 5L), (2, 4L)))
-      monoid.heavyHitters(sm1) must be_==(List((1, 5L)))
+      monoid.heavyHitters(sm1) must be_==(SortedSet[(Int, Long)]((1, 5L)))
 
       val sm2 = monoid.plus(sm1, monoid.create((2, 2L)))
-      monoid.heavyHitters(sm2) must be_==(List((2, 6L)))
+      monoid.heavyHitters(sm2) must be_==(SortedSet[(Int, Long)]((2, 6L)))
 
       val sm3 = monoid.plus(sm2, monoid.create((1, 2L)))
-      monoid.heavyHitters(sm3) must be_==(List((1, 7L)))
+      monoid.heavyHitters(sm3) must be_==(SortedSet[(Int, Long)]((1, 7L)))
 
       val sm4 = monoid.plus(sm3, monoid.create((0, 10L)))
-      monoid.heavyHitters(sm4) must be_==(List((0, 10L)))
+      monoid.heavyHitters(sm4) must be_==(SortedSet[(Int, Long)]((0, 10L)))
     }
 
     "exactly compute heavy hitters in a small stream" in {
@@ -104,10 +106,10 @@ class SketchMapTest extends Specification {
       val monoid4 = SketchMap.monoid[Int, Long](params4)
       val sm4 = monoid4.create(data)
 
-      sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
-      sm2.heavyHitterKeys must be_==(List(5, 4, 3))
-      sm3.heavyHitterKeys must be_==(List(5))
-      sm4.heavyHitterKeys must be_==(List.empty[Int])
+      sm1.heavyHitterKeys must be_==(SortedSet[Int](5, 4, 3, 2, 1))
+      sm2.heavyHitterKeys must be_==(SortedSet[Int](5, 4, 3))
+      sm3.heavyHitterKeys must be_==(SortedSet[Int](5))
+      sm4.heavyHitterKeys must be_==(SortedSet.empty[Int])
     }
 
     "use custom monoid" in {
@@ -130,19 +132,19 @@ class SketchMapTest extends Specification {
       val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
-      monoid.heavyHitters(sm1) must be_==(List((100, 10L)))
+      monoid.heavyHitters(sm1) must be_==(SortedSet[(Int, Long)]((100, 10L)))
 
       // Summing should yield the smaller number, via smallerMonoid.
       val sm2 = monoid.plus(sm1, monoid.create((100, 5L)))
-      monoid.heavyHitters(sm2) must be_==(List((100, 5L)))
+      monoid.heavyHitters(sm2) must be_==(SortedSet[(Int, Long)]((100, 5L)))
 
       // Summing a bigger number should not affect the data structure.
       val sm3 = monoid.plus(sm2, monoid.create((100, 100L)))
-      monoid.heavyHitters(sm3) must be_==(List((100, 5L)))
+      monoid.heavyHitters(sm3) must be_==(SortedSet[(Int, Long)]((100, 5L)))
 
       // Try more than one at a time.
       val sm4 = monoid.plus(sm3, monoid.create(Seq((100, 100L), (200, 30L), (200, 20L), (200, 10L))))
-      monoid.heavyHitters(sm4) must be_==(List((100, 5L), (200, 10L)))
+      monoid.heavyHitters(sm4) must be_==(SortedSet[(Int, Long)]((100, 5L), (200, 10L)))
     }
 
     "work as an Aggregator" in {
@@ -157,10 +159,10 @@ class SketchMapTest extends Specification {
       val sm3 = SketchMap.aggregator[Int, Long](params3).apply(data)
       val sm4 = SketchMap.aggregator[Int, Long](params4).apply(data)
 
-      sm1.heavyHitterKeys must be_==(List(5, 4, 3, 2, 1))
-      sm2.heavyHitterKeys must be_==(List(5, 4, 3))
-      sm3.heavyHitterKeys must be_==(List(5))
-      sm4.heavyHitterKeys must be_==(List.empty[Int])
+      sm1.heavyHitterKeys must be_==(SortedSet[Int](5, 4, 3, 2, 1))
+      sm2.heavyHitterKeys must be_==(SortedSet[Int](5, 4, 3))
+      sm3.heavyHitterKeys must be_==(SortedSet[Int](5))
+      sm4.heavyHitterKeys must be_==(SortedSet.empty[Int])
     }
   }
 }

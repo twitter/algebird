@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.breakOut
+import scala.collection.SortedSet
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
@@ -46,15 +47,18 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   /**
    * A zero Sketch Map is one with zero elements.
    */
-  val zero: SketchMap[K, V] = SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
+  val zero: SketchMap[K, V] =
+    SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero),
+              SortedSet.empty[K](Ordering.Unit.on[K] { _ => }),
+              monoid.zero)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
     val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
-    val newHeavyHitters = left.heavyHitterKeys.toSet ++ right.heavyHitterKeys
+    val newHeavyHitters = left.heavyHitterKeys.iterator.toSet ++ right.heavyHitterKeys
 
     SketchMap(
       newValuesTable,
-      params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
+      params.updatedHeavyHitters(newHeavyHitters, newValuesTable),
       Monoid.plus(left.totalValue, right.totalValue))
   }
 
@@ -67,7 +71,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
    * Create a Sketch Map sketch from a sequence of pairs.
    */
   def create(data: Seq[(K, V)]): SketchMap[K, V] = {
-    val heavyHitters = data.map { _._1 }
+    val heavyHitters = data.map { _._1 }.toSet
     val totalValue = Monoid.sum(data.map { _._2 })
     val initTable = AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
@@ -99,8 +103,12 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   /**
    * Returns a sorted list of heavy hitter key/value tuples.
    */
-  def heavyHitters(sm: SketchMap[K,V]) : List[(K, V)] =
-    sm.heavyHitterKeys.map { item => (item, heavyHittersMapping(sm).getOrElse(item, monoid.zero)) }
+  def heavyHitters(sm: SketchMap[K,V]) : SortedSet[(K, V)] = {
+    val mapping = params.calculateHeavyHittersMapping(sm.heavyHitterKeys, sm.valuesTable)
+    val elems = sm.heavyHitterKeys.map { item => (item, mapping.getOrElse(item, monoid.zero)) }
+    SortedSet.empty[(K,V)](valueOrdering.on[(K, V)] { _._2 }) ++ elems
+  }
+
 }
 
 
@@ -145,11 +153,12 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
    * Returns a new set of sorted and concatenated heavy hitters given an
    * arbitrary list of keys.
    */
-  def updatedHeavyHitters[V:Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
+  def updatedHeavyHitters[V:Ordering](hitters: Set[K], table: AdaptiveMatrix[V]): SortedSet[K] = {
     val mapping = calculateHeavyHittersMapping(hitters, table)
-    val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
-
-    hitters.sorted(specificOrdering).take(heavyHittersCount).toList
+    // Note that this means if you try to add an element to the resulting SortedSet for which
+    // there is not a corresponding V you will get an error.
+    val specificOrdering: Ordering[K] = Ordering.by[K, V] { mapping(_) }.reverse
+    (SortedSet.empty[K](specificOrdering) ++ hitters).take(heavyHittersCount)
   }
 }
 
@@ -199,7 +208,9 @@ object SketchMap {
 
 case class SketchMap[K, V](
   val valuesTable: AdaptiveMatrix[V],
-  val heavyHitterKeys: List[K],
+  // Note that this is only meant to be read from. If you want to add new elements to this, you need to make
+  // sure to update the ordering as the ordering is only valid for the mapping that was available at the time.
+  val heavyHitterKeys: SortedSet[K],
   val totalValue: V
 ) extends java.io.Serializable
 
@@ -207,7 +218,9 @@ case class SketchMap[K, V](
   * An Aggregator for the SketchMap.
   * Can be created using SketchMap.aggregator
   */
-case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid : SketchMapMonoid[K, V])(implicit valueOrdering: Ordering[V], valueMonoid: Monoid[V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid : SketchMapMonoid[K, V])
+                                    (implicit valueOrdering: Ordering[V], valueMonoid: Monoid[V])
+    extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
   val monoid = skmMonoid
 
   def prepare(value: (K,V)) = monoid.create(value)
