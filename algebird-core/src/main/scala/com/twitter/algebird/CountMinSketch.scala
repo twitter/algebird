@@ -362,7 +362,7 @@ object CMSInstance {
  *
  *   h(x) = [a * x + b (mod p)] (mod m)
  */
-case class CMSHash(a : Int, b : Int, width : Int) extends Function1[Long, Int] {
+case class CMSHash(a : Int, b : Int, width : Int) {
 
   val PRIME_MODULUS = (1L << 31) - 1
 
