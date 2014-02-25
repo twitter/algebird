@@ -22,7 +22,7 @@ package com.twitter.algebird
  * TODO remove T => Boolean. it ruins toString and doesn't help anything
  * https://github.com/twitter/algebird/issues/261
  */
-sealed trait Interval[T] extends (T => Boolean) with java.io.Serializable {
+sealed trait Interval[T] extends java.io.Serializable {
   def contains(t: T): Boolean
 
   def intersect(that: Interval[T]): Interval[T]
