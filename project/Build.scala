@@ -43,12 +43,13 @@ object AlgebirdBuild extends Build {
 
     pomIncludeRepository := { x => false },
 
-    publishTo <<= version { (v: String) =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("sonatype-snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("sonatype-releases"  at nexus + "service/local/staging/deploy/maven2")
+    publishTo <<= version { v =>
+      Some(
+        if (v.trim.endsWith("SNAPSHOT"))
+          Opts.resolver.sonatypeSnapshots
+        else
+          Opts.resolver.sonatypeStaging
+      )
     },
 
     pomExtra := (
@@ -88,7 +89,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.3.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.4.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -145,6 +146,6 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.0"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }

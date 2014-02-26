@@ -37,7 +37,7 @@ object Aggregator extends java.io.Serializable {
   }
 }
 
-trait Aggregator[-A,B,+C] extends Function1[TraversableOnce[A], C] with java.io.Serializable { self =>
+trait Aggregator[-A,B,+C] extends java.io.Serializable { self =>
   def prepare(input : A) : B
   def reduce(l : B, r : B) : B
   def present(reduction : B) : C

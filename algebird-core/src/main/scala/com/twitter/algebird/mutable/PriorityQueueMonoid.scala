@@ -58,11 +58,19 @@ class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
 
   override def plus(left : PriorityQueue[K], right : PriorityQueue[K]): PriorityQueue[K] = {
     val (bigger, smaller) = if(left.size >= right.size) (left, right) else (right, left)
-    val biggest = bigger.peek
+    var biggest = bigger.peek
 
     var next = smaller.poll
     while(next != null) {
-      if(bigger.size < max || ord.lteq(next, biggest)) bigger.add(next)
+      if(bigger.size < max) {
+        // we may have increased the biggest value:
+        biggest = ord.max(biggest, next)
+        bigger.add(next)
+      }
+      else if (ord.lteq(next, biggest)) {
+        // this cannot increase the biggerst
+        bigger.add(next)
+      }
       next = smaller.poll
     }
     limit(bigger)

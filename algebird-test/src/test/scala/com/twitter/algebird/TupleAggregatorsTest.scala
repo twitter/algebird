@@ -8,7 +8,7 @@ class TupleAggregatorsTest extends Specification {
   val data = List(1, 3, 2, 0, 5, 6)
   val MinAgg = new Aggregator[Int, Int, Int] {
     def prepare(v: Int) = v
-    def reduce(v1: Int, v2: Int) = Math.min(v1, v2)
+    def reduce(v1: Int, v2: Int) = math.min(v1, v2)
     def present(v: Int) = v
   }
 

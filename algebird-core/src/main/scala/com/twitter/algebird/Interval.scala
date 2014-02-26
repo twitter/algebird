@@ -19,8 +19,10 @@ package com.twitter.algebird
 // TODO this is clearly more general than summingbird, and should be extended to be a ring (add union, etc...)
 
 /** Represents a single interval on a T with an Ordering
+ * TODO remove T => Boolean. it ruins toString and doesn't help anything
+ * https://github.com/twitter/algebird/issues/261
  */
-sealed trait Interval[T] extends (T => Boolean) with java.io.Serializable {
+sealed trait Interval[T] extends java.io.Serializable {
   def contains(t: T): Boolean
 
   def intersect(that: Interval[T]): Interval[T]
@@ -57,8 +59,38 @@ object Interval extends java.io.Serializable {
 }
 
 // Marker traits to keep lower on the left in Intersection
-sealed trait Lower[T] extends Interval[T]
-sealed trait Upper[T] extends Interval[T]
+sealed trait Lower[T] extends Interval[T] {
+  /**
+   * The smallest value that is contained here
+   * This is an Option, because of cases like ExclusiveLower(Int.MaxValue)
+   * which are pathological and equivalent to Empty
+   */
+  def least(implicit s: Successible[T]): Option[T]
+  /** Iterates all the items in this Lower[T] from lowest to highest
+   */
+  def toIterable(implicit s: Successible[T]): Iterable[T] =
+    least match {
+      case Some(l) => s.iterateNext(l)
+      case None => Iterable.empty
+    }
+}
+sealed trait Upper[T] extends Interval[T] {
+  /**
+   * The smallest value that is contained here
+   * This is an Option, because of cases like ExclusiveUpper(Int.MinValue),
+   * which are pathological and equivalent to Empty
+   */
+  def greatest(implicit p: Predecessible[T]): Option[T]
+  // The smallest value that is not present
+  def strictUpperBound(implicit s: Successible[T]): Option[T]
+  /** Iterates all the items in this Upper[T] from highest to lowest
+   */
+  def toIterable(implicit p: Predecessible[T]): Iterable[T] =
+    greatest match {
+      case Some(g) => p.iteratePrev(g)
+      case None => Iterable.empty
+    }
+}
 
 case class InclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Lower[T] {
   def contains(t: T): Boolean = ordering.lteq(lower, t)
@@ -73,6 +105,7 @@ case class InclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) exten
     case lb@ExclusiveLower(thatlb) => if (lb.ordering.gt(lower, thatlb)) this else that
     case Intersection(thatL, thatU) => (this && thatL) && thatU
   }
+  def least(implicit s: Successible[T]): Option[T] = Some(lower)
   def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] = InclusiveLower(fn(lower))
 }
 case class ExclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Lower[T] {
@@ -88,10 +121,14 @@ case class ExclusiveLower[T](lower: T)(implicit val ordering: Ordering[T]) exten
     case lb@ExclusiveLower(thatlb) => if (lb.ordering.gteq(lower, thatlb)) this else that
     case Intersection(thatL, thatU) => (this && thatL) && thatU
   }
+  def least(implicit s: Successible[T]): Option[T] = s.next(lower)
   def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] = ExclusiveLower(fn(lower))
 }
 case class InclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Upper[T] {
   def contains(t: T): Boolean = ordering.lteq(t, upper)
+  def greatest(implicit p: Predecessible[T]): Option[T] = Some(upper)
+  // The smallest value that is not present
+  def strictUpperBound(implicit s: Successible[T]): Option[T] = s.next(upper)
   def intersect(that: Interval[T]): Interval[T] = that match {
     case Universe() => this
     case Empty() => that
@@ -109,6 +146,9 @@ case class InclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) exten
 }
 case class ExclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) extends Interval[T] with Upper[T] {
   def contains(t: T): Boolean = ordering.lt(t, upper)
+  def greatest(implicit p: Predecessible[T]): Option[T] = p.prev(upper)
+  // The smallest value that is not present
+  def strictUpperBound(implicit s: Successible[T]): Option[T] = Some(upper)
   def intersect(that: Interval[T]): Interval[T] = that match {
     case Universe() => this
     case Empty() => that
@@ -128,9 +168,53 @@ case class ExclusiveUpper[T](upper: T)(implicit val ordering: Ordering[T]) exten
 case class Intersection[T](lower: Lower[T], upper: Upper[T]) extends Interval[T] {
   def contains(t: T): Boolean = lower.contains(t) && upper.contains(t)
   def intersect(that: Interval[T]): Interval[T] = that match {
+    case Universe() => this
+    case Empty() => that
+    case lb@InclusiveLower(_) => (lb && lower) && upper
+    case lb@ExclusiveLower(_) => (lb && lower) && upper
+    case ub@InclusiveUpper(_) => lower && (ub && upper)
+    case ub@ExclusiveUpper(_) => lower && (ub && upper)
     case Intersection(thatL, thatU) => (lower && thatL) && (upper && thatU)
-    case _ => (lower && that) && (upper && that)
   }
   def mapNonDecreasing[U:Ordering](fn: T => U): Interval[U] =
     lower.mapNonDecreasing(fn) && upper.mapNonDecreasing(fn)
+
+  /** Goes from lowest to highest for all items
+   * that are contained in this Intersection
+   */
+  def leastToGreatest(implicit s: Successible[T]): Iterable[T] = {
+    val self = this
+    // TODO https://github.com/twitter/algebird/issues/263
+    new AbstractIterable[T] {
+      // we have to do this because the normal takeWhile causes OOM on big intervals
+      def iterator = lower.toIterable.iterator.takeWhile(self.upper.contains(_))
+    }
+  }
+  /** Goes from highest to lowest for all items
+   * that are contained in this Intersection
+   */
+  def greatestToLeast(implicit p: Predecessible[T]): Iterable[T] = {
+    val self = this
+    // TODO https://github.com/twitter/algebird/issues/263
+    new AbstractIterable[T] {
+      // we have to do this because the normal takeWhile causes OOM on big intervals
+      def iterator = upper.toIterable.iterator.takeWhile(self.lower.contains(_))
+    }
+  }
+
+  /**
+   * Some intervals can actually be synonyms for empty:
+   * (0,0) for instance, contains nothing. This cannot be normalized to
+   * [a, b) form, thus we return an option
+   * Also, there are cases like [Int.MinValue, Int.MaxValue] that cannot
+   * are actually equivalent to Universe.
+   * The bottom line: if this returns None, it just means you can't express
+   * it this way, it does not mean it is empty or universe, etc... (there
+   * are other cases).
+   */
+  def toLeftClosedRightOpen(implicit s: Successible[T]): Option[(T, T)] =
+    for {
+      l <- lower.least
+      g <- upper.strictUpperBound
+    } yield (l, g)
 }

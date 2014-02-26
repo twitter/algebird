@@ -1,5 +1,21 @@
 # Algebird #
 
+### Version 0.4.0 ###
+* Make SketchMap1 the only SketchMap implementation: https://github.com/twitter/algebird/pull/256
+* Use semigroup in StateWithError: https://github.com/twitter/algebird/pull/255
+* Don't iterate through everything in unit monoid: https://github.com/twitter/algebird/pull/253
+* Factor as much logic as possible into SketchmapMonoid1: https://github.com/twitter/algebird/pull/251
+* Moving Trampoline flatMap implementation into trait: https://github.com/twitter/algebird/pull/249
+* Integrate Caliper: https://github.com/twitter/algebird/pull/248
+* Adds append method to MonoidAggregator and RingAggregator: https://github.com/twitter/algebird/pull/246
+* Make the map monoid more performant for mutable maps: https://github.com/twitter/algebird/pull/245
+* Make BFHash take on non negative values only: https://github.com/twitter/algebird/pull/243
+* Fixed DecayedValue: https://github.com/twitter/algebird/pull/238
+* Updated scaladoc to 0.3.0: https://github.com/twitter/algebird/pull/237
+* Add Incrementable and tests: https://github.com/twitter/algebird/pull/234
+* Updates sbt runner: https://github.com/twitter/algebird/pull/232
+* Upgrade sbt, specs, add a build.properties, and bump travis's target: https://github.com/twitter/algebird/pull/231
+
 ### Version 0.3.1 ###
 * Make a field transient in BloomFilter serialization: https://github.com/twitter/algebird/pull/209
 * Add the TunnelMonoid to Util (like async function monoid): https://github.com/twitter/algebird/pull/213
