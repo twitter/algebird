@@ -58,7 +58,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   }
 
   override def createCreatable(i: (K,V)): SketchMap[K, V] = create(i)
-  override def batchCreateCreatable(is: Seq[(K,V)]): SketchMap[K, V] = create(is)
+  def batchCreateCreatable(is: Seq[(K,V)]): SketchMap[K, V] = create(is)
 
   /**
    * Create a Sketch Map sketch out of a single key/value pair.
