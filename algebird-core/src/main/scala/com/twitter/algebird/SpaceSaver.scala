@@ -9,6 +9,8 @@ object SpaceSaver {
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
+
+  implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
 }
 
 /**

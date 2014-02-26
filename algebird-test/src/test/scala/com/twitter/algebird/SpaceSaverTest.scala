@@ -12,8 +12,6 @@ import org.scalacheck.Gen.{ frequency, choose, oneOf, containerOf1 }
 object SpaceSaverLaws extends Properties("SpaceSaver") {
   import BaseProperties._
 
-  implicit val ssSemigroup = new SpaceSaverSemigroup[Int]
-
   // limit sizes to 100 to avoid large data structures in tests
   property("SpaceSaver is a Semigroup") = forAll(choose(2, 100)){ capacity =>
     forAll(choose(1, 100)){ range =>
@@ -22,10 +20,10 @@ object SpaceSaverLaws extends Properties("SpaceSaver") {
       implicit val ssGenOne: Arbitrary[SSOne[Int]] = Arbitrary {
         for (key <- frequency((1 to range).map{ x => (x * x, x : Gen[Int]) }: _*)) yield SpaceSaver(capacity, key).asInstanceOf[SSOne[Int]]
       }
-      implicit val ssGen: Arbitrary[SpaceSaver[Int]] = Arbitrary {
+      implicit def ssGen(implicit sg: Semigroup[SpaceSaver[Int]]): Arbitrary[SpaceSaver[Int]] = Arbitrary {
         oneOf(
           arbitrary[SSOne[Int]],
-          containerOf1[List, SSOne[Int]](arbitrary[SSOne[Int]]).map(_.reduce(ssSemigroup.plus))
+          containerOf1[List, SSOne[Int]](arbitrary[SSOne[Int]]).map(_.reduce(sg.plus))
         )
       }
 
