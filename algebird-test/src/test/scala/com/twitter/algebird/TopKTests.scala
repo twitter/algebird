@@ -58,11 +58,21 @@ object TopKTests extends Properties("TopKTests") {
   def eqFn(q1: PriorityQueue[Int], q2: PriorityQueue[Int]): Boolean = {
     q2l(q1) == q2l(q2)
   }
-  property("PriorityQueueMonoid works") = forAll { (items: List[List[Int]]) =>
+  def pqIsCorrect(items: List[List[Int]]): Boolean =  {
     val correct = items.flatten.sorted.take(SIZE)
     // Have to do this last since this monoid is mutating inputs
     q2l(Monoid.sum(items.map { l => qmonoid.build(l) } )) == correct
   }
+
+  property("PriorityQueueMonoid works") = forAll { (items: List[List[Int]]) =>
+    pqIsCorrect(items)
+  }
+  /** The following were specific bugs that we failed some prior
+   * scalacheck (yay for randomized testing)
+   */
+  val pqPriorBugs = Seq(List(List(1, 1, 1, 2), List(0, 0, 0, 0, 0, 0, 0)))
+  property("Specific regressions are handled") = pqPriorBugs.forall(pqIsCorrect(_))
+
   property("PriorityQueueMonoid is a Monoid") = monoidLawsEq[PriorityQueue[Int]](eqFn)
 
   implicit def tkmonoid = new TopKMonoid[Int](SIZE)
