@@ -21,6 +21,7 @@ import org.scalacheck.Prop._
 
 object IntervalLaws extends Properties("Interval") {
   import Generators._
+  import Interval.GenIntersection
 
   property("[x, x + 1) contains x") =
     forAll { y: Int =>
@@ -41,16 +42,27 @@ object IntervalLaws extends Properties("Interval") {
     forAll { x: Int => ! Interval.leftOpenRightClosed(x, x + 1).contains(x) }
 
   property("[x, x) is empty") =
-    forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }
+    forAll { x : Int => Interval.leftClosedRightOpen(x, x).isLeft }
+
+  property("(x, x] is empty") =
+    forAll { x : Int => Interval.leftOpenRightClosed(x, x).isLeft }
 
   property("If an intersection contains, both of the intervals contain") =
     forAll { (item: Long, i1: Interval[Long], i2: Interval[Long]) =>
       (i1 && i2).contains(item) == (i1(item) && i2(item))
     }
+  property("If an interval is empty, contains is false") =
+    forAll { (item: Long, intr: Interval[Long]) =>
+      !(intr.isEmpty && intr.contains(item))
+    }
+  property("If an a Lower intersects an Upper, the intersection is nonEmpty") =
+    forAll { (low: Lower[Long], upper: Upper[Long]) =>
+      low.intersects(upper) == ((low && upper).nonEmpty)
+    }
 
   property("toLeftClosedRightOpen is an Injection") =
-    forAll { (intr: Intersection[Long], tests: List[Long]) =>
-      intr.toLeftClosedRightOpen.map { case (low, high) =>
+    forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
+      intr.toLeftClosedRightOpen.map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
         val intr2 = Interval.leftClosedRightOpen(low, high)
         tests.forall { t => intr(t) == intr2(t) }
       }.getOrElse(true) // none means this can't be expressed as this kind of interval
@@ -84,7 +96,7 @@ object IntervalLaws extends Properties("Interval") {
     }
 
   property("leastToGreatest and greatestToLeast are ordered and adjacent") =
-    forAll { (intr: Intersection[Long]) =>
+    forAll { (intr: GenIntersection[Long]) =>
       val items1 = intr.leastToGreatest.take(100)
       (items1.size < 2) || items1.sliding(2).forall { it =>
         it.toList match {
