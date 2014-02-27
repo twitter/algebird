@@ -33,7 +33,7 @@ object Generators {
   implicit def upperIntArb[T:Arbitrary:Ordering]: Arbitrary[Upper[T]] =
     Arbitrary(oneOf(genInclusiveUpper, genExclusiveUpper))
 
-  implicit def intersectionArb[T:Arbitrary:Ordering]: Arbitrary[Intersection[T]] =
+  implicit def intersectionArb[T:Arbitrary:Ordering]: Arbitrary[Interval.GenIntersection[T]] =
     Arbitrary(genIntersection)
 
   def genUniverse[T:Arbitrary:Ordering] =
@@ -71,6 +71,6 @@ object Generators {
   def genIntersection[T:Arbitrary:Ordering] =
       for {
         l <- Arbitrary.arbitrary[Lower[T]]
-        u <- Arbitrary.arbitrary[Upper[T]] if ((l && u) != Empty[T]())
+        u <- Arbitrary.arbitrary[Upper[T]] if l.intersects(u)
       } yield Intersection(l, u)
 }
