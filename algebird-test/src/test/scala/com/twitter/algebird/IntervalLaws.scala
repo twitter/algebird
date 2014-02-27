@@ -53,11 +53,30 @@ object IntervalLaws extends Properties("Interval") {
     }
   property("If an interval is empty, contains is false") =
     forAll { (item: Long, intr: Interval[Long]) =>
-      !(intr.isEmpty && intr.contains(item))
+      intr match {
+        case Empty() => !intr.contains(item)
+        case _ => true // may be here
+      }
     }
-  property("If an a Lower intersects an Upper, the intersection is nonEmpty") =
-    forAll { (low: Lower[Long], upper: Upper[Long]) =>
-      low.intersects(upper) == ((low && upper).nonEmpty)
+
+  property("If an a Lower intersects an Upper, the intersection is non Empty") =
+    forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
+      if(low.intersects(upper)) {
+        low.least.map(upper.contains(_) == true).getOrElse(true) &&
+          ((low && upper) match {
+            case Intersection(_, _) => true
+            case _ => false
+          })
+      }
+      else {
+        // nothing is in both
+        low.least.map(upper.contains(_) == false).getOrElse(true) &&
+          items.forall { i => (low.contains(i) && upper.contains(i)) == false } &&
+          (low && upper match {
+            case Empty() => true
+            case _ => false
+          })
+      }
     }
 
   property("toLeftClosedRightOpen is an Injection") =
