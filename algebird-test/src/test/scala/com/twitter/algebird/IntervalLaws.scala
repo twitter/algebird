@@ -21,6 +21,7 @@ import org.scalacheck.Prop._
 
 object IntervalLaws extends Properties("Interval") {
   import Generators._
+  import Interval.GenIntersection
 
   property("[x, x + 1) contains x") =
     forAll { y: Int =>
@@ -41,16 +42,78 @@ object IntervalLaws extends Properties("Interval") {
     forAll { x: Int => ! Interval.leftOpenRightClosed(x, x + 1).contains(x) }
 
   property("[x, x) is empty") =
-    forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }
+    forAll { x : Int => Interval.leftClosedRightOpen(x, x).isLeft }
+
+  property("(x, x] is empty") =
+    forAll { x : Int => Interval.leftOpenRightClosed(x, x).isLeft }
 
   property("If an intersection contains, both of the intervals contain") =
     forAll { (item: Long, i1: Interval[Long], i2: Interval[Long]) =>
       (i1 && i2).contains(item) == (i1(item) && i2(item))
     }
+  property("If an interval is empty, contains is false") =
+    forAll { (item: Long, intr: Interval[Long]) =>
+      intr match {
+        case Empty() => !intr.contains(item)
+        case _ => true // may be here
+      }
+    }
+
+  property("[n, inf) and (-inf, n] intersect") = forAll { (n: Long) =>
+    InclusiveLower(n).intersects(InclusiveUpper(n))
+  }
+
+  property("(x, inf) and (-inf, y) intersects if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (ExclusiveLower(x).intersects(ExclusiveUpper(y)))
+  }
+  property("(x, inf) and (-inf, y] intersect if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (ExclusiveLower(x).intersects(InclusiveUpper(y)))
+  }
+  property("[x, inf) and (-inf, y) intersect if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (InclusiveLower(x).intersects(ExclusiveUpper(y)))
+  }
+  property("[x, inf) and (-inf, y] intersect if and only if y >= x") = forAll { (x: Long, y: Long) =>
+    (y >= x) == (InclusiveLower(x).intersects(InclusiveUpper(y)))
+  }
+
+  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) = {
+      if(low.intersects(upper)) {
+        low.least.map { lb =>
+          // This is the usual case
+          upper.contains(lb) || {
+            // but possibly we have: (lb, lb+1)
+            Equiv[Option[Long]].equiv(Some(lb), upper.strictUpperBound)
+          }
+        }.getOrElse(true) &&
+          ((low && upper) match {
+            case Intersection(_, _) => true
+            case _ => false
+          })
+      }
+      else {
+        // nothing is in both
+        low.least.map(upper.contains(_) == false).getOrElse(true) &&
+          items.forall { i => (low.contains(i) && upper.contains(i)) == false } &&
+          (low && upper match {
+            case Empty() => true
+            case _ => false
+          })
+      }
+    }
+  property("If an a Lower intersects an Upper, the intersection is non Empty") =
+    forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
+      lowerUpperIntersection(low, upper, items)
+    }
+
+  // This specific case broke the tests before
+  property("(n, n+1) follows the intersect law") =
+    forAll { (n: Long) => (n == Long.MaxValue) ||
+      lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n+1L), Nil)
+    }
 
   property("toLeftClosedRightOpen is an Injection") =
-    forAll { (intr: Intersection[Long], tests: List[Long]) =>
-      intr.toLeftClosedRightOpen.map { case (low, high) =>
+    forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
+      intr.toLeftClosedRightOpen.map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
         val intr2 = Interval.leftClosedRightOpen(low, high)
         tests.forall { t => intr(t) == intr2(t) }
       }.getOrElse(true) // none means this can't be expressed as this kind of interval
@@ -84,7 +147,7 @@ object IntervalLaws extends Properties("Interval") {
     }
 
   property("leastToGreatest and greatestToLeast are ordered and adjacent") =
-    forAll { (intr: Intersection[Long]) =>
+    forAll { (intr: GenIntersection[Long]) =>
       val items1 = intr.leastToGreatest.take(100)
       (items1.size < 2) || items1.sliding(2).forall { it =>
         it.toList match {
