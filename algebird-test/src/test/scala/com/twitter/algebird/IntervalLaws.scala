@@ -21,7 +21,6 @@ import org.scalacheck.Prop._
 
 object IntervalLaws extends Properties("Interval") {
   import Generators._
-  import Interval.GenIntersection
 
   property("[x, x + 1) contains x") =
     forAll { y: Int =>
@@ -42,46 +41,16 @@ object IntervalLaws extends Properties("Interval") {
     forAll { x: Int => ! Interval.leftOpenRightClosed(x, x + 1).contains(x) }
 
   property("[x, x) is empty") =
-    forAll { x : Int => Interval.leftClosedRightOpen(x, x).isLeft }
-
-  property("(x, x] is empty") =
-    forAll { x : Int => Interval.leftOpenRightClosed(x, x).isLeft }
+    forAll { x : Int => Interval.leftClosedRightOpen(x, x) == Empty[Int]() }
 
   property("If an intersection contains, both of the intervals contain") =
     forAll { (item: Long, i1: Interval[Long], i2: Interval[Long]) =>
       (i1 && i2).contains(item) == (i1(item) && i2(item))
     }
-  property("If an interval is empty, contains is false") =
-    forAll { (item: Long, intr: Interval[Long]) =>
-      intr match {
-        case Empty() => !intr.contains(item)
-        case _ => true // may be here
-      }
-    }
-
-  property("If an a Lower intersects an Upper, the intersection is non Empty") =
-    forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
-      if(low.intersects(upper)) {
-        low.least.map(upper.contains(_) == true).getOrElse(true) &&
-          ((low && upper) match {
-            case Intersection(_, _) => true
-            case _ => false
-          })
-      }
-      else {
-        // nothing is in both
-        low.least.map(upper.contains(_) == false).getOrElse(true) &&
-          items.forall { i => (low.contains(i) && upper.contains(i)) == false } &&
-          (low && upper match {
-            case Empty() => true
-            case _ => false
-          })
-      }
-    }
 
   property("toLeftClosedRightOpen is an Injection") =
-    forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
-      intr.toLeftClosedRightOpen.map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
+    forAll { (intr: Intersection[Long], tests: List[Long]) =>
+      intr.toLeftClosedRightOpen.map { case (low, high) =>
         val intr2 = Interval.leftClosedRightOpen(low, high)
         tests.forall { t => intr(t) == intr2(t) }
       }.getOrElse(true) // none means this can't be expressed as this kind of interval
@@ -115,7 +84,7 @@ object IntervalLaws extends Properties("Interval") {
     }
 
   property("leastToGreatest and greatestToLeast are ordered and adjacent") =
-    forAll { (intr: GenIntersection[Long]) =>
+    forAll { (intr: Intersection[Long]) =>
       val items1 = intr.leastToGreatest.take(100)
       (items1.size < 2) || items1.sliding(2).forall { it =>
         it.toList match {
