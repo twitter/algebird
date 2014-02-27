@@ -59,10 +59,32 @@ object IntervalLaws extends Properties("Interval") {
       }
     }
 
-  property("If an a Lower intersects an Upper, the intersection is non Empty") =
-    forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
+  property("[n, inf) and (-inf, n] intersect") = forAll { (n: Long) =>
+    InclusiveLower(n).intersects(InclusiveUpper(n))
+  }
+
+  property("(x, inf) and (-inf, y) intersects if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (ExclusiveLower(x).intersects(ExclusiveUpper(y)))
+  }
+  property("(x, inf) and (-inf, y] intersect if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (ExclusiveLower(x).intersects(InclusiveUpper(y)))
+  }
+  property("[x, inf) and (-inf, y) intersect if and only if y > x") = forAll { (x: Long, y: Long) =>
+    (y > x) == (InclusiveLower(x).intersects(ExclusiveUpper(y)))
+  }
+  property("[x, inf) and (-inf, y] intersect if and only if y >= x") = forAll { (x: Long, y: Long) =>
+    (y >= x) == (InclusiveLower(x).intersects(InclusiveUpper(y)))
+  }
+
+  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) = {
       if(low.intersects(upper)) {
-        low.least.map(upper.contains(_) == true).getOrElse(true) &&
+        low.least.map { lb =>
+          // This is the usual case
+          upper.contains(lb) || {
+            // but possibly we have: (lb, lb+1)
+            Equiv[Option[Long]].equiv(Some(lb), upper.strictUpperBound)
+          }
+        }.getOrElse(true) &&
           ((low && upper) match {
             case Intersection(_, _) => true
             case _ => false
@@ -77,6 +99,16 @@ object IntervalLaws extends Properties("Interval") {
             case _ => false
           })
       }
+    }
+  property("If an a Lower intersects an Upper, the intersection is non Empty") =
+    forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
+      lowerUpperIntersection(low, upper, items)
+    }
+
+  // This specific case broke the tests before
+  property("(n, n+1) follows the intersect law") =
+    forAll { (n: Long) => (n == Long.MaxValue) ||
+      lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n+1L), Nil)
     }
 
   property("toLeftClosedRightOpen is an Injection") =
