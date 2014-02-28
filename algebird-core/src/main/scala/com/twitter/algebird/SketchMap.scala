@@ -106,11 +106,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
 /**
  * Convenience class for holding constant parameters of a Sketch Map.
  */
-case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
+case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)
                               (implicit serialization: K => Array[Byte]) {
-  def width = SketchMapParams.width(eps)
-  def depth = SketchMapParams.depth(delta)
-
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
   assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
@@ -154,6 +151,12 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
 }
 
 object SketchMapParams {
+  /**
+   * Overloaded apply method for convenience.
+   */
+  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
+              (implicit serialization: K => Array[Byte]): SketchMapParams[K] =
+    SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
    * depth = ceil(ln 1/delta)
