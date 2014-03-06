@@ -1,5 +1,21 @@
 # Algebird #
 
+### Version 0.5.0 ###
+* Remove handling that doesn't seem needed/wanted for longs: https://github.com/twitter/algebird/pull/287
+* Add average() for DecayedValue: https://github.com/twitter/algebird/pull/286
+* SketchMapParams can support being constructed with both width/depth and eps/delta: https://github.com/twitter/algebird/pull/285
+* undo the undo of the interval fixes: https://github.com/twitter/algebird/pull/283
+* Fix priority queue bug found by scalacheck: https://github.com/twitter/algebird/pull/280
+* Adds type parameters to Intersection for more precision: https://github.com/twitter/algebird/pull/279
+* Make resolver consistent with scalding: https://github.com/twitter/algebird/pull/276
+* remove Math use in test: https://github.com/twitter/algebird/pull/275
+* Remove extends function from algebird: https://github.com/twitter/algebird/pull/274
+* remove unnecessary implicit requirement: https://github.com/twitter/algebird/pull/272
+* Fix SketchMapMonoid zero: https://github.com/twitter/algebird/pull/269
+* Make SketchMapMonoid params public: https://github.com/twitter/algebird/pull/265
+* Add Predecessible and methods to Interval: https://github.com/twitter/algebird/pull/262
+* Implement StreamSummary data structure for finding frequent/top-k items: https://github.com/twitter/algebird/pull/259
+
 ### Version 0.4.0 ###
 * Make SketchMap1 the only SketchMap implementation: https://github.com/twitter/algebird/pull/256
 * Use semigroup in StateWithError: https://github.com/twitter/algebird/pull/255
