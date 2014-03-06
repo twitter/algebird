@@ -88,7 +88,7 @@ object HyperLogLog {
     loop(0, 0)
   }
 
-  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+  /** The value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def rhoW(bsl: BitSetLite, bits: Int): Byte = {
@@ -100,10 +100,10 @@ object HyperLogLog {
   }
 
   /** We are computing j and \rho(w) from the paper,
-   *  sorry for the name, but it allows someone to compare to the paper extremely low probability 
+   *  sorry for the name, but it allows someone to compare to the paper extremely low probability
    *  rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and 
-   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading 
+   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and
+   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
    *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
    */
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {
@@ -184,10 +184,6 @@ object HyperLogLog {
   }
 
   def error(bits: Int): Double = 1.04/scala.math.sqrt(twopow(bits))
-
-  // Some constants from the algorithm:
-  private[algebird] val fourBillionSome = twopow(32)
-  private[algebird] val largeE = fourBillionSome/30.0
 }
 
 sealed abstract class HLL extends java.io.Serializable {
@@ -208,10 +204,9 @@ sealed abstract class HLL extends java.io.Serializable {
 
     val e = factor * z
     // There are large and small value corrections from the paper
-    if (e > largeE) {
-      -fourBillionSome * scala.math.log1p(-e/fourBillionSome)
-    }
-    else if (e <= smallE) {
+    // We stopped using the small value corrections since when using Long's
+    // there was pathalogically bad results. See https://github.com/twitter/algebird/issues/284
+    if (e <= smallE) {
       smallEstimate(e)
     }
     else {

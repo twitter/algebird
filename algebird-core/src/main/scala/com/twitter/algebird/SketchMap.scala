@@ -28,8 +28,7 @@ import scala.collection.breakOut
  * Hashes an arbitrary key type to one that the Sketch Map can use.
  */
 case class SketchMapHash[K](hasher: CMSHash, seed: Int)
-                            (implicit serialization: K => Array[Byte])
-                            extends Function1[K, Int] {
+                            (implicit serialization: K => Array[Byte]) {
   def apply(obj: K): Int = {
     val (first, second) = MurmurHash128(seed)(serialization(obj))
     hasher(first ^ second)
@@ -39,14 +38,14 @@ case class SketchMapHash[K](hasher: CMSHash, seed: Int)
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](params: SketchMapParams[K])
+class SketchMapMonoid[K, V](val params: SketchMapParams[K])
                             (implicit valueOrdering: Ordering[V], monoid: Monoid[V])
                             extends Monoid[SketchMap[K, V]] {
 
   /**
    * A zero Sketch Map is one with zero elements.
    */
-  val zero: SketchMap[K, V] = SketchMap[K, V](AdaptiveMatrix.monoid.zero, Nil, monoid.zero)
+  val zero: SketchMap[K, V] = SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
     val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
@@ -107,11 +106,8 @@ class SketchMapMonoid[K, V](params: SketchMapParams[K])
 /**
  * Convenience class for holding constant parameters of a Sketch Map.
  */
-case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
+case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)
                               (implicit serialization: K => Array[Byte]) {
-  def width = SketchMapParams.width(eps)
-  def depth = SketchMapParams.depth(delta)
-
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
   assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
@@ -121,7 +117,8 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
     val numHashes = depth
     val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
-      SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)(serialization)
+      val smhash: SketchMapHash[K] = SketchMapHash(CMSHash(r.nextInt, 0, numCounters), seed)(serialization)
+      new (K => Int) { override def apply(k: K) = smhash(k) }
     }
   }
 
@@ -154,6 +151,12 @@ case class SketchMapParams[K](seed: Int, eps: Double, delta: Double, heavyHitter
 }
 
 object SketchMapParams {
+  /**
+   * Overloaded apply method for convenience.
+   */
+  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
+              (implicit serialization: K => Array[Byte]): SketchMapParams[K] =
+    SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
    * depth = ceil(ln 1/delta)
@@ -189,14 +192,12 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] = {
+  def monoid[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] =
     new SketchMapMonoid(params)(valueOrdering, monoid)
-  }
 
   def aggregator[K, V](params: SketchMapParams[K])
-                      (implicit serialization: K => Array[Byte], valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] = {
+                      (implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
-  }
 }
 
 case class SketchMap[K, V](

@@ -66,4 +66,15 @@ case class DecayedValue(value : Double, scaledTime : Double) extends Ordered[Dec
   def compare(that : DecayedValue) : Int = {
     scaledTime.compareTo(that.scaledTime)
   }
+
+  // A DecayedValue can be translated to a moving average with the window size of its half-life.
+  //   It is EXACTLY a sample of the Laplace transform of the signal of values.
+  //   Therefore, we can get the moving average by normalizing a decayed value with halflife/ln(2),
+  //   which is the integral of exp(-t(ln(2))/halflife) from 0 to infinity.
+  //
+  //   See: https://github.com/twitter/algebird/wiki/Using-DecayedValue-as-moving-average
+  def average(halfLife: Double) = {
+    val normalization = halfLife / math.log(2)
+    value / normalization
+  }
 }
