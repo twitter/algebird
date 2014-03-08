@@ -83,7 +83,7 @@ sealed abstract class SpaceSaver[T] {
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
-case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSaver[T] {
+case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
   def min: Long = 0L
@@ -108,7 +108,7 @@ object SSMany {
     SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
+case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
   //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
 
   lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
