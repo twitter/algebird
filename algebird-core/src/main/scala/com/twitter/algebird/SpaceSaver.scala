@@ -101,14 +101,14 @@ object SSMany {
   private def apply[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]): SSMany[T] =
     SSMany(capacity, counters, Some(buckets))
 
-  def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
+  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
     SSMany(capacity, counters, None)
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
     SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
+case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
   //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
 
   lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
