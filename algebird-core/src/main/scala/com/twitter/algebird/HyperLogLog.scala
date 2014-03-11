@@ -342,7 +342,7 @@ case class DenseHLL(bits : Int, v : IndexedSeq[Byte]) extends HLL {
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
  * which means each HLLInstance is about 2^{12} = 4kb per instance.
  */
-class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
+class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] with Creatable[Array[Byte], HLL] {
   import HyperLogLog._
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
@@ -362,6 +362,9 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
       items.foreach { _.updateInto(buffer) }
       Some(DenseHLL(bits, buffer.toIndexedSeq))
     }
+
+  override def createCreatable(example : Array[Byte]) : HLL = create(example)
+  def batchCreateCreatable(is: Seq[Array[Byte]]): HLL = batchCreate(is)
 
   def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)

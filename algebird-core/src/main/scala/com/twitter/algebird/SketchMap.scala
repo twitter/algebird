@@ -40,7 +40,7 @@ case class SketchMapHash[K](hasher: CMSHash, seed: Int)
  */
 class SketchMapMonoid[K, V](val params: SketchMapParams[K])
                             (implicit valueOrdering: Ordering[V], monoid: Monoid[V])
-                            extends Monoid[SketchMap[K, V]] {
+                            extends Monoid[SketchMap[K, V]] with Creatable[(K,V), SketchMap[K,V]] {
 
   /**
    * A zero Sketch Map is one with zero elements.
@@ -56,6 +56,9 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
       Monoid.plus(left.totalValue, right.totalValue))
   }
+
+  override def createCreatable(i: (K,V)): SketchMap[K, V] = create(i)
+  def batchCreateCreatable(is: Seq[(K,V)]): SketchMap[K, V] = create(is)
 
   /**
    * Create a Sketch Map sketch out of a single key/value pair.

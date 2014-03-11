@@ -68,7 +68,7 @@ object BloomFilter{
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Monoid[BF]{
+case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Monoid[BF] with Creatable[String, BF] {
   val hashes: BFHash = BFHash(numHashes, width, seed)
 
   val zero: BF = BFZero(hashes, width)
@@ -81,11 +81,14 @@ case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Mono
    */
   def plus(left: BF, right: BF): BF = left ++ right
 
+  override def createCreatable(i: String): BF = create(i)
+
+  def batchCreateCreatable(is: Seq[String]): BF = create(is: _*)
+
   /**
    * Create a bloom filter with one item.
    */
   def create(item: String): BF = BFItem(item, hashes, width)
-
 
   /**
    * Create a bloom filter with multiple items.
@@ -320,7 +323,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
       val y = math.abs(x).toInt // y may be negative (Interger.MIN_VALUE)
       y & 0x7fffffff // no change for positive numbers, converts Interger.MIN_VALUE to positive number
     }
-	
+
     val upper = toNonNegativeInt(x >> 32)
     val lower = toNonNegativeInt((x << 32) >> 32)
     (upper, lower)
