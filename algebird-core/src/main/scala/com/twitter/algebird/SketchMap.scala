@@ -57,6 +57,31 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       Monoid.plus(left.totalValue, right.totalValue))
   }
 
+  override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
+    if(items.isEmpty) None
+    else {
+      val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
+      val maxBuffer = 1000
+      def sumBuffer: Unit = {
+        val bufferView = buffer.view
+        val newValuesTable = Monoid.sum(bufferView.map(_.valuesTable))
+        val heavyHittersSet = Monoid.sum(bufferView.map(_.heavyHitterKeys.toSet))
+        val newtotalValue = Monoid.sum(bufferView.map(_.totalValue))
+        buffer.clear()
+        buffer += SketchMap(
+          newValuesTable,
+          params.updatedHeavyHitters(heavyHittersSet.toSeq, newValuesTable),
+          newtotalValue)
+      }
+
+      items.foreach { sm =>
+        if(buffer.size > maxBuffer) sumBuffer
+        buffer += sm
+      }
+      if(buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
+      Some(buffer(0))
+    }
+
   /**
    * Create a Sketch Map sketch out of a single key/value pair.
    */
