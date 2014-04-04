@@ -25,7 +25,7 @@ trait MapOperations[K, V, M <: ScMap[K, V]] {
 }
 
 abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: Semigroup[V])
-    extends Monoid[M] with MapOperations[K, V, M] {
+    extends Monoid[M] with MapOperations[K, V, M] { mapMonoid =>
 
   val nonZero: (V => Boolean) = semigroup match {
     case mon: Monoid[_] => mon.isNonZero(_)
@@ -70,23 +70,21 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
         remove(oldMap, kv._1)
     }
   }
-  override def sumOption(items: TraversableOnce[M]): Option[M] =
-    if(items.isEmpty) None
-    else {
-      val mutable = MMap[K,V]()
-      items.foreach { m =>
-        m.foreach { case (k, v) =>
-          val oldVOpt = mutable.get(k)
-          // sorry for the micro optimization here: avoiding a closure
-          val newV = if(oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
-          if (nonZero(newV))
-            mutable.update(k, newV)
-          else
-            mutable.remove(k)
-        }
+
+  override def statefulSummer(): StatefulSummer[M] = new MutableSumAll[M, MMap[K, V]]()(mapMonoid) {
+    def initMutable: MMap[K, V] = MMap[K, V]()
+    def updateInto(mutable: MMap[K, V], item: M) =
+      item.foreach { case (k, v) =>
+        val oldVOpt = mutable.get(k)
+        // sorry for the micro optimization here: avoiding a closure
+        val newV = if(oldVOpt.isEmpty) v else mapMonoid.semigroup.plus(oldVOpt.get, v)
+        if (mapMonoid.nonZero(newV))
+          mutable.update(k, newV)
+        else
+          mutable.remove(k)
       }
-      Some(fromMutable(mutable))
-    }
+    def fromMutable(mutable: MMap[K, V]): M = mapMonoid.fromMutable(mutable)
+  }
 }
 
 class MapMonoid[K,V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, Map[K,V]] {

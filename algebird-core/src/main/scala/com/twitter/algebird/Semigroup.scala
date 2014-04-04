@@ -29,11 +29,24 @@ import scala.annotation.{implicitNotFound, tailrec}
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializable {
   def plus(l : T, r : T) : T
+
+  def bufferedSumOption(items: Seq[T]): Option[T] =
+    items.reduceLeftOption { plus(_, _) }
+
+  def statefulSummer(): StatefulSummer[T] = new SumAll()(this)
   /**
    * override this if there is a faster way to do this sum than reduceLeftOption on plus
    */
-  def sumOption(iter: TraversableOnce[T]): Option[T] =
-    iter.reduceLeftOption { plus(_, _) }
+  def sumOption(iter: TraversableOnce[T]): Option[T] = {
+    val summer = statefulSummer()
+    val partial = iter.flatMap { summer.put(_) }.reduceLeftOption { plus(_, _) }
+    val flushed = summer.flush
+    if (partial.isDefined) {
+      if (flushed.isDefined) Some(plus(partial.get, flushed.get)) else partial
+    } else {
+      flushed
+    }
+  }
 }
 
 // For Java interop so they get the default sumOption

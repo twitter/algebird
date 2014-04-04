@@ -21,6 +21,8 @@ import scala.math.Equiv
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
 import java.util.{List => JList}
 
+import scala.collection.mutable.{Set => MSet}
+
 /**
  * Monoid (take a deep breath, and relax about the weird name):
  *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
@@ -108,13 +110,11 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
 class SetMonoid[T] extends Monoid[Set[T]] {
   override def zero = Set[T]()
   override def plus(left : Set[T], right : Set[T]) = left ++ right
-  override def sumOption(items: TraversableOnce[Set[T]]): Option[Set[T]] =
-    if(items.isEmpty) None
-    else {
-      val mutable = scala.collection.mutable.Set[T]()
-      items.foreach { s => mutable ++= s }
-      Some(mutable.toSet)
-    }
+  override def statefulSummer(): StatefulSummer[Set[T]] = new MutableSumAll[Set[T], MSet[T]]()(this) {
+    def initMutable: MSet[T] = MSet[T]()
+    def updateInto(mutable: MSet[T], item: Set[T]) = mutable ++= item
+    def fromMutable(mutable: MSet[T]) = mutable.toSet
+  }
 }
 
 /** Function1 monoid.

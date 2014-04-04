@@ -51,5 +51,29 @@ class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V]
   with StatefulSummer[V]
   with BufferedReduce[V] {
 
-  def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
+  def operate(nonEmpty: Seq[V]): V = semigroup.bufferedSumOption(nonEmpty).get
+}
+
+abstract class MutableSumAll[V, T](implicit override val semigroup: Semigroup[V])
+  extends StatefulSummer[V] {
+
+  def initMutable: T
+  def updateInto(mutable: T, item: V): Unit
+  def fromMutable(mutable: T): V
+
+  var mutable: Option[T] = None
+
+  def put(item: V): Option[V] = {
+    if (mutable.isEmpty) mutable = Some(initMutable)
+    updateInto(mutable.get, item)
+    None
+  }
+
+  def flush: Option[V] = {
+    val result = if (mutable.isDefined) Some(fromMutable(mutable.get)) else None
+    mutable = None
+    result
+  }
+
+  def isFlushed: Boolean = mutable.isEmpty
 }

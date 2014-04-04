@@ -355,13 +355,11 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 
   def plus(left : HLL, right : HLL) = left + right
 
-  override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
-    if(items.isEmpty) None
-    else {
-      val buffer = new Array[Byte](size)
-      items.foreach { _.updateInto(buffer) }
-      Some(DenseHLL(bits, buffer.toIndexedSeq))
-    }
+  override def statefulSummer() = new MutableSumAll[HLL, Array[Byte]]()(this) {
+    def initMutable: Array[Byte] = new Array[Byte](size)
+    def updateInto(mutable: Array[Byte], item: HLL) = item.updateInto(mutable)
+    def fromMutable(mutable: Array[Byte]): HLL = DenseHLL(bits, mutable)
+  }
 
   def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)
