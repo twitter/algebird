@@ -25,19 +25,22 @@ import scala.collection.JavaConverters._
  * @author Ian O Connell
  */
 
-class AsyncMapSum[Key, Value](cacheSize: Int,
-                                          override val flushFrequency: Duration,
-                                          override val softMemoryFlush: Float,
+class AsyncMapSum[Key, Value](bufferSize: BufferSize,
+                                          override val flushFrequency: FlushFrequency,
+                                          override val softMemoryFlush: MemoryFlushPercent,
                                           workPool: FuturePool)
                                          (implicit semigroup: Semigroup[Value])
-                                          extends AsyncSummer[Key, Value]
-                                          with WithFlushConditions[Key, Value] {
+                                          extends AsyncSummer[(Key, Value), Map[Key, Value]]
+                                          with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
-  require(cacheSize > 0, "Use the Null summer for an empty async summer")
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
-  private[this] final val queue = new ArrayBlockingQueue[Map[Key, Value]](cacheSize, true)
+  protected override val emptyResult = Map.empty[Key, Value]
 
-  override def forceTick: Future[Map[Key, Value]] = {
+  private[this] final val queue = new ArrayBlockingQueue[Map[Key, Value]](bufferSize.v, true)
+  override def isFlushed: Boolean = queue.size == 0
+
+  override def flush: Future[Map[Key, Value]] = {
     didFlush // bumps timeout on the flush conditions
     val toSum = ListBuffer[Map[Key, Value]]()
     queue.drainTo(toSum.asJava)
@@ -46,10 +49,10 @@ class AsyncMapSum[Key, Value](cacheSize: Int,
     }
   }
 
-  def insert(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
     val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
     if(!queue.offer(curData)) {
-      forceTick.map { flushRes =>
+      flush.map { flushRes =>
         Semigroup.plus(flushRes, curData)
       }
     }

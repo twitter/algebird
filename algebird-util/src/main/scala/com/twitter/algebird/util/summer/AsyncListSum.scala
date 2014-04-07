@@ -20,25 +20,30 @@ import com.twitter.util.{Duration, Future, FuturePool}
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
-
+import scala.collection.mutable.{Set => MSet}
 /**
  * @author Ian O Connell
  */
 
-class AsyncListSum[Key, Value](cacheSize: Int,
-                                          override val flushFrequency: Duration,
-                                          override val softMemoryFlush: Float,
+class AsyncListSum[Key, Value](bufferSize: BufferSize,
+                                          override val flushFrequency: FlushFrequency,
+                                          override val softMemoryFlush: MemoryFlushPercent,
                                           workPool: FuturePool)
                                          (implicit semigroup: Semigroup[Value])
-                                          extends AsyncSummer[Key, Value]
-                                          with WithFlushConditions[Key, Value] {
+                                          extends AsyncSummer[(Key, Value), Map[Key, Value]]
+                                          with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
-  require(cacheSize > 0, "Use the Null summer for an empty async summer")
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
-  private[this] final val queueMap = new ConcurrentHashMap[Key, IndexedSeq[Value]]
+  protected override val emptyResult = Map.empty[Key, Value]
+
+  private[this] final val queueMap = new ConcurrentHashMap[Key, IndexedSeq[Value]]()
+  val seenKeys = MSet[Key]()
   private[this] final val elementsInCache = new AtomicInteger(0)
 
-  override def forceTick: Future[Map[Key, Value]] =
+  override def isFlushed: Boolean = elementsInCache.get == 0
+
+  override def flush: Future[Map[Key, Value]] =
     workPool {
       didFlush // bumps timeout on the flush conditions
       // Take a copy of the keyset into a scala set (toSet forces the copy)
@@ -47,7 +52,8 @@ class AsyncListSum[Key, Value](cacheSize: Int,
       keys.flatMap { k =>
         val retV = queueMap.remove(k)
         if(retV != null) {
-          elementsInCache.addAndGet(retV.size * -1)
+          require(this.synchronized{seenKeys.contains(k)}, "Reading Something as a k we never inserted?")
+          val newRemaining = elementsInCache.addAndGet(retV.size * -1)
           Semigroup.sumOption(retV).map(v => (k, v))
         }
         else None
@@ -56,10 +62,16 @@ class AsyncListSum[Key, Value](cacheSize: Int,
 
   @annotation.tailrec
   private[this] final def doInsert(key: Key, vals: IndexedSeq[Value]) {
+    require(key != null, "Key can not be null")
+    require(this.synchronized{seenKeys.contains(key)}, "Inserting as a k we never inserted?")
     val success = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)
-      val newValue = vals ++ oldValue
-      queueMap.replace(key, oldValue, newValue)
+      if(oldValue != null) {
+        val newValue = vals ++ oldValue
+        queueMap.replace(key, oldValue, newValue)
+      } else {
+        false // Removed between the check above and fetching
+      }
     } else {
       // Test if something else has raced into our spot.
       queueMap.putIfAbsent(key, vals) == null
@@ -73,19 +85,22 @@ class AsyncListSum[Key, Value](cacheSize: Int,
     }
   }
 
-  def insert(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
     val prepVals = vals.map { case (k, v) =>
-      Map(k -> IndexedSeq(v))
-    } : TraversableOnce[Map[Key, IndexedSeq[Value]]]
+      require(k != null, "Inserting a null key?")
+      this.synchronized{seenKeys += k}
+      (k -> IndexedSeq(v))
+    } : TraversableOnce[(Key, IndexedSeq[Value])]
 
-    val curData = Semigroup.sumOption(prepVals).getOrElse(Map.empty)
+    val curData = MapAlgebra.sumByKey(prepVals)
 
     curData.foreach { case (k, v) =>
+      require(this.synchronized{seenKeys.contains(k)}, "Inserting as a k we never inserted pre-call")
       doInsert(k, v)
     }
 
-    if(elementsInCache.get >= cacheSize) {
-      forceTick
+    if(elementsInCache.get >= bufferSize.v) {
+      flush
     } else {
       Future.value(Map.empty)
     }

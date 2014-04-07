@@ -23,17 +23,19 @@ import com.twitter.util.{Duration, Future}
  * @author Ian O Connell
  */
 
-case class SyncSummingQueue[Key, Value](cacheSize: Int,
-                                        override val flushFrequency: Duration,
-                                        override val softMemoryFlush: Float)
-  (implicit semigroup: Semigroup[Value]) extends AsyncSummer[Key, Value] with WithFlushConditions[Key, Value]  {
+case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
+                                        override val flushFrequency: FlushFrequency,
+                                        override val softMemoryFlush: MemoryFlushPercent)
+  (implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]]  {
 
-  require(cacheSize > 0, "Use the Null summer for an empty async summer")
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
+  protected override val emptyResult = Map.empty[Key, Value]
 
-  private[this] final val squeue: SummingQueue[Map[Key, Value]] = SummingQueue(cacheSize)
+  private[this] final val squeue: SummingQueue[Map[Key, Value]] = SummingQueue(bufferSize.v)
+  override def isFlushed: Boolean = squeue.isFlushed
 
-  def forceTick: Future[Map[Key, Value]] = Future.value(squeue.flush.getOrElse(Map.empty))
+  def flush: Future[Map[Key, Value]] = Future.value(squeue.flush.getOrElse(Map.empty))
 
-  def insert(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
     Future.value(squeue.put(Monoid.sum(vals.map(Map(_)))).getOrElse(Map.empty))
 }

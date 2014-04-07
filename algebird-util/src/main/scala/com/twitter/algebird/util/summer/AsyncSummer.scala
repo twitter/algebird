@@ -21,52 +21,60 @@ import com.twitter.util.{Duration, Future}
 /**
  * @author Ian O Connell
  */
-trait AsyncSummer[Key, Value] { self =>
-  def forceTick: Future[Map[Key, Value]]
-  def tick: Future[Map[Key, Value]]
-  def insert(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]]
+
+
+trait AsyncSummer[T, M <: Iterable[T]] { self =>
+  def flush: Future[M]
+  def tick: Future[M]
+  def add(t: T) = addAll(Iterator(t))
+  def addAll(vals: TraversableOnce[T]): Future[M]
+
+  def isFlushed: Boolean
   def cleanup: Future[Unit] = Future.Unit
-  def withCleanup(cleanup: () => Future[Unit]) = {
+  def withCleanup(cleanup: () => Future[Unit]): AsyncSummer[T, M] = {
     val oldSelf = self
-    new AsyncSummerProxy[Key, Value] {
+    new AsyncSummerProxy[T, M] {
       override val self = oldSelf
       override def cleanup = {
-        self.cleanup.flatMap { _ => cleanup }
+        oldSelf.cleanup.flatMap { _ => cleanup }
       }
     }
   }
 }
 
-trait AsyncSummerProxy[Key, Value] extends AsyncSummer[Key, Value] {
-  def self: AsyncSummer[Key, Value]
-  def forceTick = self.forceTick
+trait AsyncSummerProxy[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
+  def self: AsyncSummer[T, M]
+  def flush = self.flush
   def tick = self.tick
-  def insert(vals: TraversableOnce[(Key, Value)]) = self.insert(vals)
+  override def add(t: T) = self.add(t)
+  def addAll(vals: TraversableOnce[T]) = self.addAll(vals)
+  def isFlushed = self.isFlushed
   override def cleanup: Future[Unit] = self.cleanup
 }
 
 
-private[summer] trait WithFlushConditions[Key, Value] extends AsyncSummer[Key, Value] {
+private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   protected var lastDump:Long = System.currentTimeMillis
-  protected def softMemoryFlush: Float
-  protected def flushFrequency: Duration
+  protected def softMemoryFlush: MemoryFlushPercent
+  protected def flushFrequency: FlushFrequency
+  protected def emptyResult: M
 
-  protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.inMilliseconds
+  protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
   protected lazy val runtime  = Runtime.getRuntime
 
   protected def didFlush {lastDump = System.currentTimeMillis}
 
   protected def memoryWaterMark = {
     val used = ((runtime.totalMemory - runtime.freeMemory).toDouble * 100) / runtime.maxMemory
-    used > softMemoryFlush
+    used > softMemoryFlush.v
   }
 
-  def tick: Future[Map[Key, Value]] = {
+  def tick: Future[M] = {
     if (timedOut || memoryWaterMark) {
-          forceTick
+          flush
       }
     else {
-      Future.value(Map.empty)
+      Future.value(emptyResult)
     }
   }
 }
