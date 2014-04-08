@@ -38,7 +38,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   protected override val emptyResult = Map.empty[Key, Value]
 
   private[this] final val queueMap = new ConcurrentHashMap[Key, IndexedSeq[Value]]()
-  val seenKeys = MSet[Key]()
   private[this] final val elementsInCache = new AtomicInteger(0)
 
   override def isFlushed: Boolean = elementsInCache.get == 0
@@ -52,7 +51,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       keys.flatMap { k =>
         val retV = queueMap.remove(k)
         if(retV != null) {
-          require(this.synchronized{seenKeys.contains(k)}, "Reading Something as a k we never inserted?")
           val newRemaining = elementsInCache.addAndGet(retV.size * -1)
           Semigroup.sumOption(retV).map(v => (k, v))
         }
@@ -63,7 +61,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   @annotation.tailrec
   private[this] final def doInsert(key: Key, vals: IndexedSeq[Value]) {
     require(key != null, "Key can not be null")
-    require(this.synchronized{seenKeys.contains(key)}, "Inserting as a k we never inserted?")
     val success = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)
       if(oldValue != null) {
@@ -88,14 +85,12 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
     val prepVals = vals.map { case (k, v) =>
       require(k != null, "Inserting a null key?")
-      this.synchronized{seenKeys += k}
       (k -> IndexedSeq(v))
     } : TraversableOnce[(Key, IndexedSeq[Value])]
 
     val curData = MapAlgebra.sumByKey(prepVals)
 
     curData.foreach { case (k, v) =>
-      require(this.synchronized{seenKeys.contains(k)}, "Inserting as a k we never inserted pre-call")
       doInsert(k, v)
     }
 
