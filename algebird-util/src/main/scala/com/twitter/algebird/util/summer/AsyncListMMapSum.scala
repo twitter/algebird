@@ -17,47 +17,65 @@ package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
 import com.twitter.util.{Duration, Future, FuturePool}
-import java.util.concurrent.ArrayBlockingQueue
-import scala.collection.mutable.ArrayBuffer
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
+import scala.collection.mutable.{Set => MSet, ListBuffer, Map => MMap}
+import scala.collection.breakOut
 
 /**
  * @author Ian O Connell
  */
 
-class AsyncMapSum[Key, Value](bufferSize: BufferSize,
+
+
+class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
                                           override val flushFrequency: FlushFrequency,
                                           override val softMemoryFlush: MemoryFlushPercent,
                                           workPool: FuturePool)
-                                         (implicit semigroup: Semigroup[Value])
+                                         (implicit sg: Semigroup[Value])
                                           extends AsyncSummer[(Key, Value), Map[Key, Value]]
                                           with WithFlushConditions[(Key, Value), Map[Key, Value]] {
-
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
+
+
+  private[this] final val queueMap = MMap[Key, ListBuffer[Value]]()
+  private[this] final val mutex = new Object()
+  @volatile private[this] var presentTuples = 0
 
   protected override val emptyResult = Map.empty[Key, Value]
 
-  private[this] final val queue = new ArrayBlockingQueue[Map[Key, Value]](bufferSize.v, true)
-  override def isFlushed: Boolean = queue.size == 0
+  override def isFlushed: Boolean = mutex.synchronized{ presentTuples  == 0 }
 
-  override def flush: Future[Map[Key, Value]] = {
-    didFlush // bumps timeout on the flush conditions
-    val toSum = ArrayBuffer[Map[Key, Value]]()
-    queue.drainTo(toSum.asJava)
+  override def flush: Future[Map[Key, Value]] =
     workPool {
-      Semigroup.sumOption(toSum).getOrElse(Map.empty)
+      val curData = mutex.synchronized {
+        didFlush // bumps timeout on the flush conditions
+        presentTuples = 0
+        val l = queueMap.toList
+        queueMap.clear
+        l
+      }
+      curData.flatMap { case (k, listV) =>
+        sg.sumOption(listV).map(v => (k, v))
+      }(breakOut)
     }
-  }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
-    if(!queue.offer(curData)) {
-      flush.map { flushRes =>
-        Semigroup.plus(flushRes, curData)
+    var newlyAddedTuples = 0
+
+    mutex.synchronized {
+      vals.foreach { case (k, v) =>
+        val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
+        existingV += v
+        newlyAddedTuples += 1
       }
+      presentTuples += newlyAddedTuples
     }
-    else {
-      Future.value(Map.empty)
-    }
+
+    if(presentTuples >= bufferSize.v)
+      flush
+    else
+      Future.value(emptyResult)
   }
 }
