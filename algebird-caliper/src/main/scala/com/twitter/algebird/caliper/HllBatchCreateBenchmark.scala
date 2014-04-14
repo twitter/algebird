@@ -1,11 +1,11 @@
 package com.twitter.algebird.caliper
 
-import com.google.caliper.{Param, SimpleBenchmark}
+import com.google.caliper.{Benchmark, Param}
 import com.twitter.algebird.HyperLogLogMonoid
-
+import com.twitter.bijection._
 import java.nio.ByteBuffer
 
-class HllBatchCreateBenchmark extends SimpleBenchmark {
+class HllBatchCreateBenchmark extends Benchmark{
   @Param(Array("5", "10", "17", "25"))
   val bits: Int = 0
 
@@ -14,13 +14,7 @@ class HllBatchCreateBenchmark extends SimpleBenchmark {
 
   var set: Set[Long] = _
 
-  /* Don't use twitter bijection to reduce dependencies on other projects */
-  implicit def injection(value: Long) = {
-    val size = 8
-    val buf = ByteBuffer.allocate(size)
-    buf.putLong(value)
-    buf.array
-  }
+  implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
 
   override def setUp {
     set = (0L until max).toSet
@@ -30,7 +24,7 @@ class HllBatchCreateBenchmark extends SimpleBenchmark {
     val hllMonoid = new HyperLogLogMonoid(bits)
     var dummy = 0
     while (dummy < reps) {
-      val hll = hllMonoid.batchCreate(set)(injection)
+      val hll = hllMonoid.batchCreate(set)(byteEncoder.toFunction)
       dummy += 1
     }
     dummy
