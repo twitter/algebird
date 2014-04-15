@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.breakOut
+import com.twitter.algebird.matrix.AdaptiveMatrix
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
@@ -159,8 +160,8 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
   def frequency[V:Ordering](key: K, table: AdaptiveMatrix[V]): V =
     hashes
       .view
-      .zip(table.rowsByColumns)
-      .map { case (hash, row) => row(hash(key)) }
+      .zipWithIndex
+      .map { case (hash, row) => table.getValue(row, hash(key)) }
       .min
 
   /**
