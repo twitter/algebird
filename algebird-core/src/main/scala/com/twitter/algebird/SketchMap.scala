@@ -228,6 +228,7 @@ case class SketchMap[K, V](
   /**
    * Calculates the frequencies for every heavy hitter.
    */
+  @transient
   lazy val heavyHittersMapping: Map[K, V] =
     heavyHitterKeys.map { (item: K) => (item, frequencyCalculator(this, item)) }(breakOut)
 
