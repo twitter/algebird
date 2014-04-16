@@ -65,10 +65,9 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
       val maxBuffer = 1000
       def sumBuffer: Unit = {
-        val bufferIter = buffer.iterator
-        val newValuesTable = Monoid.sum(bufferIter.map(_.valuesTable))
-        val heavyHittersSet = Monoid.sum(bufferIter.map(_.heavyHitterKeys.toSet))
-        val newtotalValue = Monoid.sum(bufferIter.map(_.totalValue))
+        val newValuesTable = Monoid.sum(buffer.iterator.map(_.valuesTable))
+        val heavyHittersSet = Monoid.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
+        val newtotalValue = Monoid.sum(buffer.iterator.map(_.totalValue))
         buffer.clear()
         buffer += SketchMap(
           newValuesTable,
@@ -219,10 +218,10 @@ object SketchMap {
 }
 
 case class SketchMap[K, V](
-  valuesTable: AdaptiveMatrix[V],
-  heavyHitterKeys: List[K],
-  totalValue: V,
-  frequencyCalculator: (SketchMap[K, V], K) => V
+  val valuesTable: AdaptiveMatrix[V],
+  val heavyHitterKeys: List[K],
+  val totalValue: V,
+  private val frequencyCalculator: (SketchMap[K, V], K) => V
 ) extends java.io.Serializable {
 
   /**
