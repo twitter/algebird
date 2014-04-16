@@ -18,7 +18,7 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird._
 import com.twitter.util.{Duration, Future, FuturePool}
 import java.util.concurrent.ArrayBlockingQueue
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
 
 /**
@@ -42,7 +42,7 @@ class AsyncMapSum[Key, Value](bufferSize: BufferSize,
 
   override def flush: Future[Map[Key, Value]] = {
     didFlush // bumps timeout on the flush conditions
-    val toSum = ListBuffer[Map[Key, Value]]()
+    val toSum = ArrayBuffer[Map[Key, Value]]()
     queue.drainTo(toSum.asJava)
     workPool {
       Semigroup.sumOption(toSum).getOrElse(Map.empty)
