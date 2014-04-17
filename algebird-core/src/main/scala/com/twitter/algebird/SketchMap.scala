@@ -219,7 +219,7 @@ case class SketchMap[K, V](
   val valuesTable: AdaptiveMatrix[V],
   val heavyHitterKeys: List[K],
   val totalValue: V
-)(implicit valueOrdering: Ordering[V]) extends java.io.Serializable
+) extends java.io.Serializable
 
 /**
   * An Aggregator for the SketchMap.
