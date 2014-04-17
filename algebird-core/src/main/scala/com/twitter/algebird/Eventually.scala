@@ -58,7 +58,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   /**
    * used to avoid materializing the entire input in memory
    */
-  private def checkSize[T](buffer: Buffer[T])(implicit sg: Semigroup[T]) {
+  private[this] final def checkSize[T](buffer: Buffer[T])(implicit sg: Semigroup[T]) {
     if (buffer.size > maxBuffer) {
       val sum = Semigroup.sumOption(buffer)
       buffer.clear
@@ -83,9 +83,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
           v match {
             case Left(ve) => { // one left value => the right list needs to be converted
               val newBuffer = Buffer[E]()
-              if (bo.size > 0) {
-                Semigroup.sumOption(bo).map((sum) => newBuffer += convert(sum))
-              }
+              Semigroup.sumOption(bo).foreach((sum) => newBuffer += convert(sum))
               newBuffer += ve
               Left(newBuffer)
             }
