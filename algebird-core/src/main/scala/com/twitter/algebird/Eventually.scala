@@ -70,7 +70,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) ((buffer, v) => {
 
       def addToEventualBuffer(buffer: Buffer[E], value: Either[E, O]): Unit =
-        v match {
+        value match {
           case Left(ve) => buffer += ve
           case Right(vo) => buffer += convert(vo)
         }
