@@ -116,7 +116,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   }
 
   // Overriden by EventuallyGroup to ensure that the group laws are obeyed.
-  def left(e: E): Either[E, O] = Left(e)
+  protected def left(e: E): Either[E, O] = Left(e)
 
 }
 
