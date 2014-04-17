@@ -16,107 +16,121 @@ limitations under the License.
 
 package com.twitter.algebird
 
-// Classes that support algebraic structures with dynamic switching between
-// multiple representations.  In the case of Semigroup, we specify
-// - Two Semigroups L and R
-// - A Semigroup homomorphism convert: R => L
-// - A conditional mustConvert: R => Boolean
-// Then we get a Semigroup[Either[L,R]], where:
-//   Left(x)  + Left(y)  = Left(x+y)
-//   Left(x)  + Right(y) = Left(x+convert(y))
-//   Right(x) + Left(y)  = Left(convert(x)+y)
-//   Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y)
-//                         Right(x+y) otherwise.
-// EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously,
-// with the contract that convert respect the appropriate structure.
+/**
+ * Classes that support algebraic structures with dynamic switching between
+ * two representations, the original type O and the eventual type E.
+ * In the case of Semigroup, we specify
+ * - Two Semigroups eventualSemigroup and originalSemigroup
+ * - A Semigroup homomorphism convert: O => E
+ * - A conditional mustConvert: O => Boolean
+ * Then we get a Semigroup[Either[E,O]], where:
+ *   Left(x)  + Left(y)  = Left(x+y)
+ *   Left(x)  + Right(y) = Left(x+convert(y))
+ *   Right(x) + Left(y)  = Left(convert(x)+y)
+ *   Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y)
+ *                         Right(x+y) otherwise.
+ * EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously,
+ * with the contract that convert respect the appropriate structure.
+ *
+ * @param E eventual type
+ * @param O original type
+ */
+class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
+  (implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
 
-class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
-  (implicit lSemigroup: Semigroup[L], rSemigroup: Semigroup[R]) extends Semigroup[Either[L,R]] {
-
-  override def plus(x: Either[L,R], y: Either[L,R]) = {
+  override def plus(x: Either[E, O], y: Either[E, O]) = {
     x match {
-      case Left(xl) => y match {
-        case Left(yl) => left(Semigroup.plus(xl, yl))
-        case Right(yr) => left(Semigroup.plus(xl, convert(yr)))
+      case Left(xe) => y match {
+        case Left(ye) => left(Semigroup.plus(xe, ye))
+        case Right(yo) => left(Semigroup.plus(xe, convert(yo)))
       }
-      case Right(xr) => y match {
-        case Left(yl) => left(Semigroup.plus(convert(xr), yl))
-        case Right(yr) => conditionallyConvert(Semigroup.plus(xr, yr))
+      case Right(xo) => y match {
+        case Left(ye) => left(Semigroup.plus(convert(xo), ye))
+        case Right(yo) => conditionallyConvert(Semigroup.plus(xo, yo))
       }
     }
   }
 
-  override def sumOption(iter: TraversableOnce[Either[L,R]]): Option[Either[L,R]] = {
+  override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
     import scala.collection.mutable.ArrayBuffer
-    iter.foldLeft[Either[ArrayBuffer[L], ArrayBuffer[R]]](Right(new ArrayBuffer[R]))((acc, v) => {
+    iter.foldLeft[Either[ArrayBuffer[E], ArrayBuffer[O]]](Right(new ArrayBuffer[O]))((acc, v) => {
       // turns the list of either into an either of lists
       acc match {
-        case Left(al) => v match {
-          case Left(vl) => al += vl
-          case Right(vr) => al += convert(vr)
+        case Left(ae) => v match {
+          case Left(ve) => ae += ve
+          case Right(vo) => ae += convert(vo)
         }; acc // left stays left we just add to the buffer and convert if needed
-        case Right(ar) => v match {
-          case Left(vl) => Left(ar.map(convert(_)) += vl) // one left value => the right list needs to be converted
-          case Right(vr) => ar += vr; acc // otherwise stays right, just add to the buffer
+        case Right(ao) => v match {
+          case Left(ve) => Left(ao.map(convert(_)) += ve) // one left value => the right list needs to be converted
+          case Right(vo) => ao += vo; acc // otherwise stays right, just add to the buffer
         }
       }
     }) match { // finally apply sumOption accordingly
-       case Left(bl) => lSemigroup.sumOption(bl).map(left(_))
-       case Right(br) => rSemigroup.sumOption(br).map(conditionallyConvert(_)) // and optionally convert
+       case Left(be) => eventualSemigroup.sumOption(be).map(left(_))
+       case Right(bo) => originalSemigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
     }
   }
 
-  def conditionallyConvert(r: R) = {
-    if (mustConvert(r)) {
-      left(convert(r))
+  def conditionallyConvert(o: O) = {
+    if (mustConvert(o)) {
+      left(convert(o))
     } else {
-      Right(r)
+      Right(o)
     }
   }
 
   // Overriden by EventuallyGroup to ensure that the group laws are obeyed.
-  def left(l: L): Either[L,R] = Left(l)
+  def left(e: E): Either[E, O] = Left(e)
 
 }
 
-class EventuallyMonoid[L,R](convert: R => L)(mustConvert: R => Boolean)
-  (implicit lSemigroup: Semigroup[L], rMonoid: Monoid[R]) extends EventuallySemigroup[L,R](convert)(mustConvert)
-  with Monoid[Either[L,R]] {
+/**
+ * @see EventuallySemigroup
+ */
+class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)
+  (implicit lSemigroup: Semigroup[E], rMonoid: Monoid[O]) extends EventuallySemigroup[E, O](convert)(mustConvert)
+  with Monoid[Either[E, O]] {
 
-  override def zero = Right(Monoid.zero[R])
+  override def zero = Right(Monoid.zero[O])
 
 }
 
-class EventuallyGroup[L,R](convert: R => L)(mustConvert: R => Boolean)
-  (implicit lGroup: Group[L], rGroup: Group[R]) extends EventuallyMonoid[L,R](convert)(mustConvert)
-  with Group[Either[L,R]] {
+/**
+ * @see EventuallySemigroup
+ */
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)
+  (implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
+  with Group[Either[E, O]] {
 
-  override def negate(x: Either[L,R]) = {
+  override def negate(x: Either[E, O]) = {
     x match {
-      case Left(xl) => left(Group.negate(xl))
-      case Right(xr) => Right(Group.negate(xr))
+      case Left(xe) => left(Group.negate(xe))
+      case Right(xo) => Right(Group.negate(xo))
     }
   }
 
-  override def left(l: L) = if (Monoid.isNonZero(l)) Left(l) else zero
+  override def left(e: E) = if (Monoid.isNonZero(e)) Left(e) else zero
 
 }
 
-class EventuallyRing[L,R](convert: R => L)(mustConvert: R => Boolean)
-  (implicit lRing: Ring[L], rRing: Ring[R]) extends EventuallyGroup[L,R](convert)(mustConvert)
-  with Ring[Either[L,R]] {
+/**
+ * @see EventuallySemigroup
+ */
+class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)
+  (implicit lRing: Ring[E], rRing: Ring[O]) extends EventuallyGroup[E, O](convert)(mustConvert)
+  with Ring[Either[E, O]] {
 
-  override def one = Right(Ring.one[R])
+  override def one = Right(Ring.one[O])
 
-  override def times(x: Either[L,R], y: Either[L,R]) = {
+  override def times(x: Either[E, O], y: Either[E,O]) = {
     x match {
-      case Left(xl) => y match {
-        case Left(yl) => left(Ring.times(xl, yl))
-        case Right(yr) => left(Ring.times(xl, convert(yr)))
+      case Left(xe) => y match {
+        case Left(ye) => left(Ring.times(xe, ye))
+        case Right(yo) => left(Ring.times(xe, convert(yo)))
       }
-      case Right(xr) => y match {
-        case Left(yl) => left(Ring.times(convert(xr), yl))
-        case Right(yr) => conditionallyConvert(Ring.times(xr, yr))
+      case Right(xo) => y match {
+        case Left(ye) => left(Ring.times(convert(xo), ye))
+        case Right(yo) => conditionallyConvert(Ring.times(xo, yo))
       }
     }
   }
