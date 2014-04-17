@@ -48,15 +48,17 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
    */
   val zero: SketchMap[K, V] = SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero, internalFrequency(_: SketchMap[K, V], _: K))
 
+  def buildSketchMap(valuesTable: AdaptiveMatrix[V], heavyHitterKeys: List[K], totalValue: V): SketchMap[K, V] =
+    SketchMap(valuesTable, heavyHitterKeys, totalValue, internalFrequency(_: SketchMap[K, V], _: K))
+
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
     val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
     val newHeavyHitters = left.heavyHitterKeys.toSet ++ right.heavyHitterKeys
 
-    SketchMap(
+    buildSketchMap(
       newValuesTable,
       params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
-      Monoid.plus(left.totalValue, right.totalValue),
-      internalFrequency(_: SketchMap[K, V], _: K))
+      Monoid.plus(left.totalValue, right.totalValue))
   }
 
   override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
@@ -69,11 +71,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
         val heavyHittersSet = Monoid.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
         val newtotalValue = Monoid.sum(buffer.iterator.map(_.totalValue))
         buffer.clear()
-        buffer += SketchMap(
+        buffer += buildSketchMap(
           newValuesTable,
           params.updatedHeavyHitters(heavyHittersSet.toSeq, newValuesTable),
-          newtotalValue,
-          internalFrequency(_: SketchMap[K, V], _: K))
+          newtotalValue)
       }
 
       items.foreach { sm =>
@@ -105,7 +106,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       }
     }
 
-    SketchMap(newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue, internalFrequency(_: SketchMap[K, V], _: K))
+    buildSketchMap(newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
   }
 
   private def internalFrequency(sm: SketchMap[K,V], key: K): V =
