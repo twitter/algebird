@@ -66,8 +66,6 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     }
   }
 
-  val o = new Object()
-
   override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
     iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) ((buffer, v) => {
       // turns the list of either into an either of lists
