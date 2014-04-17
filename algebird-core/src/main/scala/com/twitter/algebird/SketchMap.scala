@@ -46,10 +46,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   /**
    * A zero Sketch Map is one with zero elements.
    */
-  val zero: SketchMap[K, V] = SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero, internalFrequency(_: SketchMap[K, V], _: K))
+  val zero: SketchMap[K, V] = buildSketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
 
   def buildSketchMap(valuesTable: AdaptiveMatrix[V], heavyHitterKeys: List[K], totalValue: V): SketchMap[K, V] =
-    SketchMap(valuesTable, heavyHitterKeys, totalValue, internalFrequency(_: SketchMap[K, V], _: K))
+    SketchMap(valuesTable, heavyHitterKeys, totalValue, params)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
     val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
@@ -109,16 +109,13 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
     buildSketchMap(newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
   }
 
-  private def internalFrequency(sm: SketchMap[K,V], key: K): V =
-    params.frequency(key, sm.valuesTable)
-
   /**
    * Calculates the approximate frequency for any key.
    */
   def frequency(sm: SketchMap[K,V], key: K): V =
     // If the key is a heavy hitter, then use the precalculated heavy hitters mapping.
     // Otherwise, calculate it normally.
-    sm.heavyHittersMapping.getOrElse(key, internalFrequency(sm, key))
+    sm.heavyHittersMapping.getOrElse(key, params.frequency(key, sm.valuesTable))
 
   /**
    * Returns a sorted list of heavy hitter key/value tuples.
@@ -222,15 +219,15 @@ case class SketchMap[K, V](
   val valuesTable: AdaptiveMatrix[V],
   val heavyHitterKeys: List[K],
   val totalValue: V,
-  private val frequencyCalculator: (SketchMap[K, V], K) => V
-) extends java.io.Serializable {
+  val params: SketchMapParams[K]
+)(implicit valueOrdering: Ordering[V]) extends java.io.Serializable {
 
   /**
    * Calculates the frequencies for every heavy hitter.
    */
   @transient
   lazy val heavyHittersMapping: Map[K, V] =
-    heavyHitterKeys.map { (item: K) => (item, frequencyCalculator(this, item)) }(breakOut)
+    heavyHitterKeys.map { (item: K) => (item, params.frequency(item, valuesTable)) }(breakOut)
 
 }
 
