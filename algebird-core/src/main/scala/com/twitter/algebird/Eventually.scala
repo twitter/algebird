@@ -46,6 +46,26 @@ class EventuallySemigroup[L,R](convert: R => L)(mustConvert: R => Boolean)
     }
   }
 
+  override def sumOption(iter: TraversableOnce[Either[L,R]]): Option[Either[L,R]] = {
+    import scala.collection.mutable.ArrayBuffer
+    iter.foldLeft[Either[ArrayBuffer[L], ArrayBuffer[R]]](Right(new ArrayBuffer[R]))((acc, v) => {
+      // turns the list of either into an either of lists
+      acc match {
+        case Left(al) => v match {
+          case Left(vl) => al += vl
+          case Right(vr) => al += convert(vr)
+        }; acc // left stays left we just add to the buffer and convert if needed
+        case Right(ar) => v match {
+          case Left(vl) => Left(ar.map(convert(_)) += vl) // one left value => the right list needs to be converted
+          case Right(vr) => ar += vr; acc // otherwise stays right, just add to the buffer
+        }
+      }
+    }) match { // finally apply sumOption accordingly
+       case Left(bl) => lSemigroup.sumOption(bl).map(left(_))
+       case Right(br) => rSemigroup.sumOption(br).map(conditionallyConvert(_)) // and optionally convert
+    }
+  }
+
   def conditionallyConvert(r: R) = {
     if (mustConvert(r)) {
       left(convert(r))
