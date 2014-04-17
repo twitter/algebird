@@ -62,6 +62,21 @@ class EventuallyTest extends Specification {
       eventuallyMonoid.plus(Left(long.length), Left(short.length)) must be_==(Left(short.length + long.length))
     }
 
+    "sumOption L,L,L" in {
+      eventuallyMonoid.sum(List(Left(short.length), Left(short.length), Left(short.length))) must be_==(Left(3 * short.length))
+      eventuallyMonoid.sum(List(Left(long.length), Left(short.length), Left(short.length))) must be_==(Left(2 * short.length + long.length))
+    }
+
+    "sumOption L,R,L" in {
+      eventuallyMonoid.sum(List(Left(short.length), Right(short), Left(short.length))) must be_==(Left(3 * short.length))
+      eventuallyMonoid.sum(List(Left(long.length), Right(short), Left(short.length))) must be_==(Left(2 * short.length + long.length))
+    }
+
+    "sumOption R,R,R" in {
+      eventuallyMonoid.sum(List(Right(short), Right(short), Right(short))) must be_==(Right(short + short + short))
+      eventuallyMonoid.sum(List(Right(long), Right(short), Right(short))) must be_==(Left(2 * short.length + long.length))
+    }
+
   }
 
 }
