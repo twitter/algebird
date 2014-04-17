@@ -66,21 +66,36 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     }
   }
 
+  val o = new Object()
+
   override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
-    iter.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]()))((buffer, v) => {
+    iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) ((buffer, v) => {
       // turns the list of either into an either of lists
       buffer match {
-        case Left(be) => checkSize(be); v match {
-          case Left(ve) => be += ve
-          case Right(vo) => be += convert(vo)
-        }; buffer // left stays left we just add to the buffer and convert if needed
-        case Right(bo) => checkSize(bo); v match {
-          case Left(ve) => { // one left value => the right list needs to be converted
-            val newBuffer = Buffer[E]()
-            Semigroup.sumOption(bo).map((sum) => Buffer[E]() += convert(sum))
-            Left(newBuffer)
+        case Left(be) => {
+          checkSize(be)
+          v match {
+            case Left(ve) => be += ve
+            case Right(vo) => be += convert(vo)
           }
-          case Right(vo) => bo += vo; buffer // otherwise stays right, just add to the buffer
+          buffer // left stays left we just add to the buffer and convert if needed
+        }
+        case Right(bo) => {
+          checkSize(bo)
+          v match {
+            case Left(ve) => { // one left value => the right list needs to be converted
+              val newBuffer = Buffer[E]()
+              if (bo.size > 0) {
+                Semigroup.sumOption(bo).map((sum) => newBuffer += convert(sum))
+              }
+              newBuffer += ve
+              Left(newBuffer)
+            }
+            case Right(vo) => {
+              bo += vo
+              buffer // otherwise stays right, just add to the buffer
+            }
+          }
         }
       }
     }) match { // finally apply sumOption accordingly
@@ -140,7 +155,7 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)
 
   override def one = Right(Ring.one[O])
 
-  override def times(x: Either[E, O], y: Either[E,O]) = {
+  override def times(x: Either[E, O], y: Either[E, O]) = {
     x match {
       case Left(xe) => y match {
         case Left(ye) => left(Ring.times(xe, ye))

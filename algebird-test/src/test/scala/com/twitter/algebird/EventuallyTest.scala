@@ -35,6 +35,10 @@ class EventuallyTest extends Specification {
   val med = Stream.continually("bar").take(20).mkString("")
   val long = Stream.continually("bell").take(100).mkString("")
 
+  // max batch is 1000
+  val listOfRights = Stream.continually[Either[Int, String]](Right(short)).take(1010).toList
+  val listOfLefts = Stream.continually[Either[Int, String]](Left(short.length)).take(1010).toList
+
   "EventuallyMonoid" should {
 
     "have the right zero" in {
@@ -75,6 +79,14 @@ class EventuallyTest extends Specification {
     "sumOption R,R,R" in {
       eventuallyMonoid.sum(List(Right(short), Right(short), Right(short))) must be_==(Right(short + short + short))
       eventuallyMonoid.sum(List(Right(long), Right(short), Right(short))) must be_==(Left(2 * short.length + long.length))
+    }
+
+    "sumOption 1010 R, L ,R" in {
+      eventuallyMonoid.sum(listOfRights :+ Left(short.length) :+ Right(short) ) must be_==(Left(1012 * short.length))
+    }
+
+    "sumOption 1010 L, R ,L" in {
+      eventuallyMonoid.sum(listOfLefts :+ Right(short) :+ Left(short.length) ) must be_==(Left(1012 * short.length))
     }
 
   }
