@@ -107,7 +107,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     }
   }
 
-  def conditionallyConvert(o: O): Either[E, O] = {
+  protected def conditionallyConvert(o: O): Either[E, O] = {
     if (mustConvert(o)) {
       left(convert(o))
     } else {
