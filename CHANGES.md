@@ -1,5 +1,17 @@
 # Algebird #
 
+### Version 0.6.0 ###
+* make constructors for SpaceSaver subclasses public so that deserializers..: https://github.com/twitter/algebird/pull/289
+* Restoring optimized SketchMapMonoid#sumOption: https://github.com/twitter/algebird/pull/293
+* Newer caliper hll benchmark: https://github.com/twitter/algebird/pull/297
+* hll optimization: https://github.com/twitter/algebird/pull/299
+* Optimize the storage backend used in sketch map: https://github.com/twitter/algebird/pull/301
+* migrate async summers from Summingbird: https://github.com/twitter/algebird/pull/296
+* add sumOption to EventuallySemiGroup: https://github.com/twitter/algebird/pull/306
+* Heavyhitters no longer attempts lazy storage in SketchMap: https://github.com/twitter/algebird/pull/305
+* Async Maps performance improvements: https://github.com/twitter/algebird/pull/302
+* Make the AsyncListSum be immutable again: https://github.com/twitter/algebird/pull/309
+
 ### Version 0.5.0 ###
 * Remove handling that doesn't seem needed/wanted for longs: https://github.com/twitter/algebird/pull/287
 * Add average() for DecayedValue: https://github.com/twitter/algebird/pull/286
