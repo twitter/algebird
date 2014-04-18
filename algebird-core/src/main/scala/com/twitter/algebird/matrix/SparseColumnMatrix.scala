@@ -62,4 +62,14 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
     updateInto(buf)
     DenseMatrix(rows, cols, buf)
   }
+
+  override def toString: String = {
+    val builder = new scala.collection.mutable.StringBuilder()
+    builder ++= "Row: %d, Cols: %d. Dense elements:\n".format(rows, cols)
+    rowsByColumns.foreach {v =>
+      builder ++= v.denseIterator.toList.toString
+      builder ++= "\n"
+    }
+    builder.toString
+  }
 }

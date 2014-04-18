@@ -64,10 +64,9 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
       val maxBuffer = 1000
       def sumBuffer: Unit = {
-        val bufferView = buffer.view
-        val newValuesTable = Monoid.sum(bufferView.map(_.valuesTable))
-        val heavyHittersSet = Monoid.sum(bufferView.map(_.heavyHitterKeys.toSet))
-        val newtotalValue = Monoid.sum(bufferView.map(_.totalValue))
+        val newValuesTable = Monoid.sum(buffer.iterator.map(_.valuesTable))
+        val heavyHittersSet = Monoid.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
+        val newtotalValue = Monoid.sum(buffer.iterator.map(_.totalValue))
         buffer.clear()
         buffer += SketchMap(
           newValuesTable,
@@ -111,21 +110,18 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
    * Calculates the approximate frequency for any key.
    */
   def frequency(sm: SketchMap[K,V], key: K): V =
-    // If the key is a heavy hitter, then use the precalculated heavy hitters mapping.
-    // Otherwise, calculate it normally.
-    heavyHittersMapping(sm).getOrElse(key, params.frequency(key, sm.valuesTable))
+    params.frequency(key, sm.valuesTable)
 
-  /**
-   * All of the Heavy Hitter frequencies calculated all at once.
-   */
-  private def heavyHittersMapping(sm: SketchMap[K,V]): Map[K, V] =
-    params.calculateHeavyHittersMapping(sm.heavyHitterKeys, sm.valuesTable)
+  def frequencyWithHHCache(sm: SketchMap[K,V]): K => V = {
+    val hhMap: Map[K, V] = heavyHitters(sm).toMap
+    (k: K) => hhMap.getOrElse(k, frequency(sm, k))
+  }
 
   /**
    * Returns a sorted list of heavy hitter key/value tuples.
    */
   def heavyHitters(sm: SketchMap[K,V]) : List[(K, V)] =
-    sm.heavyHitterKeys.map { item => (item, heavyHittersMapping(sm).getOrElse(item, monoid.zero)) }
+    sm.heavyHitterKeys.map { item => (item, frequency(sm, item)) }
 }
 
 
@@ -149,17 +145,11 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
   }
 
   /**
-   * Calculates the frequencies for every heavy hitter.
-   */
-  def calculateHeavyHittersMapping[V:Ordering](keys: Iterable[K], table: AdaptiveMatrix[V]): Map[K, V] =
-    keys.map { (item: K) => (item, frequency(item, table)) }(breakOut)
-
-  /**
    * Calculates the frequency for a key given a values table.
    */
   def frequency[V:Ordering](key: K, table: AdaptiveMatrix[V]): V =
     hashes
-      .view
+      .iterator
       .zipWithIndex
       .map { case (hash, row) => table.getValue(row, hash(key)) }
       .min
@@ -169,9 +159,8 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
    * arbitrary list of keys.
    */
   def updatedHeavyHitters[V:Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
-    val mapping = calculateHeavyHittersMapping(hitters, table)
-    val specificOrdering = Ordering.by[K, V] { mapping(_) } reverse
-
+    val mapping: Map[K, V] = hitters.map(item => (item, frequency(item, table)))(breakOut)
+    val specificOrdering = Ordering.by[K, V] { mapping(_) }.reverse
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
   }
 }
