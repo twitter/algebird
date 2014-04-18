@@ -5,6 +5,7 @@ import scala.collection.immutable.SortedMap
 object SpaceSaver {
   /**
     * Construct SpaceSaver with given capacity containing a single item.
+    * This is the public api to create a new SpaceSaver.
     */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
@@ -18,8 +19,8 @@ object SpaceSaver {
   * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
   * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
   * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
-  * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
-  * or preserve the guarantees or benefits of the algorithm.
+  * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven
+  *  to be mathematically correct or preserve the guarantees or benefits of the algorithm.
   */
 sealed abstract class SpaceSaver[T] {
   import SpaceSaver.ordering
@@ -94,31 +95,26 @@ case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
     case other: SSOne[_] => SSMany(this).add(other)
     case other: SSMany[_] => other.add(this)
   }
-
 }
 
 object SSMany {
-  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]): SSMany[T] =
-    SSMany(capacity, counters, Some(buckets))
+  private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] = 
+    SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
 
   private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
-    SSMany(capacity, counters, None)
+    SSMany(capacity, counters, bucketsFromCounters(counters))
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
     SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
-  //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
-
-  lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
-    case Some(buckets) => buckets
-    case None => SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
-  }
+case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
+  //assert(buckets.values.map(_.size).sum == counters.size)
+  //assert(buckets == SSMany.bucketsFromCounters(counters))
 
   private val exact: Boolean = counters.size < capacity
 
-  lazy val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
+  val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
 
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
@@ -163,7 +159,6 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOptio
   }
 
   // merge two stream summaries
-  // defer the creation of buckets since more pairwise merges might be necessary and buckets are not used for those
   private def merge(x: SSMany[T]): SSMany[T] = {
     require(x.capacity == capacity)
     val counters1 = Map() ++
@@ -183,11 +178,9 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOptio
     case other: SSOne[_] => add(other)
     case other: SSMany[_] => merge(other)
   }
-
 }
 
 class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
 
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
-
 }
