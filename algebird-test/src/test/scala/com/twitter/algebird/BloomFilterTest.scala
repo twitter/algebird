@@ -24,9 +24,75 @@ object BloomFilterLaws extends Properties("BloomFilter") {
   property("BloomFilter is a Monoid") = monoidLaws[BF]
 }
 
+object BFHashIndices extends Properties("BFHash") {
+  import org.scalacheck.Prop.forAll
+
+  val NUM_HASHES = 10
+  val WIDTH = 4752800
+
+  val SEED = 1
+
+  implicit val bfHash: Arbitrary[BFHash] =
+    Arbitrary {
+      for {
+        hashes <- choose(1, 10)
+        width <- choose(100, 5000000)
+      } yield BFHash(hashes, width, SEED)
+    }
+
+  property("Indices are non negative") = forAll{ (hash: BFHash, v: Long) => hash.apply(v.toString).forall(_ >= 0) }
+
+  /**
+   *   This is the version of the BFHash as of before the "negative values fix"
+   */
+  case class NegativeBFHash(numHashes: Int, width: Int, seed: Long = 0L) {
+    val size = numHashes
+
+    def apply(s: String) = nextHash(s.getBytes, numHashes)
+
+    private def splitLong(x: Long) = {
+      val upper = math.abs(x >> 32).toInt
+      val lower = math.abs((x << 32) >> 32).toInt
+      (upper, lower)
+    }
+
+    private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
+      if(k == 0)
+        Stream.empty
+      else{
+        val d = if(digested.isEmpty){
+          val (a, b) = MurmurHash128(k)(bytes)
+          val (x1, x2) = splitLong(a)
+          val (x3, x4) = splitLong(b)
+          Seq(x1, x2, x3, x4)
+        }else
+          digested
+
+        Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
+      }
+    }
+  }
+
+  implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
+    Arbitrary {
+      for {
+        hashes <- choose(1, 10)
+        width <- choose(100, 5000000)
+      } yield (BFHash(hashes, width, SEED), NegativeBFHash(hashes, width, SEED))
+    }
+
+  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") =
+    forAll{
+      (pair: (BFHash, NegativeBFHash), v: Long) =>
+        val s = v.toString
+        val (hash, negativeHash) = pair
+        val indices = negativeHash.apply(s)
+        indices == hash.apply(s) || indices.exists(_ < 0)
+    }
+}
+
 
 class BloomFilterTest extends Specification {
-
 
   val SEED = 1
   val RAND = new scala.util.Random
@@ -118,6 +184,19 @@ class BloomFilterTest extends Specification {
       bf.contains("1").isTrue must be_==(true)
       val bytesAfterSizeCalled = new String(serialize(bf))
       bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
+    }
+
+    /**
+     * this test failed before the fix for https://github.com/twitter/algebird/issues/229
+     */
+    "not have negative hash values" in {
+      val NUM_HASHES = 2
+      val WIDTH = 4752800
+      val bfHash = BFHash(NUM_HASHES, WIDTH, SEED)
+      val s = "7024497610539761509"
+      val index = bfHash.apply(s).head
+
+      index must be_>=(0)
     }
   }
 }

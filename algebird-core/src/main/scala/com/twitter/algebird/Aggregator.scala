@@ -20,26 +20,35 @@ object Aggregator extends java.io.Serializable {
     def reduce(l : T, r : T) = sg.plus(l, r)
     def present(reduction : T) = reduction
   }
-  def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T,T,T] = new MonoidAggregator[T,T,T] {
-    def prepare(input : T) = input
+  def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T,T,T] = fromMonoid[T,T](mon,identity[T])
+  // Uses the product from the ring
+  def fromRing[T](implicit rng: Ring[T]): RingAggregator[T,T,T] = fromRing[T,T](rng,identity[T])
+
+  def fromMonoid[F,T](implicit mon: Monoid[T],prep: F=>T): MonoidAggregator[F,T,T] = new MonoidAggregator[F,T,T] {
+    def prepare(input : F) = prep(input)
     def monoid = mon
     def present(reduction : T) = reduction
   }
   // Uses the product from the ring
-  def fromRing[T](implicit rng: Ring[T]): RingAggregator[T,T,T] = new RingAggregator[T,T,T] {
-    def prepare(input : T) = input
+  def fromRing[F,T](implicit rng: Ring[T],prep: F=>T): RingAggregator[F,T,T] = new RingAggregator[F,T,T] {
+    def prepare(input : F) = prep(input)
     def ring = rng
     def present(reduction : T) = reduction
   }
 }
 
-trait Aggregator[-A,B,+C] extends Function1[TraversableOnce[A], C] with java.io.Serializable { self =>
+trait Aggregator[-A,B,+C] extends java.io.Serializable { self =>
   def prepare(input : A) : B
   def reduce(l : B, r : B) : B
   def present(reduction : B) : C
 
   def reduce(items : TraversableOnce[B]) : B = items.reduce{reduce(_,_)}
   def apply(inputs : TraversableOnce[A]) : C = present(reduce(inputs.map{prepare(_)}))
+
+  def append(l: B,r: A): B=reduce(l,prepare(r))
+
+  def appendAll(old: B, items: TraversableOnce[A]): B =
+    if (items.isEmpty) old else reduce(old, reduce(items.map(prepare)))
 
   /** Like calling andThen on the present function */
   def andThenPresent[D](present2: C => D): Aggregator[A,B,D] =
@@ -62,6 +71,8 @@ trait MonoidAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   final def reduce(l : B, r : B) : B = monoid.plus(l, r)
   final override def reduce(items : TraversableOnce[B]) : B =
     monoid.sum(items)
+
+  def appendAll(items:TraversableOnce[A]): B=appendAll(monoid.zero,items)
 }
 
 trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
@@ -70,4 +81,6 @@ trait RingAggregator[-A,B,+C] extends Aggregator[A,B,C] {
   final override def reduce(items : TraversableOnce[B]) : B =
     if(items.isEmpty) ring.one // There are several pseudo-rings, so avoid one if you can
     else items.reduceLeft(reduce _)
+
+  def appendAll(items:TraversableOnce[A]): B=appendAll(ring.one,items)
 }

@@ -42,7 +42,7 @@ object SummingQueue {
 }
 
 class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: Semigroup[V])
-  extends (V => Option[V]) with StatefulSummer[V] {
+  extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None

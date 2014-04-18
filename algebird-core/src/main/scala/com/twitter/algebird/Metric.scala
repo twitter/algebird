@@ -101,6 +101,6 @@ object Metric {
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")
-trait Metric[@specialized(Int,Long,Float,Double) -V] extends Function2[V, V, Double] with java.io.Serializable {
+trait Metric[@specialized(Int,Long,Float,Double) -V] extends java.io.Serializable {
   def apply(v1: V, v2: V): Double
 }

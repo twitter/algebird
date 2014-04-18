@@ -1,5 +1,49 @@
 # Algebird #
 
+### Version 0.6.0 ###
+* make constructors for SpaceSaver subclasses public so that deserializers..: https://github.com/twitter/algebird/pull/289
+* Restoring optimized SketchMapMonoid#sumOption: https://github.com/twitter/algebird/pull/293
+* Newer caliper hll benchmark: https://github.com/twitter/algebird/pull/297
+* hll optimization: https://github.com/twitter/algebird/pull/299
+* Optimize the storage backend used in sketch map: https://github.com/twitter/algebird/pull/301
+* migrate async summers from Summingbird: https://github.com/twitter/algebird/pull/296
+* add sumOption to EventuallySemiGroup: https://github.com/twitter/algebird/pull/306
+* Heavyhitters no longer attempts lazy storage in SketchMap: https://github.com/twitter/algebird/pull/305
+* Async Maps performance improvements: https://github.com/twitter/algebird/pull/302
+* Make the AsyncListSum be immutable again: https://github.com/twitter/algebird/pull/309
+
+### Version 0.5.0 ###
+* Remove handling that doesn't seem needed/wanted for longs: https://github.com/twitter/algebird/pull/287
+* Add average() for DecayedValue: https://github.com/twitter/algebird/pull/286
+* SketchMapParams can support being constructed with both width/depth and eps/delta: https://github.com/twitter/algebird/pull/285
+* undo the undo of the interval fixes: https://github.com/twitter/algebird/pull/283
+* Fix priority queue bug found by scalacheck: https://github.com/twitter/algebird/pull/280
+* Adds type parameters to Intersection for more precision: https://github.com/twitter/algebird/pull/279
+* Make resolver consistent with scalding: https://github.com/twitter/algebird/pull/276
+* remove Math use in test: https://github.com/twitter/algebird/pull/275
+* Remove extends function from algebird: https://github.com/twitter/algebird/pull/274
+* remove unnecessary implicit requirement: https://github.com/twitter/algebird/pull/272
+* Fix SketchMapMonoid zero: https://github.com/twitter/algebird/pull/269
+* Make SketchMapMonoid params public: https://github.com/twitter/algebird/pull/265
+* Add Predecessible and methods to Interval: https://github.com/twitter/algebird/pull/262
+* Implement StreamSummary data structure for finding frequent/top-k items: https://github.com/twitter/algebird/pull/259
+
+### Version 0.4.0 ###
+* Make SketchMap1 the only SketchMap implementation: https://github.com/twitter/algebird/pull/256
+* Use semigroup in StateWithError: https://github.com/twitter/algebird/pull/255
+* Don't iterate through everything in unit monoid: https://github.com/twitter/algebird/pull/253
+* Factor as much logic as possible into SketchmapMonoid1: https://github.com/twitter/algebird/pull/251
+* Moving Trampoline flatMap implementation into trait: https://github.com/twitter/algebird/pull/249
+* Integrate Caliper: https://github.com/twitter/algebird/pull/248
+* Adds append method to MonoidAggregator and RingAggregator: https://github.com/twitter/algebird/pull/246
+* Make the map monoid more performant for mutable maps: https://github.com/twitter/algebird/pull/245
+* Make BFHash take on non negative values only: https://github.com/twitter/algebird/pull/243
+* Fixed DecayedValue: https://github.com/twitter/algebird/pull/238
+* Updated scaladoc to 0.3.0: https://github.com/twitter/algebird/pull/237
+* Add Incrementable and tests: https://github.com/twitter/algebird/pull/234
+* Updates sbt runner: https://github.com/twitter/algebird/pull/232
+* Upgrade sbt, specs, add a build.properties, and bump travis's target: https://github.com/twitter/algebird/pull/231
+
 ### Version 0.3.1 ###
 * Make a field transient in BloomFilter serialization: https://github.com/twitter/algebird/pull/209
 * Add the TunnelMonoid to Util (like async function monoid): https://github.com/twitter/algebird/pull/213
