@@ -37,50 +37,23 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
                                           extends AsyncSummer[(Key, Value), Map[Key, Value]]
                                           with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
- private class MapContainer private (val next: Value, privBuf: ListBuffer[Value], var elementsCommitted: Int) {
-    def this(v: Value) = this(v, ListBuffer[Value](), 0)
-    private var valuesStored: Int = 0
-    @volatile private var comitted = false
+ private case class MapContainer (privBuf: List[Value], size: Int) {
+    def this(v: Value) = this(List[Value](v), 1)
 
-    def commit {
-      this.synchronized {
-        if(!comitted) {
-          privBuf += next
-          comitted = true
-          elementsCommitted += 1
-        }
-      }
-    }
-
-    def size = {
-      if(comitted)
-        elementsCommitted
-      else
-        elementsCommitted + 1
-      }
-
-    def addValue(v: Value): MapContainer = {
-      commit
-      require(comitted == true, "Should be comitted to make a new MapContainer")
-      new MapContainer(v, privBuf, elementsCommitted)
-    }
+    def addValue(v: Value): MapContainer = new MapContainer(v :: privBuf, size + 1)
 
     override def equals(o: Any) = o match {
       case that: MapContainer => that eq this
       case _ => false
     }
 
-    def dump: (Int, Iterable[Value]) = {
-      commit
-      (elementsCommitted, privBuf)
-    }
+    def dump: (Int, Iterable[Value]) = (size, privBuf)
   }
 
-  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
   protected override val emptyResult = Map.empty[Key, Value]
-
   private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
 
