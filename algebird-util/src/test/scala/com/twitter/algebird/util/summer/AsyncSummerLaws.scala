@@ -32,6 +32,9 @@ object AsyncSummerLaws {
   val executor = Executors.newFixedThreadPool(4)
   val workPool = FuturePool(executor)
 
+  private[this] val schedulingExecutor = Executors.newFixedThreadPool(4)
+  private[this] val schedulingWorkPool = FuturePool(schedulingExecutor)
+
   implicit def arbFlushFreq = Arbitrary {
          Gen.choose(1, 4000)
             .map { x: Int => FlushFrequency(Duration.fromMilliseconds(x)) }
@@ -51,7 +54,11 @@ object AsyncSummerLaws {
 
   def summingWithAndWithoutSummerShouldMatch[K, V: Semigroup](asyncSummer: AsyncSummer[(K, V), Map[K, V]], inputs: List[List[(K, V)]]) = {
     val reference = MapAlgebra.sumByKey(inputs.flatten)
-    val resA = Await.result(Future.collect(inputs.map(asyncSummer.addAll(_)))).map(_.toList).flatten
+    val resA = Await.result(Future.collect(inputs.map{ i =>
+      schedulingWorkPool {
+        asyncSummer.addAll(i)
+      }.flatMap(identity)
+    })).map(_.toList).flatten
     val resB = Await.result(asyncSummer.flush)
     require(asyncSummer.isFlushed, "The flush should have ensured we are flushed now")
 
@@ -60,21 +67,6 @@ object AsyncSummerLaws {
       reference,
       other
     )
-    if(!res) {
-      println("Different keys:")
-      println("Only in reference:")
-      (reference.keys.toSet -- other.keys.toSet).foreach(println(_))
-      println("Only in calc..")
-      (other.keys.toSet -- reference.keys.toSet).foreach(println(_))
-      println("key\trefValue\tcalculated Value:")
-      reference.foreach {case (k, refV) =>
-        other.get(k) match {
-          case Some(calcV) if(calcV != refV) => println("%s\t%d\t%s".format(k, refV, other.get(k)))
-          case None => println("%s\t%d\t%s".format(k, refV, other.get(k)))
-          case _ => ()
-        }
-      }
-    }
     res
   }
 
