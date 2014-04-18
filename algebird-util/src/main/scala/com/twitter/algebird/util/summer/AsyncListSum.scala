@@ -27,8 +27,6 @@ import scala.collection.breakOut
  * @author Ian O Connell
  */
 
-
-
 class AsyncListSum[Key, Value](bufferSize: BufferSize,
                                           override val flushFrequency: FlushFrequency,
                                           override val softMemoryFlush: MemoryFlushPercent,
@@ -49,7 +47,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       case _ => false
     }
 
-    def dump: (Int, Iterable[Value]) = (size, privBuf)
+    lazy val toSeq = privBuf.reverse
   }
 
 
@@ -71,9 +69,8 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
         val retV = queueMap.remove(k)
 
         if(retV != null) {
-          val (numElements, buf) = retV.dump
-          val newRemaining = elementsInCache.addAndGet(numElements * -1)
-          sg.sumOption(buf).map(v => (k, v))
+          val newRemaining = elementsInCache.addAndGet(retV.size * -1)
+          sg.sumOption(retV.toSeq).map(v => (k, v))
         }
         else None
       }(breakOut)
