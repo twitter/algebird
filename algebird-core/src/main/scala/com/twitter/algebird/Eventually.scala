@@ -38,8 +38,6 @@ package com.twitter.algebird
 class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   (implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
 
-  import scala.collection.mutable.Buffer
-
   override def plus(x: Either[E, O], y: Either[E, O]) = {
     x match {
       case Left(xe) => y match {
@@ -53,57 +51,40 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     }
   }
 
-  private val maxBuffer = 1000
+  /** stops on the first Left */
+  private class RightIterator(val i: BufferedIterator[Either[E, O]]) extends Iterator[O] {
 
-  /**
-   * used to avoid materializing the entire input in memory
-   */
-  private[this] final def checkSize[T:Semigroup](buffer: Buffer[T]) {
-    if (buffer.size > maxBuffer) {
-      val sum = Semigroup.sumOption(buffer)
-      buffer.clear
-      sum.foreach(buffer += _)
+    override def hasNext = i.hasNext && (i.head match {
+        case Right(v) => true
+        case Left(_) => false
+    })
+
+    override def next = i.next match {
+      case Right(v) => v
+      case Left(v) => throw new IllegalStateException("Called next when hasNext was false!: " + v)
+    }
+  }
+
+  /** converts Rights to Lefts */
+  private class LeftIterator(val i: Iterator[Either[E, O]]) extends Iterator[E] {
+
+    override def hasNext = i.hasNext
+
+    override def next = i.next match {
+      case Right(v) => convert(v)
+      case Left(v) => v
     }
   }
 
   override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
-    iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) ((buffer, v) => {
-
-      def addToEventualBuffer(buffer: Buffer[E], value: Either[E, O]): Unit =
-        value match {
-          case Left(ve) => buffer += ve
-          case Right(vo) => buffer += convert(vo)
-        }
-
-      def toEventualBuffer(buffer: Buffer[O]): Buffer[E] = {
-        val newBuffer = Buffer[E]()
-        Semigroup.sumOption(buffer).foreach((sum) => newBuffer += convert(sum))
-        newBuffer
-      }
-
-      // turns the list of either into an either of lists
-      buffer match {
-        case Left(be) => {
-          checkSize(be)
-          addToEventualBuffer(be, v)
-          buffer // left stays left we just add to the buffer and convert if needed
-        }
-        case Right(bo) => {
-          checkSize(bo)
-          v match {
-            // one Left eventual value => the right list needs to be converted
-            case Left(ve) => Left(toEventualBuffer(bo) += ve)
-            // otherwise stays Right, just add to the buffer
-            case Right(vo) => {
-              bo += vo
-              buffer
-            }
-          }
-        }
-      }
-    }) match { // finally apply sumOption accordingly
-       case Left(be) => Semigroup.sumOption(be).map(left(_))
-       case Right(bo) => Semigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
+    val i = iter.toIterator.buffered
+    val rs = originalSemigroup.sumOption(new RightIterator(i))
+    val ls = eventualSemigroup.sumOption(new LeftIterator(i))
+    (rs, ls) match {
+      case (None, None) => None
+      case (Some(r), None) => Some(conditionallyConvert(r))
+      case (Some(r), Some(l)) => Some(left(Semigroup.plus(convert(r), l)))
+      case (None, Some(l)) => Some(left(l))
     }
   }
 
