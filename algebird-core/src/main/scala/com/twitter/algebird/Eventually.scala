@@ -39,29 +39,22 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   (implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
 
   override def plus(x: Either[E, O], y: Either[E, O]) = {
-    x match {
-      case Left(xe) => y match {
-        case Left(ye) => left(Semigroup.plus(xe, ye))
-        case Right(yo) => left(Semigroup.plus(xe, convert(yo)))
-      }
-      case Right(xo) => y match {
-        case Left(ye) => left(Semigroup.plus(convert(xo), ye))
-        case Right(yo) => conditionallyConvert(Semigroup.plus(xo, yo))
-      }
+    (x, y) match {
+      case (Left(xe), Left(ye)) => left(Semigroup.plus(xe, ye))
+      case (Left(xe), Right(yo)) => left(Semigroup.plus(xe, convert(yo)))
+      case (Right(xo), Left(ye)) => left(Semigroup.plus(convert(xo), ye))
+      case (Right(xo), Right(yo)) => conditionallyConvert(Semigroup.plus(xo, yo))
     }
   }
 
   /** stops on the first Left */
   private class RightIterator(val i: BufferedIterator[Either[E, O]]) extends Iterator[O] {
 
-    override def hasNext = i.hasNext && (i.head match {
-        case Right(v) => true
-        case Left(_) => false
-    })
+    override def hasNext = i.hasNext && i.head.isRight
 
     override def next = i.next match {
       case Right(v) => v
-      case Left(v) => throw new IllegalStateException("Called next when hasNext was false!: " + v)
+      case v@_ => throw new IllegalStateException("Called next when hasNext was false: " + v)
     }
   }
 
@@ -140,15 +133,11 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)
   override def one = Right(Ring.one[O])
 
   override def times(x: Either[E, O], y: Either[E, O]) = {
-    x match {
-      case Left(xe) => y match {
-        case Left(ye) => left(Ring.times(xe, ye))
-        case Right(yo) => left(Ring.times(xe, convert(yo)))
-      }
-      case Right(xo) => y match {
-        case Left(ye) => left(Ring.times(convert(xo), ye))
-        case Right(yo) => conditionallyConvert(Ring.times(xo, yo))
-      }
+    (x, y) match {
+      case (Left(xe), Left(ye)) => left(Ring.times(xe, ye))
+      case (Left(xe), Right(yo)) => left(Ring.times(xe, convert(yo)))
+      case (Right(xo), Left(ye)) => left(Ring.times(convert(xo), ye))
+      case (Right(xo), Right(yo)) => conditionallyConvert(Ring.times(xo, yo))
     }
   }
 
