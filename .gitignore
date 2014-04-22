@@ -29,6 +29,10 @@
 /.cache
 /.idea
 /.settings
+*/.classpath
+*/.project
+*/.cache
+*/.settings
 
 # bak files produced by ./cleanup-commit
 *.bak
