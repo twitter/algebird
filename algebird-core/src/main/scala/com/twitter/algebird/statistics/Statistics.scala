@@ -33,7 +33,7 @@ private class Statistics {
   import java.lang.Long.numberOfLeadingZeros
   val maxBucket = 10
   var distribution: Array[Long] = new Array(maxBucket + 1)
-  var total: Double = 0
+  var total: Long = 0
 
   def put(v: Long) {
     total += v
@@ -46,14 +46,14 @@ private class Statistics {
 
   override def toString =
       distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow(2, i).toInt) + ": " + v }.mkString(", ") +
-      ", avg=" + total / count + " count=" + count
+      ", avg=" + total.toDouble / count + " count=" + count
 
 }
 
 /** used to keep track of stats and time spent processing iterators passed to the methods */
 private class IterCallStatistics {
   val countStats = new Statistics
-  var totalCallTime: Double = 0
+  var totalCallTime: Long = 0
 
   /** used to count how many values are pulled from the Iterator without iterating twice */
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
@@ -80,7 +80,7 @@ private class IterCallStatistics {
   override def toString =
     countStats.toString + ", " +
     "total time: " + totalCallTime + "ms, " +
-    "avg time: " + (totalCallTime / countStats.count)
+    "avg time: " + (totalCallTime.toDouble / countStats.count)
 }
 
 /** collect statistics about the calls to the wrapped Semigroup */
@@ -91,9 +91,9 @@ class StatisticsSemigroup[T] (implicit wrappedSemigroup: Semigroup[T])
   private val sumOptionCallsStats = new IterCallStatistics
 
   // access to collected stats
-  def getPlusCallCount = plusCallsCount
-  def getSumOptionCallCount = sumOptionCallsStats.countStats.count
-  def getSumOptionCallTime = sumOptionCallsStats.totalCallTime
+  def getPlusCallCount: Long = plusCallsCount
+  def getSumOptionCallCount: Long = sumOptionCallsStats.countStats.count
+  def getSumOptionCallTime: Long = sumOptionCallsStats.totalCallTime
 
   override def plus(x: T, y: T) = {
     plusCallsCount += 1
@@ -118,9 +118,9 @@ class StatisticsMonoid[T] (implicit wrappedMonoid: Monoid[T])
   private val sumCallsStats = new IterCallStatistics
 
   // access to collected stats
-  def getZeroCallCount = zeroCallsCount
-  def getSumCallCount = sumCallsStats.countStats.count
-  def getSumCallTime = sumCallsStats.totalCallTime
+  def getZeroCallCount: Long = zeroCallsCount
+  def getSumCallCount: Long = sumCallsStats.countStats.count
+  def getSumCallTime: Long = sumCallsStats.totalCallTime
 
   override def zero = {
     zeroCallsCount += 1
@@ -146,8 +146,8 @@ class StatisticsGroup[T](implicit group: Group[T])
   private var minusCallsCount: Long = 0
 
   // access to collected stats
-  def getNegateCallCount = negateCallsCount
-  def getMinusCallCount = minusCallsCount
+  def getNegateCallCount: Long = negateCallsCount
+  def getMinusCallCount: Long = minusCallsCount
 
   override def negate(x: T) = {
     negateCallsCount += 1
@@ -176,10 +176,10 @@ class StatisticsRing[T] (implicit ring: Ring[T])
   private val productCallsStats = new IterCallStatistics
 
   // access to collected stats
-  def getOneCallCount = oneCallsCount
-  def getTimesCallCount = timesCallsCount
-  def getProductCallCount = productCallsStats.countStats.count
-  def getProductCallTime = productCallsStats.totalCallTime
+  def getOneCallCount: Long = oneCallsCount
+  def getTimesCallCount: Long = timesCallsCount
+  def getProductCallCount: Long = productCallsStats.countStats.count
+  def getProductCallTime: Long = productCallsStats.totalCallTime
 
   override def one = {
     oneCallsCount += 1

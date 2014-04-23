@@ -55,13 +55,13 @@ class StatisticsTest extends Specification {
 
     "count sum calls" in {
       statsMonoid.getSumCallCount must be_==(3000)
-      statsMonoid.getSumCallTime must be_>(0f)
+      statsMonoid.getSumCallTime must be_>(0L)
       statsMonoid.toString.contains("sum calls: <1: 0, <2: 1, <4: 2, <8: 4, <16: 8, <32: 16, <64: 32, <128: 64, <256: 128, <512: 256, >: 2489, avg=1500.5 count=3000")
     }
 
     "count sumOption calls" in {
       statsMonoid.getSumOptionCallCount must be_==(2000)
-      statsMonoid.getSumOptionCallTime must be_>(0f)
+      statsMonoid.getSumOptionCallTime must be_>(0L)
       statsMonoid.toString.contains("sumOption calls: <1: 0, <2: 1, <4: 2, <8: 4, <16: 8, <32: 16, <64: 32, <128: 64, <256: 128, <512: 256, >: 1489, avg=1000.5 count=2000")
     }
 
