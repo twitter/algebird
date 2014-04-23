@@ -37,7 +37,10 @@ class StatisticsTest extends Specification {
     for (i <- 1 to 3000) statsMonoid.sum(for (v <- 1 to i) yield v)
     for (i <- 1 to 2000) statsMonoid.sumOption(for (v <- 1 to i) yield v)
   } catch {
-    case e: Exception => e.printStackTrace(); throw e
+    case e: Exception => {
+      e.printStackTrace()
+      throw e
+    }
   }
 
   "StatisticsMonoid" should {
