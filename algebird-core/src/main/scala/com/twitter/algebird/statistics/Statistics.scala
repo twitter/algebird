@@ -30,20 +30,20 @@ import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
  */
 private class Statistics {
   import scala.math.{pow, min}
-  val maxPow = 10
-  var distribution: Array[Long] = new Array(maxPow + 1)
+  val maxBucket = 10
+  var distribution: Array[Long] = new Array(maxBucket + 1)
   var total: Float = 0
 
   def put(v: Int) {
     total += v
-    val log2 = 32 - Integer.numberOfLeadingZeros(v);
-    distribution(min(log2, maxPow)) += 1
+    val bucket = min(32 - Integer.numberOfLeadingZeros(v), maxBucket)
+    distribution(bucket) += 1
   }
 
   def count() = distribution.sum
 
   override def toString =
-      distribution.zipWithIndex.map { case (v, i)  => (if(i == maxPow) ">" else "<" + pow(2, i).toInt) + ": " + v }.mkString(", ") +
+      distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow(2, i).toInt) + ": " + v }.mkString(", ") +
       ", avg=" + total / count + " count=" + count
 
 }
