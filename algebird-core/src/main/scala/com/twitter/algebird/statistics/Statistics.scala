@@ -17,32 +17,71 @@ limitations under the License.
 package com.twitter.algebird.statistics
 
 import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * These wrappers can be used to collect statistics around usage of monoids
- * Unlike most semigroups, monoids, etc they are not thread safe and one instance should be used per thread.
+ * They are thread safe unless false is passed to the constructor (to remove overhead when threads are not used)
  * 
  * @author Julien Le Dem
  */
 
+/** deals with optionally making this thread safe */
+private object Counter {
+  def apply(threadSafe: Boolean): Counter = if (threadSafe) AtomicCounter() else PlainCounter()
+}
+
+private sealed trait Counter {
+  def increment: Unit
+  def add(v: Long): Unit
+  def get: Long
+  def toDouble = get.toDouble
+  override def toString = get.toString
+}
+
+private object AtomicCounter {
+  def apply(): Counter = new AtomicCounter
+}
+
+/** thread safe */
+private class AtomicCounter extends Counter {
+  val counter = new AtomicLong(0)
+  override def increment = counter.incrementAndGet
+  override def add(v: Long) = counter.addAndGet(v)
+  override def get = counter.get
+}
+
+private object PlainCounter {
+  def apply(): Counter = new PlainCounter
+}
+
+/** not thread safe */
+private class PlainCounter extends Counter {
+  var counter: Long = 0
+  override def increment = counter += 1
+  override def add(v: Long) = counter += v
+  override def get = counter
+}
+
 /**
  * internal collection of a distribution of values on a log scale
  */
-private class Statistics {
+private class Statistics(threadSafe: Boolean) {
   import scala.math.{pow, min}
   import java.lang.Long.numberOfLeadingZeros
   val maxBucket = 10
-  var distribution: Array[Long] = new Array(maxBucket + 1)
-  var total: Long = 0
+  val distribution: Array[Counter] = new Array(maxBucket + 1)
+  for (i <- 0 to maxBucket) distribution(i) = Counter(threadSafe)
+  val total = Counter(threadSafe)
 
   def put(v: Long) {
-    total += v
+    total.add(v)
     // log2(v + 1) for v up to 2^maxBucket
     val bucket = min(64 - numberOfLeadingZeros(v), maxBucket)
-    distribution(bucket) += 1
+    distribution(bucket).increment
   }
 
-  def count() = distribution.sum
+  def count() = distribution.foldLeft(0L) { _ + _.get } // sum
 
   override def toString =
       distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow(2, i).toInt) + ": " + v }.mkString(", ") +
@@ -51,9 +90,9 @@ private class Statistics {
 }
 
 /** used to keep track of stats and time spent processing iterators passed to the methods */
-private class IterCallStatistics {
-  val countStats = new Statistics
-  var totalCallTime: Long = 0
+private class IterCallStatistics(threadSafe: Boolean) {
+  val countStats = new Statistics(threadSafe)
+  val totalCallTime = Counter(threadSafe)
 
   /** used to count how many values are pulled from the Iterator without iterating twice */
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
@@ -73,7 +112,7 @@ private class IterCallStatistics {
     val r = f(ci)
     val t1 = System.currentTimeMillis()
     countStats.put(ci.nextCount)
-    totalCallTime += (t1 - t0)
+    totalCallTime.add(t1 - t0)
     return r
   }
 
@@ -84,19 +123,19 @@ private class IterCallStatistics {
 }
 
 /** collect statistics about the calls to the wrapped Semigroup */
-class StatisticsSemigroup[T] (implicit wrappedSemigroup: Semigroup[T])
+class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigroup: Semigroup[T])
   extends Semigroup[T] {
 
-  private var plusCallsCount: Long = 0
-  private val sumOptionCallsStats = new IterCallStatistics
+  private val plusCallsCount = Counter(threadSafe)
+  private val sumOptionCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
-  def getPlusCallCount: Long = plusCallsCount
+  def getPlusCallCount: Long = plusCallsCount.get
   def getSumOptionCallCount: Long = sumOptionCallsStats.countStats.count
-  def getSumOptionCallTime: Long = sumOptionCallsStats.totalCallTime
+  def getSumOptionCallTime: Long = sumOptionCallsStats.totalCallTime.get
 
   override def plus(x: T, y: T) = {
-    plusCallsCount += 1
+    plusCallsCount.increment
     Semigroup.plus(x, y)
   }
 
@@ -111,19 +150,19 @@ class StatisticsSemigroup[T] (implicit wrappedSemigroup: Semigroup[T])
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsMonoid[T] (implicit wrappedMonoid: Monoid[T])
-  extends StatisticsSemigroup[T] with Monoid[T] {
+class StatisticsMonoid[T](threadSafe: Boolean = true) (implicit wrappedMonoid: Monoid[T])
+  extends StatisticsSemigroup[T](threadSafe) with Monoid[T] {
 
-  private var zeroCallsCount: Long = 0
-  private val sumCallsStats = new IterCallStatistics
+  private val zeroCallsCount = Counter(threadSafe)
+  private val sumCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
-  def getZeroCallCount: Long = zeroCallsCount
+  def getZeroCallCount: Long = zeroCallsCount.get
   def getSumCallCount: Long = sumCallsStats.countStats.count
-  def getSumCallTime: Long = sumCallsStats.totalCallTime
+  def getSumCallTime: Long = sumCallsStats.totalCallTime.get
 
   override def zero = {
-    zeroCallsCount += 1
+    zeroCallsCount.increment
     Monoid.zero
   }
 
@@ -139,23 +178,23 @@ class StatisticsMonoid[T] (implicit wrappedMonoid: Monoid[T])
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsGroup[T](implicit group: Group[T])
-  extends StatisticsMonoid[T] with Group[T] {
+class StatisticsGroup[T](threadSafe: Boolean = true) (implicit group: Group[T])
+  extends StatisticsMonoid[T](threadSafe) with Group[T] {
 
-  private var negateCallsCount: Long = 0
-  private var minusCallsCount: Long = 0
+  private val negateCallsCount = Counter(threadSafe)
+  private val minusCallsCount = Counter(threadSafe)
 
   // access to collected stats
-  def getNegateCallCount: Long = negateCallsCount
-  def getMinusCallCount: Long = minusCallsCount
+  def getNegateCallCount: Long = negateCallsCount.get
+  def getMinusCallCount: Long = minusCallsCount.get
 
   override def negate(x: T) = {
-    negateCallsCount += 1
+    negateCallsCount.increment
     Group.negate(x)
   }
 
   override def minus(l : T, r : T) = {
-    minusCallsCount += 1
+    minusCallsCount.increment
     Group.minus(l, r)
   }
 
@@ -168,26 +207,26 @@ class StatisticsGroup[T](implicit group: Group[T])
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsRing[T] (implicit ring: Ring[T])
-  extends StatisticsGroup[T] with Ring[T] {
+class StatisticsRing[T](threadSafe: Boolean = true) (implicit ring: Ring[T])
+  extends StatisticsGroup[T](threadSafe) with Ring[T] {
 
-  private var oneCallsCount: Long = 0
-  private var timesCallsCount: Long = 0
-  private val productCallsStats = new IterCallStatistics
+  private val oneCallsCount = Counter(threadSafe)
+  private val timesCallsCount = Counter(threadSafe)
+  private val productCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
-  def getOneCallCount: Long = oneCallsCount
-  def getTimesCallCount: Long = timesCallsCount
+  def getOneCallCount: Long = oneCallsCount.get
+  def getTimesCallCount: Long = timesCallsCount.get
   def getProductCallCount: Long = productCallsStats.countStats.count
-  def getProductCallTime: Long = productCallsStats.totalCallTime
+  def getProductCallTime: Long = productCallsStats.totalCallTime.get
 
   override def one = {
-    oneCallsCount += 1
+    oneCallsCount.increment
     Ring.one
   }
 
   override def times(x: T, y: T) = {
-    timesCallsCount += 1
+    timesCallsCount.increment
     Ring.times(x, y)
   }
 
