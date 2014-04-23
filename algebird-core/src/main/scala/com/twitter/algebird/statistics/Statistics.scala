@@ -30,13 +30,15 @@ import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
  */
 private class Statistics {
   import scala.math.{pow, min}
+  import java.lang.Long.numberOfLeadingZeros
   val maxBucket = 10
   var distribution: Array[Long] = new Array(maxBucket + 1)
-  var total: Float = 0
+  var total: Double = 0
 
-  def put(v: Int) {
+  def put(v: Long) {
     total += v
-    val bucket = min(32 - Integer.numberOfLeadingZeros(v), maxBucket)
+    // log2(v + 1) for v up to 2^maxBucket
+    val bucket = min(64 - numberOfLeadingZeros(v), maxBucket)
     distribution(bucket) += 1
   }
 
@@ -51,11 +53,11 @@ private class Statistics {
 /** used to keep track of stats and time spent processing iterators passed to the methods */
 private class IterCallStatistics {
   val countStats = new Statistics
-  var totalCallTime: Float = 0
+  var totalCallTime: Double = 0
 
   /** used to count how many values are pulled from the Iterator without iterating twice */
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
-    var nextCount: Int = 0
+    var nextCount: Long = 0
     override def hasNext = i.hasNext
     override def next = {
       val n = i.next
