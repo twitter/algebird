@@ -1,8 +1,10 @@
-package com.twitter.algebird
+package com.twitter.algebird.statistics
 
 import org.scalacheck.{Arbitrary, Properties}
 import org.scalacheck.Gen._
 import org.specs2.mutable._
+
+import com.twitter.algebird.BaseProperties
 
 object StatisticsRingLaws extends Properties("StatisticsRing") {
   import BaseProperties._

@@ -14,9 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.twitter.algebird
+package com.twitter.algebird.statistics
+
+import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
 
 /**
+ * These wrappers can be used to collect statistics around usage of monoids
+ * Unlike most semigroups, monoids, etc they are not thread safe and one instance should be used per thread.
+ * 
  * @author Julien Le Dem
  */
 
