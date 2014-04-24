@@ -19,7 +19,7 @@ package com.twitter.algebird.statistics
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- *  Counter abstraction that can optionally optionally be thread safe
+ *  Counter abstraction that can optionally be thread safe
  *  @author Julien Le Dem
  */
 private object Counter {
