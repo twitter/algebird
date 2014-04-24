@@ -23,16 +23,16 @@
 # eclipse, intellij
 /.classpath
 /.project
-/*/.classpath
-/*/.project
 /src/intellij/*.iml
 /src/intellij/*.ipr
 /src/intellij/*.iws
 /.cache
-/*/.cache
 /.idea
 /.settings
-/*/.settings
+*/.classpath
+*/.project
+*/.cache
+*/.settings
 
 # bak files produced by ./cleanup-commit
 *.bak
