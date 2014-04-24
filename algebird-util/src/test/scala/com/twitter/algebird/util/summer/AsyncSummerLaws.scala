@@ -52,7 +52,7 @@ object AsyncSummerLaws {
 
   def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
-  def summingWithAndWithoutSummerShouldMatch[K, V: Semigroup](asyncSummer: AsyncSummer[(K, V), Map[K, V]], inputs: List[List[(K, V)]]) = {
+  def summingWithAndWithoutSummerShouldMatch[K, V: Semigroup](asyncSummer: AsyncSummer[(K, V), Iterable[(K, V)]], inputs: List[List[(K, V)]]) = {
     val reference = MapAlgebra.sumByKey(inputs.flatten)
     val resA = Await.result(Future.collect(inputs.map{ i =>
       schedulingWorkPool {
