@@ -75,6 +75,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
     val rs: Option[Either[E, O]] = if (ri.hasNext) {
       var result = ri.next
       var convertResult = false
+      // If we encounter a Left(E) or mustConvert returns true on a plus result we must move to sumOption on E
       while (ri.hasNext && !convertResult) {
         result = Semigroup.plus(result, ri.next)
         convertResult = mustConvert(result)
@@ -82,8 +83,10 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
       Some(if (convertResult) left(convert(result)) else Right(result))
     } else None
 
-    val ls = eventualSemigroup.sumOption(new LeftIterator(i))
+    // run sumOption of E on the remainder
+    val ls = Semigroup.sumOption(new LeftIterator(i))
 
+    // add up the two computed sums
     (ls, rs) match {
       case (None, _) => rs
       case (Some(l), None) => Some(left(l))
