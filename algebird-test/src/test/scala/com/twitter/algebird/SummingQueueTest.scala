@@ -31,11 +31,12 @@ object SummingCacheTest extends Properties("SummingCache") {
 
   // Maps are tricky to compare equality for since zero values are often removed
   def test[K,V:Monoid](c: Capacity, items: List[(K,V)]) = {
-    val sc = SummingCache[K, V](c.cap)
-    val mitems = items.map { Map(_) }
-    implicit val mapEq = mapEquiv[K,V]
-    StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
-      StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
+    List(SummingCache[K, V](c.cap), PlusOptimizedSummingCache[K,V](c.cap), SumOptionOptimizedSummingCache[K,V](c.cap)).map((sc) => {
+      val mitems = items.map { Map(_) }
+      implicit val mapEq = mapEquiv[K,V]
+      StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
+        StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
+    }).fold(true)(_ && _)
   }
 
   property("puts are like sums (Int, Int)") = forAll { (c: Capacity, items: List[(Int,Int)]) =>
