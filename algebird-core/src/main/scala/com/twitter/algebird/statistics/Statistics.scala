@@ -39,25 +39,17 @@ private sealed trait Counter {
   override def toString = get.toString
 }
 
-private object AtomicCounter {
-  def apply(): Counter = new AtomicCounter
-}
-
 /** thread safe */
-private class AtomicCounter extends Counter {
-  val counter = new AtomicLong(0)
+private case class AtomicCounter() extends Counter {
+  private[this] final val counter = new AtomicLong(0)
   override def increment = counter.incrementAndGet
   override def add(v: Long) = counter.addAndGet(v)
   override def get = counter.get
 }
 
-private object PlainCounter {
-  def apply(): Counter = new PlainCounter
-}
-
 /** not thread safe */
-private class PlainCounter extends Counter {
-  var counter: Long = 0
+private case class PlainCounter() extends Counter {
+  private[this] final var counter: Long = 0
   override def increment = counter += 1
   override def add(v: Long) = counter += v
   override def get = counter
@@ -70,8 +62,9 @@ private class Statistics(threadSafe: Boolean) {
   import scala.math.min
   import java.lang.Long.numberOfLeadingZeros
   val maxBucket = 10
-  val distribution: Array[Counter] = new Array(maxBucket + 1)
-  for (i <- 0 to maxBucket) distribution(i) = Counter(threadSafe)
+  val distribution: Array[Counter] = Array.fill(maxBucket + 1) {
+    Counter(threadSafe)
+  }
   val total = Counter(threadSafe)
 
   def put(v: Long) {
@@ -81,30 +74,33 @@ private class Statistics(threadSafe: Boolean) {
     distribution(bucket).increment
   }
 
-  def count() = distribution.foldLeft(0L) { _ + _.get } // sum
+  def count = distribution.foldLeft(0L) { _ + _.get } // sum
 
   def pow2(i: Int): Int = 1 << i
 
   override def toString =
-      distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow2(i)) + ": " + v }.mkString(", ") +
-      ", avg=" + total.toDouble / count + " count=" + count
+      distribution.zipWithIndex.map {
+        case (v, i)  =>
+          (if(i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
+      }.mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
 
 }
 
 /** used to keep track of stats and time spent processing iterators passed to the methods */
 private class IterCallStatistics(threadSafe: Boolean) {
-  val countStats = new Statistics(threadSafe)
-  val totalCallTime = Counter(threadSafe)
+  private[this] final val countStats = new Statistics(threadSafe)
+  private[this] final val totalCallTime = Counter(threadSafe)
 
   /** used to count how many values are pulled from the Iterator without iterating twice */
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
-    var nextCount: Long = 0
+    private[this] final var nextCount: Long = 0
     override def hasNext = i.hasNext
     override def next = {
       val n = i.next
       nextCount += 1
       n
     }
+    def getNextCount = nextCount
   }
 
   /** measures the time spent calling f on iter and the size of iter */
@@ -113,10 +109,13 @@ private class IterCallStatistics(threadSafe: Boolean) {
     val t0 = System.currentTimeMillis()
     val r = f(ci)
     val t1 = System.currentTimeMillis()
-    countStats.put(ci.nextCount)
+    countStats.put(ci.getNextCount)
     totalCallTime.add(t1 - t0)
-    return r
+    r
   }
+
+  def getCallCount = countStats.count
+  def getTotalCallTime = totalCallTime.get
 
   override def toString =
     countStats.toString + ", " +
@@ -128,13 +127,13 @@ private class IterCallStatistics(threadSafe: Boolean) {
 class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigroup: Semigroup[T])
   extends Semigroup[T] {
 
-  private val plusCallsCount = Counter(threadSafe)
-  private val sumOptionCallsStats = new IterCallStatistics(threadSafe)
+  private[this] final val plusCallsCount = Counter(threadSafe)
+  private[this] final val sumOptionCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
   def getPlusCallCount: Long = plusCallsCount.get
-  def getSumOptionCallCount: Long = sumOptionCallsStats.countStats.count
-  def getSumOptionCallTime: Long = sumOptionCallsStats.totalCallTime.get
+  def getSumOptionCallCount: Long = sumOptionCallsStats.getCallCount
+  def getSumOptionCallTime: Long = sumOptionCallsStats.getTotalCallTime
 
   override def plus(x: T, y: T) = {
     plusCallsCount.increment
@@ -155,13 +154,13 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigr
 class StatisticsMonoid[T](threadSafe: Boolean = true) (implicit wrappedMonoid: Monoid[T])
   extends StatisticsSemigroup[T](threadSafe) with Monoid[T] {
 
-  private val zeroCallsCount = Counter(threadSafe)
-  private val sumCallsStats = new IterCallStatistics(threadSafe)
+  private[this] final val zeroCallsCount = Counter(threadSafe)
+  private[this] final val sumCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
   def getZeroCallCount: Long = zeroCallsCount.get
-  def getSumCallCount: Long = sumCallsStats.countStats.count
-  def getSumCallTime: Long = sumCallsStats.totalCallTime.get
+  def getSumCallCount: Long = sumCallsStats.getCallCount
+  def getSumCallTime: Long = sumCallsStats.getTotalCallTime
 
   override def zero = {
     zeroCallsCount.increment
@@ -183,8 +182,8 @@ class StatisticsMonoid[T](threadSafe: Boolean = true) (implicit wrappedMonoid: M
 class StatisticsGroup[T](threadSafe: Boolean = true) (implicit group: Group[T])
   extends StatisticsMonoid[T](threadSafe) with Group[T] {
 
-  private val negateCallsCount = Counter(threadSafe)
-  private val minusCallsCount = Counter(threadSafe)
+  private[this] final val negateCallsCount = Counter(threadSafe)
+  private[this] final val minusCallsCount = Counter(threadSafe)
 
   // access to collected stats
   def getNegateCallCount: Long = negateCallsCount.get
@@ -212,15 +211,15 @@ class StatisticsGroup[T](threadSafe: Boolean = true) (implicit group: Group[T])
 class StatisticsRing[T](threadSafe: Boolean = true) (implicit ring: Ring[T])
   extends StatisticsGroup[T](threadSafe) with Ring[T] {
 
-  private val oneCallsCount = Counter(threadSafe)
-  private val timesCallsCount = Counter(threadSafe)
-  private val productCallsStats = new IterCallStatistics(threadSafe)
+  private[this] final val oneCallsCount = Counter(threadSafe)
+  private[this] final val timesCallsCount = Counter(threadSafe)
+  private[this] final val productCallsStats = new IterCallStatistics(threadSafe)
 
   // access to collected stats
   def getOneCallCount: Long = oneCallsCount.get
   def getTimesCallCount: Long = timesCallsCount.get
-  def getProductCallCount: Long = productCallsStats.countStats.count
-  def getProductCallTime: Long = productCallsStats.totalCallTime.get
+  def getProductCallCount: Long = productCallsStats.getCallCount
+  def getProductCallTime: Long = productCallsStats.getTotalCallTime
 
   override def one = {
     oneCallsCount.increment
