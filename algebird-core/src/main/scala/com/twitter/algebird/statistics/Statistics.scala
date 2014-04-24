@@ -13,11 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package com.twitter.algebird.statistics
 
 import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * These wrappers can be used to collect statistics around usage of monoids
@@ -25,103 +23,6 @@ import java.util.concurrent.atomic.AtomicLong
  * 
  * @author Julien Le Dem
  */
-
-/** deals with optionally making this thread safe */
-private object Counter {
-  def apply(threadSafe: Boolean): Counter = if (threadSafe) AtomicCounter() else PlainCounter()
-}
-
-private sealed trait Counter {
-  def increment: Unit
-  def add(v: Long): Unit
-  def get: Long
-  def toDouble = get.toDouble
-  override def toString = get.toString
-}
-
-/** thread safe */
-private case class AtomicCounter() extends Counter {
-  private[this] final val counter = new AtomicLong(0)
-  override def increment = counter.incrementAndGet
-  override def add(v: Long) = counter.addAndGet(v)
-  override def get = counter.get
-}
-
-/** not thread safe */
-private case class PlainCounter() extends Counter {
-  private[this] final var counter: Long = 0
-  override def increment = counter += 1
-  override def add(v: Long) = counter += v
-  override def get = counter
-}
-
-/**
- * internal collection of a distribution of values on a log scale
- */
-private class Statistics(threadSafe: Boolean) {
-  import scala.math.min
-  import java.lang.Long.numberOfLeadingZeros
-  val maxBucket = 10
-  val distribution: Array[Counter] = Array.fill(maxBucket + 1) {
-    Counter(threadSafe)
-  }
-  val total = Counter(threadSafe)
-
-  def put(v: Long) {
-    total.add(v)
-    // log2(v + 1) for v up to 2^maxBucket
-    val bucket = min(64 - numberOfLeadingZeros(v), maxBucket)
-    distribution(bucket).increment
-  }
-
-  def count = distribution.foldLeft(0L) { _ + _.get } // sum
-
-  def pow2(i: Int): Int = 1 << i
-
-  override def toString =
-      distribution.zipWithIndex.map {
-        case (v, i)  =>
-          (if(i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
-      }.mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
-
-}
-
-/** used to keep track of stats and time spent processing iterators passed to the methods */
-private class IterCallStatistics(threadSafe: Boolean) {
-  private[this] final val countStats = new Statistics(threadSafe)
-  private[this] final val totalCallTime = Counter(threadSafe)
-
-  /** used to count how many values are pulled from the Iterator without iterating twice */
-  private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
-    private[this] final var nextCount: Long = 0
-    override def hasNext = i.hasNext
-    override def next = {
-      val n = i.next
-      nextCount += 1
-      n
-    }
-    def getNextCount = nextCount
-  }
-
-  /** measures the time spent calling f on iter and the size of iter */
-  def measure[T, O](iter: TraversableOnce[T]) (f: (TraversableOnce[T]) => O): O = {
-    val ci = new CountingIterator(iter.toIterator)
-    val t0 = System.currentTimeMillis()
-    val r = f(ci)
-    val t1 = System.currentTimeMillis()
-    countStats.put(ci.getNextCount)
-    totalCallTime.add(t1 - t0)
-    r
-  }
-
-  def getCallCount = countStats.count
-  def getTotalCallTime = totalCallTime.get
-
-  override def toString =
-    countStats.toString + ", " +
-    "total time: " + totalCallTime + "ms, " +
-    "avg time: " + (totalCallTime.toDouble / countStats.count)
-}
 
 /** collect statistics about the calls to the wrapped Semigroup */
 class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigroup: Semigroup[T])
