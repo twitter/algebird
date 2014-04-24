@@ -338,6 +338,12 @@ case class DenseHLL(bits : Int, v : IndexedSeq[Byte]) extends HLL {
   }
 }
 
+class IndexedSeqArrayByte(buf: Array[Byte]) extends scala.collection.IndexedSeq[Byte] {
+  def length = buf.length
+  def apply(idx: Int): Byte = buf.apply(idx)
+  override def stringPrefix = "Array"
+}
+
 /*
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
  * which means each HLLInstance is about 2^{12} = 4kb per instance.
@@ -355,13 +361,30 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
 
   def plus(left : HLL, right : HLL) = left + right
 
+  private[this] final def denseUpdate(existing: HLL, iter: Iterator[HLL]): HLL = {
+    val buffer = new Array[Byte](size)
+    existing.updateInto(buffer)
+    iter.foreach { _.updateInto(buffer) }
+
+    DenseHLL(bits, new IndexedSeqArrayByte(buffer))
+  }
+
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
-    if(items.isEmpty) None
-    else {
-      val buffer = new Array[Byte](size)
-      items.foreach { _.updateInto(buffer) }
-      Some(DenseHLL(bits, buffer.toIndexedSeq))
+    if(items.isEmpty) {
+      None
+    } else {
+      val iter = items.toIterator.buffered
+      var curValue = iter.next
+      while(iter.hasNext) {
+        curValue = (curValue, iter.head) match {
+          case (DenseHLL(_, _), _) => denseUpdate(curValue, iter)
+          case (_, DenseHLL(_, _)) => denseUpdate(curValue, iter)
+          case _ =>  curValue + iter.next
+        }
+      }
+      Some(curValue)
     }
+
 
   def create(example : Array[Byte]) : HLL = {
     val hashed = hash(example)

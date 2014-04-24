@@ -89,7 +89,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.5.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.6.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -134,12 +134,15 @@ object AlgebirdBuild extends Build {
 
   /* Adapted from {@link https://github.com/sirthias/scala-benchmarking-template/blob/master/project/Build.scala} */
   lazy val algebirdCaliper = module("caliper").settings(
-    libraryDependencies ++= Seq("com.google.caliper" % "caliper" % "0.5-rc1",
-      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
-      "com.google.code.gson" % "gson" % "1.7.1"),
+    libraryDependencies ++= Seq("com.google.caliper" % "caliper" % "1.0-beta-1",
+      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
+      "com.google.code.gson" % "gson" % "1.7.1",
+      "com.sun.jersey" % "jersey-client" % "1.11" force(),
+      "com.sun.jersey" % "jersey-core" % "1.11" force(),
+      "com.twitter" %% "bijection-core" % "0.6.2"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
       fork in run := true
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
 
   lazy val algebirdUtil = module("util").settings(
     libraryDependencies += withCross("com.twitter" %% "util-core" % "6.3.0")
