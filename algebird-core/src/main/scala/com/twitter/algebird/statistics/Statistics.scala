@@ -67,7 +67,7 @@ private class PlainCounter extends Counter {
  * internal collection of a distribution of values on a log scale
  */
 private class Statistics(threadSafe: Boolean) {
-  import scala.math.{pow, min}
+  import scala.math.min
   import java.lang.Long.numberOfLeadingZeros
   val maxBucket = 10
   val distribution: Array[Counter] = new Array(maxBucket + 1)
@@ -83,8 +83,10 @@ private class Statistics(threadSafe: Boolean) {
 
   def count() = distribution.foldLeft(0L) { _ + _.get } // sum
 
+  def pow2(i: Int): Int = 1 << i
+
   override def toString =
-      distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow(2, i).toInt) + ": " + v }.mkString(", ") +
+      distribution.zipWithIndex.map { case (v, i)  => (if(i == maxBucket) ">" else "<" + pow2(i)) + ": " + v }.mkString(", ") +
       ", avg=" + total.toDouble / count + " count=" + count
 
 }
