@@ -40,7 +40,7 @@ object DynamicSummerProperties extends Properties("DynamicSummerProperties") {
                                                                           bufferSize: BufferSize,
                                                                           memoryFlushPercent: MemoryFlushPercent) =>
     val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
-    val dynamicSummer = new DynamicSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
+    val dynamicSummer = DynamicSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
     summingWithAndWithoutSummerShouldMatch(dynamicSummer, inputs)
   }
 
