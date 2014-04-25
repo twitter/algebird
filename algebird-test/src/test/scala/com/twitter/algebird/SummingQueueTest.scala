@@ -36,7 +36,7 @@ object SummingCacheTest extends Properties("SummingCache") {
       implicit val mapEq = mapEquiv[K,V]
       StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
         StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
-    }).fold(true)(_ && _)
+    }).reduce(_ && _)
   }
 
   property("puts are like sums (Int, Int)") = forAll { (c: Capacity, items: List[(Int,Int)]) =>
