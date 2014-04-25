@@ -18,16 +18,15 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird._
 import com.twitter.util.{Duration, Future, FuturePool}
 import java.util.concurrent.ConcurrentHashMap
+import scala.collection.mutable.ArrayBuffer
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet, ArrayBuffer}
-import scala.collection.breakOut
 
 /**
  * @author Ian O Connell
  */
 
-class DynamicSummer[Key, Value](override val flushFrequency: FlushFrequency,
+class DynamicSummer[Key, Value](hhPct: Float, override val flushFrequency: FlushFrequency,
                               override val softMemoryFlush: MemoryFlushPercent,
                               backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]])
                              (implicit sg: Semigroup[Value])
@@ -37,13 +36,79 @@ class DynamicSummer[Key, Value](override val flushFrequency: FlushFrequency,
   override def flush: Future[Iterable[(Key, Value)]] = backingSummer.flush
   override def isFlushed = backingSummer.isFlushed
   override val emptyResult = Seq[(Key, Value)]()
-  private[this] final val monoid = CMS.monoid(4, 100, 2, 0.05)
-  private[this] var cmsData: CMS = monoid.zero
 
 
-  private def updateCMSTestMatch(t: Long): Boolean = {
-    cmsData = monoid.plus(cmsData, monoid.create(t))
-    cmsData.heavyHitters.contains(t)
+  private[this] final val hh = new java.util.HashMap[Long, Long]()
+  private[this] final var totalCount = 0L
+  private[this] final var hhMinReq = 0L
+  private[this] final val HH_PCT = hhPct
+  private[this] final val WIDTH = 1000
+  private[this] final val DEPTH = 2
+  private[this] final val countsTable = Array.fill(WIDTH * DEPTH)(0L)
+  private[this] final val hashes: IndexedSeq[CMSHash] = {
+    val r = new scala.util.Random(5)
+    (0 until DEPTH).map { _ => CMSHash(r.nextInt, 0, WIDTH) }
+  }.toIndexedSeq
+
+  @inline
+  def pruneHH {
+    val iter = hh.values.iterator
+    while(iter.hasNext) {
+      val n = iter.next
+      if(n < hhMinReq) {
+        iter.remove
+      }
+    }
+  }
+
+  @inline
+  private[this] final def frequencyEst(item : Long): Long = {
+    var min = Long.MaxValue
+    var indx = 0
+    while (indx < DEPTH) {
+      val newVal = countsTable(indx*WIDTH + hashes(indx)(item))
+      if(newVal < min) min = newVal
+      indx += 1
+    }
+    min
+  }
+
+  @inline
+  private[this] final def updateItem(item: Long) {
+    totalCount += 1L
+    hhMinReq = (HH_PCT * totalCount).toLong
+    var indx = 0
+    while (indx < DEPTH) {
+      val offset = indx*WIDTH + hashes(indx)(item)
+      countsTable.update(offset, countsTable(offset) + 1L)
+      indx += 1
+    }
+    updateHH(item)
+  }
+
+  @inline
+  private[this] final def updateHH(item : Long) {
+    if(hh.containsKey(item)) {
+      val v = hh.get(item)
+      val newItemCount =  + 1L
+      if (newItemCount < hhMinReq) {
+        pruneHH
+      } else {
+        hh.put(item, newItemCount)
+      }
+    } else {
+      val newItemCount = frequencyEst(item) + 1L
+      if (newItemCount >= hhMinReq) {
+        hh.put(item, totalCount)
+      }
+      pruneHH
+    }
+  }
+
+  @inline
+  private def updateCMSTestMatch(t: Long): Boolean = hh.synchronized {
+    updateItem(t)
+    hh.containsKey(t)
   }
 
   def wrapTraversableOnce(t: Iterator[T]): (ArrayBuffer[T], Iterator[T]) = {
