@@ -33,7 +33,11 @@ object SummingCache {
   /**
    * returns the default SummingCache implementation: PlusOptimizedSummingCache
    */
-  def apply[K,V:Semigroup](cap: Int): SummingCache[K,V] = PlusOptimizedSummingCache(cap)
+  def apply[K,V](cap: Int) (implicit sg:Semigroup[V]): SummingCache[K,V] = sg match {
+      case _:PlusPreferedOperation => PlusOptimizedSummingCache(cap)
+      case _:SumOptionPreferedOperation => SumOptionOptimizedSummingCache(cap)
+      case _ => PlusOptimizedSummingCache(cap)
+    }
 }
 
 object SumOptionOptimizedSummingCache {

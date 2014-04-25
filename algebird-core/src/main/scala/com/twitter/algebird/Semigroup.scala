@@ -36,6 +36,15 @@ trait Semigroup[@specialized(Int,Long,Float,Double) T] extends java.io.Serializa
     iter.reduceLeftOption { plus(_, _) }
 }
 
+/**
+ *  Hint provided for optimizers
+ *  indicate the most efficient implementation to sum many elements
+ *  A simple Semigroup on ints would prefer plus when a more complex one like HLL would prefer sumOption
+ */
+sealed trait PreferedOperation
+trait PlusPreferedOperation extends PreferedOperation
+trait SumOptionPreferedOperation extends PreferedOperation
+
 // For Java interop so they get the default sumOption
 abstract class AbstractSemigroup[T] extends Semigroup[T]
 
