@@ -57,19 +57,20 @@ object DynamicSummer {
 
 }
 
-class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
+class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
                               override val softMemoryFlush: MemoryFlushPercent,
-                              backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]])
-                              extends AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-                              with WithFlushConditions[(Key, Value), Iterable[(Key, Value)]] {
-  type T = (Key, Value)
-  override def flush: Future[Iterable[(Key, Value)]] = backingSummer.flush
+                              backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
+                              extends AsyncSummer[(K, V), Iterable[(K, V)]]
+                              with WithFlushConditions[(K, V), Iterable[(K, V)]] {
+
+  type T = (K, V) // We only treat the K, V types as a pair almost exclusively in this class.
+
+  override def flush: Future[Iterable[T]] = backingSummer.flush
   override def isFlushed = backingSummer.isFlushed
-  override val emptyResult = Seq[(Key, Value)]()
+  override val emptyResult = Seq[T]()
 
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
-
   private[this] final val hh = new java.util.HashMap[Long, Long]()
   private[this] final var totalCount = 0L
   private[this] final var hhMinReq = 0L
@@ -83,19 +84,8 @@ class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFr
     (0 until DEPTH).map { _ => CMSHash(r.nextInt, 0, WIDTH) }
   }.toIndexedSeq
 
-  private[this] def resetCMS {
-    hh.clear
-    totalCount = 0L
-    hhMinReq = 0L
-    var indx = 0
-    while(indx < WIDTH * DEPTH) {
-      countsTable.update(indx, 0L)
-      indx += 1
-    }
-  }
-
   @inline
-  def pruneHH {
+  private[this] final def pruneHH {
     val iter = hh.values.iterator
     while(iter.hasNext) {
       val n = iter.next
@@ -117,6 +107,10 @@ class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFr
     min
   }
 
+
+  // Update functions in the write path
+  // a synchronized guard should be used around these
+  // to ensure consistent updates to backing data structures
   @inline
   private[this] final def updateItem(item: Long) {
     totalCount += 1L
@@ -149,10 +143,30 @@ class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFr
     }
   }
 
-  private val updateStep = new java.util.concurrent.atomic.AtomicLong(0L)
+  // We include the ability to reset the CMS so we can age our counters
+  // over time
+  private[this] def resetCMS {
+    hh.clear
+    totalCount = 0L
+    hhMinReq = 0L
+    var indx = 0
+    while(indx < WIDTH * DEPTH) {
+      countsTable.update(indx, 0L)
+      indx += 1
+    }
+  }
+  // End of thread-unsafe update steps
+
+  private[this] final val updateStep = new java.util.concurrent.atomic.AtomicLong(0L)
 
   @inline
-  private def updateCMSTestMatch(t: Long): Boolean = {
+  private[this] final def updateCMSTestMatch(t: Long): Boolean = {
+    // This is the entry point from the iterator into our CMS implementation
+    // We only update on certain steps < a threshold and on every nTh step.
+
+    // We only acquire locks/synchronize when hitting the update/write path.
+    // most passes into this function will just hit the final line(containsKey).
+    // which is our thread safe read path.
     val newCounter = updateStep.incrementAndGet
     if (newCounter > rollOverFrequency) {
       hh.synchronized {
@@ -168,9 +182,9 @@ class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFr
     hh.containsKey(t)
   }
 
-  def wrapTraversableOnce(t: Iterator[T]): (ListBuffer[T], Iterator[T]) = {
-    val store = new ListBuffer[(Key, Value)]
-    val iter = new Iterator[(Key, Value)] {
+  private[this] final def wrapTraversableOnce(t: Iterator[T]): (ListBuffer[T], Iterator[T]) = {
+    val store = new ListBuffer[T]
+    val iter = new Iterator[T] {
       var head: T = null
       override def hasNext: Boolean = {
         if(head != null) return true
@@ -198,7 +212,7 @@ class DynamicSummer[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFr
     (store, iter)
   }
 
-  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Iterable[T]] = {
+  def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
     val (s, iter) = wrapTraversableOnce(vals.toIterator)
     if(iter.hasNext) {
       backingSummer.addAll(iter.toTraversable).map { fResp =>
