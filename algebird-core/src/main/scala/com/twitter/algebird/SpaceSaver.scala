@@ -109,9 +109,6 @@ object SSMany {
 }
 
 case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
-  //assert(buckets.values.map(_.size).sum == counters.size)
-  //assert(buckets == SSMany.bucketsFromCounters(counters))
-
   private val exact: Boolean = counters.size < capacity
 
   val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
