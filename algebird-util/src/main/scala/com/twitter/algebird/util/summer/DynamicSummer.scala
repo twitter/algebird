@@ -43,7 +43,6 @@ case class RollOverFrequency(toLong: Long)
 case class HeavyHittersPercent(toFloat: Float)
 
 object DynamicSummer {
-  // 1%
   val DEFAULT_HH_PERCENT = HeavyHittersPercent(0.01f)
   val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
   val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
@@ -71,7 +70,7 @@ class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequenc
 
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
-  private[this] final val hh = new java.util.HashMap[Long, Long]()
+  private[this] final val hh = new java.util.HashMap[Int, Long]()
   private[this] final var totalCount = 0L
   private[this] final var hhMinReq = 0L
   private[this] final val hhPercent = hhPct.toFloat
@@ -112,7 +111,7 @@ class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequenc
   // a synchronized guard should be used around these
   // to ensure consistent updates to backing data structures
   @inline
-  private[this] final def updateItem(item: Long) {
+  private[this] final def updateItem(item: Int) {
     totalCount += 1L
     hhMinReq = (hhPercent * totalCount).toLong
     var indx = 0
@@ -125,7 +124,7 @@ class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequenc
   }
 
   @inline
-  private[this] final def updateHH(item : Long) {
+  private[this] final def updateHH(item : Int) {
     if(hh.containsKey(item)) {
       val v = hh.get(item)
       val newItemCount =  + 1L
@@ -160,7 +159,7 @@ class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequenc
   private[this] final val updateStep = new java.util.concurrent.atomic.AtomicLong(0L)
 
   @inline
-  private[this] final def updateCMSTestMatch(t: Long): Boolean = {
+  private[this] final def updateCMSTestMatch(t: Int): Boolean = {
     // This is the entry point from the iterator into our CMS implementation
     // We only update on certain steps < a threshold and on every nTh step.
 
