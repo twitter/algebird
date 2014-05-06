@@ -225,7 +225,7 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     val self = this
     // TODO https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
-      // we have to do this because the normal takeWhile causes OOM on big intervals
+      // We have to do this because the normal takeWhile causes OOM on big intervals
       def iterator = lower.toIterable.iterator.takeWhile(self.upper.contains(_))
     }
   }
@@ -236,7 +236,7 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     val self = this
     // TODO https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
-      // we have to do this because the normal takeWhile causes OOM on big intervals
+      // We have to do this because the normal takeWhile causes OOM on big intervals
       def iterator = upper.toIterable.iterator.takeWhile(self.lower.contains(_))
     }
   }
