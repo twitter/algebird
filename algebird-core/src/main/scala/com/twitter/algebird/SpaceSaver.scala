@@ -35,7 +35,7 @@ sealed abstract class SpaceSaver[T] {
   def min: Long
 
   /**
-    * Map of item to counter, where each counter consist of a observed count and possible over-estimation (error)
+    * Map of item to counter, where each counter consists of an observed count and possible over-estimation (error)
     */
   def counters: Map[T, (Long, Long)]
 
@@ -79,7 +79,7 @@ sealed abstract class SpaceSaver[T] {
     * Check consistency with other SpaceSaver, useful for testing.
     * Returns boolean indicating if they are consistent
     */
-  def consistentWith(that: SpaceSaver[T]): Boolean = 
+  def consistentWith(that: SpaceSaver[T]): Boolean =
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
