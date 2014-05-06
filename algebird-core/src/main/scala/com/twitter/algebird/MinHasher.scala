@@ -11,7 +11,7 @@ case class MinHashSignature(bytes: Array[Byte])
 
 object MinHasher {
 
-  /** numerically solve the inverse of estimatedThreshold, given numBands*numRows */
+  /** Numerically solve the inverse of estimatedThreshold, given numBands*numRows */
   def pickBands(threshold : Double, hashes : Int) = {
     val target = hashes * -1 * math.log(threshold)
     var bands = 1
@@ -25,7 +25,7 @@ object MinHasher {
     val hashes = (maxHashes / bands) * bands
     (hashes, bands)
   }
-  
+
 }
 
 /**
@@ -35,12 +35,12 @@ object MinHasher {
   * A signature is represented by a byte array of approx maxBytes size.
   * You can initialize a signature with a single element, usually a Long or String.
   * You can combine any two set's signatures to produce the signature of their union.
-  * You can compare any two set's signatures to estimate their jaccard similarity.
+  * You can compare any two set's signatures to estimate their Jaccard similarity.
   * You can use a set's signature to estimate the number of distinct values in the set.
   * You can also use a combination of the above to estimate the size of the intersection of
   * two sets from their signatures.
   * The more bytes in the signature, the more accurate all of the above will be.
-  * 
+  *
   * You can also use these signatures to quickly find similar sets without doing
   * n^2 comparisons. Each signature is assigned to several buckets; sets whose signatures
   * end up in the same bucket are likely to be similar. The targetThreshold controls
@@ -56,7 +56,7 @@ object MinHasher {
 **/
 abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n : Numeric[H]) extends Monoid[MinHashSignature] {
 
-  /** the number of bytes used for each hash in the signature */
+  /** The number of bytes used for each hash in the signature */
   def hashSize : Int
 
   /** For explanation of the "bands" and "rows" see Ullman and Rajaraman */
@@ -72,7 +72,7 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}    
+    (1 to numHashFunctions).map{i => MurmurHash128(r.nextLong)}
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
@@ -82,8 +82,8 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
   def plus(left : MinHashSignature, right : MinHashSignature) : MinHashSignature = MinHashSignature(
     buildArray(left.bytes, right.bytes){(l, r) => n.min(l, r)}
   )
-  
-  /** Esimate jaccard similarity (size of union / size of intersection) */
+
+  /** Esimate Jaccard similarity (size of union / size of intersection) */
   def similarity(left : MinHashSignature, right : MinHashSignature) : Double =
     buildArray(left.bytes,right.bytes){(l,r) => if(l == r) n.one else n.zero}
       .map{_.toDouble}.sum / numHashes
@@ -94,7 +94,7 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
       .filter{_.size == numRows * hashSize}
       .map{hashFunctions.head(_)._1}
       .toList
-  
+
   /** Create a signature for a single Long value */
   def init(value : Long) : MinHashSignature = init{_(value)}
 
@@ -116,10 +116,10 @@ abstract class MinHasher[H](val numHashes : Int, val numBands : Int)(implicit n 
     MinHashSignature(bytes)
   }
 
-  /** useful for understanding the effects of numBands and numRows */
+  /** Useful for understanding the effects of numBands and numRows */
   val estimatedThreshold = math.pow(1.0/numBands, 1.0/numRows)
 
-  /** useful for understanding the effects of numBands and numRows */
+  /** Useful for understanding the effects of numBands and numRows */
   def probabilityOfInclusion(sim : Double) = 1.0 - math.pow(1.0 - math.pow(sim, numRows), numBands)
 
   /** Maximum value the hash can take on (not 2*hashSize because of signed types) */
@@ -138,12 +138,12 @@ class MinHasher32(numHashes : Int, numBands : Int) extends MinHasher[Int](numHas
 
   def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 4))
 
-  override def hashSize = 4  
+  override def hashSize = 4
 
   override def maxHash = Int.MaxValue
 
   override protected def buildArray(fn: => Int) : Array[Byte] = {
-    val byteBuffer = ByteBuffer.allocate(numBytes)    
+    val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asIntBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
@@ -155,7 +155,7 @@ class MinHasher32(numHashes : Int, numBands : Int) extends MinHasher[Int](numHas
     buildArray{fn(leftBuffer.get, rightBuffer.get)}
   }
 
-  /** seems to work, but experimental and not generic yet */
+  /** Seems to work, but experimental and not generic yet */
   def approxCount(sig : Array[Byte]) = {
     val buffer = ByteBuffer.wrap(sig).asIntBuffer
     val mean = 1.to(numHashes).map{i => buffer.get.toLong}.sum / numHashes
@@ -169,12 +169,12 @@ class MinHasher16(numHashes : Int, numBands : Int) extends MinHasher[Char](numHa
 
   def this(targetThreshold : Double, maxBytes : Int) = this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 2))
 
-  override def hashSize = 2  
+  override def hashSize = 2
 
   override def maxHash = Char.MaxValue
 
   override protected def buildArray(fn: => Char) : Array[Byte] = {
-    val byteBuffer = ByteBuffer.allocate(numBytes)    
+    val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asCharBuffer
     1.to(numHashes).foreach{i => writeBuffer.put(fn)}
     byteBuffer.array
