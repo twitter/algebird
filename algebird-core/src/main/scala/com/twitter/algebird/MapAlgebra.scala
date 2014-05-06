@@ -186,7 +186,7 @@ object MapAlgebra {
   def sumByKey[K,V:Semigroup](pairs: TraversableOnce[(K,V)]): Map[K,V] =
     Monoid.sum(pairs map { Map(_) })
 
-  // Consider this as edges from k -> v, preduce a Map[K,Set[V]]
+  // Consider this as edges from k -> v, produce a Map[K,Set[V]]
   def toGraph[K,V](pairs: TraversableOnce[(K,V)]): Map[K, Set[V]] =
     Monoid.sum(pairs.map { case (k,v) => Map(k -> Set(v)) })
 
