@@ -68,7 +68,7 @@ class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
         bigger.add(next)
       }
       else if (ord.lteq(next, biggest)) {
-        // this cannot increase the biggerst
+        // this cannot increase the biggest
         bigger.add(next)
       }
       next = smaller.poll
