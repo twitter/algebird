@@ -58,7 +58,7 @@ class TopKMonoid[T](k : Int)(implicit ord : Ordering[T]) extends Monoid[TopK[T]]
   }
   protected def merge(bigger: TopK[T], smaller: TopK[T]): TopK[T] = {
     import SortedTakeListMonoid.mergeSortR
-    //This is the internal loop that does one comparison:
+    // This is the internal loop that does one comparison:
     val newItems = mergeSortR(Nil, bigger.items, smaller.items, k)
     val max = newItems.headOption
     // Now reverse and get the size:
