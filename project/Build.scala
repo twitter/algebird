@@ -36,6 +36,8 @@ object AlgebirdBuild extends Build {
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
+    libraryDependencies += "junit" % "junit" % "4.11" % "test",
+
     // Publishing options:
     publishMavenStyle := true,
 
