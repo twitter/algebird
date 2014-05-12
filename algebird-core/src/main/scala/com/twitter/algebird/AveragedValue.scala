@@ -33,7 +33,7 @@ object AveragedGroup extends Group[AveragedValue] {
   // can be:
   private val STABILITY_CONSTANT = 0.1
   /**
-   * uses a more stable online algorithm which should
+   * Uses a more stable online algorithm which should
    * be suitable for large numbers of records
    * similar to:
    * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm

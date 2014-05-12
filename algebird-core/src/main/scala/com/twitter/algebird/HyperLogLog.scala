@@ -430,8 +430,8 @@ class HyperLogLogMonoid(val bits : Int) extends Monoid[HLL] {
       sizeOf(head) + intersectionSize(tail) -
         intersectionSize(tail.map { _ + head })
     }
-    .map { _.withMin(0L) } //We always know the insection is >= 0
-    .getOrElse(Approximate.exact(0L)) //Empty lists have no intersection
+    .map { _.withMin(0L) } // We always know the intersection is >= 0
+    .getOrElse(Approximate.exact(0L)) // Empty lists have no intersection
   }
 }
 

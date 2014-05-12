@@ -20,7 +20,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
 
 /**
-  * Generators useful in testing Inteval
+  * Generators useful in testing Interval
   */
 object Generators {
 

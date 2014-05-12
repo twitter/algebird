@@ -18,7 +18,7 @@ package com.twitter.algebird.monad
 
 import com.twitter.algebird.Monad
 
-// Monad for either, used for mondeling Error where L is the type of the error
+// Monad for either, used for modeling Error where L is the type of the error
 object EitherMonad {
   class Error[L] extends Monad[({type RightType[R] = Either[L,R]})#RightType] {
     def apply[R](r: R) = Right(r)
