@@ -24,7 +24,7 @@ import com.twitter.algebird.{AdaptiveVector, Monoid}
  * Initial support here is focused on a dense row count with a sparse set of columns
  */
 
-abstract class AdaptiveMatrix[V: Monoid] {
+abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
   def rows: Int
   def cols: Int
   def size = rows * cols
