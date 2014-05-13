@@ -17,6 +17,7 @@ package com.twitter.algebird.javaapi;
 
 import com.twitter.algebird.Monoid;
 import com.twitter.algebird.Monoid$;
+import com.twitter.algebird.Semigroup;
 
 /**
  *
@@ -51,14 +52,14 @@ public class Monoids {
   public static Monoid<Float> floatMonoid() { return MODULE.jfloatMonoid(); }
   public static Monoid<Double> doubleMonoid() { return MODULE.jdoubleMonoid(); }
   public static Monoid<String> stringMonoid() { return MODULE.stringMonoid(); }
-  public static <T> Monoid<scala.Option<T>> optionMonoid(Monoid<T> componentMonoid) { return MODULE.optionMonoid(componentMonoid); }
+  public static <T> Monoid<scala.Option<T>> optionMonoid(Semigroup<T> componentSemigroup) { return MODULE.optionMonoid(componentSemigroup); }
   public static <T> Monoid<scala.collection.immutable.List<T>> listMonoid() { return MODULE.listMonoid(); }
   public static <T> Monoid<scala.collection.Seq<T>> seqMonoid() { return MODULE.seqMonoid(); }
   public static <T> Monoid<scala.collection.IndexedSeq<T>> indexedSeqMonoid(Monoid<T> componentMonoid) { return MODULE.indexedSeqMonoid(componentMonoid); }
   public static <T> Monoid<java.util.List<T>> jlistMonoid() { return MODULE.jlistMonoid(); }
   public static <T> Monoid<scala.collection.immutable.Set<T>> setMonoid() { return MODULE.setMonoid(); }
-  public static <K, V> Monoid<scala.collection.immutable.Map<K,V>> mapMonoid(Monoid<V> componentMonoid) { return MODULE.mapMonoid(componentMonoid); }
-  public static <K, V> Monoid<scala.collection.Map<K,V>> scMapMonoid(Monoid<V> componentMonoid) { return MODULE.scMapMonoid(componentMonoid); }
-  public static <K, V> Monoid<java.util.Map<K,V>> jmapMonoid(Monoid<V> componentMonoid) { return MODULE.jmapMonoid(componentMonoid); }
+  public static <K, V> Monoid<scala.collection.immutable.Map<K,V>> mapMonoid(Semigroup<V> componentSemigroup) { return MODULE.mapMonoid(componentSemigroup); }
+  public static <K, V> Monoid<scala.collection.Map<K,V>> scMapMonoid(Semigroup<V> componentSemigroup) { return MODULE.<K,V>scMapMonoid(componentSemigroup); }
+  public static <K, V> Monoid<java.util.Map<K,V>> jmapMonoid(Semigroup<V> componentSemigroup) { return MODULE.jmapMonoid(componentSemigroup); }
   public static <T> Monoid<scala.Function1<T,T>> function1Monoid() { return MODULE.function1Monoid(); }
 }

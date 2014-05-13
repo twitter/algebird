@@ -19,7 +19,11 @@ import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
 import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList}
+import java.util.{List => JList, Map => JMap}
+
+import scala.collection.mutable.{Map => MMap}
+import scala.collection.{Map => ScMap}
+
 
 /**
  * Monoid (take a deep breath, and relax about the weird name):
@@ -214,15 +218,15 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit val doubleMonoid : Monoid[Double] = DoubleField
   implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
   implicit val stringMonoid : Monoid[String] = StringMonoid
-  implicit def optionMonoid[T : Semigroup] = new OptionMonoid[T]
+  implicit def optionMonoid[T : Semigroup] : Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
-  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
+  implicit def indexedSeqMonoid[T:Monoid] : Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V: Semigroup] = new MapMonoid[K,V]
-  implicit def scMapMonoid[K,V: Semigroup] = new ScMapMonoid[K,V]
-  implicit def jmapMonoid[K,V : Semigroup] = new JMapMonoid[K,V]
-  implicit def eitherMonoid[L : Semigroup, R : Monoid] = new EitherMonoid[L, R]
-  implicit def function1Monoid[T] = new Function1Monoid[T]
+  implicit def mapMonoid[K,V: Semigroup] : Monoid[Map[K,V]] = new MapMonoid[K,V]
+  implicit def scMapMonoid[K,V: Semigroup] : Monoid[ScMap[K,V]] = new ScMapMonoid[K,V]
+  implicit def jmapMonoid[K,V : Semigroup] : Monoid[JMap[K,V]] = new JMapMonoid[K,V]
+  implicit def eitherMonoid[L : Semigroup, R : Monoid] : Monoid[Either[L,R]] = new EitherMonoid[L, R]
+  implicit def function1Monoid[T] : Monoid[Function1[T,T]] = new Function1Monoid[T]
 }

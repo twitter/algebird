@@ -155,6 +155,6 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   implicit def mapSemigroup[K,V:Semigroup]: Semigroup[Map[K,V]] = new MapMonoid[K,V]
   implicit def scMapSemigroup[K,V:Semigroup]: Semigroup[ScMap[K,V]] = new ScMapMonoid[K,V]
   implicit def jmapSemigroup[K,V : Semigroup] : Semigroup[JMap[K, V]] = new JMapMonoid[K,V]
-  implicit def eitherSemigroup[L : Semigroup, R : Semigroup] = new EitherSemigroup[L,R]
+  implicit def eitherSemigroup[L : Semigroup, R : Semigroup] : Semigroup[Either[L,R]] = new EitherSemigroup[L,R]
   implicit def function1Semigroup[T] : Semigroup[Function1[T,T]] = new Function1Monoid[T]
 }
