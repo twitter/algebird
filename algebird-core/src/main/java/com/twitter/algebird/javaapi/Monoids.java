@@ -29,7 +29,9 @@ public class Monoids {
 
   private Monoids() {}
 
-  private static MethodRegistry registry = new MethodRegistry(Monoid$.MODULE$, Monoid.class);
+  private static final Monoid$ MODULE = Monoid$.MODULE$;
+
+  private static final MethodRegistry registry = new MethodRegistry(MODULE, Monoid.class);
 
   /**
    * @param c the type of the elements
@@ -40,4 +42,23 @@ public class Monoids {
     Monoid<T> m = (Monoid<T>)registry.resolveAndInvoke(c);
     return m;
   }
+
+  public static Monoid<Boolean> boolMonoid() { return MODULE.jboolMonoid(); }
+  public static Monoid<Integer> intMonoid() { return MODULE.jintMonoid(); }
+  public static Monoid<Short> shortMonoid() { return MODULE.jshortMonoid(); }
+  public static Monoid<scala.math.BigInt> bigIntMonoid() { return MODULE.bigIntMonoid(); }
+  public static Monoid<Long> longMonoid() { return MODULE.jlongMonoid(); }
+  public static Monoid<Float> floatMonoid() { return MODULE.jfloatMonoid(); }
+  public static Monoid<Double> doubleMonoid() { return MODULE.jdoubleMonoid(); }
+  public static Monoid<String> stringMonoid() { return MODULE.stringMonoid(); }
+  public static <T> Monoid<scala.Option<T>> optionMonoid(Monoid<T> componentMonoid) { return MODULE.optionMonoid(componentMonoid); }
+  public static <T> Monoid<scala.collection.immutable.List<T>> listMonoid() { return MODULE.listMonoid(); }
+  public static <T> Monoid<scala.collection.Seq<T>> seqMonoid() { return MODULE.seqMonoid(); }
+  public static <T> Monoid<scala.collection.IndexedSeq<T>> indexedSeqMonoid(Monoid<T> componentMonoid) { return MODULE.indexedSeqMonoid(componentMonoid); }
+  public static <T> Monoid<java.util.List<T>> jlistMonoid() { return MODULE.jlistMonoid(); }
+  public static <T> Monoid<scala.collection.immutable.Set<T>> setMonoid() { return MODULE.setMonoid(); }
+  public static <K, V> Monoid<scala.collection.immutable.Map<K,V>> mapMonoid(Monoid<V> componentMonoid) { return MODULE.mapMonoid(componentMonoid); }
+  public static <K, V> Monoid<scala.collection.Map<K,V>> scMapMonoid(Monoid<V> componentMonoid) { return MODULE.scMapMonoid(componentMonoid); }
+  public static <K, V> Monoid<java.util.Map<K,V>> jmapMonoid(Monoid<V> componentMonoid) { return MODULE.jmapMonoid(componentMonoid); }
+  public static <T> Monoid<scala.Function1<T,T>> function1Monoid() { return MODULE.function1Monoid(); }
 }

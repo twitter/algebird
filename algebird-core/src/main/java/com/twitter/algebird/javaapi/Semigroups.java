@@ -29,7 +29,8 @@ public class Semigroups {
 
   private Semigroups() {}
 
-  private static MethodRegistry registry = new MethodRegistry(Semigroup$.MODULE$, Semigroup.class);
+  private static final Semigroup$ MODULE = Semigroup$.MODULE$;
+  private static final MethodRegistry registry = new MethodRegistry(MODULE, Semigroup.class);
 
   /**
    * @param c the type of the elements
@@ -40,4 +41,23 @@ public class Semigroups {
     Semigroup<T> sg = (Semigroup<T>)registry.resolveAndInvoke(c);
     return sg;
   }
+
+  public static Semigroup<Boolean> boolSemigroup() { return MODULE.jboolSemigroup(); }
+  public static Semigroup<Integer> intSemigroup() { return MODULE.jintSemigroup(); }
+  public static Semigroup<Short> shortSemigroup() { return MODULE.jshortSemigroup(); }
+  public static Semigroup<scala.math.BigInt> bigIntSemigroup() { return MODULE.bigIntSemigroup(); }
+  public static Semigroup<Long> longSemigroup() { return MODULE.jlongSemigroup(); }
+  public static Semigroup<Float> floatSemigroup() { return MODULE.jfloatSemigroup(); }
+  public static Semigroup<Double> doubleSemigroup() { return MODULE.jdoubleSemigroup(); }
+  public static Semigroup<String> stringSemigroup() { return MODULE.stringSemigroup(); }
+  public static <T> Semigroup<scala.Option<T>> optionSemigroup(Semigroup<T> componentSemigroup) { return MODULE.optionSemigroup(componentSemigroup); }
+  public static <T> Semigroup<scala.collection.immutable.List<T>> listSemigroup() { return MODULE.listSemigroup(); }
+  public static <T> Semigroup<scala.collection.Seq<T>> seqSemigroup() { return MODULE.seqSemigroup(); }
+  public static <T> Semigroup<scala.collection.IndexedSeq<T>> indexedSeqSemigroup(Semigroup<T> componentSemigroup) { return MODULE.indexedSeqSemigroup(componentSemigroup); }
+  public static <T> Semigroup<java.util.List<T>> jlistSemigroup() { return MODULE.jlistSemigroup(); }
+  public static <T> Semigroup<scala.collection.immutable.Set<T>> setSemigroup() { return MODULE.setSemigroup(); }
+  public static <K, V> Semigroup<scala.collection.immutable.Map<K,V>> mapSemigroup(Semigroup<V> componentSemigroup) { return MODULE.mapSemigroup(componentSemigroup); }
+  public static <K, V> Semigroup<scala.collection.Map<K,V>> scMapSemigroup(Semigroup<V> componentSemigroup) { return MODULE.scMapSemigroup(componentSemigroup); }
+  public static <K, V> Semigroup<java.util.Map<K,V>> jmapSemigroup(Semigroup<V> componentSemigroup) { return MODULE.jmapSemigroup(componentSemigroup); }
+  public static <T> Semigroup<scala.Function1<T,T>> function1Semigroup() { return MODULE.function1Semigroup(); }
 }
