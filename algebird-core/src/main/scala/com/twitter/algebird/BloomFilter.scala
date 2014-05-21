@@ -51,10 +51,10 @@ object BloomFilter{
   }
 
 
-  // compute optimal number of hashes: k = m/n ln(2)
+  // Compute optimal number of hashes: k = m/n ln(2)
   def optimalNumHashes(numEntries: Int, width: Int): Int = math.ceil(width / numEntries * math.log(2)).toInt
 
-  // compute optimal width: m = - n ln(p) / (ln(2))^2
+  // Compute optimal width: m = - n ln(p) / (ln(2))^2
   def optimalWidth(numEntries: Int, fpProb: Double): Int = math.ceil(-1 * numEntries * math.log(fpProb) / math.log(2) / math.log(2)).toInt
 }
 
@@ -62,7 +62,7 @@ object BloomFilter{
  * Bloom Filter - a probabilistic data structure to test presence of an element.
  *
  * Operations
- *   1) insert: hash the value k times, updating the bitfield at the index equal to the each hashed value
+ *   1) insert: hash the value k times, updating the bitfield at the index equal to each hashed value
  *   2) query: hash the value k times.  If there are k collisions, then return true; otherwise false.
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
@@ -317,10 +317,10 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
 
   private def splitLong(x: Long) = {
     def toNonNegativeInt(x: Long) = {
-      val y = math.abs(x).toInt // y may be negative (Interger.MIN_VALUE)
-      y & 0x7fffffff // no change for positive numbers, converts Interger.MIN_VALUE to positive number
+      val y = math.abs(x).toInt // y may be negative (Integer.MIN_VALUE)
+      y & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
     }
-	
+
     val upper = toNonNegativeInt(x >> 32)
     val lower = toNonNegativeInt((x << 32) >> 32)
     (upper, lower)

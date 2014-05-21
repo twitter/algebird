@@ -20,14 +20,14 @@ import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
 /** This is a combinator on semigroups, after you do the plus, you transform B with a fold function
- * This will not be valid for all fold functions. You need to prove that it still associative.
+ * This will not be valid for all fold functions. You need to prove that it is still associative.
  *
  * Clearly only values of (a,b) are valid if fold(a,b) == b, so keep that in mind.
  *
  * I have not yet found a sufficient condition on (A,B) => B that makes it correct
  * Clearly a (trivial) constant function {(l,r) => r} works.
  * Also, if B is List[T], and (l:A,r:List[T]) = r.sortBy(fn(l))
- * this works as well (due to the associativity on A, and the fact that the list never looses data).
+ * this works as well (due to the associativity on A, and the fact that the list never loses data).
  *
  * For approximate lists (like top-K applications) this might work (or be close enough to associative
  * that for approximation algorithms it is fine), and in fact, that is the main motivation of this code:

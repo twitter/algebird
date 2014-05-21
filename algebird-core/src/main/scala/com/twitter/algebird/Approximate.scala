@@ -31,7 +31,7 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
 
   def ||(that: ApproximateBoolean): ApproximateBoolean = {
     if(isTrue || that.isTrue) {
-      //We need at least one of them to be true:
+      // We need at least one of them to be true:
       val newP = List(this, that)
         .filter { _.isTrue }
         .map { _.withProb }
@@ -39,14 +39,14 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
       ApproximateBoolean(true, newP)
     }
     else {
-      // we need both of these to be correct to believe it is false
+      // We need both of these to be correct to believe it is false:
       ApproximateBoolean(false, withProb * that.withProb)
     }
   }
 
   def &&(that: ApproximateBoolean): ApproximateBoolean = {
     if(isTrue && that.isTrue) {
-      //We need both to be correct:
+      // We need both to be correct:
       ApproximateBoolean(true, withProb * that.withProb)
     }
     else {
@@ -69,7 +69,7 @@ object ApproximateBoolean {
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
 case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
   (implicit val numeric: Numeric[N]) {
-   // is this value contained within the bounds:
+   // Is this value contained within the bounds:
    def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
    def contains(v: N): ApproximateBoolean =
      ApproximateBoolean(boundsContain(v), probWithinBounds)
@@ -137,7 +137,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
       Approximate(m, numeric.max(m, estimate), max, probWithinBounds)
     }
   }
-  // Assert that we definitely know the lower bound is better than m
+  // Assert that we definitely know the upper bound is at most m
   def withMax(m: N): Approximate[N] = {
     require(numeric.lteq(min, m))
     if(numeric.lteq(max, m) ) {

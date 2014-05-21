@@ -48,7 +48,7 @@ case class DecayedValueMonoid(eps:Double) extends Monoid[DecayedValue] {
   override val zero = DecayedValue(0.0, Double.NegativeInfinity)
   override def plus(left : DecayedValue, right : DecayedValue) =
     if (left < right) {
-      //left is older:
+      // left is older:
       DecayedValue.scale(right, left, eps)
     }
     else {

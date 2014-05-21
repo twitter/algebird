@@ -21,7 +21,7 @@ package com.twitter.algebird
  * like Semigroup[String] or Semigroup[List[T]]
  *
  * If l.size != r.size, then only sums the elements up to the index min(l.size, r.size); appends
- * the remaineder to the result.
+ * the remainder to the result.
  */
 class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
 
