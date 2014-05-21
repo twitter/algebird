@@ -68,5 +68,19 @@ public class TestRegistry {
     assertEquals(0, intMonoid().zero().intValue());
     assertEquals("", monoid(String.class).zero());
     assertEquals("", stringMonoid().zero());
+
+    Map<String, Long> map1 = new HashMap<String, Long>();
+    map1.put("foo", 1L);
+    map1.put("bar", 2L);
+    Map<String, Long> map2 = new HashMap<String, Long>();
+    map2.put("foo", 3L);
+    map2.put("bar", 4L);
+    Map<String, Long> map3 = new HashMap<String, Long>();
+    map3.put("foo", 4L);
+    map3.put("bar", 6L);
+    assertEquals(map3, Monoids.<String, Long>jmapMonoid(longSemigroup()).plus(map1, map2));
+
+    assertEquals(EMPTY_LIST, monoid(List.class).plus(EMPTY_LIST, EMPTY_LIST));
+    assertEquals(emptyList(), jlistMonoid().plus(emptyList(), emptyList()));
   }
 }
