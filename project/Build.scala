@@ -4,6 +4,8 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
   def withCross(dep: ModuleID) =
@@ -18,7 +20,12 @@ object AlgebirdBuild extends Build {
       case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
   }
 
-  val sharedSettings = Project.defaultSettings ++ Seq(
+  val appScalariformSettings =
+    ScalariformKeys.preferences :=
+      FormattingPreferences()
+        .setPreference(IndentWithTabs, false)
+
+  val sharedSettings = Project.defaultSettings ++ scalariformSettings ++ appScalariformSettings ++ Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
     crossScalaVersions := Seq("2.9.3", "2.10.0"),

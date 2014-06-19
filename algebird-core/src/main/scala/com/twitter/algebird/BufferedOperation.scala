@@ -18,7 +18,8 @@ package com.twitter.algebird
 
 import scala.collection.mutable.ArrayBuffer
 
-/** Represents something that consumes I and may emit O. Has some internal
+/**
+ * Represents something that consumes I and may emit O. Has some internal
  * state that may be used to improve performance.
  * Generally used to model folds or reduces (see BufferedReduce)
  */
@@ -37,12 +38,12 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
 
   def put(item: I): Option[O] = {
     buffer += item
-    if(buffer.size >= size) flush
+    if (buffer.size >= size) flush
     else None
   }
 
   def flush: Option[O] =
-    if(buffer.isEmpty) None
+    if (buffer.isEmpty) None
     else {
       val res = operate(buffer)
       buffer.clear
@@ -60,7 +61,7 @@ trait BufferedReduce[V] extends Buffered[V, V] {
   abstract override def put(item: V) = {
     val res = super.put(item)
     // avoiding closures for performance critical code:
-    if(res.isDefined) put(res.get)
+    if (res.isDefined) put(res.get)
     else None
   }
 }

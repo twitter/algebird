@@ -33,39 +33,37 @@ package com.twitter.algebird
  * sent to a single reducer and all the Accs are added up.
  */
 object RightFolded2 {
-  def monoid[In,Out:Group](foldfn : (In,Out) => Out) =
-    new RightFolded2Monoid[In,Out,Out](foldfn, identity _)
+  def monoid[In, Out: Group](foldfn: (In, Out) => Out) =
+    new RightFolded2Monoid[In, Out, Out](foldfn, identity _)
 
-  def monoid[In,Out,Acc:Group](trans: (Out) => Acc)(foldfn: (In,Out) => Out) =
-    new RightFolded2Monoid[In,Out,Acc](foldfn, trans)
+  def monoid[In, Out, Acc: Group](trans: (Out) => Acc)(foldfn: (In, Out) => Out) =
+    new RightFolded2Monoid[In, Out, Acc](foldfn, trans)
 }
 
-class RightFolded2Monoid[In,Out,Acc](foldfn: (In,Out) => Out, accfn: (Out) => Acc)
-  (implicit grpAcc: Group[Acc])
-  extends Monoid[RightFolded2[In,Out,Acc]] {
+class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(implicit grpAcc: Group[Acc])
+    extends Monoid[RightFolded2[In, Out, Acc]] {
   val zero = RightFoldedZero2
 
-  def init(i: Out) = RightFoldedValue2[In,Out,Acc](i, accfn(i), Nil)
+  def init(i: Out) = RightFoldedValue2[In, Out, Acc](i, accfn(i), Nil)
   def toFold(v: In) = RightFoldedToFold2(List(v))
 
-  protected def doFold(vals: List[In], init: Out, acc: Acc) : (Out,Acc) = {
+  protected def doFold(vals: List[In], init: Out, acc: Acc): (Out, Acc) = {
     val newV = vals.foldRight(init)(foldfn)
     val delta = grpAcc.plus(accfn(newV), grpAcc.negate(accfn(init)))
     (newV, grpAcc.plus(delta, acc))
   }
 
-  def plus(left: RightFolded2[In,Out,Acc], right : RightFolded2[In,Out,Acc]) = left match {
-    case RightFoldedValue2(leftV,leftAcc,leftRvals) => {
+  def plus(left: RightFolded2[In, Out, Acc], right: RightFolded2[In, Out, Acc]) = left match {
+    case RightFoldedValue2(leftV, leftAcc, leftRvals) => {
       right match {
         case RightFoldedZero2 => left
         case RightFoldedToFold2(in) => RightFoldedValue2(leftV, leftAcc, leftRvals ++ in)
-        case RightFoldedValue2(rightV,rightAcc,rightRvals) => {
+        case RightFoldedValue2(rightV, rightAcc, rightRvals) => {
           if (leftRvals.isEmpty) {
             // This is the case of two initial values next to each other, return the left:
             val newAcc = grpAcc.plus(leftAcc, rightAcc)
             RightFoldedValue2(leftV, newAcc, rightRvals)
-          }
-          else {
+          } else {
             val (newV, newRightAcc) = doFold(leftRvals, rightV, rightAcc)
             // Now actually add the left value, with the right:
             val newAcc = grpAcc.plus(leftAcc, newRightAcc)
@@ -78,7 +76,7 @@ class RightFolded2Monoid[In,Out,Acc](foldfn: (In,Out) => Out, accfn: (Out) => Ac
     case RightFoldedToFold2(lList) => right match {
       case RightFoldedZero2 => left
       case RightFoldedToFold2(rList) => RightFoldedToFold2(lList ++ rList)
-      case RightFoldedValue2(vr,accr,valsr) => {
+      case RightFoldedValue2(vr, accr, valsr) => {
         val (newV, newAcc) = doFold(lList, vr, accr)
         RightFoldedValue2(newV, newAcc, valsr)
       }
@@ -86,7 +84,7 @@ class RightFolded2Monoid[In,Out,Acc](foldfn: (In,Out) => Out, accfn: (Out) => Ac
   }
 }
 
-sealed abstract class RightFolded2[+In,+Out,+Acc]
-case object RightFoldedZero2 extends RightFolded2[Nothing,Nothing,Nothing]
-case class RightFoldedValue2[+In,+Out,+Acc](v: Out, acc: Acc, rvals: List[In]) extends RightFolded2[In,Out,Acc]
-case class RightFoldedToFold2[+In](in: List[In]) extends RightFolded2[In,Nothing,Nothing]
+sealed abstract class RightFolded2[+In, +Out, +Acc]
+case object RightFoldedZero2 extends RightFolded2[Nothing, Nothing, Nothing]
+case class RightFoldedValue2[+In, +Out, +Acc](v: Out, acc: Acc, rvals: List[In]) extends RightFolded2[In, Out, Acc]
+case class RightFoldedToFold2[+In](in: List[In]) extends RightFolded2[In, Nothing, Nothing]

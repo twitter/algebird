@@ -38,7 +38,7 @@ package com.twitter.algebird
  */
 
 object QTree {
-  def apply[A:Monoid](kv : (Double,A), level : Int = -16) : QTree[A] = {
+  def apply[A: Monoid](kv: (Double, A), level: Int = -16): QTree[A] = {
     QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
       level,
       1,
@@ -47,7 +47,7 @@ object QTree {
       None)
   }
 
-  def apply[A:Monoid](kv : (Long,A)) : QTree[A] = {
+  def apply[A: Monoid](kv: (Long, A)): QTree[A] = {
     QTree(kv._1,
       0,
       1,
@@ -57,39 +57,39 @@ object QTree {
   }
 
   /**
-  * The common case of wanting a count and sum for the same value
-  */
-  def apply(k : Long) : QTree[Long] = apply(k -> k)
-  def apply(k : Double) : QTree[Double] = apply(k -> k)
+   * The common case of wanting a count and sum for the same value
+   */
+  def apply(k: Long): QTree[Long] = apply(k -> k)
+  def apply(k: Double): QTree[Double] = apply(k -> k)
 }
 
-class QTreeSemigroup[A:Monoid](k : Int) extends Semigroup[QTree[A]] {
-  def plus(left : QTree[A], right : QTree[A]) = left.merge(right).compress(k)
+class QTreeSemigroup[A: Monoid](k: Int) extends Semigroup[QTree[A]] {
+  def plus(left: QTree[A], right: QTree[A]) = left.merge(right).compress(k)
 }
 
 case class QTree[A](
-              offset : Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
-              level : Int,
-              count : Long, //the total count for this node and all of its children
-              sum : A, //the sum at just this node (*not* including its children)
-              lowerChild : Option[QTree[A]],
-              upperChild : Option[QTree[A]])(implicit monoid : Monoid[A]) {
+    offset: Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
+    level: Int,
+    count: Long, //the total count for this node and all of its children
+    sum: A, //the sum at just this node (*not* including its children)
+    lowerChild: Option[QTree[A]],
+    upperChild: Option[QTree[A]])(implicit monoid: Monoid[A]) {
 
   require(offset >= 0, "QTree can not accept negative values")
 
-  def range : Double = math.pow(2.0, level)
-  def lowerBound : Double = range * offset
-  def upperBound : Double = range * (offset + 1)
+  def range: Double = math.pow(2.0, level)
+  def lowerBound: Double = range * offset
+  def upperBound: Double = range * (offset + 1)
 
-  private def extendToLevel(n : Int) : QTree[A] = {
-    if(n <= level)
+  private def extendToLevel(n: Int): QTree[A] = {
+    if (n <= level)
       this
     else {
       val nextLevel = level + 1
       val nextOffset = offset / 2
 
       val parent =
-        if(offset % 2 == 0)
+        if (offset % 2 == 0)
           QTree[A](nextOffset, nextLevel, count, monoid.zero, Some(this), None)
         else
           QTree[A](nextOffset, nextLevel, count, monoid.zero, None, Some(this))
@@ -98,166 +98,166 @@ case class QTree[A](
   }
 
   /**
-  *
-  * Find the smallest dyadic interval that contains the dyadic interval
-  * for this tree's root and the other tree's root, and return its
-  * level (that is, the power of 2 for the interval).
-  **/
+   *
+   * Find the smallest dyadic interval that contains the dyadic interval
+   * for this tree's root and the other tree's root, and return its
+   * level (that is, the power of 2 for the interval).
+   */
 
-  private def commonAncestorLevel(other : QTree[A]) = {
+  private def commonAncestorLevel(other: QTree[A]) = {
     val minLevel = level.min(other.level)
     val leftOffset = offset << (level - minLevel)
     val rightOffset = other.offset << (other.level - minLevel)
     var offsetDiff = leftOffset ^ rightOffset
     var ancestorLevel = minLevel
-    while(offsetDiff > 0) {
+    while (offsetDiff > 0) {
       ancestorLevel += 1
       offsetDiff >>= 1
     }
     ancestorLevel.max(level).max(other.level)
   }
 
-  def merge(other : QTree[A]) = {
+  def merge(other: QTree[A]) = {
     val commonAncestor = commonAncestorLevel(other)
     val left = extendToLevel(commonAncestor)
     val right = other.extendToLevel(commonAncestor)
     left.mergeWithPeer(right)
   }
 
-  private def mergeWithPeer(other : QTree[A]) : QTree[A] = {
+  private def mergeWithPeer(other: QTree[A]): QTree[A] = {
     assert(other.lowerBound == lowerBound, "lowerBound " + other.lowerBound + " != " + lowerBound)
     assert(other.level == level, "level " + other.level + " != " + level)
 
     copy(count = count + other.count,
-         sum = monoid.plus(sum, other.sum),
-         lowerChild = mergeOptions(lowerChild, other.lowerChild),
-         upperChild = mergeOptions(upperChild, other.upperChild))
+      sum = monoid.plus(sum, other.sum),
+      lowerChild = mergeOptions(lowerChild, other.lowerChild),
+      upperChild = mergeOptions(upperChild, other.upperChild))
   }
 
-  private def mergeOptions(a : Option[QTree[A]], b : Option[QTree[A]]) : Option[QTree[A]] = {
-    (a,b) match {
+  private def mergeOptions(a: Option[QTree[A]], b: Option[QTree[A]]): Option[QTree[A]] = {
+    (a, b) match {
       case (Some(qa), Some(qb)) => Some(qa.mergeWithPeer(qb))
       case (None, _) => b
       case (_, None) => a
     }
   }
 
-  def quantileBounds(p : Double) : (Double, Double) = {
+  def quantileBounds(p: Double): (Double, Double) = {
     val rank = math.floor(count * p).toLong
     (findRankLowerBound(rank).get, findRankUpperBound(rank).get)
   }
 
-  private def findRankLowerBound(rank : Long) : Option[Double] = {
-    if(rank > count)
+  private def findRankLowerBound(rank: Long): Option[Double] = {
+    if (rank > count)
       None
     else {
-      val childCounts = mapChildrenWithDefault(0L){_.count}
+      val childCounts = mapChildrenWithDefault(0L) { _.count }
       val parentCount = count - childCounts._1 - childCounts._2
-      lowerChild.flatMap{_.findRankLowerBound(rank - parentCount)}.orElse {
+      lowerChild.flatMap { _.findRankLowerBound(rank - parentCount) }.orElse {
         val newRank = rank - childCounts._1 - parentCount
-        if(newRank <= 0)
+        if (newRank <= 0)
           Some(lowerBound)
         else
-          upperChild.flatMap{_.findRankLowerBound(newRank)}
+          upperChild.flatMap { _.findRankLowerBound(newRank) }
       }
     }
   }
 
-  private def findRankUpperBound(rank : Long) : Option[Double] = {
-    if(rank > count)
+  private def findRankUpperBound(rank: Long): Option[Double] = {
+    if (rank > count)
       None
     else {
-      lowerChild.flatMap{_.findRankUpperBound(rank)}.orElse {
-        val lowerCount = lowerChild.map{_.count}.getOrElse(0L)
-        upperChild.flatMap{_.findRankUpperBound(rank - lowerCount)}.orElse(Some(upperBound))
+      lowerChild.flatMap { _.findRankUpperBound(rank) }.orElse {
+        val lowerCount = lowerChild.map { _.count }.getOrElse(0L)
+        upperChild.flatMap { _.findRankUpperBound(rank - lowerCount) }.orElse(Some(upperBound))
       }
     }
   }
 
-  def rangeSumBounds(from : Double, to : Double) : (A,A) = {
-    if(from <= lowerBound && to >= upperBound) {
+  def rangeSumBounds(from: Double, to: Double): (A, A) = {
+    if (from <= lowerBound && to >= upperBound) {
       val s = totalSum
-      (s,s)
-    } else if(from < upperBound && to >= lowerBound) {
-      val ((lower1,upper1),(lower2,upper2)) =
-        mapChildrenWithDefault((monoid.zero,monoid.zero)){_.rangeSumBounds(from,to)}
+      (s, s)
+    } else if (from < upperBound && to >= lowerBound) {
+      val ((lower1, upper1), (lower2, upper2)) =
+        mapChildrenWithDefault((monoid.zero, monoid.zero)) { _.rangeSumBounds(from, to) }
       (monoid.plus(lower1, lower2),
-       monoid.plus(sum, monoid.plus(upper1, upper2)))
+        monoid.plus(sum, monoid.plus(upper1, upper2)))
     } else {
-      (monoid.zero,monoid.zero)
+      (monoid.zero, monoid.zero)
     }
   }
 
-  def rangeCountBounds(from : Double, to : Double) : (Long,Long) = {
-    if(from <= lowerBound && to >= upperBound) {
+  def rangeCountBounds(from: Double, to: Double): (Long, Long) = {
+    if (from <= lowerBound && to >= upperBound) {
       val s = count
-      (s,s)
-    } else if(from < upperBound && to >= lowerBound) {
-      val ((lower1,upper1),(lower2,upper2)) =
-        mapChildrenWithDefault((0L,0L)){_.rangeCountBounds(from,to)}
+      (s, s)
+    } else if (from < upperBound && to >= lowerBound) {
+      val ((lower1, upper1), (lower2, upper2)) =
+        mapChildrenWithDefault((0L, 0L)) { _.rangeCountBounds(from, to) }
       (lower1 + lower2, parentCount + upper1 + upper2)
     } else {
       (0L, 0L)
     }
   }
 
-  def compress(k : Int) = {
+  def compress(k: Int) = {
     val minCount = count >> k
-    val (newTree, pruned) = pruneChildrenWhere{_.count < minCount}
+    val (newTree, pruned) = pruneChildrenWhere { _.count < minCount }
     newTree
   }
 
-  private def pruneChildrenWhere(fn : QTree[A] => Boolean) : (QTree[A], Boolean) = {
-    if(fn(this)) {
+  private def pruneChildrenWhere(fn: QTree[A] => Boolean): (QTree[A], Boolean) = {
+    if (fn(this)) {
       (copy(sum = totalSum, lowerChild = None, upperChild = None), true)
     } else {
       val (newLower, lowerPruned) = pruneChildWhere(lowerChild, fn)
       val (newUpper, upperPruned) = pruneChildWhere(upperChild, fn)
-      if(!lowerPruned && !upperPruned)
+      if (!lowerPruned && !upperPruned)
         (this, false)
       else
         (copy(lowerChild = newLower, upperChild = newUpper), true)
     }
   }
 
-  private def pruneChildWhere(child : Option[QTree[A]], fn : QTree[A] => Boolean) : (Option[QTree[A]], Boolean) = {
-    val result = child.map{_.pruneChildrenWhere(fn)}
-    (result.map{_._1}, result.map{_._2}.getOrElse(false))
+  private def pruneChildWhere(child: Option[QTree[A]], fn: QTree[A] => Boolean): (Option[QTree[A]], Boolean) = {
+    val result = child.map { _.pruneChildrenWhere(fn) }
+    (result.map { _._1 }, result.map { _._2 }.getOrElse(false))
   }
 
-  def size : Int = {
-    val childSizes = mapChildrenWithDefault(0){_.size}
+  def size: Int = {
+    val childSizes = mapChildrenWithDefault(0) { _.size }
     1 + childSizes._1 + childSizes._2
   }
 
-  def totalSum : A = {
-    val childSums = mapChildrenWithDefault(monoid.zero){_.totalSum}
+  def totalSum: A = {
+    val childSums = mapChildrenWithDefault(monoid.zero) { _.totalSum }
     monoid.plus(sum, monoid.plus(childSums._1, childSums._2))
   }
 
-  private def mapChildrenWithDefault[T](default : T)(fn : QTree[A] => T) : (T,T) = {
+  private def mapChildrenWithDefault[T](default: T)(fn: QTree[A] => T): (T, T) = {
     (lowerChild.map(fn).getOrElse(default),
-     upperChild.map(fn).getOrElse(default))
+      upperChild.map(fn).getOrElse(default))
   }
 
   private def parentCount = {
-    val childCounts = mapChildrenWithDefault(0L){_.count}
+    val childCounts = mapChildrenWithDefault(0L) { _.count }
     count - childCounts._1 - childCounts._2
   }
 
   def dump {
-    for(i <- (20 to level by -1))
+    for (i <- (20 to level by -1))
       print(" ")
     print(lowerBound + " - " + upperBound + ": " + count)
-    if(lowerChild.isDefined || upperChild.isDefined) {
+    if (lowerChild.isDefined || upperChild.isDefined) {
       print(" (" + parentCount + ")")
     }
     println(" {" + sum + "}")
-    lowerChild.foreach{_.dump}
-    upperChild.foreach{_.dump}
+    lowerChild.foreach { _.dump }
+    upperChild.foreach { _.dump }
   }
 
-  def interQuartileMean(implicit n : Numeric[A]) : (Double,Double) = {
+  def interQuartileMean(implicit n: Numeric[A]): (Double, Double) = {
     val (l25, u25) = quantileBounds(0.25)
     val (l75, u75) = quantileBounds(0.75)
     val (ll, lu) = rangeSumBounds(l25, l75)

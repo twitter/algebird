@@ -24,7 +24,7 @@ package com.twitter.algebird
  * which our ordering is violating. This is also useful for closed sets which have a fixed
  * progression.
  */
-trait Successible[@specialized(Int,Long,Float,Double) T] {
+trait Successible[@specialized(Int, Long, Float, Double) T] {
   def next(old: T): Option[T]
   def next(old: Option[T]): Option[T] = old flatMap next
   def iterateNext(old: T): Iterable[T] = {
@@ -35,8 +35,8 @@ trait Successible[@specialized(Int,Long,Float,Double) T] {
     new AbstractIterable[T] {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.next(_) }
-         .takeWhile(_.isDefined)
-         .map(_.get)
+          .takeWhile(_.isDefined)
+          .map(_.get)
     }
   }
   def ordering: Ordering[T]
@@ -67,7 +67,7 @@ object Successible {
 }
 
 // TODO Remove Ordering. It is unused. Note Numeric and Integral extend ordering
-class NumericSuccessible[@specialized(Int,Long,Float,Double) T:Numeric:Ordering] extends Successible[T] {
+class NumericSuccessible[@specialized(Int, Long, Float, Double) T: Numeric: Ordering] extends Successible[T] {
   def next(old: T) = {
     val numeric = implicitly[Numeric[T]]
     val newV = numeric.plus(old, numeric.one)

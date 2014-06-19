@@ -35,8 +35,7 @@ package com.twitter.algebird
  * @param E eventual type
  * @param O original type
  */
-class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
-  (implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
+class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
 
   import scala.collection.mutable.Buffer
 
@@ -58,7 +57,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   /**
    * used to avoid materializing the entire input in memory
    */
-  private[this] final def checkSize[T:Semigroup](buffer: Buffer[T]) {
+  private[this] final def checkSize[T: Semigroup](buffer: Buffer[T]) {
     if (buffer.size > maxBuffer) {
       val sum = Semigroup.sumOption(buffer)
       buffer.clear
@@ -67,7 +66,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
   }
 
   override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
-    iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) ((buffer, v) => {
+    iter.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]()))((buffer, v) => {
 
       def addToEventualBuffer(buffer: Buffer[E], value: Either[E, O]): Unit =
         value match {
@@ -102,8 +101,8 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
         }
       }
     }) match { // finally apply sumOption accordingly
-       case Left(be) => Semigroup.sumOption(be).map(left(_))
-       case Right(bo) => Semigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
+      case Left(be) => Semigroup.sumOption(be).map(left(_))
+      case Right(bo) => Semigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
     }
   }
 
@@ -123,9 +122,8 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)
 /**
  * @see EventuallySemigroup
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)
-  (implicit lSemigroup: Semigroup[E], rMonoid: Monoid[O]) extends EventuallySemigroup[E, O](convert)(mustConvert)
-  with Monoid[Either[E, O]] {
+class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lSemigroup: Semigroup[E], rMonoid: Monoid[O]) extends EventuallySemigroup[E, O](convert)(mustConvert)
+    with Monoid[Either[E, O]] {
 
   override def zero = Right(Monoid.zero[O])
 
@@ -134,9 +132,8 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)
 /**
  * @see EventuallySemigroup
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)
-  (implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
-  with Group[Either[E, O]] {
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
+    with Group[Either[E, O]] {
 
   override def negate(x: Either[E, O]) = {
     x match {
@@ -152,9 +149,8 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)
 /**
  * @see EventuallySemigroup
  */
-class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)
-  (implicit lRing: Ring[E], rRing: Ring[O]) extends EventuallyGroup[E, O](convert)(mustConvert)
-  with Ring[Either[E, O]] {
+class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lRing: Ring[E], rRing: Ring[O]) extends EventuallyGroup[E, O](convert)(mustConvert)
+    with Ring[Either[E, O]] {
 
   override def one = Right(Ring.one[O])
 

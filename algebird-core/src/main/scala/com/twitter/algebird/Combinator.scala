@@ -19,7 +19,8 @@ import scala.annotation.tailrec
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
-/** This is a combinator on semigroups, after you do the plus, you transform B with a fold function
+/**
+ * This is a combinator on semigroups, after you do the plus, you transform B with a fold function
  * This will not be valid for all fold functions. You need to prove that it is still associative.
  *
  * Clearly only values of (a,b) are valid if fold(a,b) == b, so keep that in mind.
@@ -35,13 +36,13 @@ import scala.math.Equiv
  *
  * Seems like an open topic here.... you are obliged to think on your own about this.
  */
-class SemigroupCombinator[A:Semigroup,B:Semigroup](fold: (A,B) => B) extends Semigroup[(A,B)] {
-  def plus(left: (A,B), right: (A,B)) = {
+class SemigroupCombinator[A: Semigroup, B: Semigroup](fold: (A, B) => B) extends Semigroup[(A, B)] {
+  def plus(left: (A, B), right: (A, B)) = {
     val first = Semigroup.plus(left._1, right._1)
     (first, fold(first, Semigroup.plus(left._2, right._2)))
   }
 }
 
-class MonoidCombinator[A:Monoid,B:Monoid](fold: (A,B) => B) extends SemigroupCombinator[A,B](fold) with Monoid[(A,B)] {
+class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B) extends SemigroupCombinator[A, B](fold) with Monoid[(A, B)] {
   def zero = (Monoid.zero[A], Monoid.zero[B])
 }

@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 
 import scala.annotation.implicitNotFound
 /**
@@ -31,14 +31,14 @@ import scala.annotation.implicitNotFound
  *
  */
 object Metric {
-  def apply[V : Metric](v1: V, v2: V): Double = implicitly[Metric[V]].apply(v1, v2)
-  def norm[V : Metric : Monoid](v: V) = apply(v, Monoid.zero[V])
+  def apply[V: Metric](v1: V, v2: V): Double = implicitly[Metric[V]].apply(v1, v2)
+  def norm[V: Metric: Monoid](v: V) = apply(v, Monoid.zero[V])
   def from[V](f: (V, V) => Double) = new Metric[V] {
     def apply(v1: V, v2: V) = f(v1, v2)
   }
 
   // See http://en.wikipedia.org/wiki/Minkowski_distance
-  def minkowskiIterable[V : Monoid : Metric](p: Double): Metric[Iterable[V]] = Metric.from{
+  def minkowskiIterable[V: Monoid: Metric](p: Double): Metric[Iterable[V]] = Metric.from {
     (a: Iterable[V], b: Iterable[V]) =>
 
       // TODO: copied from IndexedSeq.scala
@@ -46,30 +46,30 @@ object Metric {
       val maxSize = scala.math.max(a.size, b.size)
       def pad(v: Iterable[V]) = {
         val diff = maxSize - v.size
-        if(diff > 0) {
+        if (diff > 0) {
           v ++ (Iterator.fill(diff)(Monoid.zero[V]))
-        }
-        else {
+        } else {
           v
         }
       }
 
-    val outP = pad(a).view
+      val outP = pad(a).view
         .zip(pad(b))
-        .map { case(i, j) =>
-          math.pow(implicitly[Metric[V]].apply(i, j), p)
+        .map {
+          case (i, j) =>
+            math.pow(implicitly[Metric[V]].apply(i, j), p)
         }.sum
       math.pow(outP, 1.0 / p)
   }
 
-  def L1Iterable[V : Monoid : Metric] = minkowskiIterable[V](1.0)
-  def L2Iterable[V : Monoid : Metric] = minkowskiIterable[V](2.0)
+  def L1Iterable[V: Monoid: Metric] = minkowskiIterable[V](1.0)
+  def L2Iterable[V: Monoid: Metric] = minkowskiIterable[V](2.0)
   // TODO: Implement Linf, using an ordering on V
 
-  def minkowskiMap[K, V : Monoid : Metric](p: Double): Metric[Map[K, V]] = Metric.from{
+  def minkowskiMap[K, V: Monoid: Metric](p: Double): Metric[Map[K, V]] = Metric.from {
     (a: Map[K, V], b: Map[K, V]) =>
       val outP = (a.keySet ++ b.keySet)
-        .map{ key: K =>
+        .map { key: K =>
           val v1 = a.getOrElse(key, Monoid.zero[V])
           val v2 = b.getOrElse(key, Monoid.zero[V])
           math.pow(implicitly[Metric[V]].apply(v1, v2), p)
@@ -78,8 +78,8 @@ object Metric {
       math.pow(outP, 1.0 / p)
   }
 
-  def L1Map[K, V : Monoid : Metric] = minkowskiMap[K, V](1.0)
-  def L2Map[K, V : Monoid : Metric] = minkowskiMap[K, V](2.0)
+  def L1Map[K, V: Monoid: Metric] = minkowskiMap[K, V](1.0)
+  def L2Map[K, V: Monoid: Metric] = minkowskiMap[K, V](2.0)
 
   // Implicit values
   implicit val doubleMetric = Metric.from((a: Double, b: Double) => math.abs(a - b))
@@ -87,20 +87,20 @@ object Metric {
   implicit val longMetric = Metric.from((a: Long, b: Long) => math.abs((a - b).toDouble))
   implicit val floatMetric = Metric.from((a: Float, b: Float) => math.abs((a.toDouble - b.toDouble)))
   implicit val shortMetric = Metric.from((a: Short, b: Short) => math.abs((a - b).toDouble))
-  implicit val boolMetric = Metric.from((x: Boolean, y: Boolean) => if(x ^ y) 1.0 else 0.0 )
+  implicit val boolMetric = Metric.from((x: Boolean, y: Boolean) => if (x ^ y) 1.0 else 0.0)
   implicit val jDoubleMetric = Metric.from((a: JDouble, b: JDouble) => math.abs(a - b))
   implicit val jIntMetric = Metric.from((a: JInt, b: JInt) => math.abs((a - b).toDouble))
   implicit val jLongMetric = Metric.from((a: JLong, b: JLong) => math.abs((a - b).toDouble))
   implicit val jFloatMetric = Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
   implicit val jShortMetric = Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
-  implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if(x ^ y) 1.0 else 0.0 )
+  implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if (x ^ y) 1.0 else 0.0)
 
   // If you don't want to use L2 as your default metrics, you need to override these
-  implicit def iterableMetric[V : Monoid : Metric] = L2Iterable[V]
-  implicit def mapMetric[K, V : Monoid : Metric] = L2Map[K, V]
+  implicit def iterableMetric[V: Monoid: Metric] = L2Iterable[V]
+  implicit def mapMetric[K, V: Monoid: Metric] = L2Map[K, V]
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")
-trait Metric[@specialized(Int,Long,Float,Double) -V] extends java.io.Serializable {
+trait Metric[@specialized(Int, Long, Float, Double) -V] extends java.io.Serializable {
   def apply(v1: V, v2: V): Double
 }
