@@ -42,7 +42,7 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
 /**
  * Either semigroup is useful for error handling.
  * if everything is correct, use Right (it's right, get it?), if something goes
- * wrong, use Left.  plus does the normal thing for plus(Right,Right), or plus(Left,Left),
+ * wrong, use Left.  plus does the normal thing for plus(Right, Right), or plus(Left, Left),
  * but if exactly one is Left, we return that value (to keep the error condition).
  * Typically, the left value will be a string representing the errors.
  */
