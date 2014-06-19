@@ -31,7 +31,7 @@ import scala.collection.{Map => ScMap}
  */
 
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
-trait Monoid[@specialized(Int,Long,Float,Double) T] extends Semigroup[T] {
+trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
   def zero : T //additive identity
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v : T) {
@@ -59,7 +59,7 @@ abstract class AbstractMonoid[T] extends Monoid[T]
  * Some(5) + Some(3) == Some(8)
  * Some(5) + None == Some(5)
  */
-class OptionMonoid[T](implicit semi : Semigroup[T]) extends Monoid[Option[T]] {
+class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
   def zero = None
   def plus(left : Option[T], right : Option[T]) : Option[T] = {
     if(left.isEmpty) {
@@ -77,7 +77,7 @@ class OptionMonoid[T](implicit semi : Semigroup[T]) extends Monoid[Option[T]] {
     else Some(Semigroup.sumOption(items.filter(_.isDefined).map { _.get }))
 }
 
-class EitherMonoid[L,R](implicit semigroupl : Semigroup[L], monoidr : Monoid[R]) extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L,R]] {
+class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R]) extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L, R]] {
   override lazy val zero = Right(monoidr.zero)
 }
 
@@ -124,12 +124,12 @@ class SetMonoid[T] extends Monoid[Set[T]] {
 /** Function1 monoid.
  * plus means function composition, zero is the identity function
  */
-class Function1Monoid[T] extends Monoid[Function1[T,T]] {
+class Function1Monoid[T] extends Monoid[Function1[T, T]] {
   override def zero = identity[T]
 
   // (f1 + f2)(x) = f2(f1(x)) so that:
   // listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
-  override def plus(f1 : Function1[T,T], f2 : Function1[T,T]) = {
+  override def plus(f1 : Function1[T, T], f2 : Function1[T, T]) = {
     (t : T) => f2(f1(t))
   }
 }
@@ -166,10 +166,10 @@ object AndValMonoid extends Monoid[AndVal] {
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   // This pattern is really useful for typeclasses
-  def zero[T](implicit mon : Monoid[T]) = mon.zero
+  def zero[T](implicit mon: Monoid[T]) = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples
   // are monoids, and code already depends on this:
-  def plus[T](l: T, r: T)(implicit monoid: Monoid[T]): T = monoid.plus(l,r)
+  def plus[T](l: T, r: T)(implicit monoid: Monoid[T]): T = monoid.plus(l, r)
   def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
   def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
   def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
@@ -177,16 +177,16 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   def sum[T](iter : TraversableOnce[T])(implicit monoid: Monoid[T]): T =
     monoid.sum(iter)
 
-  def from[T](z: => T)(associativeFn: (T,T) => T): Monoid[T] = new Monoid[T] {
+  def from[T](z: => T)(associativeFn: (T, T) => T): Monoid[T] = new Monoid[T] {
     lazy val zero = z
-    def plus(l:T, r:T) = associativeFn(l,r)
+    def plus(l:T, r:T) = associativeFn(l, r)
   }
 
   /** Return an Equiv[T] that uses isNonZero to return equality for all zeros
    * useful for Maps/Vectors that have many equivalent in memory representations of zero
    */
   def zeroEquiv[T:Equiv:Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
-    (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a,b)
+    (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a, b)
   }
 
   /** Same as v + v + v .. + v (i times in total)
@@ -202,31 +202,31 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
     }
   }
 
-  implicit val nullMonoid : Monoid[Null] = NullGroup
-  implicit val unitMonoid : Monoid[Unit] = UnitGroup
-  implicit val boolMonoid : Monoid[Boolean] = BooleanField
-  implicit val jboolMonoid : Monoid[JBool] = JBoolField
-  implicit val intMonoid : Monoid[Int] = IntRing
-  implicit val jintMonoid : Monoid[JInt] = JIntRing
-  implicit val shortMonoid : Monoid[Short] = ShortRing
-  implicit val jshortMonoid : Monoid[JShort] = JShortRing
-  implicit val bigIntMonoid : Monoid[BigInt] = BigIntRing
-  implicit val longMonoid : Monoid[Long] = LongRing
-  implicit val jlongMonoid : Monoid[JLong] = JLongRing
-  implicit val floatMonoid : Monoid[Float] = FloatField
-  implicit val jfloatMonoid : Monoid[JFloat] = JFloatField
-  implicit val doubleMonoid : Monoid[Double] = DoubleField
-  implicit val jdoubleMonoid : Monoid[JDouble] = JDoubleField
-  implicit val stringMonoid : Monoid[String] = StringMonoid
-  implicit def optionMonoid[T : Semigroup] : Monoid[Option[T]] = new OptionMonoid[T]
-  implicit def listMonoid[T] : Monoid[List[T]] = new ListMonoid[T]
-  implicit def seqMonoid[T] : Monoid[Seq[T]] = new SeqMonoid[T]
-  implicit def indexedSeqMonoid[T:Monoid] : Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
-  implicit def jlistMonoid[T] : Monoid[JList[T]] = new JListMonoid[T]
-  implicit def setMonoid[T] : Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K,V: Semigroup] : Monoid[Map[K,V]] = new MapMonoid[K,V]
-  implicit def scMapMonoid[K,V: Semigroup] : Monoid[ScMap[K,V]] = new ScMapMonoid[K,V]
-  implicit def jmapMonoid[K,V : Semigroup] : Monoid[JMap[K,V]] = new JMapMonoid[K,V]
-  implicit def eitherMonoid[L : Semigroup, R : Monoid] : Monoid[Either[L,R]] = new EitherMonoid[L, R]
-  implicit def function1Monoid[T] : Monoid[Function1[T,T]] = new Function1Monoid[T]
+  implicit val nullMonoid: Monoid[Null] = NullGroup
+  implicit val unitMonoid: Monoid[Unit] = UnitGroup
+  implicit val boolMonoid: Monoid[Boolean] = BooleanField
+  implicit val jboolMonoid: Monoid[JBool] = JBoolField
+  implicit val intMonoid: Monoid[Int] = IntRing
+  implicit val jintMonoid: Monoid[JInt] = JIntRing
+  implicit val shortMonoid: Monoid[Short] = ShortRing
+  implicit val jshortMonoid: Monoid[JShort] = JShortRing
+  implicit val bigIntMonoid: Monoid[BigInt] = BigIntRing
+  implicit val longMonoid: Monoid[Long] = LongRing
+  implicit val jlongMonoid: Monoid[JLong] = JLongRing
+  implicit val floatMonoid: Monoid[Float] = FloatField
+  implicit val jfloatMonoid: Monoid[JFloat] = JFloatField
+  implicit val doubleMonoid: Monoid[Double] = DoubleField
+  implicit val jdoubleMonoid: Monoid[JDouble] = JDoubleField
+  implicit val stringMonoid: Monoid[String] = StringMonoid
+  implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
+  implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
+  implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]
+  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
+  implicit def jlistMonoid[T]: Monoid[JList[T]] = new JListMonoid[T]
+  implicit def setMonoid[T]: Monoid[Set[T]] = new SetMonoid[T]
+  implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new MapMonoid[K, V]
+  implicit def scMapMonoid[K, V: Semigroup]: Monoid[ScMap[K, V]] = new ScMapMonoid[K, V]
+  implicit def jmapMonoid[K, V: Semigroup]: Monoid[JMap[K, V]] = new JMapMonoid[K, V]
+  implicit def eitherMonoid[L: Semigroup, R: Monoid]: Monoid[Either[L, R]] = new EitherMonoid[L, R]
+  implicit def function1Monoid[T]: Monoid[Function1[T, T]] = new Function1Monoid[T]
 }
