@@ -28,8 +28,7 @@ import com.twitter.algebird.matrix.AdaptiveMatrix
 /**
  * Hashes an arbitrary key type to one that the Sketch Map can use.
  */
-case class SketchMapHash[K](hasher: CMSHash, seed: Int)
-                            (implicit serialization: K => Array[Byte]) {
+case class SketchMapHash[K](hasher: CMSHash, seed: Int)(implicit serialization: K => Array[Byte]) {
   def apply(obj: K): Int = {
     val (first, second) = MurmurHash128(seed)(serialization(obj))
     hasher(first ^ second)
@@ -39,9 +38,8 @@ case class SketchMapHash[K](hasher: CMSHash, seed: Int)
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](val params: SketchMapParams[K])
-                            (implicit valueOrdering: Ordering[V], monoid: Monoid[V])
-                            extends Monoid[SketchMap[K, V]] {
+class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V])
+  extends Monoid[SketchMap[K, V]] {
 
   /**
    * A zero Sketch Map is one with zero elements.
@@ -59,7 +57,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   }
 
   override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
-    if(items.isEmpty) None
+    if (items.isEmpty) None
     else {
       val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
       val maxBuffer = 1000
@@ -75,10 +73,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
       }
 
       items.foreach { sm =>
-        if(buffer.size > maxBuffer) sumBuffer
+        if (buffer.size > maxBuffer) sumBuffer
         buffer += sm
       }
-      if(buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
+      if (buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
       Some(buffer(0))
     }
 
@@ -95,12 +93,14 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
     val totalValue = Monoid.sum(data.map { _._2 })
     val initTable = AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
-    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
-      data.foldLeft(table) { case (innerTable, (key, value)) =>
-        val pos = (row, params.hashes(row)(key))
-        val currValue: V = innerTable.getValue(pos)
-        innerTable.updated(pos, Monoid.plus(currValue, value))
-      }
+    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) {
+      case (table, row) =>
+        data.foldLeft(table) {
+          case (innerTable, (key, value)) =>
+            val pos = (row, params.hashes(row)(key))
+            val currValue: V = innerTable.getValue(pos)
+            innerTable.updated(pos, Monoid.plus(currValue, value))
+        }
     }
 
     SketchMap(newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
@@ -109,10 +109,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   /**
    * Calculates the approximate frequency for any key.
    */
-  def frequency(sm: SketchMap[K,V], key: K): V =
+  def frequency(sm: SketchMap[K, V], key: K): V =
     params.frequency(key, sm.valuesTable)
 
-  def frequencyWithHHCache(sm: SketchMap[K,V]): K => V = {
+  def frequencyWithHHCache(sm: SketchMap[K, V]): K => V = {
     val hhMap: Map[K, V] = heavyHitters(sm).toMap
     (k: K) => hhMap.getOrElse(k, frequency(sm, k))
   }
@@ -120,19 +120,17 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])
   /**
    * Returns a sorted list of heavy hitter key/value tuples.
    */
-  def heavyHitters(sm: SketchMap[K,V]) : List[(K, V)] =
+  def heavyHitters(sm: SketchMap[K, V]): List[(K, V)] =
     sm.heavyHitterKeys.map { item => (item, frequency(sm, item)) }
 }
-
 
 /**
  * Convenience class for holding constant parameters of a Sketch Map.
  */
-case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)
-                              (implicit serialization: K => Array[Byte]) {
+case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)(implicit serialization: K => Array[Byte]) {
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
-  assert(0 <= heavyHittersCount , "heavyHittersCount must be greater than 0")
+  assert(0 <= heavyHittersCount, "heavyHittersCount must be greater than 0")
 
   lazy val hashes: Seq[K => Int] = {
     val r = new scala.util.Random(seed)
@@ -147,7 +145,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
   /**
    * Calculates the frequency for a key given a values table.
    */
-  def frequency[V:Ordering](key: K, table: AdaptiveMatrix[V]): V =
+  def frequency[V: Ordering](key: K, table: AdaptiveMatrix[V]): V =
     hashes
       .iterator
       .zipWithIndex
@@ -158,7 +156,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
    * Returns a new set of sorted and concatenated heavy hitters given an
    * arbitrary list of keys.
    */
-  def updatedHeavyHitters[V:Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
+  def updatedHeavyHitters[V: Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping: Map[K, V] = hitters.map(item => (item, frequency(item, table)))(breakOut)
     val specificOrdering = Ordering.by[K, V] { mapping(_) }.reverse
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
@@ -169,8 +167,7 @@ object SketchMapParams {
   /**
    * Overloaded apply method for convenience.
    */
-  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)
-              (implicit serialization: K => Array[Byte]): SketchMapParams[K] =
+  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)(implicit serialization: K => Array[Byte]): SketchMapParams[K] =
     SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
   /**
    * Functions to translate between (eps, delta) and (depth, width). The translation is:
@@ -182,7 +179,6 @@ object SketchMapParams {
   def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
   def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
 }
-
 
 /**
  * Data structure representing an approximation of Map[K, V], where V has an
@@ -210,24 +206,22 @@ object SketchMap {
   def monoid[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] =
     new SketchMapMonoid(params)(valueOrdering, monoid)
 
-  def aggregator[K, V](params: SketchMapParams[K])
-                      (implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
+  def aggregator[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
 }
 
 case class SketchMap[K, V](
   val valuesTable: AdaptiveMatrix[V],
   val heavyHitterKeys: List[K],
-  val totalValue: V
-) extends java.io.Serializable
+  val totalValue: V) extends java.io.Serializable
 
 /**
-  * An Aggregator for the SketchMap.
-  * Can be created using SketchMap.aggregator
-  */
-case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid : SketchMapMonoid[K, V])(implicit valueOrdering: Ordering[V], valueMonoid: Monoid[V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+ * An Aggregator for the SketchMap.
+ * Can be created using SketchMap.aggregator
+ */
+case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid: SketchMapMonoid[K, V])(implicit valueOrdering: Ordering[V], valueMonoid: Monoid[V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
   val monoid = skmMonoid
 
-  def prepare(value: (K,V)) = monoid.create(value)
+  def prepare(value: (K, V)) = monoid.create(value)
   def present(skm: SketchMap[K, V]) = skm
 }
