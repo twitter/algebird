@@ -57,7 +57,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
 
   override def flush: Future[Map[Key, Value]] =
     workPool {
-      didFlush // bumps timeout on the flush conditions
       // Take a copy of the keyset into a scala set (toSet forces the copy)
       // We want this to be safe around uniqueness in the keys coming out of the keys.flatMap
       val keys = MSet[Key]()
