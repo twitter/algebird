@@ -29,7 +29,8 @@ trait StatefulSummer[V] extends Buffered[V, V] {
   def semigroup: Semigroup[V]
 }
 
-/** Sum the entire iterator one item at a time. Only emits on flush
+/**
+ * Sum the entire iterator one item at a time. Only emits on flush
  * you should probably prefer BufferedSumAll
  */
 class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
@@ -47,9 +48,9 @@ class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulS
 }
 
 class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V])
-  extends ArrayBufferedOperation[V, V](size)
-  with StatefulSummer[V]
-  with BufferedReduce[V] {
+    extends ArrayBufferedOperation[V, V](size)
+    with StatefulSummer[V]
+    with BufferedReduce[V] {
 
   def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
 }

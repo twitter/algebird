@@ -16,7 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
-/** Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
+/**
+ * Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
  * This does element-wise operations, like standard vector math, not concatenation,
  * like Semigroup[String] or Semigroup[List[T]]
  *
@@ -29,12 +30,12 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
     // We need summands to be the same length
     val (leftSummand, rightSummand, remainder) = if (left.size > right.size) {
       (left.view(0, right.size),
-       right,
-       left.view(right.size, left.size))
+        right,
+        left.view(right.size, left.size))
     } else {
       (left,
-      right.view(0, left.size),
-      right.view(left.size, right.size))
+        right.view(0, left.size),
+        right.view(left.size, right.size))
     }
 
     val sum = leftSummand
@@ -45,20 +46,19 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
   }
 }
 
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with
-  Monoid[IndexedSeq[T]] {
+class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) =
     v.exists { t => mont.isNonZero(t) }
 }
 
 class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T]()(grp)
-  with Group[IndexedSeq[T]] {
+    with Group[IndexedSeq[T]] {
   override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map { grp.negate(_) }
 }
 
 class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng)
-  with Ring[IndexedSeq[T]] {
+    with Ring[IndexedSeq[T]] {
 
   // TODO
   def one = sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")

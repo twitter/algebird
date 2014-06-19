@@ -17,16 +17,15 @@ package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
 import com.twitter.util.Future
-import com.twitter.util.{Duration, Future}
+import com.twitter.util.{ Duration, Future }
 
 /**
  * @author Ian O Connell
  */
 
 case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
-                                        override val flushFrequency: FlushFrequency,
-                                        override val softMemoryFlush: MemoryFlushPercent)
-  (implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]]  {
+    override val flushFrequency: FlushFrequency,
+    override val softMemoryFlush: MemoryFlushPercent)(implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
   protected override val emptyResult = Map.empty[Key, Value]

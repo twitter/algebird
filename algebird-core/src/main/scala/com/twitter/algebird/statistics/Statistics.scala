@@ -15,18 +15,18 @@ limitations under the License.
 */
 package com.twitter.algebird.statistics
 
-import com.twitter.algebird.{Semigroup, Monoid, Group, Ring}
+import com.twitter.algebird.{ Semigroup, Monoid, Group, Ring }
 
 /**
  * These wrappers can be used to collect statistics around usage of monoids
  * They are thread safe unless false is passed to the constructor (to remove overhead when threads are not used)
- * 
+ *
  * @author Julien Le Dem
  */
 
 /** collect statistics about the calls to the wrapped Semigroup */
-class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigroup: Semigroup[T])
-  extends Semigroup[T] {
+class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigroup: Semigroup[T])
+    extends Semigroup[T] {
 
   private[this] final val plusCallsCount = Counter(threadSafe)
   private[this] final val sumOptionCallsStats = new IterCallStatistics(threadSafe)
@@ -46,14 +46,14 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true) (implicit wrappedSemigr
 
   override def toString =
     "plus calls: " + plusCallsCount + "\n" +
-    "sumOption calls: " + sumOptionCallsStats
+      "sumOption calls: " + sumOptionCallsStats
 }
 
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsMonoid[T](threadSafe: Boolean = true) (implicit wrappedMonoid: Monoid[T])
-  extends StatisticsSemigroup[T](threadSafe) with Monoid[T] {
+class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Monoid[T])
+    extends StatisticsSemigroup[T](threadSafe) with Monoid[T] {
 
   private[this] final val zeroCallsCount = Counter(threadSafe)
   private[this] final val sumCallsStats = new IterCallStatistics(threadSafe)
@@ -73,15 +73,15 @@ class StatisticsMonoid[T](threadSafe: Boolean = true) (implicit wrappedMonoid: M
 
   override def toString =
     super.toString + "\n" +
-    "zero calls: " + zeroCallsCount + "\n" +
-    "sum calls: " + sumCallsStats
+      "zero calls: " + zeroCallsCount + "\n" +
+      "sum calls: " + sumCallsStats
 }
 
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsGroup[T](threadSafe: Boolean = true) (implicit group: Group[T])
-  extends StatisticsMonoid[T](threadSafe) with Group[T] {
+class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
+    extends StatisticsMonoid[T](threadSafe) with Group[T] {
 
   private[this] final val negateCallsCount = Counter(threadSafe)
   private[this] final val minusCallsCount = Counter(threadSafe)
@@ -95,22 +95,22 @@ class StatisticsGroup[T](threadSafe: Boolean = true) (implicit group: Group[T])
     Group.negate(x)
   }
 
-  override def minus(l : T, r : T) = {
+  override def minus(l: T, r: T) = {
     minusCallsCount.increment
     Group.minus(l, r)
   }
 
   override def toString =
     super.toString + "\n" +
-    "negate calls: " + negateCallsCount + "\n" +
-    "minus calls: " + minusCallsCount
+      "negate calls: " + negateCallsCount + "\n" +
+      "minus calls: " + minusCallsCount
 }
 
 /**
  * @see StatisticsSemigroup
  */
-class StatisticsRing[T](threadSafe: Boolean = true) (implicit ring: Ring[T])
-  extends StatisticsGroup[T](threadSafe) with Ring[T] {
+class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
+    extends StatisticsGroup[T](threadSafe) with Ring[T] {
 
   private[this] final val oneCallsCount = Counter(threadSafe)
   private[this] final val timesCallsCount = Counter(threadSafe)
@@ -132,13 +132,13 @@ class StatisticsRing[T](threadSafe: Boolean = true) (implicit ring: Ring[T])
     Ring.times(x, y)
   }
 
-  override def product(iter : TraversableOnce[T]): T =
+  override def product(iter: TraversableOnce[T]): T =
     productCallsStats.measure(iter) { Ring.product(_) }
 
   override def toString =
     super.toString + "\n" +
-    "one calls: " + oneCallsCount + "\n" +
-    "time calls: " + timesCallsCount + "\n" +
-    "product calls: " + productCallsStats
+      "one calls: " + oneCallsCount + "\n" +
+      "time calls: " + timesCallsCount + "\n" +
+      "product calls: " + productCallsStats
 }
 

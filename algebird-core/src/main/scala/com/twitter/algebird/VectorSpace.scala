@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
+import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 
 import scala.annotation.implicitNotFound
 /**
@@ -30,15 +30,15 @@ object VectorSpace {
   def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit fField: Field[F], cGroup: Group[C[F]]) = new VectorSpace[F, C] {
     def field = fField
     def group = cGroup
-    def scale(v: F, c: C[F]) = if(field.isNonZero(v)) scaleFn(v, c) else cGroup.zero
+    def scale(v: F, c: C[F]) = if (field.isNonZero(v)) scaleFn(v, c) else cGroup.zero
   }
 
   // Implicits
-  implicit def indexedSeqSpace[T : Field] =
-    from[T, IndexedSeq]{(s, seq) => seq.map(Ring.times(s, _)) }
+  implicit def indexedSeqSpace[T: Field] =
+    from[T, IndexedSeq] { (s, seq) => seq.map(Ring.times(s, _)) }
 
-  implicit def mapSpace[K, T : Field] =
-    from[T, ({type x[a]=Map[K, a]})#x] { (s, m) => m.mapValues(Ring.times(s, _))}
+  implicit def mapSpace[K, T: Field] =
+    from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) => m.mapValues(Ring.times(s, _)) }
 
   // TODO: add implicits for java lists, arrays, and options
 }
