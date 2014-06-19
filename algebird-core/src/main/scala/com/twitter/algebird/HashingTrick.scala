@@ -16,21 +16,21 @@ limitations under the License.
 
 package com.twitter.algebird
 
-class HashingTrickMonoid[V:Group](bits : Int, seed : Int = 123456) extends Monoid[AdaptiveVector[V]] {
-	val vectorSize = 1 << bits
-	val bitMask = vectorSize - 1
-	val hash = MurmurHash128(seed)
+class HashingTrickMonoid[V: Group](bits: Int, seed: Int = 123456) extends Monoid[AdaptiveVector[V]] {
+  val vectorSize = 1 << bits
+  val bitMask = vectorSize - 1
+  val hash = MurmurHash128(seed)
 
-	val zero = AdaptiveVector.fill[V](vectorSize)(Monoid.zero[V])
+  val zero = AdaptiveVector.fill[V](vectorSize)(Monoid.zero[V])
 
-	def plus(left : AdaptiveVector[V], right : AdaptiveVector[V]) = Monoid.plus(left, right)
+  def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) = Monoid.plus(left, right)
 
-	def init[K <% Array[Byte]](kv : (K,V)) : AdaptiveVector[V] = {
-		val (long1, long2) = hash(kv._1)
-		val index = (long1 & bitMask).toInt
-		val isNegative = (long2 & 1) == 1
+  def init[K <% Array[Byte]](kv: (K, V)): AdaptiveVector[V] = {
+    val (long1, long2) = hash(kv._1)
+    val index = (long1 & bitMask).toInt
+    val isNegative = (long2 & 1) == 1
 
-		val signedValue = if(isNegative) Group.negate(kv._2) else kv._2
-		AdaptiveVector.fromMap[V](Map(index -> signedValue), Monoid.zero[V], vectorSize)
-	}
+    val signedValue = if (isNegative) Group.negate(kv._2) else kv._2
+    AdaptiveVector.fromMap[V](Map(index -> signedValue), Monoid.zero[V], vectorSize)
+  }
 }

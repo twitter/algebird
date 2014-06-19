@@ -15,7 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-/** Used to represent cases where we need to periodically reset
+/**
+ * Used to represent cases where we need to periodically reset
  *  a +  b =   a + b
  * |a +  b = |(a + b)
  *  a + |b = |b
@@ -26,7 +27,7 @@ case class SetValue[+A](get: A) extends ResetState[A]
 case class ResetValue[+A](get: A) extends ResetState[A]
 
 object ResetState {
-  implicit def monoid[A:Monoid]: Monoid[ResetState[A]] = new ResetStateMonoid[A]
+  implicit def monoid[A: Monoid]: Monoid[ResetState[A]] = new ResetStateMonoid[A]
 }
 
 class ResetStateMonoid[A](implicit monoid: Monoid[A]) extends Monoid[ResetState[A]] {

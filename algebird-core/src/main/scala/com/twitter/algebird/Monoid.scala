@@ -18,12 +18,11 @@ package com.twitter.algebird
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList, Map => JMap}
+import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
+import java.util.{ List => JList, Map => JMap }
 
-import scala.collection.mutable.{Map => MMap}
-import scala.collection.{Map => ScMap}
-
+import scala.collection.mutable.{ Map => MMap }
+import scala.collection.{ Map => ScMap }
 
 /**
  * Monoid (take a deep breath, and relax about the weird name):
@@ -32,19 +31,18 @@ import scala.collection.{Map => ScMap}
 
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
-  def zero : T //additive identity
+  def zero: T //additive identity
   def isNonZero(v: T): Boolean = (v != zero)
-  def assertNotZero(v : T) {
-    if(!isNonZero(v)) {
+  def assertNotZero(v: T) {
+    if (!isNonZero(v)) {
       throw new java.lang.IllegalArgumentException("argument should not be zero")
     }
   }
 
-  def nonZeroOption(v : T): Option[T] = {
+  def nonZeroOption(v: T): Option[T] = {
     if (isNonZero(v)) {
       Some(v)
-    }
-    else {
+    } else {
       None
     }
   }
@@ -61,19 +59,17 @@ abstract class AbstractMonoid[T] extends Monoid[T]
  */
 class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
   def zero = None
-  def plus(left : Option[T], right : Option[T]) : Option[T] = {
-    if(left.isEmpty) {
+  def plus(left: Option[T], right: Option[T]): Option[T] = {
+    if (left.isEmpty) {
       right
-    }
-    else if(right.isEmpty) {
+    } else if (right.isEmpty) {
       left
-    }
-    else {
+    } else {
       Some(semi.plus(left.get, right.get))
     }
   }
   override def sumOption(items: TraversableOnce[Option[T]]): Option[Option[T]] =
-    if(items.isEmpty) None
+    if (items.isEmpty) None
     else Some(Semigroup.sumOption(items.filter(_.isDefined).map { _.get }))
 }
 
@@ -83,37 +79,39 @@ class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R]) 
 
 object StringMonoid extends Monoid[String] {
   override val zero = ""
-  override def plus(left : String, right : String) = left + right
+  override def plus(left: String, right: String) = left + right
   override def sumOption(items: TraversableOnce[String]): Option[String] =
-    if(items.isEmpty) None
+    if (items.isEmpty) None
     else Some(items.mkString(""))
 }
 
-/** List concatenation monoid.
+/**
+ * List concatenation monoid.
  * plus means concatenation, zero is empty list
  */
 class ListMonoid[T] extends Monoid[List[T]] {
   override def zero = List[T]()
-  override def plus(left : List[T], right : List[T]) = left ++ right
+  override def plus(left: List[T], right: List[T]) = left ++ right
   override def sumOption(items: TraversableOnce[List[T]]): Option[List[T]] =
-    if(items.isEmpty) None
-    else Some(items.foldRight(Nil:List[T])(_ ::: _))
+    if (items.isEmpty) None
+    else Some(items.foldRight(Nil: List[T])(_ ::: _))
 }
 
 // equivalent to ListMonoid
 class SeqMonoid[T] extends Monoid[Seq[T]] {
   override def zero = Seq[T]()
-  override def plus(left : Seq[T], right : Seq[T]) = left ++ right
+  override def plus(left: Seq[T], right: Seq[T]) = left ++ right
 }
 
-/** Set union monoid.
+/**
+ * Set union monoid.
  * plus means union, zero is empty set
  */
 class SetMonoid[T] extends Monoid[Set[T]] {
   override def zero = Set[T]()
-  override def plus(left : Set[T], right : Set[T]) = left ++ right
+  override def plus(left: Set[T], right: Set[T]) = left ++ right
   override def sumOption(items: TraversableOnce[Set[T]]): Option[Set[T]] =
-    if(items.isEmpty) None
+    if (items.isEmpty) None
     else {
       val mutable = scala.collection.mutable.Set[T]()
       items.foreach { s => mutable ++= s }
@@ -121,7 +119,8 @@ class SetMonoid[T] extends Monoid[Set[T]] {
     }
 }
 
-/** Function1 monoid.
+/**
+ * Function1 monoid.
  * plus means function composition, zero is the identity function
  */
 class Function1Monoid[T] extends Monoid[Function1[T, T]] {
@@ -129,8 +128,8 @@ class Function1Monoid[T] extends Monoid[Function1[T, T]] {
 
   // (f1 + f2)(x) = f2(f1(x)) so that:
   // listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
-  override def plus(f1 : Function1[T, T], f2 : Function1[T, T]) = {
-    (t : T) => f2(f1(t))
+  override def plus(f1: Function1[T, T], f2: Function1[T, T]) = {
+    (t: T) => f2(f1(t))
   }
 }
 
@@ -141,7 +140,8 @@ object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
 }
 
-/** Boolean OR monoid.
+/**
+ * Boolean OR monoid.
  * plus means logical OR, zero is false.
  */
 object OrValMonoid extends Monoid[OrVal] {
@@ -156,12 +156,13 @@ object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid
 }
 
-/** Boolean AND monoid.
+/**
+ * Boolean AND monoid.
  * plus means logical AND, zero is true.
  */
 object AndValMonoid extends Monoid[AndVal] {
   override def zero = AndVal(true)
-  override def plus(l: AndVal, r: AndVal) = if(l.get) r else l
+  override def plus(l: AndVal, r: AndVal) = if (l.get) r else l
 }
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
@@ -174,30 +175,31 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
   def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) = monoid.nonZeroOption(v)
   // Left sum: (((a + b) + c) + d)
-  def sum[T](iter : TraversableOnce[T])(implicit monoid: Monoid[T]): T =
+  def sum[T](iter: TraversableOnce[T])(implicit monoid: Monoid[T]): T =
     monoid.sum(iter)
 
   def from[T](z: => T)(associativeFn: (T, T) => T): Monoid[T] = new Monoid[T] {
     lazy val zero = z
-    def plus(l:T, r:T) = associativeFn(l, r)
+    def plus(l: T, r: T) = associativeFn(l, r)
   }
 
-  /** Return an Equiv[T] that uses isNonZero to return equality for all zeros
+  /**
+   * Return an Equiv[T] that uses isNonZero to return equality for all zeros
    * useful for Maps/Vectors that have many equivalent in memory representations of zero
    */
-  def zeroEquiv[T:Equiv:Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
+  def zeroEquiv[T: Equiv: Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
     (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a, b)
   }
 
-  /** Same as v + v + v .. + v (i times in total)
+  /**
+   * Same as v + v + v .. + v (i times in total)
    * requires i >= 0, wish we had NonnegativeBigInt as a class
    */
   def intTimes[T](i: BigInt, v: T)(implicit mon: Monoid[T]): T = {
     require(i >= 0, "Cannot do negative products with a Monoid, try Group.intTimes")
     if (i == 0) {
       mon.zero
-    }
-    else {
+    } else {
       Semigroup.intTimes(i, v)(mon)
     }
   }
@@ -221,7 +223,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]
-  implicit def indexedSeqMonoid[T:Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
+  implicit def indexedSeqMonoid[T: Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T]: Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T]: Monoid[Set[T]] = new SetMonoid[T]
   implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new MapMonoid[K, V]

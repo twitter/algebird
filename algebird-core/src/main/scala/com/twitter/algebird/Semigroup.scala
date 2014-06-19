@@ -15,12 +15,12 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList, Map => JMap}
+import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
+import java.util.{ List => JList, Map => JMap }
 
-import scala.collection.mutable.{Map => MMap}
-import scala.collection.{Map => ScMap}
-import scala.annotation.{implicitNotFound, tailrec}
+import scala.collection.mutable.{ Map => MMap }
+import scala.collection.{ Map => ScMap }
+import scala.annotation.{ implicitNotFound, tailrec }
 
 /**
  * Semigroup:
@@ -39,7 +39,8 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serial
 // For Java interop so they get the default sumOption
 abstract class AbstractSemigroup[T] extends Semigroup[T]
 
-/** Either semigroup is useful for error handling.
+/**
+ * Either semigroup is useful for error handling.
  * if everything is correct, use Right (it's right, get it?), if something goes
  * wrong, use Left.  plus does the normal thing for plus(Right, Right), or plus(Left, Left),
  * but if exactly one is Left, we return that value (to keep the error condition).
@@ -48,22 +49,19 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
 class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R]) extends Semigroup[Either[L, R]] {
 
   override def plus(l: Either[L, R], r: Either[L, R]) = {
-    if(l.isLeft) {
+    if (l.isLeft) {
       // l is Left, r may or may not be:
-      if(r.isRight) {
+      if (r.isRight) {
         //Avoid the allocation:
         l
-      }
-      else {
+      } else {
         //combine the lefts:
         Left(semigroupl.plus(l.left.get, r.left.get))
       }
-    }
-    else if(r.isLeft) {
+    } else if (r.isLeft) {
       //l is not a Left value, so just return right:
       r
-    }
-    else {
+    } else {
       //both l and r are Right values:
       Right(semigroupr.plus(l.right.get, r.right.get))
     }
@@ -77,22 +75,22 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]): Option[T] =
     sg.sumOption(iter)
 
-  def from[T](associativeFn: (T, T) => T): Semigroup[T] = new Semigroup[T] { def plus(l:T, r:T) = associativeFn(l, r) }
+  def from[T](associativeFn: (T, T) => T): Semigroup[T] = new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
 
-  /** Same as v + v + v .. + v (i times in total)
+  /**
+   * Same as v + v + v .. + v (i times in total)
    * requires i > 0, wish we had PositiveBigInt as a class
    */
   def intTimes[T](i: BigInt, v: T)(implicit sg: Semigroup[T]): T = {
     require(i > 0, "Cannot do non-positive products with a Semigroup, try Monoid/Group.intTimes")
-    intTimesRec(i-1, v, 0, (v, Vector[T]()))
+    intTimesRec(i - 1, v, 0, (v, Vector[T]()))
   }
 
   @tailrec
   private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(implicit sg: Semigroup[T]): T = {
-    if(i == 0) {
+    if (i == 0) {
       vaccMemo._1
-    }
-    else {
+    } else {
       /* i2 = i % 2
        * 2^pow(i*v) + acc == 2^(pow+1)((i/2)*v) + (acc + 2^pow i2 * v)
        */
@@ -110,17 +108,15 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   private def timesPow2[T](power: Int, v: T, memo: Vector[T])(implicit sg: Semigroup[T]): (T, Vector[T]) = {
     val size = memo.size
     require(power >= 0, "power cannot be negative")
-    if(power == 0) {
+    if (power == 0) {
       (v, memo)
-    }
-    else if (power <= size) {
-      (memo(power-1), memo)
-    }
-    else {
-      var item = if(size == 0) v else memo.last
+    } else if (power <= size) {
+      (memo(power - 1), memo)
+    } else {
+      var item = if (size == 0) v else memo.last
       var pow = size
       var newMemo = memo
-      while(pow < power) {
+      while (pow < power) {
         // x = 2*x
         item = sg.plus(item, item)
         pow += 1
@@ -152,8 +148,8 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   implicit def indexedSeqSemigroup[T: Semigroup]: Semigroup[IndexedSeq[T]] = new IndexedSeqSemigroup[T]
   implicit def jlistSemigroup[T]: Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T]: Semigroup[Set[T]] = new SetMonoid[T]
-  implicit def mapSemigroup[K, V:Semigroup]: Semigroup[Map[K, V]] = new MapMonoid[K, V]
-  implicit def scMapSemigroup[K, V:Semigroup]: Semigroup[ScMap[K, V]] = new ScMapMonoid[K, V]
+  implicit def mapSemigroup[K, V: Semigroup]: Semigroup[Map[K, V]] = new MapMonoid[K, V]
+  implicit def scMapSemigroup[K, V: Semigroup]: Semigroup[ScMap[K, V]] = new ScMapMonoid[K, V]
   implicit def jmapSemigroup[K, V: Semigroup]: Semigroup[JMap[K, V]] = new JMapMonoid[K, V]
   implicit def eitherSemigroup[L: Semigroup, R: Semigroup]: Semigroup[Either[L, R]] = new EitherSemigroup[L, R]
   implicit def function1Semigroup[T]: Semigroup[Function1[T, T]] = new Function1Monoid[T]

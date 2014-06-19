@@ -16,8 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird.matrix
 
-import scala.collection.mutable.{ArrayBuffer, Map => MMap}
-import com.twitter.algebird.{AdaptiveVector, Monoid}
+import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
+import com.twitter.algebird.{ AdaptiveVector, Monoid }
 
 /**
  * A Matrix structure that is designed to hide moving between sparse and dense representations
@@ -48,7 +48,7 @@ object AdaptiveMatrix {
   }
 
   // The adaptive monoid to swap between sparse modes.
-  implicit def monoid[V:Monoid]: Monoid[AdaptiveMatrix[V]] = new Monoid[AdaptiveMatrix[V]] {
+  implicit def monoid[V: Monoid]: Monoid[AdaptiveMatrix[V]] = new Monoid[AdaptiveMatrix[V]] {
     private[this] final val innerZero = implicitly[Monoid[V]].zero
 
     override def zero: AdaptiveMatrix[V] = SparseColumnMatrix[V](IndexedSeq[AdaptiveVector[V]]())
@@ -69,11 +69,13 @@ object AdaptiveMatrix {
     }
 
     private def sparseUpdate(storage: IndexedSeq[MMap[Int, V]], other: SparseColumnMatrix[V]) = {
-      other.rowsByColumns.zipWithIndex.foreach { case (contents, indx) =>
-        val curMap: MMap[Int, V] = storage(indx)
-        AdaptiveVector.toMap(contents).foreach { case (col, value) =>
-          curMap.update(col, Monoid.plus(value, curMap.getOrElse(col, innerZero)))
-        }
+      other.rowsByColumns.zipWithIndex.foreach {
+        case (contents, indx) =>
+          val curMap: MMap[Int, V] = storage(indx)
+          AdaptiveVector.toMap(contents).foreach {
+            case (col, value) =>
+              curMap.update(col, Monoid.plus(value, curMap.getOrElse(col, innerZero)))
+          }
       }
     }
 
@@ -81,40 +83,41 @@ object AdaptiveMatrix {
       val buffer = ArrayBuffer.fill(rows * cols)(innerZero)
       var row = 0
       val iter = storage.iterator
-      while(iter.hasNext) {
+      while (iter.hasNext) {
         val curRow = iter.next
-        curRow.foreach { case (col, value) =>
-          buffer(row*cols + col) = value
+        curRow.foreach {
+          case (col, value) =>
+            buffer(row * cols + col) = value
         }
         row += 1
       }
       denseInsert(rows, cols, buffer, remainder)
     }
 
-  override def sumOption(items: TraversableOnce[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] =
-    if(items.isEmpty) {
-      None
-    } else {
-      val iter = items.toIterator.buffered
-      val rows = iter.head.rows
-      val cols = iter.head.cols
-      val sparseStorage = (0 until rows).map{_ => MMap[Int, V]()}.toIndexedSeq
+    override def sumOption(items: TraversableOnce[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] =
+      if (items.isEmpty) {
+        None
+      } else {
+        val iter = items.toIterator.buffered
+        val rows = iter.head.rows
+        val cols = iter.head.cols
+        val sparseStorage = (0 until rows).map{ _ => MMap[Int, V]() }.toIndexedSeq
 
-      while(iter.hasNext) {
-        val current = iter.next
-        current match {
-          case d@DenseMatrix(_, _, _) => return denseUpdate(d, iter)
-          case s@SparseColumnMatrix(_) =>
-            sparseUpdate(sparseStorage, s)
-            if(sparseStorage(0).size > current.cols/4) {
-              return goDense(rows, cols, sparseStorage, iter)
-            }
+        while (iter.hasNext) {
+          val current = iter.next
+          current match {
+            case d @ DenseMatrix(_, _, _) => return denseUpdate(d, iter)
+            case s @ SparseColumnMatrix(_) =>
+              sparseUpdate(sparseStorage, s)
+              if (sparseStorage(0).size > current.cols / 4) {
+                return goDense(rows, cols, sparseStorage, iter)
+              }
+          }
         }
-      }
 
-      // Need to still be sparse to reach here, so must unpack the MMap to be used again.
-      Some(SparseColumnMatrix.fromSeqMap(cols, sparseStorage))
-    }
+        // Need to still be sparse to reach here, so must unpack the MMap to be used again.
+        Some(SparseColumnMatrix.fromSeqMap(cols, sparseStorage))
+      }
   }
 }
 
