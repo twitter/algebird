@@ -4,6 +4,8 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
   def withCross(dep: ModuleID) =
@@ -18,10 +20,11 @@ object AlgebirdBuild extends Build {
       case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
   }
 
-  val sharedSettings = Project.defaultSettings ++ Seq(
+  val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
     crossScalaVersions := Seq("2.9.3", "2.10.0"),
+    ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -81,6 +84,14 @@ object AlgebirdBuild extends Build {
         </developer>
       </developers>)
   ) ++ mimaDefaultSettings
+
+
+  lazy val formattingPreferences = {
+    import scalariform.formatter.preferences._
+    FormattingPreferences().
+      setPreference(AlignParameters, false).
+      setPreference(PreserveSpaceBeforeArguments, true)
+  }
 
   /**
     * This returns the youngest jar we released that is compatible with
@@ -154,3 +165,5 @@ object AlgebirdBuild extends Build {
     libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
+
+
