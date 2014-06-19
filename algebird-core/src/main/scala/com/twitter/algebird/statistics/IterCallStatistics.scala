@@ -44,8 +44,8 @@ private class IterCallStatistics(threadSafe: Boolean) {
 
     override def toString =
       distribution.zipWithIndex.map {
-        case (v, i)  =>
-          (if(i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
+        case (v, i) =>
+          (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
       }.mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
 
   }
@@ -66,7 +66,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
   }
 
   /** measures the time spent calling f on iter and the size of iter */
-  def measure[T, O](iter: TraversableOnce[T]) (f: (TraversableOnce[T]) => O): O = {
+  def measure[T, O](iter: TraversableOnce[T])(f: (TraversableOnce[T]) => O): O = {
     val ci = new CountingIterator(iter.toIterator)
     val t0 = System.currentTimeMillis()
     val r = f(ci)
@@ -81,6 +81,6 @@ private class IterCallStatistics(threadSafe: Boolean) {
 
   override def toString =
     countStats.toString + ", " +
-    "total time: " + totalCallTime + "ms, " +
-    "avg time: " + (totalCallTime.toDouble / countStats.count)
+      "total time: " + totalCallTime + "ms, " +
+      "avg time: " + (totalCallTime.toDouble / countStats.count)
 }

@@ -30,26 +30,24 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
   }
 
   def ||(that: ApproximateBoolean): ApproximateBoolean = {
-    if(isTrue || that.isTrue) {
+    if (isTrue || that.isTrue) {
       // We need at least one of them to be true:
       val newP = List(this, that)
         .filter { _.isTrue }
         .map { _.withProb }
         .max
       ApproximateBoolean(true, newP)
-    }
-    else {
+    } else {
       // We need both of these to be correct to believe it is false:
       ApproximateBoolean(false, withProb * that.withProb)
     }
   }
 
   def &&(that: ApproximateBoolean): ApproximateBoolean = {
-    if(isTrue && that.isTrue) {
+    if (isTrue && that.isTrue) {
       // We need both to be correct:
       ApproximateBoolean(true, withProb * that.withProb)
-    }
-    else {
+    } else {
       // Our confidence is the maximum confidence of the false cases:
       val newP = List(this, that)
         .filterNot { _.isTrue }
@@ -67,57 +65,56 @@ object ApproximateBoolean {
 }
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
-case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
-  (implicit val numeric: Numeric[N]) {
-   // Is this value contained within the bounds:
-   def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
-   def contains(v: N): ApproximateBoolean =
-     ApproximateBoolean(boundsContain(v), probWithinBounds)
-   /*
+case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) {
+  // Is this value contained within the bounds:
+  def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
+  def contains(v: N): ApproximateBoolean =
+    ApproximateBoolean(boundsContain(v), probWithinBounds)
+  /*
     * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
     * and then x ~ 1.05 returns true
     */
-   def ~(v:N): Boolean = boundsContain(v)
-   /*
+  def ~(v: N): Boolean = boundsContain(v)
+  /*
     * Contract is:
     * Prob(boundsContain(estimate)) >= probWithinBounds
     */
-   def isExact: Boolean = (probWithinBounds == 1.0) && numeric.equiv(min, max)
-   def +(right: Approximate[N]): Approximate[N] = {
-     val n = numeric
-     Approximate(n.plus(min, right.min),
-       n.plus(estimate, right.estimate),
-       n.plus(max, right.max),
-       probWithinBounds * right.probWithinBounds)
-   }
-   def -(right: Approximate[N]): Approximate[N] = {
-     this.+(right.negate)
-   }
-   /** This is not distributive, because:
-    * a*(b+c) has two probability multiplications
-    * while (a*b + a*b) has three
-    * Some kind of general formula solver could possibly
-    * make this distributive, but in the mean time, it's only
-    * a group
-    */
-   def *(right: Approximate[N]): Approximate[N] =
-     if(right.isZero || isOne) {
-       right
-     }
-     else if(isZero || right.isOne) {
-       this
-     }
-     else {
-       val n = numeric
-       val ends = for(leftv <- List(min, max);
-                      rightv <- List(right.min, right.max))
-                  yield n.times(leftv, rightv)
+  def isExact: Boolean = (probWithinBounds == 1.0) && numeric.equiv(min, max)
+  def +(right: Approximate[N]): Approximate[N] = {
+    val n = numeric
+    Approximate(n.plus(min, right.min),
+      n.plus(estimate, right.estimate),
+      n.plus(max, right.max),
+      probWithinBounds * right.probWithinBounds)
+  }
+  def -(right: Approximate[N]): Approximate[N] = {
+    this.+(right.negate)
+  }
+  /**
+   * This is not distributive, because:
+   * a*(b+c) has two probability multiplications
+   * while (a*b + a*b) has three
+   * Some kind of general formula solver could possibly
+   * make this distributive, but in the mean time, it's only
+   * a group
+   */
+  def *(right: Approximate[N]): Approximate[N] =
+    if (right.isZero || isOne) {
+      right
+    } else if (isZero || right.isOne) {
+      this
+    } else {
+      val n = numeric
+      val ends = for (
+        leftv <- List(min, max);
+        rightv <- List(right.min, right.max)
+      ) yield n.times(leftv, rightv)
 
-       val newProb = probWithinBounds * right.probWithinBounds
+      val newProb = probWithinBounds * right.probWithinBounds
 
-       Approximate(ends.min, n.times(estimate, right.estimate),
-         ends.max, newProb)
-     }
+      Approximate(ends.min, n.times(estimate, right.estimate),
+        ends.max, newProb)
+    }
 
   def isZero: Boolean =
     isExact && numeric.equiv(estimate, numeric.zero)
@@ -130,27 +127,25 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
   // Assert that we definitely know the lower bound is better than m
   def withMin(m: N): Approximate[N] = {
     require(numeric.lteq(m, max))
-    if(numeric.lteq(m, min) ) {
+    if (numeric.lteq(m, min)) {
       this
-    }
-    else {
+    } else {
       Approximate(m, numeric.max(m, estimate), max, probWithinBounds)
     }
   }
   // Assert that we definitely know the upper bound is at most m
   def withMax(m: N): Approximate[N] = {
     require(numeric.lteq(min, m))
-    if(numeric.lteq(max, m) ) {
+    if (numeric.lteq(max, m)) {
       this
-    }
-    else {
+    } else {
       Approximate(min, numeric.min(m, estimate), m, probWithinBounds)
     }
   }
 }
 
 object Approximate {
-  def exact[N:Numeric](v: N) = Approximate(v,v,v,1.0)
+  def exact[N: Numeric](v: N) = Approximate(v, v, v, 1.0)
   def zero[N](implicit n: Numeric[N]) = exact(n.zero)
   def one[N](implicit n: Numeric[N]) = exact(n.one)
   // Not a group/ring:

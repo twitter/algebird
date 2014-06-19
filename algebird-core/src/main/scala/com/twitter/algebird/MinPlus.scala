@@ -41,7 +41,7 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
     (left, right) match {
       case (MinPlusZero, _) => right
       case (_, MinPlusZero) => left
-      case (MinPlusValue(lv), MinPlusValue(rv)) => if(ord.lteq(lv, rv)) left else right
+      case (MinPlusValue(lv), MinPlusValue(rv)) => if (ord.lteq(lv, rv)) left else right
     }
 
   // a*b = a+b
@@ -54,5 +54,5 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
 }
 
 object MinPlus extends java.io.Serializable {
-  implicit def semiring[V:Monoid:Ordering]: Ring[MinPlus[V]] = new MinPlusSemiring[V]
+  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] = new MinPlusSemiring[V]
 }

@@ -26,11 +26,10 @@ object DecayedVector {
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
   }
 
-  def monoidWithEpsilon[C[_]](eps: Double)
-      (implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) = new Monoid[DecayedVector[C]] {
+  def monoidWithEpsilon[C[_]](eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) = new Monoid[DecayedVector[C]] {
     override val zero = DecayedVector(vs.group.zero, Double.NegativeInfinity)
     override def plus(left: DecayedVector[C], right: DecayedVector[C]) = {
-      if(left.scaledTime <= right.scaledTime) {
+      if (left.scaledTime <= right.scaledTime) {
         scaledPlus(right, left, eps)
       } else {
         scaledPlus(left, right, eps)
@@ -38,27 +37,24 @@ object DecayedVector {
     }
   }
 
-  def forMap[K](m: Map[K, Double], scaledTime: Double) = DecayedVector[({type x[a]=Map[K, a]})#x](m, scaledTime)
+  def forMap[K](m: Map[K, Double], scaledTime: Double) = DecayedVector[({ type x[a] = Map[K, a] })#x](m, scaledTime)
   def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double) =
     forMap(m, time * scala.math.log(2.0) / halfLife)
 
-  def mapMonoidWithEpsilon[K](eps: Double)
-      (implicit vs: VectorSpace[Double, ({type x[a]=Map[K, a]})#x], metric: Metric[Map[K, Double]]) =
-    monoidWithEpsilon[({type x[a]=Map[K, a]})#x](eps)
+  def mapMonoidWithEpsilon[K](eps: Double)(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
+    monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
 
   // This is the default monoid that never thresholds.
   // If you want to set a specific accuracy you need to implicitly override this
   implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]], ord: Ordering[F]) = monoidWithEpsilon(-1.0)
-  implicit def mapMonoid[K]
-      (implicit vs: VectorSpace[Double, ({type x[a]=Map[K, a]})#x], metric: Metric[Map[K, Double]]) =
+  implicit def mapMonoid[K](implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
     mapMonoidWithEpsilon(-1.0)
 
-  def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)
-      (implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]): DecayedVector[C] = {
+  def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]): DecayedVector[C] = {
     implicit val mon: Monoid[C[Double]] = vs.group
     val expFactor = scala.math.exp(oldVal.scaledTime - newVal.scaledTime)
     val newVector = Monoid.plus(newVal.vector, vs.scale(expFactor, oldVal.vector))
-    if(eps < 0.0 || Metric.norm(newVector) > eps) {
+    if (eps < 0.0 || Metric.norm(newVector) > eps) {
       DecayedVector(newVector, newVal.scaledTime)
     } else {
       DecayedVector(mon.zero, Double.NegativeInfinity)
