@@ -60,8 +60,6 @@ private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSumm
   protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
   protected lazy val runtime = Runtime.getRuntime
 
-  protected def didFlush { lastDump = System.currentTimeMillis }
-
   protected def memoryWaterMark = {
     val used = ((runtime.totalMemory - runtime.freeMemory).toDouble * 100) / runtime.maxMemory
     used > softMemoryFlush.v
@@ -69,6 +67,7 @@ private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSumm
 
   def tick: Future[M] = {
     if (timedOut || memoryWaterMark) {
+      lastDump = System.currentTimeMillis // reset the timeout condition
       flush
     } else {
       Future.value(emptyResult)

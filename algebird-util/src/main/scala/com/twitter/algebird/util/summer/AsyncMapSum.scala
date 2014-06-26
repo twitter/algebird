@@ -40,7 +40,6 @@ class AsyncMapSum[Key, Value](bufferSize: BufferSize,
   override def isFlushed: Boolean = queue.size == 0
 
   override def flush: Future[Map[Key, Value]] = {
-    didFlush // bumps timeout on the flush conditions
     val toSum = ArrayBuffer[Map[Key, Value]]()
     queue.drainTo(toSum.asJava)
     workPool {

@@ -49,7 +49,6 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
   override def flush: Future[Map[Key, Value]] =
     workPool {
       val curData = mutex.synchronized {
-        didFlush // bumps timeout on the flush conditions
         presentTuples = 0
         val l = queueMap.toList
         queueMap.clear
