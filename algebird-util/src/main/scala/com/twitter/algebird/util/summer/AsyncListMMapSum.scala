@@ -16,11 +16,11 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
+import com.twitter.util.{ Duration, Future, FuturePool }
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet, ListBuffer, Map => MMap}
+import scala.collection.mutable.{ Set => MSet, ListBuffer, Map => MMap }
 import scala.collection.breakOut
 
 /**
@@ -30,17 +30,13 @@ import scala.collection.breakOut
  * When flushing it acquires the lock, drains the mutable map but does the compaction without holding the lock.
  */
 
-
-
 class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
-                                          override val flushFrequency: FlushFrequency,
-                                          override val softMemoryFlush: MemoryFlushPercent,
-                                          workPool: FuturePool)
-                                         (implicit sg: Semigroup[Value])
-                                          extends AsyncSummer[(Key, Value), Map[Key, Value]]
-                                          with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+  override val flushFrequency: FlushFrequency,
+  override val softMemoryFlush: MemoryFlushPercent,
+  workPool: FuturePool)(implicit sg: Semigroup[Value])
+  extends AsyncSummer[(Key, Value), Map[Key, Value]]
+  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
-
 
   private[this] final val queueMap = MMap[Key, ListBuffer[Value]]()
   private[this] final val mutex = new Object()
@@ -48,19 +44,19 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
 
   protected override val emptyResult = Map.empty[Key, Value]
 
-  override def isFlushed: Boolean = mutex.synchronized{ presentTuples  == 0 }
+  override def isFlushed: Boolean = mutex.synchronized{ presentTuples == 0 }
 
   override def flush: Future[Map[Key, Value]] =
     workPool {
       val curData = mutex.synchronized {
-        didFlush // bumps timeout on the flush conditions
         presentTuples = 0
         val l = queueMap.toList
         queueMap.clear
         l
       }
-      curData.flatMap { case (k, listV) =>
-        sg.sumOption(listV).map(v => (k, v))
+      curData.flatMap {
+        case (k, listV) =>
+          sg.sumOption(listV).map(v => (k, v))
       }(breakOut)
     }
 
@@ -68,15 +64,16 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
     var newlyAddedTuples = 0
 
     mutex.synchronized {
-      vals.foreach { case (k, v) =>
-        val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
-        existingV += v
-        newlyAddedTuples += 1
+      vals.foreach {
+        case (k, v) =>
+          val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
+          existingV += v
+          newlyAddedTuples += 1
       }
       presentTuples += newlyAddedTuples
     }
 
-    if(presentTuples >= bufferSize.v)
+    if (presentTuples >= bufferSize.v)
       flush
     else
       Future.value(emptyResult)

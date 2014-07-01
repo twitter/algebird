@@ -4,8 +4,8 @@ import scala.collection.immutable.SortedMap
 
 object SpaceSaver {
   /**
-    * Construct SpaceSaver with given capacity containing a single item.
-    */
+   * Construct SpaceSaver with given capacity containing a single item.
+   */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
@@ -14,45 +14,45 @@ object SpaceSaver {
 }
 
 /**
-  * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
-  * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
-  * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
-  * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
-  * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
-  * or preserve the guarantees or benefits of the algorithm.
-  */
+ * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
+ * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
+ * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
+ * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
+ * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
+ * or preserve the guarantees or benefits of the algorithm.
+ */
 sealed abstract class SpaceSaver[T] {
   import SpaceSaver.ordering
 
   /**
-    * Maximum number of counters to keep (parameter "m" in the research paper).
-    */
+   * Maximum number of counters to keep (parameter "m" in the research paper).
+   */
   def capacity: Int
 
   /**
-    * Current lowest value for count
-    */
+   * Current lowest value for count
+   */
   def min: Long
 
   /**
-    * Map of item to counter, where each counter consist of a observed count and possible over-estimation (error)
-    */
+   * Map of item to counter, where each counter consists of an observed count and possible over-estimation (error)
+   */
   def counters: Map[T, (Long, Long)]
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T]
 
   /**
-    * returns the frequency estimate for the item
-    */
+   * returns the frequency estimate for the item
+   */
   def frequency(item: T): Approximate[Long] = {
     val (count, err) = counters.getOrElse(item, (min, min))
     Approximate(count - err, count, count, 1.0)
   }
 
   /**
-    * Get the elements that show up more than thres times.
-    * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
-    */
+   * Get the elements that show up more than thres times.
+   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   */
   def mostFrequent(thres: Int): Seq[(T, Approximate[Long], Boolean)] =
     counters
       .iterator
@@ -62,9 +62,9 @@ sealed abstract class SpaceSaver[T] {
       .map { case (item, (count, err)) => (item, Approximate(count - err, count, count, 1.0), thres <= count - err) }
 
   /**
-    * Get the top-k elements.
-    * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
-    */
+   * Get the top-k elements.
+   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   */
   def topK(k: Int): Seq[(T, Approximate[Long], Boolean)] = {
     require(k < capacity)
     val si = counters
@@ -76,10 +76,10 @@ sealed abstract class SpaceSaver[T] {
   }
 
   /**
-    * Check consistency with other SpaceSaver, useful for testing.
-    * Returns boolean indicating if they are consistent
-    */
-  def consistentWith(that: SpaceSaver[T]): Boolean = 
+   * Check consistency with other SpaceSaver, useful for testing.
+   * Returns boolean indicating if they are consistent
+   */
+  def consistentWith(that: SpaceSaver[T]): Boolean =
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 

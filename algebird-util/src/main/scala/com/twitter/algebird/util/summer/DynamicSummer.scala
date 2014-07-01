@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
+import com.twitter.util.{ Duration, Future, FuturePool }
 import java.util.concurrent.ConcurrentHashMap
 import scala.collection.mutable.ListBuffer
 import java.util.concurrent.atomic.AtomicInteger
@@ -27,7 +27,6 @@ import scala.collection.JavaConverters._
  *
  * This class is designed to use a local mutable CMS to skip keeping low freqeuncy keys in a buffer.
  */
-
 
 // The update frequency is how often we should update the mutable CMS
 // other steps will just query the pre-established HH's
@@ -41,7 +40,6 @@ case class RollOverFrequency(toLong: Long)
 // The heavy hitters percent is used to control above what % of items we should send to the backing
 // aggregator
 case class HeavyHittersPercent(toFloat: Float)
-
 
 class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency) {
   private[this] final val WIDTH = 1000
@@ -60,17 +58,16 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   }.toIndexedSeq
 
   @inline
-  private[this] final def frequencyEst(item : Long): Long = {
+  private[this] final def frequencyEst(item: Long): Long = {
     var min = Long.MaxValue
     var indx = 0
     while (indx < DEPTH) {
-      val newVal = countsTable(indx*WIDTH + hashes(indx)(item))
-      if(newVal < min) min = newVal
+      val newVal = countsTable(indx * WIDTH + hashes(indx)(item))
+      if (newVal < min) min = newVal
       indx += 1
     }
     min
   }
-
 
   // Update functions in the write path
   // a synchronized guard should be used around these
@@ -81,7 +78,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
     hhMinReq = (hhPercent * totalCount).toLong
     var indx = 0
     while (indx < DEPTH) {
-      val offset = indx*WIDTH + hashes(indx)(item)
+      val offset = indx * WIDTH + hashes(indx)(item)
       countsTable.update(offset, countsTable(offset) + 1L)
       indx += 1
     }
@@ -90,21 +87,21 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   }
 
   @inline
-  private[this] final def updateHH(item : Int) {
+  private[this] final def updateHH(item: Int) {
     @inline
     def pruneHH {
       val iter = hh.values.iterator
-      while(iter.hasNext) {
+      while (iter.hasNext) {
         val n = iter.next
-        if(n < hhMinReq) {
+        if (n < hhMinReq) {
           iter.remove
         }
       }
     }
 
-    if(hh.containsKey(item)) {
+    if (hh.containsKey(item)) {
       val v = hh.get(item)
-      val newItemCount =  + 1L
+      val newItemCount = +1L
       if (newItemCount < hhMinReq) {
         pruneHH
       } else {
@@ -145,7 +142,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
         resetCMS
       }
     }
-    if(newCounter < 1000L || newCounter % updateFrequency == 0L) {
+    if (newCounter < 1000L || newCounter % updateFrequency == 0L) {
       hh.synchronized {
         updateItem(t)
       }
@@ -153,13 +150,13 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
     hh.containsKey(t)
   }
 
-    // Tuples returned are (hh, non-HH)
+  // Tuples returned are (hh, non-HH)
   final def splitTraversableOnce[T](t: TraversableOnce[T], extractor: T => Int): (ListBuffer[T], ListBuffer[T]) = {
     val hh = new ListBuffer[T]
     val nonHH = new ListBuffer[T]
 
     t.foreach { t =>
-      if(hhFilter(extractor(t)))
+      if (hhFilter(extractor(t)))
         hh += t
       else
         nonHH += t
@@ -178,16 +175,16 @@ object DynamicSummer {
     new DynamicSummer[Key, Value](DEFAULT_HH_PERCENT, DEFAULT_UPDATE_FREQUENCY, DEFAULT_ROLL_OVER_FREQUENCY, flushFrequency, softMemoryFlush, backingSummer)
 
   def apply[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency,
-                        flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
+    flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
     new DynamicSummer[Key, Value](hhPct, updateFreq, roFreq, flushFrequency, softMemoryFlush, backingSummer)
 
 }
 
 class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
-                              override val softMemoryFlush: MemoryFlushPercent,
-                              backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
-                              extends AsyncSummer[(K, V), Iterable[(K, V)]]
-                              with WithFlushConditions[(K, V), Iterable[(K, V)]] {
+  override val softMemoryFlush: MemoryFlushPercent,
+  backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
+  extends AsyncSummer[(K, V), Iterable[(K, V)]]
+  with WithFlushConditions[(K, V), Iterable[(K, V)]] {
 
   type T = (K, V) // We only treat the K, V types as a pair almost exclusively in this class.
 
@@ -198,11 +195,11 @@ class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequenc
   private[this] final val approxHH = new ApproxHHTracker(hhPct, updateFreq, roFreq)
 
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
-    val (hh, nonHH) = approxHH.splitTraversableOnce(vals, {t: T => t._1.hashCode })
+    val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 
-    if(!hh.isEmpty) {
+    if (!hh.isEmpty) {
       backingSummer.addAll(hh).map { fResp =>
-        if(fResp.isEmpty) {
+        if (fResp.isEmpty) {
           nonHH
         } else {
           fResp.view ++ nonHH

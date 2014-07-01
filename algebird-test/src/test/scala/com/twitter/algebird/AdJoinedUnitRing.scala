@@ -25,7 +25,7 @@ import org.scalacheck.Gen.choose
 object AdjoinedRingSpecification extends Properties("AdjoinedRing") {
   import BaseProperties._
 
-  implicit def adjoined[T:Arbitrary]: Arbitrary[AdjoinedUnit[T]] = Arbitrary {
+  implicit def adjoined[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] = Arbitrary {
     implicitly[Arbitrary[T]].arbitrary.map { t => AdjoinedUnit(t) }
   }
   // AdjoinedUnit requires this method to be correct, so it is tested here:

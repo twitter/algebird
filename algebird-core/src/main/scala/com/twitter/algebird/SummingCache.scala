@@ -23,55 +23,56 @@ package com.twitter.algebird
 import java.util.concurrent.ArrayBlockingQueue
 
 import java.util.{ LinkedHashMap => JLinkedHashMap, Map => JMap }
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{ Map => MMap }
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 object SummingCache {
-  def apply[K,V:Semigroup](cap: Int): SummingCache[K,V] = new SummingCache[K,V](cap)
+  def apply[K, V: Semigroup](cap: Int): SummingCache[K, V] = new SummingCache[K, V](cap)
 }
-/** A Stateful Summer on Map[K,V] that keeps a cache of recent keys
+/**
+ * A Stateful Summer on Map[K,V] that keeps a cache of recent keys
  */
-class SummingCache[K,V] private (capacity: Int)(implicit sgv: Semigroup[V])
-  extends StatefulSummer[Map[K,V]] {
+class SummingCache[K, V] private (capacity: Int)(implicit sgv: Semigroup[V])
+  extends StatefulSummer[Map[K, V]] {
 
   require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
 
-  override val semigroup = new MapMonoid[K,V]
-  protected def optNonEmpty(m: Map[K,V]) = if (m.isEmpty) None else Some(m)
+  override val semigroup = new MapMonoid[K, V]
+  protected def optNonEmpty(m: Map[K, V]) = if (m.isEmpty) None else Some(m)
 
-  override def put(m: Map[K,V]): Option[Map[K,V]] = {
-    val replaced = m.map { case (k, v) =>
-      val newV = cache.get(k)
-        .map { oldV => sgv.plus(oldV, v) }
-        .getOrElse { v }
-      (k, newV)
+  override def put(m: Map[K, V]): Option[Map[K, V]] = {
+    val replaced = m.map {
+      case (k, v) =>
+        val newV = cache.get(k)
+          .map { oldV => sgv.plus(oldV, v) }
+          .getOrElse { v }
+        (k, newV)
     }
 
     cache ++= replaced
     val ret = lastEvicted
     // Rest this var
-    lastEvicted = Map.empty[K,V]
+    lastEvicted = Map.empty[K, V]
     optNonEmpty(ret)
   }
-  override def flush: Option[Map[K,V]] = {
-    //Get a copy of the cache, since it is mutable
+  override def flush: Option[Map[K, V]] = {
+    // Get a copy of the cache, since it is mutable
     val res = optNonEmpty(Map(cache.toSeq: _*))
     cache.clear
     res
   }
   def isFlushed = cache.isEmpty
 
-  protected var lastEvicted: Map[K,V] = Map.empty[K,V]
+  protected var lastEvicted: Map[K, V] = Map.empty[K, V]
   // TODO fancier caches will give better performance:
-  protected lazy val cache: MMap[K,V] = (new JLinkedHashMap[K,V](capacity + 1, 0.75f, true) {
-      override protected def removeEldestEntry(eldest : JMap.Entry[K, V]) =
-        if(super.size > capacity) {
-          lastEvicted += (eldest.getKey -> eldest.getValue)
-          true
-        }
-        else {
-          false
-        }
-    }).asScala
+  protected lazy val cache: MMap[K, V] = (new JLinkedHashMap[K, V](capacity + 1, 0.75f, true) {
+    override protected def removeEldestEntry(eldest: JMap.Entry[K, V]) =
+      if (super.size > capacity) {
+        lastEvicted += (eldest.getKey -> eldest.getValue)
+        true
+      } else {
+        false
+      }
+  }).asScala
 }

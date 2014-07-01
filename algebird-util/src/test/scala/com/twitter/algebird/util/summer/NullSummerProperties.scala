@@ -16,9 +16,9 @@
 
 package com.twitter.algebird.util.summer
 
-import com.twitter.algebird.{MapAlgebra, Semigroup}
-import com.twitter.util.{Future, Await}
-import scala.collection.mutable.{Map => MMap}
+import com.twitter.algebird.{ MapAlgebra, Semigroup }
+import com.twitter.util.{ Future, Await }
+import scala.collection.mutable.{ Map => MMap }
 import org.scalacheck._
 import Gen._
 import Arbitrary._
@@ -26,7 +26,6 @@ import org.scalacheck.Prop._
 import scala.util.Random
 import com.twitter.util.Duration
 import Arbitrary.arbitrary
-
 
 object NullSummerProperties extends Properties("NullSummerProperties") {
   import AsyncSummerLaws._

@@ -26,7 +26,6 @@ object CountMinSketchLaws extends Properties("CountMinSketch") {
 
 class CountMinSketchTest extends Specification {
 
-
   val DELTA = 1E-10
   val EPS = 0.001
   val SEED = 1
@@ -37,7 +36,7 @@ class CountMinSketchTest extends Specification {
   /**
    * Returns the exact frequency of {x} in {data}.
    */
-  def exactFrequency(data : Seq[Long], x : Long) : Long = {
+  def exactFrequency(data: Seq[Long], x: Long): Long = {
     data.filter { _ == x }.size
   }
 
@@ -45,9 +44,9 @@ class CountMinSketchTest extends Specification {
    * Returns the exact inner product between two data streams, when the streams
    * are viewed as count vectors.
    */
-  def exactInnerProduct(data1 : Seq[Long], data2 : Seq[Long]) : Long = {
-    val counts1 = data1.groupBy( x => x ).mapValues( _.size )
-    val counts2 = data2.groupBy( x => x ).mapValues( _.size )
+  def exactInnerProduct(data1: Seq[Long], data2: Seq[Long]): Long = {
+    val counts1 = data1.groupBy(x => x).mapValues(_.size)
+    val counts2 = data2.groupBy(x => x).mapValues(_.size)
 
     (counts1.keys.toSet & counts2.keys.toSet).map { k => counts1(k) * counts2(k) }.sum
   }
@@ -55,8 +54,8 @@ class CountMinSketchTest extends Specification {
   /**
    * Returns the elements in {data} that appear at least heavyHittersPct * data.size times.
    */
-  def exactHeavyHitters(data : Seq[Long], heavyHittersPct : Double) : Set[Long] = {
-    val counts = data.groupBy( x => x ).mapValues( _.size )
+  def exactHeavyHitters(data: Seq[Long], heavyHittersPct: Double): Set[Long] = {
+    val counts = data.groupBy(x => x).mapValues(_.size)
     val totalCount = counts.values.sum
     counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
   }
