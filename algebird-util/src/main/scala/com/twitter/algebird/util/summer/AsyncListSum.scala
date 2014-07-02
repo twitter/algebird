@@ -16,71 +16,40 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
+import com.twitter.util.{ Duration, Future, FuturePool }
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet, ListBuffer}
+import scala.collection.mutable.{ Set => MSet, ListBuffer }
 import scala.collection.breakOut
 
 /**
  * @author Ian O Connell
  */
 
-
-
 class AsyncListSum[Key, Value](bufferSize: BufferSize,
-                                          override val flushFrequency: FlushFrequency,
-                                          override val softMemoryFlush: MemoryFlushPercent,
-                                          workPool: FuturePool)
-                                         (implicit sg: Semigroup[Value])
-                                          extends AsyncSummer[(Key, Value), Map[Key, Value]]
-                                          with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+  override val flushFrequency: FlushFrequency,
+  override val softMemoryFlush: MemoryFlushPercent,
+  workPool: FuturePool)(implicit sg: Semigroup[Value])
+  extends AsyncSummer[(Key, Value), Map[Key, Value]]
+  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
- private class MapContainer private (val next: Value, privBuf: ListBuffer[Value], var elementsCommitted: Int) {
-    def this(v: Value) = this(v, ListBuffer[Value](), 0)
-    private var valuesStored: Int = 0
-    @volatile private var comitted = false
+  private case class MapContainer(privBuf: List[Value], size: Int) {
+    def this(v: Value) = this(List[Value](v), 1)
 
-    def commit {
-      this.synchronized {
-        if(!comitted) {
-          privBuf += next
-          comitted = true
-          elementsCommitted += 1
-        }
-      }
-    }
-
-    def size = {
-      if(comitted)
-        elementsCommitted
-      else
-        elementsCommitted + 1
-      }
-
-    def addValue(v: Value): MapContainer = {
-      commit
-      require(comitted == true, "Should be comitted to make a new MapContainer")
-      new MapContainer(v, privBuf, elementsCommitted)
-    }
+    def addValue(v: Value): MapContainer = new MapContainer(v :: privBuf, size + 1)
 
     override def equals(o: Any) = o match {
       case that: MapContainer => that eq this
       case _ => false
     }
 
-    def dump: (Int, Iterable[Value]) = {
-      commit
-      (elementsCommitted, privBuf)
-    }
+    lazy val toSeq = privBuf.reverse
   }
 
-  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
-
   protected override val emptyResult = Map.empty[Key, Value]
-
   private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
 
@@ -88,7 +57,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
 
   override def flush: Future[Map[Key, Value]] =
     workPool {
-      didFlush // bumps timeout on the flush conditions
       // Take a copy of the keyset into a scala set (toSet forces the copy)
       // We want this to be safe around uniqueness in the keys coming out of the keys.flatMap
       val keys = MSet[Key]()
@@ -97,12 +65,10 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       keys.flatMap { k =>
         val retV = queueMap.remove(k)
 
-        if(retV != null) {
-          val (numElements, buf) = retV.dump
-          val newRemaining = elementsInCache.addAndGet(numElements * -1)
-          sg.sumOption(buf).map(v => (k, v))
-        }
-        else None
+        if (retV != null) {
+          val newRemaining = elementsInCache.addAndGet(retV.size * -1)
+          sg.sumOption(retV.toSeq).map(v => (k, v))
+        } else None
       }(breakOut)
     }
 
@@ -110,7 +76,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   private[this] final def doInsert(key: Key, value: Value) {
     val success = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)
-      if(oldValue != null) {
+      if (oldValue != null) {
         queueMap.replace(key, oldValue, oldValue.addValue(value))
       } else {
         false // Removed between the check above and fetching
@@ -120,7 +86,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       queueMap.putIfAbsent(key, new MapContainer(value)) == null
     }
 
-    if(success) {
+    if (success) {
       // Successful insert
       elementsInCache.addAndGet(1)
     } else {
@@ -129,11 +95,12 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    vals.foreach { case (k, v) =>
-      doInsert(k, v)
+    vals.foreach {
+      case (k, v) =>
+        doInsert(k, v)
     }
 
-    if(elementsInCache.get >= bufferSize.v) {
+    if (elementsInCache.get >= bufferSize.v) {
       flush
     } else {
       Future.value(Map.empty)

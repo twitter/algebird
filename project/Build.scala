@@ -4,6 +4,8 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
   def withCross(dep: ModuleID) =
@@ -18,10 +20,11 @@ object AlgebirdBuild extends Build {
       case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
   }
 
-  val sharedSettings = Project.defaultSettings ++ Seq(
+  val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.9.3",
     crossScalaVersions := Seq("2.9.3", "2.10.0"),
+    ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -35,6 +38,8 @@ object AlgebirdBuild extends Build {
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
+
+    libraryDependencies += "junit" % "junit" % "4.11" % "test",
 
     // Publishing options:
     publishMavenStyle := true,
@@ -80,6 +85,14 @@ object AlgebirdBuild extends Build {
       </developers>)
   ) ++ mimaDefaultSettings
 
+
+  lazy val formattingPreferences = {
+    import scalariform.formatter.preferences._
+    FormattingPreferences().
+      setPreference(AlignParameters, false).
+      setPreference(PreserveSpaceBeforeArguments, true)
+  }
+
   /**
     * This returns the youngest jar we released that is compatible with
     * the current.
@@ -89,7 +102,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.5.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.6.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -152,3 +165,5 @@ object AlgebirdBuild extends Build {
     libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
+
+

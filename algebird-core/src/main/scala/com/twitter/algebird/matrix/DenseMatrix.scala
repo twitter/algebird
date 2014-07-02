@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package com.twitter.algebird.matrix
-import scala.collection.mutable.{ArrayBuffer, Map => MMap}
+import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
 
 import com.twitter.algebird.Monoid
 
@@ -29,11 +29,10 @@ case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSe
   override def updated(position: (Int, Int), value: V): DenseMatrix[V] =
     DenseMatrix[V](rows, cols, rowsByColumns.updated(tupToIndex(position), value))
 
-
   override def updateInto(buffer: ArrayBuffer[V]) {
     var indx = 0
     val lsize = size
-    while(indx < lsize) {
+    while (indx < lsize) {
       buffer(indx) = valueMonoid.plus(buffer(indx), rowsByColumns(indx))
       indx += 1
     }

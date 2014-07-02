@@ -32,8 +32,8 @@ trait Predecessible[T] extends java.io.Serializable {
     new AbstractIterable[T] {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.prev(_) }
-         .takeWhile(_.isDefined)
-         .map(_.get)
+          .takeWhile(_.isDefined)
+          .map(_.get)
     }
   }
   def ordering: Ordering[T]
@@ -50,7 +50,7 @@ object Predecessible extends java.io.Serializable {
   implicit def integralPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
 }
 
-class IntegralPredecessible[T:Integral] extends Predecessible[T] {
+class IntegralPredecessible[T: Integral] extends Predecessible[T] {
   def prev(old: T) = {
     val numeric = implicitly[Integral[T]]
     val newV = numeric.minus(old, numeric.one)
