@@ -27,7 +27,7 @@ import scala.util.Random
 import com.twitter.util.Duration
 import Arbitrary.arbitrary
 
-object DynamicSummerProperties extends Properties("DynamicSummerProperties") {
+object HeavyHittersCachingSummerProperties extends Properties("HeavyHittersCachingSummerProperties") {
 
   import AsyncSummerLaws._
 
@@ -38,8 +38,8 @@ object DynamicSummerProperties extends Properties("DynamicSummerProperties") {
     bufferSize: BufferSize,
     memoryFlushPercent: MemoryFlushPercent) =>
     val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
-    val dynamicSummer = DynamicSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
-    summingWithAndWithoutSummerShouldMatch(dynamicSummer, inputs)
+    val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
+    summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs)
   }
 
 }

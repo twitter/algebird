@@ -166,21 +166,21 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   }
 }
 
-object DynamicSummer {
+object HeavyHittersCachingSummer {
   val DEFAULT_HH_PERCENT = HeavyHittersPercent(0.01f)
   val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
   val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
 
   def apply[Key, Value](flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new DynamicSummer[Key, Value](DEFAULT_HH_PERCENT, DEFAULT_UPDATE_FREQUENCY, DEFAULT_ROLL_OVER_FREQUENCY, flushFrequency, softMemoryFlush, backingSummer)
+    new HeavyHittersCachingSummer[Key, Value](DEFAULT_HH_PERCENT, DEFAULT_UPDATE_FREQUENCY, DEFAULT_ROLL_OVER_FREQUENCY, flushFrequency, softMemoryFlush, backingSummer)
 
   def apply[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency,
     flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new DynamicSummer[Key, Value](hhPct, updateFreq, roFreq, flushFrequency, softMemoryFlush, backingSummer)
+    new HeavyHittersCachingSummer[Key, Value](hhPct, updateFreq, roFreq, flushFrequency, softMemoryFlush, backingSummer)
 
 }
 
-class DynamicSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
+class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
   backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
   extends AsyncSummer[(K, V), Iterable[(K, V)]]
