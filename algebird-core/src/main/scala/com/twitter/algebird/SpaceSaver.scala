@@ -98,7 +98,7 @@ case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
 }
 
 object SSMany {
-  private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] = 
+  private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] =
     SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
 
   private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
