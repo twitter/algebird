@@ -24,10 +24,10 @@ object MonadInstanceLaws extends Properties("Monad") {
 
   // Mutually recursive functions
   def ping(todo: Int, acc: Int): Trampoline[Int] =
-    if(todo <= 0) Trampoline(acc) else Trampoline.call(pong(todo - 1, acc + 1))
+    if (todo <= 0) Trampoline(acc) else Trampoline.call(pong(todo - 1, acc + 1))
 
   def pong(todo: Int, acc: Int): Trampoline[Int] =
-    if(todo <= 0) Trampoline(acc) else Trampoline.call(ping(todo - 1, acc + 1))
+    if (todo <= 0) Trampoline(acc) else Trampoline.call(ping(todo - 1, acc + 1))
 
   property("Trampoline should run without stackoverflow") =
     forAll { (b: Int) =>
@@ -46,7 +46,7 @@ object MonadInstanceLaws extends Properties("Monad") {
 
   property("State behaves correctly") = forAll { (in: Int, head: Long, fns: List[(Int) => Either[String, (Int, Long)]]) =>
     val mons = fns.map { StateWithError(_) }
-    val init = StateWithError.const[Int, Long](head) : StateWithError[Int,String,Long]
+    val init = StateWithError.const[Int, Long](head): StateWithError[Int, String, Long]
     val comp = mons.foldLeft(init) { (old, fn) =>
       old.flatMap { x => fn } // just bind
     }
@@ -71,7 +71,7 @@ object MonadInstanceLaws extends Properties("Monad") {
       }
     }
     // Now apply them all:
-    val bigReader = readers.foldLeft(Reader.const(()) : Reader[MutableBox, Unit]) { (oldr, thisR) =>
+    val bigReader = readers.foldLeft(Reader.const(()): Reader[MutableBox, Unit]) { (oldr, thisR) =>
       oldr.flatMap { x => thisR } // just sequence them
     }
     // apply:

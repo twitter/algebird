@@ -16,14 +16,13 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future}
+import com.twitter.util.{ Duration, Future }
 
 /**
  * @author Ian O Connell
  */
 
-
-trait AsyncSummer[T, M <: Iterable[T]] { self =>
+trait AsyncSummer[T, +M <: Iterable[T]] { self =>
   def flush: Future[M]
   def tick: Future[M]
   def add(t: T) = addAll(Iterator(t))
@@ -42,7 +41,7 @@ trait AsyncSummer[T, M <: Iterable[T]] { self =>
   }
 }
 
-trait AsyncSummerProxy[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
+trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
   def self: AsyncSummer[T, M]
   def flush = self.flush
   def tick = self.tick
@@ -52,17 +51,14 @@ trait AsyncSummerProxy[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   override def cleanup: Future[Unit] = self.cleanup
 }
 
-
 private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
-  protected var lastDump:Long = System.currentTimeMillis
+  protected var lastDump: Long = System.currentTimeMillis
   protected def softMemoryFlush: MemoryFlushPercent
   protected def flushFrequency: FlushFrequency
   protected def emptyResult: M
 
   protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
-  protected lazy val runtime  = Runtime.getRuntime
-
-  protected def didFlush {lastDump = System.currentTimeMillis}
+  protected lazy val runtime = Runtime.getRuntime
 
   protected def memoryWaterMark = {
     val used = ((runtime.totalMemory - runtime.freeMemory).toDouble * 100) / runtime.maxMemory
@@ -71,9 +67,9 @@ private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSumm
 
   def tick: Future[M] = {
     if (timedOut || memoryWaterMark) {
-          flush
-      }
-    else {
+      lastDump = System.currentTimeMillis // reset the timeout condition
+      flush
+    } else {
       Future.value(emptyResult)
     }
   }

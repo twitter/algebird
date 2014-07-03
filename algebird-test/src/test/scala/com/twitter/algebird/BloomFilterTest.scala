@@ -6,7 +6,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
-import java.io.{ObjectOutputStream, ByteArrayOutputStream}
+import java.io.{ ObjectOutputStream, ByteArrayOutputStream }
 
 object BloomFilterLaws extends Properties("BloomFilter") {
   import BaseProperties._
@@ -57,15 +57,15 @@ object BFHashIndices extends Properties("BFHash") {
     }
 
     private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
-      if(k == 0)
+      if (k == 0)
         Stream.empty
-      else{
-        val d = if(digested.isEmpty){
+      else {
+        val d = if (digested.isEmpty) {
           val (a, b) = MurmurHash128(k)(bytes)
           val (x1, x2) = splitLong(a)
           val (x3, x4) = splitLong(b)
           Seq(x1, x2, x3, x4)
-        }else
+        } else
           digested
 
         Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
@@ -91,7 +91,6 @@ object BFHashIndices extends Properties("BFHash") {
     }
 }
 
-
 class BloomFilterTest extends Specification {
 
   val SEED = 1
@@ -101,16 +100,17 @@ class BloomFilterTest extends Specification {
 
     "identify all true positives" in {
       (0 to 100).foreach{
-        _ => {
-          val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = bfMonoid.create(entries: _*)
+        _ =>
+          {
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = bfMonoid.create(entries: _*)
 
-          entries.foreach{
-            i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach{
+              i => bf.contains(i.toString).isTrue must be_==(true)
+            }
           }
-        }
       }
     }
 
@@ -118,24 +118,26 @@ class BloomFilterTest extends Specification {
       val iter = 10000
 
       Seq(0.1, 0.01, 0.001).foreach{
-        fpProb => {
-          val fps = (0 until iter).par.map{
-            _ => {
-              val numEntries = RAND.nextInt(10) + 1
+        fpProb =>
+          {
+            val fps = (0 until iter).par.map{
+              _ =>
+                {
+                  val numEntries = RAND.nextInt(10) + 1
 
-              val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
+                  val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
 
-              val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
-              val bf = bfMonoid.create(entries.drop(1): _*)
+                  val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
+                  val bf = bfMonoid.create(entries.drop(1): _*)
 
-              if(bf.contains(entries(0)).isTrue) 1.0 else 0.0
+                  if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
+                }
             }
+
+            val observedFpProb = fps.sum / fps.size
+
+            observedFpProb must be_<=(2 * fpProb)
           }
-
-          val observedFpProb = fps.sum / fps.size
-
-          observedFpProb must be_<=(2 * fpProb)
-        }
       }
     }
 
@@ -154,16 +156,17 @@ class BloomFilterTest extends Specification {
 
     "work as an Aggregator" in {
       (0 to 10).foreach{
-        _ => {
-          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32, SEED)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = aggregator(entries)
+        _ =>
+          {
+            val aggregator = BloomFilterAggregator(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = aggregator(entries)
 
-          entries.foreach{
-            i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach{
+              i => bf.contains(i.toString).isTrue must be_==(true)
+            }
           }
-        }
       }
     }
 

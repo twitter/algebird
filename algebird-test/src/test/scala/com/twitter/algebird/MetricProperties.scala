@@ -33,8 +33,8 @@ object BaseMetricProperties extends Properties("Metric") with MetricProperties {
     val maxSize = scala.math.max(a.size, b.size)
     val diffA = maxSize - a.size
     val diffB = maxSize - b.size
-    val newA = if(diffA > 0) a ++ Iterator.fill(diffA)(0.0) else a
-    val newB = if(diffB > 0) b ++ Iterator.fill(diffB)(0.0) else b
+    val newA = if (diffA > 0) a ++ Iterator.fill(diffA)(0.0) else a
+    val newB = if (diffB > 0) b ++ Iterator.fill(diffB)(0.0) else b
     newA == newB
   }
 
@@ -58,27 +58,27 @@ object BaseMetricProperties extends Properties("Metric") with MetricProperties {
 }
 
 trait MetricProperties {
-  def isNonNegative[T : Metric : Arbitrary] = forAll { (a: T, b: T) =>
+  def isNonNegative[T: Metric: Arbitrary] = forAll { (a: T, b: T) =>
     val m = Metric(a, b)
     beGreaterThan(m, 0.0) || beCloseTo(m, 0.0)
   }
-  def isEqualIffZero[T : Metric : Arbitrary](eqfn: (T, T) => Boolean) = forAll { (a: T, b: T) =>
-    if(eqfn(a, b)) beCloseTo(Metric(a, b), 0.0) else !beCloseTo(Metric(a, b), 0.0)
+  def isEqualIffZero[T: Metric: Arbitrary](eqfn: (T, T) => Boolean) = forAll { (a: T, b: T) =>
+    if (eqfn(a, b)) beCloseTo(Metric(a, b), 0.0) else !beCloseTo(Metric(a, b), 0.0)
   }
-  def isSymmetric[T : Metric : Arbitrary] = forAll { (a: T, b: T) =>
+  def isSymmetric[T: Metric: Arbitrary] = forAll { (a: T, b: T) =>
     beCloseTo(Metric(a, b), Metric(b, a))
   }
-  def satisfiesTriangleInequality[T : Metric : Arbitrary] = forAll { (a: T, b: T, c: T) =>
+  def satisfiesTriangleInequality[T: Metric: Arbitrary] = forAll { (a: T, b: T, c: T) =>
     val m1 = Metric(a, b) + Metric(b, c)
     val m2 = Metric(a, c)
     beGreaterThan(m1, m2) || beCloseTo(m1, m2)
   }
 
-  def metricLaws[T : Metric : Arbitrary](eqfn: (T, T) => Boolean) =
+  def metricLaws[T: Metric: Arbitrary](eqfn: (T, T) => Boolean) =
     isNonNegative[T] && isEqualIffZero[T](eqfn) && isSymmetric[T] && satisfiesTriangleInequality[T]
 
   // TODO: these are copied elsewhere in the tests. Move them to a common place
-  def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =  a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
+  def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) = a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
   def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10) = a > b - eps || (a.isInfinite && b.isInfinite)
   def defaultEqFn[T](a: T, b: T): Boolean = a == b
 }

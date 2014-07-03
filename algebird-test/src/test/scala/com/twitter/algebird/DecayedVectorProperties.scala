@@ -24,13 +24,15 @@ import org.scalacheck.Gen.choose
 object DecayedVectorProperties extends Properties("DecayedVector") {
   import BaseProperties._
 
-  implicit val mpint: Arbitrary[DecayedVector[({type x[a]=Map[Int, a]})#x]] = Arbitrary { for {
+  implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
+    for {
       t <- choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
       m <- arbitrary[Map[Int, Double]]
-    } yield DecayedVector.forMap(m, t) }
+    } yield DecayedVector.forMap(m, t)
+  }
 
   // TODO: we won't need this when we have an Equatable trait
-  def decayedMapEqFn(a: DecayedVector[({type x[a]=Map[Int, a]})#x], b: DecayedVector[({type x[a]=Map[Int, a]})#x]) = {
+  def decayedMapEqFn(a: DecayedVector[({ type x[a] = Map[Int, a] })#x], b: DecayedVector[({ type x[a] = Map[Int, a] })#x]) = {
     def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =
       a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
@@ -45,5 +47,5 @@ object DecayedVectorProperties extends Properties("DecayedVector") {
     mapsAreClose && timesAreClose
   }
 
-  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
+  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
 }

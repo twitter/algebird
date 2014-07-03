@@ -25,24 +25,24 @@ package com.twitter.algebird
  * so this forms a kind of reset of the fold.
  */
 object RightFolded {
-  def monoid[In,Out](foldfn : (In,Out) => Out) =
-    new Monoid[RightFolded[In,Out]] {
+  def monoid[In, Out](foldfn: (In, Out) => Out) =
+    new Monoid[RightFolded[In, Out]] {
 
-    val zero = RightFoldedZero
+      val zero = RightFoldedZero
 
-    def plus(left : RightFolded[In,Out], right : RightFolded[In,Out]) = left match {
-      case RightFoldedValue(_) => left
-      case RightFoldedZero => right
-      case RightFoldedToFold(lList) => right match {
-        case RightFoldedZero => RightFoldedToFold(lList)
-        case RightFoldedValue(vr) => RightFoldedValue(lList.foldRight(vr)(foldfn))
-        case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
+      def plus(left: RightFolded[In, Out], right: RightFolded[In, Out]) = left match {
+        case RightFoldedValue(_) => left
+        case RightFoldedZero => right
+        case RightFoldedToFold(lList) => right match {
+          case RightFoldedZero => RightFoldedToFold(lList)
+          case RightFoldedValue(vr) => RightFoldedValue(lList.foldRight(vr)(foldfn))
+          case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
+        }
       }
     }
-  }
 }
 
-sealed abstract class RightFolded[+In,+Out]
-case object RightFoldedZero extends RightFolded[Nothing,Nothing]
-case class RightFoldedValue[+Out](v : Out) extends RightFolded[Nothing,Out]
-case class RightFoldedToFold[+In](in : List[In]) extends RightFolded[In,Nothing]
+sealed abstract class RightFolded[+In, +Out]
+case object RightFoldedZero extends RightFolded[Nothing, Nothing]
+case class RightFoldedValue[+Out](v: Out) extends RightFolded[Nothing, Out]
+case class RightFoldedToFold[+In](in: List[In]) extends RightFolded[In, Nothing]

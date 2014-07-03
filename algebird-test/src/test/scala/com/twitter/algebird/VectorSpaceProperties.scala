@@ -34,5 +34,5 @@ object VectorSpaceProperties extends Properties("ScalingOperator") {
     }
   }
 
-  property("map int double scaling") = vectorSpaceLaws[Double,({type x[a]=Map[Int, a]})#x](mapEqFn(_, _))
+  property("map int double scaling") = vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
 }

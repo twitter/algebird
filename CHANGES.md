@@ -1,5 +1,18 @@
 # Algebird #
 
+### Version 0.7.0 ###
+* simplification for spacesaver. before buckets were kept in an option str...: https://github.com/twitter/algebird/pull/308
+* Dynamic Summer, may use heuristics to decide not to keep a tuple in a buffer for aggregation.: https://github.com/twitter/algebird/pull/314
+* Was a missing call to the update if we had flushed. Now we just do it as...: https://github.com/twitter/algebird/pull/324
+* Bump to 2.10.4 in travis: https://github.com/twitter/algebird/pull/323
+* Feature/auto formatter ran: https://github.com/twitter/algebird/pull/321
+* Little commit fixing up some spacing per our norms:: https://github.com/twitter/algebird/pull/319
+* provider methods for java: https://github.com/twitter/algebird/pull/317
+* Serializable adaptive matrix: https://github.com/twitter/algebird/pull/318
+* Clean up comments: https://github.com/twitter/algebird/pull/315
+* make distribution immutable now that it contains mutable counters: https://github.com/twitter/algebird/pull/313
+* a monoid that keeps track of the monoid usage: https://github.com/twitter/algebird/pull/311
+
 ### Version 0.6.0 ###
 * make constructors for SpaceSaver subclasses public so that deserializers..: https://github.com/twitter/algebird/pull/289
 * Restoring optimized SketchMapMonoid#sumOption: https://github.com/twitter/algebird/pull/293

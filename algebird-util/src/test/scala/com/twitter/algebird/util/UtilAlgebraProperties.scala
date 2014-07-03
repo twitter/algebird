@@ -29,19 +29,19 @@ object UtilAlgebraProperties extends Properties("UtilAlgebras") {
     try {
       Some(Await.result(f))
     } catch {
-      case _:Exception => None
+      case _: Exception => None
     }
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
       arbitrary[T].map { l => Future.value(l) } |
-      Future.exception(new RuntimeException("fail!"))
+        Future.exception(new RuntimeException("fail!"))
     }
 
   implicit def returnA[T: Arbitrary]: Arbitrary[Try[T]] =
     Arbitrary {
       arbitrary[T].map { l => Return(l) } |
-      Throw(new RuntimeException("fail!"))
+        Throw(new RuntimeException("fail!"))
     }
 
   property("futureMonad") = monadLaws[Future, Int, String, Long] { (f1, f2) =>

@@ -17,10 +17,11 @@
 package com.twitter
 
 package object algebird {
-  /** TODO remove these in scala 2.11 and use the standard there.
+  /**
+   * TODO remove these in scala 2.11 and use the standard there.
    * these are here to avoid massive bloat around these classes
    * https://github.com/twitter/algebird/issues/263
    */
-  private [algebird] abstract class AbstractIterable[T] extends Iterable[T]
-  private [algebird] abstract class AbstractIterator[T] extends Iterator[T]
+  private[algebird] abstract class AbstractIterable[T] extends Iterable[T]
+  private[algebird] abstract class AbstractIterator[T] extends Iterator[T]
 }

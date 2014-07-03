@@ -22,14 +22,14 @@ import scala.collection.JavaConverters._
 
 import java.util.PriorityQueue
 
-/** for sort-with take and better performance over large values
+/**
+ * for sort-with take and better performance over large values
  * The priority queues should be MAX queues, i.e. the ones we want least
  * should be in the .peek position
  * This is MUCH Faster for Top-K algorithms
  * Note this is MUTABLE. When you put something in plus, it is changed!
  */
-class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
-  Monoid[PriorityQueue[K]] {
+class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid[PriorityQueue[K]] {
 
   require(max > 0, "PriorityQueueMonoid requires keeping at least 1 item")
   // Java throws if you try to make a queue size 0
@@ -50,25 +50,24 @@ class PriorityQueueMonoid[K](max : Int)(implicit ord : Ordering[K]) extends
     q
   }
   protected def limit(q: PriorityQueue[K]) {
-    while(q.size > max) { q.poll() }
+    while (q.size > max) { q.poll() }
   }
 
   override def zero = new PriorityQueue[K](MINQUEUESIZE, ord.reverse)
   override def isNonZero(q: PriorityQueue[K]) = q.size > 0
 
-  override def plus(left : PriorityQueue[K], right : PriorityQueue[K]): PriorityQueue[K] = {
-    val (bigger, smaller) = if(left.size >= right.size) (left, right) else (right, left)
+  override def plus(left: PriorityQueue[K], right: PriorityQueue[K]): PriorityQueue[K] = {
+    val (bigger, smaller) = if (left.size >= right.size) (left, right) else (right, left)
     var biggest = bigger.peek
 
     var next = smaller.poll
-    while(next != null) {
-      if(bigger.size < max) {
+    while (next != null) {
+      if (bigger.size < max) {
         // we may have increased the biggest value:
         biggest = ord.max(biggest, next)
         bigger.add(next)
-      }
-      else if (ord.lteq(next, biggest)) {
-        // this cannot increase the biggerst
+      } else if (ord.lteq(next, biggest)) {
+        // this cannot increase the biggest
         bigger.add(next)
       }
       next = smaller.poll
