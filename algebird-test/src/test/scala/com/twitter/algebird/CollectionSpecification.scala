@@ -120,6 +120,11 @@ object CollectionSpecification extends Properties("Collections") {
     !MapAlgebra.removeZeros(m).values.toSet.contains(0)
   }
 
+  property("MapAlgebra.sumByKey with Unit works") = forAll { l: Set[String] =>
+    val lst = l.toList
+    l == MapAlgebra.sumByKey((lst ++ lst ++ lst).map((_, ()))).keys
+  }
+
   property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") =
     forAll { (m: Map[Int, Int]) =>
       Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m))
