@@ -14,7 +14,7 @@ object FunctionMonoidTests extends Properties("FunctionMonoid") {
     for (
       a <- Arbitrary.arbInt.arbitrary;
       b <- Arbitrary.arbInt.arbitrary
-    ) yield ((x : Int) => a * x + b )
+    ) yield ((x: Int) => a * x + b)
   }
 
   property("Linear functions over the integers form a monoid under function composition") =
@@ -27,7 +27,7 @@ object FunctionMonoidTests extends Properties("FunctionMonoid") {
     for (
       a <- Arbitrary.arbInt.arbitrary;
       b <- Arbitrary.arbInt.arbitrary
-    ) yield AffineFunction(a,b)
+    ) yield AffineFunction(a, b)
   }
   property("AffineFunctions are monoids") = monoidLaws[AffineFunction[Int]]
 }

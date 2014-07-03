@@ -33,12 +33,9 @@ object SketchMapLaws extends Properties("SketchMap") {
   }
 }
 
-
 class SketchMapTest extends Specification {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
-
-
 
   val PARAMS = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
   val MONOID = SketchMap.monoid[Int, Long](PARAMS)

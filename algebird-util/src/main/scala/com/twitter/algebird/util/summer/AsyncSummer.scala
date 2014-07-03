@@ -22,7 +22,7 @@ import com.twitter.util.{ Duration, Future }
  * @author Ian O Connell
  */
 
-trait AsyncSummer[T, M <: Iterable[T]] { self =>
+trait AsyncSummer[T, +M <: Iterable[T]] { self =>
   def flush: Future[M]
   def tick: Future[M]
   def add(t: T) = addAll(Iterator(t))
@@ -41,7 +41,7 @@ trait AsyncSummer[T, M <: Iterable[T]] { self =>
   }
 }
 
-trait AsyncSummerProxy[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
+trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
   def self: AsyncSummer[T, M]
   def flush = self.flush
   def tick = self.tick

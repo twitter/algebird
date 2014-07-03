@@ -22,7 +22,7 @@ import org.scalacheck.Properties
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop.forAll
 
-import Monad.{pureOp, operators}
+import Monad.{ pureOp, operators }
 
 object MonadProperties extends Properties("Monad") {
   import BaseProperties._

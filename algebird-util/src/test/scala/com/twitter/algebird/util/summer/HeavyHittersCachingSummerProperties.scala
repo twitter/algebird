@@ -27,12 +27,19 @@ import scala.util.Random
 import com.twitter.util.Duration
 import Arbitrary.arbitrary
 
-object NullSummerProperties extends Properties("NullSummerProperties") {
+object HeavyHittersCachingSummerProperties extends Properties("HeavyHittersCachingSummerProperties") {
+
   import AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") = forAll { (inputs: List[List[(Int, Long)]]) =>
-    val summer = new NullSummer[Int, Long]()
-    summingWithAndWithoutSummerShouldMatch(summer, inputs)
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+
+  property("Summing with and without the summer should match") = forAll { (inputs: List[List[(Int, Long)]],
+    flushFrequency: FlushFrequency,
+    bufferSize: BufferSize,
+    memoryFlushPercent: MemoryFlushPercent) =>
+    val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
+    val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
+    summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs)
   }
 
 }

@@ -5,7 +5,7 @@ import org.specs2.mutable._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Properties
-import org.scalacheck.Gen.{choose, oneOf, value}
+import org.scalacheck.Gen.{ choose, oneOf, value }
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Prop
 
@@ -18,7 +18,8 @@ object ApproximateLaws extends Properties("Approximate") {
 
   implicit val approxGen =
     Arbitrary {
-      for (v0 <- choose(0L, (1L << 15) - 2);
+      for (
+        v0 <- choose(0L, (1L << 15) - 2);
         v1 <- choose(v0, (1L << 15) - 1);
         v2 <- choose(v1, (1L << 15))
       ) yield Approximate(v0, v1, v2, 0.9)
@@ -27,11 +28,11 @@ object ApproximateLaws extends Properties("Approximate") {
   property("is a Monoid") = monoidLaws[Approximate[Long]]
   property("always contain estimate") = forAll {
     (ap1: Approximate[Long], ap2: Approximate[Long]) =>
-    ((ap1 + ap2) ~ (ap1.estimate + ap2.estimate)) &&
-      ((ap1 * ap2) ~ (ap1.estimate * ap2.estimate)) &&
-      ap1 ~ (ap1.estimate) &&
-      ap2 ~ (ap2.estimate) &&
-      ((ap1 + (ap1.negate)) ~ 0L)
+      ((ap1 + ap2) ~ (ap1.estimate + ap2.estimate)) &&
+        ((ap1 * ap2) ~ (ap1.estimate * ap2.estimate)) &&
+        ap1 ~ (ap1.estimate) &&
+        ap2 ~ (ap2.estimate) &&
+        ((ap1 + (ap1.negate)) ~ 0L)
       ((ap2 + (ap2.negate)) ~ 0L)
   }
   def boundsAreOrdered[N](ap: Approximate[N]) = {
@@ -56,28 +57,27 @@ object ApproximateLaws extends Properties("Approximate") {
 
   property("Boolean: &&") = forAll { (a: ApproximateBoolean) =>
     ((a && ApproximateBoolean.exact(false)) == ApproximateBoolean.exact(false)) &&
-    // Make sure when it is false, we don't lose precision:
-    (a && ApproximateBoolean(false, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
+      // Make sure when it is false, we don't lose precision:
+      (a && ApproximateBoolean(false, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
   }
   property("Boolean: ||") = forAll { (a: ApproximateBoolean) =>
     (a || ApproximateBoolean.exact(true)) == ApproximateBoolean.exact(true) &&
-    // Make sure when it is true, we don't lose precision:
-    (a || ApproximateBoolean(true, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
+      // Make sure when it is true, we don't lose precision:
+      (a || ApproximateBoolean(true, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
   }
   property("logic works") = forAll { (a: ApproximateBoolean, b: ApproximateBoolean) =>
     (a ^ b).isTrue == (a.isTrue ^ b.isTrue) &&
-    (a^b).withProb >= (a.withProb * b.withProb) &&
-    (a || b).isTrue == (a.isTrue || b.isTrue) &&
-    (a||b).withProb >= (a.withProb * b.withProb) &&
-    (a && b).isTrue == (a.isTrue && b.isTrue) &&
-    (a&&b).withProb >= (a.withProb * b.withProb) &&
-    (a.not).isTrue == (!(a.isTrue)) &&
-    (a.not.withProb) == a.withProb
+      (a ^ b).withProb >= (a.withProb * b.withProb) &&
+      (a || b).isTrue == (a.isTrue || b.isTrue) &&
+      (a || b).withProb >= (a.withProb * b.withProb) &&
+      (a && b).isTrue == (a.isTrue && b.isTrue) &&
+      (a && b).withProb >= (a.withProb * b.withProb) &&
+      (a.not).isTrue == (!(a.isTrue)) &&
+      (a.not.withProb) == a.withProb
   }
 }
 
 class ApproximateTest extends Specification {
-
 
   "Approximate" should {
     "Correctly identify exact" in {

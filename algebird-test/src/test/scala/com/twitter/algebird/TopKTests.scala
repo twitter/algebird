@@ -21,7 +21,7 @@ import java.util.PriorityQueue
 
 import scala.collection.JavaConverters._
 
-import org.scalacheck.{Arbitrary, Properties}
+import org.scalacheck.{ Arbitrary, Properties }
 import org.scalacheck.Gen._
 import org.specs2.mutable._
 import org.scalacheck.Prop.forAll
@@ -58,16 +58,17 @@ object TopKTests extends Properties("TopKTests") {
   def eqFn(q1: PriorityQueue[Int], q2: PriorityQueue[Int]): Boolean = {
     q2l(q1) == q2l(q2)
   }
-  def pqIsCorrect(items: List[List[Int]]): Boolean =  {
+  def pqIsCorrect(items: List[List[Int]]): Boolean = {
     val correct = items.flatten.sorted.take(SIZE)
     // Have to do this last since this monoid is mutating inputs
-    q2l(Monoid.sum(items.map { l => qmonoid.build(l) } )) == correct
+    q2l(Monoid.sum(items.map { l => qmonoid.build(l) })) == correct
   }
 
   property("PriorityQueueMonoid works") = forAll { (items: List[List[Int]]) =>
     pqIsCorrect(items)
   }
-  /** The following were specific bugs that we failed some prior
+  /**
+   * The following were specific bugs that we failed some prior
    * scalacheck (yay for randomized testing)
    */
   val pqPriorBugs = Seq(List(List(1, 1, 1, 2), List(0, 0, 0, 0, 0, 0, 0)))
@@ -81,7 +82,7 @@ object TopKTests extends Properties("TopKTests") {
   }
   property("TopKMonoid works") = forAll { (its: List[List[Int]]) =>
     val correct = its.flatten.sorted.take(SIZE)
-    Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) } ).items, correct)
+    Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) }).items, correct)
   }
   property("TopKMonoid is a Monoid") = monoidLawsEq[PriorityQueue[Int]](eqFn)
 }

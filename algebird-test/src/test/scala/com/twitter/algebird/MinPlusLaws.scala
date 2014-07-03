@@ -24,9 +24,11 @@ import org.scalacheck.Gen.choose
 object MinPlusLaws extends Properties("MinPlus") {
   import BaseProperties._
 
-  implicit val mpint: Arbitrary[MinPlus[Int]] = Arbitrary { for {
-      a <- choose(-1000,1000) // Don't get too big and overflow
-    } yield MinPlusValue(a) }
+  implicit val mpint: Arbitrary[MinPlus[Int]] = Arbitrary {
+    for {
+      a <- choose(-1000, 1000) // Don't get too big and overflow
+    } yield MinPlusValue(a)
+  }
 
   property("is a semiring") = semiringLaws[MinPlus[Int]]
 }

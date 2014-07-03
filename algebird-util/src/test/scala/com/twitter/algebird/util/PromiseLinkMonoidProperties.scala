@@ -22,7 +22,7 @@ import org.scalacheck.{ Arbitrary, Properties }
 import scala.annotation.tailrec
 
 object PromiseLinkMonoidProperties extends Properties("PromiseLinkMonoids") {
-	property("associative") = {
+  property("associative") = {
     def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
     def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
       finalTunnel.completeWithStartingValue(toFeed)

@@ -1,17 +1,17 @@
 package com.twitter.algebird
 
-import org.scalacheck.{Arbitrary, Properties}
+import org.scalacheck.{ Arbitrary, Properties }
 import org.scalacheck.Gen._
 import org.specs2.mutable._
 
 object EventuallyRingLaws extends Properties("EventuallyRing") {
   import BaseProperties._
 
-  val eventuallyRing = new EventuallyRing[Long,Int](_.asInstanceOf[Long])(_ > 10000)
+  val eventuallyRing = new EventuallyRing[Long, Int](_.asInstanceOf[Long])(_ > 10000)
   val lGen = for (v <- choose(0L, 1L << 30L)) yield Left(v)
   val rGen = for (v <- choose(0, 10000)) yield Right(v)
 
-  property("EventuallyRing is a Ring") = ringLaws[Either[Long,Int]](eventuallyRing, Arbitrary(oneOf(lGen, rGen)))
+  property("EventuallyRing is a Ring") = ringLaws[Either[Long, Int]](eventuallyRing, Arbitrary(oneOf(lGen, rGen)))
 
 }
 
@@ -19,17 +19,17 @@ object EventuallyRingLaws extends Properties("EventuallyRing") {
 object EventuallyMonoidLaws extends Properties("EventuallyMonoid") {
   import BaseProperties._
 
-  val eventuallyMonoid = new EventuallyMonoid[Int,String](_.length)(_.length > 100)
+  val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
   val lGen = for (v <- choose(0, 1 << 14)) yield Left(v)
   val rGen = for (v <- alphaStr) yield Right(v)
 
-  property("EventuallyMonoid is a Monoid") = monoidLaws[Either[Int,String]](eventuallyMonoid, Arbitrary(oneOf(lGen, rGen)))
+  property("EventuallyMonoid is a Monoid") = monoidLaws[Either[Int, String]](eventuallyMonoid, Arbitrary(oneOf(lGen, rGen)))
 
 }
 
 class EventuallyTest extends Specification {
 
-  val eventuallyMonoid = new EventuallyMonoid[Int,String](_.length)(_.length > 100)
+  val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
 
   val short = "foo"
   val med = Stream.continually("bar").take(20).mkString("")
@@ -82,11 +82,11 @@ class EventuallyTest extends Specification {
     }
 
     "sumOption 1010 R, L ,R" in {
-      eventuallyMonoid.sum(listOfRights :+ Left(short.length) :+ Right(short) ) must be_==(Left(1012 * short.length))
+      eventuallyMonoid.sum(listOfRights :+ Left(short.length) :+ Right(short)) must be_==(Left(1012 * short.length))
     }
 
     "sumOption 1010 L, R ,L" in {
-      eventuallyMonoid.sum(listOfLefts :+ Right(short) :+ Left(short.length) ) must be_==(Left(1012 * short.length))
+      eventuallyMonoid.sum(listOfLefts :+ Right(short) :+ Left(short.length)) must be_==(Left(1012 * short.length))
     }
 
   }
