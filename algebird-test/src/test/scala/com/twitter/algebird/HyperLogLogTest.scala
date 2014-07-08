@@ -80,15 +80,34 @@ class HyperLogLogTest extends Specification {
     hll.sizeOf(hll.sum(it.map { hll(_) })).estimate.toDouble
   }
 
+  // This makes a list of sets that overlap in exactly overlap items
+  def makeNwithOverlapK(sets: Int, overlap: Int, sizeEach: Int): List[Set[Int]] = {
+    val overlapSet = (0 until overlap).toSet
+    (overlap until (sets * sizeEach))
+      .iterator
+      .grouped(sizeEach - overlap)
+      .take(sets)
+      .map(s => s.toSet ++ overlapSet)
+      .toList
+   }
+
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
 
   def exactIntersect[T](it: Seq[Iterable[T]]): Int = {
     it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
   }
-  def approxIntersect[T <% Array[Byte]](bits: Int, it: Seq[Iterable[T]]): Double = {
+  def toHLL[T <% Array[Byte]](bits: Int): (Iterable[T] => HLL) = {
     val hll = new HyperLogLogMonoid(bits)
+
+    { iter: Iterable[T] =>
+      //Map each iterable to a HLL instance:
+      hll.sum(iter.iterator.map { hll(_) })
+    };
+  }
+  def approxIntersect[T <% Array[Byte]](bits: Int, it: Seq[Iterable[T]]): Double = {
     //Map each iterable to a HLL instance:
-    val seqHlls = it.map { iter => hll.sum(iter.view.map { hll(_) }) }
+    val seqHlls = it.map(toHLL(bits))
+    val hll = new HyperLogLogMonoid(bits)
     hll.intersectionSize(seqHlls).estimate.toDouble
   }
 
@@ -103,13 +122,38 @@ class HyperLogLogTest extends Specification {
     scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(3.5 * aveErrorOf(bits))
   }
   def testLongIntersection(bits: Int, sets: Int) {
-    val data: Seq[Iterable[Int]] = (0 until sets).map { idx =>
-      (0 to 1000).map { i => r.nextInt(100) }
-    }.toSeq
-    val exact = exactIntersect(data)
-    val errorMult = scala.math.pow(2.0, sets) - 1.0
-    scala.math.abs(exact - approxIntersect(bits, data)) / exact must be_<(errorMult *
+    // make sets of size 100, with between 1 and 10 overlap
+    val intersectSize = r.nextInt(10) + 1
+    val data: Seq[Iterable[Int]] = makeNwithOverlapK(sets, intersectSize, 100)
+    val seqHlls = data.map(toHLL(bits))
+
+    val hll = new HyperLogLogMonoid(bits)
+    hll.intersectionSize(seqHlls).contains(intersectSize)
+  }
+  /*
+   * Totally unprincipled test, and rather large error for small overlaps
+   */
+  def testLongIntersection2(bits: Int, sets: Int) {
+    // make sets of size 100, with between 1 and 10 overlap
+    val intersectSize = r.nextInt(99) + 1
+    val data: Seq[Iterable[Int]] = makeNwithOverlapK(sets, intersectSize, 100)
+    // This s
+    val errorMult = 100.0
+    scala.math.abs(intersectSize - approxIntersect2(bits, data)) / intersectSize must be_<(errorMult *
       aveErrorOf(bits))
+  }
+  // This is an unproven tecphnique
+  def intersect(h1: HLL, h2: HLL): HLL = {
+    assert(h1.bits == h2.bits, "bits mismatch: " + h1.toString + h2.toString)
+    val newBuf = new Array[Byte](1 << h1.bits)
+    h1.toDenseHLL.v.zip(h2.toDenseHLL.v).zipWithIndex.foreach { case ((l, r), idx) =>
+      newBuf(idx) = l min r
+    }
+    DenseHLL(h1.bits, new IndexedSeqArrayByte(newBuf))
+  }
+  def approxIntersect2[T <% Array[Byte]](bits: Int, it: Seq[Iterable[T]]): Double = {
+    val seqHlls = it.map(toHLL(bits))
+    seqHlls.reduce(intersect).estimatedSize
   }
 
   "HyperLogLog" should {
@@ -132,6 +176,10 @@ class HyperLogLogTest extends Specification {
     "count intersections of 2" in { testLongIntersection(10, 2) }
     "count intersections of 3" in { testLongIntersection(10, 3) }
     "count intersections of 4" in { testLongIntersection(10, 4) }
+    "count min-intersections of 2" in { testLongIntersection2(10, 2) }
+    "count min-intersections of 3" in { testLongIntersection2(10, 3) }
+    "count min-intersections of 4" in { testLongIntersection2(10, 4) }
+    "count min-intersections of 5" in { testLongIntersection2(10, 5) }
 
     "throw error for differently sized HLL instances" in {
       val bigMon = new HyperLogLogMonoid(5)
