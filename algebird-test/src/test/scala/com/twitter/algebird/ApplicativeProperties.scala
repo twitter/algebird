@@ -23,10 +23,10 @@ object ApplicativeProperties extends Properties("Applicative") {
   import Monad._ // for Monad instances
   import MonadLaws._ // for Arbitrary instances
 
-  property("list") = applicativeLaws[List, Int, String]()
-  property("option") = applicativeLaws[Option, Int, String]()
-  property("indexedseq") = applicativeLaws[IndexedSeq, Int, String]()
-  property("vector") = applicativeLaws[Vector, Int, String]()
-  property("set") = applicativeLaws[Set, Int, String]()
-  property("seq") = applicativeLaws[Seq, Int, String]()
+  property("list") = applicativeLaws[List, Int, String, Long]()
+  property("option") = applicativeLaws[Option, Int, String, Long]()
+  property("indexedseq") = applicativeLaws[IndexedSeq, Int, String, Long]()
+  property("vector") = applicativeLaws[Vector, Int, String, Long]()
+  property("set") = applicativeLaws[Set, Int, String, Long]()
+  property("seq") = applicativeLaws[Seq, Int, String, Long]()
 }

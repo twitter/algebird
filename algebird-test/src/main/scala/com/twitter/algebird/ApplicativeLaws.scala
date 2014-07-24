@@ -45,12 +45,33 @@ object ApplicativeLaws {
         app.apply((t, u)))
     }
 
-  def applicativeLaws[M[_], T, U](
+  // These follow from apply and join:
+
+  def sequenceLaw[M[_], T](
+    eq: HigherEq[M] = new DefaultHigherEq[M])(
+      implicit app: Applicative[M],
+      arb: Arbitrary[Seq[T]]): Prop =
+    forAll { (ts: Seq[T]) => eq(app.sequence(ts map { app.apply(_) }), app.apply(ts)) }
+
+  def joinWithLaw[M[_], T, U, V](
+    eq: HigherEq[M] = new DefaultHigherEq[M])(
+      implicit app: Applicative[M],
+      arbT: Arbitrary[T],
+      arbU: Arbitrary[U],
+      arbJoinFn: Arbitrary[(T, U) => V]): Prop =
+    forAll { (t: T, u: U, fn: (T, U) => V) => eq(app.joinWith(app.apply(t), app.apply(u))(fn), app.apply(fn(t, u))) }
+
+  def applicativeLaws[M[_], T, U, V](
     eq: HigherEq[M] = new DefaultHigherEq[M])(
       implicit app: Applicative[M],
       arbMt: Arbitrary[T],
+      arbMts: Arbitrary[Seq[T]],
       arbMu: Arbitrary[U],
-      arbFn: Arbitrary[T => U]): Prop =
-    applyLaw[M, T, U](eq) && joinLaw[M, T, U](eq)
+      arbFn: Arbitrary[T => U],
+      arbJoinFn: Arbitrary[(T, U) => V]): Prop =
+    applyLaw[M, T, U](eq) &&
+      joinLaw[M, T, U](eq) &&
+      sequenceLaw[M, T](eq) &&
+      joinWithLaw[M, T, U, V](eq)
 }
 
