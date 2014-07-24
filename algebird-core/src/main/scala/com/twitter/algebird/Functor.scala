@@ -18,14 +18,15 @@ package com.twitter.algebird
 import scala.annotation.implicitNotFound
 
 /**
- * Simple implementation of a Functor type-class
+ * Simple implementation of a Functor type-class.
+ *
+ * Laws Functors must follow:
+ *  map(m)(id) == m
+ *  map(m)(f andThen g) == map(map(m)(f))(g)
  */
 @implicitNotFound(msg = "Cannot find Functor type class for ${M}")
 trait Functor[M[_]] {
   def map[T, U](m: M[T])(fn: (T) => U): M[U]
-  // Laws these must follow are:
-  //  map(m)(id) == m
-  //  map(m)(f andThen g) == map(map(m)(f))(g)
 }
 
 /**

@@ -25,6 +25,13 @@ import collection.GenTraversable
  * Simple implementation of a Monad type-class.
  * Subclasses only need to override apply and flatMap, but they should override map,
  * join, joinWith, and sequence if there are better implementations.
+ *
+ * Laws Monads must follow:
+ * identities:
+ *  flatMap(apply(x))(fn) == fn(x)
+ *  flatMap(m)(apply _) == m
+ * associativity on flatMap (you can either flatMap f first, or f to g:
+ *  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
  */
 @implicitNotFound(msg = "Cannot find Monad type class for ${M}")
 trait Monad[M[_]] extends Applicative[M] {
@@ -34,12 +41,6 @@ trait Monad[M[_]] extends Applicative[M] {
     flatMap(mt) { (t: T) =>
       map(mu) { (u: U) => (t, u) }
     }
-  // Laws these must follow are:
-  // identities:
-  //  flatMap(apply(x))(fn) == fn(x)
-  //  flatMap(m)(apply _) == m
-  // associativity on flatMap (you can either flatMap f first, or f to g:
-  //  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
 }
 
 /**

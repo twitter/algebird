@@ -20,14 +20,21 @@ import scala.annotation.implicitNotFound
 /**
  * Simple implementation of an Applicative type-class.
  * There are many choices for the canonical second operation (join, sequence, joinWith, ap),
- * but these two join and sequence have natural semantics for concurrent
- * "MonadError"-like contexts: join fails as soon as one of the elements fails;
- * sequence as soon as any fails. Future is the best example of this.
+ * all equivalent. For a Functor modelling concurrent computations with failure, like Future,
+ * combining results with join can save a lot of time over combining with flatMap. (Given two
+ * operations, if the second fails before the first completes, one can fail the entire computation
+ * right then. With flatMap, one would have to wait for the first operation to complete before
+ * failing it.)
+ *
+ * Laws Applicatives must follow:
+ *  map(apply(x))(f) == apply(f(x))
+ *  join(apply(x), apply(y)) == apply((x, y))
+ *  (sequence and joinWith specialize join - they should behave appropriately)
  */
 @implicitNotFound(msg = "Cannot find Applicative type class for ${M}")
 trait Applicative[M[_]] extends Functor[M] {
   // in haskell, called return, but that's a reserved word
-  // constructs a Monad instance from the given value, e.g. List(1)
+  // constructs an Applicative instance from the given value, e.g. List(1)
   def apply[T](v: T): M[T]
   def join[T, U](mt: M[T], mu: M[U]): M[(T, U)]
   def sequence[T](ms: Seq[M[T]]): M[Seq[T]] =
@@ -38,16 +45,12 @@ trait Applicative[M[_]] extends Functor[M] {
       case _ =>
         val mb =
           ms.foldLeft(apply(Seq.newBuilder[T])) { (mb, mt) =>
-            joinWith(mb, mt) { (b, t) => b += t; b }
+            joinWith(mb, mt) { (b, t) => b += t }
           }
         map(mb) { _.result }
     }
   def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
     map(join(mt, mu)) { case (t, u) => fn(t, u) }
-  // Laws these must follow are:
-  //  map(apply(x))(f) == apply(f(x))
-  //  join(apply(x), apply(y)) == apply((x, y))
-  //  (sequence and joinWith specialize join - they should behave appropriately)
 }
 
 /**
@@ -69,7 +72,7 @@ object Applicative {
     app.joinWith(mt, mu)(fn)
 
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
-  // import Monad.{pureOp, operators} to get
+  // import Applicative.{pureOp, operators} to get
   implicit def pureOp[A](a: A) = new PureOp(a)
   implicit def operators[A, M[_]](m: M[A])(implicit app: Applicative[M]) =
     new ApplicativeOperators(m)(app)
