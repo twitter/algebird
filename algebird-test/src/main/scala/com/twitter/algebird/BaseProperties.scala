@@ -26,6 +26,14 @@ import scala.math.Equiv
 object BaseProperties {
   def defaultEq[T](t0: T, t1: T) = t0 == t1
 
+  trait HigherEq[M[_]] {
+    def apply[T](m: M[T], n: M[T]): Boolean
+  }
+
+  class DefaultHigherEq[M[_]] extends HigherEq[M] {
+    override def apply[T](m: M[T], n: M[T]) = m == n
+  }
+
   def isNonZero[V: Semigroup](v: V) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(v)
     case _ => true

@@ -20,16 +20,20 @@ import java.util.{ List => JList, Map => JMap }
 
 import scala.annotation.implicitNotFound
 import collection.GenTraversable
+
 /**
- * Simple implementation of a Monad type-class
+ * Simple implementation of a Monad type-class.
+ * Subclasses only need to override apply and flatMap, but they should override map,
+ * join, joinWith, and sequence if there are better implementations.
  */
 @implicitNotFound(msg = "Cannot find Monad type class for ${M}")
-trait Monad[M[_]] {
-  // in haskell, called return, but that's a reserved word
-  // constructs a Monad instance from the given value, e.g. List(1)
-  def apply[T](v: T): M[T]
+trait Monad[M[_]] extends Applicative[M] {
   def flatMap[T, U](m: M[T])(fn: (T) => M[U]): M[U]
-  def map[T, U](m: M[T])(fn: (T) => U): M[U] = flatMap(m)((t: T) => apply(fn(t)))
+  override def map[T, U](m: M[T])(fn: (T) => U): M[U] = flatMap(m)((t: T) => apply(fn(t)))
+  override def join[T, U](mt: M[T], mu: M[U]): M[(T, U)] =
+    flatMap(mt) { (t: T) =>
+      map(mu) { (u: U) => (t, u) }
+    }
   // Laws these must follow are:
   // identities:
   //  flatMap(apply(x))(fn) == fn(x)
@@ -90,24 +94,15 @@ object Monad {
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
   // import Monad.{pureOp, operators} to get
   implicit def pureOp[A](a: A) = new PureOp(a)
-  implicit def operators[A, M[A]](m: M[A])(implicit monad: Monad[M]) =
+  implicit def operators[A, M[_]](m: M[A])(implicit monad: Monad[M]) =
     new MonadOperators(m)(monad)
-}
-
-// This is the enrichment pattern to allow syntax like: 1.pure[List] == List(1)
-// if we put a pure method in Monad, it would take two type parameters, only one
-// of which could be inferred, and that' annoying to write Monad.pure[Int,List](1)
-class PureOp[A](a: A) {
-  def pure[M[_]](implicit monad: Monad[M]) = monad(a)
 }
 
 /**
  * This enrichment allows us to use our Monad instances in for expressions:
  * if (import Monad._) has been done
  */
-class MonadOperators[A, M[A]](m: M[A])(implicit monad: Monad[M]) {
-  // This is called fmap in haskell (and in Functor, not Monad)
-  def map[U](fn: (A) => U): M[U] = monad.map(m)(fn)
+class MonadOperators[A, M[_]](m: M[A])(implicit monad: Monad[M]) extends ApplicativeOperators[A, M](m) {
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
 }
 
