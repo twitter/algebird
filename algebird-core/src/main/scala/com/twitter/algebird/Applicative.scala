@@ -47,9 +47,9 @@ trait Applicative[M[_]] extends Functor[M] {
       case Seq() => apply(Seq.empty)
       case Seq(m) => map(m) { Seq(_) }
       case Seq(m, n) => joinWith(m, n) { Seq(_, _) }
-      case _ => traverse[Seq, T](ms)
+      case _ => genSequence[Seq, T](ms)
     }
-  def traverse[C[_] <: GenTraversable[_], T](ms: C[M[T]])(implicit cbf: CanBuildFrom[C[T], T, C[T]]): M[C[T]] = {
+  def genSequence[C[_] <: GenTraversable[_], T](ms: C[M[T]])(implicit cbf: CanBuildFrom[C[T], T, C[T]]): M[C[T]] = {
     val mx =
       ms.foldLeft(apply(cbf())) { (mb, mt) =>
         joinWith(mb, mt.asInstanceOf[M[T]]) { (b, t) => b += t }
