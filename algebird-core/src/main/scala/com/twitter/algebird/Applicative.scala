@@ -16,9 +16,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
-import scala.collection.GenTraversable
-import scala.collection.generic.CanBuildFrom
-import scala.collection.mutable.Builder
 
 /**
  * Simple implementation of an Applicative type-class.
@@ -40,22 +37,20 @@ trait Applicative[M[_]] extends Functor[M] {
   // constructs an Applicative instance from the given value, e.g. List(1)
   def apply[T](v: T): M[T]
   def join[T, U](mt: M[T], mu: M[U]): M[(T, U)]
-  def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
-    map(join(mt, mu)) { case (t, u) => fn(t, u) }
   def sequence[T](ms: Seq[M[T]]): M[Seq[T]] =
     ms match {
       case Seq() => apply(Seq.empty)
       case Seq(m) => map(m) { Seq(_) }
       case Seq(m, n) => joinWith(m, n) { Seq(_, _) }
-      case _ => genSequence[Seq, T](ms)
+      case _ =>
+        val mb =
+          ms.foldLeft(apply(Seq.newBuilder[T])) { (mb, mt) =>
+            joinWith(mb, mt) { (b, t) => b += t }
+          }
+        map(mb) { _.result }
     }
-  def genSequence[C[_] <: GenTraversable[_], T](ms: C[M[T]])(implicit cbf: CanBuildFrom[C[T], T, C[T]]): M[C[T]] = {
-    val mx =
-      ms.foldLeft(apply(cbf())) { (mb, mt) =>
-        joinWith(mb, mt.asInstanceOf[M[T]]) { (b, t) => b += t }
-      }
-    map(mx) { _.result }
-  }
+  def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
+    map(join(mt, mu)) { case (t, u) => fn(t, u) }
 }
 
 /**
