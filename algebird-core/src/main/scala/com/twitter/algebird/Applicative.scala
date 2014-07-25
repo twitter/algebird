@@ -20,7 +20,7 @@ import scala.annotation.implicitNotFound
 /**
  * Simple implementation of an Applicative type-class.
  * There are many choices for the canonical second operation (join, sequence, joinWith, ap),
- * all equivalent. For a Functor modelling concurrent computations with failure, like Future,
+ * all equivalent. For a Functor modeling concurrent computations with failure, like Future,
  * combining results with join can save a lot of time over combining with flatMap. (Given two
  * operations, if the second fails before the first completes, one can fail the entire computation
  * right then. With flatMap, one would have to wait for the first operation to complete before
@@ -80,7 +80,7 @@ object Applicative {
 
 // This is the enrichment pattern to allow syntax like: 1.pure[List] == List(1)
 // if we put a pure method in Applicative, it would take two type parameters, only one
-// of which could be inferred, and that' annoying to write Applicative.pure[Int,List](1)
+// of which could be inferred, and it's annoying to write Applicative.pure[Int,List](1)
 class PureOp[A](a: A) {
   def pure[M[_]](implicit app: Applicative[M]) = app(a)
 }
