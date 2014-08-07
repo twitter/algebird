@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Twitter, Inc.
+Copyright 2014 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Properties }
 
-object SuccessibleProperties extends Properties("Successibles") {
-  import SuccessibleLaws.{ successibleLaws => laws }
+object PredecessibleTests extends Properties("Predessibles") {
+  import PredecessibleLaws.{ predessibleLaws => laws }
 
-  property("Int is Successible") = laws[Int]
-  property("Long is Successible") = laws[Long]
-  property("BigInt is Successible") = laws[BigInt]
+  property("Int is Predecessible") = laws[Int]
+  property("Long is Predecessible") = laws[Long]
+  property("BigInt is Predecessible") = laws[BigInt]
 }
