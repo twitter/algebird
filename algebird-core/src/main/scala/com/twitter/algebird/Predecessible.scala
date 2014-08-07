@@ -33,13 +33,31 @@ trait Predecessible[T] extends java.io.Serializable {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.prev(_) }
           .takeWhile(_.isDefined)
-          .map(_.get)
+          .collect { case Some(t) => t }
     }
   }
-  def ordering: Ordering[T]
+  /**
+   * The law is:
+   * prev(t)
+   *   .map { n => partialOrdering.lteq(n, t) && (!partialOrdering.equiv(t, n)) }
+   *   .getOrElse(true)
+   *
+   * Note Ordering extends PartialOrdering, so we are taking a weak constraint
+   * that some items can be ordered, and namely, the sequence of items returned
+   * by prev is strictly decreasing
+   */
+  def partialOrdering: PartialOrdering[T]
 }
 
 object Predecessible extends java.io.Serializable {
+  /**
+   * This makes it easy to construct from a function when T has an ordering, which is common
+   * Note, your function must respect the ordering
+   */
+  def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] = new Predecessible[T] {
+    def prev(t: T) = prevFn(t)
+    def partialOrdering = ord
+  }
   // enables: Predecessible.prev(2) == Some(1)
   def prev[T](t: T)(implicit p: Predecessible[T]): Option[T] = p.prev(t)
   def prev[T](t: Option[T])(implicit p: Predecessible[T]): Option[T] = p.prev(t)
@@ -51,10 +69,10 @@ object Predecessible extends java.io.Serializable {
 }
 
 class IntegralPredecessible[T: Integral] extends Predecessible[T] {
+  private[this] val integral = implicitly[Integral[T]]
   def prev(old: T) = {
-    val numeric = implicitly[Integral[T]]
-    val newV = numeric.minus(old, numeric.one)
-    if (ordering.compare(newV, old) >= 0) {
+    val newV = integral.minus(old, integral.one)
+    if (integral.compare(newV, old) >= 0) {
       // We wrapped around
       None
     } else {
@@ -62,5 +80,5 @@ class IntegralPredecessible[T: Integral] extends Predecessible[T] {
     }
   }
 
-  def ordering: Ordering[T] = implicitly[Integral[T]]
+  def partialOrdering: PartialOrdering[T] = integral
 }
