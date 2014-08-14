@@ -51,7 +51,7 @@ trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
   override def cleanup: Future[Unit] = self.cleanup
 }
 
-private[summer] trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
+trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   protected var lastDump: Long = System.currentTimeMillis
   protected def softMemoryFlush: MemoryFlushPercent
   protected def flushFrequency: FlushFrequency
