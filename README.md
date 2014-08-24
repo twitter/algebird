@@ -7,6 +7,8 @@ See the [current API documentation](http://twitter.github.com/algebird) for more
 ## What can you do with this code?
 
 ```scala
+> ./sbt algebird-core/console
+
 Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
 Type in expressions to have them evaluated.
 Type :help for more information.
