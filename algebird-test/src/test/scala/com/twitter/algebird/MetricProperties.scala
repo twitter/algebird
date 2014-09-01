@@ -16,15 +16,31 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck._
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
+import org.scalacheck.Arbitrary
 
-object BaseMetricProperties extends Properties("Metric") with MetricProperties {
-  property("double metric") = metricLaws[Double](defaultEqFn)
-  property("int metric") = metricLaws[Int](defaultEqFn)
-  property("float metric") = metricLaws[Float](defaultEqFn)
-  property("long metric") = metricLaws[Long](defaultEqFn)
-  property("short metric") = metricLaws[Short](defaultEqFn)
+class BaseMetricProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions with MetricProperties {
+  property("double metric") {
+    metricLaws[Double](defaultEqFn)
+  }
+
+  property("int metric") {
+    metricLaws[Int](defaultEqFn)
+  }
+
+  property("float metric") {
+    metricLaws[Float](defaultEqFn)
+  }
+
+  property("long metric") {
+    metricLaws[Long](defaultEqFn)
+  }
+
+  property("short metric") {
+    metricLaws[Short](defaultEqFn)
+  }
 
   implicit val iterMetric = Metric.L1Iterable[Double]
 
@@ -38,7 +54,9 @@ object BaseMetricProperties extends Properties("Metric") with MetricProperties {
     newA == newB
   }
 
-  property("double iterable metric") = metricLaws[List[Double]](listEqfn)
+  property("double iterable metric") {
+    metricLaws[List[Double]](listEqfn)
+  }
 
   implicit val mapMetric = Metric.L1Map[Int, Double]
 
@@ -54,7 +72,10 @@ object BaseMetricProperties extends Properties("Metric") with MetricProperties {
     }
   }
 
-  property("int double map metric") = metricLaws[Map[Int, Double]](mapEqFn)
+  property("int double map metric") {
+    metricLaws[Map[Int, Double]](mapEqFn)
+  }
+
 }
 
 trait MetricProperties {

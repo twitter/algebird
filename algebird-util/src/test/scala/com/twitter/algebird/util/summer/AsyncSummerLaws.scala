@@ -16,7 +16,8 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalacheck._
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import Arbitrary._
 import Gen._
 import Prop._

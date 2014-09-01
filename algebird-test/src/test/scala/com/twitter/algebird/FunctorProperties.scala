@@ -16,17 +16,37 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
 
-object FunctorProperties extends Properties("Functor") {
+class FunctorProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import FunctorLaws._
   import Monad._ // for Monad instances
   import MonadLaws._ // for Arbitrary instances
 
-  property("list") = functorLaws[List, Int, String, Long]()
-  property("option") = functorLaws[Option, Int, String, Long]()
-  property("indexedseq") = functorLaws[IndexedSeq, Int, String, Long]()
-  property("vector") = functorLaws[Vector, Int, String, Long]()
-  property("set") = functorLaws[Set, Int, String, Long]()
-  property("seq") = functorLaws[Seq, Int, String, Long]()
+  property("list") {
+    functorLaws[List, Int, String, Long]()
+  }
+
+  property("option") {
+    functorLaws[Option, Int, String, Long]()
+  }
+
+  property("indexedseq") {
+    functorLaws[IndexedSeq, Int, String, Long]()
+  }
+
+  property("vector") {
+    functorLaws[Vector, Int, String, Long]()
+  }
+
+  property("set") {
+    functorLaws[Set, Int, String, Long]()
+  }
+
+  property("seq") {
+    functorLaws[Seq, Int, String, Long]()
+  }
+
 }

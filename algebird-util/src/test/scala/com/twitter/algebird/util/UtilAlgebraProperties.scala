@@ -18,11 +18,13 @@ package com.twitter.algebird.util
 
 import com.twitter.algebird.MonadLaws.monadLaws
 import com.twitter.util.{ Await, Future, Throw, Return, Try }
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
 import Arbitrary.arbitrary
 
-object UtilAlgebraProperties extends Properties("UtilAlgebras") {
+class UtilAlgebraProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import UtilAlgebras._
 
   def toOption[T](f: Future[T]): Option[T] =
@@ -44,8 +46,12 @@ object UtilAlgebraProperties extends Properties("UtilAlgebras") {
         Throw(new RuntimeException("fail!"))
     }
 
-  property("futureMonad") = monadLaws[Future, Int, String, Long] { (f1, f2) =>
+  property("futureMonad") =
+  monadLaws[Future, Int, String, Long] { (f1, f2) =>
     toOption(f1) == toOption(f2)
   }
-  property("tryMonad") = monadLaws[Try, Int, String, Long]()
+  property("tryMonad") {
+    monadLaws[Try, Int, String, Long]()
+    }
+
 }

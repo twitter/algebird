@@ -16,13 +16,23 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Prop.forAll
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
-object CombinatorTest extends Properties("Combinator") {
+class CombinatorTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import BaseProperties._
 
   implicit def minArb[T: Arbitrary]: Arbitrary[Min[T]] = Arbitrary {
@@ -58,8 +68,13 @@ object CombinatorTest extends Properties("Combinator") {
       ) yield mond.plus(mond.zero, (m, l))
     }
 
-  property("SemigroupCombinator with mod sortfn forms a Semigroup") = semigroupLaws[(Max[Int], List[Int])]
-  property("MonoidCombinator with mod sortfn forms a Monoid") = monoidLaws[(Max[Int], List[Int])]
+  property("SemigroupCombinator with mod sortfn forms a Semigroup") {
+    semigroupLaws[(Max[Int], List[Int])]
+  }
+
+  property("MonoidCombinator with mod sortfn forms a Monoid") {
+    monoidLaws[(Max[Int], List[Int])]
+  }
 
   // Now test the expected use case: top-K by appearances:
   implicit val monTopK: Monoid[(Map[Int, Int], Set[Int])] =
@@ -80,6 +95,8 @@ object CombinatorTest extends Properties("Combinator") {
         m = smallvals.groupBy { s => s }.mapValues { _.size }
       ) yield monTopK.plus(monTopK.zero, (m, smallvals.toSet))
     }
-  property("MonoidCombinator with top-K forms a Monoid") = monoidLaws[(Map[Int, Int], Set[Int])]
+  property("MonoidCombinator with top-K forms a Monoid") {
+    monoidLaws[(Map[Int, Int], Set[Int])]
+  }
 
 }

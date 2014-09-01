@@ -19,21 +19,25 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird.{ MapAlgebra, Semigroup }
 import com.twitter.util.{ Future, Await }
 import scala.collection.mutable.{ Map => MMap }
-import org.scalacheck._
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import Gen._
 import Arbitrary._
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 import scala.util.Random
 import com.twitter.util.Duration
 import Arbitrary.arbitrary
 
-object AsyncListMMapSumProperties extends Properties("AsyncListMMapSumProperties") {
+class AsyncListMMapSumProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
 
   import AsyncSummerLaws._
 
   def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
-  property("Summing with and without the summer should match") = forAll { (inputs: List[List[(Int, Long)]],
+  property("Summing with and without the summer should match") =
+  forAll { (inputs: List[List[(Int, Long)]],
     flushFrequency: FlushFrequency,
     bufferSize: BufferSize,
     memoryFlushPercent: MemoryFlushPercent) =>

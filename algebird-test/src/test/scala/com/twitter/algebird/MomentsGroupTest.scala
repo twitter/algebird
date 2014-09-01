@@ -1,8 +1,8 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-class MomentsGroupTest extends Specification {
+class MomentsGroupTest extends WordSpec with Matchers with DiagrammedAssertions {
 
   /**
    * Given a list of doubles, create a Moments object to hold
@@ -13,9 +13,9 @@ class MomentsGroupTest extends Specification {
 
   def testApproxEq(f1: Double, f2: Double) {
     if (f2 == 0)
-      f1 must be_<(1e-10)
+      assert(f1 < 1e-10)
     else
-      (scala.math.abs(f1 - f2) / scala.math.abs(f2)) must be_<(1e-10)
+      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
   }
 
   "Moments should count" in {

@@ -18,10 +18,11 @@ package com.twitter.algebird.util
 import com.twitter.algebird._
 import com.twitter.util.{ Await, Future }
 import scala.util.Random
-import org.scalacheck.{ Arbitrary, Properties }
-import scala.annotation.tailrec
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.Arbitrary
 
-object TunnelMonoidProperties extends Properties("TunnelMonoids") {
+class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   implicit val monoid = new Monoid[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer
@@ -35,7 +36,7 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
     val numbers = (1 to 40).map { _ => makeRandomInput(r.nextInt) }
     def helper(seeds: Seq[I], toFeed: I) = {
       val tunnels = seeds.map(makeTunnel)
-      @tailrec
+      @annotation.tailrec
       def process(tunnels: Seq[V]): V = {
         val size = tunnels.size
         if (size > 2) {
@@ -62,7 +63,7 @@ object TunnelMonoidProperties extends Properties("TunnelMonoids") {
     }
   }
 
-  property("associative") = {
+  property("associative") {
     def makeTunnel(seed: Int) = Tunnel.toIncrement(seed)
     def collapseFinalValues(finalTunnel: Tunnel[Int], tunnels: Seq[Tunnel[Int]], toFeed: Int) =
       finalTunnel(toFeed) +: tunnels.map { _.future }

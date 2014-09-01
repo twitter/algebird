@@ -16,12 +16,20 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
-object MinPlusLaws extends Properties("MinPlus") {
+class MinPlusLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import BaseProperties._
 
   implicit val mpint: Arbitrary[MinPlus[Int]] = Arbitrary {
@@ -30,5 +38,8 @@ object MinPlusLaws extends Properties("MinPlus") {
     } yield MinPlusValue(a)
   }
 
-  property("is a semiring") = semiringLaws[MinPlus[Int]]
+  property("is a semiring") {
+    semiringLaws[MinPlus[Int]]
+  }
+
 }

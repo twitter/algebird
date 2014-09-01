@@ -16,18 +16,17 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
-object DecayedVectorProperties extends Properties("DecayedVector") {
+class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import BaseProperties._
 
   implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
     for {
-      t <- choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
-      m <- arbitrary[Map[Int, Double]]
+      t <- Gen.choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
+      m <- Arbitrary.arbitrary[Map[Int, Double]]
     } yield DecayedVector.forMap(m, t)
   }
 
@@ -47,5 +46,7 @@ object DecayedVectorProperties extends Properties("DecayedVector") {
     mapsAreClose && timesAreClose
   }
 
-  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
+  property("for Map[Int, Double] is a monoid") {
+    monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
+  }
 }

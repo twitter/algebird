@@ -13,14 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package com.twitter.algebird
 
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-object SuccessibleProperties extends Properties("Successibles") {
+class SuccessibleProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import SuccessibleLaws.{ successibleLaws => laws }
 
-  property("Int is Successible") = laws[Int]
-  property("Long is Successible") = laws[Long]
-  property("BigInt is Successible") = laws[BigInt]
+  property("Int is Successible") {
+    laws[Int]
+  }
+
+  property("Long is Successible") {
+    laws[Long]
+  }
+
+  property("BigInt is Successible") {
+    laws[BigInt]
+  }
+
 }

@@ -1,29 +1,29 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
 import java.util.Arrays
 
-object MinHasherTest extends Properties("MinHasher") {
+class MinHasherTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
   import BaseProperties._
 
   implicit val mhMonoid = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary {
     for (
-      v <- choose(0, 10000)
+      v <- Gen.choose(0, 10000)
     ) yield (mhMonoid.init(v))
   }
 
-  property("MinHasher is a Monoid") =
+  property("MinHasher is a Monoid") {
     monoidLawsEq[MinHashSignature]{ (a, b) => a.bytes.toList == b.bytes.toList }
+  }
 }
 
-class MinHasherSpec extends Specification {
+class MinHasherSpec extends WordSpec with Matchers with DiagrammedAssertions {
   val r = new java.util.Random
 
   def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double) = {
@@ -31,8 +31,8 @@ class MinHasherSpec extends Specification {
 
     val exact = exactSimilarity(set1, set2)
     val sim = approxSimilarity(mh, set1, set2)
-    val error = math.abs(exact - sim)
-    error must be_<[Double](epsilon)
+    val error: Double = math.abs(exact - sim)
+    assert(error < epsilon)
   }
 
   def randomSets(similarity: Double) = {
