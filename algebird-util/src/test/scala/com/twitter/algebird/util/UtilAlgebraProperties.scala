@@ -34,20 +34,20 @@ class UtilAlgebraProperties extends PropSpec with PropertyChecks with Matchers {
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
-      Arbitrary.arbitrary[T].map { l => Future.value(l) } |
-        Future.exception(new RuntimeException("fail!"))
+      Arbitrary.arbitrary[T].map { l => Future.value(l) }
     }
 
   implicit def returnA[T: Arbitrary]: Arbitrary[Try[T]] =
     Arbitrary {
-      Arbitrary.arbitrary[T].map { l => Return(l) } |
-        Throw(new RuntimeException("fail!"))
+      Arbitrary.arbitrary[T].map { l => Return(l) }
     }
 
-  property("futureMonad") =
+  property("futureMonad") {
     monadLaws[Future, Int, String, Long] { (f1, f2) =>
       toOption(f1) == toOption(f2)
     }
+  }
+
   property("tryMonad") {
     monadLaws[Try, Int, String, Long]()
   }

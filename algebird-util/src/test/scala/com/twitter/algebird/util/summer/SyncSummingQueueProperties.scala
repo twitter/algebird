@@ -22,13 +22,14 @@ import org.scalatest.prop.PropertyChecks
 class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") =
+  property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
       val summer = new SyncSummingQueue[Int, Long](bufferSize, flushFrequency, memoryFlushPercent)
-      summingWithAndWithoutSummerShouldMatch(summer, inputs)
+      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
+  }
 
 }

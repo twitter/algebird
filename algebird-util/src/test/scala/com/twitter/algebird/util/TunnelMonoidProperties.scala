@@ -22,12 +22,7 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
-class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers {
-  implicit val monoid = new Monoid[Int] {
-    val zero = 0
-    def plus(older: Int, newer: Int): Int = older + newer
-  }
-
+object TunnelMonoidProperties {
   def testTunnelMonoid[I, V](makeRandomInput: Int => I,
     makeTunnel: I => V,
     collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(implicit monoid: Monoid[I],
@@ -61,6 +56,15 @@ class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers 
       }
       Await.result(Future.collect(finalResults).map { _.forall(identity) })
     }
+  }
+}
+
+class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers {
+  import TunnelMonoidProperties._
+
+  implicit val monoid = new Monoid[Int] {
+    val zero = 0
+    def plus(older: Int, newer: Int): Int = older + newer
   }
 
   property("associative") {

@@ -18,7 +18,7 @@ package com.twitter.algebird.util.summer
 
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Arbitrary
+import org.scalacheck.{ Gen, Arbitrary }
 import com.twitter.algebird.{ MapAlgebra, Semigroup }
 import com.twitter.util.{ Future, Await, Duration, FuturePool }
 

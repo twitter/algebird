@@ -22,10 +22,11 @@ import org.scalatest.prop.PropertyChecks
 class NullSummerProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") =
+  property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]]) =>
       val summer = new NullSummer[Int, Long]()
-      summingWithAndWithoutSummerShouldMatch(summer, inputs)
+      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
+  }
 
 }

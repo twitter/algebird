@@ -23,15 +23,13 @@ class AsyncListMMapSumProperties extends PropSpec with PropertyChecks with Match
 
   import AsyncSummerLaws._
 
-  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
-
-  property("Summing with and without the summer should match") =
+  property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
       val summer = new AsyncListMMapSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
-      summingWithAndWithoutSummerShouldMatch(summer, inputs)
+      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
-
+  }
 }

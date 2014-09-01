@@ -18,21 +18,19 @@ package com.twitter.algebird.util.summer
 
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Arbitrary
 
 class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
 
-  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
-
-  property("Summing with and without the summer should match") =
+  property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
       val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
       val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
-      summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs)
+      assert(summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
     }
+  }
 
 }
