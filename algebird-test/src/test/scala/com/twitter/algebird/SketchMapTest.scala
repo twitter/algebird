@@ -11,7 +11,7 @@ object SketchMapTestImplicits {
   val HEAVY_HITTERS_COUNT = 10
 }
 
-class SketchMapLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SketchMapLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
@@ -31,7 +31,7 @@ class SketchMapLaws extends PropSpec with PropertyChecks with Matchers with Diag
   }
 }
 
-class SketchMapTest extends WordSpec with Matchers with DiagrammedAssertions {
+class SketchMapTest extends WordSpec with Matchers {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 

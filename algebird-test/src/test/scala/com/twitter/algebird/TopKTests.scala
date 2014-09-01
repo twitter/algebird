@@ -26,7 +26,7 @@ import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class TopKTests extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class TopKTests extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   val SIZE = 10
 

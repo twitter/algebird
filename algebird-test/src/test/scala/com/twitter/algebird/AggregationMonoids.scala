@@ -1,10 +1,10 @@
 package com.twitter.algebird
 
 import org.scalacheck.{ Gen, Arbitrary }
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 
-class AggregationMonoidSpecification extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class AggregationMonoidSpecification extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import Gen.choose
 

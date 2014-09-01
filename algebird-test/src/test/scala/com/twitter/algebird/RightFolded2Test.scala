@@ -1,12 +1,12 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 import scala.annotation.tailrec
 
-class RightFolded2Test extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class RightFolded2Test extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   def monFold(i: Int, l: Long) = l + i.toLong

@@ -17,10 +17,10 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 
-class AdjoinedRingSpecification extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class AdjoinedRingSpecification extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit def adjoined[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] = Arbitrary {

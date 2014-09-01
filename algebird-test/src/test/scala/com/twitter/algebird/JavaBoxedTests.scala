@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
@@ -9,7 +9,7 @@ import java.util.{ List => JList, Map => JMap }
 
 import scala.collection.JavaConverters._
 
-class JavaBoxedTests extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class JavaBoxedTests extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val jboolArg = Arbitrary { for (v <- Gen.oneOf(JBool.TRUE, JBool.FALSE)) yield v }

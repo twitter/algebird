@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-class TupleAggregatorsTest extends WordSpec with Matchers with DiagrammedAssertions {
+class TupleAggregatorsTest extends WordSpec with Matchers {
   import GeneratedTupleAggregator._
 
   val data = List(1, 3, 2, 0, 5, 6)

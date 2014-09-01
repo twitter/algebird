@@ -6,7 +6,7 @@ import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val DELTA = 1E-8
@@ -25,7 +25,7 @@ class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers with
 
 }
 
-class CountMinSketchTest extends WordSpec with Matchers with DiagrammedAssertions {
+class CountMinSketchTest extends WordSpec with Matchers {
 
   val DELTA = 1E-10
   val EPS = 0.001

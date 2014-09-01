@@ -16,20 +16,20 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
-class MinPlusLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class MinPlusLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val mpint: Arbitrary[MinPlus[Int]] = Arbitrary {

@@ -2,13 +2,13 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 import java.util.Arrays
 
-class MinHasherTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class MinHasherTest extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val mhMonoid = new MinHasher32(0.5, 512)
@@ -23,7 +23,7 @@ class MinHasherTest extends PropSpec with PropertyChecks with Matchers with Diag
   }
 }
 
-class MinHasherSpec extends WordSpec with Matchers with DiagrammedAssertions {
+class MinHasherSpec extends WordSpec with Matchers {
   val r = new java.util.Random
 
   def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double) = {

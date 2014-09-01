@@ -17,10 +17,10 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 
-class AggregatorLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {

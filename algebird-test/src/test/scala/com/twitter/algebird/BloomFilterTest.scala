@@ -5,7 +5,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 import java.io.{ ObjectOutputStream, ByteArrayOutputStream }
 
-class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val NUM_HASHES = 6
@@ -23,7 +23,7 @@ class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers with Di
   }
 }
 
-class BFHashIndices extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
@@ -94,7 +94,7 @@ class BFHashIndices extends PropSpec with PropertyChecks with Matchers with Diag
   }
 }
 
-class BloomFilterTest extends WordSpec with Matchers with DiagrammedAssertions {
+class BloomFilterTest extends WordSpec with Matchers {
 
   val SEED = 1
   val RAND = new scala.util.Random

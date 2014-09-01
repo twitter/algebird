@@ -1,16 +1,16 @@
 package com.twitter.algebird.statistics
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen._
 import org.scalatest._
 
 import com.twitter.algebird.BaseProperties
 
-class StatisticsRingLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class StatisticsRingLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val statsRing = new StatisticsRing[Int]
@@ -22,7 +22,7 @@ class StatisticsRingLaws extends PropSpec with PropertyChecks with Matchers with
 
 }
 
-class StatisticsMonoidLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class StatisticsMonoidLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val statsMonoid = new StatisticsMonoid[Int]
@@ -35,7 +35,7 @@ class StatisticsMonoidLaws extends PropSpec with PropertyChecks with Matchers wi
 
 }
 
-class StatisticsTest extends WordSpec with Matchers with DiagrammedAssertions {
+class StatisticsTest extends WordSpec with Matchers {
 
   // the test framework garbles the exceptions :/
   lazy val statsMonoid = new StatisticsMonoid[Int]

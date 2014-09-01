@@ -1,16 +1,16 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Gen, Properties }
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 
 import scala.collection.{ Map => ScMap }
 import scala.collection.mutable.{ Map => MMap }
 
-class CollectionSpecification extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class CollectionSpecification extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit def arbMin[T: Arbitrary]: Arbitrary[Min[T]] =
@@ -274,7 +274,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
 
   property("MapAlgebra.invertExact works") {
     forAll { (m: Map[Option[Int], Set[Int]]) =>
-      assert(MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m)
+      assert(MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined))
     }
   }
 

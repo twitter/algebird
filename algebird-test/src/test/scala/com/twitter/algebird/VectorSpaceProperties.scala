@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 
-class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers {
   import BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait

@@ -35,7 +35,7 @@ object ReferenceHyperLogLog {
 
 }
 
-class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import HyperLogLog._
 
@@ -54,7 +54,7 @@ class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers with Di
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
-class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
   import HyperLogLog._
 
   implicit val hashGen = Arbitrary { Gen.containerOfN[Array, Byte](16, Arbitrary.arbitrary[Byte]) }
@@ -69,7 +69,7 @@ class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers with Dia
   }
 }
 
-class HyperLogLogTest extends WordSpec with Matchers with DiagrammedAssertions {
+class HyperLogLogTest extends WordSpec with Matchers {
 
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 

@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   // limit sizes to 100 to avoid large data structures in tests
@@ -28,7 +28,7 @@ class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers with Dia
   }
 }
 
-class SpaceSaverTest extends WordSpec with Matchers with DiagrammedAssertions {
+class SpaceSaverTest extends WordSpec with Matchers {
   "SpaceSaver" should {
     "produce a top 20 with exact bounds" in {
       val gen = Gen.frequency((1 to 100).map{ x => (x * x, x: Gen[Int]) }: _*)

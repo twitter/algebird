@@ -16,13 +16,13 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 import Monad.{ pureOp, operators }
 
-class MonadProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class MonadProperties extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import MonadLaws._
 

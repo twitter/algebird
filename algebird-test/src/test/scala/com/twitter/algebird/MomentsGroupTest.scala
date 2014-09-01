@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-class MomentsGroupTest extends WordSpec with Matchers with DiagrammedAssertions {
+class MomentsGroupTest extends WordSpec with Matchers {
 
   /**
    * Given a list of doubles, create a Moments object to hold

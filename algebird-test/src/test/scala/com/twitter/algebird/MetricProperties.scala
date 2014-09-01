@@ -16,12 +16,12 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary
 
-class BaseMetricProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions with MetricProperties {
+class BaseMetricProperties extends PropSpec with PropertyChecks with Matchers with MetricProperties {
   property("double metric") {
     metricLaws[Double](defaultEqFn)
   }

@@ -16,14 +16,14 @@
 
 // package com.twitter.algebird
 
-// import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+// import org.scalatest.{ PropSpec, Matchers }
 // import org.scalatest.prop.PropertyChecks
 // import org.scalacheck.Properties
-// import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+// import org.scalatest.{ PropSpec, Matchers }
 // import org.scalatest.prop.PropertyChecks
 // import org.scalacheck.Prop._
 
-// class IntervalLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+// class IntervalLaws extends PropSpec with PropertyChecks with Matchers  {
 //   import Generators._
 //   import Interval.GenIntersection
 

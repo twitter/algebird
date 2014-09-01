@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-class MinMaxAggregatorTest extends WordSpec with Matchers with DiagrammedAssertions {
+class MinMaxAggregatorTest extends WordSpec with Matchers {
   val data = List(1, 3, 5, 0, 7, 6)
 
   sealed trait TestElementParent

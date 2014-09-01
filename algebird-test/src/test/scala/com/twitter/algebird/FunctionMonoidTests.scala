@@ -1,10 +1,10 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Prop, Arbitrary }
 
-class FunctionMonoidTests extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class FunctionMonoidTests extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   // Generates an arbitrary linear function of the form f(x) = a * x + b,

@@ -4,7 +4,7 @@ import org.scalatest._
 
 import Operators._
 
-class OperatorTest extends WordSpec with Matchers with DiagrammedAssertions {
+class OperatorTest extends WordSpec with Matchers {
 
   "Operators" should {
     "allow plus" in {

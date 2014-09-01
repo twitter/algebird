@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop
 import com.twitter.algebird.BaseProperties._
@@ -9,7 +9,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import scala.Some
 
-class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
 
   property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]

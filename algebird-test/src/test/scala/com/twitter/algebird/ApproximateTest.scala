@@ -10,7 +10,7 @@ import org.scalacheck.Prop
 // that an ApproximateBoolean agrees with the correct Boolean at least as often
 // as it is claimed to
 
-class ApproximateLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import Gen.choose
 

@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class SummingCacheTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SummingCacheTest extends PropSpec with PropertyChecks with Matchers {
   case class Capacity(cap: Int)
   implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 10240)) yield Capacity(c) }
 
@@ -49,7 +49,7 @@ class SummingCacheTest extends PropSpec with PropertyChecks with Matchers with D
   }
 }
 
-class SummingQueueTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SummingQueueTest extends PropSpec with PropertyChecks with Matchers {
   val zeroCapQueue = SummingQueue[Int](0) // passes all through
 
   property("0 capacity always returns") {

@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-class SuccessibleProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SuccessibleProperties extends PropSpec with PropertyChecks with Matchers {
   import SuccessibleLaws.{ successibleLaws => laws }
 
   property("Int is Successible") {

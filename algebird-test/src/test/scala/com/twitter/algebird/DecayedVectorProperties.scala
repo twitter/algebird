@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {

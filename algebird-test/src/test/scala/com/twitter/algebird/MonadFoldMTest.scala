@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-class MonadFoldMTest extends WordSpec with Matchers with DiagrammedAssertions {
+class MonadFoldMTest extends WordSpec with Matchers {
 
   def binSmalls(x: Int, y: Int): Option[Int] = if (y > 9) None else Some(x + y)
   "A monad foldM" should {

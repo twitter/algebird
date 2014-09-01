@@ -18,11 +18,11 @@ package com.twitter.algebird.util
 import com.twitter.algebird._
 import com.twitter.util.{ Await, Future }
 import scala.util.Random
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
-class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers {
   implicit val monoid = new Monoid[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer

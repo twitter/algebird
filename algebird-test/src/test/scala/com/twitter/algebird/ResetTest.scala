@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
-class ResetTest extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class ResetTest extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit def resetArb[T: Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {

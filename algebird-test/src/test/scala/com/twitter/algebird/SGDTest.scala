@@ -2,13 +2,13 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers }
+import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 import java.lang.AssertionError
 import java.util.Arrays
 
-class SGDLaws extends PropSpec with PropertyChecks with Matchers with DiagrammedAssertions {
+class SGDLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val sgdMonoid = new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
