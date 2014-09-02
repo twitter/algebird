@@ -46,7 +46,7 @@ class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers
     mapsAreClose && timesAreClose
   }
 
-  property("for Map[Int, Double] is a monoid") {
+  property("DecayedVector[Map[Int, _]] is a monoid") {
     monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
   }
 }
