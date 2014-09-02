@@ -163,7 +163,7 @@ class IntervalLaws extends PropSpec with PropertyChecks with Matchers {
         .getOrElse {
           lower match {
             case InclusiveLower(l) => l == Long.MinValue
-            case ExclusiveLower(l) => false // prev should be the lowest
+            case ExclusiveLower(l) => l == Long.MaxValue
           }
         })
     }
@@ -178,7 +178,7 @@ class IntervalLaws extends PropSpec with PropertyChecks with Matchers {
         .getOrElse {
           upper match {
             case InclusiveUpper(l) => l == Long.MaxValue
-            case ExclusiveUpper(l) => false // prev should be the lowest
+            case ExclusiveUpper(l) => l == Long.MinValue
           }
         })
     }
