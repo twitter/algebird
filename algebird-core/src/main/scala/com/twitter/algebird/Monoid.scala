@@ -94,13 +94,26 @@ class ListMonoid[T] extends Monoid[List[T]] {
   override def plus(left: List[T], right: List[T]) = left ++ right
   override def sumOption(items: TraversableOnce[List[T]]): Option[List[T]] =
     if (items.isEmpty) None
-    else Some(items.foldRight(Nil: List[T])(_ ::: _))
+    else {
+      // ListBuilder mutates the tail of the list until
+      // result is called so that it is O(N) to push N things on, not N^2
+      val builder = List.newBuilder[T]
+      items.foreach { builder ++= _ }
+      Some(builder.result())
+    }
 }
 
 // equivalent to ListMonoid
 class SeqMonoid[T] extends Monoid[Seq[T]] {
   override def zero = Seq[T]()
   override def plus(left: Seq[T], right: Seq[T]) = left ++ right
+  override def sumOption(items: TraversableOnce[Seq[T]]): Option[Seq[T]] =
+    if (items.isEmpty) None
+    else {
+      val builder = Seq.newBuilder[T]
+      items.foreach { builder ++= _ }
+      Some(builder.result())
+    }
 }
 
 /**
