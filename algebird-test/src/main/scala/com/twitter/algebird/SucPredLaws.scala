@@ -38,7 +38,10 @@ object SuccessibleLaws {
 
   /**
    * Use this to test your implementations:
-   * property("My succ") = successibleLaws[MyType]
+   * property("My succ") {
+   * successibleLaws[MyType]
+   * }
+   *
    */
   def successibleLaws[T: Successible: Arbitrary]: Prop = forAll { (t: T, size: Short) =>
     law(t) && iterateNextIncreases(t, size)
@@ -64,7 +67,10 @@ object PredecessibleLaws {
 
   /**
    * Use this to test your implementations:
-   * property("My succ") = predessibleLaws[MyType]
+   * property("My succ") {
+   * predessibleLaws[MyType]
+   * }
+   *
    */
   def predessibleLaws[T: Predecessible: Arbitrary]: Prop = forAll { (t: T, size: Short) =>
     law(t) && iteratePrevDecreases(t, size)

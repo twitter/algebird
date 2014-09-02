@@ -16,17 +16,34 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
 
-object ApplicativeProperties extends Properties("Applicative") {
+class ApplicativeProperties extends PropSpec with PropertyChecks with Matchers {
   import ApplicativeLaws._
   import Monad._ // for Monad instances
   import MonadLaws._ // for Arbitrary instances
 
-  property("list") = applicativeLaws[List, Int, String, Long]()
-  property("option") = applicativeLaws[Option, Int, String, Long]()
-  property("indexedseq") = applicativeLaws[IndexedSeq, Int, String, Long]()
-  property("vector") = applicativeLaws[Vector, Int, String, Long]()
-  property("set") = applicativeLaws[Set, Int, String, Long]()
-  property("seq") = applicativeLaws[Seq, Int, String, Long]()
+  property("list") {
+    applicativeLaws[List, Int, String, Long]()
+  }
+
+  property("option") {
+    applicativeLaws[Option, Int, String, Long]()
+  }
+
+  property("indexedseq") {
+    applicativeLaws[IndexedSeq, Int, String, Long]()
+  }
+  property("vector") {
+    applicativeLaws[Vector, Int, String, Long]()
+  }
+
+  property("set") {
+    applicativeLaws[Set, Int, String, Long]()
+  }
+  property("seq") {
+    applicativeLaws[Seq, Int, String, Long]()
+  }
 }

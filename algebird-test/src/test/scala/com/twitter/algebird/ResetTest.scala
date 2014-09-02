@@ -16,13 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
 
-object ResetTest extends Properties("ResetAlgebra") {
+class ResetTest extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit def resetArb[T: Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {
@@ -35,15 +33,23 @@ object ResetTest extends Properties("ResetAlgebra") {
     }
   }
 
-  property("ResetState[Int] forms a Monoid") = monoidLaws[ResetState[Int]]
-  property("ResetState[String] forms a Monoid") = monoidLaws[ResetState[String]]
-  property("ResetState[Int] works as expected") = forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
-    val result = Monoid.plus(Monoid.plus(a, b), c)
-    ((a, b, c) match {
-      case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x + y + z)
-      case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x + y + z)
-      case (_, ResetValue(y), SetValue(z)) => ResetValue(y + z)
-      case (_, _, ResetValue(z)) => ResetValue(z)
-    }) == result
+  property("ResetState[Int] forms a Monoid") {
+    monoidLaws[ResetState[Int]]
+  }
+
+  property("ResetState[String] forms a Monoid") {
+    monoidLaws[ResetState[String]]
+  }
+
+  property("ResetState[Int] works as expected") {
+    forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
+      val result = Monoid.plus(Monoid.plus(a, b), c)
+      assert(((a, b, c) match {
+        case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x + y + z)
+        case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x + y + z)
+        case (_, ResetValue(y), SetValue(z)) => ResetValue(y + z)
+        case (_, _, ResetValue(z)) => ResetValue(z)
+      }) == result)
+    }
   }
 }

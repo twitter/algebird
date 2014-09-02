@@ -1,13 +1,9 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.{ arbitrary, arbByte }
-import org.scalacheck.{ Prop, Properties }
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Gen
-import org.scalacheck.Gen.{ choose, containerOfN }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
 import scala.collection.BitSet
 
@@ -39,7 +35,7 @@ object ReferenceHyperLogLog {
 
 }
 
-object HyperLogLogLaws extends Properties("HyperLogLog") {
+class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import HyperLogLog._
 
@@ -47,28 +43,33 @@ object HyperLogLogLaws extends Properties("HyperLogLog") {
 
   implicit val hllGen = Arbitrary {
     for (
-      v <- choose(0, 10000)
+      v <- Gen.choose(0, 10000)
     ) yield (hllMonoid(v))
   }
 
-  property("HyperLogLog is a Monoid") = monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
+  property("HyperLogLog is a Monoid") {
+    monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
+  }
+
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
-object jRhoWMatchTest extends Properties("jRhoWMatch") {
+class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
   import HyperLogLog._
 
-  implicit val hashGen = Arbitrary { containerOfN[Array, Byte](16, arbitrary[Byte]) }
+  implicit val hashGen = Arbitrary { Gen.containerOfN[Array, Byte](16, Arbitrary.arbitrary[Byte]) }
   /* For some reason choose in this version of scalacheck
   is bugged so I need the suchThat clause */
-  implicit val bitsGen = Arbitrary { choose(4, 31) suchThat (x => x >= 4 && x <= 31) }
+  implicit val bitsGen = Arbitrary { Gen.choose(4, 31) suchThat (x => x >= 4 && x <= 31) }
 
-  property("jRhoW matches referenceJRhoW") = forAll { (in: Array[Byte], bits: Int) =>
-    jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits)
+  property("jRhoW matches referenceJRhoW") {
+    forAll { (in: Array[Byte], bits: Int) =>
+      assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
+    }
   }
 }
 
-class HyperLogLogTest extends Specification {
+class HyperLogLogTest extends WordSpec with Matchers {
 
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 
@@ -95,12 +96,12 @@ class HyperLogLogTest extends Specification {
   def test(bits: Int) {
     val data = (0 to 10000).map { i => r.nextInt(1000) }
     val exact = exactCount(data).toDouble
-    scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(3.5 * aveErrorOf(bits))
+    assert(scala.math.abs(exact - approxCount(bits, data)) / exact < 3.5 * aveErrorOf(bits))
   }
   def testLong(bits: Int) {
     val data = (0 to 10000).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
-    scala.math.abs(exact - approxCount(bits, data)) / exact must be_<(3.5 * aveErrorOf(bits))
+    assert(scala.math.abs(exact - approxCount(bits, data)) / exact < 3.5 * aveErrorOf(bits))
   }
   def testLongIntersection(bits: Int, sets: Int) {
     val data: Seq[Iterable[Int]] = (0 until sets).map { idx =>
@@ -108,7 +109,7 @@ class HyperLogLogTest extends Specification {
     }.toSeq
     val exact = exactIntersect(data)
     val errorMult = scala.math.pow(2.0, sets) - 1.0
-    scala.math.abs(exact - approxIntersect(bits, data)) / exact must be_<(errorMult *
+    assert(scala.math.abs(exact - approxIntersect(bits, data)) / exact < errorMult *
       aveErrorOf(bits))
   }
 
@@ -138,7 +139,9 @@ class HyperLogLogTest extends Specification {
       val smallMon = new HyperLogLogMonoid(4)
       val larger = bigMon(1) // uses implicit long2Bytes to make 8 byte array
       val smaller = smallMon(1) // uses implicit int2Bytes to make 4 byte array
-      (larger + smaller) must throwA[AssertionError]
+      intercept[AssertionError] {
+        (larger + smaller)
+      }
     }
     "Correctly serialize" in {
       (4 to 20).foreach { bits =>
@@ -162,12 +165,12 @@ class HyperLogLogTest extends Specification {
       val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       // Now the ith entry of partialSums (0-based) is an HLL structure for i underlying elements
       partialSums.foreach { hll =>
-        hll.isInstanceOf[SparseHLL] must beTrue
-        hll.size must be_==(hll.toDenseHLL.size)
-        hll.zeroCnt must be_==(hll.toDenseHLL.zeroCnt)
-        hll.z must be_==(hll.toDenseHLL.z)
-        hll.approximateSize must be_==(hll.toDenseHLL.approximateSize)
-        hll.estimatedSize must be_==(hll.toDenseHLL.estimatedSize)
+        assert(hll.isInstanceOf[SparseHLL])
+        assert(hll.size == hll.toDenseHLL.size)
+        assert(hll.zeroCnt == hll.toDenseHLL.zeroCnt)
+        assert(hll.z == hll.toDenseHLL.z)
+        assert(hll.approximateSize == hll.toDenseHLL.approximateSize)
+        assert(hll.estimatedSize == hll.toDenseHLL.estimatedSize)
       }
     }
     "properly convert to dense" in {
@@ -176,9 +179,9 @@ class HyperLogLogTest extends Specification {
       val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       partialSums.foreach { hll =>
         if (hll.size - hll.zeroCnt <= 64) {
-          hll.isInstanceOf[SparseHLL] must beTrue
+          assert(hll.isInstanceOf[SparseHLL])
         } else {
-          hll.isInstanceOf[DenseHLL] must beTrue
+          assert(hll.isInstanceOf[DenseHLL])
         }
       }
     }
@@ -187,7 +190,7 @@ class HyperLogLogTest extends Specification {
       val data = (1 to 200).map { _ => r.nextLong }
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       (1 to 200).map { n =>
-        partialSums(n) must be_==(mon.batchCreate(data.slice(0, n)))
+        assert(partialSums(n) == mon.batchCreate(data.slice(0, n)))
       }
     }
 
@@ -198,7 +201,7 @@ class HyperLogLogTest extends Specification {
         val exact = exactCount(data).toDouble
 
         val approxCount = aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
-        scala.math.abs(exact - approxCount) / exact must be_<(3.5 * aveErrorOf(bits))
+        assert(scala.math.abs(exact - approxCount) / exact < 3.5 * aveErrorOf(bits))
       })
     }
 
@@ -209,13 +212,13 @@ class HyperLogLogTest extends Specification {
         val exact = exactCount(data).toDouble
 
         val estimate = aggregator(data.map(int2Bytes(_)))
-        scala.math.abs(exact - estimate) / exact must be_<(3.5 * aveErrorOf(bits))
+        assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(bits))
       })
     }
 
     def verifySerialization(h: HLL) {
-      fromBytes(toBytes(h)) must be_==(h)
-      fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) must be_==(h)
+      assert(fromBytes(toBytes(h)) == h)
+      fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
     }
   }
 }

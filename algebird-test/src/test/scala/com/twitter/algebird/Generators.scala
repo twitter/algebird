@@ -17,14 +17,21 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
 import org.scalacheck.Gen._
 
 /**
  * Generators useful in testing Interval
  */
 object Generators {
+  // The new scalacheck oneOf results in diverging implicits here
+  // should follow up an investigation?
+  def oneOf[T](g1: Gen[T], g2: Gen[T], gs: Gen[T]*) = for {
+    i <- choose(0, gs.length + 1)
+    x <- if (i == 0) g1 else if (i == 1) g2 else gs(i - 2)
+  } yield x
 
-  implicit def intervalArb[T: Arbitrary: Ordering]: Arbitrary[Interval[T]] =
+  implicit def intervalArb[T](implicit arb: Arbitrary[T], ord: Ordering[T]): Arbitrary[Interval[T]] =
     Arbitrary(oneOf(genUniverse, genEmpty, genInclusiveLower, genExclusiveLower, genInclusiveUpper, genExclusiveUpper, genIntersection))
 
   implicit def lowerIntArb[T: Arbitrary: Ordering]: Arbitrary[Lower[T]] =

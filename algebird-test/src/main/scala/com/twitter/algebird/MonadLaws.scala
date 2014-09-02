@@ -16,9 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Properties }
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen.choose
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 import Monad.{ pureOp, operators }

@@ -16,26 +16,20 @@
 
 package com.twitter.algebird.util.summer
 
-import com.twitter.algebird.{ MapAlgebra, Semigroup }
-import com.twitter.util.{ Future, Await }
-import scala.collection.mutable.{ Map => MMap }
-import org.scalacheck._
-import Gen._
-import Arbitrary._
-import org.scalacheck.Prop._
-import scala.util.Random
-import com.twitter.util.Duration
-import Arbitrary.arbitrary
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 
-object SyncSummingQueueProperties extends Properties("SyncSummingQueueProperties") {
+class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") = forAll { (inputs: List[List[(Int, Long)]],
-    flushFrequency: FlushFrequency,
-    bufferSize: BufferSize,
-    memoryFlushPercent: MemoryFlushPercent) =>
-    val summer = new SyncSummingQueue[Int, Long](bufferSize, flushFrequency, memoryFlushPercent)
-    summingWithAndWithoutSummerShouldMatch(summer, inputs)
+  property("Summing with and without the summer should match") {
+    forAll { (inputs: List[List[(Int, Long)]],
+      flushFrequency: FlushFrequency,
+      bufferSize: BufferSize,
+      memoryFlushPercent: MemoryFlushPercent) =>
+      val summer = new SyncSummingQueue[Int, Long](bufferSize, flushFrequency, memoryFlushPercent)
+      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
+    }
   }
 
 }

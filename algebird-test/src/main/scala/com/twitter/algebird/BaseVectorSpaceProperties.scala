@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Properties }
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 /**

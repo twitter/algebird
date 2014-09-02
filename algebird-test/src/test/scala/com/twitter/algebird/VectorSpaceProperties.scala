@@ -16,10 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck._
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 
-object VectorSpaceProperties extends Properties("ScalingOperator") {
+class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers {
   import BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait
@@ -34,5 +35,7 @@ object VectorSpaceProperties extends Properties("ScalingOperator") {
     }
   }
 
-  property("map int double scaling") = vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
+  property("map int double scaling") {
+    vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
+  }
 }

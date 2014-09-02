@@ -1,14 +1,12 @@
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Gen.oneOf
-import org.scalacheck.Gen
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
 import scala.annotation.tailrec
 
-object RightFolded2Test extends Properties("RightFolded2Monoid") {
+class RightFolded2Test extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   def monFold(i: Int, l: Long) = l + i.toLong
@@ -23,14 +21,16 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
     for (v <- arbin.arbitrary) yield mon.toFold(v)
 
   implicit def rightFolded2[In, Out, Acc](implicit arbin: Arbitrary[In], arbout: Arbitrary[Out], mon: RightFolded2Monoid[In, Out, Acc]): Arbitrary[RightFolded2[In, Out, Acc]] =
-    Arbitrary { oneOf(rightFolded2Value[In, Out, Acc], rightFolded2ToFold[In, Out, Acc]) }
+    Arbitrary { Gen.oneOf(rightFolded2Value[In, Out, Acc], rightFolded2ToFold[In, Out, Acc]) }
 
-  property("RightFolded2 is a monoid") = monoidLaws[RightFolded2[Int, Long, Long]]
+  property("RightFolded2 is a monoid") {
+    monoidLaws[RightFolded2[Int, Long, Long]]
+  }
 
   // Make a list of lists such that the all but the last element satisfies the predicate
   // and joining the lists returns the original list
   @tailrec
-  def chunk[T](items: List[T], acc: List[List[T]] = Nil)(pred: T => Boolean): List[List[T]] = {
+  private[this] def chunk[T](items: List[T], acc: List[List[T]] = Nil)(pred: T => Boolean): List[List[T]] = {
     val (headL, tailL) = items.span(pred)
     if (tailL.isEmpty) {
       if (!headL.isEmpty) (headL :: acc).reverse else acc.reverse
@@ -50,6 +50,7 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
       case _ => None
     }
   }
+
   def sum[In, Out, Acc: Group](l: List[RightFolded2[In, Out, Acc]])(foldfn: (In, Out) => Out)(mapfn: (Out) => Acc): Acc = {
     def notIsVal(rf: RightFolded2[In, Out, Acc]) = rf match {
       case RightFoldedValue2(_, _, _) => false
@@ -69,8 +70,10 @@ object RightFolded2Test extends Properties("RightFolded2Monoid") {
     }
   }
 
-  property("RightFolded2 sum works as expected") = forAll { (ls: List[RightFolded2[Int, Long, Long]]) =>
-    val accSum = accOf(rightFoldedMonoid.sum(ls)).getOrElse(0L)
-    (sum(ls)(monFold)(mapFn) == accSum)
+  property("RightFolded2 sum works as expected") {
+    forAll { (ls: List[RightFolded2[Int, Long, Long]]) =>
+      val accSum = accOf(rightFoldedMonoid.sum(ls)).getOrElse(0L)
+      assert(sum(ls)(monFold)(mapFn) == accSum)
+    }
   }
 }
