@@ -147,7 +147,7 @@ class Function1Monoid[T] extends Monoid[Function1[T, T]] {
 }
 
 // To use the OrValMonoid wrap your item in a OrVal object
-case class OrVal(get: Boolean)
+case class OrVal(get: Boolean) extends AnyVal
 
 object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
@@ -163,7 +163,7 @@ object OrValMonoid extends Monoid[OrVal] {
 }
 
 // To use the AndValMonoid wrap your item in a AndVal object
-case class AndVal(get: Boolean)
+case class AndVal(get: Boolean) extends AnyVal
 
 object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid

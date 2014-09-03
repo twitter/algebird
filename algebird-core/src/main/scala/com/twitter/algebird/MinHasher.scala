@@ -7,7 +7,7 @@ import java.nio._
  * The bytes are assumed to be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is
  * because a ByteBuffer is used internally in MinHasher and it can wrap Array[Byte].
  */
-case class MinHashSignature(bytes: Array[Byte])
+case class MinHashSignature(bytes: Array[Byte]) extends AnyVal
 
 object MinHasher {
 
