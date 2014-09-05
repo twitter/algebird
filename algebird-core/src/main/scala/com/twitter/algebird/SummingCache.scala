@@ -37,17 +37,15 @@ class SummingCache[K, V] private (capacity: Int)(implicit sgv: Semigroup[V])
   protected def optNonEmpty(m: Map[K, V]) = if (m.isEmpty) None else Some(m)
 
   override def put(m: Map[K, V]): Option[Map[K, V]] = {
-    val bldr = Seq.newBuilder[(K, V)]
+    val bldr = Map.newBuilder[K, V]
     m.foreach {
       case (k, v) =>
-        val newV = cache.peek(k)
-          .map { oldV => sgv.plus(oldV, v) }
-          .getOrElse { v }
-
-        cache.update((k, newV)).foreach { bldr += _ }
+        cache.update(k) {
+          case None => v
+          case Some(oldV) => sgv.plus(oldV, v)
+        }.foreach { bldr += _ }
     }
-
-    optNonEmpty(MapAlgebra.sumByKey(bldr.result()))
+    optNonEmpty(bldr.result())
   }
   override def flush: Option[Map[K, V]] =
     optNonEmpty(cache.clear.toMap)

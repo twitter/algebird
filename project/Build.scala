@@ -4,6 +4,7 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import cappi.Plugin._
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
 
@@ -140,17 +141,12 @@ object AlgebirdBuild extends Build {
     )
   ).dependsOn(algebirdCore)
 
-  /* Adapted from {@link https://github.com/sirthias/scala-benchmarking-template/blob/master/project/Build.scala} */
+  /** Uses https://github.com/softprops/cappi#readme */
   lazy val algebirdCaliper = module("caliper").settings(
-    libraryDependencies ++= Seq("com.google.caliper" % "caliper" % "1.0-beta-1",
-      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
-      "com.google.code.gson" % "gson" % "1.7.1",
-      "com.sun.jersey" % "jersey-client" % "1.11" force(),
-      "com.sun.jersey" % "jersey-core" % "1.11" force(),
-      "com.twitter" %% "bijection-core" % "0.6.3"),
+     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.6.3"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
       fork in run := true
-  ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
+    ).settings(cappiSettings : _*).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
 
   lazy val algebirdUtil = module("util").settings(
     libraryDependencies += "com.twitter" %% "util-core" % "6.20.0"

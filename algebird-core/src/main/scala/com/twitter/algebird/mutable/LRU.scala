@@ -45,7 +45,7 @@ class LRU[K, V](capacity: Int) {
    * should be faster than Java:
    * https://gist.github.com/pchiusano/1423303
    */
-  private val map = new collection.mutable.OpenHashMap[K, LinkedNode[(K, V)]](capacity)
+  private val map = new java.util.HashMap[K, LinkedNode[(K, V)]](capacity)
 
   private var oldest: LinkedNode[(K, V)] = _
   private var newest: LinkedNode[(K, V)] = _
@@ -73,7 +73,7 @@ class LRU[K, V](capacity: Int) {
       // newest might be the oldest
       if (newest == linked) { newest = null }
       val res = linked.item
-      map -= res._1
+      map.remove(res._1)
       free(linked)
       Some(res)
   }
@@ -82,46 +82,45 @@ class LRU[K, V](capacity: Int) {
   def peek(k: K): Option[V] =
     // Scala throws an exception on getting from capacity 0
     if (capacity == 0) None
-    else map.get(k).map(_.item._2)
+    else map.get(k) match {
+      case null => None
+      case node => Some(node.item._2)
+    }
 
   // Update and maybe evict an old node
-  def update(kv: (K, V)): Option[(K, V)] =
-    if (capacity == 0) Some(kv)
-    else map.get(kv._1) match {
-      case None => // New node
+  def update(k: K)(fn: Option[V] => V): Option[(K, V)] =
+    if (capacity == 0) Some((k, fn(None)))
+    else map.get(k) match {
+      case null => // New node
         val evicted = if (map.size >= capacity) evictOldest else None
         val newln = alloc
         if (newest != null) { newest.next = newln }
-        newln.item = kv
+        newln.item = (k, fn(None))
         newln.prev = newest
         newest = newln
         // We are the newest and the oldest
         if (oldest == null) { oldest = newln }
         // Point the key at this node
-        map += kv._1 -> newln
+        map.put(k, newln)
         evicted
-      case Some(existing) =>
-        // If the item exists, we don't change the hashmap, just the linked list
-
-        // This is the case where we are the oldest, but there
-        // is more than one item.
-        if ((oldest == existing) && (existing.next != null)) {
-          oldest = existing.next
-        }
-        // Else we are the oldest and there is exactly 1 item,
-        // so oldest does not change
-
-        if (newest != existing) {
-          // If existing is not the newest, unlink it and make it the newest
+      case existing =>
+        def updateNewest: Unit = {
           existing.unlink
+          newest.next = existing
           existing.prev = newest
-          existing.next = null
-          if (newest != null) { newest.next = existing }
           newest = existing
-        } else {
-          // existing is the newest, no change to structure
         }
-        existing.item = kv
+        // If the item exists, we don't change the hashmap, just the linked list
+        if (existing == newest) {
+          // Don't move the node, already the newest
+        } else if (existing == oldest) {
+          // More than one node because we are the oldest but not newest
+          oldest = existing.next
+          updateNewest
+        } else {
+          updateNewest
+        }
+        existing.item = (k, fn(Some(existing.item._2)))
         None
     }
   // Returns the items from oldest to newest
