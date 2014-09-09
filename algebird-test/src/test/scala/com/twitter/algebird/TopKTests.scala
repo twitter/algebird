@@ -30,25 +30,6 @@ class TopKTests extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   val SIZE = 10
 
-  property("SortedTakeListMonoid is a Monoid") {
-    implicit val listMonoid = new SortedTakeListMonoid[Int](SIZE)
-    implicit val queueArb = Arbitrary {
-      // This monoid assumes it is getting sorted lists to operate on
-      implicitly[Arbitrary[List[Int]]].arbitrary.map { _.sorted.take(SIZE) }
-    }
-    monoidLaws[List[Int]]
-  }
-  property("SortedTakeListMonoid works") {
-    implicit val listMonoid = new SortedTakeListMonoid[Int](SIZE)
-    implicit val queueArb = Arbitrary {
-      // This monoid assumes it is getting sorted lists to operate on
-      implicitly[Arbitrary[List[Int]]].arbitrary.map { _.sorted.take(SIZE) }
-    }
-    forAll { (items: List[List[Int]]) =>
-      val byHand = (items.flatten.sorted.take(SIZE))
-      assert(Monoid.sum(items) == byHand)
-    }
-  }
   implicit def qmonoid = new PriorityQueueMonoid[Int](SIZE)
   implicit def queueArb = Arbitrary {
     implicitly[Arbitrary[List[Int]]].arbitrary.map { qmonoid.build(_) }
