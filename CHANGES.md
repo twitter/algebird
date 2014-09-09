@@ -1,6 +1,7 @@
 # Algebird #
 
 ### Version 0.8.0 ###
+* Removes deprecated monoid: https://github.com/twitter/algebird/pull/342
 * Use some value classes: https://github.com/twitter/algebird/pull/340
 * WIP: Algebird 210 211: https://github.com/twitter/algebird/pull/337
 * Use Builder in Seq/List Monoids: https://github.com/twitter/algebird/pull/338
