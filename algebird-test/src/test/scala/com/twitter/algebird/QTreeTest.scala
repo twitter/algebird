@@ -16,16 +16,24 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
 import java.util.Arrays
 
-object QTreeLaws extends Properties("QTree") {
+class QTreeLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   implicit val qtSemigroup = new QTreeSemigroup[Long](6)
@@ -35,10 +43,13 @@ object QTreeLaws extends Properties("QTree") {
     ) yield (QTree(v))
   }
 
-  property("QTree is associative") = isAssociative[QTree[Long]]
+  property("QTree is associative") {
+    isAssociative[QTree[Long]]
+  }
+
 }
 
-class QTreeTest extends Specification {
+class QTreeTest extends WordSpec with Matchers {
   def randomList(n: Long) = {
     (1L to n).map{ i => math.random }
   }
@@ -66,8 +77,8 @@ class QTreeTest extends Specification {
         val quantile = math.random
         val (lower, upper) = qt.quantileBounds(quantile)
         val truth = trueQuantile(list, quantile)
-        truth must be_>=(lower)
-        truth must be_<=(upper)
+        assert(truth >= lower)
+        assert(truth <= upper)
       }
       "always contain the true range sum within its bounds" in {
         val list = randomList(10000)
@@ -76,13 +87,13 @@ class QTreeTest extends Specification {
         val to = math.random
         val (lower, upper) = qt.rangeSumBounds(from, to)
         val truth = trueRangeSum(list, from, to)
-        truth must be_>=(lower)
-        truth must be_<=(upper)
+        assert(truth >= lower)
+        assert(truth <= upper)
       }
       "have size bounded by 2^(k+2)" in {
         val list = randomList(100000)
         val qt = buildQTree(k, list)
-        qt.size must be_<=(1 << (k + 2))
+        assert(qt.size <= (1 << (k + 2)))
       }
     }
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Twitter, Inc.
+Copyright 2014 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-class SuccessibleProperties extends PropSpec with PropertyChecks with Matchers {
-  import SuccessibleLaws.{ successibleLaws => laws }
+class PredecessibleTests extends PropSpec with PropertyChecks with Matchers {
+  import PredecessibleLaws.{ predessibleLaws => laws }
 
-  property("Int is Successible") {
+  property("Int is Predecessible") {
     laws[Int]
   }
 
-  property("Long is Successible") {
+  property("Long is Predecessible") {
     laws[Long]
   }
 
-  property("BigInt is Successible") {
+  property("BigInt is Predecessible") {
     laws[BigInt]
   }
 

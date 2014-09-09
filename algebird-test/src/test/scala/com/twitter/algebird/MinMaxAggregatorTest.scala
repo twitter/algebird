@@ -1,8 +1,8 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-class MinMaxAggregatorTest extends Specification {
+class MinMaxAggregatorTest extends WordSpec with Matchers {
   val data = List(1, 3, 5, 0, 7, 6)
 
   sealed trait TestElementParent
@@ -24,20 +24,20 @@ class MinMaxAggregatorTest extends Specification {
   "MinAggregator" should {
     "produce the minimum value" in {
       val agg = Min.aggregator[Int]
-      agg(data) must be_==(0)
+      assert(agg(data) == 0)
 
       val agg2 = Min.aggregator[TestElementParent]
-      agg2(data2) must be_==(TestElementA)
+      assert(agg2(data2) == TestElementA)
     }
   }
 
   "MaxAggregator" should {
     "produce the maximum value" in {
       val agg = Max.aggregator[Int]
-      agg(data) must be_==(7)
+      assert(agg(data) == 7)
 
       val agg2 = Max.aggregator[TestElementParent]
-      agg2(data2) must be_==(TestElementC)
+      assert(agg2(data2) == TestElementC)
     }
   }
 }

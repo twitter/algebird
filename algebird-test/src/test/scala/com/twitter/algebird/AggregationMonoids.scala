@@ -1,12 +1,12 @@
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalacheck.{ Gen, Arbitrary }
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 
-object AggregationMonoidSpecification extends Properties("Aggregations") {
+class AggregationMonoidSpecification extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
+  import Gen.choose
 
   def approxEq(f1: Double, f2: Double) = (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10
 
@@ -18,8 +18,11 @@ object AggregationMonoidSpecification extends Properties("Aggregations") {
   }
 
   implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
-  property("DecayedValue Monoid laws") = monoidLawsEq[DecayedValue] { (dvl, dvr) =>
-    approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
+
+  property("DecayedValue Monoid laws") {
+    monoidLawsEq[DecayedValue] { (dvl, dvr) =>
+      approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
+    }
   }
 
   implicit val avgen = Arbitrary {
@@ -29,9 +32,11 @@ object AggregationMonoidSpecification extends Properties("Aggregations") {
     } yield AveragedValue(cnt, v)
   }
 
-  property("AveragedValue Group laws") = groupLawsEq[AveragedValue] { (avl, avr) =>
-    ((avl.count == 0L) && (avr.count == 0L)) || {
-      approxEq(avl.value, avr.value) && (avl.count == avr.count)
+  property("AveragedValue Group laws") {
+    groupLawsEq[AveragedValue] { (avl, avr) =>
+      ((avl.count == 0L) && (avr.count == 0L)) || {
+        approxEq(avl.value, avr.value) && (avl.count == avr.count)
+      }
     }
   }
 
@@ -45,11 +50,13 @@ object AggregationMonoidSpecification extends Properties("Aggregations") {
     } yield new Moments(m0, m1, m2, m3, m4)
   }
 
-  property("Moments Group laws") = groupLawsEq[Moments] { (ml, mr) =>
-    (ml.m0 == mr.m0) &&
-      approxEq(ml.m1, mr.m1) &&
-      approxEq(ml.m2, mr.m2) &&
-      approxEq(ml.m3, mr.m3) &&
-      approxEq(ml.m4, mr.m4)
+  property("Moments Group laws") {
+    groupLawsEq[Moments] { (ml, mr) =>
+      (ml.m0 == mr.m0) &&
+        approxEq(ml.m1, mr.m1) &&
+        approxEq(ml.m2, mr.m2) &&
+        approxEq(ml.m3, mr.m3) &&
+        approxEq(ml.m4, mr.m4)
+    }
   }
 }

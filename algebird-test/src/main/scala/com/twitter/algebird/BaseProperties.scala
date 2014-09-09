@@ -16,15 +16,25 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Gen, Properties }
+import org.scalacheck.Arbitrary
+import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 import scala.math.Equiv
+
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
 
 object BaseProperties {
   def defaultEq[T](t0: T, t1: T) = t0 == t1
+
+  trait HigherEq[M[_]] {
+    def apply[T](m: M[T], n: M[T]): Boolean
+  }
+
+  class DefaultHigherEq[M[_]] extends HigherEq[M] {
+    override def apply[T](m: M[T], n: M[T]) = m == n
+  }
 
   def isNonZero[V: Semigroup](v: V) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(v)
@@ -100,11 +110,13 @@ object BaseProperties {
   def validZero[T: Monoid: Arbitrary] = validZeroEq[T](defaultEq _)
 
   def monoidLaws[T: Monoid: Arbitrary] = validZero[T] && semigroupLaws[T] && isNonZeroWorksMonoid[T]
-  def monoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean) =
+
+  def monoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop =
     validZeroEq[T](eqfn) && semigroupLawsEq[T](eqfn)
 
   def commutativeMonoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean) =
     monoidLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)
+
   def commutativeMonoidLaws[T: Monoid: Arbitrary] = commutativeMonoidLawsEq[T](defaultEq _)
 
   def hasAdditiveInversesDifferentTypes[T: Group, U <: T: Arbitrary] = forAll { (a: U) =>

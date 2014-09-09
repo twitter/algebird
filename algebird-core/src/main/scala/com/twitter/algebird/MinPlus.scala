@@ -26,15 +26,15 @@ package com.twitter.algebird
  */
 
 // This is basically a sigil class to represent using the Min-Plus semi-ring
-sealed abstract class MinPlus[+V] extends java.io.Serializable
+sealed trait MinPlus[+V] extends Any with java.io.Serializable
 case object MinPlusZero extends MinPlus[Nothing]
-case class MinPlusValue[V](get: V) extends MinPlus[V]
+case class MinPlusValue[V](get: V) extends AnyVal with MinPlus[V]
 
 class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends Ring[MinPlus[V]] {
   override def zero = MinPlusZero
   override def negate(mv: MinPlus[V]) =
     sys.error("MinPlus is a semi-ring, there is no additive inverse")
-  override lazy val one = MinPlusValue(monoid.zero)
+  override def one: MinPlus[V] = MinPlusValue(monoid.zero)
   // a+b = min(a,b)
   override def plus(left: MinPlus[V], right: MinPlus[V]) =
     // We are doing the if to avoid an allocation:

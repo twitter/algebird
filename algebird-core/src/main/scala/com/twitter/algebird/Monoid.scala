@@ -94,13 +94,26 @@ class ListMonoid[T] extends Monoid[List[T]] {
   override def plus(left: List[T], right: List[T]) = left ++ right
   override def sumOption(items: TraversableOnce[List[T]]): Option[List[T]] =
     if (items.isEmpty) None
-    else Some(items.foldRight(Nil: List[T])(_ ::: _))
+    else {
+      // ListBuilder mutates the tail of the list until
+      // result is called so that it is O(N) to push N things on, not N^2
+      val builder = List.newBuilder[T]
+      items.foreach { builder ++= _ }
+      Some(builder.result())
+    }
 }
 
 // equivalent to ListMonoid
 class SeqMonoid[T] extends Monoid[Seq[T]] {
   override def zero = Seq[T]()
   override def plus(left: Seq[T], right: Seq[T]) = left ++ right
+  override def sumOption(items: TraversableOnce[Seq[T]]): Option[Seq[T]] =
+    if (items.isEmpty) None
+    else {
+      val builder = Seq.newBuilder[T]
+      items.foreach { builder ++= _ }
+      Some(builder.result())
+    }
 }
 
 /**
@@ -134,7 +147,7 @@ class Function1Monoid[T] extends Monoid[Function1[T, T]] {
 }
 
 // To use the OrValMonoid wrap your item in a OrVal object
-case class OrVal(get: Boolean)
+case class OrVal(get: Boolean) extends AnyVal
 
 object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
@@ -150,7 +163,7 @@ object OrValMonoid extends Monoid[OrVal] {
 }
 
 // To use the AndValMonoid wrap your item in a AndVal object
-case class AndVal(get: Boolean)
+case class AndVal(get: Boolean) extends AnyVal
 
 object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid

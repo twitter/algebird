@@ -1,14 +1,11 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
-
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalatest.{ DiagrammedAssertions, WordSpec, PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 import java.io.{ ObjectOutputStream, ByteArrayOutputStream }
 
-object BloomFilterLaws extends Properties("BloomFilter") {
+class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val NUM_HASHES = 6
@@ -18,15 +15,15 @@ object BloomFilterLaws extends Properties("BloomFilter") {
   implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH, SEED)
   implicit val bfGen =
     Arbitrary {
-      for (v <- choose(0, 10000)) yield (bfMonoid.create(v.toString))
+      for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
     }
 
-  property("BloomFilter is a Monoid") = monoidLaws[BF]
+  property("BloomFilter is a Monoid") {
+    monoidLaws[BF]
+  }
 }
 
-object BFHashIndices extends Properties("BFHash") {
-  import org.scalacheck.Prop.forAll
-
+class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
@@ -35,12 +32,18 @@ object BFHashIndices extends Properties("BFHash") {
   implicit val bfHash: Arbitrary[BFHash] =
     Arbitrary {
       for {
-        hashes <- choose(1, 10)
-        width <- choose(100, 5000000)
+        hashes <- Gen.choose(1, 10)
+        width <- Gen.choose(100, 5000000)
       } yield BFHash(hashes, width, SEED)
     }
 
-  property("Indices are non negative") = forAll{ (hash: BFHash, v: Long) => hash.apply(v.toString).forall(_ >= 0) }
+  property("Indices are non negative") {
+    forAll { (hash: BFHash, v: Long) =>
+      hash.apply(v.toString).foreach { e =>
+        assert(e >= 0)
+      }
+    }
+  }
 
   /**
    *   This is the version of the BFHash as of before the "negative values fix"
@@ -76,22 +79,22 @@ object BFHashIndices extends Properties("BFHash") {
   implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
     Arbitrary {
       for {
-        hashes <- choose(1, 10)
-        width <- choose(100, 5000000)
+        hashes <- Gen.choose(1, 10)
+        width <- Gen.choose(100, 5000000)
       } yield (BFHash(hashes, width, SEED), NegativeBFHash(hashes, width, SEED))
     }
 
-  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") =
-    forAll{
-      (pair: (BFHash, NegativeBFHash), v: Long) =>
-        val s = v.toString
-        val (hash, negativeHash) = pair
-        val indices = negativeHash.apply(s)
-        indices == hash.apply(s) || indices.exists(_ < 0)
+  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") {
+    forAll { (pair: (BFHash, NegativeBFHash), v: Long) =>
+      val s = v.toString
+      val (hash, negativeHash) = pair
+      val indices = negativeHash.apply(s)
+      assert(indices == hash.apply(s) || indices.exists(_ < 0))
     }
+  }
 }
 
-class BloomFilterTest extends Specification {
+class BloomFilterTest extends WordSpec with Matchers {
 
   val SEED = 1
   val RAND = new scala.util.Random
@@ -107,8 +110,8 @@ class BloomFilterTest extends Specification {
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = bfMonoid.create(entries: _*)
 
-            entries.foreach{
-              i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach{ i =>
+              assert(bf.contains(i.toString).isTrue)
             }
           }
       }
@@ -117,27 +120,26 @@ class BloomFilterTest extends Specification {
     "have small false positive rate" in {
       val iter = 10000
 
-      Seq(0.1, 0.01, 0.001).foreach{
-        fpProb =>
-          {
-            val fps = (0 until iter).par.map{
-              _ =>
-                {
-                  val numEntries = RAND.nextInt(10) + 1
+      Seq(0.1, 0.01, 0.001).foreach { fpProb =>
+        {
+          val fps = (0 until iter).par.map{
+            _ =>
+              {
+                val numEntries = RAND.nextInt(10) + 1
 
-                  val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
+                val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
 
-                  val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
-                  val bf = bfMonoid.create(entries.drop(1): _*)
+                val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
+                val bf = bfMonoid.create(entries.drop(1): _*)
 
-                  if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
-                }
-            }
-
-            val observedFpProb = fps.sum / fps.size
-
-            observedFpProb must be_<=(2 * fpProb)
+                if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
+              }
           }
+
+          val observedFpProb = fps.sum / fps.size
+
+          assert(observedFpProb <= 2 * fpProb)
+        }
       }
     }
 
@@ -148,9 +150,9 @@ class BloomFilterTest extends Specification {
         val bf = bfMonoid.create(items: _*)
         val size = bf.size
 
-        (size ~ exactCardinality) must be_==(true)
-        size.min must be_<=(size.estimate)
-        size.max must be_>=(size.estimate)
+        assert(size ~ exactCardinality)
+        assert(size.min <= size.estimate)
+        assert(size.max >= size.estimate)
       }
     }
 
@@ -163,8 +165,8 @@ class BloomFilterTest extends Specification {
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = aggregator(entries)
 
-            entries.foreach{
-              i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach { i =>
+              assert(bf.contains(i.toString).isTrue)
             }
           }
       }
@@ -184,9 +186,11 @@ class BloomFilterTest extends Specification {
       val bf = BloomFilter(10, 0.1, SEED).create(items: _*)
       val bytesBeforeSizeCalled = new String(serialize(bf))
       bf.size
-      bf.contains("1").isTrue must be_==(true)
+
+      assert(bf.contains("1").isTrue)
+
       val bytesAfterSizeCalled = new String(serialize(bf))
-      bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
+      assert(bytesBeforeSizeCalled == bytesAfterSizeCalled)
     }
 
     /**
@@ -199,7 +203,7 @@ class BloomFilterTest extends Specification {
       val s = "7024497610539761509"
       val index = bfHash.apply(s).head
 
-      index must be_>=(0)
+      assert(index >= 0)
     }
   }
 }

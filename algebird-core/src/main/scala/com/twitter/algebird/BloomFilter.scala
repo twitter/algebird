@@ -38,7 +38,7 @@ class RichCBitSet(val cb: CBitSet) {
   def toBitSet(width: Int): BitSet = {
     val a = new Array[Long]((width + 63) / 64)
     cb.asScala.foreach{ i: java.lang.Integer => a(i.intValue / 64) |= 1L << (i.intValue % 64) }
-    BitSet.fromArray(a)
+    BitSet.fromBitMask(a)
   }
 }
 

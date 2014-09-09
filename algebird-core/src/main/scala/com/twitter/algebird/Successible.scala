@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * This is a monoid to represent things which increase. Note that it is important
+ * This is a typeclass to represent things which increase. Note that it is important
  * that a value after being incremented is always larger than it was before. Note
  * that next returns Option because this class comes with the notion of the "greatest"
  * key, which is None. Ints, for example, will cycle if next(java.lang.Integer.MAX_VALUE)
@@ -24,9 +24,9 @@ package com.twitter.algebird
  * which our ordering is violating. This is also useful for closed sets which have a fixed
  * progression.
  */
-trait Successible[@specialized(Int, Long, Float, Double) T] {
+trait Successible[T] {
   def next(old: T): Option[T]
-  def next(old: Option[T]): Option[T] = old flatMap next
+  def next(old: Option[T]): Option[T] = old.flatMap(next)
   def iterateNext(old: T): Iterable[T] = {
     val self = this
     // TODO in scala 2.11, there is an AbstractIterable which should be used here
@@ -36,20 +36,38 @@ trait Successible[@specialized(Int, Long, Float, Double) T] {
       def iterator =
         Iterator.iterate[Option[T]](Some(old)) { self.next(_) }
           .takeWhile(_.isDefined)
-          .map(_.get)
+          .collect { case Some(t) => t }
     }
   }
-  def ordering: Ordering[T]
+  /**
+   * The law is:
+   * next(t)
+   *   .map { n => partialOrdering.lteq(t, n) && (!partialOrdering.equiv(t, n)) }
+   *   .getOrElse(true)
+   *
+   * Note Ordering extends PartialOrdering, so we are taking a weak constraint
+   * that some items can be ordered, and namely, the sequence of items returned
+   * by next is strictly increasing
+   */
+  def partialOrdering: PartialOrdering[T]
 }
 
 object Successible {
+  /**
+   * This makes it easy to construct from a function when T has an ordering, which is common
+   * Note, your function must respect the ordering
+   */
+  def fromNextOrd[T](nextFn: T => Option[T])(implicit ord: Ordering[T]): Successible[T] = new Successible[T] {
+    def next(t: T) = nextFn(t)
+    def partialOrdering = ord
+  }
   // enables: Successible.next(2) == Some(3)
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
   def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] = succ.next(t)
   def iterateNext[T](old: T)(implicit succ: Successible[T]): Iterable[T] =
     succ.iterateNext(old)
 
-  implicit def numSucc[N: Numeric]: Successible[N] = new NumericSuccessible[N]
+  implicit def integralSucc[N: Integral]: Successible[N] = new IntegralSuccessible[N]
 
   /**
    * The difference between this and the default ordering on Option[T] is that it treats None
@@ -64,19 +82,20 @@ object Successible {
         case (None, None) => 0
       }
   }
+  // For some sad reason, scala does not define implicit PartialOrderings this way
+  implicit def partialFromOrdering[T](implicit ord: Ordering[T]): PartialOrdering[T] = ord
 }
 
-// TODO Remove Ordering. It is unused. Note Numeric and Integral extend ordering
-class NumericSuccessible[@specialized(Int, Long, Float, Double) T: Numeric: Ordering] extends Successible[T] {
+class IntegralSuccessible[T: Integral] extends Successible[T] {
+  private[this] val integral = implicitly[Integral[T]]
   def next(old: T) = {
-    val numeric = implicitly[Numeric[T]]
-    val newV = numeric.plus(old, numeric.one)
-    if (ordering.compare(newV, old) <= 0) {
+    val newV = integral.plus(old, integral.one)
+    if (integral.compare(newV, old) <= 0) {
       None
     } else {
       Some(newV)
     }
   }
 
-  def ordering: Ordering[T] = implicitly[Numeric[T]]
+  def partialOrdering = integral
 }
