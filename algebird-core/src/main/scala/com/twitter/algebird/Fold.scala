@@ -181,6 +181,11 @@ final class FoldState[X, -I, +O] private[algebird] (
  */
 object Fold {
   /**
+   * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
+   */
+  implicit def applicative[I]: Applicative[({ type L[O] = Fold[I, O] })#L] = new FoldApplicative[I]
+
+  /**
    * Turn a common Scala foldLeft into a Fold.
    * The accumulator MUST be immutable and serializable.
    */
@@ -314,7 +319,7 @@ object Fold {
   /**
    * A Fold that returns the product of a numeric sequence. Does not protect against overflow.
    */
-  def product[I](implicit numeric: Numeric[I]): Fold[I, I] =
+  def product[I](implicit numeric: Ring[I]): Fold[I, I] =
     Fold.foldLeft(numeric.one) { case (x, i) => numeric.times(x, i) }
 
   /**
@@ -350,7 +355,9 @@ object Fold {
 /**
  * Folds are Applicatives!
  */
-trait FoldApplicative[I] extends Applicative[({ type L[A] = Fold[I, A] })#L] {
+class FoldApplicative[I] extends Applicative[({ type L[O] = Fold[I, O] })#L] {
+  override def map[T, U](mt: Fold[I, T])(fn: T => U): Fold[I, U] =
+    mt.map(fn)
   override def apply[T](v: T): Fold[I, T] =
     Fold.const(v)
   override def join[T, U](mt: Fold[I, T], mu: Fold[I, U]): Fold[I, (T, U)] =
