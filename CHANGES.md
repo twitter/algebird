@@ -1,5 +1,16 @@
 # Algebird #
 
+### Version 0.8.0 ###
+* Removes deprecated monoid: https://github.com/twitter/algebird/pull/342
+* Use some value classes: https://github.com/twitter/algebird/pull/340
+* WIP: Algebird 210 211: https://github.com/twitter/algebird/pull/337
+* Use Builder in Seq/List Monoids: https://github.com/twitter/algebird/pull/338
+* Add a commment to close 334: https://github.com/twitter/algebird/pull/339
+* Make trait public that should never have been private: https://github.com/twitter/algebird/pull/335
+* Fix some issues with Successible/Predessible: https://github.com/twitter/algebird/pull/332
+* Add Applicative and Functor as superclasses of Monad: https://github.com/twitter/algebird/pull/330
+* Updated Maven section to updated version 0.7.0: https://github.com/twitter/algebird/pull/329
+
 ### Version 0.7.0 ###
 * simplification for spacesaver. before buckets were kept in an option str...: https://github.com/twitter/algebird/pull/308
 * Dynamic Summer, may use heuristics to decide not to keep a tuple in a buffer for aggregation.: https://github.com/twitter/algebird/pull/314

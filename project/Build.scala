@@ -12,7 +12,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.10.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.2"),
     ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
@@ -98,7 +98,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.6.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.8.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -141,7 +141,12 @@ object AlgebirdBuild extends Build {
     )
   ).dependsOn(algebirdCore)
 
-  /** Uses https://github.com/softprops/cappi#readme */
+  /** Uses https://github.com/softprops/cappi#readme
+   * Note, a bug in cappi mis-reports the benchmark
+   * names.
+   *
+   * use cappi::benchmarkOnly com.twitter.algebird.caliper.HllBenchmark
+   */
   lazy val algebirdCaliper = module("caliper").settings(
      libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.6.3"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
@@ -153,7 +158,7 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.3"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.7.0"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
 
