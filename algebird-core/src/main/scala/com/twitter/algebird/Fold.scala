@@ -26,7 +26,7 @@ import scala.collection.mutable.Builder
  * A Fold accumulates inputs (I) into some internal type (X), converting to a defined output type
  * (O) when done.  We use existential types to hide internal details and to allow for internal and
  * external (X and O) types to differ for "map" and "join."
- * 
+ *
  * In discussing this type we draw parallels to Function1 and related types. You can think of a
  * fold as a function "Seq[I] => O" but in reality we do not have to materialize the input sequence
  * at once to "run" the fold.
@@ -34,13 +34,13 @@ import scala.collection.mutable.Builder
  * The traversal of the input data structure is NOT done by Fold itself. Instead we expose some
  * methods like "overTraversable" that know how to iterate through various sequence types and drive
  * the fold. We also expose some internal state so library authors can fold over their own types.
- *  
- * See the companion object for constructors. 
+ *
+ * See the companion object for constructors.
  */
 sealed trait Fold[-I, +O] extends Serializable {
   /**
    * Users can ignore this type.
-   *  
+   *
    * The internal accumulator type. No one outside this Fold needs to know what this is, and that's
    * a good thing. It keeps type signatures sane and makes this easy to use for the amount of
    * flexibility it provides.
@@ -50,11 +50,11 @@ sealed trait Fold[-I, +O] extends Serializable {
   /**
    * Users can ignore this method.  It is exposed so library authors can run folds over their own
    * sequence types.
-   * 
+   *
    * "build" constructs a FoldState, which tells us how to run the fold.  It is expected that we can
    * run the same Fold many times over different data structures, but we must build a new FoldState
    * every time.
-   * 
+   *
    * See FoldState for information on how to use this for your own sequence types.
    */
   def build(): FoldState[X, I, O]
@@ -86,8 +86,7 @@ sealed trait Fold[-I, +O] extends Serializable {
         new FoldState(
           { case ((x, y), i) => (first.add(x, i), second.add(y, i)) },
           (first.start, second.start),
-          { case (x, y) => f(first.end(x), second.end(y)) }
-        )
+          { case (x, y) => f(first.end(x), second.end(y)) })
       }
     }
   }
@@ -100,7 +99,7 @@ sealed trait Fold[-I, +O] extends Serializable {
 
   /**
    * Transforms the input of the fold before every accumulation. (The name comes from "contravariant
-   * map.") This is analogous to "Function1.andThen." 
+   * map.") This is analogous to "Function1.andThen."
    */
   def contramap[H](f: H => I): Fold[H, O] = {
     val self = this
@@ -141,25 +140,24 @@ sealed trait Fold[-I, +O] extends Serializable {
 /**
  * A FoldState defines a left fold with a "hidden" accumulator type. It is exposed so
  * library authors can run Folds over their own sequence types.
- * 
+ *
  * The fold can be executed correctly according to the properties of "add" and your traversed
  * data structure. For example, the "add" function of a monoidal fold will be associative. A
  * FoldState is valid for only one iteration because the accumulator (seeded by "start"  may be
  * mutable.
- * 
+ *
  * The three components of a fold are
  *   add: (X, I) => X - updates and returns internal state for every input I
  *   start: X - the initial state
  *   end: X => O - transforms internal state to a final result
- * 
+ *
  * Folding over Seq(x, y) would produce the result
  *   end(add(add(start, x), y))
  */
 final class FoldState[X, -I, +O] private[algebird] (
   val add: (X, I) => X,
   val start: X,
-  val end: X => O
-) extends Serializable {
+  val end: X => O) extends Serializable {
   /**
    * Transforms the output type of the FoldState (see Fold.map).
    */
@@ -175,7 +173,7 @@ final class FoldState[X, -I, +O] private[algebird] (
 
 /**
  * Methods to create and run Folds.
- * 
+ *
  * The Folds defined here are immutable and serializable, which we expect by default. It is
  * important that you as a user indicate mutability or non-serializability when defining new Folds.
  * Additionally, it is recommended that "end" functions not mutate the accumulator in order to
@@ -218,8 +216,7 @@ object Fold {
     Fold.foldMutable[Builder[I, C[I]], I, C[I]] (
       { case (b, i) => b += i },
       { _ => cbf.apply },
-      { _.result }
-    )
+      { _.result })
 
   /**
    * An even simpler Fold that collects into a Seq.  Shorthand for "container[I, Seq];" fewer type
@@ -279,13 +276,22 @@ object Fold {
   /**
    * A Fold that returns the sum of a numeric sequence. Does not protect against overflow.
    */
-  def sum[I](implicit numeric: Numeric[I]): Fold[I, I] =
+  def sum[I](implicit numeric: Monoid[I]): Fold[I, I] =
     Fold.foldLeft(numeric.zero) { case (x, i) => numeric.plus(x, i) }
+
+  /**
+   * For a semigroup, if we get more than 0 items, use plus
+   */
+  def sumOption[T](implicit sg: Semigroup[T]): Fold[T, Option[T]] =
+    Fold.foldLeft(None: Option[T]) {
+      case (None, i) => Some(i)
+      case (Some(l), r) => Some(sg.plus(l, r))
+    }
 
   /**
    * A Fold that returns the product of a numeric sequence. Does not protect against overflow.
    */
-  def product[I](implicit numeric: Numeric[I]): Fold[I, I] =
+  def product[I](implicit numeric: Ring[I]): Fold[I, I] =
     Fold.foldLeft(numeric.one) { case (x, i) => numeric.times(x, i) }
 
   /**
@@ -296,14 +302,14 @@ object Fold {
 
   /**
    * A Fold that returns "true" if all elements of the sequence statisfy the predicate.
-   * Note this does not short-circuit enumeration of the sequence. 
+   * Note this does not short-circuit enumeration of the sequence.
    */
   def forall[I](pred: I => Boolean): Fold[I, Boolean] =
     foldLeft(true) { (b, i) => b && pred(i) }
 
   /**
    * A Fold that returns "true" if any element of the sequence statisfies the predicate.
-   * Note this does not short-circuit enumeration of the sequence. 
+   * Note this does not short-circuit enumeration of the sequence.
    */
   def exists[I](pred: I => Boolean): Fold[I, Boolean] =
     foldLeft(false) { (b, i) => b || pred(i) }
