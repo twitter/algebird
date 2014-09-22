@@ -1,5 +1,41 @@
 # Algebird #
 
+### Version 0.8.0 ###
+* Removes deprecated monoid: https://github.com/twitter/algebird/pull/342
+* Use some value classes: https://github.com/twitter/algebird/pull/340
+* WIP: Algebird 210 211: https://github.com/twitter/algebird/pull/337
+* Use Builder in Seq/List Monoids: https://github.com/twitter/algebird/pull/338
+* Add a commment to close 334: https://github.com/twitter/algebird/pull/339
+* Make trait public that should never have been private: https://github.com/twitter/algebird/pull/335
+* Fix some issues with Successible/Predessible: https://github.com/twitter/algebird/pull/332
+* Add Applicative and Functor as superclasses of Monad: https://github.com/twitter/algebird/pull/330
+* Updated Maven section to updated version 0.7.0: https://github.com/twitter/algebird/pull/329
+
+### Version 0.7.0 ###
+* simplification for spacesaver. before buckets were kept in an option str...: https://github.com/twitter/algebird/pull/308
+* Dynamic Summer, may use heuristics to decide not to keep a tuple in a buffer for aggregation.: https://github.com/twitter/algebird/pull/314
+* Was a missing call to the update if we had flushed. Now we just do it as...: https://github.com/twitter/algebird/pull/324
+* Bump to 2.10.4 in travis: https://github.com/twitter/algebird/pull/323
+* Feature/auto formatter ran: https://github.com/twitter/algebird/pull/321
+* Little commit fixing up some spacing per our norms:: https://github.com/twitter/algebird/pull/319
+* provider methods for java: https://github.com/twitter/algebird/pull/317
+* Serializable adaptive matrix: https://github.com/twitter/algebird/pull/318
+* Clean up comments: https://github.com/twitter/algebird/pull/315
+* make distribution immutable now that it contains mutable counters: https://github.com/twitter/algebird/pull/313
+* a monoid that keeps track of the monoid usage: https://github.com/twitter/algebird/pull/311
+
+### Version 0.6.0 ###
+* make constructors for SpaceSaver subclasses public so that deserializers..: https://github.com/twitter/algebird/pull/289
+* Restoring optimized SketchMapMonoid#sumOption: https://github.com/twitter/algebird/pull/293
+* Newer caliper hll benchmark: https://github.com/twitter/algebird/pull/297
+* hll optimization: https://github.com/twitter/algebird/pull/299
+* Optimize the storage backend used in sketch map: https://github.com/twitter/algebird/pull/301
+* migrate async summers from Summingbird: https://github.com/twitter/algebird/pull/296
+* add sumOption to EventuallySemiGroup: https://github.com/twitter/algebird/pull/306
+* Heavyhitters no longer attempts lazy storage in SketchMap: https://github.com/twitter/algebird/pull/305
+* Async Maps performance improvements: https://github.com/twitter/algebird/pull/302
+* Make the AsyncListSum be immutable again: https://github.com/twitter/algebird/pull/309
+
 ### Version 0.5.0 ###
 * Remove handling that doesn't seem needed/wanted for longs: https://github.com/twitter/algebird/pull/287
 * Add average() for DecayedValue: https://github.com/twitter/algebird/pull/286

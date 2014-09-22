@@ -17,35 +17,41 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
-import org.scalacheck.Properties
-import org.scalacheck.Prop._
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 
-object AggregatorLaws extends Properties("Aggregator") {
+class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
-  implicit def aggregator[A,B,C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]):
-    Arbitrary[Aggregator[A,B,C]] = Arbitrary { for {
+  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+    for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
-    } yield new Aggregator[A,B,C] {
-      def prepare(a:A)= pp(a)
-      def reduce(l:B, r:B) = sg.plus(l,r)
-      def present(b:B) = ps(b)
+    } yield new Aggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def reduce(l: B, r: B) = sg.plus(l, r)
+      def present(b: B) = ps(b)
     }
   }
 
-  property("composing before Aggregator is correct") = forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int,Int,Int]) =>
-    val composed = ag.composePrepare(compose)
-    in.isEmpty || composed(in) == ag(in.map(compose))
+  property("composing before Aggregator is correct") {
+    forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
+      val composed = ag.composePrepare(compose)
+      assert(in.isEmpty || composed(in) == ag(in.map(compose)))
+    }
   }
-  property("andThen after Aggregator is correct") = forAll { (in: List[Int], andt: (Int => Int), ag: Aggregator[Int,Int,Int]) =>
-    val ag1 = ag.andThenPresent(andt)
-    in.isEmpty || ag1(in) == andt(ag(in))
+
+  property("andThen after Aggregator is correct") {
+    forAll { (in: List[Int], andt: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
+      val ag1 = ag.andThenPresent(andt)
+      assert(in.isEmpty || ag1(in) == andt(ag(in)))
+    }
   }
-  property("composing two Aggregators is correct") = forAll { (in: List[Int], ag1: Aggregator[Int,Int,Int], ag2:
-    Aggregator[Int,Double,String]) =>
-    val c = GeneratedTupleAggregator.from2(ag1, ag2)
-    in.isEmpty || c(in) == (ag1(in), ag2(in))
+
+  property("composing two Aggregators is correct") {
+    forAll { (in: List[Int], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[Int, Double, String]) =>
+      val c = GeneratedTupleAggregator.from2(ag1, ag2)
+      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+    }
   }
 }

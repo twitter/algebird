@@ -16,9 +16,11 @@
 
 package com.twitter.algebird.bijection
 
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-object AlgebirdBijectionLaws extends Properties("AlgebirdBijections") {
+class AlgebirdBijectionLaws extends PropSpec with PropertyChecks with Matchers {
   // TODO: Fill in tests. Ideally we'd publish an algebird-testing
   // module before merging this in.
 }

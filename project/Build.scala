@@ -4,24 +4,15 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
-  def withCross(dep: ModuleID) =
-    dep cross CrossVersion.binaryMapped {
-      case "2.9.3" => "2.9.2" // TODO: hack because twitter hasn't built things against 2.9.3
-      case version if version startsWith "2.10" => "2.10" // TODO: hack because sbt is broken
-      case x => x
-    }
-
-  def specs2Import(scalaVersion: String) = scalaVersion match {
-      case version if version startsWith "2.9" => "org.specs2" %% "specs2" % "1.12.4.1" % "test"
-      case version if version startsWith "2.10" => "org.specs2" %% "specs2" % "1.13" % "test"
-  }
-
-  val sharedSettings = Project.defaultSettings ++ Seq(
+  val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
-    scalaVersion := "2.9.3",
-    crossScalaVersions := Seq("2.9.3", "2.10.0"),
+    scalaVersion := "2.10.4",
+    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
       "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -32,9 +23,18 @@ object AlgebirdBuild extends Build {
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
-    scalacOptions ++= Seq("-unchecked", "-deprecation"),
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-language:implicitConversions", "-language:higherKinds", "-language:existentials"),
+
+    scalacOptions <++= (scalaVersion) map { sv =>
+        if (sv startsWith "2.10")
+          Seq("-Xdivergence211")
+        else
+          Seq()
+    },
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
+
+    libraryDependencies += "junit" % "junit" % "4.11" % "test",
 
     // Publishing options:
     publishMavenStyle := true,
@@ -80,6 +80,14 @@ object AlgebirdBuild extends Build {
       </developers>)
   ) ++ mimaDefaultSettings
 
+
+  lazy val formattingPreferences = {
+    import scalariform.formatter.preferences._
+    FormattingPreferences().
+      setPreference(AlignParameters, false).
+      setPreference(PreserveSpaceBeforeArguments, true)
+  }
+
   /**
     * This returns the youngest jar we released that is compatible with
     * the current.
@@ -89,7 +97,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.9.3") % "0.5.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.8.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -127,25 +135,30 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdTest = module("test").settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.10.0"
-    ),
-    libraryDependencies <+= scalaVersion(specs2Import(_))
+      "org.scalacheck" %% "scalacheck" % "1.11.5",
+      "org.scalatest" %% "scalatest" % "2.2.2"
+    )
   ).dependsOn(algebirdCore)
 
   /* Adapted from {@link https://github.com/sirthias/scala-benchmarking-template/blob/master/project/Build.scala} */
   lazy val algebirdCaliper = module("caliper").settings(
-    libraryDependencies ++= Seq("com.google.caliper" % "caliper" % "0.5-rc1",
-      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
-      "com.google.code.gson" % "gson" % "1.7.1"),
+    libraryDependencies ++= Seq("com.google.caliper" % "caliper" % "1.0-beta-1",
+      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
+      "com.google.code.gson" % "gson" % "1.7.1",
+      "com.sun.jersey" % "jersey-client" % "1.11" force(),
+      "com.sun.jersey" % "jersey-core" % "1.11" force(),
+      "com.twitter" %% "bijection-core" % "0.7.0"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
       fork in run := true
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
 
   lazy val algebirdUtil = module("util").settings(
-    libraryDependencies += withCross("com.twitter" %% "util-core" % "6.3.0")
+    libraryDependencies += "com.twitter" %% "util-core" % "6.20.0"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.6.2"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.7.0"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
+
+

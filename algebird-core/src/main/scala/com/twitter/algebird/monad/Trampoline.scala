@@ -40,13 +40,13 @@ final case class FlatMapped[C, A](start: Trampoline[C], fn: C => Trampoline[A]) 
 object Trampoline {
   val unit: Trampoline[Unit] = Done(())
   def apply[A](a: A): Trampoline[A] = Done(a)
-  def lazyVal[A](a: => A): Trampoline[A] = FlatMapped(unit, { (u:Unit) => Done(a) })
+  def lazyVal[A](a: => A): Trampoline[A] = FlatMapped(unit, { (u: Unit) => Done(a) })
   /**
    * Use this to call to another trampoline returning function
    * you break the effect of this if you directly recursively call a Trampoline
    * returning function
    */
-  def call[A](layzee: => Trampoline[A]): Trampoline[A] = FlatMapped(unit, { (u:Unit) => layzee })
+  def call[A](layzee: => Trampoline[A]): Trampoline[A] = FlatMapped(unit, { (u: Unit) => layzee })
   implicit val Monad: Monad[Trampoline] = new Monad[Trampoline] {
     def apply[A](a: A) = Done(a)
     def flatMap[A, B](start: Trampoline[A])(fn: A => Trampoline[B]) = start.flatMap(fn)

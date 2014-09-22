@@ -16,21 +16,22 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
-object DecayedVectorProperties extends Properties("DecayedVector") {
+class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
-  implicit val mpint: Arbitrary[DecayedVector[({type x[a]=Map[Int, a]})#x]] = Arbitrary { for {
-      t <- choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
-      m <- arbitrary[Map[Int, Double]]
-    } yield DecayedVector.forMap(m, t) }
+  implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
+    for {
+      t <- Gen.choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
+      m <- Arbitrary.arbitrary[Map[Int, Double]]
+    } yield DecayedVector.forMap(m, t)
+  }
 
   // TODO: we won't need this when we have an Equatable trait
-  def decayedMapEqFn(a: DecayedVector[({type x[a]=Map[Int, a]})#x], b: DecayedVector[({type x[a]=Map[Int, a]})#x]) = {
+  def decayedMapEqFn(a: DecayedVector[({ type x[a] = Map[Int, a] })#x], b: DecayedVector[({ type x[a] = Map[Int, a] })#x]) = {
     def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =
       a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
@@ -45,5 +46,7 @@ object DecayedVectorProperties extends Properties("DecayedVector") {
     mapsAreClose && timesAreClose
   }
 
-  property("for Map[Int, Double] is a monoid") = monoidLawsEq[DecayedVector[({type x[a]=Map[Int, a]})#x]](decayedMapEqFn)
+  property("DecayedVector[Map[Int, _]] is a monoid") {
+    monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
+  }
 }

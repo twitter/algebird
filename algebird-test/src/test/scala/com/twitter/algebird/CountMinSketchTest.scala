@@ -1,14 +1,12 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
-import org.scalacheck.Prop.forAll
+import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers, WordSpec }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
-object CountMinSketchLaws extends Properties("CountMinSketch") {
+class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val DELTA = 1E-8
@@ -18,14 +16,16 @@ object CountMinSketchLaws extends Properties("CountMinSketch") {
   implicit val cmsMonoid = new CountMinSketchMonoid(EPS, DELTA, SEED)
   implicit val cmsGen =
     Arbitrary {
-      for (v <- choose(0, 10000)) yield (cmsMonoid.create(v))
+      for (v <- Gen.choose(0, 10000)) yield (cmsMonoid.create(v))
     }
 
-  property("CountMinSketch is a Monoid") = monoidLaws[CMS]
+  property("CountMinSketch is a Monoid") {
+    monoidLaws[CMS]
+  }
+
 }
 
-class CountMinSketchTest extends Specification {
-
+class CountMinSketchTest extends WordSpec with Matchers {
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -37,7 +37,7 @@ class CountMinSketchTest extends Specification {
   /**
    * Returns the exact frequency of {x} in {data}.
    */
-  def exactFrequency(data : Seq[Long], x : Long) : Long = {
+  def exactFrequency(data: Seq[Long], x: Long): Long = {
     data.filter { _ == x }.size
   }
 
@@ -45,9 +45,9 @@ class CountMinSketchTest extends Specification {
    * Returns the exact inner product between two data streams, when the streams
    * are viewed as count vectors.
    */
-  def exactInnerProduct(data1 : Seq[Long], data2 : Seq[Long]) : Long = {
-    val counts1 = data1.groupBy( x => x ).mapValues( _.size )
-    val counts2 = data2.groupBy( x => x ).mapValues( _.size )
+  def exactInnerProduct(data1: Seq[Long], data2: Seq[Long]): Long = {
+    val counts1 = data1.groupBy(x => x).mapValues(_.size)
+    val counts2 = data2.groupBy(x => x).mapValues(_.size)
 
     (counts1.keys.toSet & counts2.keys.toSet).map { k => counts1(k) * counts2(k) }.sum
   }
@@ -55,8 +55,8 @@ class CountMinSketchTest extends Specification {
   /**
    * Returns the elements in {data} that appear at least heavyHittersPct * data.size times.
    */
-  def exactHeavyHitters(data : Seq[Long], heavyHittersPct : Double) : Set[Long] = {
-    val counts = data.groupBy( x => x ).mapValues( _.size )
+  def exactHeavyHitters(data: Seq[Long], heavyHittersPct: Double): Set[Long] = {
+    val counts = data.groupBy(x => x).mapValues(_.size)
     val totalCount = counts.values.sum
     counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
   }
@@ -69,7 +69,7 @@ class CountMinSketchTest extends Specification {
       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range).toLong }
       val cms = CMS_MONOID.create(data)
 
-      cms.totalCount must be_==(totalCount)
+      assert(cms.totalCount == totalCount)
     }
 
     "estimate frequencies" in {
@@ -84,8 +84,8 @@ class CountMinSketchTest extends Specification {
         val approx = cms.frequency(x).estimate
         val maxError = approx - cms.frequency(x).min
 
-        approx must be_>=(exact)
-        (approx - exact) must be_<=(maxError)
+        assert(approx >= (exact))
+        assert((approx - exact) <= (maxError))
       }
     }
 
@@ -94,16 +94,16 @@ class CountMinSketchTest extends Specification {
       val two = CMS_MONOID.create(2)
       val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
 
-      cms.frequency(0).estimate must be_==(0)
-      cms.frequency(1).estimate must be_==(1)
-      cms.frequency(2).estimate must be_==(2)
+      assert(cms.frequency(0).estimate == 0)
+      assert(cms.frequency(1).estimate == 1)
+      assert(cms.frequency(2).estimate == 2)
 
       val three = CMS_MONOID.create(Seq(1L, 1L, 1L))
-      three.frequency(1L).estimate must be_==(3)
+      assert(three.frequency(1L).estimate == 3)
       val four = CMS_MONOID.create(Seq(1L, 1L, 1L, 1L))
-      four.frequency(1L).estimate must be_==(4)
+      assert(four.frequency(1L).estimate == 4)
       val cms2 = CMS_MONOID.plus(four, three)
-      cms2.frequency(1L).estimate must be_==(7)
+      assert(cms2.frequency(1L).estimate == 7)
     }
 
     "estimate inner products" in {
@@ -119,31 +119,31 @@ class CountMinSketchTest extends Specification {
       val exact = exactInnerProduct(data1, data2)
       val maxError = approx - approxA.min
 
-      approx must be_==(cms2.innerProduct(cms1).estimate)
-      approx must be_>=(exact)
-      (approx - exact) must be_<=(maxError)
+      assert(approx == cms2.innerProduct(cms1).estimate)
+      assert(approx >= exact)
+      assert((approx - exact) <= maxError)
     }
 
     "exactly compute inner product of small streams" in {
       // Nothing in common.
       val a1 = List(1L, 2L, 3L)
       val a2 = List(4L, 5L, 6L)
-      CMS_MONOID.create(a1).innerProduct(CMS_MONOID.create(a2)).estimate must be_==(0)
+      assert(CMS_MONOID.create(a1).innerProduct(CMS_MONOID.create(a2)).estimate == 0)
 
       // One element in common.
       val b1 = List(1L, 2L, 3L)
       val b2 = List(3L, 5L, 6L)
-      CMS_MONOID.create(b1).innerProduct(CMS_MONOID.create(b2)).estimate must be_==(1)
+      assert(CMS_MONOID.create(b1).innerProduct(CMS_MONOID.create(b2)).estimate == 1)
 
       // Multiple, non-repeating elements in common.
       val c1 = List(1L, 2L, 3L)
       val c2 = List(3L, 2L, 6L)
-      CMS_MONOID.create(c1).innerProduct(CMS_MONOID.create(c2)).estimate must be_==(2)
+      assert(CMS_MONOID.create(c1).innerProduct(CMS_MONOID.create(c2)).estimate == 2)
 
       // Multiple, repeating elements in common.
       val d1 = List(1L, 2L, 2L, 3L, 3L)
       val d2 = List(2L, 3L, 3L, 6L)
-      CMS_MONOID.create(d1).innerProduct(CMS_MONOID.create(d2)).estimate must be_==(6)
+      assert(CMS_MONOID.create(d1).innerProduct(CMS_MONOID.create(d2)).estimate == 6)
     }
 
     "estimate heavy hitters" in {
@@ -160,28 +160,28 @@ class CountMinSketchTest extends Specification {
       val estimatedHhs = cms.heavyHitters
 
       // All true heavy hitters must be claimed as heavy hitters.
-      (trueHhs.intersect(estimatedHhs) == trueHhs) must be_==(true)
+      assert((trueHhs.intersect(estimatedHhs) == trueHhs) == true)
 
       // It should be very unlikely that any element with count less than
       // (heavyHittersPct - eps) * totalCount is claimed as a heavy hitter.
       val minHhCount = (cms.heavyHittersPct - cms.eps) * cms.totalCount
       val infrequent = data.groupBy{ x => x }.mapValues{ _.size }.filter{ _._2 < minHhCount }.keys.toSet
-      infrequent.intersect(estimatedHhs).size must be_==(0)
+      assert(infrequent.intersect(estimatedHhs).size == 0)
     }
 
     "drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = new CountMinSketchMonoid(EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1L, 2L, 2L))
-      cms1.heavyHitters must be_==(Set(1L, 2L))
+      assert(cms1.heavyHitters == Set(1L, 2L))
 
       val cms2 = cms1 ++ monoid.create(2L)
-      cms2.heavyHitters must be_==(Set(2L))
+      assert(cms2.heavyHitters == Set(2L))
 
       val cms3 = cms2 ++ monoid.create(1L)
-      cms3.heavyHitters must be_==(Set(1L, 2L))
+      assert(cms3.heavyHitters == Set(1L, 2L))
 
       val cms4 = cms3 ++ monoid.create(Seq(0L, 0L, 0L, 0L, 0L, 0L))
-      cms4.heavyHitters must be_==(Set(0L))
+      assert(cms4.heavyHitters == Set(0L))
     }
 
     "exactly compute heavy hitters in a small stream" in {
@@ -190,11 +190,10 @@ class CountMinSketchTest extends Specification {
       val cms2 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.1)).create(data1)
       val cms3 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.3)).create(data1)
       val cms4 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.9)).create(data1)
-
-      cms1.heavyHitters must be_==(Set(1L, 2L, 3L, 4L, 5L))
-      cms2.heavyHitters must be_==(Set(2L, 3L, 4L, 5L))
-      cms3.heavyHitters must be_==(Set(5L))
-      cms4.heavyHitters must be_==(Set[Long]())
+      assert(cms1.heavyHitters == Set(1L, 2L, 3L, 4L, 5L))
+      assert(cms2.heavyHitters == Set(2L, 3L, 4L, 5L))
+      assert(cms3.heavyHitters == Set(5L))
+      assert(cms4.heavyHitters == Set[Long]())
     }
 
     "work as an Aggregator" in {
@@ -203,11 +202,10 @@ class CountMinSketchTest extends Specification {
       val cms2 = CMS.aggregator(EPS, DELTA, SEED, 0.1).apply(data1)
       val cms3 = CMS.aggregator(EPS, DELTA, SEED, 0.3).apply(data1)
       val cms4 = CMS.aggregator(EPS, DELTA, SEED, 0.9).apply(data1)
-
-      cms1.heavyHitters must be_==(Set(1L, 2L, 3L, 4L, 5L))
-      cms2.heavyHitters must be_==(Set(2L, 3L, 4L, 5L))
-      cms3.heavyHitters must be_==(Set(5L))
-      cms4.heavyHitters must be_==(Set[Long]())
+      assert(cms1.heavyHitters == Set(1L, 2L, 3L, 4L, 5L))
+      assert(cms2.heavyHitters == Set(2L, 3L, 4L, 5L))
+      assert(cms3.heavyHitters == Set(5L))
+      assert(cms4.heavyHitters == Set[Long]())
     }
   }
 }

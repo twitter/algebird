@@ -18,34 +18,38 @@ package com.twitter.algebird.util
 
 import com.twitter.algebird.MonadLaws.monadLaws
 import com.twitter.util.{ Await, Future, Throw, Return, Try }
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-import Arbitrary.arbitrary
-
-object UtilAlgebraProperties extends Properties("UtilAlgebras") {
+class UtilAlgebraProperties extends PropSpec with PropertyChecks with Matchers {
   import UtilAlgebras._
 
   def toOption[T](f: Future[T]): Option[T] =
     try {
       Some(Await.result(f))
     } catch {
-      case _:Exception => None
+      case _: Exception => None
     }
 
   implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
     Arbitrary {
-      arbitrary[T].map { l => Future.value(l) } |
-      Future.exception(new RuntimeException("fail!"))
+      Arbitrary.arbitrary[T].map { l => Future.value(l) }
     }
 
   implicit def returnA[T: Arbitrary]: Arbitrary[Try[T]] =
     Arbitrary {
-      arbitrary[T].map { l => Return(l) } |
-      Throw(new RuntimeException("fail!"))
+      Arbitrary.arbitrary[T].map { l => Return(l) }
     }
 
-  property("futureMonad") = monadLaws[Future, Int, String, Long] { (f1, f2) =>
-    toOption(f1) == toOption(f2)
+  property("futureMonad") {
+    monadLaws[Future, Int, String, Long] { (f1, f2) =>
+      toOption(f1) == toOption(f2)
+    }
   }
-  property("tryMonad") = monadLaws[Try, Int, String, Long]()
+
+  property("tryMonad") {
+    monadLaws[Try, Int, String, Long]()
+  }
+
 }
