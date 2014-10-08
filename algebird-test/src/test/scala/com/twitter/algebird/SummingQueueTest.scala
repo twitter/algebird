@@ -20,9 +20,13 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
+object SummingCacheTest {
+  case class Capacity(cap: Int) extends AnyVal
+  implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 1024)) yield Capacity(c) }
+}
+
 class SummingCacheTest extends PropSpec with PropertyChecks with Matchers {
-  case class Capacity(cap: Int)
-  implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 10240)) yield Capacity(c) }
+  import SummingCacheTest._
 
   // Get the zero-aware map equiv
   import SummingIteratorTest.mapEquiv
@@ -42,8 +46,8 @@ class SummingCacheTest extends PropSpec with PropertyChecks with Matchers {
     }
   }
   // String is not commutative:
-  property("puts are like sums (Int, String)") {
-    forAll { (c: Capacity, items: List[(Int, String)]) =>
+  property("puts are like sums (Int, List[Int])") {
+    forAll { (c: Capacity, items: List[(Int, List[Int])]) =>
       test(c, items)
     }
   }

@@ -1,11 +1,11 @@
 package com.twitter.algebird.caliper
 
-import com.google.caliper.{Benchmark, Param}
+import com.google.caliper.{ SimpleBenchmark, Param }
 import com.twitter.algebird.HyperLogLogMonoid
 import com.twitter.bijection._
 import java.nio.ByteBuffer
 
-class HllBatchCreateBenchmark extends Benchmark{
+class HllBatchCreateBenchmark extends SimpleBenchmark {
   @Param(Array("5", "10", "17", "25"))
   val bits: Int = 0
 
