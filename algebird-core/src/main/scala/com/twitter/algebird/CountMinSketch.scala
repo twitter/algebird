@@ -87,9 +87,9 @@ class CountMinSketchMonoid[K: Ordering: CMSHasher](eps: Double,
   seed: Int,
   heavyHittersPct: Double = 0.01) extends Monoid[CMS[K]] {
 
-  assert(0 < eps && eps < 1, "eps must lie in (0, 1)")
-  assert(0 < delta && delta < 1, "delta must lie in (0, 1)")
-  assert(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
+  require(0 < eps && eps < 1, "eps must lie in (0, 1)")
+  require(0 < delta && delta < 1, "delta must lie in (0, 1)")
+  require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
   // Typically, we would use d pair-wise independent hash functions of the form
   //
@@ -345,7 +345,7 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CMSCountsTable[K],
   def innerProduct(other: CMS[K]): Approximate[Long] = {
     other match {
       case other: CMSInstance[_] =>
-        assert((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
+        require((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
 
         def innerProductAtDepth(d: Int) = (0 to (width - 1)).map { w =>
           countsTable.getCount(d, w) * other.countsTable.getCount(d, w)
@@ -415,8 +415,8 @@ object CMSInstance {
    * TODO: implement a dense matrix type, and use it here
    */
   case class CMSCountsTable[K](counts: Vector[Vector[Long]]) {
-    assert(depth > 0, "Table must have at least 1 row.")
-    assert(width > 0, "Table must have at least 1 column.")
+    require(depth > 0, "Table must have at least 1 row.")
+    require(width > 0, "Table must have at least 1 column.")
 
     def depth: Int = counts.size
 
@@ -424,9 +424,7 @@ object CMSInstance {
 
     def getCount(pos: (Int, Int)): Long = {
       val (row, col) = pos
-
-      assert(row < depth && col < width, "Position must be within the bounds of this table.")
-
+      require(row < depth && col < width, "Position must be within the bounds of this table.")
       counts(row)(col)
     }
 
@@ -444,7 +442,7 @@ object CMSInstance {
      * Adds another counts table to this one, through element-wise addition.
      */
     def ++(other: CMSCountsTable[K]): CMSCountsTable[K] = {
-      assert((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
+      require((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
       val iil: IndexedSeq[IndexedSeq[Long]] = Monoid.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
       def toVector[V](is: IndexedSeq[V]): Vector[V] = is match {
         case v: Vector[_] => v
