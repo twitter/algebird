@@ -1,45 +1,48 @@
 package com.twitter.algebird
 
-import org.scalatest._
-
-import org.scalatest.{ DiagrammedAssertions, PropSpec, Matchers, WordSpec }
+import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
+  import CMSHasherImplicits._
+
+  type KEY = Long
 
   val DELTA = 1E-8
   val EPS = 0.005
   val SEED = 1
 
-  implicit val cmsMonoid = new CountMinSketchMonoid(EPS, DELTA, SEED)
+  implicit val cmsMonoid = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED)
   implicit val cmsGen =
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield (cmsMonoid.create(v))
+      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(v)
     }
 
   property("CountMinSketch is a Monoid") {
-    monoidLaws[CMS]
+    monoidLaws[CMS[KEY]]
   }
 
 }
 
 class CountMinSketchTest extends WordSpec with Matchers {
 
+  import CMSHasherImplicits._
+
+  type KEY = Long // To highlight which type we're testing; actual test data is still hardcoded to Long, e.g. `1L`.
+
   val DELTA = 1E-10
   val EPS = 0.001
   val SEED = 1
 
-  val CMS_MONOID = new CountMinSketchMonoid(EPS, DELTA, SEED)
+  val CMS_MONOID = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED)
   val RAND = new scala.util.Random
 
   /**
    * Returns the exact frequency of {x} in {data}.
    */
-  def exactFrequency(data: Seq[Long], x: Long): Long = {
-    data.filter { _ == x }.size
-  }
+  def exactFrequency(data: Seq[Long], x: Long): Long = data.count(_ == x)
 
   /**
    * Returns the exact inner product between two data streams, when the streams
@@ -84,8 +87,8 @@ class CountMinSketchTest extends WordSpec with Matchers {
         val approx = cms.frequency(x).estimate
         val maxError = approx - cms.frequency(x).min
 
-        assert(approx >= (exact))
-        assert((approx - exact) <= (maxError))
+        assert(approx >= exact)
+        assert((approx - exact) <= maxError)
       }
     }
 
@@ -154,13 +157,13 @@ class CountMinSketchTest extends WordSpec with Matchers {
       val data = data1 ++ data2 ++ data3
 
       // Find elements that appear at least 20% of the time.
-      val cms = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.2)).create(data)
+      val cms = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.2).create(data)
 
       val trueHhs = exactHeavyHitters(data, cms.heavyHittersPct)
       val estimatedHhs = cms.heavyHitters
 
       // All true heavy hitters must be claimed as heavy hitters.
-      assert((trueHhs.intersect(estimatedHhs) == trueHhs) == true)
+      assert(trueHhs.intersect(estimatedHhs) == trueHhs)
 
       // It should be very unlikely that any element with count less than
       // (heavyHittersPct - eps) * totalCount is claimed as a heavy hitter.
@@ -170,7 +173,7 @@ class CountMinSketchTest extends WordSpec with Matchers {
     }
 
     "drop old heavy hitters when new heavy hitters replace them" in {
-      val monoid = new CountMinSketchMonoid(EPS, DELTA, SEED, 0.3)
+      val monoid = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1L, 2L, 2L))
       assert(cms1.heavyHitters == Set(1L, 2L))
 
@@ -186,10 +189,10 @@ class CountMinSketchTest extends WordSpec with Matchers {
 
     "exactly compute heavy hitters in a small stream" in {
       val data1 = Seq(1L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 5L)
-      val cms1 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.01)).create(data1)
-      val cms2 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.1)).create(data1)
-      val cms3 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.3)).create(data1)
-      val cms4 = (new CountMinSketchMonoid(EPS, DELTA, SEED, 0.9)).create(data1)
+      val cms1 = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.01).create(data1)
+      val cms2 = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.1).create(data1)
+      val cms3 = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.3).create(data1)
+      val cms4 = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED, 0.9).create(data1)
       assert(cms1.heavyHitters == Set(1L, 2L, 3L, 4L, 5L))
       assert(cms2.heavyHitters == Set(2L, 3L, 4L, 5L))
       assert(cms3.heavyHitters == Set(5L))
@@ -198,10 +201,10 @@ class CountMinSketchTest extends WordSpec with Matchers {
 
     "work as an Aggregator" in {
       val data1 = Seq(1L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 5L)
-      val cms1 = CMS.aggregator(EPS, DELTA, SEED, 0.01).apply(data1)
-      val cms2 = CMS.aggregator(EPS, DELTA, SEED, 0.1).apply(data1)
-      val cms3 = CMS.aggregator(EPS, DELTA, SEED, 0.3).apply(data1)
-      val cms4 = CMS.aggregator(EPS, DELTA, SEED, 0.9).apply(data1)
+      val cms1 = CMS.aggregator[KEY](EPS, DELTA, SEED, 0.01).apply(data1)
+      val cms2 = CMS.aggregator[KEY](EPS, DELTA, SEED, 0.1).apply(data1)
+      val cms3 = CMS.aggregator[KEY](EPS, DELTA, SEED, 0.3).apply(data1)
+      val cms4 = CMS.aggregator[KEY](EPS, DELTA, SEED, 0.9).apply(data1)
       assert(cms1.heavyHitters == Set(1L, 2L, 3L, 4L, 5L))
       assert(cms2.heavyHitters == Set(2L, 3L, 4L, 5L))
       assert(cms3.heavyHitters == Set(5L))
