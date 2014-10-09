@@ -8,20 +8,45 @@ class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
   import CMSHasherImplicits._
 
-  type KEY = Long
-
   val DELTA = 1E-8
   val EPS = 0.005
   val SEED = 1
 
-  implicit val cmsMonoid = new CountMinSketchMonoid[KEY](EPS, DELTA, SEED)
-  implicit val cmsGen =
+  private def createArbitrary[K : Numeric](cmsMonoid: CountMinSketchMonoid[K]): Arbitrary[CMS[K]] = {
+    val k = implicitly[Numeric[K]]
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(v)
+      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
     }
+  }
 
-  property("CountMinSketch is a Monoid") {
-    monoidLaws[CMS[KEY]]
+  property("CountMinSketch[Byte] is a Monoid") {
+    implicit val cmsMonoid = new CountMinSketchMonoid[Byte](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Byte](cmsMonoid)
+    monoidLaws[CMS[Byte]]
+  }
+
+  property("CountMinSketch[Short] is a Monoid") {
+    implicit val cmsMonoid = new CountMinSketchMonoid[Short](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+    monoidLaws[CMS[Short]]
+  }
+
+  property("CountMinSketch[Int] is a Monoid") {
+    implicit val cmsMonoid = new CountMinSketchMonoid[Int](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+    monoidLaws[CMS[Int]]
+  }
+
+  property("CountMinSketch[Long] is a Monoid") {
+    implicit val cmsMonoid = new CountMinSketchMonoid[Long](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+    monoidLaws[CMS[Long]]
+  }
+
+  property("CountMinSketch[BigInt] is a Monoid") {
+    implicit val cmsMonoid = new CountMinSketchMonoid[BigInt](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+    monoidLaws[CMS[BigInt]]
   }
 
 }
