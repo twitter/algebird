@@ -544,12 +544,6 @@ object CMSHasherImplicits {
 
   }
 
-  implicit object CMSHasherByte extends CMSHasher[Byte] {
-
-    def hash(a: Int, b: Int, width: Int)(x: Byte) = CMSHasherInt.hash(a, b, width)(x)
-
-  }
-
   implicit object CMSHasherShort extends CMSHasher[Short] {
 
     def hash(a: Int, b: Int, width: Int)(x: Short) = CMSHasherInt.hash(a, b, width)(x)

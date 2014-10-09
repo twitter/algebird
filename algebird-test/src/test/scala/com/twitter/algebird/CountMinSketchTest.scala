@@ -20,12 +20,6 @@ class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
-  property("CountMinSketch[Byte] is a Monoid") {
-    implicit val cmsMonoid = new CountMinSketchMonoid[Byte](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[Byte](cmsMonoid)
-    monoidLaws[CMS[Byte]]
-  }
-
   property("CountMinSketch[Short] is a Monoid") {
     implicit val cmsMonoid = new CountMinSketchMonoid[Short](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
