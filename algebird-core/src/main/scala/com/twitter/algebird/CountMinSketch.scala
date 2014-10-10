@@ -302,9 +302,9 @@ case class CMSItem[K: Ordering](item: K, params: CMSParams[K]) extends CMS[K] {
  * The general Count-Min sketch structure, used for holding any number of elements.
  */
 case class CMSInstance[K: Ordering](countsTable: CMSInstance.CMSCountsTable[K],
-  totalCount: Long,
-  hhs: CMSInstance.HeavyHitters[K],
-  params: CMSParams[K]) extends CMS[K] {
+                                    totalCount: Long,
+                                    hhs: CMSInstance.HeavyHitters[K],
+                                    params: CMSParams[K]) extends CMS[K] {
 
   def eps: Double = params.eps
 
