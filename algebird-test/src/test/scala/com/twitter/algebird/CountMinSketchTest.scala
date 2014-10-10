@@ -4,16 +4,16 @@ import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-import CMSHasherImplicits._ // required, although e.g. IntelliJ IDEA may flag it as unused import
+import CmsHasherImplicits._ // required, although e.g. IntelliJ IDEA may flag it as unused import
 
-class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
+class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
   val DELTA = 1E-8
   val EPS = 0.005
   val SEED = 1
 
-  private def createArbitrary[K: Numeric](cmsMonoid: CountMinSketchMonoid[K]): Arbitrary[CMS[K]] = {
+  private def createArbitrary[K: Numeric](cmsMonoid: CmsMonoid[K]): Arbitrary[Cms[K]] = {
     val k = implicitly[Numeric[K]]
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
@@ -21,43 +21,43 @@ class CountMinSketchLaws extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("CountMinSketch[Short] is a Monoid") {
-    implicit val cmsMonoid = new CountMinSketchMonoid[Short](EPS, DELTA, SEED)
+    implicit val cmsMonoid = Cms.monoid[Short](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    monoidLaws[CMS[Short]]
+    monoidLaws[Cms[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
-    implicit val cmsMonoid = new CountMinSketchMonoid[Int](EPS, DELTA, SEED)
+    implicit val cmsMonoid = Cms.monoid[Int](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    monoidLaws[CMS[Int]]
+    monoidLaws[Cms[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
-    implicit val cmsMonoid = new CountMinSketchMonoid[Long](EPS, DELTA, SEED)
+    implicit val cmsMonoid = Cms.monoid[Long](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    monoidLaws[CMS[Long]]
+    monoidLaws[Cms[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
-    implicit val cmsMonoid = new CountMinSketchMonoid[BigInt](EPS, DELTA, SEED)
+    implicit val cmsMonoid = Cms.monoid[BigInt](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    monoidLaws[CMS[BigInt]]
+    monoidLaws[Cms[BigInt]]
   }
 
 }
 
-class CountMinSketchShortTest extends CountMinSketchTest[Short]
-class CountMinSketchIntTest extends CountMinSketchTest[Int]
-class CountMinSketchLongTest extends CountMinSketchTest[Long]
-class CountMinSketchBigIntTest extends CountMinSketchTest[BigInt]
+class CmsShortTest extends CmsTest[Short]
+class CmsIntTest extends CmsTest[Int]
+class CmsLongTest extends CmsTest[Long]
+class CmsBigIntTest extends CmsTest[BigInt]
 
-abstract class CountMinSketchTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers {
+abstract class CmsTest[K: Ordering: CmsHasher: Numeric] extends WordSpec with Matchers {
 
   val DELTA = 1E-10
   val EPS = 0.001
   val SEED = 1
 
-  val CMS_MONOID = new CountMinSketchMonoid[K](EPS, DELTA, SEED)
+  val CMS_MONOID = Cms.monoid[K](EPS, DELTA, SEED)
   val RAND = new scala.util.Random
 
   /**
@@ -182,7 +182,7 @@ abstract class CountMinSketchTest[K: Ordering: CMSHasher: Numeric] extends WordS
       val data = data1 ++ data2 ++ data3
 
       // Find elements that appear at least 20% of the time.
-      val cms = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.2).create(data)
+      val cms = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.2).create(data)
 
       val trueHhs = exactHeavyHitters(data, cms.heavyHittersPct)
       val estimatedHhs = cms.heavyHitters
@@ -198,7 +198,7 @@ abstract class CountMinSketchTest[K: Ordering: CMSHasher: Numeric] extends WordS
     }
 
     "drop old heavy hitters when new heavy hitters replace them" in {
-      val monoid = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.3)
+      val monoid = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
       cms1.heavyHitters should be (Set(1, 2))
 
@@ -214,27 +214,30 @@ abstract class CountMinSketchTest[K: Ordering: CMSHasher: Numeric] extends WordS
 
     "exactly compute heavy hitters in a small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
-      val cms1 = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.01).create(data1)
-      val cms2 = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.1).create(data1)
-      val cms3 = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.3).create(data1)
-      val cms4 = new CountMinSketchMonoid[K](EPS, DELTA, SEED, 0.9).create(data1)
+      val cms1 = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
+      val cms2 = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
+      val cms3 = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
+      val cms4 = TopPctCms.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
       cms1.heavyHitters should be (Set(1, 2, 3, 4, 5))
       cms2.heavyHitters should be (Set(2, 3, 4, 5))
       cms3.heavyHitters should be (Set(5))
       cms4.heavyHitters should be (Set[K]())
     }
 
+    // TODO: test aggregator for Cms, not only for TopPctCms
+
     "work as an Aggregator" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
-      val cms1 = CMS.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
-      val cms2 = CMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
-      val cms3 = CMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
-      val cms4 = CMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
+      val cms1 = TopPctCms.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
+      val cms2 = TopPctCms.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
+      val cms3 = TopPctCms.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
+      val cms4 = TopPctCms.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
       cms1.heavyHitters should be (Set(1, 2, 3, 4, 5))
       cms2.heavyHitters should be (Set(2, 3, 4, 5))
       cms3.heavyHitters should be (Set(5))
       cms4.heavyHitters should be (Set[K]())
     }
+
   }
 
   implicit class IntCast(x: Int) {
