@@ -22,26 +22,31 @@ import scala.collection.immutable.SortedSet
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
  *
- * It works as follows. Let (eps, delta) be two parameters that describe the
- * confidence in our error estimates, and let d = ceil(ln 1/delta)
- * and w = ceil(e / eps). Then:
+ * It works as follows. Let `(eps, delta)` be two parameters that describe the
+ * confidence in our error estimates, and let `d = ceil(ln 1/delta)`
+ * and `w = ceil(e / eps)`.
  *
- * - Take d pairwise independent hash functions h_i, each of which maps
- *   onto the domain [0, w - 1].
- * - Create a 2-dimensional table of counts, with d rows and w columns,
+ * Note: Throughout the code `d` and `w` are called `depth` and `width`,
+ * respectively.
+ *
+ * Then:
+ *
+ * - Take `d` pairwise independent hash functions `h_i`, each of which maps
+ *   onto the domain `[0, w - 1]`.
+ * - Create a 2-dimensional table of counts, with `d` rows and `w` columns,
  *   initialized with all zeroes.
  * - When a new element x arrives in the stream, update the table of counts
- *   by setting counts[i, h_i[x]] += 1, for each 1 <= i <= d.
+ *   by setting `counts[i, h_i[x]] += 1`, for each `1 <= i <= d`.
  * - (Note the rough similarity to a Bloom filter.)
  *
  * As an example application, suppose you want to estimate the number of
- * times an element x has appeared in a data stream so far.
+ * times an element `x` has appeared in a data stream so far.
  * The Count-Min sketch estimate of this frequency is
  *
  *   min_i { counts[i, h_i[x]] }
  *
- * With probability at least 1 - delta, this estimate is within eps * N
- * of the true frequency (i.e., true frequency <= estimate <= true frequency + eps * N),
+ * With probability at least `1 - delta`, this estimate is within `eps * N`
+ * of the true frequency (i.e., `true frequency <= estimate <= true frequency + eps * N`),
  * where N is the total size of the stream so far.
  *
  * See http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf for technical details,
@@ -54,10 +59,10 @@ import scala.collection.immutable.SortedSet
  */
 
 /**
- * Monoid for adding Count-Min sketches.
+ * Monoid for adding [[CMS]] sketches.
  *
- * eps and delta are parameters that bound the error of each query estimate. For example, errors in
- * answering queries (e.g., how often has element x appeared in the stream described by the sketch?)
+ * `eps` and `delta` are parameters that bound the error of each query estimate. For example, errors in
+ * answering point queries (e.g., how often has element x appeared in the stream described by the sketch?)
  * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
  * some factor depending on eps."
  *
@@ -507,19 +512,14 @@ object CMSInstance {
 }
 
 /**
- * Monoid for adding Count-Min sketches.
- *
- * eps and delta are parameters that bound the error of each query estimate. For example, errors in
- * answering queries (e.g., how often has element x appeared in the stream described by the sketch?)
- * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
- * some factor depending on eps."
+ * Monoid for adding [[TopPctCMS]] sketches.
  *
  * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
  *
- * @param cms A counting-only CMS instance, which is used for the counting performed by this class.
+ * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
  * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
  *                  (heavyHittersPct * totalCount) times in the stream.
  * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
