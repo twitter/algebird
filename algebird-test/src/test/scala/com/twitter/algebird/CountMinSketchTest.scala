@@ -60,6 +60,18 @@ abstract class CmsTest[K: Ordering: CmsHasher: Numeric] extends WordSpec with Ma
   val CMS_MONOID = Cms.monoid[K](EPS, DELTA, SEED)
   val RAND = new scala.util.Random
 
+  implicit class IntCast(x: Int) {
+    def toK[K: Numeric]: K = implicitly[Numeric[K]].fromInt(x)
+  }
+
+  implicit class SeqCast(xs: Seq[Int]) {
+    def toK[K: Numeric]: Seq[K] = xs map { _.toK[K] }
+  }
+
+  implicit class SetCast(xs: Set[Int]) {
+    def toK[K: Numeric]: Set[K] = xs map { _.toK[K] }
+  }
+
   /**
    * Returns the exact frequency of {x} in {data}.
    */
@@ -238,18 +250,6 @@ abstract class CmsTest[K: Ordering: CmsHasher: Numeric] extends WordSpec with Ma
       cms4.heavyHitters should be (Set[K]())
     }
 
-  }
-
-  implicit class IntCast(x: Int) {
-    def toK[K: Numeric]: K = implicitly[Numeric[K]].fromInt(x)
-  }
-
-  implicit class SeqCast(xs: Seq[Int]) {
-    def toK[K: Numeric]: Seq[K] = xs map { _.toK[K] }
-  }
-
-  implicit class SetCast(xs: Set[Int]) {
-    def toK[K: Numeric]: Set[K] = xs map { _.toK[K] }
   }
 
 }
