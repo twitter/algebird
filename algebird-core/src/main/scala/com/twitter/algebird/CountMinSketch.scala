@@ -506,12 +506,6 @@ object CMSInstance {
 
 }
 
-case class TopPctCMSParams(heavyHittersPct: Double) {
-
-  require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
-
-}
-
 /**
  * Monoid for adding Count-Min sketches.
  *
@@ -559,6 +553,12 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
   def create(data: Seq[K]): TopPctCMS[K] = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
+
+}
+
+case class TopPctCMSParams(heavyHittersPct: Double) {
+
+  require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
 }
 
