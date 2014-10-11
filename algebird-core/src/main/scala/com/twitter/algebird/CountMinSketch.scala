@@ -457,8 +457,8 @@ object CmsInstance {
   /**
    * The 2-dimensional table of counters used in the Count-Min sketch.
    * Each row corresponds to a particular hash function.
-   * TODO: implement a dense matrix type, and use it here
    */
+  // TODO: implement a dense matrix type, and use it here
   case class CmsCountsTable[K](counts: Vector[Vector[Long]]) {
     require(depth > 0, "Table must have at least 1 row.")
     require(width > 0, "Table must have at least 1 column.")
