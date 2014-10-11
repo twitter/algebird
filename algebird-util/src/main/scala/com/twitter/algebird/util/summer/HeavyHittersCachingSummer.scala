@@ -43,7 +43,7 @@ case class HeavyHittersPercent(toFloat: Float)
 
 class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency) {
 
-  import CmsHasherImplicits._
+  import CMSHasherImplicits._
 
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
@@ -55,9 +55,9 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   private[this] final val rollOverFrequency = roFreq.toLong
   private[this] final var countsTable = Array.fill(WIDTH * DEPTH)(0L)
 
-  private[this] final val hashes: IndexedSeq[CmsHash[Long]] = {
+  private[this] final val hashes: IndexedSeq[CMSHash[Long]] = {
     val r = new scala.util.Random(5)
-    (0 until DEPTH).map { _ => CmsHash[Long](r.nextInt, 0, WIDTH) }
+    (0 until DEPTH).map { _ => CMSHash[Long](r.nextInt, 0, WIDTH) }
   }.toIndexedSeq
 
   @inline

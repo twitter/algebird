@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.breakOut
-import com.twitter.algebird.CmsHasherImplicits._
+import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird.matrix.AdaptiveMatrix
 
 /**
@@ -29,7 +29,7 @@ import com.twitter.algebird.matrix.AdaptiveMatrix
 /**
  * Hashes an arbitrary key type to one that the Sketch Map can use.
  */
-case class SketchMapHash[K](hasher: CmsHash[Long], seed: Int)(implicit serialization: K => Array[Byte]) {
+case class SketchMapHash[K](hasher: CMSHash[Long], seed: Int)(implicit serialization: K => Array[Byte]) {
   def apply(obj: K): Int = {
     val (first, second) = MurmurHash128(seed)(serialization(obj))
     hasher(first ^ second)
@@ -138,7 +138,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     val numHashes = depth
     val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
-      val smhash: SketchMapHash[K] = SketchMapHash(CmsHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
+      val smhash: SketchMapHash[K] = SketchMapHash(CMSHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
       new (K => Int) { override def apply(k: K) = smhash(k) }
     }
   }
