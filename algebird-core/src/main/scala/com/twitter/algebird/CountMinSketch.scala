@@ -120,6 +120,7 @@ case class CmsParams[K](hashes: Seq[CmsHash[K]], eps: Double, delta: Double) {
 
   require(0 < eps && eps < 1, "eps must lie in (0, 1)")
   require(0 < delta && delta < 1, "delta must lie in (0, 1)")
+  require(hashes.size >= CmsFunctions.depth(delta), s"we require at least ${CmsFunctions.depth(delta)} hash functions")
 
 }
 
