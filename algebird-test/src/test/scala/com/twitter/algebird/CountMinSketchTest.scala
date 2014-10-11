@@ -46,6 +46,47 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
+  import BaseProperties._
+
+  val DELTA = 1E-8
+  val EPS = 0.005
+  val SEED = 1
+  val HEAVY_HITTERS_PCT = 0.1
+
+  private def createArbitrary[K: Numeric](cmsMonoid: TopPctCmsMonoid[K]): Arbitrary[TopPctCms[K]] = {
+    val k = implicitly[Numeric[K]]
+    Arbitrary {
+      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
+    }
+  }
+
+  property("TopPctCms[Short] is a Monoid") {
+    implicit val cmsMonoid = TopPctCms.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+    monoidLaws[TopPctCms[Short]]
+  }
+
+  property("TopPctCms[Int] is a Monoid") {
+    implicit val cmsMonoid = TopPctCms.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+    monoidLaws[TopPctCms[Int]]
+  }
+
+  property("TopPctCms[Long] is a Monoid") {
+    implicit val cmsMonoid = TopPctCms.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+    monoidLaws[TopPctCms[Long]]
+  }
+
+  property("TopPctCms[BigInt] is a Monoid") {
+    implicit val cmsMonoid = TopPctCms.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+    monoidLaws[TopPctCms[BigInt]]
+  }
+
+}
+
 class CmsShortTest extends CmsTest[Short]
 class CmsIntTest extends CmsTest[Int]
 class CmsLongTest extends CmsTest[Long]
