@@ -107,7 +107,7 @@ class CmsMonoid[K: Ordering: CmsHasher](eps: Double, delta: Double, seed: Int) e
 }
 
 /**
- * Configuration paramaters for [[Cms]].
+ * Configuration parameters for [[Cms]].
  *
  * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
  *               `delta`).
@@ -177,9 +177,13 @@ object CmsFunctions {
 }
 
 /**
+ * A trait for CMS implementations that can count elements in a data stream and that can answer point queries (i.e.
+ * frequency estimates) for these elements.
+ *
+ * Known implementations: [[Cms]], [[TopPctCms]].
  *
  * @tparam K The type used to identify the elements to be counted.
- * @tparam C The type of the CMS variant.
+ * @tparam C The type of the actual CMS that implements this trait.
  */
 trait CmsCounting[K, C[_]] {
 
@@ -205,6 +209,9 @@ trait CmsCounting[K, C[_]] {
    */
   def width: Int = CmsFunctions.width(eps)
 
+  /**
+   * Returns a new sketch that is the combination of this sketch and the other sketch.
+   */
   def ++(other: C[K]): C[K]
 
   /**
@@ -259,6 +266,13 @@ trait CmsCounting[K, C[_]] {
 
 }
 
+/**
+ * A trait for CMS implementations that can track heavy hitters in a data stream.
+ *
+ * Known implementations: [[TopPctCms]].
+ *
+ * @tparam K The type used to identify the elements to be counted.
+ */
 trait CmsHeavyHitters[K] {
 
   /**
@@ -310,9 +324,8 @@ object Cms {
 }
 
 /**
- * The actual Count-Min sketch data structure.  This data structure only allows for counting and frequency estimation.
+ * A Count-Min sketch data structure that allows for counting and frequency estimation of elements in a data stream.
  */
-// TODO: Maybe we need to require Ordering[K] only here in the base class?
 sealed abstract class Cms[K: Ordering](params: CmsParams[K]) extends java.io.Serializable with CmsCounting[K, Cms] {
 
   override val eps: Double = params.eps
@@ -536,10 +549,13 @@ class TopPctCmsMonoid[K: Ordering](cms: Cms[K], heavyHittersPct: Double = 0.01) 
   def plus(left: TopPctCms[K], right: TopPctCms[K]): TopPctCms[K] = left ++ right
 
   /**
-   * Create a sketch out of a single item or data stream.
+   * Create a sketch out of a single item.
    */
   def create(item: K): TopPctCms[K] = TopPctCmsItem[K](item, cms, conf)
 
+  /**
+   * Create a sketch out of multiple items.
+   */
   def create(data: Seq[K]): TopPctCms[K] = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
@@ -574,6 +590,12 @@ object TopPctCms {
 
 }
 
+/**
+ * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
+ * and (b) tracking the heavy hitters among these elements.
+ *
+ * @tparam K The type used to identify the elements to be counted.
+ */
 sealed abstract class TopPctCms[K: Ordering](val cms: Cms[K], conf: TopPctCmsParams)
   extends java.io.Serializable with CmsCounting[K, TopPctCms] with CmsHeavyHitters[K] {
 
@@ -609,7 +631,6 @@ case class TopPctCmsZero[K: Ordering](override val cms: Cms[K], conf: TopPctCmsP
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-// TODO: Do we still need this, given that TopPctCmsItem does not count iself?
 case class TopPctCmsItem[K: Ordering](item: K,
   override val cms: Cms[K],
   conf: TopPctCmsParams) extends TopPctCms[K](cms, conf) {
@@ -707,7 +728,7 @@ object HeavyHitter {
 }
 
 /**
- * An Aggregator for the Count-Min Sketch.  Can be created using [[Cms.aggregator]].
+ * An Aggregator for [[Cms]].  Can be created using [[Cms.aggregator]].
  */
 case class CmsAggregator[K](cmsMonoid: CmsMonoid[K]) extends MonoidAggregator[K, Cms[K], Cms[K]] {
 
@@ -720,7 +741,7 @@ case class CmsAggregator[K](cmsMonoid: CmsMonoid[K]) extends MonoidAggregator[K,
 }
 
 /**
- * An Aggregator for the Top Percentage Count-Min Sketch.  Can be created using [[TopPctCms.aggregator]].
+ * An Aggregator for [[TopPctCms]].  Can be created using [[TopPctCms.aggregator]].
  */
 case class TopPctCmsAggregator[K](topPctCmsMonoid: TopPctCmsMonoid[K])
   extends MonoidAggregator[K, TopPctCms[K], TopPctCms[K]] {
@@ -745,7 +766,8 @@ trait CmsHasher[K] {
 }
 
 /**
- * The Count-Min sketch uses `d` pair-wise independent hash functions drawn from a universal hashing family of the form:
+ * The Count-Min sketch uses `d` (aka `depth`) pair-wise independent hash functions drawn from a universal hashing
+ * family of the form:
  *
  * `h(x) = [a * x + b (mod p)] (mod m)`
  */
@@ -758,6 +780,9 @@ case class CmsHash[K: CmsHasher](a: Int, b: Int, width: Int) {
 
 }
 
+/**
+ * Implicits that enable CMS-hashing for common data types such as [[Long]] and [[BigInt]].
+ */
 object CmsHasherImplicits {
 
   implicit object CmsHasherLong extends CmsHasher[Long] {
