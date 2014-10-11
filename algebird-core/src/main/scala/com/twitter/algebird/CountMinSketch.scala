@@ -754,6 +754,12 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 
 }
 
+/**
+ * The Count-Min sketch uses `d` (aka `depth`) pair-wise independent hash functions drawn from a universal hashing
+ * family of the form:
+ *
+ * `h(x) = [a * x + b (mod p)] (mod m)`
+ */
 trait CMSHasher[K] {
 
   val PRIME_MODULUS = (1L << 31) - 1
@@ -765,12 +771,6 @@ trait CMSHasher[K] {
 
 }
 
-/**
- * The Count-Min sketch uses `d` (aka `depth`) pair-wise independent hash functions drawn from a universal hashing
- * family of the form:
- *
- * `h(x) = [a * x + b (mod p)] (mod m)`
- */
 case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) {
 
   /**
