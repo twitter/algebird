@@ -53,6 +53,16 @@ import scala.collection.immutable.SortedSet
  * @author Edwin Chen
  */
 
+/**
+ * Configuration paramaters for [[Cms]].
+ *
+ * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
+ *               `delta`).
+ * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
+ * @param delta A bound on the probability that a query estimate does not lie within some small interval
+ *              (an interval that depends on `eps`) around the truth.
+ * @tparam K
+ */
 case class CmsParams[K](hashes: Seq[CmsHash[K]], eps: Double, delta: Double) {
 
   require(0 < eps && eps < 1, "eps must lie in (0, 1)")
@@ -73,9 +83,9 @@ case class CmsParams[K](hashes: Seq[CmsHash[K]], eps: Double, delta: Double) {
  * import com.twitter.algebird.CmsHasherImplicits._
  * }}}
  *
- * @param eps A parameter that bounds the error of each query estimate.
+ * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
- *        (an interval that depends on eps) around the truth.
+ *        (an interval that depends on `eps`) around the truth.
  * @param seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
  * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
@@ -102,49 +112,60 @@ class CmsMonoid[K: Ordering: CmsHasher](eps: Double, delta: Double, seed: Int) e
   def plus(left: Cms[K], right: Cms[K]): Cms[K] = left ++ right
 
   /**
-   * Create a sketch out of a single item or data stream.
+   * Create a sketch out of a single item.
    */
   def create(item: K): Cms[K] = CmsItem[K](item, params)
 
-  def create(data: Seq[K]): Cms[K] = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
+  /**
+   * Create a sketch out of multiple items.
+   */
+  def create(data: Seq[K]): Cms[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
 }
 
 trait CmsCounting[K, C[_]] {
 
-  // Parameters used to bound confidence in error estimates.
+  /**
+   * Returns the one-sided error bound on the error of each point query, i.e. frequency estimate.
+   */
   def eps: Double
 
+  /**
+   * Returns the bound on the probability that a query estimate does NOT lie within some small interval (an interval
+   * that depends on `eps`) around the truth.
+   */
   def delta: Double
 
   /**
-   * Number of hash functions.
+   * Number of hash functions (also: number of rows in the counting table).  This number is derived from `delta`.
    */
   def depth: Int = CmsFunctions.depth(delta)
 
   /**
-   * Number of counters per hash function.
+   * Number of counters per hash function (also: number of columns in the counting table).  This number is derived from
+   * `eps`.
    */
   def width: Int = CmsFunctions.width(eps)
 
   def ++(other: C[K]): C[K]
 
   /**
-   * Updates the sketch with a new element from the data stream.
+   * Counts the item and returns the result as a new sketch.
    */
   def +(item: K): C[K] = this + (item, 1L)
 
+  /**
+   * Counts the item `count` times and returns the result as a new sketch.
+   */
   def +(item: K, count: Long): C[K]
 
   /**
    * Returns an estimate of the total number of times this item has been seen
    * in the stream so far. This estimate is an upper bound.
    *
-   * It is always true that trueFrequency <= estimatedFrequency.
-   * With probability p >= 1 - delta, it also holds that
-   * estimatedFrequency <= trueFrequency + eps * totalCount.
+   * It is always true that `estimatedFrequency >= trueFrequency`.
+   * With probability `p >= 1 - delta`, it also holds that
+   * `estimatedFrequency <= trueFrequency + eps * totalCount`.
    */
   def frequency(item: K): Approximate[Long]
 
@@ -153,18 +174,18 @@ trait CmsCounting[K, C[_]] {
    *
    * In other words, let a_i denote the number of times element i has been seen in
    * the data stream summarized by this CMS, and let b_i denote the same for the other CMS.
-   * Then this returns an estimate of <a, b> = \sum a_i b_i
+   * Then this returns an estimate of `<a, b> = \sum a_i b_i`.
    *
-   * Note: this can also be viewed as the join size between two relations.
+   * Note: This can also be viewed as the join size between two relations.
    *
    * It is always true that actualInnerProduct <= estimatedInnerProduct.
-   * With probability p >= 1 - delta, it also holds that
-   * estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount
+   * With probability `p >= 1 - delta`, it also holds that
+   * `estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount`.
    */
   def innerProduct(other: C[K]): Approximate[Long]
 
   /**
-   * Total number of elements seen in the data stream so far.
+   * Total number of elements counted (i.e. seen in the data stream) so far.
    */
   def totalCount: Long
 
@@ -174,7 +195,7 @@ trait CmsCounting[K, C[_]] {
   def f1: Long = totalCount
 
   /**
-   * The second frequency moment is `\sum a_i^2`, where a_i is the count of the ith element.
+   * The second frequency moment is `\sum a_i^2`, where `a_i` is the count of the i-th element.
    */
   def f2: Approximate[Long]
 
@@ -184,47 +205,70 @@ trait CmsHeavyHitters[K] {
 
   /**
    * Finds all heavy hitters, i.e., elements in the stream that appear at least
-   * (heavyHittersPct * totalCount) times.
+   * `(heavyHittersPct * totalCount)` times.
    *
-   * Every item that appears at least (heavyHittersPct * totalCount) times is output,
-   * and with probability p >= 1 - delta, no item whose count is less than
-   * (heavyHittersPct - eps) * totalCount is output.
+   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output,
+   * and with probability `p >= 1 - delta`, no item whose count is less than
+   * `(heavyHittersPct - eps) * totalCount` is output.
    *
-   * Note that the set of heavy hitters contains at most 1 / heavyHittersPct
+   * Note that the set of heavy hitters contains at most `1 / heavyHittersPct`
    * elements, so keeping track of all elements that appear more than (say) 1% of the
    * time requires tracking at most 100 items.
    */
   def heavyHittersPct: Double
 
+  /**
+   * Returns the descendingly sorted list of heavy hitters (e.g. the heaviest hitter is the first element).
+   */
   def heavyHitters: Set[K]
 
 }
 
 /**
- * Functions to translate between (eps, delta) and (depth, width). The translation is:
- * depth = ceil(ln 1/delta)
- * width = ceil(e / eps)
+ * Helper functions to generate or to translate between various `Cms` parameters.
  */
 object CmsFunctions {
 
+  /**
+   * Translates from `width` to `eps`.
+   */
   def eps(width: Int): Double = scala.math.exp(1.0) / width
 
+  /**
+   * Translates from `depth` to `delta`.
+   */
   def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
 
+  /**
+   * Translates from `delta` to `depth`.
+   */
   def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
 
+  /**
+   * Translates from `eps` to `width`.
+   */
   def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
 
-  // Typically, we would use d pair-wise independent hash functions of the form
-  //
-  //   h_i(x) = a_i * x + b_i (mod p)
-  //
-  // But for this particular application, setting b_i does not matter (since all it does is shift the results of a
-  // particular hash), so we omit it (by setting b_i to 0) and simply use hash functions of the form
-  //
-  //   h_i(x) = a_i * x (mod p)
-  //
+  /**
+   * Generates `N=depth` pair-wise independent hash functions.
+   *
+   * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
+   * @param delta Error bound on the probability that a query estimate does NOT lie within some small interval around
+   *              the truth.
+   * @param seed Seed for the random number generator.
+   * @tparam K The type used to identify the elements to be counted.
+   * @return The generated hash functions.
+   */
   def generateHashes[K: CmsHasher](eps: Double, delta: Double, seed: Int): Seq[CmsHash[K]] = {
+    // Typically, we would use d -- aka depth -- pair-wise independent hash functions of the form
+    //
+    //   h_i(x) = a_i * x + b_i (mod p)
+    //
+    // But for this particular application, setting b_i does not matter (since all it does is shift the results of a
+    // particular hash), so we omit it (by setting b_i to 0) and simply use hash functions of the form
+    //
+    //   h_i(x) = a_i * x (mod p)
+    //
     val r = new scala.util.Random(seed)
     val numHashes = depth(delta)
     val numCounters = width(eps)
@@ -375,7 +419,8 @@ case class CmsInstance[K: Ordering](countsTable: CmsInstance.CmsCountsTable[K],
             table + (pos, count)
         }
       CmsInstance[K](newCountsTable, totalCount + count, params)
-    } else this
+    }
+    else this
   }
 
 }
