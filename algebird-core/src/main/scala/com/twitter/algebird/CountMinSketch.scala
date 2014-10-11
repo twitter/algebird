@@ -567,25 +567,25 @@ object TopPctCMS {
   def monoid[K: Ordering: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
-    heavyHittersPct: Double = 0.01): TopPctCMSMonoid[K] =
+    heavyHittersPct: Double): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
   def monoid[K: Ordering: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
-    heavyHittersPct: Double = 0.01): TopPctCMSMonoid[K] =
+    heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
   def aggregator[K: Ordering: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
-    heavyHittersPct: Double= 0.01): TopPctCMSAggregator[K] =
+    heavyHittersPct: Double): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
   def aggregator[K: Ordering: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
-    heavyHittersPct: Double = 0.01): TopPctCMSAggregator[K] =
+    heavyHittersPct: Double): TopPctCMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
 }
