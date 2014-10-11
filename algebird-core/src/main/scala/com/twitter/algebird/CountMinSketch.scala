@@ -54,23 +54,6 @@ import scala.collection.immutable.SortedSet
  */
 
 /**
- * Configuration paramaters for [[Cms]].
- *
- * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
- *               `delta`).
- * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
- * @param delta A bound on the probability that a query estimate does not lie within some small interval
- *              (an interval that depends on `eps`) around the truth.
- * @tparam K
- */
-case class CmsParams[K](hashes: Seq[CmsHash[K]], eps: Double, delta: Double) {
-
-  require(0 < eps && eps < 1, "eps must lie in (0, 1)")
-  require(0 < delta && delta < 1, "delta must lie in (0, 1)")
-
-}
-
-/**
  * Monoid for adding Count-Min sketches.
  *
  * eps and delta are parameters that bound the error of each query estimate. For example, errors in
@@ -123,6 +106,81 @@ class CmsMonoid[K: Ordering: CmsHasher](eps: Double, delta: Double, seed: Int) e
 
 }
 
+/**
+ * Configuration paramaters for [[Cms]].
+ *
+ * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
+ *               `delta`).
+ * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
+ * @param delta A bound on the probability that a query estimate does not lie within some small interval
+ *              (an interval that depends on `eps`) around the truth.
+ * @tparam K
+ */
+case class CmsParams[K](hashes: Seq[CmsHash[K]], eps: Double, delta: Double) {
+
+  require(0 < eps && eps < 1, "eps must lie in (0, 1)")
+  require(0 < delta && delta < 1, "delta must lie in (0, 1)")
+
+}
+
+/**
+ * Helper functions to generate or to translate between various CMS parameters (cf. [[CmsParams]]).
+ */
+object CmsFunctions {
+
+  /**
+   * Translates from `width` to `eps`.
+   */
+  def eps(width: Int): Double = scala.math.exp(1.0) / width
+
+  /**
+   * Translates from `depth` to `delta`.
+   */
+  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
+
+  /**
+   * Translates from `delta` to `depth`.
+   */
+  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+
+  /**
+   * Translates from `eps` to `width`.
+   */
+  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
+
+  /**
+   * Generates `N=depth` pair-wise independent hash functions.
+   *
+   * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
+   * @param delta Error bound on the probability that a query estimate does NOT lie within some small interval around
+   *              the truth.
+   * @param seed Seed for the random number generator.
+   * @tparam K The type used to identify the elements to be counted.
+   * @return The generated hash functions.
+   */
+  def generateHashes[K: CmsHasher](eps: Double, delta: Double, seed: Int): Seq[CmsHash[K]] = {
+    // Typically, we would use d -- aka depth -- pair-wise independent hash functions of the form
+    //
+    //   h_i(x) = a_i * x + b_i (mod p)
+    //
+    // But for this particular application, setting b_i does not matter (since all it does is shift the results of a
+    // particular hash), so we omit it (by setting b_i to 0) and simply use hash functions of the form
+    //
+    //   h_i(x) = a_i * x (mod p)
+    //
+    val r = new scala.util.Random(seed)
+    val numHashes = depth(delta)
+    val numCounters = width(eps)
+    (0 to (numHashes - 1)).map { _ => CmsHash[K](r.nextInt(), 0, numCounters) }
+  }
+
+}
+
+/**
+ *
+ * @tparam K The type used to identify the elements to be counted.
+ * @tparam C The type of the CMS variant.
+ */
 trait CmsCounting[K, C[_]] {
 
   /**
@@ -221,59 +279,6 @@ trait CmsHeavyHitters[K] {
    * Returns the descendingly sorted list of heavy hitters (e.g. the heaviest hitter is the first element).
    */
   def heavyHitters: Set[K]
-
-}
-
-/**
- * Helper functions to generate or to translate between various `Cms` parameters.
- */
-object CmsFunctions {
-
-  /**
-   * Translates from `width` to `eps`.
-   */
-  def eps(width: Int): Double = scala.math.exp(1.0) / width
-
-  /**
-   * Translates from `depth` to `delta`.
-   */
-  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
-
-  /**
-   * Translates from `delta` to `depth`.
-   */
-  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
-
-  /**
-   * Translates from `eps` to `width`.
-   */
-  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
-
-  /**
-   * Generates `N=depth` pair-wise independent hash functions.
-   *
-   * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
-   * @param delta Error bound on the probability that a query estimate does NOT lie within some small interval around
-   *              the truth.
-   * @param seed Seed for the random number generator.
-   * @tparam K The type used to identify the elements to be counted.
-   * @return The generated hash functions.
-   */
-  def generateHashes[K: CmsHasher](eps: Double, delta: Double, seed: Int): Seq[CmsHash[K]] = {
-    // Typically, we would use d -- aka depth -- pair-wise independent hash functions of the form
-    //
-    //   h_i(x) = a_i * x + b_i (mod p)
-    //
-    // But for this particular application, setting b_i does not matter (since all it does is shift the results of a
-    // particular hash), so we omit it (by setting b_i to 0) and simply use hash functions of the form
-    //
-    //   h_i(x) = a_i * x (mod p)
-    //
-    val r = new scala.util.Random(seed)
-    val numHashes = depth(delta)
-    val numCounters = width(eps)
-    (0 to (numHashes - 1)).map { _ => CmsHash[K](r.nextInt(), 0, numCounters) }
-  }
 
 }
 
