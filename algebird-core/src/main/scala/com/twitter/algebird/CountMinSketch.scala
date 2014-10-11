@@ -438,8 +438,7 @@ case class CmsInstance[K: Ordering](countsTable: CmsInstance.CmsCountsTable[K],
             table + (pos, count)
         }
       CmsInstance[K](newCountsTable, totalCount + count, params)
-    }
-    else this
+    } else this
   }
 
 }

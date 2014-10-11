@@ -61,15 +61,15 @@ abstract class CmsTest[K: Ordering: CmsHasher: Numeric] extends WordSpec with Ma
   val RAND = new scala.util.Random
 
   implicit class IntCast(x: Int) {
-    def toK[K: Numeric]: K = implicitly[Numeric[K]].fromInt(x)
+    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
   }
 
   implicit class SeqCast(xs: Seq[Int]) {
-    def toK[K: Numeric]: Seq[K] = xs map { _.toK[K] }
+    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
   }
 
   implicit class SetCast(xs: Set[Int]) {
-    def toK[K: Numeric]: Set[K] = xs map { _.toK[K] }
+    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
   }
 
   /**
