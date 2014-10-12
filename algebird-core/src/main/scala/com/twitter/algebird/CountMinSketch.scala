@@ -813,7 +813,9 @@ object CMSHasherImplicits {
     def hash(a: Int, b: Int, width: Int)(x: Int) = {
       val unModded: Int = (x * a) + b
       val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
-      modded.toInt % width
+      val h = modded.toInt % width
+      assert(h >= 0, "hash must not be negative")
+      h
     }
 
   }
@@ -823,7 +825,9 @@ object CMSHasherImplicits {
     def hash(a: Int, b: Int, width: Int)(x: BigInt) = {
       val unModded: BigInt = (x * a) + b
       val modded: BigInt = (unModded + (unModded >> 32)) & PRIME_MODULUS
-      modded.toInt % width
+      val h = modded.toInt % width
+      assert(h >= 0, "hash must not be negative")
+      h
     }
 
   }
