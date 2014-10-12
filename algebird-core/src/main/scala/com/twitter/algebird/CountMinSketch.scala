@@ -533,9 +533,9 @@ object CMSInstance {
  */
 class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopPctCMS[K]] {
 
-  val conf: TopPctCMSParams = TopPctCMSParams(heavyHittersPct)
+  val params: TopPctCMSParams = TopPctCMSParams(heavyHittersPct)
 
-  val zero: TopPctCMS[K] = TopPctCMSZero[K](cms, conf)
+  val zero: TopPctCMS[K] = TopPctCMSZero[K](cms, params)
 
   /**
    * We assume the sketches on the left and right use the same hash functions.
@@ -545,7 +545,7 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
   /**
    * Create a sketch out of a single item.
    */
-  def create(item: K): TopPctCMS[K] = TopPctCMSItem[K](item, cms, conf)
+  def create(item: K): TopPctCMS[K] = TopPctCMSItem[K](item, cms, params)
 
   /**
    * Create a sketch out of multiple items.
@@ -596,7 +596,7 @@ object TopPctCMS {
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], conf: TopPctCMSParams)
+sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSParams)
   extends java.io.Serializable with CMSCounting[K, TopPctCMS] with CMSHeavyHitters[K] {
 
   override val eps: Double = cms.eps
@@ -605,7 +605,7 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], conf: TopPctCMSPar
 
   override val totalCount: Long = cms.totalCount
 
-  override val heavyHittersPct = conf.heavyHittersPct
+  override val heavyHittersPct = params.heavyHittersPct
 
   override def frequency(item: K): Approximate[Long] = cms.frequency(item)
 
@@ -618,11 +618,12 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], conf: TopPctCMSPar
 /**
  * Zero element.  Used for initialization.
  */
-case class TopPctCMSZero[K: Ordering](override val cms: CMS[K], conf: TopPctCMSParams) extends TopPctCMS[K](cms, conf) {
+case class TopPctCMSZero[K: Ordering](override val cms: CMS[K],
+  params: TopPctCMSParams) extends TopPctCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set.empty[K]
 
-  override def +(item: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, conf) + (item, count)
+  override def +(item: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, params) + (item, count)
 
   override def ++(other: TopPctCMS[K]): TopPctCMS[K] = other
 
@@ -633,16 +634,16 @@ case class TopPctCMSZero[K: Ordering](override val cms: CMS[K], conf: TopPctCMSP
  */
 case class TopPctCMSItem[K: Ordering](item: K,
   override val cms: CMS[K],
-  conf: TopPctCMSParams) extends TopPctCMS[K](cms, conf) {
+  params: TopPctCMSParams) extends TopPctCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set(item)
 
-  override def +(x: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, conf) + item + (x, count)
+  override def +(x: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, params) + item + (x, count)
 
   override def ++(other: TopPctCMS[K]): TopPctCMS[K] = {
     other match {
       case other: TopPctCMSZero[_] => this
-      case other: TopPctCMSItem[K] => TopPctCMSInstance[K](cms, conf) + item + other.item
+      case other: TopPctCMSItem[K] => TopPctCMSInstance[K](cms, params) + item + other.item
       case other: TopPctCMSInstance[K] => other + item
     }
   }
@@ -651,15 +652,17 @@ case class TopPctCMSItem[K: Ordering](item: K,
 
 object TopPctCMSInstance {
 
-  def apply[K: Ordering](cms: CMS[K], conf: TopPctCMSParams): TopPctCMSInstance[K] = {
+  def apply[K: Ordering](cms: CMS[K], params: TopPctCMSParams): TopPctCMSInstance[K] = {
     implicit val heavyHitterOrdering = HeavyHitter.ordering[K]
-    TopPctCMSInstance[K](cms, HeavyHitters[K](SortedSet[HeavyHitter[K]]()), conf)
+    TopPctCMSInstance[K](cms, HeavyHitters[K](SortedSet[HeavyHitter[K]]()), params)
   }
 
 }
 
-case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitters[K], conf: TopPctCMSParams)
-  extends TopPctCMS[K](cms, conf) {
+case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K],
+  hhs: HeavyHitters[K],
+  params: TopPctCMSParams)
+  extends TopPctCMS[K](cms, params) {
 
   override def heavyHitters: Set[K] = hhs.items
 
@@ -668,7 +671,7 @@ case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHi
     if (count != 0L) {
       val newHhs = updateHeavyHitters(item, count)
       val newCMS = cms + (item, count)
-      TopPctCMSInstance[K](newCMS, newHhs, conf)
+      TopPctCMSInstance[K](newCMS, newHhs, params)
     } else this
   }
 
@@ -682,12 +685,12 @@ case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHi
 
     // If the new item is a heavy hitter, add it, and remove any previous instances.
     val newHhs =
-      if (newItemCount >= conf.heavyHittersPct * newTotalCount) {
+      if (newItemCount >= params.heavyHittersPct * newTotalCount) {
         hhs - HeavyHitter[K](item, oldItemCount) + HeavyHitter[K](item, newItemCount)
       } else hhs
 
     // Remove any items below the new heavy hitter threshold.
-    newHhs.dropCountsBelow(conf.heavyHittersPct * newTotalCount)
+    newHhs.dropCountsBelow(params.heavyHittersPct * newTotalCount)
   }
 
   override def ++(other: TopPctCMS[K]): TopPctCMS[K] = {
@@ -696,8 +699,8 @@ case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHi
       case other: TopPctCMSItem[K] => this + other.item
       case other: TopPctCMSInstance[K] =>
         val newTotalCount = totalCount + other.totalCount
-        val newHhs = (hhs ++ other.hhs).dropCountsBelow(conf.heavyHittersPct * newTotalCount)
-        TopPctCMSInstance(cms ++ other.cms, newHhs, conf)
+        val newHhs = (hhs ++ other.hhs).dropCountsBelow(params.heavyHittersPct * newTotalCount)
+        TopPctCMSInstance(cms ++ other.cms, newHhs, params)
     }
   }
 
