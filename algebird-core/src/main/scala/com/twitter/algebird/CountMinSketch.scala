@@ -83,7 +83,9 @@ import scala.collection.immutable.SortedSet
  *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
  *           implicits that can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
+ *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.  Other possibilities
+ *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
+ *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
 class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
 
