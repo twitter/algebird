@@ -98,7 +98,14 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
   val EPS = 0.001
   val SEED = 1
 
-  val CMS_MONOID = CMS.monoid[K](EPS, DELTA, SEED)
+  // We use TopPctCMS for testing CMSCounting functionality.  We argue that because TopPctCMS[K] encapsulates CMS[K]
+  // and uses it for all its counting/querying functionality (like an adapter) we can test CMS[K] indirectly through
+  // testing TopPctCMS[K].
+  val COUNTING_CMS_MONOID = {
+    val ANY_HEAVY_HITTERS_PCT = 0.1 // heavy hitters functionality is not relevant for the tests using this monoid
+    TopPctCMS.monoid[K](EPS, DELTA, SEED, ANY_HEAVY_HITTERS_PCT)
+  }
+
   val RAND = new scala.util.Random
 
   implicit class IntCast(x: Int) {
@@ -144,7 +151,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val totalCount = 1243
       val range = 234
       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val cms = CMS_MONOID.create(data)
+      val cms = COUNTING_CMS_MONOID.create(data)
 
       cms.totalCount should be (totalCount)
     }
@@ -153,7 +160,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val totalCount = 5678
       val range = 897
       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val cms = CMS_MONOID.create(data)
+      val cms = COUNTING_CMS_MONOID.create(data)
 
       (0 to 100).foreach { _ =>
         val x = RAND.nextInt(range).toK[K]
@@ -169,19 +176,19 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     }
 
     "exactly compute frequencies in a small stream" in {
-      val one = CMS_MONOID.create(1.toK[K])
-      val two = CMS_MONOID.create(2.toK[K])
-      val cms = CMS_MONOID.plus(CMS_MONOID.plus(one, two), two)
+      val one = COUNTING_CMS_MONOID.create(1.toK[K])
+      val two = COUNTING_CMS_MONOID.create(2.toK[K])
+      val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
 
       cms.frequency(0.toK[K]).estimate should be (0)
       cms.frequency(1.toK[K]).estimate should be (1)
       cms.frequency(2.toK[K]).estimate should be (2)
 
-      val three = CMS_MONOID.create(Seq(1, 1, 1).toK[K])
+      val three = COUNTING_CMS_MONOID.create(Seq(1, 1, 1).toK[K])
       three.frequency(1.toK[K]).estimate should be (3)
-      val four = CMS_MONOID.create(Seq(1, 1, 1, 1).toK[K])
+      val four = COUNTING_CMS_MONOID.create(Seq(1, 1, 1, 1).toK[K])
       four.frequency(1.toK[K]).estimate should be (4)
-      val cms2 = CMS_MONOID.plus(four, three)
+      val cms2 = COUNTING_CMS_MONOID.plus(four, three)
       cms2.frequency(1.toK[K]).estimate should be (7)
     }
 
@@ -190,8 +197,8 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val range = 1390
       val data1 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
       val data2 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val cms1 = CMS_MONOID.create(data1)
-      val cms2 = CMS_MONOID.create(data1)
+      val cms1 = COUNTING_CMS_MONOID.create(data1)
+      val cms2 = COUNTING_CMS_MONOID.create(data1)
 
       val approxA = cms1.innerProduct(cms2)
       val approx = approxA.estimate
@@ -209,22 +216,22 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       // Nothing in common.
       val a1 = List(1, 2, 3).toK[K]
       val a2 = List(4, 5, 6).toK[K]
-      CMS_MONOID.create(a1).innerProduct(CMS_MONOID.create(a2)).estimate should be (0)
+      COUNTING_CMS_MONOID.create(a1).innerProduct(COUNTING_CMS_MONOID.create(a2)).estimate should be (0)
 
       // One element in common.
       val b1 = List(1, 2, 3).toK[K]
       val b2 = List(3, 5, 6).toK[K]
-      CMS_MONOID.create(b1).innerProduct(CMS_MONOID.create(b2)).estimate should be (1)
+      COUNTING_CMS_MONOID.create(b1).innerProduct(COUNTING_CMS_MONOID.create(b2)).estimate should be (1)
 
       // Multiple, non-repeating elements in common.
       val c1 = List(1, 2, 3).toK[K]
       val c2 = List(3, 2, 6).toK[K]
-      CMS_MONOID.create(c1).innerProduct(CMS_MONOID.create(c2)).estimate should be (2)
+      COUNTING_CMS_MONOID.create(c1).innerProduct(COUNTING_CMS_MONOID.create(c2)).estimate should be (2)
 
       // Multiple, repeating elements in common.
       val d1 = List(1, 2, 2, 3, 3).toK[K]
       val d2 = List(2, 3, 3, 6).toK[K]
-      CMS_MONOID.create(d1).innerProduct(CMS_MONOID.create(d2)).estimate should be (6)
+      COUNTING_CMS_MONOID.create(d1).innerProduct(COUNTING_CMS_MONOID.create(d2)).estimate should be (6)
     }
 
     "work as an Aggregator" in {
