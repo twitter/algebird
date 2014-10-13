@@ -236,12 +236,23 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     "work as an Aggregator" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+
       val cms = CMS.aggregator[K](EPS, DELTA, SEED).apply(data1)
       cms.frequency(1.toK[K]).estimate should be(1L)
       cms.frequency(2.toK[K]).estimate should be(2L)
       cms.frequency(3.toK[K]).estimate should be(3L)
       cms.frequency(4.toK[K]).estimate should be(4L)
       cms.frequency(5.toK[K]).estimate should be(5L)
+
+      val topPctCMS = {
+        val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+        TopPctCMS.aggregator[K](EPS, DELTA, SEED, anyHeavyHittersPct).apply(data1)
+      }
+      topPctCMS.frequency(1.toK[K]).estimate should be(1L)
+      topPctCMS.frequency(2.toK[K]).estimate should be(2L)
+      topPctCMS.frequency(3.toK[K]).estimate should be(3L)
+      topPctCMS.frequency(4.toK[K]).estimate should be(4L)
+      topPctCMS.frequency(5.toK[K]).estimate should be(5L)
     }
 
   }
