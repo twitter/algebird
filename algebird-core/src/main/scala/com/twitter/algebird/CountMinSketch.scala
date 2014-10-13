@@ -331,6 +331,37 @@ object CMS {
 
 /**
  * A Count-Min sketch data structure that allows for counting and frequency estimation of elements in a data stream.
+ *
+ * Tip: If you also need to track heavy hitters ("Top N" problems), take a look at [[TopPctCMS]].
+ *
+ * =Usage=
+ *
+ * This example demonstrates how to count [[Long]] elements with [[CMS]], i.e. `K=Long`.
+ *
+ * Note that the actual counting is always performed with a [[Long]], regardless of your choice of `K`.  That is,
+ * the counting table behind the scenes is backed by [[Long]] values (at least in the current implementation), and thus
+ * the returned frequency estimates are always instances of `Approximate[Long]`.
+ *
+ * @example {{{
+ * // Implicits that enabling CMS-hashing of `Long` values.
+ * import com.twitter.algebird.CMSHasherImplicits._
+ *
+ * // Create a monoid for a CMS that can count `Long` elements.
+ * val cmsMonoid: CMSMonoid[Long] = {
+ *   val eps = 0.001
+ *   val delta = 1E-10
+ *   val seed = 1
+ *   CMS.monoid[Long](eps, delta, seed)
+ * }
+ *
+ * // Create a CMS instance that has counted the element `1L`.
+ * val cms: CMS[Long] = cmsMonoid.create(1L)
+ *
+ * // Estimate frequency of `1L`
+ * val estimate: Approximate[Long] = cms.frequency(1L)
+ * }}}
+ *
+ * @tparam K The type used to identify the elements to be counted.
  */
 sealed abstract class CMS[K: Ordering](params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
 
@@ -593,6 +624,39 @@ object TopPctCMS {
 /**
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
  * and (b) tracking the heavy hitters among these elements.
+ *
+ * Tip: If you do not need to track heavy hitters, take a look at [[CMS]], which is more efficient in this case.
+ *
+ * =Usage=
+ *
+ * This example demonstrates how to count `Long` elements with [[TopPctCMS]], i.e. `K=Long`.
+ *
+ * Note that the actual counting is always performed with a [[Long]], regardless of your choice of `K`.  That is,
+ * the counting table behind the scenes is backed by [[Long]] values (at least in the current implementation), and thus
+ * the returned frequency estimates are always instances of `Approximate[Long]`.
+ *
+ * @example {{{
+ * // Implicits that enabling CMS-hashing of `Long` values.
+ * import com.twitter.algebird.CMSHasherImplicits._
+ *
+ * // Create a monoid for a CMS that can count `Long` elements.
+ * val topPctCMSMonoid: TopPctCMSMonoid[Long] = {
+ *   val eps = 0.001
+ *   val delta = 1E-10
+ *   val seed = 1
+ *   val heavyHittersPct = 0.1
+ *   TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
+ * }
+ *
+ * // Create a TopPctCMS instance that has counted the element `1L`.
+ * val topPctCMS: TopPctCMS[Long] = topPctCMSMonoid.create(1L)
+ *
+ * // Estimate frequency of `1L`
+ * val estimate: Approximate[Long] = topPctCMS.frequency(1L)
+ *
+ * // What are the heavy hitters so far?
+ * val heavyHitters: Set[Long] = topPctCMS.heavyHitters
+ * }}}
  *
  * @tparam K The type used to identify the elements to be counted.
  */
