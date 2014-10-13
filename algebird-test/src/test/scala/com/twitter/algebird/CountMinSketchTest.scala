@@ -138,7 +138,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
   }
 
-  "CountMinSketch" should {
+  "A Count-Min sketch implementing CMSCounting" should {
 
     "count total number of elements in a stream" in {
       val totalCount = 1243
@@ -227,6 +227,20 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       CMS_MONOID.create(d1).innerProduct(CMS_MONOID.create(d2)).estimate should be (6)
     }
 
+    "work as an Aggregator" in {
+      val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+      val cms = CMS.aggregator[K](EPS, DELTA, SEED).apply(data1)
+      cms.frequency(1.toK[K]).estimate should be(1L)
+      cms.frequency(2.toK[K]).estimate should be(2L)
+      cms.frequency(3.toK[K]).estimate should be(3L)
+      cms.frequency(4.toK[K]).estimate should be(4L)
+      cms.frequency(5.toK[K]).estimate should be(5L)
+    }
+
+  }
+
+  "A Count-Min sketch implementing CMSHeavyHitters" should {
+
     "estimate heavy hitters" in {
       // Simple way of making some elements appear much more often than others.
       val data1 = (1 to 3000).map { _ => RAND.nextInt(3) }.toK[K]
@@ -276,8 +290,6 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       cms3.heavyHitters should be (Set(5))
       cms4.heavyHitters should be (Set[K]())
     }
-
-    // TODO: test aggregator for Cms, not only for TopPctCms
 
     "work as an Aggregator" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
