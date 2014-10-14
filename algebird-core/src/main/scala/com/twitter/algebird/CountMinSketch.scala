@@ -665,13 +665,13 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSP
    * Finds all heavy hitters, i.e., elements in the stream that appear at least
    * `(heavyHittersPct * totalCount)` times.
    *
-   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output,
-   * and with probability `p >= 1 - delta`, no item whose count is less than
-   * `(heavyHittersPct - eps) * totalCount` is output.
+   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output, and with probability
+   * `p >= 1 - delta`, no item whose count is less than `(heavyHittersPct - eps) * totalCount` is output.
    *
-   * Note that the set of heavy hitters contains at most `1 / heavyHittersPct`
-   * elements, so keeping track of all elements that appear more than (say) 1% of the
-   * time requires tracking at most 100 items.
+   * This also means that this parameter is an upper bound on the number of heavy hitters that will be tracked: the set
+   * of heavy hitters contains at most `1 / heavyHittersPct` elements.  For example, if `heavyHittersPct=0.01` (or
+   * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
+   * This parameter can thus control the memory footprint required for tracking heavy hitters.
    */
   val heavyHittersPct: Double = params.heavyHittersPct
 
