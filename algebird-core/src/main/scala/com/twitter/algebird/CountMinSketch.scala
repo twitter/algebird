@@ -766,9 +766,9 @@ case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K],
       case other: TopPctCMSZero[_] => this
       case other: TopPctCMSItem[K] => this + other.item
       case other: TopPctCMSInstance[K] =>
-        val newTotalCount = totalCount + other.totalCount
-        val newHhs = (hhs ++ other.hhs).dropCountsBelow(params.heavyHittersPct * newTotalCount)
-        TopPctCMSInstance(cms ++ other.cms, newHhs, params)
+        val newCms = cms ++ other.cms
+        val newHhs = (hhs ++ other.hhs).dropCountsBelow(params.heavyHittersPct * newCms.totalCount)
+        TopPctCMSInstance(newCms, newHhs, params)
     }
   }
 
