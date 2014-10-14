@@ -277,25 +277,15 @@ trait CMSCounting[K, C[_]] {
 /**
  * A trait for CMS implementations that can track heavy hitters in a data stream.
  *
+ * It is up to the implementation how the semantics of tracking heavy hitters are defined.  For instance, one
+ * implementation could track the "top %" heavy hitters whereas another implementation could track the "top N" heavy
+ * hitters.
+ *
  * Known implementations: [[TopPctCMS]].
  *
  * @tparam K The type used to identify the elements to be counted.
  */
 trait CMSHeavyHitters[K] {
-
-  /**
-   * Finds all heavy hitters, i.e., elements in the stream that appear at least
-   * `(heavyHittersPct * totalCount)` times.
-   *
-   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output,
-   * and with probability `p >= 1 - delta`, no item whose count is less than
-   * `(heavyHittersPct - eps) * totalCount` is output.
-   *
-   * Note that the set of heavy hitters contains at most `1 / heavyHittersPct`
-   * elements, so keeping track of all elements that appear more than (say) 1% of the
-   * time requires tracking at most 100 items.
-   */
-  def heavyHittersPct: Double
 
   /**
    * Returns the descendingly sorted list of heavy hitters (e.g. the heaviest hitter is the first element).
@@ -671,7 +661,19 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSP
 
   override val totalCount: Long = cms.totalCount
 
-  override val heavyHittersPct = params.heavyHittersPct
+  /**
+   * Finds all heavy hitters, i.e., elements in the stream that appear at least
+   * `(heavyHittersPct * totalCount)` times.
+   *
+   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output,
+   * and with probability `p >= 1 - delta`, no item whose count is less than
+   * `(heavyHittersPct - eps) * totalCount` is output.
+   *
+   * Note that the set of heavy hitters contains at most `1 / heavyHittersPct`
+   * elements, so keeping track of all elements that appear more than (say) 1% of the
+   * time requires tracking at most 100 items.
+   */
+  val heavyHittersPct: Double = params.heavyHittersPct
 
   override def frequency(item: K): Approximate[Long] = cms.frequency(item)
 
