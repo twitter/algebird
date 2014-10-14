@@ -188,7 +188,7 @@ object CMSFunctions {
  * A trait for CMS implementations that can count elements in a data stream and that can answer point queries (i.e.
  * frequency estimates) for these elements.
  *
- * Known implementations: [[CMS]], [[TopPctCMS]].
+ * Known implementations: [[CMS]], [[TopCMS]].
  *
  * @tparam K The type used to identify the elements to be counted.
  * @tparam C The type of the actual CMS that implements this trait.
@@ -281,15 +281,16 @@ trait CMSCounting[K, C[_]] {
  * implementation could track the "top %" heavy hitters whereas another implementation could track the "top N" heavy
  * hitters.
  *
- * Known implementations: [[TopPctCMS]].
+ * Known implementations: [[TopCMS]].
  *
  * @tparam K The type used to identify the elements to be counted.
  */
 trait CMSHeavyHitters[K] {
 
   /**
-   * Returns the descendingly sorted list of heavy hitters (e.g. the heaviest hitter is the first element).
+   * Returns the set of heavy hitters.
    */
+  // TODO: Should we change the contract to return a descendingly sorted list of heavy hitters (heaviest = first)?
   def heavyHitters: Set[K]
 
 }
@@ -324,7 +325,7 @@ object CMS {
 /**
  * A Count-Min sketch data structure that allows for counting and frequency estimation of elements in a data stream.
  *
- * Tip: If you also need to track heavy hitters ("Top N" problems), take a look at [[TopPctCMS]].
+ * Tip: If you also need to track heavy hitters ("Top N" problems), take a look at [[TopCMS]].
  *
  * =Usage=
  *
@@ -535,7 +536,7 @@ object CMSInstance {
 }
 
 /**
- * Monoid for adding [[TopPctCMS]] sketches.
+ * Monoid for adding [[TopCMS]] sketches.
  *
  * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
  * {{{
@@ -554,36 +555,82 @@ object CMSInstance {
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopPctCMS[K]] {
+class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
-  val params: TopPctCMSParams = TopPctCMSParams(heavyHittersPct)
+  val params: TopCMSParams[K] = {
+    val logic = new TopPctHeavyHittersLogic[K](heavyHittersPct)
+    TopCMSParams[K](logic)
+  }
 
-  val zero: TopPctCMS[K] = TopPctCMSZero[K](cms, params)
+  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
 
   /**
    * We assume the sketches on the left and right use the same hash functions.
    */
-  def plus(left: TopPctCMS[K], right: TopPctCMS[K]): TopPctCMS[K] = left ++ right
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
 
   /**
    * Create a sketch out of a single item.
    */
-  def create(item: K): TopPctCMS[K] = TopPctCMSItem[K](item, cms, params)
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
 
   /**
    * Create a sketch out of multiple items.
    */
-  def create(data: Seq[K]): TopPctCMS[K] = {
+  def create(data: Seq[K]): TopCMS[K] = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
 
 }
 
-case class TopPctCMSParams(heavyHittersPct: Double) {
+/**
+ * Monoid for adding [[TopCMS]] sketches.
+ *
+ * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * {{{
+ * import com.twitter.algebird.CMSHasherImplicits._
+ * }}}
+ *
+ * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
+ * @param heavyHittersN The maximum number of heavy hitters to track.
+ * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
+ *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
+ *           your problem domain and their identifiers used for counting via CMS should be bijective.
+ *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
+ *           implicits that can be imported.
+ *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
+ *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
+ */
+class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
 
-  require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
+  val params: TopCMSParams[K] = {
+    val logic = new TopNHeavyHittersLogic[K](heavyHittersN)
+    TopCMSParams[K](logic)
+  }
+
+  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
+
+  /**
+   * We assume the sketches on the left and right use the same hash functions.
+   */
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
+
+  /**
+   * Create a sketch out of a single item.
+   */
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
+
+  /**
+   * Create a sketch out of multiple items.
+   */
+  def create(data: Seq[K]): TopCMS[K] = {
+    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  }
 
 }
+
+case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
 
 object TopPctCMS {
 
@@ -613,6 +660,34 @@ object TopPctCMS {
 
 }
 
+object TopNCMS {
+
+  def monoid[K: Ordering: CMSHasher](eps: Double,
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSMonoid[K] =
+    new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
+
+  def monoid[K: Ordering: CMSHasher](depth: Int,
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSMonoid[K] =
+    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
+
+  def aggregator[K: Ordering: CMSHasher](eps: Double,
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSAggregator[K] =
+    new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
+
+  def aggregator[K: Ordering: CMSHasher](depth: Int,
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSAggregator[K] =
+    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
+
+}
+
 /**
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
  * and (b) tracking the heavy hitters among these elements.
@@ -621,7 +696,7 @@ object TopPctCMS {
  *
  * =Usage=
  *
- * This example demonstrates how to count `Long` elements with [[TopPctCMS]], i.e. `K=Long`.
+ * This example demonstrates how to count `Long` elements with [[TopCMS]], i.e. `K=Long`.
  *
  * Note that the actual counting is always performed with a [[Long]], regardless of your choice of `K`.  That is,
  * the counting table behind the scenes is backed by [[Long]] values (at least in the current implementation), and thus
@@ -652,8 +727,8 @@ object TopPctCMS {
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSParams)
-  extends java.io.Serializable with CMSCounting[K, TopPctCMS] with CMSHeavyHitters[K] {
+sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[K])
+  extends java.io.Serializable with CMSCounting[K, TopCMS] with CMSHeavyHitters[K] {
 
   override val eps: Double = cms.eps
 
@@ -661,23 +736,9 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSP
 
   override val totalCount: Long = cms.totalCount
 
-  /**
-   * Finds all heavy hitters, i.e., elements in the stream that appear at least
-   * `(heavyHittersPct * totalCount)` times.
-   *
-   * Every item that appears at least `(heavyHittersPct * totalCount)` times is output, and with probability
-   * `p >= 1 - delta`, no item whose count is less than `(heavyHittersPct - eps) * totalCount` is output.
-   *
-   * This also means that this parameter is an upper bound on the number of heavy hitters that will be tracked: the set
-   * of heavy hitters contains at most `1 / heavyHittersPct` elements.  For example, if `heavyHittersPct=0.01` (or
-   * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
-   * This parameter can thus control the memory footprint required for tracking heavy hitters.
-   */
-  val heavyHittersPct: Double = params.heavyHittersPct
-
   override def frequency(item: K): Approximate[Long] = cms.frequency(item)
 
-  override def innerProduct(other: TopPctCMS[K]): Approximate[Long] = cms.innerProduct(other.cms)
+  override def innerProduct(other: TopCMS[K]): Approximate[Long] = cms.innerProduct(other.cms)
 
   def f2: Approximate[Long] = innerProduct(this)
 
@@ -686,90 +747,121 @@ sealed abstract class TopPctCMS[K: Ordering](val cms: CMS[K], params: TopPctCMSP
 /**
  * Zero element.  Used for initialization.
  */
-case class TopPctCMSZero[K: Ordering](override val cms: CMS[K],
-  params: TopPctCMSParams) extends TopPctCMS[K](cms, params) {
+case class TopCMSZero[K: Ordering](override val cms: CMS[K], params: TopCMSParams[K])
+  extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set.empty[K]
 
-  override def +(item: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, params) + (item, count)
+  override def +(item: K, count: Long): TopCMS[K] = TopCMSInstance(cms, params) + (item, count)
 
-  override def ++(other: TopPctCMS[K]): TopPctCMS[K] = other
+  override def ++(other: TopCMS[K]): TopCMS[K] = other
 
 }
 
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class TopPctCMSItem[K: Ordering](item: K,
-  override val cms: CMS[K],
-  params: TopPctCMSParams) extends TopPctCMS[K](cms, params) {
+case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: TopCMSParams[K])
+  extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set(item)
 
-  override def +(x: K, count: Long): TopPctCMS[K] = TopPctCMSInstance(cms, params) + item + (x, count)
+  override def +(x: K, count: Long): TopCMS[K] = TopCMSInstance(cms, params) + item + (x, count)
 
-  override def ++(other: TopPctCMS[K]): TopPctCMS[K] = {
+  override def ++(other: TopCMS[K]): TopCMS[K] = {
     other match {
-      case other: TopPctCMSZero[_] => this
-      case other: TopPctCMSItem[K] => TopPctCMSInstance[K](cms, params) + item + other.item
-      case other: TopPctCMSInstance[K] => other + item
+      case other: TopCMSZero[_] => this
+      case other: TopCMSItem[K] => TopCMSInstance[K](cms, params) + item + other.item
+      case other: TopCMSInstance[K] => other + item
     }
   }
 
 }
 
-object TopPctCMSInstance {
+object TopCMSInstance {
 
-  def apply[K: Ordering](cms: CMS[K], params: TopPctCMSParams): TopPctCMSInstance[K] = {
-    implicit val heavyHitterOrdering = HeavyHitter.ordering[K]
-    TopPctCMSInstance[K](cms, HeavyHitters[K](SortedSet[HeavyHitter[K]]()), params)
+  def apply[K: Ordering](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
+    TopCMSInstance[K](cms, HeavyHitters.empty[K], params)
   }
 
 }
 
-case class TopPctCMSInstance[K: Ordering](override val cms: CMS[K],
-  hhs: HeavyHitters[K],
-  params: TopPctCMSParams)
-  extends TopPctCMS[K](cms, params) {
+case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
+  extends TopCMS[K](cms, params) {
 
   override def heavyHitters: Set[K] = hhs.items
 
-  override def +(item: K, count: Long): TopPctCMSInstance[K] = {
+  override def +(item: K, count: Long): TopCMSInstance[K] = {
     require(count >= 0, "count must be >= 0 (negative counts not implemented")
     if (count != 0L) {
-      val newHhs = updateHeavyHitters(item, count)
-      val newCMS = cms + (item, count)
-      TopPctCMSInstance[K](newCMS, newHhs, params)
+      val newCms = cms + (item, count)
+      val newHhs = params.logic.updateHeavyHitters(cms, newCms)(hhs, item, count)
+      TopCMSInstance[K](newCms, newHhs, params)
     } else this
   }
 
-  /**
-   * Updates the data structure of heavy hitters when a new item (with associated count) enters the stream.
-   */
-  private def updateHeavyHitters(item: K, count: Long): HeavyHitters[K] = {
-    val oldItemCount = frequency(item).estimate
-    val newItemCount = oldItemCount + count
-    val newTotalCount = totalCount + count
-
-    // If the new item is a heavy hitter, add it, and remove any previous instances.
-    val newHhs =
-      if (newItemCount >= params.heavyHittersPct * newTotalCount) {
-        hhs - HeavyHitter[K](item, oldItemCount) + HeavyHitter[K](item, newItemCount)
-      } else hhs
-
-    // Remove any items below the new heavy hitter threshold.
-    newHhs.dropCountsBelow(params.heavyHittersPct * newTotalCount)
+  override def ++(other: TopCMS[K]): TopCMS[K] = {
+    other match {
+      case other: TopCMSZero[_] => this
+      case other: TopCMSItem[K] => this + other.item
+      case other: TopCMSInstance[K] =>
+        val newCms = cms ++ other.cms
+        val newHhs = params.logic.updateHeavyHitters(newCms)(hhs, other.hhs)
+        TopCMSInstance(newCms, newHhs, params)
+    }
   }
 
-  override def ++(other: TopPctCMS[K]): TopPctCMS[K] = {
-    other match {
-      case other: TopPctCMSZero[_] => this
-      case other: TopPctCMSItem[K] => this + other.item
-      case other: TopPctCMSInstance[K] =>
-        val newCms = cms ++ other.cms
-        val newHhs = (hhs ++ other.hhs).dropCountsBelow(params.heavyHittersPct * newCms.totalCount)
-        TopPctCMSInstance(newCms, newHhs, params)
-    }
+}
+
+abstract class HeavyHittersLogic[K: Ordering] {
+
+  def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
+    val oldItemCount = oldCms.frequency(item).estimate
+    val oldHh = HeavyHitter[K](item, oldItemCount)
+    val newItemCount = oldItemCount + count
+    val newHh = HeavyHitter[K](item, newItemCount)
+    purgeHeavyHitters(newCms)(hhs - oldHh + newHh)
+  }
+
+  def updateHeavyHitters(cms: CMS[K])(left: HeavyHitters[K], right: HeavyHitters[K]) = {
+    val allItems = left.items ++ right.items
+    val hitters = allItems.map { case i => HeavyHitter[K](i, cms.frequency(i).estimate) }
+    val newHhs = HeavyHitters.from(hitters)
+    purgeHeavyHitters(cms)(newHhs)
+  }
+
+  def purgeHeavyHitters(cms: CMS[K])(hhs: HeavyHitters[K]): HeavyHitters[K]
+
+}
+
+/**
+ * Finds all heavy hitters, i.e., elements in the stream that appear at least `(heavyHittersPct * totalCount)` times.
+ *
+ * Every item that appears at least `(heavyHittersPct * totalCount)` times is output, and with probability
+ * `p >= 1 - delta`, no item whose count is less than `(heavyHittersPct - eps) * totalCount` is output.
+ *
+ * This also means that this parameter is an upper bound on the number of heavy hitters that will be tracked: the set
+ * of heavy hitters contains at most `1 / heavyHittersPct` elements.  For example, if `heavyHittersPct=0.01` (or
+ * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
+ * This parameter can thus control the memory footprint required for tracking heavy hitters.
+ */
+case class TopPctHeavyHittersLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
+
+  require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
+
+  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
+    val minCount = heavyHittersPct * cms.totalCount
+    HeavyHitters[K](hitters.hhs.dropWhile { _.count < minCount })
+  }
+
+}
+
+case class TopNHeavyHittersLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
+
+  require(heavyHittersN > 0, "heavyHittersN must be > 0")
+
+  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
+    HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
   }
 
 }
@@ -787,7 +879,21 @@ case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) {
 
   def items: Set[K] = hhs.map { _.item }
 
-  def dropCountsBelow(minCount: Double): HeavyHitters[K] = HeavyHitters[K](hhs.dropWhile { _.count < minCount })
+}
+
+object HeavyHitters {
+
+  def empty[K: Ordering]: HeavyHitters[K] = HeavyHitters(emptyHhs)
+
+  private def emptyHhs[K: Ordering]: SortedSet[HeavyHitter[K]] = {
+    implicit val heavyHitterOrdering = HeavyHitter.ordering[K]
+    SortedSet[HeavyHitter[K]]()
+  }
+
+  def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = {
+    HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
+  }
+
 }
 
 case class HeavyHitter[K: Ordering](item: K, count: Long)
@@ -815,13 +921,27 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
 case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopPctCMS[K], TopPctCMS[K]] {
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
   val monoid = cmsMonoid
 
-  def prepare(value: K): TopPctCMS[K] = monoid.create(value)
+  def prepare(value: K): TopCMS[K] = monoid.create(value)
 
-  def present(cms: TopPctCMS[K]): TopPctCMS[K] = cms
+  def present(cms: TopCMS[K]): TopCMS[K] = cms
+
+}
+
+/**
+ * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
+ */
+case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
+  val monoid = cmsMonoid
+
+  def prepare(value: K): TopCMS[K] = monoid.create(value)
+
+  def present(cms: TopCMS[K]): TopCMS[K] = cms
 
 }
 

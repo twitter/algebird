@@ -4,7 +4,9 @@ import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-import CMSHasherImplicits._ // required, although e.g. IntelliJ IDEA may flag it as unused import
+import CMSHasherImplicits._
+
+// required, although e.g. IntelliJ IDEA may flag it as unused import
 
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
@@ -54,7 +56,7 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   val SEED = 1
   val HEAVY_HITTERS_PCT = 0.1
 
-  private def createArbitrary[K: Numeric](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopPctCMS[K]] = {
+  private def createArbitrary[K: Numeric](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {
     val k = implicitly[Numeric[K]]
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
@@ -64,25 +66,25 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   property("TopPctCms[Short] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    monoidLaws[TopPctCMS[Short]]
+    monoidLaws[TopCMS[Short]]
   }
 
   property("TopPctCms[Int] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    monoidLaws[TopPctCMS[Int]]
+    monoidLaws[TopCMS[Int]]
   }
 
   property("TopPctCms[Long] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    monoidLaws[TopPctCMS[Long]]
+    monoidLaws[TopCMS[Long]]
   }
 
   property("TopPctCms[BigInt] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    monoidLaws[TopPctCMS[BigInt]]
+    monoidLaws[TopCMS[BigInt]]
   }
 
 }
@@ -153,7 +155,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
       val cms = COUNTING_CMS_MONOID.create(data)
 
-      cms.totalCount should be (totalCount)
+      cms.totalCount should be(totalCount)
     }
 
     "estimate frequencies" in {
@@ -180,16 +182,16 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val two = COUNTING_CMS_MONOID.create(2.toK[K])
       val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
 
-      cms.frequency(0.toK[K]).estimate should be (0)
-      cms.frequency(1.toK[K]).estimate should be (1)
-      cms.frequency(2.toK[K]).estimate should be (2)
+      cms.frequency(0.toK[K]).estimate should be(0)
+      cms.frequency(1.toK[K]).estimate should be(1)
+      cms.frequency(2.toK[K]).estimate should be(2)
 
       val three = COUNTING_CMS_MONOID.create(Seq(1, 1, 1).toK[K])
-      three.frequency(1.toK[K]).estimate should be (3)
+      three.frequency(1.toK[K]).estimate should be(3)
       val four = COUNTING_CMS_MONOID.create(Seq(1, 1, 1, 1).toK[K])
-      four.frequency(1.toK[K]).estimate should be (4)
+      four.frequency(1.toK[K]).estimate should be(4)
       val cms2 = COUNTING_CMS_MONOID.plus(four, three)
-      cms2.frequency(1.toK[K]).estimate should be (7)
+      cms2.frequency(1.toK[K]).estimate should be(7)
     }
 
     "estimate inner products" in {
@@ -216,22 +218,22 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       // Nothing in common.
       val a1 = List(1, 2, 3).toK[K]
       val a2 = List(4, 5, 6).toK[K]
-      COUNTING_CMS_MONOID.create(a1).innerProduct(COUNTING_CMS_MONOID.create(a2)).estimate should be (0)
+      COUNTING_CMS_MONOID.create(a1).innerProduct(COUNTING_CMS_MONOID.create(a2)).estimate should be(0)
 
       // One element in common.
       val b1 = List(1, 2, 3).toK[K]
       val b2 = List(3, 5, 6).toK[K]
-      COUNTING_CMS_MONOID.create(b1).innerProduct(COUNTING_CMS_MONOID.create(b2)).estimate should be (1)
+      COUNTING_CMS_MONOID.create(b1).innerProduct(COUNTING_CMS_MONOID.create(b2)).estimate should be(1)
 
       // Multiple, non-repeating elements in common.
       val c1 = List(1, 2, 3).toK[K]
       val c2 = List(3, 2, 6).toK[K]
-      COUNTING_CMS_MONOID.create(c1).innerProduct(COUNTING_CMS_MONOID.create(c2)).estimate should be (2)
+      COUNTING_CMS_MONOID.create(c1).innerProduct(COUNTING_CMS_MONOID.create(c2)).estimate should be(2)
 
       // Multiple, repeating elements in common.
       val d1 = List(1, 2, 2, 3, 3).toK[K]
       val d2 = List(2, 3, 3, 6).toK[K]
-      COUNTING_CMS_MONOID.create(d1).innerProduct(COUNTING_CMS_MONOID.create(d2)).estimate should be (6)
+      COUNTING_CMS_MONOID.create(d1).innerProduct(COUNTING_CMS_MONOID.create(d2)).estimate should be(6)
     }
 
     "work as an Aggregator" in {
@@ -257,7 +259,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
   }
 
-  "A Count-Min sketch implementing CMSHeavyHitters" should {
+  "A Top-% Count-Min sketch implementing CMSHeavyHitters" should {
 
     "estimate heavy hitters" in {
       // Simple way of making some elements appear much more often than others.
@@ -267,34 +269,35 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val data = data1 ++ data2 ++ data3
 
       // Find elements that appear at least 20% of the time.
+      val heavyHittersPct = 0.2
       val cms = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.2).create(data)
 
-      val trueHhs = exactHeavyHitters(data, cms.heavyHittersPct)
+      val trueHhs = exactHeavyHitters(data, heavyHittersPct)
       val estimatedHhs = cms.heavyHitters
 
       // All true heavy hitters must be claimed as heavy hitters.
-      trueHhs.intersect(estimatedHhs) should be (trueHhs)
+      trueHhs.intersect(estimatedHhs) should be(trueHhs)
 
       // It should be very unlikely that any element with count less than
       // (heavyHittersPct - eps) * totalCount is claimed as a heavy hitter.
-      val minHhCount = (cms.heavyHittersPct - cms.eps) * cms.totalCount
-      val infrequent = data.groupBy{ x => x }.mapValues{ _.size }.filter{ _._2 < minHhCount }.keys.toSet
-      infrequent.intersect(estimatedHhs) should be ('empty)
+      val minHhCount = (heavyHittersPct - cms.eps) * cms.totalCount
+      val infrequent = data.groupBy { x => x }.mapValues { _.size }.filter { _._2 < minHhCount }.keys.toSet
+      infrequent.intersect(estimatedHhs) should be('empty)
     }
 
     "drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
-      cms1.heavyHitters should be (Set(1, 2))
+      cms1.heavyHitters should be(Set(1, 2))
 
       val cms2 = cms1 ++ monoid.create(2.toK[K])
-      cms2.heavyHitters should be (Set(2))
+      cms2.heavyHitters should be(Set(2))
 
       val cms3 = cms2 ++ monoid.create(1.toK[K])
-      cms3.heavyHitters should be (Set(1, 2))
+      cms3.heavyHitters should be(Set(1, 2))
 
       val cms4 = cms3 ++ monoid.create(Seq(0, 0, 0, 0, 0, 0).toK[K])
-      cms4.heavyHitters should be (Set(0))
+      cms4.heavyHitters should be(Set(0))
     }
 
     "exactly compute heavy hitters in a small stream" in {
@@ -303,10 +306,47 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
       val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
       val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
-      cms1.heavyHitters should be (Set(1, 2, 3, 4, 5))
-      cms2.heavyHitters should be (Set(2, 3, 4, 5))
-      cms3.heavyHitters should be (Set(5))
-      cms4.heavyHitters should be (Set[K]())
+      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms3.heavyHitters should be(Set(5))
+      cms4.heavyHitters should be(Set[K]())
+    }
+
+    "compute heavy hitters correctly (regression test of GH-353)" in {
+      val monoid = TopPctCMS.monoid(EPS, DELTA, SEED, 0.1)
+
+      val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
+      val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
+      val data3 = Seq(3, 6, 6, 6, 7, 7).toK[K]
+      val data4 = Seq(3, 8, 8, 8, 9, 9).toK[K]
+      val singleData = data1 ++ data2 ++ data3 ++ data4
+
+      /*
+        Data sets from above shown in tabular view
+
+        Item    1   2   3   4   total (= singleData)
+        ----------------------------------------
+        A (1)   3   -   -   -   3
+        B (2)   2   -   -   -   2
+        C (3)   1   1   1   1   4  <<< C is global top 1 heavy hitter
+        D (4)   -   3   -   -   3
+        E (5)   -   2   -   -   2
+        F (6)   -   -   3   -   3
+        G (7)   -   -   2   -   2
+        H (8)   -   -   -   3   3
+        I (9)   -   -   -   2   2
+
+       */
+
+      val cms1 = monoid.create(data1)
+      val cms2 = monoid.create(data2)
+      val cms3 = monoid.create(data3)
+      val cms4 = monoid.create(data4)
+      val aggregated = cms1 ++ cms2 ++ cms3 ++ cms4
+
+      val single = monoid.create(singleData)
+      aggregated.heavyHitters should be(single.heavyHitters)
+      aggregated.heavyHitters contains(3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
     "work as an Aggregator" in {
@@ -315,10 +355,64 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val cms2 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
       val cms3 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
       val cms4 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
-      cms1.heavyHitters should be (Set(1, 2, 3, 4, 5))
-      cms2.heavyHitters should be (Set(2, 3, 4, 5))
-      cms3.heavyHitters should be (Set(5))
-      cms4.heavyHitters should be (Set[K]())
+      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms3.heavyHitters should be(Set(5))
+      cms4.heavyHitters should be(Set[K]())
+    }
+
+  }
+
+  "A Top-N Count-Min sketch implementing CMSHeavyHitters" should {
+
+    // Note: As we learned in https://github.com/twitter/algebird/issues/353
+    // a top-N CMS cannot merge heavy hitters correctly all the time.
+    // This is because merging top-N based heavy hitters is not an associative
+    // operation.
+    //
+    // We still keep the heavy hitter related tests below in the spec,
+    // but be aware that in general you cannot trust the heavy hitters
+    // functionality in top-N CMS implementations.
+
+    "drop old heavy hitters when new heavy hitters replace them" in {
+      val heavyHittersN = 2
+      val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, heavyHittersN)
+      val cms1 = monoid.create(Seq(1, 2, 2).toK[K]) // 1x 1, 2x 2
+      cms1.heavyHitters should be(Set(1, 2))
+      val cms2 = cms1 ++ monoid.create(Seq(3, 3, 3).toK[K]) // 1x 1, 2x 2, 3x 3
+      cms2.heavyHitters should be(Set(2, 3))
+      val cms3 = cms2 ++ monoid.create(Seq(1, 1, 1).toK[K]) // 4x 1, 2x 2, 3x 3
+      cms3.heavyHitters should be(Set(3, 1))
+      val cms4 = cms3 ++ monoid.create(Seq(6, 6, 6, 6, 6, 6).toK[K]) // 4x 1, 2x 2, 3x 3, 6x 6
+      cms4.heavyHitters should be(Set(1, 6))
+    }
+
+    "exactly compute heavy hitters in a small stream" in {
+      val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+      val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
+      val cms2 = TopNCMS.monoid[K](EPS, DELTA, SEED, 4).create(data1)
+      val cms3 = TopNCMS.monoid[K](EPS, DELTA, SEED, 3).create(data1)
+      val cms4 = TopNCMS.monoid[K](EPS, DELTA, SEED, 2).create(data1)
+      val cms5 = TopNCMS.monoid[K](EPS, DELTA, SEED, 1).create(data1)
+      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms3.heavyHitters should be(Set(3, 4, 5))
+      cms4.heavyHitters should be(Set(4, 5))
+      cms5.heavyHitters should be(Set(5))
+    }
+
+    "work as an Aggregator" in {
+      val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+      val cms1 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 5).apply(data1)
+      val cms2 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 4).apply(data1)
+      val cms3 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 3).apply(data1)
+      val cms4 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 2).apply(data1)
+      val cms5 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 1).apply(data1)
+      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms3.heavyHitters should be(Set(3, 4, 5))
+      cms4.heavyHitters should be(Set(4, 5))
+      cms5.heavyHitters should be(Set(5))
     }
 
   }
