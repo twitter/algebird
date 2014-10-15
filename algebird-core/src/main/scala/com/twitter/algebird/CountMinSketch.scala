@@ -114,6 +114,19 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
 }
 
 /**
+ * An Aggregator for [[CMS]].  Can be created using [[CMS.aggregator]].
+ */
+case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
+
+  val monoid = cmsMonoid
+
+  def prepare(value: K): CMS[K] = monoid.create(value)
+
+  def present(cms: CMS[K]): CMS[K] = cms
+
+}
+
+/**
  * Configuration parameters for [[CMS]].
  *
  * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
@@ -535,158 +548,7 @@ object CMSInstance {
 
 }
 
-/**
- * Monoid for adding [[TopCMS]] sketches.
- *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
- * {{{
- * import com.twitter.algebird.CMSHasherImplicits._
- * }}}
- *
- * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
- * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
- *                  (heavyHittersPct * totalCount) times in the stream.
- * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
- *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
- *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
- *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
- *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
- */
-class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
-
-  val params: TopCMSParams[K] = {
-    val logic = new TopPctHeavyHittersLogic[K](heavyHittersPct)
-    TopCMSParams[K](logic)
-  }
-
-  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
-
-  /**
-   * We assume the sketches on the left and right use the same hash functions.
-   */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
-
-  /**
-   * Create a sketch out of a single item.
-   */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
-
-  /**
-   * Create a sketch out of multiple items.
-   */
-  def create(data: Seq[K]): TopCMS[K] = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
-
-}
-
-/**
- * Monoid for adding [[TopCMS]] sketches.
- *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
- * {{{
- * import com.twitter.algebird.CMSHasherImplicits._
- * }}}
- *
- * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
- * @param heavyHittersN The maximum number of heavy hitters to track.
- * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
- *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
- *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
- *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
- *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
- */
-class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
-
-  val params: TopCMSParams[K] = {
-    val logic = new TopNHeavyHittersLogic[K](heavyHittersN)
-    TopCMSParams[K](logic)
-  }
-
-  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
-
-  /**
-   * We assume the sketches on the left and right use the same hash functions.
-   */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
-
-  /**
-   * Create a sketch out of a single item.
-   */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
-
-  /**
-   * Create a sketch out of multiple items.
-   */
-  def create(data: Seq[K]): TopCMS[K] = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
-
-}
-
 case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
-
-object TopPctCMS {
-
-  def monoid[K: Ordering: CMSHasher](eps: Double,
-    delta: Double,
-    seed: Int,
-    heavyHittersPct: Double): TopPctCMSMonoid[K] =
-    new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
-
-  def monoid[K: Ordering: CMSHasher](depth: Int,
-    width: Int,
-    seed: Int,
-    heavyHittersPct: Double): TopPctCMSMonoid[K] =
-    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
-
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
-    delta: Double,
-    seed: Int,
-    heavyHittersPct: Double): TopPctCMSAggregator[K] =
-    new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
-
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
-    width: Int,
-    seed: Int,
-    heavyHittersPct: Double): TopPctCMSAggregator[K] =
-    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
-
-}
-
-object TopNCMS {
-
-  def monoid[K: Ordering: CMSHasher](eps: Double,
-    delta: Double,
-    seed: Int,
-    heavyHittersN: Int): TopNCMSMonoid[K] =
-    new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
-
-  def monoid[K: Ordering: CMSHasher](depth: Int,
-    width: Int,
-    seed: Int,
-    heavyHittersN: Int): TopNCMSMonoid[K] =
-    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
-
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
-    delta: Double,
-    seed: Int,
-    heavyHittersN: Int): TopNCMSAggregator[K] =
-    new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
-
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
-    width: Int,
-    seed: Int,
-    heavyHittersN: Int): TopNCMSAggregator[K] =
-    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
-
-}
 
 /**
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
@@ -905,15 +767,78 @@ object HeavyHitter {
 }
 
 /**
- * An Aggregator for [[CMS]].  Can be created using [[CMS.aggregator]].
+ * Monoid for Top-% based [[TopCMS]] sketches.
+ *
+ * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * {{{
+ * import com.twitter.algebird.CMSHasherImplicits._
+ * }}}
+ *
+ * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
+ * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
+ *                  (heavyHittersPct * totalCount) times in the stream.
+ * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
+ *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
+ *           your problem domain and their identifiers used for counting via CMS should be bijective.
+ *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
+ *           implicits that can be imported.
+ *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
+ *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
+class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
-  val monoid = cmsMonoid
+  val params: TopCMSParams[K] = {
+    val logic = new TopPctHeavyHittersLogic[K](heavyHittersPct)
+    TopCMSParams[K](logic)
+  }
 
-  def prepare(value: K): CMS[K] = monoid.create(value)
+  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
 
-  def present(cms: CMS[K]): CMS[K] = cms
+  /**
+   * We assume the sketches on the left and right use the same hash functions.
+   */
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
+
+  /**
+   * Create a sketch out of a single item.
+   */
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
+
+  /**
+   * Create a sketch out of multiple items.
+   */
+  def create(data: Seq[K]): TopCMS[K] = {
+    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  }
+
+}
+
+object TopPctCMS {
+
+  def monoid[K: Ordering: CMSHasher](eps: Double,
+                                     delta: Double,
+                                     seed: Int,
+                                     heavyHittersPct: Double): TopPctCMSMonoid[K] =
+    new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
+
+  def monoid[K: Ordering: CMSHasher](depth: Int,
+                                     width: Int,
+                                     seed: Int,
+                                     heavyHittersPct: Double): TopPctCMSMonoid[K] =
+    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
+
+  def aggregator[K: Ordering: CMSHasher](eps: Double,
+                                         delta: Double,
+                                         seed: Int,
+                                         heavyHittersPct: Double): TopPctCMSAggregator[K] =
+    new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
+
+  def aggregator[K: Ordering: CMSHasher](depth: Int,
+                                         width: Int,
+                                         seed: Int,
+                                         heavyHittersPct: Double): TopPctCMSAggregator[K] =
+    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
 }
 
@@ -921,7 +846,7 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
 case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+    extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
   val monoid = cmsMonoid
 
@@ -932,10 +857,85 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 }
 
 /**
+ * Monoid for Top-N based [[TopCMS]] sketches.
+ *
+ * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * {{{
+ * import com.twitter.algebird.CMSHasherImplicits._
+ * }}}
+ *
+ * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
+ * @param heavyHittersN The maximum number of heavy hitters to track.
+ * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
+ *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
+ *           your problem domain and their identifiers used for counting via CMS should be bijective.
+ *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
+ *           implicits that can be imported.
+ *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
+ *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
+ */
+class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
+
+  val params: TopCMSParams[K] = {
+    val logic = new TopNHeavyHittersLogic[K](heavyHittersN)
+    TopCMSParams[K](logic)
+  }
+
+  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
+
+  /**
+   * We assume the sketches on the left and right use the same hash functions.
+   */
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
+
+  /**
+   * Create a sketch out of a single item.
+   */
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
+
+  /**
+   * Create a sketch out of multiple items.
+   */
+  def create(data: Seq[K]): TopCMS[K] = {
+    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  }
+
+}
+
+object TopNCMS {
+
+  def monoid[K: Ordering: CMSHasher](eps: Double,
+                                     delta: Double,
+                                     seed: Int,
+                                     heavyHittersN: Int): TopNCMSMonoid[K] =
+    new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
+
+  def monoid[K: Ordering: CMSHasher](depth: Int,
+                                     width: Int,
+                                     seed: Int,
+                                     heavyHittersN: Int): TopNCMSMonoid[K] =
+    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
+
+  def aggregator[K: Ordering: CMSHasher](eps: Double,
+                                         delta: Double,
+                                         seed: Int,
+                                         heavyHittersN: Int): TopNCMSAggregator[K] =
+    new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
+
+  def aggregator[K: Ordering: CMSHasher](depth: Int,
+                                         width: Int,
+                                         seed: Int,
+                                         heavyHittersN: Int): TopNCMSAggregator[K] =
+    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
+
+}
+
+/**
  * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
  */
 case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+    extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
   val monoid = cmsMonoid
 
