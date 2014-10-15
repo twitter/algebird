@@ -1,7 +1,7 @@
 package com.twitter.algebird.caliper
 
 import com.google.caliper.{ Param, SimpleBenchmark }
-import com.twitter.algebird.{ TopCMS, CMSHasherImplicits, TopPctCMSMonoid }
+import com.twitter.algebird.{ TopPctCMS, TopCMS, CMSHasherImplicits, TopPctCMSMonoid }
 
 /**
  * Benchmarks the Count-Min sketch implementation in Algebird.
@@ -39,12 +39,12 @@ class CMSBenchmark extends SimpleBenchmark {
 
     cmsLongMonoid = {
       val seed = 1
-      TopCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
+      TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
     }
 
     cmsBigIntMonoid = {
       val seed = 1
-      TopCMS.monoid[BigInt](eps, delta, seed, heavyHittersPct)
+      TopPctCMS.monoid[BigInt](eps, delta, seed, heavyHittersPct)
     }
 
     random = new scala.util.Random
