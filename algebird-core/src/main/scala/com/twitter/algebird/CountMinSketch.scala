@@ -539,11 +539,13 @@ object CMSInstance {
   }
 
   object CountsTable {
+
     /**
      * Creates a new [[CountsTable]] with counts initialized to all zeroes.
      */
     def apply[K: Ordering](depth: Int, width: Int): CountsTable[K] =
       CountsTable[K](Vector.fill[Long](depth, width)(0L))
+
   }
 
 }
@@ -630,12 +632,10 @@ case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: To
 
   override def +(x: K, count: Long): TopCMS[K] = TopCMSInstance(cms, params) + item + (x, count)
 
-  override def ++(other: TopCMS[K]): TopCMS[K] = {
-    other match {
-      case other: TopCMSZero[_] => this
-      case other: TopCMSItem[K] => TopCMSInstance[K](cms, params) + item + other.item
-      case other: TopCMSInstance[K] => other + item
-    }
+  override def ++(other: TopCMS[K]): TopCMS[K] = other match {
+    case other: TopCMSZero[_] => this
+    case other: TopCMSItem[K] => TopCMSInstance[K](cms, params) + item + other.item
+    case other: TopCMSInstance[K] => other + item
   }
 
 }
@@ -662,15 +662,13 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
     } else this
   }
 
-  override def ++(other: TopCMS[K]): TopCMS[K] = {
-    other match {
-      case other: TopCMSZero[_] => this
-      case other: TopCMSItem[K] => this + other.item
-      case other: TopCMSInstance[K] =>
-        val newCms = cms ++ other.cms
-        val newHhs = params.logic.updateHeavyHitters(newCms)(hhs, other.hhs)
-        TopCMSInstance(newCms, newHhs, params)
-    }
+  override def ++(other: TopCMS[K]): TopCMS[K] = other match {
+    case other: TopCMSZero[_] => this
+    case other: TopCMSItem[K] => this + other.item
+    case other: TopCMSInstance[K] =>
+      val newCms = cms ++ other.cms
+      val newHhs = params.logic.updateHeavyHitters(newCms)(hhs, other.hhs)
+      TopCMSInstance(newCms, newHhs, params)
   }
 
 }
@@ -752,9 +750,7 @@ object HeavyHitters {
     SortedSet[HeavyHitter[K]]()
   }
 
-  def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = {
-    HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
-  }
+  def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
 
 }
 
@@ -897,9 +893,7 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
   /**
    * Create a sketch out of multiple items.
    */
-  def create(data: Seq[K]): TopCMS[K] = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
+  def create(data: Seq[K]): TopCMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
 }
 
