@@ -301,6 +301,11 @@ trait CMSCounting[K, C[_]] {
 trait CMSHeavyHitters[K] {
 
   /**
+   * The pluggable logic with which heavy hitters are being tracked.
+   */
+  def heavyHittersLogic: HeavyHittersLogic[K]
+
+  /**
    * Returns the set of heavy hitters.
    */
   // TODO: Should we change the contract to return a descendingly sorted list of heavy hitters (heaviest = first)?
@@ -606,6 +611,11 @@ sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[
 
   def f2: Approximate[Long] = innerProduct(this)
 
+  /**
+   * The pluggable logic with which heavy hitters are being tracked.
+   */
+  override def heavyHittersLogic: HeavyHittersLogic[K] = params.logic
+
 }
 
 /**
@@ -657,7 +667,7 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
     require(count >= 0, "count must be >= 0 (negative counts not implemented")
     if (count != 0L) {
       val newCms = cms + (item, count)
-      val newHhs = params.logic.updateHeavyHitters(cms, newCms)(hhs, item, count)
+      val newHhs = heavyHittersLogic.updateHeavyHitters(cms, newCms)(hhs, item, count)
       TopCMSInstance[K](newCms, newHhs, params)
     } else this
   }
@@ -667,12 +677,15 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
     case other: TopCMSItem[K] => this + other.item
     case other: TopCMSInstance[K] =>
       val newCms = cms ++ other.cms
-      val newHhs = params.logic.updateHeavyHitters(newCms)(hhs, other.hhs)
+      val newHhs = heavyHittersLogic.updateHeavyHitters(newCms)(hhs, other.hhs)
       TopCMSInstance(newCms, newHhs, params)
   }
 
 }
 
+/**
+ * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
+ */
 abstract class HeavyHittersLogic[K: Ordering] {
 
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
@@ -705,7 +718,7 @@ abstract class HeavyHittersLogic[K: Ordering] {
  * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
  * This parameter can thus control the memory footprint required for tracking heavy hitters.
  */
-case class TopPctHeavyHittersLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
+case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
 
   require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
@@ -716,7 +729,7 @@ case class TopPctHeavyHittersLogic[K: Ordering](heavyHittersPct: Double) extends
 
 }
 
-case class TopNHeavyHittersLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
+case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
@@ -786,7 +799,7 @@ object HeavyHitter {
 class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
-    val logic = new TopPctHeavyHittersLogic[K](heavyHittersPct)
+    val logic = new TopPctLogic[K](heavyHittersPct)
     TopCMSParams[K](logic)
   }
 
@@ -875,7 +888,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
-    val logic = new TopNHeavyHittersLogic[K](heavyHittersN)
+    val logic = new TopNLogic[K](heavyHittersN)
     TopCMSParams[K](logic)
   }
 
