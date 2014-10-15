@@ -134,7 +134,7 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
  *              (an interval that depends on `eps`) around the truth.
- * @tparam K
+ * @tparam K The type used to identify the elements to be counted.
  */
 case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double) {
 
