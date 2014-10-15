@@ -531,7 +531,7 @@ object CMSInstance {
       require((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
       val iil: IndexedSeq[IndexedSeq[Long]] = Monoid.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
       def toVector[V](is: IndexedSeq[V]): Vector[V] = is match {
-        case v: Vector[_] => v
+        case v: Vector[_] => v.asInstanceOf[Vector[V]]
         case _ => Vector(is: _*)
       }
       CountsTable[K](toVector(iil.map { toVector }))
