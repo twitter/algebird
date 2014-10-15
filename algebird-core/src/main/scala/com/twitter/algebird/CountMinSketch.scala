@@ -737,6 +737,7 @@ case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) {
 
   def ++(other: HeavyHitters[K]): HeavyHitters[K] = HeavyHitters[K](hhs ++ other.hhs)
 
+  // TODO: Should we return a descendingly sorted list here?
   def items: Set[K] = hhs.map { _.item }
 
 }
