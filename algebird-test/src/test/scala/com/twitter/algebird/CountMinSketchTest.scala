@@ -347,7 +347,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
       val single = monoid.create(singleData)
       aggregated.heavyHitters should be(single.heavyHitters)
-      aggregated.heavyHitters contains(3.toK[K]) // C=3 is global top 1 heavy hitter
+      aggregated.heavyHitters contains (3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
     "work as an Aggregator" in {

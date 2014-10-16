@@ -97,9 +97,14 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   val zero: CMS[K] = CMSZero[K](params)
 
   /**
-   * We assume the sketches on the left and right use the same hash functions.
+   * Combines the two sketches.
+   *
+   * The sketches must use the same hash functions.
    */
-  def plus(left: CMS[K], right: CMS[K]): CMS[K] = left ++ right
+  def plus(left: CMS[K], right: CMS[K]): CMS[K] = {
+    require(left.params.hashes == right.params.hashes, "The sketches must use the same hash functions.")
+    left ++ right
+  }
 
   /**
    * Create a sketch out of a single item.
@@ -373,7 +378,7 @@ object CMS {
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class CMS[K: Ordering](params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
+sealed abstract class CMS[K: Ordering](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
 
   override val eps: Double = params.eps
 
@@ -386,7 +391,7 @@ sealed abstract class CMS[K: Ordering](params: CMSParams[K]) extends java.io.Ser
 /**
  * Zero element.  Used for initialization.
  */
-case class CMSZero[K: Ordering](params: CMSParams[K]) extends CMS[K](params) {
+case class CMSZero[K: Ordering](override val params: CMSParams[K]) extends CMS[K](params) {
 
   override val totalCount: Long = 0L
 
@@ -403,7 +408,7 @@ case class CMSZero[K: Ordering](params: CMSParams[K]) extends CMS[K](params) {
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class CMSItem[K: Ordering](item: K, params: CMSParams[K]) extends CMS[K](params) {
+case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) extends CMS[K](params) {
 
   override val totalCount: Long = 1L
 
@@ -428,7 +433,7 @@ case class CMSItem[K: Ordering](item: K, params: CMSParams[K]) extends CMS[K](pa
  */
 case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
   override val totalCount: Long,
-  params: CMSParams[K]) extends CMS[K](params) {
+  override val params: CMSParams[K]) extends CMS[K](params) {
 
   def ++(other: CMS[K]): CMS[K] = {
     other match {
@@ -816,9 +821,14 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
   val zero: TopCMS[K] = TopCMSZero[K](cms, params)
 
   /**
-   * We assume the sketches on the left and right use the same hash functions.
+   * Combines the two sketches.
+   *
+   * The sketches must use the same hash functions.
    */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
+    require(left.cms.params.hashes == right.cms.params.hashes, "The sketches must use the same hash functions.")
+    left ++ right
+  }
 
   /**
    * Create a sketch out of a single item.
@@ -837,27 +847,27 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
 object TopPctCMS {
 
   def monoid[K: Ordering: CMSHasher](eps: Double,
-                                     delta: Double,
-                                     seed: Int,
-                                     heavyHittersPct: Double): TopPctCMSMonoid[K] =
+    delta: Double,
+    seed: Int,
+    heavyHittersPct: Double): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
   def monoid[K: Ordering: CMSHasher](depth: Int,
-                                     width: Int,
-                                     seed: Int,
-                                     heavyHittersPct: Double): TopPctCMSMonoid[K] =
+    width: Int,
+    seed: Int,
+    heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
   def aggregator[K: Ordering: CMSHasher](eps: Double,
-                                         delta: Double,
-                                         seed: Int,
-                                         heavyHittersPct: Double): TopPctCMSAggregator[K] =
+    delta: Double,
+    seed: Int,
+    heavyHittersPct: Double): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
   def aggregator[K: Ordering: CMSHasher](depth: Int,
-                                         width: Int,
-                                         seed: Int,
-                                         heavyHittersPct: Double): TopPctCMSAggregator[K] =
+    width: Int,
+    seed: Int,
+    heavyHittersPct: Double): TopPctCMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
 }
@@ -866,7 +876,7 @@ object TopPctCMS {
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
 case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-    extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
   val monoid = cmsMonoid
 
@@ -927,9 +937,14 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
   val zero: TopCMS[K] = TopCMSZero[K](cms, params)
 
   /**
-   * We assume the sketches on the left and right use the same hash functions.
+   * Combines the two sketches.
+   *
+   * The sketches must use the same hash functions.
    */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = left ++ right
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
+    require(left.cms.params.hashes == right.cms.params.hashes, "The sketches must use the same hash functions.")
+    left ++ right
+  }
 
   /**
    * Create a sketch out of a single item.
@@ -946,27 +961,27 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
 object TopNCMS {
 
   def monoid[K: Ordering: CMSHasher](eps: Double,
-                                     delta: Double,
-                                     seed: Int,
-                                     heavyHittersN: Int): TopNCMSMonoid[K] =
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSMonoid[K] =
     new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
 
   def monoid[K: Ordering: CMSHasher](depth: Int,
-                                     width: Int,
-                                     seed: Int,
-                                     heavyHittersN: Int): TopNCMSMonoid[K] =
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
   def aggregator[K: Ordering: CMSHasher](eps: Double,
-                                         delta: Double,
-                                         seed: Int,
-                                         heavyHittersN: Int): TopNCMSAggregator[K] =
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSAggregator[K] =
     new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
 
   def aggregator[K: Ordering: CMSHasher](depth: Int,
-                                         width: Int,
-                                         seed: Int,
-                                         heavyHittersN: Int): TopNCMSAggregator[K] =
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): TopNCMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
 }
@@ -975,7 +990,7 @@ object TopNCMS {
  * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
  */
 case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
-    extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
   val monoid = cmsMonoid
 
