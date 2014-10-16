@@ -729,19 +729,21 @@ case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHitter
 
 }
 
+/**
+ * Tracks the top N heavy hitters, where `N` is defined by `heavyHittersN`.
+ *
+ * '''Warning:''' top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with
+ * regard to heavy hitters) when merging instances.  This means merging heavy hitters across CMS instances may lead to
+ * incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are being
+ * merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely is
+ * the end result biased towards these heavy hitters.
+ *
+ * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
+ */
 case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
-  /**
-   * '''Warning:''' top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with
-   * regard to heavy hitters) when merging instances.  This means merging heavy hitters across CMS instances may lead to
-   * incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are being
-   * merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely is
-   * the end result biased towards these heavy hitters.
-   *
-   * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
-   */
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
   }
