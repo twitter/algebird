@@ -889,7 +889,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 /**
  * Monoid for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
  *
- * =Warning: Unsafe merge operation=
+ * =Warning: Adding top-N CMS instances (`++`) is an unsafe operation=
  *
  * Top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with regard to heavy
  * hitters) when ''merging'' CMS instances (e.g. via `++`).  This means merging heavy hitters across CMS instances may
@@ -897,14 +897,17 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
  * being merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely
  * is the end result biased towards these heavy hitters.
  *
- * The warning above only applies when ''merging'' CMS instances.  That is, a given top-N CMS instance will correctly
- * compute its own heavy hitters.
+ * The warning above only applies when ''adding CMS instances'' (think: `cms1 ++ cms2`).  In comparison, heavy hitters
+ * are correctly computed when:
+ *
+ *   - a top-N CMS instance is created from a single data stream, i.e. `Seq[K]`
+ *   - items are added/counted individually, i.e. `cms + item` or `cms + (item, count)`.
  *
  * See the discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]] for further details.
  *
  * =Alternatives=
  *
- * The following, alternative data structures may be better picks than a top-N based CMS:
+ * The following, alternative data structures may be better picks than a top-N based CMS given the warning above:
  *
  *   - [[TopPctCMS]]: Has safe merge semantics for its instances including heavy hitters.
  *   - [[SpaceSaver]]: Has the same ordering bias than a top-N CMS, but at least it provides bounds on the bias.
