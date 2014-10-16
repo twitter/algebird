@@ -366,14 +366,13 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
   "A Top-N Count-Min sketch implementing CMSHeavyHitters" should {
 
-    // Note: As we learned in https://github.com/twitter/algebird/issues/353
-    // a top-N CMS cannot merge heavy hitters correctly all the time.
-    // This is because merging top-N based heavy hitters is not an associative
+    // Note: As described in https://github.com/twitter/algebird/issues/353, a top-N CMS is, in general, not able to
+    // merge heavy hitters correctly.  This is because merging top-N based heavy hitters is not an associative
     // operation.
     //
-    // We still keep the heavy hitter related tests below in the spec,
-    // but be aware that in general you cannot trust the heavy hitters
-    // functionality in top-N CMS implementations.
+    // We still keep the heavy hitter related tests (which work because of "suitable" characteristics of the input data)
+    // below in the spec, but be aware that, in general, merging top-N CMS instances is an unsafe operation, where
+    // "unsafe" means it may lead to biased results.
 
     "drop old heavy hitters when new heavy hitters replace them" in {
       val heavyHittersN = 2
