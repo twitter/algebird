@@ -560,6 +560,8 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
  * and (b) tracking the heavy hitters among these elements.
  *
+ * The logic of how heavy hitters are computed is pluggable, see [[HeavyHittersLogic]].
+ *
  * Tip: If you do not need to track heavy hitters, take a look at [[CMS]], which is more efficient in this case.
  *
  * =Usage=
@@ -583,14 +585,14 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  *   TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
  * }
  *
- * // Create a TopPctCMS instance that has counted the element `1L`.
- * val topPctCMS: TopPctCMS[Long] = topPctCMSMonoid.create(1L)
+ * // Create a TopCMS instance that has counted the element `1L`.
+ * val topCMS: TopCMS[Long] = topPctCMSMonoid.create(1L)
  *
  * // Estimate frequency of `1L`
- * val estimate: Approximate[Long] = topPctCMS.frequency(1L)
+ * val estimate: Approximate[Long] = topCMS.frequency(1L)
  *
  * // What are the heavy hitters so far?
- * val heavyHitters: Set[Long] = topPctCMS.heavyHitters
+ * val heavyHitters: Set[Long] = topCMS.heavyHitters
  * }}}
  *
  * @tparam K The type used to identify the elements to be counted.
