@@ -369,35 +369,38 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // Note: As described in https://github.com/twitter/algebird/issues/353, a top-N CMS is, in general, not able to
     // merge heavy hitters correctly.  This is because merging top-N based heavy hitters is not an associative
     // operation.
-    //
-    // We still keep the heavy hitter related tests (which work because of "suitable" characteristics of the input data)
-    // below in the spec, but be aware that, in general, merging top-N CMS instances is an unsafe operation, where
-    // "unsafe" means it may lead to biased results.
 
-    "drop old heavy hitters when new heavy hitters replace them" in {
+    // This test involves merging of top-N CMS instances, which is not an associative operation.  This means that the
+    // success or failure of this test depends on the merging order and/or the test data characteristics.
+    "drop old heavy hitters when new heavy hitters replace them (positive test case)" in {
       val heavyHittersN = 2
       val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, heavyHittersN)
-      val cms1 = monoid.create(Seq(1, 2, 2).toK[K]) // 1x 1, 2x 2
+      val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
       cms1.heavyHitters should be(Set(1, 2))
-      val cms2 = cms1 ++ monoid.create(Seq(3, 3, 3).toK[K]) // 1x 1, 2x 2, 3x 3
+      val cms2 = cms1 ++ monoid.create(Seq(3, 3, 3).toK[K])
       cms2.heavyHitters should be(Set(2, 3))
-      val cms3 = cms2 ++ monoid.create(Seq(1, 1, 1).toK[K]) // 4x 1, 2x 2, 3x 3
+      val cms3 = cms2 ++ monoid.create(Seq(1, 1, 1).toK[K])
       cms3.heavyHitters should be(Set(3, 1))
-      val cms4 = cms3 ++ monoid.create(Seq(6, 6, 6, 6, 6, 6).toK[K]) // 4x 1, 2x 2, 3x 3, 6x 6
+      val cms4 = cms3 ++ monoid.create(Seq(6, 6, 6, 6, 6, 6).toK[K])
       cms4.heavyHitters should be(Set(1, 6))
     }
 
-    "exactly compute heavy hitters in a small stream" in {
+    "exactly compute its own heavy hitters in a small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+
       val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
-      val cms2 = TopNCMS.monoid[K](EPS, DELTA, SEED, 4).create(data1)
-      val cms3 = TopNCMS.monoid[K](EPS, DELTA, SEED, 3).create(data1)
-      val cms4 = TopNCMS.monoid[K](EPS, DELTA, SEED, 2).create(data1)
-      val cms5 = TopNCMS.monoid[K](EPS, DELTA, SEED, 1).create(data1)
       cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+
+      val cms2 = TopNCMS.monoid[K](EPS, DELTA, SEED, 4).create(data1)
       cms2.heavyHitters should be(Set(2, 3, 4, 5))
+
+      val cms3 = TopNCMS.monoid[K](EPS, DELTA, SEED, 3).create(data1)
       cms3.heavyHitters should be(Set(3, 4, 5))
+
+      val cms4 = TopNCMS.monoid[K](EPS, DELTA, SEED, 2).create(data1)
       cms4.heavyHitters should be(Set(4, 5))
+
+      val cms5 = TopNCMS.monoid[K](EPS, DELTA, SEED, 1).create(data1)
       cms5.heavyHitters should be(Set(5))
     }
 
