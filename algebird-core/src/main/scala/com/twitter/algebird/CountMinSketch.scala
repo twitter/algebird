@@ -301,7 +301,7 @@ trait CMSCounting[K, C[_]] {
 trait CMSHeavyHitters[K] {
 
   /**
-   * The pluggable logic with which heavy hitters are being tracked.
+   * The pluggable logic of how heavy hitters are being tracked.
    */
   def heavyHittersLogic: HeavyHittersLogic[K]
 
