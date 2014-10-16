@@ -733,6 +733,15 @@ case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
+  /**
+   * '''Warning:''' top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with
+   * regard to heavy hitters) when merging instances.  This means merging heavy hitters across CMS instances may lead to
+   * incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are being
+   * merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely is
+   * the end result biased towards these heavy hitters.
+   *
+   * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
+   */
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
   }
@@ -867,7 +876,29 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 }
 
 /**
- * Monoid for Top-N based [[TopCMS]] sketches.
+ * Monoid for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
+ *
+ * =Warning: Unsafe merge operation=
+ *
+ * Top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with regard to heavy
+ * hitters) when ''merging'' CMS instances (e.g. via `++`).  This means merging heavy hitters across CMS instances may
+ * lead to incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are
+ * being merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely
+ * is the end result biased towards these heavy hitters.
+ *
+ * The warning above only applies when ''merging'' CMS instances.  That is, a given top-N CMS instance will correctly
+ * compute its own heavy hitters.
+ *
+ * See the discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]] for further details.
+ *
+ * =Alternatives=
+ *
+ * The following, alternative data structures may be better picks than a top-N based CMS:
+ *
+ *   - [[TopPctCMS]]: Has safe merge semantics for its instances including heavy hitters.
+ *   - [[SpaceSaver]]: Has the same ordering bias than a top-N CMS, but at least it provides bounds on the bias.
+ *
+ * =Usage=
  *
  * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
  * {{{
