@@ -6,8 +6,6 @@ import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
 
-// required, although e.g. IntelliJ IDEA may flag it as unused import
-
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
