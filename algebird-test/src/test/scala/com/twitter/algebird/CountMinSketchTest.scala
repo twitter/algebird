@@ -301,15 +301,19 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       cms4.heavyHitters should be(Set(0))
     }
 
-    "exactly compute heavy hitters in a small stream" in {
+    "exactly compute its own heavy hitters in a small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+
       val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
-      val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
-      val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
-      val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
       cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+
+      val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
       cms2.heavyHitters should be(Set(2, 3, 4, 5))
+
+      val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
       cms3.heavyHitters should be(Set(5))
+
+      val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
       cms4.heavyHitters should be(Set[K]())
     }
 
