@@ -237,7 +237,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       COUNTING_CMS_MONOID.create(d1).innerProduct(COUNTING_CMS_MONOID.create(d2)).estimate should be(6)
     }
 
-    "work as an Aggregator" in {
+    "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms = CMS.aggregator[K](EPS, DELTA, SEED).apply(data1)
@@ -256,6 +256,16 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       topPctCMS.frequency(3.toK[K]).estimate should be(3L)
       topPctCMS.frequency(4.toK[K]).estimate should be(4L)
       topPctCMS.frequency(5.toK[K]).estimate should be(5L)
+
+      val topNCMS = {
+        val anyHeavyHittersN = 1 // exact setting not relevant for this test
+        TopNCMS.aggregator[K](EPS, DELTA, SEED, anyHeavyHittersN).apply(data1)
+      }
+      topNCMS.frequency(1.toK[K]).estimate should be(1L)
+      topNCMS.frequency(2.toK[K]).estimate should be(2L)
+      topNCMS.frequency(3.toK[K]).estimate should be(3L)
+      topNCMS.frequency(4.toK[K]).estimate should be(4L)
+      topNCMS.frequency(5.toK[K]).estimate should be(5L)
     }
 
   }
@@ -286,7 +296,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       infrequent.intersect(estimatedHhs) should be('empty)
     }
 
-    ", when adding CMS instances, drop old heavy hitters when new heavy hitters replace them" in {
+    "(when adding CMS instances) drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
       cms1.heavyHitters should be(Set(1, 2))
@@ -301,23 +311,24 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       cms4.heavyHitters should be(Set(0))
     }
 
-    "exactly compute its own heavy hitters in a small stream" in {
-      val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+    "(when adding individual items) drop old heavy hitters when new heavy hitters replace them" in {
+      val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
+      val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
+      cms1.heavyHitters should be(Set(1, 2))
 
-      val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
-      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      val cms2 = cms1 + 2.toK[K]
+      cms2.heavyHitters should be(Set(2))
 
-      val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
-      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      val cms3 = cms2 + 1.toK[K]
+      cms3.heavyHitters should be(Set(1, 2))
 
-      val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
-      cms3.heavyHitters should be(Set(5))
-
-      val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
-      cms4.heavyHitters should be(Set[K]())
+      val heaviest = 0.toK[K]
+      val cms4 = cms3 + heaviest + heaviest + heaviest + heaviest + heaviest + heaviest
+      cms4.heavyHitters should be(Set(heaviest))
     }
 
-    "compute heavy hitters correctly (regression test of GH-353)" in {
+    "(when adding CMS instances) merge heavy hitters correctly [GH-353 regression test]" in {
+      // See https://github.com/twitter/algebird/issues/353
       val monoid = TopPctCMS.monoid(EPS, DELTA, SEED, 0.1)
 
       val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
@@ -354,15 +365,35 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       aggregated.heavyHitters contains (3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
-    "work as an Aggregator" in {
+    "exactly compute heavy hitters when created from single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
-      val cms1 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
-      val cms2 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
-      val cms3 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
-      val cms4 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
+
+      val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
       cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+
+      val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
       cms2.heavyHitters should be(Set(2, 3, 4, 5))
+
+      val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
       cms3.heavyHitters should be(Set(5))
+
+      val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
+      cms4.heavyHitters should be(Set[K]())
+    }
+
+    "work as an Aggregator when created from a single, small stream" in {
+      val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+
+      val cms1 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
+      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+
+      val cms2 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
+      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+
+      val cms3 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
+      cms3.heavyHitters should be(Set(5))
+
+      val cms4 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
       cms4.heavyHitters should be(Set[K]())
     }
 
@@ -376,7 +407,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     // This test involves merging of top-N CMS instances, which is not an associative operation.  This means that the
     // success or failure of this test depends on the merging order and/or the test data characteristics.
-    ", when adding CMS instances, drop old heavy hitters when new heavy hitters replace them (positive test case)" in {
+    "(when adding CMS instances) drop old heavy hitters when new heavy hitters replace them, if merge order matches data" in {
       val heavyHittersN = 2
       val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, heavyHittersN)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
@@ -389,7 +420,103 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       cms4.heavyHitters should be(Set(1, 6))
     }
 
-    "exactly compute its own heavy hitters in a small stream" in {
+    "(when adding individual items) drop old heavy hitters when new heavy hitters replace them" in {
+      val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
+      val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
+      cms1.heavyHitters should be(Set(1, 2))
+
+      val cms2 = cms1 + 2.toK[K]
+      cms2.heavyHitters should be(Set(2))
+
+      val cms3 = cms2 + 1.toK[K]
+      cms3.heavyHitters should be(Set(1, 2))
+
+      val heaviest = 0.toK[K]
+      val cms4 = cms3 + heaviest + heaviest + heaviest + heaviest + heaviest + heaviest
+      cms4.heavyHitters should be(Set(heaviest))
+    }
+
+    // This test documents the order bias of top-N CMS, i.e. it's a negative test case.
+    // See https://github.com/twitter/algebird/issues/353
+    "(when adding CMS instances) generally FAIL to merge heavy hitters correctly due to order bias" in {
+      val topN = 2
+      val monoid = TopNCMS.monoid(EPS, DELTA, SEED, topN)
+
+      val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
+      val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
+      val data3 = Seq(3, 6, 6, 6, 7, 7).toK[K]
+      val data4 = Seq(3, 8, 8, 8, 9, 9).toK[K]
+      val singleData = data1 ++ data2 ++ data3 ++ data4
+
+      /*
+        Data sets from above shown in tabular view
+
+        Item    1   2   3   4   total (= singleData)
+        ----------------------------------------
+        A (1)   3   -   -   -   3
+        B (2)   2   -   -   -   2
+        C (3)   1   1   1   1   4  <<< C is global top 1 heavy hitter
+        D (4)   -   3   -   -   3
+        E (5)   -   2   -   -   2
+        F (6)   -   -   3   -   3
+        G (7)   -   -   2   -   2
+        H (8)   -   -   -   3   3
+        I (9)   -   -   -   2   2
+
+       */
+
+      val cms1 = monoid.create(data1)
+      val cms2 = monoid.create(data2)
+      val cms3 = monoid.create(data3)
+      val cms4 = monoid.create(data4)
+      val aggregated = cms1 ++ cms2 ++ cms3 ++ cms4
+
+      val single = monoid.create(singleData)
+      aggregated.heavyHitters shouldNot be(single.heavyHitters)
+      aggregated.heavyHitters shouldNot contain(3.toK[K]) // C=3 is global top 1 heavy hitter
+    }
+
+    // Compared to adding top-N CMS instances, which is generally unsafe because of order bias (see test cases above),
+    // adding individual items to a top-N CMS is a safe operation.
+    // See https://github.com/twitter/algebird/issues/353
+    "(when adding individual items) merge heavy hitters correctly [GH-353 regression test]" in {
+      val topN = 2
+      val monoid = TopNCMS.monoid(EPS, DELTA, SEED, topN)
+
+      val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
+      val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
+      val data3 = Seq(3, 6, 6, 6, 7, 7).toK[K]
+      val data4 = Seq(3, 8, 8, 8, 9, 9).toK[K]
+      val singleData = data1 ++ data2 ++ data3 ++ data4
+
+      /*
+        Data sets from above shown in tabular view
+
+        Item    1   2   3   4   total (= singleData)
+        ----------------------------------------
+        A (1)   3   -   -   -   3
+        B (2)   2   -   -   -   2
+        C (3)   1   1   1   1   4  <<< C is global top 1 heavy hitter
+        D (4)   -   3   -   -   3
+        E (5)   -   2   -   -   2
+        F (6)   -   -   3   -   3
+        G (7)   -   -   2   -   2
+        H (8)   -   -   -   3   3
+        I (9)   -   -   -   2   2
+
+       */
+
+      val cms1 = monoid.create(data1)
+      val cms2 = cms1 + 3.toK[K] + 4.toK[K] + 4.toK[K] + 4.toK[K] + 5.toK[K] + 5.toK[K] // effectively "++ data2"
+      val cms3 = cms2 + 3.toK[K] + 6.toK[K] + 6.toK[K] + 6.toK[K] + 7.toK[K] + 7.toK[K] // "++ data3"
+      val aggregated = cms3 + 3.toK[K] + 8.toK[K] + 8.toK[K] + 8.toK[K] + 9.toK[K] + 9.toK[K] // "++ data4"
+
+      val single = monoid.create(singleData)
+      aggregated.heavyHitters should be(single.heavyHitters)
+      aggregated.heavyHitters should contain(3.toK[K]) // C=3 is global top 1 heavy hitter
+    }
+
+    "exactly compute heavy hitters when created from single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
@@ -408,17 +535,22 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       cms5.heavyHitters should be(Set(5))
     }
 
-    "work as an Aggregator" in {
+    "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
+
       val cms1 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 5).apply(data1)
-      val cms2 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 4).apply(data1)
-      val cms3 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 3).apply(data1)
-      val cms4 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 2).apply(data1)
-      val cms5 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 1).apply(data1)
       cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+
+      val cms2 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 4).apply(data1)
       cms2.heavyHitters should be(Set(2, 3, 4, 5))
+
+      val cms3 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 3).apply(data1)
       cms3.heavyHitters should be(Set(3, 4, 5))
+
+      val cms4 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 2).apply(data1)
       cms4.heavyHitters should be(Set(4, 5))
+
+      val cms5 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 1).apply(data1)
       cms5.heavyHitters should be(Set(5))
     }
 
