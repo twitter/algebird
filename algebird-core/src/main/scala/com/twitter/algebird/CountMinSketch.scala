@@ -107,12 +107,12 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   }
 
   /**
-   * Create a sketch out of a single item.
+   * Creates a sketch out of a single item.
    */
   def create(item: K): CMS[K] = CMSItem[K](item, params)
 
   /**
-   * Create a sketch out of multiple items.
+   * Creates a sketch out of multiple items.
    */
   def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
@@ -361,7 +361,7 @@ object CMS {
  * // Implicits that enabling CMS-hashing of `Long` values.
  * import com.twitter.algebird.CMSHasherImplicits._
  *
- * // Create a monoid for a CMS that can count `Long` elements.
+ * // Creates a monoid for a CMS that can count `Long` elements.
  * val cmsMonoid: CMSMonoid[Long] = {
  *   val eps = 0.001
  *   val delta = 1E-10
@@ -369,10 +369,10 @@ object CMS {
  *   CMS.monoid[Long](eps, delta, seed)
  * }
  *
- * // Create a CMS instance that has counted the element `1L`.
+ * // Creates a CMS instance that has counted the element `1L`.
  * val cms: CMS[Long] = cmsMonoid.create(1L)
  *
- * // Estimate frequency of `1L`
+ * // Estimates the frequency of `1L`
  * val estimate: Approximate[Long] = cms.frequency(1L)
  * }}}
  *
@@ -581,7 +581,7 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  * // Implicits that enabling CMS-hashing of `Long` values.
  * import com.twitter.algebird.CMSHasherImplicits._
  *
- * // Create a monoid for a CMS that can count `Long` elements.
+ * // Creates a monoid for a CMS that can count `Long` elements.
  * val topPctCMSMonoid: TopPctCMSMonoid[Long] = {
  *   val eps = 0.001
  *   val delta = 1E-10
@@ -590,10 +590,10 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  *   TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
  * }
  *
- * // Create a TopCMS instance that has counted the element `1L`.
+ * // Creates a TopCMS instance that has counted the element `1L`.
  * val topCMS: TopCMS[Long] = topPctCMSMonoid.create(1L)
  *
- * // Estimate frequency of `1L`
+ * // Estimates the frequency of `1L`
  * val estimate: Approximate[Long] = topCMS.frequency(1L)
  *
  * // What are the heavy hitters so far?
@@ -831,12 +831,12 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
   }
 
   /**
-   * Create a sketch out of a single item.
+   * Creates a sketch out of a single item.
    */
   def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
 
   /**
-   * Create a sketch out of multiple items.
+   * Creates a sketch out of multiple items.
    */
   def create(data: Seq[K]): TopCMS[K] = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
@@ -947,12 +947,12 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
   }
 
   /**
-   * Create a sketch out of a single item.
+   * Creates a sketch out of a single item.
    */
   def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
 
   /**
-   * Create a sketch out of multiple items.
+   * Creates a sketch out of multiple items.
    */
   def create(data: Seq[K]): TopCMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
