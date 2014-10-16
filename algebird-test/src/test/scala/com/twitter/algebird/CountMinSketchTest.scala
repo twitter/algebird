@@ -286,7 +286,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       infrequent.intersect(estimatedHhs) should be('empty)
     }
 
-    "drop old heavy hitters when new heavy hitters replace them" in {
+    ", when adding CMS instances, drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
       cms1.heavyHitters should be(Set(1, 2))
@@ -376,7 +376,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     // This test involves merging of top-N CMS instances, which is not an associative operation.  This means that the
     // success or failure of this test depends on the merging order and/or the test data characteristics.
-    "drop old heavy hitters when new heavy hitters replace them (positive test case)" in {
+    ", when adding CMS instances, drop old heavy hitters when new heavy hitters replace them (positive test case)" in {
       val heavyHittersN = 2
       val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, heavyHittersN)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
