@@ -308,7 +308,6 @@ trait CMSHeavyHitters[K] {
   /**
    * Returns the set of heavy hitters.
    */
-  // TODO: Should we change the contract to return a descendingly sorted list of heavy hitters (heaviest = first)?
   def heavyHitters: Set[K]
 
 }
@@ -758,7 +757,6 @@ case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) {
 
   def ++(other: HeavyHitters[K]): HeavyHitters[K] = HeavyHitters[K](hhs ++ other.hhs)
 
-  // TODO: Should we return a descendingly sorted list here?
   def items: Set[K] = hhs.map { _.item }
 
 }
