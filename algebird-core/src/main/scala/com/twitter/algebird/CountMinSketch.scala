@@ -697,9 +697,8 @@ abstract class HeavyHittersLogic[K: Ordering] {
   }
 
   def updateHeavyHitters(cms: CMS[K])(left: HeavyHitters[K], right: HeavyHitters[K]) = {
-    val allItems = left.items ++ right.items
-    val hitters = allItems.map { case i => HeavyHitter[K](i, cms.frequency(i).estimate) }
-    val newHhs = HeavyHitters.from(hitters)
+    val candidates = (left.items ++ right.items).map { case i => HeavyHitter[K](i, cms.frequency(i).estimate) }
+    val newHhs = HeavyHitters.from(candidates)
     purgeHeavyHitters(cms)(newHhs)
   }
 
