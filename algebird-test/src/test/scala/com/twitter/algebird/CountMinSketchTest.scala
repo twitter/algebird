@@ -110,6 +110,9 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
   val RAND = new scala.util.Random
 
+  // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
+  // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
+  // with the existing `to[Col]` method in Scala.
   implicit class IntCast(x: Int) {
     def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
   }
