@@ -117,6 +117,26 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
 }
 
 /**
+ * Pair-wise sum Array monoid.
+ *
+ * plus returns left[i] + right[i] for all array elements.
+ * The resulting array will be as long as the longest array (with its elements duplicated)
+ * zero is an empty array
+ */
+class ArrayMonoid[T](implicit semi: Semigroup[T], manifest: Manifest[T]) extends Monoid[Array[T]] {
+  override def zero = Array[T]()
+
+  override def plus(left: Array[T], right: Array[T]) = {
+    val (longer, shorter) = if (left.length > right.length) (left, right) else (right, left)
+    val sum = longer.clone
+    for (i <- 0 until shorter.length)
+      sum.update(i, semi.plus(sum(i), shorter(i)))
+
+    sum
+  }
+}
+
+/**
  * Set union monoid.
  * plus means union, zero is empty set
  */

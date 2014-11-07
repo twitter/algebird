@@ -69,6 +69,17 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
     opt.map{ v => group.negate(v) }
 }
 
+/**
+ * Extends pair-wise sum Array monoid into a Group
+ * negate is defined as the negation of each element of the array.
+ */
+class ArrayGroup[T](implicit grp: Group[T], manifest: Manifest[T])
+  extends ArrayMonoid[T]()(grp, manifest) with Group[Array[T]] {
+  override def negate(g: Array[T]): Array[T] = g.map {
+    grp.negate(_)
+  }.toArray
+}
+
 object Group extends GeneratedGroupImplicits with ProductGroups {
   // This pattern is really useful for typeclasses
   def negate[T](x: T)(implicit grp: Group[T]) = grp.negate(x)
