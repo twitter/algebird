@@ -365,7 +365,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       aggregated.heavyHitters contains (3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
-    "exactly compute heavy hitters when created from single, small stream" in {
+    "exactly compute heavy hitters when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
@@ -516,7 +516,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       aggregated.heavyHitters should contain(3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
-    "exactly compute heavy hitters when created from single, small stream" in {
+    "exactly compute heavy hitters when created a from single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
