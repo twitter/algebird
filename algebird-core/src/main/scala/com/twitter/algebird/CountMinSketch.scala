@@ -453,10 +453,8 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
     }
   }
 
-  def frequency(item: K): Approximate[Long] = {
-    val estimates = countsTable.counts.zipWithIndex.map { case (row, i) => row(params.hashes(i)(item)) }
-    makeApprox(estimates.min)
-  }
+  def frequency(item: K): Approximate[Long] =
+    makeApprox(countsTable.counts.iterator.zip(params.hashes.iterator).map { case (row, hash) => row(hash(item)) }.min)
 
   /**
    * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and column k.
@@ -469,11 +467,11 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
       case other: CMSInstance[_] =>
         require((other.depth, other.width) == (depth, width), "Tables must have the same dimensions.")
 
-        def innerProductAtDepth(d: Int) = (0 to (width - 1)).map { w =>
+        def innerProductAtDepth(d: Int) = (0 to (width - 1)).iterator.map { w =>
           countsTable.getCount(d, w) * other.countsTable.getCount(d, w)
         }.sum
 
-        val est = (0 to (depth - 1)).map { innerProductAtDepth }.min
+        val est = (0 to (depth - 1)).iterator.map { innerProductAtDepth }.min
         Approximate(est - (eps * totalCount * other.totalCount).toLong, est, est, 1 - delta)
       case _ => other.innerProduct(this)
     }
