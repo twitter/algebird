@@ -469,7 +469,8 @@ object HeavyHitter {
  * An Aggregator for the CountMinSketch.
  * Can be created using CMS.aggregator
  */
-case class CountMinSketchAggregator(cmsMonoid: CountMinSketchMonoid) extends MonoidAggregator[Long, CMS, CMS] {
+case class CountMinSketchAggregator(cmsMonoid: CountMinSketchMonoid) extends MonoidAggregator[Long, CMS] {
+  type B = CMS
   val monoid = cmsMonoid
 
   def prepare(value: Long) = monoid.create(value)

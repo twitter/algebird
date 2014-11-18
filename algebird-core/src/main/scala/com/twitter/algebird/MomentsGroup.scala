@@ -41,7 +41,7 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
 
 object Moments {
   implicit val group = MomentsGroup
-  implicit val aggregator = MomentsAggregator
+  val aggregator = MomentsAggregator
 
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
@@ -128,7 +128,8 @@ object MomentsGroup extends Group[Moments] {
   }
 }
 
-object MomentsAggregator extends MonoidAggregator[Double, Moments, Moments] {
+object MomentsAggregator extends MonoidAggregator[Double, Moments] {
+  type B = Moments
   val monoid = MomentsGroup
 
   def prepare(input: Double): Moments = Moments(input)
