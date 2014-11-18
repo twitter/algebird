@@ -781,7 +781,7 @@ object HeavyHitters {
 
 }
 
-case class HeavyHitter[K: Ordering](item: K, count: Long)
+case class HeavyHitter[K](item: K, count: Long)
 
 object HeavyHitter {
 
