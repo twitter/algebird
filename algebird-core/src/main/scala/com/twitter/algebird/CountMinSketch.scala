@@ -884,8 +884,8 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K]] {
+  type B = TopCMS[K]
 
   val monoid = cmsMonoid
 
