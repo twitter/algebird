@@ -57,13 +57,21 @@ object Aggregator extends java.io.Serializable {
     def present(l: B) = l
   }
   /**
-   * Do all items satisfy a predicate
+   * Do any items satisfy some predicate
    */
-  def forall[T](pred: T => Boolean): Aggregator[T, Boolean] = new Aggregator[T, Boolean] {
+  def exists[T](pred: T => Boolean): MonoidAggregator[T, Boolean] = new MonoidAggregator[T, Boolean] {
     type B = Boolean
     def prepare(t: T) = pred(t)
-    val semigroup = Semigroup.from { (l: B, r: B) => l && r }
-    override def reduce(ls: TraversableOnce[B]) = ls.forall(identity)
+    val monoid = OrVal.unboxedMonoid
+    def present(r: B) = r
+  }
+  /**
+   * Do all items satisfy a predicate
+   */
+  def forall[T](pred: T => Boolean): MonoidAggregator[T, Boolean] = new MonoidAggregator[T, Boolean] {
+    type B = Boolean
+    def prepare(t: T) = pred(t)
+    val monoid = AndVal.unboxedMonoid
     def present(r: B) = r
   }
   /**
@@ -206,7 +214,7 @@ trait Aggregator[-A, +C] extends java.io.Serializable { self =>
   /**
    * An Aggregator can be converted to a Fold, but not vice-versa
    * Note, a Fold is more constrained so only do this if you require
-   * joining a Fold with an applicative.
+   * joining a Fold with an Aggregator to produce a Fold
    */
   def toFold: Fold[A, Option[C]] = Fold.fold[Option[B], A, Option[C]](
     {
