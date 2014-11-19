@@ -557,3 +557,42 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
   }
 
 }
+
+/**
+ * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
+ * versions < 0.8.1.  Note that this spec is not meant to verify their actual functionality.
+ */
+class LegacyCMSSpec extends WordSpec with Matchers {
+
+  import legacy.CountMinSketchMonoid
+
+  val DELTA = 1E-10
+  val EPS = 0.001
+  val SEED = 1
+
+  val CMS_MONOID: CountMinSketchMonoid = CountMinSketchMonoid(EPS, DELTA, SEED)
+
+  "The legacy package" should {
+
+    "provide a legacy type for the CMS implementation in Algebird versions < 0.8.1" in {
+      val cms: legacy.CMS = CMS_MONOID.create(Seq(0L, 0L))
+      cms.frequency(0L).estimate should be (2)
+      cms.heavyHitters should be(Set(0L))
+    }
+
+    "provide a legacy type for the CMS monoid implementation in Algebird versions < 0.8.1" in {
+      val cmsMonoid: CountMinSketchMonoid = {
+        val eps = 0.001
+        val delta = 1E-5
+        val seed = 1
+        val heavyHittersPct = 0.1
+        CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
+      }
+      val cms = cmsMonoid.create(Seq(0L, 0L))
+      cms.frequency(0L).estimate should be (2)
+      cms.heavyHitters should be(Set(0L))
+    }
+
+  }
+
+}
