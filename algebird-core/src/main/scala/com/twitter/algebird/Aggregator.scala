@@ -100,7 +100,7 @@ object Aggregator extends java.io.Serializable {
     override def present(l: B) = l
   }
   /**
-   * Take the largest `count` items using a heap
+   * Take the smallest `count` items using a heap
    */
   def sortedTake[T: Ordering](count: Int): MonoidAggregator[T, Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)
@@ -164,7 +164,6 @@ trait Aggregator[-A, +C] extends java.io.Serializable { self =>
 
   /**
    * combine two inner values
-   * Prefer to define semigroup and use the default implementation
    */
   def reduce(l: B, r: B): B = semigroup.plus(l, r)
   /**
