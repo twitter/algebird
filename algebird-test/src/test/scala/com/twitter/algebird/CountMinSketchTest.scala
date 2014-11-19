@@ -561,19 +561,10 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 
   property("roundtrips width->eps->width for common width values") {
-    forAll(Table("i", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) { (i: Int) =>
-      CMSFunctions.width(CMSFunctions.eps(i)) should be(i)
-    }
-  }
-
-  // Negative test case to document a precision error forsuch as:
-  //   scala> val width = 39
-  //   scala> scala.math.exp(1) / CMSFunctions.eps(width)
-  //   res171: Double = 39.00000000000001   <<< should be 39.0
-  property("fail to roundtrip width->eps->width for widths that expose type precision limits") {
-    forAll(Table(("i", "expI"), (39, 40), (86, 87), (238, 239))) { (i: Int, expI: Int) =>
-      i shouldNot be(expI) // assert correctness of test data
-      CMSFunctions.width(CMSFunctions.eps(i)) should be(expI)
+    forAll { (i: Int) =>
+      whenever(i > 0) {
+        CMSFunctions.width(CMSFunctions.eps(i)) should be(i)
+      }
     }
   }
 

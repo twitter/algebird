@@ -172,7 +172,18 @@ object CMSFunctions {
   /**
    * Translates from `eps` to `width`.
    */
-  def width(eps: Double): Int = scala.math.ceil(scala.math.exp(1) / eps).toInt
+  def width(eps: Double): Int = scala.math.ceil(truncatePrecisionError(scala.math.exp(1) / eps)).toInt
+
+  // Eliminates precision errors such as the following:
+  //
+  //   scala> val width = 39
+  //   scala> scala.math.exp(1) / CMSFunctions.eps(width)
+  //   res171: Double = 39.00000000000001   <<< should be 39.0
+  //
+  // Because of the actual types on which CMSFunctions operates (i.e. Int and Double), the maximum number of decimal
+  // places should be 6.
+  private def truncatePrecisionError(i: Double, decimalPlaces: Int = 6) =
+    BigDecimal(i).setScale(decimalPlaces, BigDecimal.RoundingMode.HALF_UP).toDouble
 
   /**
    * Generates `N=depth` pair-wise independent hash functions.
