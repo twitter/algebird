@@ -21,7 +21,7 @@ import scala.annotation.tailrec
 case class Max[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object Max {
-  implicit def semigroup[T](implicit ord: Ordering[T]) =
+  implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Max[T]] =
     Semigroup.from[Max[T]] { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
 
   // Zero should have the property that it <= all T
@@ -56,7 +56,7 @@ object Max {
 case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object Min {
-  implicit def semigroup[T](implicit ord: Ordering[T]) =
+  implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Min[T]] =
     Semigroup.from[Min[T]] { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
 
   // Zero should have the property that it >= all T
@@ -86,13 +86,13 @@ object Last {
 case class MinAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T] {
   type B = T
   def prepare(v: T) = v
-  def reduce(l: T, r: T) = ord.min(l, r)
+  val semigroup = Semigroup.from { (l: T, r: T) => ord.min(l, r) }
   def present(v: T) = v
 }
 
 case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T] {
   type B = T
   def prepare(v: T) = v
-  def reduce(l: T, r: T) = ord.max(l, r)
+  val semigroup = Semigroup.from { (l: T, r: T) => ord.max(l, r) }
   def present(v: T) = v
 }

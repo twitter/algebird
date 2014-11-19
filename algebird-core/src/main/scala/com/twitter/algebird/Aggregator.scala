@@ -13,26 +13,20 @@ object Aggregator extends java.io.Serializable {
   /**
    * This is a trivial aggregator that always returns a single value
    */
-  def const[T](t: T): Aggregator[Any, T] = new Aggregator[Any, T] {
+  def const[T](t: T): Aggregator[Any, T] = new MonoidAggregator[Any, T] {
     type B = Unit
     def prepare(in: Any) = ()
-    def reduce(l: Unit, r: Unit) = ()
+    val monoid = implicitly[Monoid[Unit]]
     def present(red: Unit) = t
-    override def reduce(us: TraversableOnce[Unit]) = ()
   }
   /**
    * Using Aggregator.prepare,present you can add to this aggregator
    */
-  def fromReduce[T](red: (T, T) => T): Aggregator[T, T] = new Aggregator[T, T] {
-    type B = T
-    def prepare(input: T) = input
-    def reduce(l: T, r: T) = red(l, r)
-    def present(reduction: T) = reduction
-  }
+  def fromReduce[T](red: (T, T) => T): Aggregator[T, T] = fromSemigroup(Semigroup.from(red))
   def fromSemigroup[T](implicit sg: Semigroup[T]): Aggregator[T, T] = new Aggregator[T, T] {
     type B = T
     def prepare(input: T) = input
-    def reduce(l: T, r: T) = sg.plus(l, r)
+    def semigroup = sg
     def present(reduction: T) = reduction
   }
   def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T, T] = fromMonoid[T, T](mon, identity[T])
@@ -53,6 +47,68 @@ object Aggregator extends java.io.Serializable {
     def present(reduction: T) = reduction
   }
 
+  /**
+   * How many items satisfy a predicate
+   */
+  def count[T](pred: T => Boolean): MonoidAggregator[T, Long] = new MonoidAggregator[T, Long] {
+    type B = Long
+    def prepare(t: T) = if (pred(t)) 1L else 0L
+    val monoid = implicitly[Monoid[Long]]
+    def present(l: B) = l
+  }
+  /**
+   * Do all items satisfy a predicate
+   */
+  def forall[T](pred: T => Boolean): Aggregator[T, Boolean] = new Aggregator[T, Boolean] {
+    type B = Boolean
+    def prepare(t: T) = pred(t)
+    val semigroup = Semigroup.from { (l: B, r: B) => l && r }
+    override def reduce(ls: TraversableOnce[B]) = ls.forall(identity)
+    def present(r: B) = r
+  }
+  /**
+   * Take the first (left most in reduce order) item found
+   */
+  def head[T]: Aggregator[T, T] = fromReduce[T] { (l, r) => l }
+  /**
+   * Take the last (right most in reduce order) item found
+   */
+  def last[T]: Aggregator[T, T] = fromReduce[T] { (l, r) => r }
+  /**
+   * Get the maximum item
+   */
+  def max[T: Ordering]: Aggregator[T, T] = new MaxAggregator[T]
+  def maxBy[U, T: Ordering](fn: U => T): Aggregator[U, U] = {
+    implicit val ordU = Ordering.by(fn)
+    max[U]
+  }
+  /**
+   * Get the minimum item
+   */
+  def min[T: Ordering]: Aggregator[T, T] = new MinAggregator[T]
+  def minBy[U, T: Ordering](fn: U => T): Aggregator[U, U] = {
+    implicit val ordU = Ordering.by(fn)
+    min[U]
+  }
+  /**
+   * This returns the number of items we find
+   */
+  def size: MonoidAggregator[Any, Long] = new MonoidAggregator[Any, Long] {
+    type B = Long
+    def prepare(t: Any) = 1L
+    val monoid = implicitly[Monoid[Long]]
+    override def present(l: B) = l
+  }
+  /**
+   * Take the largest `count` items using a heap
+   */
+  def sortedTake[T: Ordering](count: Int): MonoidAggregator[T, Seq[T]] =
+    new mutable.PriorityQueueToListAggregator[T](count)
+  /**
+   * Take the largest `count` items using a heap
+   */
+  def sortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, Seq[T]] =
+    new mutable.PriorityQueueToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
   /**
    * Put everything in a List. Note, this could fill the memory if the List is very large.
    */
@@ -85,14 +141,40 @@ object Aggregator extends java.io.Serializable {
   }
 }
 
+/**
+ * This is a type that models map/reduce(map). First each item is mapped,
+ * then we reduce with a semigroup, then finally we present the results.
+ *
+ * Note, join is very useful to combine multiple aggregations with one pass.
+ * Also GeneratedTupleAggregator.fromN((agg1, agg2, ... aggN)) can glue these together
+ * well.
+ *
+ * This type is the the Fold.M from Haskell's fold package:
+ * https://hackage.haskell.org/package/folds-0.6.2/docs/Data-Fold-M.html
+ */
 trait Aggregator[-A, +C] extends java.io.Serializable { self =>
   type B
   def prepare(input: A): B
-  def reduce(l: B, r: B): B
+  def semigroup: Semigroup[B]
   def present(reduction: B): C
 
-  def reduce(items: TraversableOnce[B]): B = items.reduce{ reduce(_, _) }
-  def apply(inputs: TraversableOnce[A]): C = present(reduce(inputs.map{ prepare(_) }))
+  /* *****
+   * All the following are in terms of the above
+   */
+
+  /**
+   * combine two inner values
+   * Prefer to define semigroup and use the default implementation
+   */
+  def reduce(l: B, r: B): B = semigroup.plus(l, r)
+  /**
+   * This may error if items is empty. To be safe you might use reduceOption
+   * if you don't know that items is non-empty
+   */
+  def reduce(items: TraversableOnce[B]): B = semigroup.sumOption(items).get
+  def reduceOption(items: TraversableOnce[B]): Option[B] = semigroup.sumOption(items)
+
+  def apply(inputs: TraversableOnce[A]): C = present(reduce(inputs.map(prepare)))
 
   def append(l: B, r: A): B = reduce(l, prepare(r))
 
@@ -104,7 +186,7 @@ trait Aggregator[-A, +C] extends java.io.Serializable { self =>
     new Aggregator[A, D] {
       type B = self.B
       def prepare(input: A) = self.prepare(input)
-      def reduce(l: B, r: B) = self.reduce(l, r)
+      def semigroup = self.semigroup
       def present(reduction: B) = present2(self.present(reduction))
     }
   /** Like calling compose on the prepare function */
@@ -112,7 +194,7 @@ trait Aggregator[-A, +C] extends java.io.Serializable { self =>
     new Aggregator[A1, C] {
       type B = self.B
       def prepare(input: A1) = self.prepare(prepare2(input))
-      def reduce(l: B, r: B) = self.reduce(l, r)
+      def semigroup = self.semigroup
       def present(reduction: B) = self.present(reduction)
     }
 
@@ -120,13 +202,7 @@ trait Aggregator[-A, +C] extends java.io.Serializable { self =>
    * This allows you to run two aggregators on the same data with a single pass
    */
   def join[A2 <: A, C2](that: Aggregator[A2, C2]): Aggregator[A2, (C, C2)] =
-    new Aggregator[A2, (C, C2)] {
-      type B = (self.B, that.B)
-      def prepare(in: A2) = (self.prepare(in), that.prepare(in))
-      def reduce(l: B, r: B) = (self.reduce(l._1, r._1), that.reduce(l._2, r._2))
-      // TODO override def reduce(t: TraversableOnce[B]) to call the underlying methods
-      def present(red: B) = (self.present(red._1), that.present(red._2))
-    }
+    GeneratedTupleAggregator.from2((this, that))
 
   /**
    * An Aggregator can be converted to a Fold, but not vice-versa
@@ -152,23 +228,24 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
     Aggregator.const(v)
   override def join[T, U](mt: Aggregator[I, T], mu: Aggregator[I, U]): Aggregator[I, (T, U)] =
     mt.join(mu)
+  override def join[T1, T2, T3](m1: Aggregator[I, T1], m2: Aggregator[I, T2], m3: Aggregator[I, T3]): Aggregator[I, (T1, T2, T3)] =
+    GeneratedTupleAggregator.from3(m1, m2, m3)
+  override def join[T1, T2, T3, T4](m1: Aggregator[I, T1], m2: Aggregator[I, T2], m3: Aggregator[I, T3], m4: Aggregator[I, T4]): Aggregator[I, (T1, T2, T3, T4)] =
+    GeneratedTupleAggregator.from4(m1, m2, m3, m4)
+  override def join[T1, T2, T3, T4, T5](m1: Aggregator[I, T1], m2: Aggregator[I, T2], m3: Aggregator[I, T3], m4: Aggregator[I, T4], m5: Aggregator[I, T5]): Aggregator[I, (T1, T2, T3, T4, T5)] =
+    GeneratedTupleAggregator.from5(m1, m2, m3, m4, m5)
 }
 
 trait MonoidAggregator[-A, +C] extends Aggregator[A, C] {
   def monoid: Monoid[B]
-  final def reduce(l: B, r: B): B = monoid.plus(l, r)
+  def semigroup = monoid
   final override def reduce(items: TraversableOnce[B]): B =
     monoid.sum(items)
 
-  def appendAll(items: TraversableOnce[A]): B = appendAll(monoid.zero, items)
+  def appendAll(items: TraversableOnce[A]): B = reduce(items.map(prepare))
 }
 
-trait RingAggregator[-A, +C] extends Aggregator[A, C] {
+trait RingAggregator[-A, +C] extends MonoidAggregator[A, C] {
   def ring: Ring[B]
-  final def reduce(l: B, r: B): B = ring.times(l, r)
-  final override def reduce(items: TraversableOnce[B]): B =
-    if (items.isEmpty) ring.one // There are several pseudo-rings, so avoid one if you can
-    else items.reduceLeft(reduce _)
-
-  def appendAll(items: TraversableOnce[A]): B = appendAll(ring.one, items)
+  def monoid = Ring.asTimesMonoid(ring)
 }
