@@ -162,12 +162,21 @@ object CMSFunctions {
   /**
    * Translates from `depth` to `delta`.
    */
-  def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
+  @throws[IllegalArgumentException]("if depth is too large, causing precision errors when computing delta")
+  def delta(depth: Int): Double = {
+    val i = 1.0 / scala.math.exp(depth)
+    require(i != 0.0, s"depth must be smaller as it causes precision errors when computing delta ($depth led to an invalid delta of 0.0)")
+    i
+  }
 
   /**
    * Translates from `delta` to `depth`.
    */
-  def depth(delta: Double): Int = scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+  @throws[IllegalArgumentException]("if delta is is not in (0, 1)")
+  def depth(delta: Double): Int = {
+    require(0 < delta && delta < 1, "delta must lie in (0, 1)")
+    scala.math.ceil(scala.math.log(1.0 / delta)).toInt
+  }
 
   /**
    * Translates from `eps` to `width`.

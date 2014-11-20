@@ -560,7 +560,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
 class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 
-  property("roundtrips width->eps->width for common width values") {
+  property("roundtrips width->eps->width") {
     forAll { (i: Int) =>
       whenever(i > 0) {
         CMSFunctions.width(CMSFunctions.eps(i)) should be(i)
@@ -577,14 +577,67 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
-  // Negative test case to document a precision error that is exposed by all depths > 709.
+  // Documents a precision error that is exposed by all depths > 709.
   // For all i > 709, CMSFunctions.delta(i) will return 0.0, which is not the mathematically correct value but rather
   // the asymptote of the delta function.
-  property("fail to roundtrip depth->delta->depth for depths that expose type precision limits") {
-    val maxI = 709
-    forAll(Gen.choose(maxI + 1, 10000)) { (i: Int) =>
-      CMSFunctions.depth(CMSFunctions.delta(i)) should be(Int.MaxValue)
+  property("throw IAE when deriving delta from invalid depth values") {
+    val maxValidDelta = 709
+    forAll(Gen.choose(maxValidDelta + 1, 10000)) { (invalidDepth: Int) =>
+      val exception = intercept[IllegalArgumentException] {
+        CMSFunctions.delta(invalidDepth)
+      }
+      exception.getMessage should fullyMatch regex
+        """requirement failed: depth must be smaller as it causes precision errors when computing delta \(\d+ led to an invalid delta of 0.0\)"""
     }
+  }
+
+  property("throw IAE when deriving depth from invalid delta values") {
+    val invalidDeltas = Table("invalidDelta", 0.0, 1E-330, 1E-400)
+    forAll(invalidDeltas) { (invalidDelta: Double) =>
+      val exception = intercept[IllegalArgumentException] {
+        CMSFunctions.depth(invalidDelta)
+      }
+      exception.getMessage should be("requirement failed: delta must lie in (0, 1)")
+    }
+  }
+
+}
+
+class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
+
+  val AnyEps = 0.001
+  val AnyDelta = 1E-5
+  val AnyHashes = {
+    val AnySeed = 1
+    CMSFunctions.generateHashes[Long](AnyEps, AnyDelta, AnySeed)
+  }
+
+  property("throw IAE for invalid eps values") {
+    val invalidEpsilons = Table("invalidEps", 0.0, 1.0, 2.0, 100.0)
+    forAll(invalidEpsilons) { (invalidEps: Double) =>
+      val exception = intercept[IllegalArgumentException] {
+        CMSParams(AnyHashes, invalidEps, AnyDelta)
+      }
+      exception.getMessage should be("requirement failed: eps must lie in (0, 1)")
+    }
+  }
+
+  property("throw IAE for invalid delta values") {
+    val invalidDeltas = Table("invalidDelta", 0.0, 1.0, 2.0, 100.0, 1E-330, 1E-400)
+    forAll(invalidDeltas) { (invalidDelta: Double) =>
+      val exception = intercept[IllegalArgumentException] {
+        CMSParams(AnyHashes, AnyEps, invalidDelta)
+      }
+      exception.getMessage should be("requirement failed: delta must lie in (0, 1)")
+    }
+  }
+
+  property("throw IAE when we do not have enough hashes") {
+    val tooFewHashes = Seq.empty[CMSHash[Long]]
+    val exception = intercept[IllegalArgumentException] {
+      CMSParams(tooFewHashes, AnyEps, AnyDelta)
+    }
+    exception.getMessage should fullyMatch regex """requirement failed: we require at least (\d+) hash functions"""
   }
 
 }
