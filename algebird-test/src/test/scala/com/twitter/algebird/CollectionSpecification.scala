@@ -99,6 +99,10 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
     monoidLaws[Seq[Int]]
   }
 
+  property("Array Monoid laws") {
+    monoidLaws[Array[Int]]
+  }
+
   property("Set plus") {
     forAll { (a: Set[Int], b: Set[Int]) =>
       val mon = implicitly[Monoid[Set[Int]]]

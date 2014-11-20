@@ -17,6 +17,7 @@ package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
+import scala.reflect.ClassTag
 
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
@@ -114,6 +115,25 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
       items.foreach { builder ++= _ }
       Some(builder.result())
     }
+}
+
+/**
+ * Pair-wise sum Array monoid.
+ *
+ * plus returns left[i] + right[i] for all array elements.
+ * The resulting array will be as long as the longest array (with its elements duplicated)
+ * zero is an empty array
+ */
+class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array[T]] {
+  override def zero = Array[T]()
+  override def plus(left: Array[T], right: Array[T]) = {
+    val (longer, shorter) = if (left.length > right.length) (left, right) else (right, left)
+    val sum = longer.clone
+    for (i <- 0 until shorter.length)
+      sum.update(i, semi.plus(sum(i), shorter(i)))
+
+    sum
+  }
 }
 
 /**
@@ -236,6 +256,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]
+  implicit def arrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) = new ArrayMonoid[T]
   implicit def indexedSeqMonoid[T: Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T]: Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T]: Monoid[Set[T]] = new SetMonoid[T]

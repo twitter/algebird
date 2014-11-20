@@ -104,6 +104,24 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
+  property("An ArrayMonoid should sum") {
+    val monoid = new ArrayMonoid[Int]
+    forAll { intList: List[Int] =>
+      val (l, r) = intList.splitAt(intList.size / 2)
+      val left = l.padTo(math.max(l.size, r.size), 0)
+      val right = r.padTo(math.max(l.size, r.size), 0)
+
+      assert((left, right).zipped.map(_ + _).toArray.deep == monoid.sum(List(l.toArray, r.toArray)).deep)
+    }
+  }
+
+  property("An ArrayGroup should negate") {
+    val arrayGroup = new ArrayGroup[Int]
+    forAll { intList: List[Int] =>
+      assert(intList.map(-1 * _).toArray.deep == arrayGroup.negate(intList.toArray).deep)
+    }
+  }
+
   property("a user-defined product monoid should work") {
     case class Metrics(count: Int, largestValue: Option[Max[Int]])
     implicit val MetricsMonoid = Monoid(Metrics.apply _, Metrics.unapply _)

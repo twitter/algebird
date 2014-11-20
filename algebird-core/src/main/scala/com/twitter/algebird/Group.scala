@@ -18,6 +18,8 @@ package com.twitter.algebird
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
+import scala.reflect.ClassTag
+
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 /**
@@ -67,6 +69,17 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
 
   override def negate(opt: Option[T]) =
     opt.map{ v => group.negate(v) }
+}
+
+/**
+ * Extends pair-wise sum Array monoid into a Group
+ * negate is defined as the negation of each element of the array.
+ */
+class ArrayGroup[T: ClassTag](implicit grp: Group[T])
+  extends ArrayMonoid[T]() with Group[Array[T]] {
+  override def negate(g: Array[T]): Array[T] = g.map {
+    grp.negate(_)
+  }.toArray
 }
 
 object Group extends GeneratedGroupImplicits with ProductGroups {
