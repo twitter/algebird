@@ -83,15 +83,13 @@ object Last {
   implicit def semigroup[T] = Semigroup.from[Last[T]] { (l, r) => r }
 }
 
-case class MinAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T] {
-  type B = T
+case class MinAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
   val semigroup = Semigroup.from { (l: T, r: T) => ord.min(l, r) }
   def present(v: T) = v
 }
 
-case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T] {
-  type B = T
+case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
   val semigroup = Semigroup.from { (l: T, r: T) => ord.max(l, r) }
   def present(v: T) = v

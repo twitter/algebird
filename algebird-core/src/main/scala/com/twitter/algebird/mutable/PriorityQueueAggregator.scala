@@ -26,8 +26,7 @@ import java.util.PriorityQueue
  * an immutable view before using it, as is done in PriorityQueueToListAggregator
  */
 abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A])
-  extends MonoidAggregator[A, C] {
-  type B = PriorityQueue[A]
+  extends MonoidAggregator[A, PriorityQueue[A], C] {
   /*
    you need to override:
   def present(q: PriorityQueue[A]): B

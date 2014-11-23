@@ -441,12 +441,11 @@ object HyperLogLogAggregator {
     new HyperLogLogAggregator(monoid)
   }
 
-  def sizeAggregator(bits: Int): Aggregator[Array[Byte], Double] =
+  def sizeAggregator(bits: Int): MonoidAggregator[Array[Byte], HLL, Double] =
     apply(bits).andThenPresent(_.estimatedSize)
 }
 
-case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL] {
-  type B = HLL
+case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {
   val monoid = hllMonoid
 
   def prepare(value: Array[Byte]) = monoid.create(value)

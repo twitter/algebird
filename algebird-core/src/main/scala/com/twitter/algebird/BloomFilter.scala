@@ -347,8 +347,7 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
   }
 }
 
-case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggregator[String, BF] {
-  type B = BF
+case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggregator[String, BF, BF] {
   val monoid = bfMonoid
 
   def prepare(value: String) = monoid.create(value)
