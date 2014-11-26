@@ -29,7 +29,7 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
       ps <- present.arbitrary
     } yield new Aggregator[A, B, C] {
       def prepare(a: A) = pp(a)
-      def reduce(l: B, r: B) = sg.plus(l, r)
+      def semigroup = sg
       def present(b: B) = ps(b)
     }
   }
@@ -49,8 +49,15 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("composing two Aggregators is correct") {
-    forAll { (in: List[Int], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[Int, Double, String]) =>
+    forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
       val c = GeneratedTupleAggregator.from2(ag1, ag2)
+      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+    }
+  }
+  property("Applicative composing two Aggregators is correct") {
+    forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
+      type AggInt[T] = Aggregator[Int, _, T]
+      val c = Applicative.join[AggInt, Int, String](ag1, ag2)
       assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
     }
   }

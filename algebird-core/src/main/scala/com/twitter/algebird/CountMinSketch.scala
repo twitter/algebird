@@ -122,7 +122,6 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
  * An Aggregator for [[CMS]].  Can be created using [[CMS.aggregator]].
  */
 case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
-
   val monoid = cmsMonoid
 
   def prepare(value: K): CMS[K] = monoid.create(value)
@@ -884,15 +883,10 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
-
-  val monoid = cmsMonoid
-
+case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+  def monoid = cmsMonoid
   def prepare(value: K): TopCMS[K] = monoid.create(value)
-
   def present(cms: TopCMS[K]): TopCMS[K] = cms
-
 }
 
 /**
@@ -1003,7 +997,6 @@ object TopNCMS {
  */
 case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
   extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
-
   val monoid = cmsMonoid
 
   def prepare(value: K): TopCMS[K] = monoid.create(value)

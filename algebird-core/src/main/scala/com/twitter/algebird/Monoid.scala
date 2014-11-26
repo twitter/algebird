@@ -171,6 +171,13 @@ case class OrVal(get: Boolean) extends AnyVal
 
 object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
+  def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
+    def zero = false
+    def plus(l: Boolean, r: Boolean) = l || r
+    override def sumOption(its: TraversableOnce[Boolean]) =
+      if (its.isEmpty) None
+      else Some(its.exists(identity))
+  }
 }
 
 /**
@@ -180,6 +187,9 @@ object OrVal {
 object OrValMonoid extends Monoid[OrVal] {
   override def zero = OrVal(false)
   override def plus(l: OrVal, r: OrVal) = if (l.get) l else r
+  override def sumOption(its: TraversableOnce[OrVal]) =
+    if (its.isEmpty) None
+    else Some(OrVal(its.exists(_.get)))
 }
 
 // To use the AndValMonoid wrap your item in a AndVal object
@@ -187,6 +197,13 @@ case class AndVal(get: Boolean) extends AnyVal
 
 object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid
+  def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
+    def zero = true
+    def plus(l: Boolean, r: Boolean) = l && r
+    override def sumOption(its: TraversableOnce[Boolean]) =
+      if (its.isEmpty) None
+      else Some(its.forall(identity))
+  }
 }
 
 /**
@@ -196,6 +213,9 @@ object AndVal {
 object AndValMonoid extends Monoid[AndVal] {
   override def zero = AndVal(true)
   override def plus(l: AndVal, r: AndVal) = if (l.get) r else l
+  override def sumOption(its: TraversableOnce[AndVal]) =
+    if (its.isEmpty) None
+    else Some(AndVal(its.forall(_.get)))
 }
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {

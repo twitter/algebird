@@ -51,6 +51,15 @@ trait Applicative[M[_]] extends Functor[M] {
     }
   def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
     map(join(mt, mu)) { case (t, u) => fn(t, u) }
+
+  def join[T1, T2, T3](m1: M[T1], m2: M[T2], m3: M[T3]): M[(T1, T2, T3)] =
+    joinWith(join(m1, m2), m3) { case ((t1, t2), t3) => (t1, t2, t3) }
+
+  def join[T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4]): M[(T1, T2, T3, T4)] =
+    joinWith(join(join(m1, m2), m3), m4) { case (((t1, t2), t3), t4) => (t1, t2, t3, t4) }
+
+  def join[T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5]): M[(T1, T2, T3, T4, T5)] =
+    joinWith(join(join(join(m1, m2), m3), m4), m5) { case ((((t1, t2), t3), t4), t5) => (t1, t2, t3, t4, t5) }
 }
 
 /**
@@ -66,6 +75,12 @@ object Applicative {
   def apply[M[_]](implicit app: Applicative[M]): Applicative[M] = app
   def join[M[_], T, U](mt: M[T], mu: M[U])(implicit app: Applicative[M]): M[(T, U)] =
     app.join(mt, mu)
+  def join[M[_], T1, T2, T3](m1: M[T1], m2: M[T2], m3: M[T3])(implicit app: Applicative[M]): M[(T1, T2, T3)] =
+    app.join(m1, m2, m3)
+  def join[M[_], T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4])(implicit app: Applicative[M]): M[(T1, T2, T3, T4)] =
+    app.join(m1, m2, m3, m4)
+  def join[M[_], T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5])(implicit app: Applicative[M]): M[(T1, T2, T3, T4, T5)] =
+    app.join(m1, m2, m3, m4, m5)
   def sequence[M[_], T](ms: Seq[M[T]])(implicit app: Applicative[M]): M[Seq[T]] =
     app.sequence(ms)
   def joinWith[M[_], T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V)(implicit app: Applicative[M]): M[V] =

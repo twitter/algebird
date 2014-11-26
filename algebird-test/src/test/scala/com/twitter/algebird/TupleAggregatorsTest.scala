@@ -3,14 +3,12 @@ package com.twitter.algebird
 import org.scalatest._
 
 class TupleAggregatorsTest extends WordSpec with Matchers {
+  // This gives you an implicit conversion from tuples of aggregators
+  // to aggregator of tuples
   import GeneratedTupleAggregator._
 
   val data = List(1, 3, 2, 0, 5, 6)
-  val MinAgg = new Aggregator[Int, Int, Int] {
-    def prepare(v: Int) = v
-    def reduce(v1: Int, v2: Int) = math.min(v1, v2)
-    def present(v: Int) = v
-  }
+  val MinAgg = Aggregator.min[Int]
 
   "GeneratedTupleAggregators" should {
     "Create an aggregator from a tuple of 2 aggregators" in {
