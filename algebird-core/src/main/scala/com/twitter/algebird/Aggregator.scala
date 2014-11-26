@@ -116,8 +116,8 @@ object Aggregator extends java.io.Serializable {
    * This may not be scalable if the Uniques are very large. You might check the
    * HyperLogLog Aggregator to get an approximate version of this that is scalable.
    */
-  def uniqueCount: MonoidAggregator[Any, Set[Any], Int] =
-    toSet[Any].andThenPresent(_.size)
+  def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
+    toSet[T].andThenPresent(_.size)
 }
 
 /**
