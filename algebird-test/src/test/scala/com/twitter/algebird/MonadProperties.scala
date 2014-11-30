@@ -55,14 +55,16 @@ class MonadProperties extends PropSpec with PropertyChecks with Matchers {
     implicit val optSg = new MonadSemigroup[Int, Option]
     implicit val listSg = new MonadSemigroup[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
-    semigroupLaws[Option[Int]] && isAssociative[List[String]]
+    semigroupLaws[Option[Int]]
+    isAssociative[List[String]]
   }
 
   property("Monad Monoid") {
     implicit val optSg = new MonadMonoid[Int, Option]
     implicit val listSg = new MonadMonoid[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
-    monoidLaws[Option[Int]] && validZero[List[String]]
+    monoidLaws[Option[Int]]
+    validZero[List[String]]
   }
 
   // These laws work for only "non-empty" monads

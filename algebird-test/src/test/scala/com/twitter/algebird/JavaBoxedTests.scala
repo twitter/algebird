@@ -74,11 +74,13 @@ class JavaBoxedTests extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("JMap[String,Int] is a Monoid") {
-    isAssociative[JMap[String, Int]] && weakZero[JMap[String, Int]]
+    isAssociative[JMap[String, Int]]
+    weakZero[JMap[String, Int]]
   }
 
   property("JMap[String,String] is a Monoid") {
-    isAssociative[JMap[String, String]] && weakZero[JMap[String, String]]
+    isAssociative[JMap[String, String]]
+    weakZero[JMap[String, String]]
   }
 
 }

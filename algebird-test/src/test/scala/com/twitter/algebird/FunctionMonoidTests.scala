@@ -1,10 +1,11 @@
 package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.prop.{ PropertyChecks, Checkers }
 import org.scalacheck.{ Prop, Arbitrary }
+import scala.reflect.ClassTag
 
-class FunctionMonoidTests extends PropSpec with PropertyChecks with Matchers {
+class FunctionMonoidTests extends PropSpec with PropertyChecks with Matchers with Checkers {
   import BaseProperties._
 
   // Generates an arbitrary linear function of the form f(x) = a * x + b,
@@ -19,7 +20,7 @@ class FunctionMonoidTests extends PropSpec with PropertyChecks with Matchers {
 
   property("Linear functions over the integers form a monoid under function composition") {
     // TODO: switch the scope of the quantification?
-    Prop.forAll { (n: Int) =>
+    forAll { (n: Int) =>
       monoidLawsEq[Function1[Int, Int]] { (f1, f2) => f1(n) == f2(n) }
     }
   }

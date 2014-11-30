@@ -59,11 +59,14 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   }
 
   property("Option Monoid laws") {
-    monoidLaws[Option[Int]] && monoidLaws[Option[String]]
+    monoidLaws[Option[Int]]
+    monoidLaws[Option[String]]
   }
 
   property("Option Group laws") {
-    groupLaws[Option[Int]] && groupLawsEq[Map[String, Option[Int]]]{
+    groupLaws[Option[Int]]
+
+    groupLawsEq[Map[String, Option[Int]]]{
       (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
         val keys: Set[String] = a.keySet | b.keySet
         keys.forall { key: String =>
@@ -151,15 +154,18 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   }
 
   property("Map[Int,Int] Monoid laws") {
-    isAssociative[Map[Int, Int]] && weakZero[Map[Int, Int]]
+    isAssociative[Map[Int, Int]]
+    weakZero[Map[Int, Int]]
   }
 
   property("ScMap[Int,Int] Monoid laws") {
-    isAssociative[ScMap[Int, Int]] && weakZero[ScMap[Int, Int]]
+    isAssociative[ScMap[Int, Int]]
+    weakZero[ScMap[Int, Int]]
   }
 
   property("MMap[Int,Int] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
+    weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
   }
 
   property("Map[Int,Int] has -") {
@@ -175,15 +181,18 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   }
 
   property("Map[Int,String] Monoid laws") {
-    isAssociative[Map[Int, String]] && weakZero[Map[Int, String]]
+    isAssociative[Map[Int, String]]
+    weakZero[Map[Int, String]]
   }
 
   property("ScMap[Int,String] Monoid laws") {
-    isAssociative[ScMap[Int, String]] && weakZero[ScMap[Int, String]]
+    isAssociative[ScMap[Int, String]]
+    weakZero[ScMap[Int, String]]
   }
 
   property("MMap[Int,String] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
+    weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
   }
 
   // We haven't implemented ring.one yet for the Map, so skip the one property
