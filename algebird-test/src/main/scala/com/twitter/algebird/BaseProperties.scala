@@ -44,8 +44,7 @@ object BaseProperties {
   def isAssociativeEq[T: Semigroup, U <: T: Arbitrary](eqfn: (T, T) => Boolean) {
     Checkers.check(forAll { (a: U, b: U, c: U) =>
       val semi = implicitly[Semigroup[T]]
-      val r = eqfn(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c))
-      r
+      eqfn(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c))
     })
   }
 
