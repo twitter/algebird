@@ -12,7 +12,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    crossScalaVersions := Seq("2.10.4", "2.11.4"),
     ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
