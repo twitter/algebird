@@ -45,7 +45,7 @@ object Aggregator extends java.io.Serializable {
     def present(reduction: T) = reduction
   }
 
-  def count[T]: MonoidAggregator[T, Long, Long] = count[T](t => true)
+  def count[T]: MonoidAggregator[T, Long, Long] = count[T] { (t: T) => true}
 
   /**
    * How many items satisfy a predicate
