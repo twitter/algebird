@@ -138,6 +138,13 @@ case class OrVal(get: Boolean)
 
 object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
+  def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
+    def zero = false
+    def plus(l: Boolean, r: Boolean) = l || r
+    override def sumOption(its: TraversableOnce[Boolean]) =
+      if (its.isEmpty) None
+      else Some(its.exists(identity))
+  }
 }
 
 /**
@@ -154,6 +161,13 @@ case class AndVal(get: Boolean)
 
 object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid
+  def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
+    def zero = true
+    def plus(l: Boolean, r: Boolean) = l && r
+    override def sumOption(its: TraversableOnce[Boolean]) =
+      if (its.isEmpty) None
+      else Some(its.forall(identity))
+  }
 }
 
 /**
