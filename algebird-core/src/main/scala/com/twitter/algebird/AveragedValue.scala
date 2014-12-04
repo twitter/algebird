@@ -20,6 +20,10 @@ object AveragedValue {
   implicit val group = AveragedGroup
   implicit val aggregator: Aggregator[Double, AveragedValue, Double] = Averager
 
+  def numericAggregator[N](implicit num: Numeric[N]): Aggregator[N, AveragedValue, Double] =
+    Aggregator.prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
+      .andThenPresent(_.value)
+
   def apply[V <% Double](v: V) = new AveragedValue(1L, v)
   def apply[V <% Double](c: Long, v: V) = new AveragedValue(c, v)
 }
