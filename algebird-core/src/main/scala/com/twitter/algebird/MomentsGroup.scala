@@ -43,6 +43,9 @@ object Moments {
   implicit val group = MomentsGroup
   implicit val aggregator = MomentsAggregator
 
+  def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
+    Aggregator.prepareMonoid { n: N => Moments(num.toDouble(n)) }
+
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
   def apply[V <% Double](value: V) = new Moments(1L, value, 0, 0, 0)
