@@ -14,11 +14,11 @@ matrix:
       env: BUILD="Mima tests"
       script: "./sbt ++$TRAVIS_SCALA_VERSION mima-report-binary-issues"
 
-    - scala: 2.11.4
+    - scala: 2.11.2
       env: BUILD="Tests"
       script: "./sbt ++$TRAVIS_SCALA_VERSION test"
 
-    - scala: 2.11.4
+    - scala: 2.11.2
       env: BUILD="Mima tests"
       script: "./sbt ++$TRAVIS_SCALA_VERSION mima-report-binary-issues"
 
