@@ -32,7 +32,15 @@ class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Match
       val tuplesIn = Counter("tuplesIn")
       val tuplesOut = Counter("tuplesOut")
       val putCounter = Counter("put")
-      val summer = new SyncSummingQueue[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, sizeCounter, putCounter, tuplesIn, tuplesOut)
+      val summer = new SyncSummingQueue[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        sizeCounter,
+        putCounter,
+        tuplesIn,
+        tuplesOut)
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }

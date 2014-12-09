@@ -33,7 +33,14 @@ class AsyncListMMapSumProperties extends PropSpec with PropertyChecks with Match
       val memoryCounter = Counter("memory")
       val insertOp = Counter("insertOp")
       val tuplesOut = Counter("tuplesOut")
-      val summer = new AsyncListMMapSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, tuplesOut, insertOp, sizeCounter, workPool)
+      val summer = new AsyncListMMapSum[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        tuplesOut,
+        insertOp,
+        sizeCounter, workPool)
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }
