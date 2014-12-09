@@ -25,22 +25,34 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
   val memoryFlushPercent = MemoryFlushPercent(80.0f)
   val executor = Executors.newFixedThreadPool(4)
   val workPool = FuturePool(executor)
-  val timeOutCounter = Counter("timeOut")
-  val sizeCounter = Counter("size")
-  val memoryCounter = Counter("memory")
-  val insertOp = Counter("insertOp")
-  val insertFails = Counter("insertFails")
-  val tuplesIn = Counter("tuplesIn")
-  val tuplesOut = Counter("tuplesOut")
-  val putCounter = Counter("put")
+  def timeOutCounter = Counter("timeOut")
+  def sizeCounter = Counter("size")
+  def memoryCounter = Counter("memory")
+  def insertOp = Counter("insertOp")
+  def insertFails = Counter("insertFails")
+  def tuplesIn = Counter("tuplesIn")
+  def tuplesOut = Counter("tuplesOut")
+  def putCounter = Counter("put")
 
   implicit val hllMonoid = new HyperLogLogMonoid(24)
 
   def genSummers[K, V: Semigroup] = Map(
-    "AsyncListSum" -> new AsyncListSum[K, V](bufferSize, flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, insertOp, insertFails, sizeCounter, tuplesIn, tuplesOut, workPool, false, CompactionSize(0)),
+    "AsyncListSum" -> new AsyncListSum[K, V](bufferSize,
+      flushFrequency,
+      memoryFlushPercent,
+      memoryCounter,
+      timeOutCounter,
+      insertOp,
+      insertFails,
+      sizeCounter,
+      tuplesIn,
+      tuplesOut,
+      workPool,
+      false,
+      CompactionSize(0)),
     "AsyncMapSum" -> new AsyncMapSum[K, V](bufferSize, flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, insertOp, tuplesOut, sizeCounter, workPool),
     "SyncSummingQueue" -> new SyncSummingQueue[K, V](bufferSize, flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, sizeCounter,putCounter,tuplesIn,tuplesOut),
-    "NullSummer" -> new NullSummer[K, V]())
+    "NullSummer" -> new NullSummer[K, V](tuplesIn,tuplesOut))
 
   var summers: Map[String, AsyncSummer[(Long, HLL), Map[Long, HLL]]] = _
 

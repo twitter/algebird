@@ -34,7 +34,6 @@ class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks w
       val insertFails = Counter("insertFails")
       val tuplesIn = Counter("tuplesIn")
       val tuplesOut = Counter("tuplesOut")
-      val putCounter = Counter("put")
 
       val summer = new AsyncListSum[Int, Long](bufferSize,
         flushFrequency,
