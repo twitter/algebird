@@ -33,6 +33,11 @@ import scala.collection.breakOut
 class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
   override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  tuplesOut: Incrementor,
+  insertOp: Incrementor,
+  sizeIncr: Incrementor,
   workPool: FuturePool)(implicit sg: Semigroup[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
@@ -54,13 +59,17 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
         queueMap.clear
         l
       }
-      curData.flatMap {
+      val result = curData.flatMap {
         case (k, listV) =>
           sg.sumOption(listV).map(v => (k, v))
-      }(breakOut)
+      }.toMap
+
+      tuplesOut.incrBy(result.size)
+      result
     }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+    insertOp.incr
     var newlyAddedTuples = 0
 
     mutex.synchronized {
@@ -73,9 +82,10 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
       presentTuples += newlyAddedTuples
     }
 
-    if (presentTuples >= bufferSize.v)
+    if (presentTuples >= bufferSize.v) {
+      sizeIncr.incr
       flush
-    else
+    } else
       Future.value(emptyResult)
   }
 }

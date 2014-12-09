@@ -27,8 +27,29 @@ class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks w
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
-      val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
-      val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency, memoryFlushPercent, summer)
+      val timeOutCounter = Counter("timeOut")
+      val sizeCounter = Counter("size")
+      val memoryCounter = Counter("memory")
+      val insertOp = Counter("insertOp")
+      val insertFails = Counter("insertFails")
+      val tuplesIn = Counter("tuplesIn")
+      val tuplesOut = Counter("tuplesOut")
+      val putCounter = Counter("put")
+
+      val summer = new AsyncListSum[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        insertOp,
+        insertFails,
+        sizeCounter,
+        tuplesIn,
+        tuplesOut,
+        workPool,
+        false,
+        CompactionSize(0))
+      val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency, memoryFlushPercent, memoryCounter, timeOutCounter, tuplesOut, insertOp, sizeCounter, summer)
       assert(summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
     }
   }

@@ -17,16 +17,23 @@ package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
 import com.twitter.util.{ Duration, Future, FuturePool }
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ ArrayBlockingQueue, ConcurrentHashMap }
+
 import scala.collection.mutable.ListBuffer
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
+import scala.collection.mutable.{ Set => MSet, ListBuffer }
 
 /**
  * @author Ian O Connell
  *
  * This class is designed to use a local mutable CMS to skip keeping low freqeuncy keys in a buffer.
  */
+
+trait Incrementor {
+  def incr: Unit
+  def incrBy(amount: Long): Unit
+}
 
 // The update frequency is how often we should update the mutable CMS
 // other steps will just query the pre-established HH's
@@ -174,17 +181,55 @@ object HeavyHittersCachingSummer {
   val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
   val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
 
-  def apply[Key, Value](flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new HeavyHittersCachingSummer[Key, Value](DEFAULT_HH_PERCENT, DEFAULT_UPDATE_FREQUENCY, DEFAULT_ROLL_OVER_FREQUENCY, flushFrequency, softMemoryFlush, backingSummer)
+  def apply[Key, Value](flushFrequency: FlushFrequency,
+    softMemoryFlush: MemoryFlushPercent,
+    memoryIncr: Incrementor,
+    timeoutIncr: Incrementor,
+    tuplesOut: Incrementor,
+    insertOp: Incrementor,
+    sizeIncr: Incrementor,
+    backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
+    new HeavyHittersCachingSummer[Key, Value](DEFAULT_HH_PERCENT,
+      DEFAULT_UPDATE_FREQUENCY,
+      DEFAULT_ROLL_OVER_FREQUENCY,
+      flushFrequency,
+      softMemoryFlush,
+      memoryIncr,
+      timeoutIncr,
+      insertOp,
+      backingSummer)
 
-  def apply[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency,
-    flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new HeavyHittersCachingSummer[Key, Value](hhPct, updateFreq, roFreq, flushFrequency, softMemoryFlush, backingSummer)
+  def apply[Key, Value](hhPct: HeavyHittersPercent,
+    updateFreq: UpdateFrequency,
+    roFreq: RollOverFrequency,
+    flushFrequency: FlushFrequency,
+    softMemoryFlush: MemoryFlushPercent,
+    memoryIncr: Incrementor,
+    timeoutIncr: Incrementor,
+    tuplesOut: Incrementor,
+    insertOp: Incrementor,
+    sizeIncr: Incrementor,
+    backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
+    new HeavyHittersCachingSummer[Key, Value](hhPct,
+      updateFreq,
+      roFreq,
+      flushFrequency,
+      softMemoryFlush,
+      memoryIncr,
+      timeoutIncr,
+      insertOp,
+      backingSummer)
 
 }
 
-class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
+class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent,
+  updateFreq: UpdateFrequency,
+  roFreq: RollOverFrequency,
+  override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
   backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
   extends AsyncSummer[(K, V), Iterable[(K, V)]]
   with WithFlushConditions[(K, V), Iterable[(K, V)]] {
@@ -198,6 +243,8 @@ class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: Up
   private[this] final val approxHH = new ApproxHHTracker(hhPct, updateFreq, roFreq)
 
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
+    //todo not sure if need to increment as backing summer may already be doing it
+    insertOp.incr
     val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 
     if (!hh.isEmpty) {
@@ -213,3 +260,117 @@ class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: Up
     }
   }
 }
+
+case class CompactionSize(toInt: Int)
+
+class AsyncCompactingListSummer[Key, Value](bufferSize: BufferSize,
+  compatSize: CompactionSize,
+  override val flushFrequency: FlushFrequency,
+  override val softMemoryFlush: MemoryFlushPercent,
+  workPool: FuturePool,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
+  insertFails: Incrementor,
+  sizeIncr: Incrementor,
+  tuplesIn: Incrementor,
+  tuplesOut: Incrementor)(implicit sg: Semigroup[Value])
+  extends AsyncSummer[(Key, Value), Map[Key, Value]]
+  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+  require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
+
+  private[this] val innerBuffSize = bufferSize.v
+
+  implicit val fSg: Semigroup[Future[Value]] = new FutureVSg[Value]
+
+  private[this] val compatSizeInt = compatSize.toInt
+
+  private case class MapContainer(privBuf: List[Future[Value]], size: Int) {
+    def this(v: Value) = this(List[Future[Value]](Future.value(v)), 1)
+
+    def addValue(v: Value): (MapContainer, Int) = {
+      if (size > compatSizeInt) {
+        val newV = workPool { fSg.sumOption(Future.value(v) :: privBuf).get }.flatten
+        (new MapContainer(List(newV), 1), size * -1)
+      } else {
+        (new MapContainer(Future.value(v) :: privBuf, size + 1), 1)
+      }
+    }
+
+    override def equals(o: Any) = o match {
+      case that: MapContainer => that eq this
+      case _ => false
+    }
+
+    lazy val toSeq = privBuf.reverse
+  }
+
+  protected override val emptyResult = Map.empty[Key, Value]
+  private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](innerBuffSize)
+  private[this] final val elementsInCache = new AtomicInteger(0)
+
+  override def isFlushed: Boolean = elementsInCache.get == 0
+
+  override def flush: Future[Map[Key, Value]] =
+    workPool {
+      // Take a copy of the keyset into a scala set (toSet forces the copy)
+      // We want this to be safe around uniqueness in the keys coming out of the keys.flatMap
+      val keys = MSet[Key]()
+      keys ++= queueMap.keySet.iterator.asScala
+
+      val lFuts = Future.collect(keys.toSeq.flatMap { k =>
+        val retV = queueMap.remove(k)
+
+        if (retV != null) {
+          val newRemaining = elementsInCache.addAndGet(retV.size * -1)
+          fSg.sumOption(retV.toSeq).map(v => v.map((k, _)))
+        } else None
+      }.toSeq)
+      lFuts
+        .map(_.toMap)
+        .foreach { r =>
+          tuplesOut.incrBy(r.size)
+        }
+    }.flatten
+
+  @annotation.tailrec
+  private[this] final def doInsert(key: Key, value: Value): Int = {
+    tuplesIn.incr
+    val (success, countChange) = if (queueMap.containsKey(key)) {
+      val oldValue = queueMap.get(key)
+      if (oldValue != null) {
+        val (newValue, countChange) = oldValue.addValue(value)
+        (queueMap.replace(key, oldValue, newValue), countChange)
+      } else {
+        (false, 0) // Removed between the check above and fetching
+      }
+    } else {
+      // Test if something else has raced into our spot.
+      (queueMap.putIfAbsent(key, new MapContainer(value)) == null, 1)
+    }
+
+    if (success) {
+      // Successful insert
+      elementsInCache.addAndGet(countChange)
+    } else {
+      insertFails.incr
+      return doInsert(key, value)
+    }
+  }
+
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = workPool {
+    insertOp.incr
+    vals.foreach {
+      case (k, v) =>
+        doInsert(k, v)
+    }
+
+    if (elementsInCache.get >= innerBuffSize) {
+      sizeIncr.incr
+      flush
+    } else {
+      Future.value(Map.empty[Key, Value])
+    }
+  }.flatten
+}
+

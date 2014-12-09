@@ -28,7 +28,27 @@ class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers 
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
-      val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
+      val timeOutCounter = Counter("timeOut")
+      val sizeCounter = Counter("size")
+      val memoryCounter = Counter("memory")
+      val insertOp = Counter("insertOp")
+      val insertFails = Counter("insertFails")
+      val tuplesIn = Counter("tuplesIn")
+      val tuplesOut = Counter("tuplesOut")
+      val putCounter = Counter("put")
+      val summer = new AsyncListSum[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        insertOp,
+        insertFails,
+        sizeCounter,
+        tuplesIn,
+        tuplesOut,
+        workPool,
+        false,
+        CompactionSize(0))
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }

@@ -22,7 +22,7 @@ import org.scalatest.prop.PropertyChecks
 class AsyncMapSumProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") {
+  /*  property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
@@ -30,6 +30,6 @@ class AsyncMapSumProperties extends PropSpec with PropertyChecks with Matchers {
       val summer = new AsyncMapSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
-  }
+  }*/
 
 }
