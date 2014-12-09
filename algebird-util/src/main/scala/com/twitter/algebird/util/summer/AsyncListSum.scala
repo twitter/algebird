@@ -151,3 +151,4 @@ class FutureVSg[T](implicit sg: Semigroup[T]) extends Semigroup[Future[T]] {
   }
 }
 
+case class CompactionSize(toInt: Int)
