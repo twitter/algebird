@@ -207,7 +207,7 @@ sealed abstract class HLL extends java.io.Serializable {
 
     val e = factor * z
     // There are large and small value corrections from the paper
-    // We stopped using the small value corrections since when using Long's
+    // We stopped using the large value corrections since when using Long's
     // there was pathalogically bad results. See https://github.com/twitter/algebird/issues/284
     if (e <= smallE) {
       smallEstimate(e)
