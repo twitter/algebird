@@ -1,74 +1,71 @@
 package com.twitter.algebird.caliper
 
+import java.lang.Math._
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 
-import com.twitter.algebird._
-import com.twitter.util.Duration
-import scala.util.Random
-import com.twitter.bijection._
+import com.google.caliper.{Param, SimpleBenchmark}
+import com.twitter.algebird.{HyperLogLogMonoid, _}
 import com.twitter.algebird.util.summer._
-import com.twitter.util.{ Await, Future }
-import com.twitter.util.{ Future, Await, Duration, FuturePool }
+import com.twitter.bijection._
+import com.twitter.util.{Await, Duration, FuturePool}
 
-import java.util.concurrent.Executors
-import com.twitter.algebird.util._
-import com.google.caliper.Param
-import com.google.caliper.SimpleBenchmark
-import com.twitter.algebird.HyperLogLogMonoid
-
-import java.nio.ByteBuffer
-
-import Math._
+import scala.util.Random
 
 class AsyncSummerBenchmark extends SimpleBenchmark {
   val flushFrequency = FlushFrequency(Duration.fromMilliseconds(100))
   val memoryFlushPercent = MemoryFlushPercent(80.0f)
   val executor = Executors.newFixedThreadPool(4)
   val workPool = FuturePool(executor)
-  def timeOutCounter = Counter("timeOut")
-  def sizeCounter = Counter("size")
-  def memoryCounter = Counter("memory")
-  def insertOp = Counter("insertOp")
-  def insertFails = Counter("insertFails")
-  def tuplesIn = Counter("tuplesIn")
-  def tuplesOut = Counter("tuplesOut")
-  def putCounter = Counter("put")
 
   implicit val hllMonoid = new HyperLogLogMonoid(24)
 
   def genSummers[K, V: Semigroup] = Map(
-    "AsyncListSum" -> new AsyncListSum[K, V](bufferSize,
+    "AsyncNonCompactListSum" -> new AsyncListSum[K, V](bufferSize,
       flushFrequency,
       memoryFlushPercent,
-      memoryCounter,
-      timeOutCounter,
-      insertOp,
-      insertFails,
-      sizeCounter,
-      tuplesIn,
-      tuplesOut,
+      Counter("memory"),
+      Counter("timeOut"),
+      Counter("insertOp"),
+      Counter("insertFails"),
+      Counter("size"),
+      Counter("tuplesIn"),
+      Counter("tuplesOut"),
       workPool,
       Compact(false),
       CompactionSize(0)),
+    "AsyncCompactListSum" -> new AsyncListSum[K, V](bufferSize,
+      flushFrequency,
+      memoryFlushPercent,
+      Counter("memory"),
+      Counter("timeOut"),
+      Counter("insertOp"),
+      Counter("insertFails"),
+      Counter("size"),
+      Counter("tuplesIn"),
+      Counter("tuplesOut"),
+      workPool,
+      Compact(true),
+      CompactionSize(500)),
     "AsyncMapSum" -> new AsyncMapSum[K, V](bufferSize,
       flushFrequency,
       memoryFlushPercent,
-      memoryCounter,
-      timeOutCounter,
-      insertOp,
-      tuplesOut,
-      sizeCounter,
+      Counter("memory"),
+      Counter("timeOut"),
+      Counter("insertOp"),
+      Counter("tuplesOut"),
+      Counter("size"),
       workPool),
     "SyncSummingQueue" -> new SyncSummingQueue[K, V](bufferSize,
       flushFrequency,
       memoryFlushPercent,
-      memoryCounter,
-      timeOutCounter,
-      sizeCounter,
+      Counter("memory"),
+      Counter("timeOut"),
+      Counter("size"),
       putCounter,
-      tuplesIn,
-      tuplesOut),
-    "NullSummer" -> new NullSummer[K, V](tuplesIn,tuplesOut))
+      Counter("tuplesIn"),
+      Counter("tuplesOut")),
+    "NullSummer" -> new NullSummer[K, V](Counter("tuplesIn"), Counter("tuplesOut")))
 
   var summers: Map[String, AsyncSummer[(Long, HLL), Map[Long, HLL]]] = _
 
@@ -136,7 +133,8 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeAsyncListSum(reps: Int): Int = doBench("AsyncListSum", reps)
+  def timeAsyncNonCompactListSum(reps: Int): Int = doBench("AsyncNonCompactListSum", reps)
+  def timeAsyncCompactListSum(reps: Int): Int = doBench("AsyncCompactListSum", reps)
   def timeAsyncMapSum(reps: Int): Int = doBench("AsyncMapSum", reps)
   def timeSyncSummingQueue(reps: Int): Int = doBench("SyncSummingQueue", reps)
   def timeNullSummer(reps: Int): Int = doBench("NullSummer", reps)

@@ -55,7 +55,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
         val newV = workPool {
           fSg.sumOption(Future.value(v) :: privBuf).get
         }.flatten
-        (new MapContainer(List(newV), 1, compact), size * -1)
+        (new MapContainer(List(newV), 1, compact), (size - 1) * -1)
       } else {
         (new MapContainer(Future.value(v) :: privBuf, size + 1, compact), 1)
       }
