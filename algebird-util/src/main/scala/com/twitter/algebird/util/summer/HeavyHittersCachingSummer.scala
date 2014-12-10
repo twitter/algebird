@@ -30,11 +30,6 @@ import scala.collection.mutable.{ Set => MSet, ListBuffer }
  * This class is designed to use a local mutable CMS to skip keeping low freqeuncy keys in a buffer.
  */
 
-trait Incrementor {
-  def incr: Unit
-  def incrBy(amount: Long): Unit
-}
-
 // The update frequency is how often we should update the mutable CMS
 // other steps will just query the pre-established HH's
 // This will only kick in after the first 1000 tuples since a Roll Over

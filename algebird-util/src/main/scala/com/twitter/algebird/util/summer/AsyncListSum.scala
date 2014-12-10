@@ -40,18 +40,18 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   tuplesIn: Incrementor,
   tuplesOut: Incrementor,
   workPool: FuturePool,
-  compact: Boolean,
+  compact: Compact,
   compatSize: CompactionSize)(implicit sg: Semigroup[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
-  private case class MapContainer(privBuf: List[Future[Value]], size: Int, compact: Boolean) {
-    def this(v: Value, compact: Boolean) = this(List[Future[Value]](Future.value(v)), 1, compact)
+  private case class MapContainer(privBuf: List[Future[Value]], size: Int, compact: Compact) {
+    def this(v: Value, compact: Compact) = this(List[Future[Value]](Future.value(v)), 1, compact)
 
     def addValue(v: Value): (MapContainer, Int) = {
-      if (compact && size > compatSizeInt) {
+      if (compact.flag && size > compatSizeInt) {
         val newV = workPool {
           fSg.sumOption(Future.value(v) :: privBuf).get
         }.flatten
@@ -85,7 +85,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       val keys = MSet[Key]()
       keys ++= queueMap.keySet.iterator.asScala
 
-      val lFuts = Future.collect(keys.toSeq.flatMap { k =>
+      val lFuts = Future.collect(keys.toIterator.flatMap { k =>
         val retV = queueMap.remove(k)
 
         if (retV != null) {
@@ -151,4 +151,6 @@ class FutureVSg[T](implicit sg: Semigroup[T]) extends Semigroup[Future[T]] {
   }
 }
 
-case class CompactionSize(toInt: Int)
+case class CompactionSize(toInt: Int) extends AnyVal
+case class Compact(flag: Boolean) extends AnyVal
+

@@ -46,7 +46,7 @@ class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks w
         tuplesIn,
         tuplesOut,
         workPool,
-        false,
+        Compact(false),
         CompactionSize(0))
       val heavyHittersCachingSummer = HeavyHittersCachingSummer[Int, Long](flushFrequency,
         memoryFlushPercent,

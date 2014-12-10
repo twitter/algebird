@@ -48,7 +48,7 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
       tuplesIn,
       tuplesOut,
       workPool,
-      false,
+      Compact(false),
       CompactionSize(0)),
     "AsyncMapSum" -> new AsyncMapSum[K, V](bufferSize,
       flushFrequency,

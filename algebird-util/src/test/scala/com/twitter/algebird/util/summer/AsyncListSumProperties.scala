@@ -47,7 +47,7 @@ class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers 
         tuplesIn,
         tuplesOut,
         workPool,
-        false,
+        Compact(false),
         CompactionSize(0))
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }

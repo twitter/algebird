@@ -31,14 +31,14 @@ import scala.collection.breakOut
  */
 
 class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
-                                   override val flushFrequency: FlushFrequency,
-                                   override val softMemoryFlush: MemoryFlushPercent,
-                                   override val memoryIncr: Incrementor,
-                                   override val timeoutIncr: Incrementor,
-                                   tuplesOut: Incrementor,
-                                   insertOp: Incrementor,
-                                   sizeIncr: Incrementor,
-                                   workPool: FuturePool)(implicit sg: Semigroup[Value])
+  override val flushFrequency: FlushFrequency,
+  override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  tuplesOut: Incrementor,
+  insertOp: Incrementor,
+  sizeIncr: Incrementor,
+  workPool: FuturePool)(implicit sg: Semigroup[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
