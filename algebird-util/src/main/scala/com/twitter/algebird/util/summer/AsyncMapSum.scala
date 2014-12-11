@@ -28,6 +28,11 @@ import scala.collection.JavaConverters._
 class AsyncMapSum[Key, Value](bufferSize: BufferSize,
   override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
+  tuplesOut: Incrementor,
+  sizeIncr: Incrementor,
   workPool: FuturePool)(implicit semigroup: Semigroup[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
@@ -43,14 +48,19 @@ class AsyncMapSum[Key, Value](bufferSize: BufferSize,
     val toSum = ArrayBuffer[Map[Key, Value]]()
     queue.drainTo(toSum.asJava)
     workPool {
-      Semigroup.sumOption(toSum).getOrElse(Map.empty)
+      val result = Semigroup.sumOption(toSum).getOrElse(Map.empty)
+      tuplesOut.incrBy(result.size)
+      result
     }
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+    insertOp.incr
+
     val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
     if (!queue.offer(curData)) {
       flush.map { flushRes =>
+        sizeIncr.incr //todo not sure if need to increase size
         Semigroup.plus(flushRes, curData)
       }
     } else {

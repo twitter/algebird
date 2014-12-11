@@ -15,13 +15,15 @@ limitations under the License.
 */
 package com.twitter.algebird.util.summer
 
-import com.twitter.algebird._
-import com.twitter.util.{ Duration, Future, FuturePool }
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+
+import com.twitter.algebird._
+import com.twitter.util.{ Future, FuturePool }
+
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ Set => MSet, ListBuffer }
 import scala.collection.breakOut
+import scala.collection.mutable.{ Set => MSet }
 
 /**
  * @author Ian O Connell
@@ -30,16 +32,34 @@ import scala.collection.breakOut
 class AsyncListSum[Key, Value](bufferSize: BufferSize,
   override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
-  workPool: FuturePool)(implicit sg: Semigroup[Value])
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
+  insertFails: Incrementor,
+  sizeIncr: Incrementor,
+  tuplesIn: Incrementor,
+  tuplesOut: Incrementor,
+  workPool: FuturePool,
+  compact: Compact,
+  compatSize: CompactionSize)(implicit sg: Semigroup[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
-  private case class MapContainer(privBuf: List[Value], size: Int) {
-    def this(v: Value) = this(List[Value](v), 1)
+  private case class MapContainer(privBuf: List[Future[Value]], size: Int, compact: Compact) {
+    def this(v: Value, compact: Compact) = this(List[Future[Value]](Future.value(v)), 1, compact)
 
-    def addValue(v: Value): MapContainer = new MapContainer(v :: privBuf, size + 1)
+    def addValue(v: Value): (MapContainer, Int) = {
+      if (compact.flag && size > compatSizeInt) {
+        val newV = workPool {
+          fSg.sumOption(Future.value(v) :: privBuf).get
+        }.flatten
+        (new MapContainer(List(newV), 1, compact), (size - 1) * -1)
+      } else {
+        (new MapContainer(Future.value(v) :: privBuf, size + 1, compact), 1)
+      }
+    }
 
     override def equals(o: Any) = o match {
       case that: MapContainer => that eq this
@@ -52,6 +72,9 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   protected override val emptyResult = Map.empty[Key, Value]
   private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
+  implicit val fSg: Semigroup[Future[Value]] = new FutureVSg[Value]
+  private[this] val innerBuffSize = bufferSize.v
+  private[this] val compatSizeInt = compatSize.toInt
 
   override def isFlushed: Boolean = elementsInCache.get == 0
 
@@ -62,48 +85,72 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       val keys = MSet[Key]()
       keys ++= queueMap.keySet.iterator.asScala
 
-      keys.flatMap { k =>
+      val lFuts = Future.collect(keys.toIterator.flatMap { k =>
         val retV = queueMap.remove(k)
 
         if (retV != null) {
           val newRemaining = elementsInCache.addAndGet(retV.size * -1)
-          sg.sumOption(retV.toSeq).map(v => (k, v))
+          fSg.sumOption(retV.toSeq).map(v => v.map((k, _)))
         } else None
-      }(breakOut)
-    }
+      }.toSeq)
+      lFuts
+        .map(_.toMap)
+        .foreach { r =>
+          tuplesOut.incrBy(r.size)
+        }
+    }.flatten
 
   @annotation.tailrec
   private[this] final def doInsert(key: Key, value: Value) {
-    val success = if (queueMap.containsKey(key)) {
+    val (success, countChange) = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)
       if (oldValue != null) {
-        queueMap.replace(key, oldValue, oldValue.addValue(value))
+        val (newValue, countChange) = oldValue.addValue(value)
+        (queueMap.replace(key, oldValue, newValue), countChange)
       } else {
-        false // Removed between the check above and fetching
+        (false, 0) // Removed between the check above and fetching
       }
     } else {
       // Test if something else has raced into our spot.
-      queueMap.putIfAbsent(key, new MapContainer(value)) == null
+      (queueMap.putIfAbsent(key, new MapContainer(value, compact)) == null, 1)
     }
 
     if (success) {
       // Successful insert
-      elementsInCache.addAndGet(1)
+      elementsInCache.addAndGet(countChange)
     } else {
       return doInsert(key, value)
     }
   }
 
-  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = workPool {
+    insertOp.incr
     vals.foreach {
       case (k, v) =>
         doInsert(k, v)
     }
 
-    if (elementsInCache.get >= bufferSize.v) {
+    if (elementsInCache.get >= innerBuffSize) {
+      sizeIncr.incr
       flush
     } else {
-      Future.value(Map.empty)
+      Future.value(Map.empty[Key, Value])
+    }
+  }.flatten
+}
+
+class FutureVSg[T](implicit sg: Semigroup[T]) extends Semigroup[Future[T]] {
+  override def plus(a: Future[T], b: Future[T]) = sumOption(List(a, b)).get
+
+  override def sumOption(iter: TraversableOnce[Future[T]]): Option[Future[T]] = {
+    if (iter.isEmpty) {
+      None
+    } else {
+      Some(Future.collect(iter.toSeq).map(sg.sumOption(_).get))
     }
   }
 }
+
+case class CompactionSize(toInt: Int) extends AnyVal
+case class Compact(flag: Boolean) extends AnyVal
+
