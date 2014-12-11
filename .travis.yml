@@ -1,4 +1,20 @@
 language: scala
-scala:
-  - 2.9.3
-  - 2.10.4
+sudo: false
+jdk: oraclejdk7
+script:
+  - "echo no op"
+
+matrix:
+ include:
+    - scala: 2.9.3
+      env: BUILD="Tests"
+      script: "./sbt ++$TRAVIS_SCALA_VERSION test"
+
+    - scala: 2.9.3
+      env: BUILD="Mima tests"
+      script: "./sbt ++$TRAVIS_SCALA_VERSION mima-report-binary-issues"
+
+    - scala: 2.10.4
+      env: BUILD="Tests"
+      script: "./sbt ++$TRAVIS_SCALA_VERSION test"
+
