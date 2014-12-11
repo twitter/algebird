@@ -62,7 +62,7 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
       Counter("memory"),
       Counter("timeOut"),
       Counter("size"),
-      putCounter,
+      Counter("puts"),
       Counter("tuplesIn"),
       Counter("tuplesOut")),
     "NullSummer" -> new NullSummer[K, V](Counter("tuplesIn"), Counter("tuplesOut")))

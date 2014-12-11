@@ -24,6 +24,7 @@ import com.twitter.util.{ Future, FuturePool }
 import scala.collection.JavaConverters._
 import scala.collection.breakOut
 import scala.collection.mutable.{ Set => MSet }
+import com.twitter.algebird.util.UtilAlgebras._
 
 /**
  * @author Ian O Connell
@@ -72,7 +73,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   protected override val emptyResult = Map.empty[Key, Value]
   private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
-  implicit val fSg: Semigroup[Future[Value]] = new FutureVSg[Value]
+  val fSg: Semigroup[Future[Value]] = implicitly[Semigroup[Future[Value]]]
   private[this] val innerBuffSize = bufferSize.v
   private[this] val compatSizeInt = compatSize.toInt
 
@@ -137,18 +138,6 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       Future.value(Map.empty[Key, Value])
     }
   }.flatten
-}
-
-class FutureVSg[T](implicit sg: Semigroup[T]) extends Semigroup[Future[T]] {
-  override def plus(a: Future[T], b: Future[T]) = sumOption(List(a, b)).get
-
-  override def sumOption(iter: TraversableOnce[Future[T]]): Option[Future[T]] = {
-    if (iter.isEmpty) {
-      None
-    } else {
-      Some(Future.collect(iter.toSeq).map(sg.sumOption(_).get))
-    }
-  }
 }
 
 case class CompactionSize(toInt: Int) extends AnyVal
