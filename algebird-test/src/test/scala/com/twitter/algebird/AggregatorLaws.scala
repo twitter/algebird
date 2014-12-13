@@ -61,4 +61,38 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
       assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
     }
   }
+
+  implicit def optionSmgrp[B](implicit smgrp: Semigroup[B]): Semigroup[Option[B]] = new Semigroup[Option[B]] {
+    override def plus(l: Option[B], r: Option[B]): Option[B] = (l, r) match {
+      case (Some(x), Some(y)) => Some(smgrp.plus(x, y))
+      case (Some(x), None) => Some(x)
+      case (None, Some(y)) => Some(y)
+      case (None, None) => None
+    }
+  }
+
+  property("Aggregator.liftOption is correct") {
+    forAll { (in: List[List[Int]], ag: Aggregator[Int, Int, Int]) =>
+      val liftedAg = ag.liftOption
+      assert(in.flatten.isEmpty || liftedAg(in) == Some(ag(in.flatten)))
+    }
+  }
+
+  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
+    for {
+      pp <- prepare.arbitrary
+      ps <- present.arbitrary
+    } yield new MonoidAggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def monoid = m
+      def present(b: B) = ps(b)
+    }
+  }
+
+  property("MonoidAggregator.lift is correct") {
+    forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
+      val liftedAg = ag.lift()
+      assert(in.isEmpty || liftedAg(in) == ag(in.flatten))
+    }
+  }
 }
