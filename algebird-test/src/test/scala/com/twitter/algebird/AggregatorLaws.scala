@@ -62,18 +62,9 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
-  implicit def optionSmgrp[B](implicit smgrp: Semigroup[B]): Semigroup[Option[B]] = new Semigroup[Option[B]] {
-    override def plus(l: Option[B], r: Option[B]): Option[B] = (l, r) match {
-      case (Some(x), Some(y)) => Some(smgrp.plus(x, y))
-      case (Some(x), None) => Some(x)
-      case (None, Some(y)) => Some(y)
-      case (None, None) => None
-    }
-  }
-
   property("Aggregator.liftOption is correct") {
     forAll { (in: List[List[Int]], ag: Aggregator[Int, Int, Int]) =>
-      val liftedAg = ag.liftOption
+      val liftedAg = ag.liftOption()
       assert(in.flatten.isEmpty || liftedAg(in) == Some(ag(in.flatten)))
     }
   }
