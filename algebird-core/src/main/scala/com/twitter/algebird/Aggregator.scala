@@ -213,7 +213,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     None,
     { _.map(self.present(_)) })
 
-  def liftOption(): Aggregator[TraversableOnce[A], Option[B], Option[C]] =
+  def lift(): Aggregator[TraversableOnce[A], Option[B], Option[C]] =
     new Aggregator[TraversableOnce[A], Option[B], Option[C]] {
       def prepare(input: TraversableOnce[A]): Option[B] = self.semigroup.sumOption(input.map(self.prepare))
       def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
@@ -276,11 +276,11 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     }
   }
 
-  def lift(): Aggregator[Traversable[A], B, C] =
+  def sumBefore(): Aggregator[Traversable[A], B, C] =
     new MonoidAggregator[Traversable[A], B, C] {
-      override def monoid: Monoid[B] = self.monoid
-      override def prepare(input: Traversable[A]): B = monoid.sum(input.map(self.prepare))
-      override def present(reduction: B): C = self.present(reduction)
+      def monoid: Monoid[B] = self.monoid
+      def prepare(input: Traversable[A]): B = monoid.sum(input.map(self.prepare))
+      def present(reduction: B): C = self.present(reduction)
     }
 }
 
