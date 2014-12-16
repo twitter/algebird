@@ -120,6 +120,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       // Successful insert
       elementsInCache.addAndGet(countChange)
     } else {
+      insertFails.incr
       return doInsert(key, value)
     }
   }
