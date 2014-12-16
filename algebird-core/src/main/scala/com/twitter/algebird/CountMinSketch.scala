@@ -1020,7 +1020,7 @@ case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
  *
  * `h(x) = [a * x + b (mod p)] (mod m)`
  */
-trait CMSHasher[K] {
+trait CMSHasher[K] extends java.io.Serializable {
 
   val PRIME_MODULUS = (1L << 31) - 1
 
