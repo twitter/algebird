@@ -709,7 +709,7 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
-abstract class HeavyHittersLogic[K: Ordering] {
+abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
 
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
