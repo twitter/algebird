@@ -709,7 +709,7 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
-abstract class HeavyHittersLogic[K: Ordering] {
+abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
 
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
@@ -775,7 +775,7 @@ case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[
 /**
  * Containers for holding heavy hitter items and their associated counts.
  */
-case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) {
+case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Serializable {
 
   def -(hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters[K](hhs - hh)
 
@@ -800,7 +800,7 @@ object HeavyHitters {
 
 }
 
-case class HeavyHitter[K](item: K, count: Long)
+case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
 
 object HeavyHitter {
 
@@ -1020,7 +1020,7 @@ case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
  *
  * `h(x) = [a * x + b (mod p)] (mod m)`
  */
-trait CMSHasher[K] {
+trait CMSHasher[K] extends java.io.Serializable {
 
   val PRIME_MODULUS = (1L << 31) - 1
 
@@ -1031,7 +1031,7 @@ trait CMSHasher[K] {
 
 }
 
-case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) {
+case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) extends java.io.Serializable {
 
   /**
    * Returns `a * x + b (mod p) (mod width)`.
