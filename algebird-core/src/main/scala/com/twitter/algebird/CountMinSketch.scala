@@ -1031,7 +1031,7 @@ trait CMSHasher[K] extends java.io.Serializable {
 
 }
 
-case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) {
+case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) extends java.io.Serializable {
 
   /**
    * Returns `a * x + b (mod p) (mod width)`.
