@@ -775,7 +775,7 @@ case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[
 /**
  * Containers for holding heavy hitter items and their associated counts.
  */
-case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) {
+case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Serializable {
 
   def -(hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters[K](hhs - hh)
 
