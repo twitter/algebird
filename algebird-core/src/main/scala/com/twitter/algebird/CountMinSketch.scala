@@ -800,7 +800,7 @@ object HeavyHitters {
 
 }
 
-case class HeavyHitter[K](item: K, count: Long)
+case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
 
 object HeavyHitter {
 
