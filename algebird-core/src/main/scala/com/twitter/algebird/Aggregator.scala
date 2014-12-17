@@ -276,7 +276,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     }
   }
 
-  def sumBefore: Aggregator[TraversableOnce[A], B, C] =
+  def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
     new MonoidAggregator[TraversableOnce[A], B, C] {
       def monoid: Monoid[B] = self.monoid
       def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
