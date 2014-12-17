@@ -84,7 +84,7 @@ The answer is a mix of the following:
 * ellchow <http://github.com/ellchow>
 * Mike Gagnon <https://twitter.com/MichaelNGagnon>
 * Moses Nakamura <https://twitter.com/mnnakamura>
-* Steven Nobel <http://twitter.com/snoble>
+* Steven Noble <http://twitter.com/snoble>
 * Sam Ritchie <http://twitter.com/sritchie>
 * Ashutosh Singhal <http://twitter.com/daashu>
 * Argyris Zymnis <http://twitter.com/argyris>
