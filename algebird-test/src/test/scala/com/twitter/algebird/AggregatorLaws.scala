@@ -62,10 +62,10 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
-  property("Aggregator.lift is correct") {
-    forAll { (in: List[List[Int]], ag: Aggregator[Int, Int, Int]) =>
-      val liftedAg = ag.lift()
-      assert(in.flatten.isEmpty || liftedAg(in) == Some(ag(in.flatten)))
+  property("Aggregator.lift works for empty sequences") {
+    forAll { (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
+      val liftedAg = ag.lift
+      assert(in.isEmpty && liftedAg(in) == None || liftedAg(in) == Some(ag(in)))
     }
   }
 
@@ -82,8 +82,8 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
 
   property("MonoidAggregator.sumBefore is correct") {
     forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
-      val liftedAg = ag.sumBefore()
-      assert(in.isEmpty || liftedAg(in) == ag(in.flatten))
+      val liftedAg = ag.sumBefore
+      assert(liftedAg(in) == ag(in.flatten))
     }
   }
 }
