@@ -212,6 +212,13 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     },
     None,
     { _.map(self.present(_)) })
+
+  def lift: MonoidAggregator[A, Option[B], Option[C]] =
+    new MonoidAggregator[A, Option[B], Option[C]] {
+      def prepare(input: A): Option[B] = Some(self.prepare(input))
+      def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
+      def monoid = new OptionMonoid[B]()(self.semigroup)
+    }
 }
 
 /**
@@ -244,7 +251,7 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
     GeneratedTupleAggregator.from5(m1, m2, m3, m4, m5)
 }
 
-trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] {
+trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   def monoid: Monoid[B]
   def semigroup = monoid
   final override def reduce(items: TraversableOnce[B]): B =
@@ -268,6 +275,13 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] {
       def present(b: B) = self.present(b)
     }
   }
+
+  def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
+    new MonoidAggregator[TraversableOnce[A], B, C] {
+      def monoid: Monoid[B] = self.monoid
+      def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
+      def present(reduction: B): C = self.present(reduction)
+    }
 }
 
 trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {
