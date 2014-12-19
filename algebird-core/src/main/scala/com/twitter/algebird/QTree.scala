@@ -203,26 +203,35 @@ case class QTree[A](
 
   def compress(k: Int) = {
     val minCount = count >> k
-    val (newTree, pruned) = pruneChildrenWhere{ _.count < minCount }
-    newTree
+    prune(minCount)._1.get
   }
 
-  private def pruneChildrenWhere(fn: QTree[A] => Boolean): (QTree[A], Boolean) = {
-    if (fn(this)) {
-      (copy(sum = totalSum, lowerChild = None, upperChild = None), true)
-    } else {
-      val (newLower, lowerPruned) = pruneChildWhere(lowerChild, fn)
-      val (newUpper, upperPruned) = pruneChildWhere(upperChild, fn)
-      if (!lowerPruned && !upperPruned)
-        (this, false)
+  private def prune(minCount: Long): (Option[QTree[A]], Boolean) = {
+    val (lowerResult, upperResult) =
+      mapChildrenWithDefault[(Option[QTree[A]], Boolean)]((None, false)){ _.prune(minCount) }
+    val parent =
+      if (lowerResult._2 || lowerResult._2)
+        copy(lowerChild = lowerResult._1, upperChild = upperResult._1)
       else
-        (copy(lowerChild = newLower, upperChild = newUpper), true)
-    }
-  }
+        this
+    val (lowerCount, upperCount) = parent.mapChildrenWithDefault(0L){ _.parentCount }
 
-  private def pruneChildWhere(child: Option[QTree[A]], fn: QTree[A] => Boolean): (Option[QTree[A]], Boolean) = {
-    val result = child.map{ _.pruneChildrenWhere(fn) }
-    (result.map{ _._1 }, result.map{ _._2 }.getOrElse(false))
+    if (parent.parentCount + lowerCount + upperCount <= minCount) {
+      val (lowerSum, upperSum) = parent.mapChildrenWithDefault(monoid.zero){ _.sum }
+      val newSum = monoid.plus(parent.sum, monoid.plus(lowerSum, upperSum))
+      val (newLowerChild, newUpperChild) =
+        parent.mapChildrenWithDefault[Option[QTree[A]]](None) {
+          c => Some(c.copy(count = c.count - c.parentCount, sum = monoid.zero))
+        }
+      val (lowerLeaf, upperLeaf) = parent.mapChildrenWithDefault(true){ _.isLeaf }
+
+      (Some(parent.copy(sum = newSum,
+        lowerChild = if (lowerLeaf) None else newLowerChild,
+        upperChild = if (upperLeaf) None else newUpperChild)),
+        true)
+    } else {
+      (Some(parent), lowerResult._2 || upperResult._2)
+    }
   }
 
   def size: Int = {
@@ -243,6 +252,13 @@ case class QTree[A](
   private def parentCount = {
     val childCounts = mapChildrenWithDefault(0L){ _.count }
     count - childCounts._1 - childCounts._2
+  }
+
+  private def isLeaf: Boolean = {
+    (lowerChild, upperChild) match {
+      case (None, None) => true
+      case _ => false
+    }
   }
 
   def dump {
