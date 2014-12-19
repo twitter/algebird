@@ -210,7 +210,7 @@ case class QTree[A](
     val (lowerResult, upperResult) =
       mapChildrenWithDefault[(Option[QTree[A]], Boolean)]((None, false)){ _.prune(minCount) }
     val parent =
-      if (lowerResult._2 || lowerResult._2)
+      if (lowerResult._2 || upperResult._2)
         copy(lowerChild = lowerResult._1, upperChild = upperResult._1)
       else
         this
