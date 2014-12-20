@@ -174,6 +174,36 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     reduceOption(inputs.map(prepare))
       .map(present)
 
+  /**
+   * This returns an iterator of the cumulative sum of its inputs, in the same order.
+   * If the inputs are empty, the result will be empty too.
+   */
+  def applyCumulative(inputs: TraversableOnce[A]): Iterator[C] = {
+    val it = inputs.toIterator
+    val aggregator = this
+    new Iterator[C] {
+      var reduction: B = _
+      var hasNext = it.hasNext
+
+      if (hasNext) {
+        reduction = aggregator.prepare(it.next)
+      }
+
+      def next = {
+        if (hasNext) {
+          val result = aggregator.present(reduction)
+          if (it.hasNext)
+            reduction = aggregator.append(reduction, it.next)
+          else
+            hasNext = false
+          result
+        } else {
+          Iterator.empty.next
+        }
+      }
+    }
+  }
+
   def append(l: B, r: A): B = reduce(l, prepare(r))
 
   def appendAll(old: B, items: TraversableOnce[A]): B =
