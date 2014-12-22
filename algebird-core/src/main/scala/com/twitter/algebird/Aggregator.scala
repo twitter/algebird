@@ -1,6 +1,9 @@
 package com.twitter.algebird
 
 import java.util.PriorityQueue
+import scala.collection.TraversableLike
+import scala.collection.generic.CanBuildFrom
+
 /**
  * Aggregators compose well.
  *
@@ -175,33 +178,22 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
       .map(present)
 
   /**
-   * This returns an iterator of the cumulative sum of its inputs, in the same order.
+   * This returns the cumulative sum of its inputs, in the same order.
    * If the inputs are empty, the result will be empty too.
    */
-  def applyCumulative(inputs: TraversableOnce[A]): Iterator[C] = {
-    val it = inputs.toIterator
-    val aggregator = this
-    new Iterator[C] {
-      var reduction: B = _
-      var hasNext = it.hasNext
-
-      if (hasNext) {
-        reduction = aggregator.prepare(it.next)
-      }
-
-      def next = {
-        if (hasNext) {
-          val result = aggregator.present(reduction)
-          if (it.hasNext)
-            reduction = aggregator.append(reduction, it.next)
-          else
-            hasNext = false
-          result
-        } else {
-          Iterator.empty.next
+  def applyCumulative[In <: TraversableLike[A, In], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
+    val results =
+      inputs
+        .toIterator
+        .scanLeft(None: Option[B]) {
+          case (None, a) => Some(prepare(a))
+          case (Some(b), a) => Some(append(b, a))
         }
-      }
-    }
+        .collect { case Some(b) => present(b) }
+
+    val builder = bf()
+    builder ++= results
+    builder.result
   }
 
   def append(l: B, r: A): B = reduce(l, prepare(r))
