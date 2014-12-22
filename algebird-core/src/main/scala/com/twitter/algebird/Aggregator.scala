@@ -1,7 +1,6 @@
 package com.twitter.algebird
 
 import java.util.PriorityQueue
-import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom
 
 /**
@@ -181,7 +180,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    * This returns the cumulative sum of its inputs, in the same order.
    * If the inputs are empty, the result will be empty too.
    */
-  def applyCumulative[In <: TraversableLike[A, In], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
+  def applyCumulative[In <: TraversableOnce[A], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
     val results =
       inputs
         .toIterator
