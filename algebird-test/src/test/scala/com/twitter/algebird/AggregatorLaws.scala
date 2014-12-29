@@ -87,9 +87,9 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
     }
   }
 
-  property("Aggregator.applyCumulative is correct") {
+  property("Aggregator.applyCumulatively is correct") {
     forAll{ (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
-      val cumulative: List[Int] = ag.applyCumulative(in)
+      val cumulative: List[Int] = ag.applyCumulatively(in)
       assert(cumulative.size == in.size)
       assert(cumulative.zipWithIndex.forall{
         case (sum, i) =>

@@ -195,6 +195,28 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     builder.result
   }
 
+  /**
+   * This returns the cumulative sum of its inputs, in the same order.
+   * If the inputs are empty, the result will be empty too.
+   */
+  def cumulativeIterator(inputs: Iterator[A]): Iterator[C] =
+    inputs
+      .scanLeft(None: Option[B]) {
+        case (None, a) => Some(prepare(a))
+        case (Some(b), a) => Some(append(b, a))
+      }
+      .collect { case Some(b) => present(b) }
+
+  /**
+   * This returns the cumulative sum of its inputs, in the same order.
+   * If the inputs are empty, the result will be empty too.
+   */
+  def applyCumulatively[In <: TraversableOnce[A], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
+    val builder = bf()
+    builder ++= cumulativeIterator(inputs.toIterator)
+    builder.result
+  }
+
   def append(l: B, r: A): B = reduce(l, prepare(r))
 
   def appendAll(old: B, items: TraversableOnce[A]): B =
