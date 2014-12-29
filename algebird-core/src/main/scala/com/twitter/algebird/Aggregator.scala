@@ -180,25 +180,6 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    * This returns the cumulative sum of its inputs, in the same order.
    * If the inputs are empty, the result will be empty too.
    */
-  def applyCumulative[In <: TraversableOnce[A], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
-    val results =
-      inputs
-        .toIterator
-        .scanLeft(None: Option[B]) {
-          case (None, a) => Some(prepare(a))
-          case (Some(b), a) => Some(append(b, a))
-        }
-        .collect { case Some(b) => present(b) }
-
-    val builder = bf()
-    builder ++= results
-    builder.result
-  }
-
-  /**
-   * This returns the cumulative sum of its inputs, in the same order.
-   * If the inputs are empty, the result will be empty too.
-   */
   def cumulativeIterator(inputs: Iterator[A]): Iterator[C] =
     inputs
       .scanLeft(None: Option[B]) {
