@@ -114,7 +114,7 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   /**
    * Creates a sketch out of multiple items.
    */
-  def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  def create(data: Seq[K]): CMS[K] = CMSItems[K](data.toList, params).toCMS
 
 }
 
@@ -436,7 +436,8 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
   override def ++(other: CMS[K]): CMS[K] = {
     other match {
       case other: CMSZero[_] => this
-      case other: CMSItem[K] => CMSInstance[K](params) + item + other.item
+      case other: CMSItem[K] => CMSItems(List(item, other.item), params)
+      case other: CMSItems[K] => other + item
       case other: CMSInstance[K] => other + item
     }
   }
@@ -445,6 +446,38 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
 
   override def innerProduct(other: CMS[K]): Approximate[Long] = other.frequency(item)
 
+}
+
+/**
+ * Used for holding a small set of elements.
+ */
+case class CMSItems[K: Ordering](items: List[K], override val params: CMSParams[K]) extends CMS[K](params) {
+
+  override val totalCount: Long = items.size
+
+  override def +(x: K, count: Long): CMS[K] = CMSItems(x :: items, params).toCMS
+
+  override def ++(other: CMS[K]): CMS[K] = {
+    other match {
+      case other: CMSZero[_] => this
+      case other: CMSItem[K] => this + other.item
+      case other: CMSItems[K] => CMSItems(items ++ other.items, params).toCMS
+      case other: CMSInstance[K] => toCMSInstance ++ other
+    }
+  }
+
+  override def frequency(x: K): Approximate[Long] = Approximate.exact(items.count{ item => item == x })
+
+  override def innerProduct(other: CMS[K]): Approximate[Long] =
+    items.map{ item => other.frequency(item) }.reduce{ _ + _ }
+
+  def toCMS: CMS[K] = if (items.size > CMSItems.MaxSize) toCMSInstance else this
+  def toCMSInstance: CMSInstance[K] = ???
+}
+
+object CMSItems {
+  //arbitrarily chosen
+  val MaxSize = 100
 }
 
 /**
@@ -458,6 +491,7 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
     other match {
       case other: CMSZero[_] => this
       case other: CMSItem[K] => this + other.item
+      case other: CMSItems[K] => this ++ other.toCMSInstance
       case other: CMSInstance[K] =>
         val newTotalCount = totalCount + other.totalCount
         CMSInstance[K](countsTable ++ other.countsTable, newTotalCount, params)
