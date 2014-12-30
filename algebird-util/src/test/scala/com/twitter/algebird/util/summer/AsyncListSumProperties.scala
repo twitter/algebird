@@ -54,10 +54,10 @@ class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers 
 
   property("CompactingList Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
-      flushFrequency: FlushFrequency,
-      bufferSize: BufferSize,
-      memoryFlushPercent: MemoryFlushPercent,
-      compactionSize: CompactionSize) =>
+              flushFrequency: FlushFrequency,
+              bufferSize: BufferSize,
+              memoryFlushPercent: MemoryFlushPercent,
+              compactionSize: CompactionSize) =>
       val timeOutCounter = Counter("timeOut")
       val sizeCounter = Counter("size")
       val memoryCounter = Counter("memory")
