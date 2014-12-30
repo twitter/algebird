@@ -225,6 +225,22 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     GeneratedTupleAggregator.from2((this, that))
 
   /**
+   * This allows you to join two aggregators into one that takes a tuple input,
+   * which in turn allows you to chain .composePrepare onto the result if you have
+   * an initial input that has to be prepared differently for each of the joined aggregators.
+   *
+   * The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+   */
+  def zip[A2, B2, C2](ag2: Aggregator[A2, B2, C2]): Aggregator[(A, A2), (B, B2), (C, C2)] = {
+    val ag1 = this
+    new Aggregator[(A, A2), (B, B2), (C, C2)] {
+      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+    }
+  }
+
+  /**
    * An Aggregator can be converted to a Fold, but not vice-versa
    * Note, a Fold is more constrained so only do this if you require
    * joining a Fold with an Aggregator to produce a Fold
