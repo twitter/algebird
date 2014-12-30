@@ -472,7 +472,17 @@ case class CMSItems[K: Ordering](items: List[K], override val params: CMSParams[
     items.map{ item => other.frequency(item) }.reduce{ _ + _ }
 
   def toCMS: CMS[K] = if (items.size > CMSItems.MaxSize) toCMSInstance else this
-  def toCMSInstance: CMSInstance[K] = ???
+  def toCMSInstance: CMSInstance[K] = {
+    val vectors = params.hashes.map{ hash =>
+      items.foldLeft(Vector.fill[Long](width)(0L)){
+        case (vector, item) =>
+          val pos = hash(item)
+          vector.updated(pos, vector(pos) + 1L)
+      }
+    }
+
+    CMSInstance(CMSInstance.CountsTable[K](vectors.toVector), items.size, params)
+  }
 }
 
 object CMSItems {
