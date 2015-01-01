@@ -21,25 +21,25 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("CountMinSketch[Short] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Short](EPS, DELTA, SEED)
+    implicit val cmsMonoid = new CMSMonoid[Short](EPS, DELTA, SEED, 0)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
     monoidLaws[CMS[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
+    implicit val cmsMonoid = new CMSMonoid[Int](EPS, DELTA, SEED, 0)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
     monoidLaws[CMS[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Long](EPS, DELTA, SEED)
+    implicit val cmsMonoid = new CMSMonoid[Long](EPS, DELTA, SEED, 0)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
     monoidLaws[CMS[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[BigInt](EPS, DELTA, SEED)
+    implicit val cmsMonoid = new CMSMonoid[BigInt](EPS, DELTA, SEED, 0)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
     monoidLaws[CMS[BigInt]]
   }

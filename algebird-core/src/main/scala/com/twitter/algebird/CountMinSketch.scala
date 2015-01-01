@@ -76,6 +76,7 @@ import scala.collection.immutable.SortedSet
  *        (an interval that depends on `eps`) around the truth.
  * @param seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
+ * @param maxExactCount The largest number of keys that will be stored directly, instead of in a sketch.
  * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
@@ -87,11 +88,11 @@ import scala.collection.immutable.SortedSet
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
-class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
+class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCount: Int = 100) extends Monoid[CMS[K]] {
 
   val params = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
-    CMSParams(hashes, eps, delta)
+    CMSParams(hashes, eps, delta, maxExactCount)
   }
 
   val zero: CMS[K] = CMSZero[K](params)
@@ -114,7 +115,7 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   /**
    * Creates a sketch out of multiple items.
    */
-  def create(data: Seq[K]): CMS[K] = CMSItems[K](data.toList, params).toCMS
+  def create(data: Seq[K]): CMS[K] = CMSItems[K](data.toList, data.size, params).toCMS
 
 }
 
@@ -138,14 +139,14 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
  *              (an interval that depends on `eps`) around the truth.
+ * @param maxExactCount The largest number of keys that will be stored directly, instead of in a sketch.
  * @tparam K The type used to identify the elements to be counted.
  */
-case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double) {
+case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double, maxExactCount: Int = 0) {
 
   require(0 < eps && eps < 1, "eps must lie in (0, 1)")
   require(0 < delta && delta < 1, "delta must lie in (0, 1)")
   require(hashes.size >= CMSFunctions.depth(delta), s"we require at least ${CMSFunctions.depth(delta)} hash functions")
-
 }
 
 /**
@@ -436,7 +437,7 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
   override def ++(other: CMS[K]): CMS[K] = {
     other match {
       case other: CMSZero[_] => this
-      case other: CMSItem[K] => CMSItems(List(item, other.item), params)
+      case other: CMSItem[K] => CMSItems(List(item, other.item), 2L, params)
       case other: CMSItems[K] => other + item
       case other: CMSInstance[K] => other + item
     }
@@ -451,17 +452,26 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
 /**
  * Used for holding a small set of elements.
  */
-case class CMSItems[K: Ordering](items: List[K], override val params: CMSParams[K]) extends CMS[K](params) {
+case class CMSItems[K: Ordering](items: List[K], override val totalCount: Long, override val params: CMSParams[K]) extends CMS[K](params) {
 
-  override val totalCount: Long = items.size
-
-  override def +(x: K, count: Long): CMS[K] = CMSItems(x :: items, params).toCMS
+  override def +(x: K, count: Long): CMS[K] = CMSItems(x :: items, totalCount + 1, params).toCMS
 
   override def ++(other: CMS[K]): CMS[K] = {
     other match {
       case other: CMSZero[_] => this
       case other: CMSItem[K] => this + other.item
-      case other: CMSItems[K] => CMSItems(items ++ other.items, params).toCMS
+      case other: CMSItems[K] => {
+        val (larger, smaller) =
+          if (totalCount > other.totalCount)
+            (this, other)
+          else
+            (other, this)
+
+        CMSItems(
+          larger.items.reverse ::: (smaller.items),
+          totalCount + other.totalCount,
+          params).toCMS
+      }
       case other: CMSInstance[K] => toCMSInstance ++ other
     }
   }
@@ -471,23 +481,16 @@ case class CMSItems[K: Ordering](items: List[K], override val params: CMSParams[
   override def innerProduct(other: CMS[K]): Approximate[Long] =
     items.map{ item => other.frequency(item) }.reduce{ _ + _ }
 
-  def toCMS: CMS[K] = if (items.size > CMSItems.MaxSize) toCMSInstance else this
+  def toCMS: CMS[K] = if (items.size > params.maxExactCount) toCMSInstance else this
   def toCMSInstance: CMSInstance[K] = {
     val vectors = params.hashes.map{ hash =>
-      items.foldLeft(Vector.fill[Long](width)(0L)){
-        case (vector, item) =>
-          val pos = hash(item)
-          vector.updated(pos, vector(pos) + 1L)
-      }
+      val array = Array.fill(width)(0L)
+      items.foreach{ item => array(hash(item)) += 1L }
+      array.toVector
     }
 
     CMSInstance(CMSInstance.CountsTable[K](vectors.toVector), items.size, params)
   }
-}
-
-object CMSItems {
-  //arbitrarily chosen
-  val MaxSize = 100
 }
 
 /**
