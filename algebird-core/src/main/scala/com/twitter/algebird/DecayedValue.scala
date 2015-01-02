@@ -73,4 +73,19 @@ case class DecayedValue(value: Double, scaledTime: Double) extends Ordered[Decay
     val normalization = halfLife / math.log(2)
     value / normalization
   }
+
+  /*
+  * Moving average assuming the signal started at zero a fixed point in the past.
+  * This normalizes by the integral of exp(-t(ln(2))/halflife) from 0 to (endTime - startTime).
+  */
+  def averageFrom(halfLife: Double, startTime: Double, endTime: Double) = {
+    if(endTime > startTime) {
+      val asOfEndTime = DecayedValue.scale(DecayedValue.build(0, endTime, halfLife), this, 0.0)
+      val timeDelta = startTime - endTime
+      val normalization = halfLife * (1 - math.pow(2, timeDelta / halfLife)) / math.log(2)
+      asOfEndTime.value / normalization
+    } else {
+      0.0
+    }
+  }
 }
