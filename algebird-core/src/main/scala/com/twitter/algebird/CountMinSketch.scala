@@ -1047,7 +1047,7 @@ object CMSHasherImplicits {
 
   implicit object CMSHasherLong extends CMSHasher[Long] {
 
-    def hash(a: Int, b: Int, width: Int)(x: Long) = {
+    override def hash(a: Int, b: Int, width: Int)(x: Long) = {
       val unModded: Long = (x * a) + b
       // Apparently a super fast way of computing x mod 2^p-1
       // See page 149 of http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
@@ -1061,13 +1061,13 @@ object CMSHasherImplicits {
 
   implicit object CMSHasherShort extends CMSHasher[Short] {
 
-    def hash(a: Int, b: Int, width: Int)(x: Short) = CMSHasherInt.hash(a, b, width)(x)
+    override def hash(a: Int, b: Int, width: Int)(x: Short) = CMSHasherInt.hash(a, b, width)(x)
 
   }
 
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
-    def hash(a: Int, b: Int, width: Int)(x: Int) = {
+    override def hash(a: Int, b: Int, width: Int)(x: Int) = {
       val unModded: Int = (x * a) + b
       val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
       val h = modded.toInt % width
@@ -1079,10 +1079,19 @@ object CMSHasherImplicits {
 
   implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
 
-    def hash(a: Int, b: Int, width: Int)(x: BigInt) = {
-      val unModded: BigInt = (x * a) + b
-      val modded: BigInt = (unModded + (unModded >> 32)) & PRIME_MODULUS
-      val h = modded.toInt % width
+    /**
+     * Implementation detail:  This hash function is based upon Murmur3.  Note that the original CMS paper requires
+     * `d` (depth) pair-wise independent hash functions;  in the specific case of Murmur3 we argue that it is sufficient
+     * to pass `d` different seed values to Murmur3 to achieve a similar effect.
+     */
+    override def hash(a: Int, b: Int, width: Int)(x: BigInt) = {
+      val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
+      val h = {
+        // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable implementation,
+        // and it requires `hash` to be an `Int` = have 32 bits (to match with `0x7FFFFFFF`).
+        val positiveHash = hash & 0x7FFFFFFF
+        positiveHash % width
+      }
       assert(h >= 0, "hash must not be negative")
       h
     }
