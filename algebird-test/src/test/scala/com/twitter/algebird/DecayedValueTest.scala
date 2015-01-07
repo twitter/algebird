@@ -1,0 +1,61 @@
+package com.twitter.algebird
+
+import org.scalacheck.{ Gen, Arbitrary }
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+
+class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
+  import BaseProperties._
+  import Gen.choose
+
+  def approxEq(f1: Double, f2: Double) = {
+    (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 0.1
+  }
+
+  def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]) = {
+    forAll{ (params: Params) =>
+      val data = (0 to params.count).map{ t => DecayedValue.build(params.mean, t, params.halfLife) }
+      val result = decayedMonoid.sum(data)
+      assert(approxEq(fn(result, params), params.mean))
+    }
+  }
+
+  implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
+  case class Params(mean: Double, halfLife: Double, count: Int)
+
+  property("for large HL and count, average(f(t)=x)=x") {
+    implicit val params: Arbitrary[Params] = Arbitrary{
+      for (
+        x <- choose(-1e100, 1e100);
+        hl <- choose(100.0, 1000.0);
+        c <- choose(10000, 100000)
+      ) yield Params(x, hl, c)
+    }
+
+    averageApproxEq{ (dv, params) => dv.average(params.halfLife) }
+  }
+
+  property("for large HL but small count, averageFrom(f(t)=x)=x") {
+    implicit val params: Arbitrary[Params] = Arbitrary{
+      for (
+        x <- choose(-1e100, 1e100);
+        hl <- choose(100.0, 1000.0);
+        c <- choose(20, 1000)
+      ) yield Params(x, hl, c)
+    }
+
+    averageApproxEq{ (dv, params) => dv.averageFrom(params.halfLife, 0, params.count) }
+  }
+
+  property("for small HL but large count, discreteAverage(f(t)=x)=x") {
+    implicit val params: Arbitrary[Params] = Arbitrary{
+      for (
+        x <- choose(-1e100, 1e100);
+        hl <- choose(1.0, 10.0);
+        c <- choose(10000, 100000)
+      ) yield Params(x, hl, c)
+    }
+
+    averageApproxEq{ (dv, params) => dv.discreteAverage(params.halfLife) }
+  }
+}
