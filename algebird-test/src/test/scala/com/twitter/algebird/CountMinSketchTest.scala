@@ -201,7 +201,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val data1 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
       val data2 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
       val cms1 = COUNTING_CMS_MONOID.create(data1)
-      val cms2 = COUNTING_CMS_MONOID.create(data1)
+      val cms2 = COUNTING_CMS_MONOID.create(data2)
 
       val approxA = cms1.innerProduct(cms2)
       val approx = approxA.estimate
