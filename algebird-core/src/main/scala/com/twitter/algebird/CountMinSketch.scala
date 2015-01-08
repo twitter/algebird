@@ -491,7 +491,8 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
         }.sum
 
         val est = (0 to (depth - 1)).iterator.map { innerProductAtDepth }.min
-        Approximate(est - (eps * totalCount * other.totalCount).toLong, est, est, 1 - delta)
+        val minimum = math.max(est - (eps * totalCount * other.totalCount).toLong, 0)
+        Approximate(minimum, est, est, 1 - delta)
       case _ => other.innerProduct(this)
     }
   }
