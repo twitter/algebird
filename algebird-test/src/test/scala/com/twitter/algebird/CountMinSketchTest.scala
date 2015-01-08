@@ -138,7 +138,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     val counts1 = data1.groupBy(x => x).mapValues(_.size)
     val counts2 = data2.groupBy(x => x).mapValues(_.size)
 
-    (counts1.keys.toSet & counts2.keys.toSet).map { k => counts1(k) * counts2(k) }.sum
+    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
   }
 
   /**
