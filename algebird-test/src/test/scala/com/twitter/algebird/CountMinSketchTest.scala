@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers, WordSpec }
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.prop.{GeneratorDrivenPropertyChecks, PropertyChecks}
 import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
@@ -92,7 +92,7 @@ class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
 class CMSBigIntTest extends CMSTest[BigInt]
 
-abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers {
+abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -196,23 +196,26 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     }
 
     "estimate inner products" in {
-      val totalCount = 5234
-      val range = 1390
-      val data1 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val data2 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val cms1 = COUNTING_CMS_MONOID.create(data1)
-      val cms2 = COUNTING_CMS_MONOID.create(data2)
+      val totalCounts = Gen.choose(1, 10000)
+      val ranges = Gen.choose(100, 2000)
 
-      val approxA = cms1.innerProduct(cms2)
-      val approx = approxA.estimate
-      val exact = exactInnerProduct(data1, data2)
-      val estimationError = approx - exact
-      val maxError = approx - approxA.min
-      val beWithinTolerance = be >= 0L and be <= maxError
+      forAll(totalCounts, ranges) { (totalCount: Int, range: Int) =>
+        val data1 = (1 to totalCount).map { _ => RAND.nextInt(range) }.toK[K]
+        val data2 = (1 to totalCount).map { _ => RAND.nextInt(range) }.toK[K]
+        val cms1 = COUNTING_CMS_MONOID.create(data1)
+        val cms2 = COUNTING_CMS_MONOID.create(data2)
 
-      approx should be(cms2.innerProduct(cms1).estimate)
-      approx should be >= exact
-      estimationError should beWithinTolerance
+        val approxA = cms1.innerProduct(cms2)
+        val approx = approxA.estimate
+        val exact = exactInnerProduct(data1, data2)
+        val estimationError = approx - exact
+        val maxError = approx - approxA.min
+        val beWithinTolerance = be >= 0L and be <= maxError
+
+        approx should be(cms2.innerProduct(cms1).estimate)
+        approx should be >= exact
+        estimationError should beWithinTolerance
+      }
     }
 
     "exactly compute inner product of small streams" in {
