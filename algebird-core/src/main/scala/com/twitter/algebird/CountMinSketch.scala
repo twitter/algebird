@@ -664,12 +664,17 @@ case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: To
 
   override val heavyHitters: Set[K] = Set(item)
 
-  override def +(x: K, count: Long): TopCMS[K] = TopCMSInstance(cms, params) + item + (x, count)
+  override def +(x: K, count: Long): TopCMS[K] = toCMSInstance + (x, count)
 
   override def ++(other: TopCMS[K]): TopCMS[K] = other match {
     case other: TopCMSZero[_] => this
-    case other: TopCMSItem[K] => TopCMSInstance[K](cms, params) + item + other.item
+    case other: TopCMSItem[K] => toCMSInstance + other.item
     case other: TopCMSInstance[K] => other + item
+  }
+
+  private def toCMSInstance: TopCMSInstance[K] = {
+    val hhs = HeavyHitters.from(HeavyHitter(item, 1L))
+    TopCMSInstance(cms, hhs, params)
   }
 
 }
@@ -799,6 +804,8 @@ object HeavyHitters {
 
   def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
 
+  def from[K: Ordering](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
+
 }
 
 case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
@@ -851,7 +858,7 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
   /**
    * Creates a sketch out of a single item.
    */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms + item, params)
 
   /**
    * Creates a sketch out of multiple items.
@@ -965,7 +972,7 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
   /**
    * Creates a sketch out of a single item.
    */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms, params)
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms + item, params)
 
   /**
    * Creates a sketch out of multiple items.
