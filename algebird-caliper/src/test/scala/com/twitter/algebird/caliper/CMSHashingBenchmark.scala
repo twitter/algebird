@@ -7,6 +7,8 @@ import com.google.caliper.{Param, SimpleBenchmark}
  *
  * The input values are generated ahead of time to ensure that each trial uses the same input (and that the RNG is not
  * influencing the runtime of the trials).
+ *
+ * More details available at https://github.com/twitter/algebird/issues/392.
  */
 // Once we can convince cappi (https://github.com/softprops/capp) -- the sbt plugin we use to run
 // caliper benchmarks -- to work with the latest caliper 1.0-beta-1, we would:
