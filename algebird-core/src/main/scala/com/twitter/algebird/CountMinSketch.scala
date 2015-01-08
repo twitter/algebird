@@ -479,7 +479,7 @@ case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
    * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and column k.
    * Then the Count-Min sketch estimate of the inner product between A and B is the minimum inner product between their
    * rows:
-   * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k])
+   * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k]|)
    */
   def innerProduct(other: CMS[K]): Approximate[Long] = {
     other match {
