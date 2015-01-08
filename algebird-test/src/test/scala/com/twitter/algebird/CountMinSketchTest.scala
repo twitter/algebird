@@ -194,7 +194,11 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     "exactly compute frequencies in a small stream" in {
       val one = COUNTING_CMS_MONOID.create(1.toK[K])
+      one.frequency(1.toK[K]).estimate should be(1)
+      one.frequency(2.toK[K]).estimate should be(0)
       val two = COUNTING_CMS_MONOID.create(2.toK[K])
+      two.frequency(1.toK[K]).estimate should be(0)
+      two.frequency(2.toK[K]).estimate should be(1)
       val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
 
       cms.frequency(0.toK[K]).estimate should be(0)
