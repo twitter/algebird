@@ -6,6 +6,8 @@ import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
 
+import scala.util.Random
+
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
 
@@ -148,12 +150,24 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
   }
 
+  /**
+   * Creates a random data stream.
+   *
+   * @param size Number of stream elements.
+   * @param range Elements are randomly drawn from [0, range).
+   * @return
+   */
+  def createRandomStream(size: Int, range: Int, rnd: Random = RAND): Seq[K] = {
+    require(size > 0)
+    (1 to size).map { _ => rnd.nextInt(range) }.toK[K]
+  }
+
   "A Count-Min sketch implementing CMSCounting" should {
 
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
-      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
+      val data = createRandomStream(totalCount, range)
       val cms = COUNTING_CMS_MONOID.create(data)
 
       cms.totalCount should be(totalCount)
@@ -162,7 +176,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     "estimate frequencies" in {
       val totalCount = 5678
       val range = 897
-      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
+      val data = createRandomStream(totalCount, range)
       val cms = COUNTING_CMS_MONOID.create(data)
 
       (0 to 100).foreach { _ =>
@@ -200,8 +214,8 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val ranges = Gen.choose(100, 2000)
 
       forAll(totalCounts, ranges) { (totalCount: Int, range: Int) =>
-        val data1 = (1 to totalCount).map { _ => RAND.nextInt(range) }.toK[K]
-        val data2 = (1 to totalCount).map { _ => RAND.nextInt(range) }.toK[K]
+        val data1 = createRandomStream(totalCount, range)
+        val data2 = createRandomStream(totalCount, range)
         val cms1 = COUNTING_CMS_MONOID.create(data1)
         val cms2 = COUNTING_CMS_MONOID.create(data2)
 
