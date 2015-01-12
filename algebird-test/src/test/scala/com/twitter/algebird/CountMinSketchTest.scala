@@ -659,7 +659,7 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
     // For all i > 709 this test break because of precision limits:  For all i > 709 will return 0.0, which is not the
     // mathematically correct value but rather the asymptote of delta.
     val maxI = 709
-    forAll(Gen.choose(0, maxI)) { (i: Int) =>
+    forAll((Gen.choose(1, maxI), "depth")) { (i: Int) =>
       CMSFunctions.depth(CMSFunctions.delta(i)) should be(i)
     }
   }
