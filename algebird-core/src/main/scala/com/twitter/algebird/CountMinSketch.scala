@@ -1030,7 +1030,7 @@ case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
  */
 trait CMSHasher[K] extends java.io.Serializable {
 
-  val PRIME_MODULUS = (1L << 31) - 1
+  val PRIME_MODULUS = Int.MaxValue
 
   /**
    * Returns `a * x + b (mod p) (mod width)`.
