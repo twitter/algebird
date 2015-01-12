@@ -230,6 +230,9 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
         val maxError = approx - approxA.min
         val beWithinTolerance = be >= 0L and be <= maxError
 
+        // We do not support negative counts, hence the lower limit of a frequency is 0 but never negative.
+        approxA.min should be >= 0L
+
         approx should be(cms2.innerProduct(cms1).estimate)
         approx should be >= exact
         estimationError should beWithinTolerance
