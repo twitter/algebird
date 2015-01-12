@@ -1055,7 +1055,7 @@ object CMSHasherImplicits {
 
   implicit object CMSHasherLong extends CMSHasher[Long] {
 
-    override def hash(a: Int, b: Int, width: Int)(x: Long) = {
+    override def hash(a: Int, b: Int, width: Int)(x: Long): Int = {
       val unModded: Long = (x * a) + b
       // Apparently a super fast way of computing x mod 2^p-1
       // See page 149 of http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
@@ -1069,13 +1069,13 @@ object CMSHasherImplicits {
 
   implicit object CMSHasherShort extends CMSHasher[Short] {
 
-    override def hash(a: Int, b: Int, width: Int)(x: Short) = CMSHasherInt.hash(a, b, width)(x)
+    override def hash(a: Int, b: Int, width: Int)(x: Short): Int = CMSHasherInt.hash(a, b, width)(x)
 
   }
 
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
-    override def hash(a: Int, b: Int, width: Int)(x: Int) = {
+    override def hash(a: Int, b: Int, width: Int)(x: Int): Int = {
       val unModded: Int = (x * a) + b
       val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
       val h = modded.toInt % width
@@ -1112,7 +1112,7 @@ object CMSHasherImplicits {
      * @param x Item to be hashed.
      * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
      */
-    override def hash(a: Int, b: Int, width: Int)(x: BigInt) = {
+    override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int = {
       val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
       val h = {
         // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
