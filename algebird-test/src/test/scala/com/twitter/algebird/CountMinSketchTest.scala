@@ -96,6 +96,8 @@ class CMSBigIntTest extends CMSTest[BigInt]
 
 abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
+  import TestImplicits._
+
   val DELTA = 1E-10
   val EPS = 0.001
   val SEED = 1
@@ -109,21 +111,6 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
   }
 
   val RAND = new scala.util.Random
-
-  // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
-  // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
-  // with the existing `to[Col]` method in Scala.
-  implicit class IntCast(x: Int) {
-    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
-  }
-
-  implicit class SeqCast(xs: Seq[Int]) {
-    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
-  }
-
-  implicit class SetCast(xs: Set[Int]) {
-    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
-  }
 
   /**
    * Returns the exact frequency of {x} in {data}.
@@ -742,6 +729,28 @@ class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+
+class CMSHasherShortSpec extends CMSHasherSpec[Short]
+class CMSHasherIntSpec extends CMSHasherSpec[Int]
+class CMSHasherLongSpec  extends CMSHasherSpec[Long]
+class CMSHasherBigIntSpec  extends CMSHasherSpec[BigInt]
+
+abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with Matchers {
+
+  import TestImplicits._
+
+  property("returns positive hashes (i.e. slots) only") {
+    forAll { (a: Int, b: Int, width: Int, x: Int) =>
+        whenever (width > 0) {
+          val hash = CMSHash[K](a, b, width)
+          hash(x.toK[K]) should be >= 0
+        }
+    }
+  }
+
+}
+
+
 /**
  * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
  * versions < 0.8.1.  Note that this spec is not meant to verify their actual functionality.
@@ -777,6 +786,25 @@ class LegacyCMSSpec extends WordSpec with Matchers {
       cms.heavyHitters should be(Set(0L))
     }
 
+  }
+
+}
+
+object TestImplicits {
+
+  // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
+  // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
+  // with the existing `to[Col]` method in Scala.
+  implicit class IntCast(x: Int) {
+    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
+  }
+
+  implicit class SeqCast(xs: Seq[Int]) {
+    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
+  }
+
+  implicit class SetCast(xs: Set[Int]) {
+    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
   }
 
 }

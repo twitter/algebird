@@ -1078,9 +1078,7 @@ object CMSHasherImplicits {
     override def hash(a: Int, b: Int, width: Int)(x: Int): Int = {
       val unModded: Int = (x * a) + b
       val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
-      val h = modded.toInt % width
-      assert(h >= 0, "hash must not be negative")
-      h
+      modded.toInt % width
     }
 
   }
@@ -1114,14 +1112,10 @@ object CMSHasherImplicits {
      */
     override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int = {
       val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
-      val h = {
-        // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
-        // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
-        val positiveHash = hash & Int.MaxValue
-        positiveHash % width
-      }
-      assert(h >= 0, "hash must not be negative")
-      h
+      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+      val positiveHash = hash & Int.MaxValue
+      positiveHash % width
     }
 
   }
