@@ -293,6 +293,44 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
   "A Top-% Count-Min sketch implementing CMSHeavyHitters" should {
 
+    "create correct sketches out of a single item" in {
+      forAll{ (x: Int, y: Int) =>
+        whenever (x != y) {
+          val data = x.toK[K]
+          val cmsMonoid = {
+            val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+            TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
+          }
+          val topCms = cmsMonoid.create(data)
+          topCms.totalCount should be(1)
+          topCms.cms.totalCount should be(1)
+          topCms.frequency(x.toK[K]).estimate should be(1)
+          topCms.frequency(y.toK[K]).estimate should be(0)
+          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+          topCms.innerProduct(topCms).estimate should be(1)
+        }
+      }
+    }
+
+    "create correct sketches out of a single-item stream" in {
+      forAll{ (x: Int, y: Int) =>
+        whenever (x != y) {
+          val data = Seq(x).toK[K]
+          val cmsMonoid = {
+            val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+            TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
+          }
+          val topCms = cmsMonoid.create(data)
+          topCms.totalCount should be(1)
+          topCms.cms.totalCount should be(1)
+          topCms.frequency(x.toK[K]).estimate should be(1)
+          topCms.frequency(y.toK[K]).estimate should be(0)
+          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+          topCms.innerProduct(topCms).estimate should be(1)
+        }
+      }
+    }
+
     "estimate heavy hitters" in {
       // Simple way of making some elements appear much more often than others.
       val data1 = (1 to 3000).map { _ => RAND.nextInt(3) }.toK[K]
@@ -425,6 +463,44 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // Note: As described in https://github.com/twitter/algebird/issues/353, a top-N CMS is, in general, not able to
     // merge heavy hitters correctly.  This is because merging top-N based heavy hitters is not an associative
     // operation.
+
+    "create correct sketches out of a single item" in {
+      forAll{ (x: Int, y: Int) =>
+        whenever (x != y) {
+          val data = x.toK[K]
+          val cmsMonoid = {
+            val anyHeavyHittersN = 2 // exact setting not relevant for this test
+            TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
+          }
+          val topCms = cmsMonoid.create(data)
+          topCms.totalCount should be(1)
+          topCms.cms.totalCount should be(1)
+          topCms.frequency(x.toK[K]).estimate should be(1)
+          topCms.frequency(y.toK[K]).estimate should be(0)
+          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+          topCms.innerProduct(topCms).estimate should be(1)
+        }
+      }
+    }
+
+    "create correct sketches out of a single-item stream" in {
+      forAll{ (x: Int, y: Int) =>
+        whenever (x != y) {
+          val data = Seq(x).toK[K]
+          val cmsMonoid = {
+            val anyHeavyHittersN = 2 // exact setting not relevant for this test
+            TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
+          }
+          val topCms = cmsMonoid.create(data)
+          topCms.totalCount should be(1)
+          topCms.cms.totalCount should be(1)
+          topCms.frequency(x.toK[K]).estimate should be(1)
+          topCms.frequency(y.toK[K]).estimate should be(0)
+          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+          topCms.innerProduct(topCms).estimate should be(1)
+        }
+      }
+    }
 
     // This test involves merging of top-N CMS instances, which is not an associative operation.  This means that the
     // success or failure of this test depends on the merging order and/or the test data characteristics.
