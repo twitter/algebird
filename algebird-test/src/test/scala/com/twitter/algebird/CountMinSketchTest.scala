@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers, WordSpec }
-import org.scalatest.prop.{GeneratorDrivenPropertyChecks, PropertyChecks}
+import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
@@ -284,27 +284,27 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
   "A Top-% Count-Min sketch implementing CMSHeavyHitters" should {
 
     "create correct sketches out of a single item" in {
-      forAll{ (x: Int, y: Int) =>
-        whenever (x != y) {
-          val data = x.toK[K]
-          val cmsMonoid = {
-            val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
-            TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
-          }
-          val topCms = cmsMonoid.create(data)
-          topCms.totalCount should be(1)
-          topCms.cms.totalCount should be(1)
-          topCms.frequency(x.toK[K]).estimate should be(1)
-          topCms.frequency(y.toK[K]).estimate should be(0)
-          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
-          topCms.innerProduct(topCms).estimate should be(1)
+      forAll{ (x: Int) =>
+        val data = x.toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+          TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
         }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
       }
     }
 
     "create correct sketches out of a single-item stream" in {
       forAll{ (x: Int, y: Int) =>
-        whenever (x != y) {
+        forAll{ (x: Int) =>
           val data = Seq(x).toK[K]
           val cmsMonoid = {
             val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
@@ -314,7 +314,9 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
           topCms.totalCount should be(1)
           topCms.cms.totalCount should be(1)
           topCms.frequency(x.toK[K]).estimate should be(1)
-          topCms.frequency(y.toK[K]).estimate should be(0)
+          // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+          val otherItem = x + 1
+          topCms.frequency(otherItem.toK[K]).estimate should be(0)
           // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
           topCms.innerProduct(topCms).estimate should be(1)
         }
@@ -455,27 +457,27 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // operation.
 
     "create correct sketches out of a single item" in {
-      forAll{ (x: Int, y: Int) =>
-        whenever (x != y) {
-          val data = x.toK[K]
-          val cmsMonoid = {
-            val anyHeavyHittersN = 2 // exact setting not relevant for this test
-            TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
-          }
-          val topCms = cmsMonoid.create(data)
-          topCms.totalCount should be(1)
-          topCms.cms.totalCount should be(1)
-          topCms.frequency(x.toK[K]).estimate should be(1)
-          topCms.frequency(y.toK[K]).estimate should be(0)
-          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
-          topCms.innerProduct(topCms).estimate should be(1)
+      forAll{ (x: Int) =>
+        val data = x.toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersN = 2 // exact setting not relevant for this test
+          TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
         }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
       }
     }
 
     "create correct sketches out of a single-item stream" in {
       forAll{ (x: Int, y: Int) =>
-        whenever (x != y) {
+        forAll{ (x: Int) =>
           val data = Seq(x).toK[K]
           val cmsMonoid = {
             val anyHeavyHittersN = 2 // exact setting not relevant for this test
@@ -485,7 +487,9 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
           topCms.totalCount should be(1)
           topCms.cms.totalCount should be(1)
           topCms.frequency(x.toK[K]).estimate should be(1)
-          topCms.frequency(y.toK[K]).estimate should be(0)
+          // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+          val otherItem = x + 1
+          topCms.frequency(otherItem.toK[K]).estimate should be(0)
           // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
           topCms.innerProduct(topCms).estimate should be(1)
         }
@@ -729,11 +733,10 @@ class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-
 class CMSHasherShortSpec extends CMSHasherSpec[Short]
 class CMSHasherIntSpec extends CMSHasherSpec[Int]
-class CMSHasherLongSpec  extends CMSHasherSpec[Long]
-class CMSHasherBigIntSpec  extends CMSHasherSpec[BigInt]
+class CMSHasherLongSpec extends CMSHasherSpec[Long]
+class CMSHasherBigIntSpec extends CMSHasherSpec[BigInt]
 
 abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with Matchers {
 
@@ -741,15 +744,14 @@ abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with Proper
 
   property("returns positive hashes (i.e. slots) only") {
     forAll { (a: Int, b: Int, width: Int, x: Int) =>
-        whenever (width > 0) {
-          val hash = CMSHash[K](a, b, width)
-          hash(x.toK[K]) should be >= 0
-        }
+      whenever (width > 0) {
+        val hash = CMSHash[K](a, b, width)
+        hash(x.toK[K]) should be >= 0
+      }
     }
   }
 
 }
-
 
 /**
  * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
