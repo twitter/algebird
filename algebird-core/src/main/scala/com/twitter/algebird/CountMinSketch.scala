@@ -1088,16 +1088,36 @@ object CMSHasherImplicits {
   implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
 
     /**
-     * Implementation detail:  This hash function is based upon Murmur3.  Note that the original CMS paper requires
+     * =Implementation details=
+     *
+     * This hash function is based upon Murmur3.  Note that the original CMS paper requires
      * `d` (depth) pair-wise independent hash functions;  in the specific case of Murmur3 we argue that it is sufficient
      * to pass `d` different seed values to Murmur3 to achieve a similar effect.
+     *
+     * To seed Murmur3 we use only `a`, which is a randomly drawn `Int` via [[scala.util.Random]] in the CMS code.
+     * What is important to note is that we intentionally ignore `b`.  Why?  We need to ensure that we seed Murmur3 with
+     * a random value, notably one that is uniformly distributed.  Somewhat surprisingly, combining two random values
+     * (such as `a` and `b` in our case) typically worsens the "randomness" of the combination, i.e. the combination is
+     * less uniformly distributed as either of its original inputs.  Hence the combination of two random values is
+     * discouraged in this context, notably if the two random inputs were generated from the same source anyways, which
+     * is the case for us because we use Scala's PRNG only.
+     *
+     * For further details please refer to the discussion
+     * [[http://stackoverflow.com/questions/3956478/understanding-randomness Understanding Randomness]] on
+     * StackOverflow.
+     *
+     * @param a Must be a random value, typically created via [[scala.util.Random]].
+     * @param b Ignored by this particular hash function, see the reasoning above for the justification.
+     * @param width Width of the CMS counting table, i.e. the width/size of each row in the counting table.
+     * @param x Item to be hashed.
+     * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
      */
     override def hash(a: Int, b: Int, width: Int)(x: BigInt) = {
       val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
       val h = {
-        // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable implementation,
-        // and it requires `hash` to be an `Int` = have 32 bits (to match with `0x7FFFFFFF`).
-        val positiveHash = hash & 0x7FFFFFFF
+        // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+        // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+        val positiveHash = hash & Int.MaxValue
         positiveHash % width
       }
       assert(h >= 0, "hash must not be negative")

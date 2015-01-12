@@ -60,9 +60,9 @@ class CMSHashingBenchmark extends SimpleBenchmark {
   private def murmurHashScala(a: Int, b: Int, width: Int)(x: BigInt) = {
     val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
     val h = {
-      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable implementation,
-      // and it requires `hash` to be an `Int` = have 32 bits (to match with `0x7FFFFFFF`).
-      val positiveHash = hash & 0x7FFFFFFF
+      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+      val positiveHash = hash & Int.MaxValue
       positiveHash % width
     }
     assert(h >= 0, "hash must not be negative")
