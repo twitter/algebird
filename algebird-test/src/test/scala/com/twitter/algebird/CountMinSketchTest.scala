@@ -303,24 +303,22 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     }
 
     "create correct sketches out of a single-item stream" in {
-      forAll{ (x: Int, y: Int) =>
-        forAll{ (x: Int) =>
-          val data = Seq(x).toK[K]
-          val cmsMonoid = {
-            val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
-            TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
-          }
-          val topCms = cmsMonoid.create(data)
-          topCms.totalCount should be(1)
-          topCms.cms.totalCount should be(1)
-          topCms.frequency(x.toK[K]).estimate should be(1)
-          // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
-          val otherItem = x + 1
-          topCms.frequency(otherItem.toK[K]).estimate should be(0)
-          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
-          topCms.innerProduct(topCms).estimate should be(1)
+      forAll{ (x: Int) =>
+        val data = Seq(x).toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+          TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
         }
-      }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+    }
     }
 
     "estimate heavy hitters" in {
@@ -476,23 +474,21 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     }
 
     "create correct sketches out of a single-item stream" in {
-      forAll{ (x: Int, y: Int) =>
-        forAll{ (x: Int) =>
-          val data = Seq(x).toK[K]
-          val cmsMonoid = {
-            val anyHeavyHittersN = 2 // exact setting not relevant for this test
-            TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
-          }
-          val topCms = cmsMonoid.create(data)
-          topCms.totalCount should be(1)
-          topCms.cms.totalCount should be(1)
-          topCms.frequency(x.toK[K]).estimate should be(1)
-          // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
-          val otherItem = x + 1
-          topCms.frequency(otherItem.toK[K]).estimate should be(0)
-          // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
-          topCms.innerProduct(topCms).estimate should be(1)
+      forAll{ (x: Int) =>
+        val data = Seq(x).toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersN = 2 // exact setting not relevant for this test
+          TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
         }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
       }
     }
 
