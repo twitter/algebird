@@ -87,7 +87,7 @@ import scala.collection.immutable.SortedSet
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
-class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
+class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
 
   val params = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
@@ -117,7 +117,6 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
   def contramap[L](f: L => K): CMSMonoid[L] = {
-    implicit val orderingL: Ordering[L] = Ordering[K].on(f)
     implicit val hashingL: CMSHasher[L] = implicitly[CMSHasher[K]].on(f)
     new CMSMonoid[L](eps, delta, seed)
   }
@@ -344,22 +343,22 @@ trait CMSHeavyHitters[K] {
 
 object CMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] =
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] =
     new CMSMonoid[K](eps, delta, seed)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
+  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
     new CMSAggregator[K](monoid(eps, delta, seed))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
 
   /**
    * Returns a fresh, zeroed CMS instance.
    */
-  def apply[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMS[K] = {
+  def apply[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMS[K] = {
     val params = {
       val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
       CMSParams(hashes, eps, delta)
@@ -403,7 +402,7 @@ object CMS {
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class CMS[K: Ordering](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
+sealed abstract class CMS[K](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
 
   override val eps: Double = params.eps
 
@@ -416,7 +415,7 @@ sealed abstract class CMS[K: Ordering](val params: CMSParams[K]) extends java.io
 /**
  * Zero element.  Used for initialization.
  */
-case class CMSZero[K: Ordering](override val params: CMSParams[K]) extends CMS[K](params) {
+case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) {
 
   override val totalCount: Long = 0L
 
@@ -433,7 +432,7 @@ case class CMSZero[K: Ordering](override val params: CMSParams[K]) extends CMS[K
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) extends CMS[K](params) {
+case class CMSItem[K](item: K, override val params: CMSParams[K]) extends CMS[K](params) {
 
   override val totalCount: Long = 1L
 
@@ -456,7 +455,7 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
 /**
  * The general Count-Min sketch structure, used for holding any number of elements.
  */
-case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
+case class CMSInstance[K](countsTable: CMSInstance.CountsTable[K],
   override val totalCount: Long,
   override val params: CMSParams[K]) extends CMS[K](params) {
 
@@ -523,7 +522,7 @@ object CMSInstance {
   /**
    * Initializes a [[CMSInstance]] with all zeroes, i.e. nothing has been counted yet.
    */
-  def apply[K: Ordering](params: CMSParams[K]): CMSInstance[K] = {
+  def apply[K](params: CMSParams[K]): CMSInstance[K] = {
     val countsTable = CountsTable[K](CMSFunctions.depth(params.delta), CMSFunctions.width(params.eps))
     CMSInstance[K](countsTable, 0, params)
   }
@@ -576,7 +575,7 @@ object CMSInstance {
     /**
      * Creates a new [[CountsTable]] with counts initialized to all zeroes.
      */
-    def apply[K: Ordering](depth: Int, width: Int): CountsTable[K] =
+    def apply[K](depth: Int, width: Int): CountsTable[K] =
       CountsTable[K](Vector.fill[Long](depth, width)(0L))
 
   }
