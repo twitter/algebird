@@ -1042,12 +1042,13 @@ trait CMSHasher[K] extends java.io.Serializable {
    */
   def hash(a: Int, b: Int, width: Int)(x: K): Int
 
-  /** Given `f`, a function from `L` into `K`, creates a `CMSHasher[L]` whose hash function is equivalent to:
-    *
-    * {{{
-    * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
-    * }}}
-    */
+  /**
+   * Given `f`, a function from `L` into `K`, creates a `CMSHasher[L]` whose hash function is equivalent to:
+   *
+   * {{{
+   * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
+   * }}}
+   */
   def on[L](f: L => K)(implicit hasher: CMSHasher[K]) = new CMSHasher[L] {
     override def hash(a: Int, b: Int, width: Int)(x: L): Int = hasher.hash(a, b, width)(f(x))
   }
@@ -1124,7 +1125,8 @@ object CMSHasherImplicits {
      * @param width Width of the CMS counting table, i.e. the width/size of each row in the counting table.
      * @param x Item to be hashed.
      * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
-     */    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
+     */
+    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
       val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
       // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
       // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
@@ -1140,10 +1142,10 @@ object CMSHasherImplicits {
   }
 
   // TODO: We should support hashing Strings directly, but we'd need another type to showcase CMS[K]->CMS[L] in tests.
-//  implicit object CMSHasherString extends CMSHasher[String] {
-//    override def hash(a: Int, b: Int, width: Int)(x: String): Int =
-//      CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
-//  }
+  // implicit object CMSHasherString extends CMSHasher[String] {
+  //  override def hash(a: Int, b: Int, width: Int)(x: String): Int =
+  //    CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
+  //}
 
 }
 
