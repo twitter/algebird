@@ -89,6 +89,43 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+// TODO: This is IMHO not a good way to test the CMS[K]->CMS[L] functionality.  But it was the quickest test to write.
+//       We should come up with a different testing approach.  Unfortunately, I haven't found an elegant way yet to
+//       plug CMS[K]->CMS[L] conversion into our "parameterized" CMSTest[K] abstract class below.
+class CMSStringTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  val DELTA = 1E-10
+  val EPS = 0.001
+  val SEED = 1
+
+  val COUNTING_CMS_MONOID = {
+    import CMSOrderingImplicits.orderingArrayByte
+    CMS.monoid[Array[Byte]](EPS, DELTA, SEED).contramap((s: String) => s.getBytes("UTF-8"))
+  }
+
+  "exactly compute frequencies in a small stream" in {
+    val one = COUNTING_CMS_MONOID.create("one")
+    one.frequency("one").estimate should be(1)
+    one.frequency("two").estimate should be(0)
+    val two = COUNTING_CMS_MONOID.create("two")
+    two.frequency("one").estimate should be(0)
+    two.frequency("two").estimate should be(1)
+    val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
+
+    cms.frequency("zero").estimate should be(0)
+    cms.frequency("one").estimate should be(1)
+    cms.frequency("two").estimate should be(2)
+
+    val three = COUNTING_CMS_MONOID.create(Seq("one", "one", "one"))
+    three.frequency("one").estimate should be(3)
+    val four = COUNTING_CMS_MONOID.create(Seq("one", "one", "one", "one"))
+    four.frequency("one").estimate should be(4)
+    val cms2 = COUNTING_CMS_MONOID.plus(four, three)
+    cms2.frequency("one").estimate should be(7)
+  }
+
+}
+
 class CMSShortTest extends CMSTest[Short]
 class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
