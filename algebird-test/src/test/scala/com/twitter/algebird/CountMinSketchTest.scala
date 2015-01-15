@@ -98,10 +98,7 @@ class CMSStringTest extends WordSpec with Matchers with GeneratorDrivenPropertyC
   val EPS = 0.001
   val SEED = 1
 
-  val COUNTING_CMS_MONOID = {
-    import CMSOrderingImplicits.orderingArrayByte
-    CMS.monoid[Array[Byte]](EPS, DELTA, SEED).contramap((s: String) => s.getBytes("UTF-8"))
-  }
+  val COUNTING_CMS_MONOID = CMS.monoid[Array[Byte]](EPS, DELTA, SEED).contramap((s: String) => s.getBytes("UTF-8"))
 
   "exactly compute frequencies in a small stream" in {
     val one = COUNTING_CMS_MONOID.create("one")
