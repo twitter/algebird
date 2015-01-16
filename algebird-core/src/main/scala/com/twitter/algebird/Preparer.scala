@@ -47,6 +47,8 @@ case class FlatMapPreparer[A, T](prepareFn: A => TraversableOnce[T])
 
   //alias for convenience
   def aggregate[B, C](aggregator: MonoidAggregator[T, B, C]) = monoidAggregate(aggregator)
+
+  def sum(implicit monoid: Monoid[T]) = monoidAggregate(Aggregator.fromMonoid(monoid))
 }
 
 trait HasMonoidAggregate[A, T] {
@@ -84,23 +86,29 @@ trait HasAggregate[A, T] {
     implicit val ordT = Ordering.by(fn)
     aggregate(Aggregator.min[T])
   }
+
+  def sum(implicit sg: Semigroup[T]) = aggregate(Aggregator.fromSemigroup(sg))
+  def reduce(fn: (T, T) => T) = aggregate(Aggregator.fromReduce(fn))
 }
 
 trait HasLift[A, T] extends HasMonoidAggregate[A, T] {
   def lift[B, C](aggregator: Aggregator[T, B, C]): MonoidAggregator[A, Option[B], Option[C]] =
     monoidAggregate(aggregator.lift)
 
-  def head = lift(Aggregator.head)
-  def last = lift(Aggregator.last)
-  def max(implicit ord: Ordering[T]) = lift(Aggregator.max)
-  def maxBy[U: Ordering](fn: T => U) = {
+  def headOption = lift(Aggregator.head)
+  def lastOption = lift(Aggregator.last)
+  def maxOption(implicit ord: Ordering[T]) = lift(Aggregator.max)
+  def maxOptionBy[U: Ordering](fn: T => U) = {
     implicit val ordT = Ordering.by(fn)
     lift(Aggregator.max[T])
   }
 
-  def min(implicit ord: Ordering[T]) = lift(Aggregator.min)
-  def minBy[U: Ordering](fn: T => U) = {
+  def minOption(implicit ord: Ordering[T]) = lift(Aggregator.min)
+  def minOptionBy[U: Ordering](fn: T => U) = {
     implicit val ordT = Ordering.by(fn)
     lift(Aggregator.min[T])
   }
+
+  def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
+  def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
