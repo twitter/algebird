@@ -114,3 +114,19 @@ trait HasLift[A, T] extends HasMonoidAggregate[A, T] {
   def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
   def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
+
+//implementing unzip as an enrichment because it seems to help with type inference
+//ideally we'd generate N versions of this, too
+//and figure out how to make it work with FlatMapPreparer
+case class Unzipper[A, U, V](preparer: MapPreparer[A, (U, V)]) {
+  def unzip[B1, B2, C1, C2](fn: (MapPreparer[U, U], MapPreparer[V, V]) => (Aggregator[U, B1, C1], Aggregator[V, B2, C2])) = {
+    val (a1, a2) = fn(Preparer[U], Preparer[V])
+    preparer.aggregate(a1.zip(a2))
+  }
+}
+
+//for some reason this implicit doesn't get picked up automatically?
+object Unzipper {
+  implicit def unzipper[A, U, V](preparer: MapPreparer[A, (U, V)]): Unzipper[A, U, V] = Unzipper(preparer)
+}
+
