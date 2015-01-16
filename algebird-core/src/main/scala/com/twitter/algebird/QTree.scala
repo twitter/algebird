@@ -200,6 +200,20 @@ case class QTree[A](
       (0L, 0L)
     }
   }
+  /**
+   * For a given value and given quantiles list, compute which quantile it fails to in this QTree
+   * @param value The specified value to compute quantile.
+   * @param quantiles The specified quantiles list, need to be sorted.
+   */
+  def getValueQuantile(value: Double, quantiles: Seq[Double]): (Double, Double) = {
+    val quantilePoints = quantiles.map { q: Double =>
+      val (lower, upper) = quantileBounds(q)
+      (lower, upper, q)
+    }
+    val lowerBound = quantilePoints.find(_._2 >= value).map(_._3).getOrElse(1.0)
+    val upperBound = quantilePoints.find(_._1 >= value).map(_._3).getOrElse(1.0)
+    (lowerBound, upperBound)
+  }
 
   def compress(k: Int) = {
     val minCount = count >> k

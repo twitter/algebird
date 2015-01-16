@@ -62,11 +62,18 @@ class QTreeTest extends WordSpec with Matchers {
   def trueQuantile(list: Seq[Double], q: Double) = {
     val rank = math.floor(q * list.size).toInt
     val sorted = list.toList.sorted
-    sorted(rank)
+    sorted(rank - 1)
   }
 
   def trueRangeSum(list: Seq[Double], from: Double, to: Double) = {
     list.filter{ _ >= from }.filter{ _ < to }.sum
+  }
+
+  def trueValueQuantile(list: Seq[Double], input: Double, quantiles: Seq[Double]) = {
+    quantiles.map { q: Double =>
+      (trueQuantile(list, q), q)
+    }
+      .find(_._1 >= input).map(_._2).getOrElse(1.0)
   }
 
   for (k <- (1 to 6))
@@ -87,6 +94,16 @@ class QTreeTest extends WordSpec with Matchers {
         val to = math.random
         val (lower, upper) = qt.rangeSumBounds(from, to)
         val truth = trueRangeSum(list, from, to)
+        assert(truth >= lower)
+        assert(truth <= upper)
+      }
+      "always return the true value quantile query" in {
+        val list = randomList(10000)
+        val qt = buildQTree(k, list)
+        val queryQuantiles = (5 to 100 by 5).map { _.toDouble / 100 }
+        val input = math.random
+        val truth = trueValueQuantile(list, input, queryQuantiles)
+        val (lower, upper) = qt.getValueQuantile(input, queryQuantiles)
         assert(truth >= lower)
         assert(truth <= upper)
       }
