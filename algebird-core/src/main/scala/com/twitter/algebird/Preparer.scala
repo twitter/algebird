@@ -7,6 +7,8 @@ trait Preparer[A, T, +This[A, T] <: Preparer[A, T, This]] extends HasMonoidAggre
 
   def flatten[U](implicit ev: <:<[T, TraversableOnce[U]]) = flatMap(ev)
 
+  def filter(fn: T => Boolean) = flatMap{ t => if (fn(t)) Some(t) else None }
+
   //really ought to generate N versions of this...
   def split[B1, B2, C1, C2](fn: This[A, T] => (Aggregator[A, B1, C1], Aggregator[A, B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(this.asInstanceOf[This[A, T]])
