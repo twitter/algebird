@@ -8,35 +8,12 @@ package com.twitter.algebird
  *
  * Uses of Preparer will always start with a call to Preparer[A], and end with a call to
  * monoidAggregate or a related method, to produce an Aggregator instance.
- *
- * This simple trait is just there to make it easier to write enrichments.
- * Most of the interesting stuff is in BasePreparer (but that has a more complicated type signature).
  */
 sealed trait Preparer[A, T] {
   /**
    * Produce a new MonoidAggregator which includes the Preparer's transformation chain in its prepare stage.
    */
   def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C]
-}
-
-object Preparer {
-  /**
-   * This is the expected entry point for creating a new Preparer.
-   */
-  def apply[A] = MapPreparer.identity[A]
-}
-
-/**
- * The two sub-types of Preparer, MapPreparer and FlatMapPreparer, both descend from this.
- * It uses F-bounded polymorphism to provide precise types for the return value of map
- * and the input values in split.
- */
-trait BasePreparer[A, T, +This[A, T] <: BasePreparer[A, T, This]]
-  extends Preparer[A, T] {
-  /**
-   * Produce a new Preparer of the same type that chains this additional transformation.
-   */
-  def map[U](fn: T => U): This[A, U]
 
   /**
    * Produce a new Preparer that chains this one-to-many transformation.
@@ -55,21 +32,6 @@ trait BasePreparer[A, T, +This[A, T] <: BasePreparer[A, T, This]]
    * Like flatMap, this limits future aggregations to MonoidAggregator.
    */
   def filter(fn: T => Boolean) = flatMap{ t => if (fn(t)) Some(t) else None }
-
-  /**
-   * Split the processing into two parallel aggregations.
-   * You provide a function which produces two different aggregators from this preparer,
-   * and it will return a single aggregator which does both aggregations in parallel.
-   * (See also Aggregator's join method.)
-   *
-   * Note: this currently produces an Aggregator which executes all of the prepare transformations
-   * twice, which is not ideal.
-   * Also, we really need to generate N versions of this for 3-way, 4-way etc splits.
-   */
-  def split[B1, B2, C1, C2](fn: This[A, T] => (Aggregator[A, B1, C1], Aggregator[A, B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
-    val (a1, a2) = fn(this.asInstanceOf[This[A, T]])
-    a1.join(a2)
-  }
 
   /**
    * count and following methods all just call monoidAggregate with one of the standard Aggregators.
@@ -92,16 +54,22 @@ trait BasePreparer[A, T, +This[A, T] <: BasePreparer[A, T, This]]
   def uniqueCount = monoidAggregate(Aggregator.uniqueCount)
 }
 
+object Preparer {
+  /**
+   * This is the expected entry point for creating a new Preparer.
+   */
+  def apply[A] = MapPreparer.identity[A]
+}
+
 /**
  * A Preparer that has had zero or more map transformations applied, but no flatMaps.
  * This can produce any type of Aggregator.
  */
-trait MapPreparer[A, T]
-  extends BasePreparer[A, T, MapPreparer] {
+trait MapPreparer[A, T] extends Preparer[A, T] {
 
   def prepareFn: A => T
 
-  def map[U](fn: T => U) =
+  def map[U](fn: T => U): MapPreparer[A, U] =
     MapPreparer[A, U](fn.compose(prepareFn))
 
   def flatMap[U](fn: T => TraversableOnce[U]) =
@@ -115,6 +83,20 @@ trait MapPreparer[A, T]
    */
   def aggregate[B, C](aggregator: Aggregator[T, B, C]): Aggregator[A, B, C] =
     aggregator.composePrepare(prepareFn)
+
+  /**
+   * Split the processing into two parallel aggregations.
+   * You provide a function which produces two different aggregators from this preparer,
+   * and it will return a single aggregator which does both aggregations in parallel.
+   * (See also Aggregator's join method.)
+   *
+   * We really need to generate N versions of this for 3-way, 4-way etc splits.
+   */
+
+  def split[B1, B2, C1, C2](fn: MapPreparer[T, T] => (Aggregator[T, B1, C1], Aggregator[T, B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
+    val (a1, a2) = fn(MapPreparer.identity[T])
+    aggregate(a1.join(a2))
+  }
 
   /**
    * head and following methods all just call aggregate with one of the standard Aggregators.
@@ -162,9 +144,11 @@ object MapPreparer {
  * A Preparer that has had one or more flatMap operations applied.
  * It can only accept MonoidAggregators.
  */
-case class FlatMapPreparer[A, T](prepareFn: A => TraversableOnce[T])
-  extends BasePreparer[A, T, FlatMapPreparer] {
-  def map[U](fn: T => U) =
+trait FlatMapPreparer[A, T] extends Preparer[A, T] {
+
+  def prepareFn: A => TraversableOnce[T]
+
+  def map[U](fn: T => U): FlatMapPreparer[A, U] =
     FlatMapPreparer { a: A => prepareFn(a).map(fn) }
 
   def flatMap[U](fn: T => TraversableOnce[U]) =
@@ -183,6 +167,20 @@ case class FlatMapPreparer[A, T](prepareFn: A => TraversableOnce[T])
    * Like monoidAggregate, but using an implicit Monoid to construct the Aggregator
    */
   def sum(implicit monoid: Monoid[T]) = monoidAggregate(Aggregator.fromMonoid(monoid))
+
+  /**
+   * Split the processing into two parallel aggregations.
+   * You provide a function which produces two different aggregators from this preparer,
+   * and it will return a single aggregator which does both aggregations in parallel.
+   * (See also Aggregator's join method.)
+   *
+   * We really need to generate N versions of this for 3-way, 4-way etc splits.
+   */
+
+  def split[B1, B2, C1, C2](fn: FlatMapPreparer[TraversableOnce[T], T] => (MonoidAggregator[TraversableOnce[T], B1, C1], MonoidAggregator[TraversableOnce[T], B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
+    val (a1, a2) = fn(FlatMapPreparer.identity[T])
+    a1.join(a2).composePrepare(prepareFn)
+  }
 
   /**
    * transform a given Aggregator into a MonoidAggregator by lifting the reduce and present stages
@@ -213,24 +211,25 @@ case class FlatMapPreparer[A, T](prepareFn: A => TraversableOnce[T])
   def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
 
-/**
- * This should really be a method on MapPreparer but it needs to be implemented as an enrichment to help the type inference.
- */
-case class Unzipper[A, U, V](preparer: MapPreparer[A, (U, V)]) {
+object FlatMapPreparer {
   /**
-   * given a chain of transformations that ends in a Tuple2, aggregate each element of the tuple separately,
-   * and return a single Aggregator that will ultimately produce a tuple of aggregations.
+   * Create a concrete FlatMapPreparer.
    */
-  def unzip[B1, B2, C1, C2](fn: (MapPreparer[U, U], MapPreparer[V, V]) => (Aggregator[U, B1, C1], Aggregator[V, B2, C2])) = {
-    val (a1, a2) = fn(Preparer[U], Preparer[V])
-    preparer.aggregate(a1.zip(a2))
+  def apply[A, T](fn: A => TraversableOnce[T]) = new FlatMapPreparer[A, T] { val prepareFn = fn }
+
+  /**
+   * This is purely an optimization for the case of flatMapping by identity.
+   * It overrides the key methods to not actually use the identity function.
+   */
+  def identity[A] = new FlatMapPreparer[TraversableOnce[A], A] {
+    val prepareFn = (a: TraversableOnce[A]) => a
+
+    override def map[U](fn: A => U) =
+      FlatMapPreparer{ a: TraversableOnce[A] => a.map(fn) }
+
+    override def flatMap[U](fn: A => TraversableOnce[U]) =
+      FlatMapPreparer{ a: TraversableOnce[A] => a.flatMap(fn) }
+
+    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) = aggregator.sumBefore
   }
 }
-
-/*
-* implicit for Unzipper. For some reason this isn't getting found without an explicit import.
-*/
-object Unzipper {
-  implicit def unzipper[A, U, V](preparer: MapPreparer[A, (U, V)]): Unzipper[A, U, V] = Unzipper(preparer)
-}
-
