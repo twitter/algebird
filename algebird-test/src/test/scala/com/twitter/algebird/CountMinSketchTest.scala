@@ -412,7 +412,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     "(when adding CMS instances) merge heavy hitters correctly [GH-353 regression test]" in {
       // See https://github.com/twitter/algebird/issues/353
-      val monoid = TopPctCMS.monoid(EPS, DELTA, SEED, 0.1)
+      val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1)
 
       val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
       val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
@@ -561,7 +561,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // See https://github.com/twitter/algebird/issues/353
     "(when adding CMS instances) generally FAIL to merge heavy hitters correctly due to order bias" in {
       val topN = 2
-      val monoid = TopNCMS.monoid(EPS, DELTA, SEED, topN)
+      val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, topN)
 
       val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
       val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
@@ -602,7 +602,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // See https://github.com/twitter/algebird/issues/353
     "(when adding individual items) merge heavy hitters correctly [GH-353 regression test]" in {
       val topN = 2
-      val monoid = TopNCMS.monoid(EPS, DELTA, SEED, topN)
+      val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, topN)
 
       val data1 = Seq(1, 1, 1, 2, 2, 3).toK[K]
       val data2 = Seq(3, 4, 4, 4, 5, 5).toK[K]
