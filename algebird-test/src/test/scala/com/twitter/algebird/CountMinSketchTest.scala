@@ -128,7 +128,7 @@ class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
 class CMSBigIntTest extends CMSTest[BigInt]
 
-abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import TestImplicits._
 

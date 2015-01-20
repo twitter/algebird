@@ -16,8 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.immutable.SortedSet
-
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -80,8 +78,8 @@ import scala.collection.immutable.SortedSet
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.  Other possibilities
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
@@ -582,7 +580,7 @@ object CMSInstance {
 
 }
 
-case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
+case class TopCMSParams[K](logic: HeavyHittersLogic[K])
 
 /**
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
@@ -625,7 +623,7 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[K])
+sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
   extends java.io.Serializable with CMSCounting[K, TopCMS] with CMSHeavyHitters[K] {
 
   override val eps: Double = cms.eps
@@ -650,7 +648,7 @@ sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[
 /**
  * Zero element.  Used for initialization.
  */
-case class TopCMSZero[K: Ordering](override val cms: CMS[K], params: TopCMSParams[K])
+case class TopCMSZero[K](override val cms: CMS[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set.empty[K]
@@ -664,7 +662,7 @@ case class TopCMSZero[K: Ordering](override val cms: CMS[K], params: TopCMSParam
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: TopCMSParams[K])
+case class TopCMSItem[K](item: K, override val cms: CMS[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set(item)
@@ -686,13 +684,13 @@ case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: To
 
 object TopCMSInstance {
 
-  def apply[K: Ordering](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
+  def apply[K](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
     TopCMSInstance[K](cms, HeavyHitters.empty[K], params)
   }
 
 }
 
-case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
+case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override def heavyHitters: Set[K] = hhs.items
@@ -720,7 +718,7 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
-abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
+abstract class HeavyHittersLogic[K] extends java.io.Serializable {
 
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
@@ -751,13 +749,13 @@ abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
  * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
  * This parameter can thus control the memory footprint required for tracking heavy hitters.
  */
-case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
+case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
 
   require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val minCount = heavyHittersPct * cms.totalCount
-    HeavyHitters[K](hitters.hhs.dropWhile { _.count < minCount })
+    HeavyHitters[K](hitters.hhs.filter { _.count >= minCount })
   }
 
 }
@@ -773,12 +771,13 @@ case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHitter
  *
  * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
  */
-case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
+case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
-    HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
+    val sorted = hitters.hhs.toSeq.sortBy(hh => hh.count).takeRight(heavyHittersN)
+    HeavyHitters[K](sorted.toSet)
   }
 
 }
@@ -786,7 +785,7 @@ case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[
 /**
  * Containers for holding heavy hitter items and their associated counts.
  */
-case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Serializable {
+case class HeavyHitters[K](hhs: Set[HeavyHitter[K]]) extends java.io.Serializable {
 
   def -(hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters[K](hhs - hh)
 
@@ -800,26 +799,17 @@ case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends jav
 
 object HeavyHitters {
 
-  def empty[K: Ordering]: HeavyHitters[K] = HeavyHitters(emptyHhs)
+  def empty[K]: HeavyHitters[K] = HeavyHitters(emptyHhs)
 
-  private def emptyHhs[K: Ordering]: SortedSet[HeavyHitter[K]] = {
-    implicit val heavyHitterOrdering = HeavyHitter.ordering[K]
-    SortedSet[HeavyHitter[K]]()
-  }
+  private def emptyHhs[K]: Set[HeavyHitter[K]] = Set[HeavyHitter[K]]()
 
-  def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
+  def from[K](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = hhs.foldLeft(empty[K])(_ + _)
 
-  def from[K: Ordering](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
+  def from[K](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
 
 }
 
 case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
-
-object HeavyHitter {
-
-  def ordering[K: Ordering]: Ordering[HeavyHitter[K]] = Ordering.by { hh: HeavyHitter[K] => (hh.count, hh.item) }
-
-}
 
 /**
  * Monoid for Top-% based [[TopCMS]] sketches.
@@ -836,12 +826,12 @@ object HeavyHitter {
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
+class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopPctLogic[K](heavyHittersPct)
@@ -876,25 +866,25 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
 
 object TopPctCMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double,
+  def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int,
+  def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
+  def aggregator[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
+  def aggregator[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
@@ -950,12 +940,12 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidA
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
+class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopNLogic[K](heavyHittersN)
@@ -988,25 +978,25 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
 
 object TopNCMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double,
+  def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int,
+  def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
+  def aggregator[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
     new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
+  def aggregator[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
@@ -1146,12 +1136,5 @@ object CMSHasherImplicits {
   //  override def hash(a: Int, b: Int, width: Int)(x: String): Int =
   //    CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
   //}
-
-}
-
-object CMSOrderingImplicits {
-
-  // TODO: Is this Ordering[Array[Byte]] efficient enough?  See http://stackoverflow.com/questions/7109943.
-  implicit val orderingArrayByte: Ordering[Array[Byte]] = Ordering.by((_: Array[Byte]).toIterable)
 
 }
