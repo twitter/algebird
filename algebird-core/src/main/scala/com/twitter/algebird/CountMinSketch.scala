@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.immutable.SortedSet
+
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -720,6 +722,8 @@ case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], par
  */
 abstract class HeavyHittersLogic[K] extends java.io.Serializable {
 
+  implicit val orderingHeavyHitterK = HeavyHitter.ordering[K]
+
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
     val oldHh = HeavyHitter[K](item, oldItemCount)
@@ -755,7 +759,7 @@ case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] 
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val minCount = heavyHittersPct * cms.totalCount
-    HeavyHitters[K](hitters.hhs.filter { _.count >= minCount })
+    HeavyHitters[K](hitters.hhs.dropWhile { _.count < minCount })
   }
 
 }
@@ -775,17 +779,21 @@ case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
-  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
-    val sorted = hitters.hhs.toSeq.sortBy(hh => hh.count).takeRight(heavyHittersN)
-    HeavyHitters[K](sorted.toSet)
-  }
+  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] =
+    HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
 
 }
 
 /**
  * Containers for holding heavy hitter items and their associated counts.
+ *
+ * =Implementation details=
+ *
+ * We use a [[SortedSet]] to minimize the time complexity of a CMS `count()` operation.  Heavy hitters need to be
+ * updated (and notably purged) on every count operation, so we benefit from a sorted representation of heavy hitters
+ * instead of (say) using a [[Set]] and re-sorting the heavy hitters every time from scratch.
  */
-case class HeavyHitters[K](hhs: Set[HeavyHitter[K]]) extends java.io.Serializable {
+case class HeavyHitters[K](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Serializable {
 
   def -(hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters[K](hhs - hh)
 
@@ -801,7 +809,7 @@ object HeavyHitters {
 
   def empty[K]: HeavyHitters[K] = HeavyHitters(emptyHhs)
 
-  private def emptyHhs[K]: Set[HeavyHitter[K]] = Set[HeavyHitter[K]]()
+  private def emptyHhs[K]: SortedSet[HeavyHitter[K]] = SortedSet[HeavyHitter[K]]()(HeavyHitter.ordering[K])
 
   def from[K](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = hhs.foldLeft(empty[K])(_ + _)
 
@@ -810,6 +818,18 @@ object HeavyHitters {
 }
 
 case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
+
+object HeavyHitter {
+
+  // Note that we can't define the ordering on `count` only.  We use a set to track heavy hitters, where equality means
+  // two elements are identical.  If we were to use `count` only, we would label different items in heavy hitters as
+  // identical simply because they have the same count (and such false duplicates may happen easily in practice).  For
+  // this reason we need to add another dimension to the ordering to prevent such false duplicates.  For this second
+  // dimension we use an item's default Java hash code because we do not want to introduce an `Ordering` constraint.
+  def ordering[K]: Ordering[HeavyHitter[K]] =
+    Ordering.by[HeavyHitter[K], (Long, Int)] { hh => (hh.count, hh.item.hashCode()) }
+
+}
 
 /**
  * Monoid for Top-% based [[TopCMS]] sketches.
