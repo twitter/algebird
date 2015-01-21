@@ -52,6 +52,34 @@ sealed trait Preparer[A, T] {
   def toList = monoidAggregate(Aggregator.toList)
   def toSet = monoidAggregate(Aggregator.toSet)
   def uniqueCount = monoidAggregate(Aggregator.uniqueCount)
+
+  /**
+   * transform a given Aggregator into a MonoidAggregator by lifting the reduce and present stages
+   * into Option space
+   */
+  def lift[B, C](aggregator: Aggregator[T, B, C]): MonoidAggregator[A, Option[B], Option[C]] =
+    monoidAggregate(aggregator.lift)
+
+  /**
+   * headOption and following methods are all just calling lift with standard Aggregators
+   * see the Aggregator object for more docs
+   */
+  def headOption = lift(Aggregator.head)
+  def lastOption = lift(Aggregator.last)
+  def maxOption(implicit ord: Ordering[T]) = lift(Aggregator.max)
+  def maxOptionBy[U: Ordering](fn: T => U) = {
+    implicit val ordT = Ordering.by(fn)
+    lift(Aggregator.max[T])
+  }
+
+  def minOption(implicit ord: Ordering[T]) = lift(Aggregator.min)
+  def minOptionBy[U: Ordering](fn: T => U) = {
+    implicit val ordT = Ordering.by(fn)
+    lift(Aggregator.min[T])
+  }
+
+  def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
+  def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
 
 object Preparer {
@@ -181,34 +209,6 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
     val (a1, a2) = fn(FlatMapPreparer.identity[T])
     a1.join(a2).composePrepare(prepareFn)
   }
-
-  /**
-   * transform a given Aggregator into a MonoidAggregator by lifting the reduce and present stages
-   * into Option space
-   */
-  def lift[B, C](aggregator: Aggregator[T, B, C]): MonoidAggregator[A, Option[B], Option[C]] =
-    monoidAggregate(aggregator.lift)
-
-  /**
-   * headOption and following methods are all just calling lift with standard Aggregators
-   * see the Aggregator object for more docs
-   */
-  def headOption = lift(Aggregator.head)
-  def lastOption = lift(Aggregator.last)
-  def maxOption(implicit ord: Ordering[T]) = lift(Aggregator.max)
-  def maxOptionBy[U: Ordering](fn: T => U) = {
-    implicit val ordT = Ordering.by(fn)
-    lift(Aggregator.max[T])
-  }
-
-  def minOption(implicit ord: Ordering[T]) = lift(Aggregator.min)
-  def minOptionBy[U: Ordering](fn: T => U) = {
-    implicit val ordT = Ordering.by(fn)
-    lift(Aggregator.min[T])
-  }
-
-  def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
-  def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
 
 object FlatMapPreparer {
