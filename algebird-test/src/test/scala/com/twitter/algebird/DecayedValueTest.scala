@@ -33,7 +33,7 @@ class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
         x <- choose(-1e100, 1e100);
         hl <- choose(100.0, 1000.0);
         c <- choose(10000, 100000);
-        n <- choose(0.0, 0.2)
+        n <- choose(0.0, 0.1)
       ) yield Params(x, hl, c, n)
     }
 
@@ -46,7 +46,7 @@ class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
         x <- choose(-1e100, 1e100);
         hl <- choose(100.0, 1000.0);
         c <- choose(20, 1000);
-        n <- choose(0.0, 0.2)
+        n <- choose(0.0, 0.1)
       ) yield Params(x, hl, c, n)
     }
 
@@ -59,7 +59,7 @@ class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
         x <- choose(-1e100, 1e100);
         hl <- choose(1.0, 10.0);
         c <- choose(10000, 100000);
-        n <- choose(0.0, 0.2)
+        n <- choose(0.0, 0.1)
       ) yield Params(x, hl, c, n)
     }
 
