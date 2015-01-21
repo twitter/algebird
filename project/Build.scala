@@ -12,7 +12,7 @@ object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.10.4", "2.11.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.5"),
     ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
@@ -98,7 +98,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.8.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.9.0" }
 
   lazy val algebird = Project(
     id = "algebird",
