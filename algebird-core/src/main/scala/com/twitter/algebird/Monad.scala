@@ -19,6 +19,8 @@ import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFl
 import java.util.{ List => JList, Map => JMap }
 
 import scala.annotation.implicitNotFound
+import scala.util.{ Failure, Success, Try }
+import scala.concurrent.{ Future, ExecutionContext }
 import collection.GenTraversable
 
 /**
@@ -91,6 +93,28 @@ object Monad {
     def apply[T](v: T) = IndexedSeq(v);
     def flatMap[T, U](m: IndexedSeq[T])(fn: (T) => IndexedSeq[U]) = m.flatMap(fn)
   }
+  implicit val scalaTry: Monad[Try] = new Monad[Try] {
+    def apply[T](t: T): Try[T] = Success(t)
+    def flatMap[T, U](t: Try[T])(fn: T => Try[U]): Try[U] = t.flatMap(fn)
+    override def map[T, U](t: Try[T])(fn: T => U): Try[U] = t.map(fn)
+    override def join[T, U](t: Try[T], u: Try[U]): Try[(T, U)] =
+      // make the common case fast:
+      if (t.isSuccess && u.isSuccess) Success((t.get, u.get))
+      else (t, u) match {
+        case (Failure(e), _) => Failure(e)
+        case (_, Failure(e)) => Failure(e)
+        // One must be a failure due to being in the else branch
+        case (_, _) => sys.error("unreachable, but the compiler can't see that")
+      }
+  }
+  implicit def scalaFuture(implicit ec: ExecutionContext): Monad[Future] = new Monad[Future] {
+    def apply[T](t: T): Future[T] = Future.successful(t)
+    def flatMap[T, U](t: Future[T])(fn: T => Future[U]): Future[U] = t.flatMap(fn)
+    override def map[T, U](t: Future[T])(fn: T => U): Future[U] = t.map(fn)
+    override def join[T, U](t: Future[T], u: Future[U]): Future[(T, U)] = t.zip(u)
+    override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] =
+      Future.sequence(fs)
+  }
 
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
   // import Monad.{pureOp, operators} to get
@@ -105,41 +129,5 @@ object Monad {
  */
 class MonadOperators[A, M[_]](m: M[A])(implicit monad: Monad[M]) extends ApplicativeOperators[A, M](m) {
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
-}
-
-// This is a Semigroup, for all Monads.
-class MonadSemigroup[T, M[_]](implicit monad: Monad[M], sg: Semigroup[T])
-  extends Semigroup[M[T]] {
-  import Monad.operators
-  def plus(l: M[T], r: M[T]) = for (lv <- l; rv <- r) yield sg.plus(lv, rv)
-}
-
-// This is a Monoid, for all Monads.
-class MonadMonoid[T, M[_]](implicit monad: Monad[M], mon: Monoid[T])
-  extends MonadSemigroup[T, M] with Monoid[M[T]] {
-  lazy val zero = monad(mon.zero)
-}
-
-// Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your Monad.
-
-class MonadGroup[T, M[_]](implicit monad: Monad[M], grp: Group[T])
-  extends MonadMonoid[T, M] with Group[M[T]] {
-  import Monad.operators
-  override def negate(v: M[T]) = v.map { grp.negate(_) }
-  override def minus(l: M[T], r: M[T]) = for (lv <- l; rv <- r) yield grp.minus(lv, rv)
-}
-
-class MonadRing[T, M[_]](implicit monad: Monad[M], ring: Ring[T])
-  extends MonadGroup[T, M] with Ring[M[T]] {
-  import Monad.operators
-  lazy val one = monad(ring.one)
-  def times(l: M[T], r: M[T]) = for (lv <- l; rv <- r) yield ring.times(lv, rv)
-}
-
-class MonadField[T, M[_]](implicit monad: Monad[M], fld: Field[T])
-  extends MonadRing[T, M] with Field[M[T]] {
-  import Monad.operators
-  override def inverse(v: M[T]) = v.map { fld.inverse(_) }
-  override def div(l: M[T], r: M[T]) = for (lv <- l; rv <- r) yield fld.div(lv, rv)
 }
 

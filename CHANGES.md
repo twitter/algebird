@@ -1,5 +1,32 @@
 # Algebird #
 
+### Version 0.9.0 ###
+* Replace mapValues with one single map to avoid serialization in frameworks like Spark. #344
+* Add Fold trait for composable incremental processing (for develop) #350
+* Add a GC friendly LRU cache to improve SummingCache #341
+* BloomFilter should warn or raise on unrealistic input. #355
+* GH-345: Parameterize CMS to CMS[K] and decouple counting/querying from heavy hitters #354
+* Add Array Monoid & Group. #356
+* Improvements to Aggregator #359
+* Improve require setup for depth/delta and associated test spec #361
+* Bump from 2.11.2 to 2.11.4 #365
+* Move to sbt 0.13.5 #364
+* Correct wrong comment in estimation function #372
+* Add increments to all Summers #373
+* removed duplicate semigroup #375
+* GH-381: Fix serialization errors when using new CMS implementation in Storm #382
+* Fix snoble's name #384
+* Lift methods for Aggregator and MonoidAggregator #380
+* applyCumulative method on Aggregator #386
+* Add Aggregator.zip #389
+* GH-388: Fix CMS test issue caused by roundtripping depth->delta->depth #395
+* GH-392: Improve hashing of BigInt #394
+* add averageFrom to DecayedValue #391
+* Freshen up Applicative instances a bit #387
+* less noise on DecayedValue tests #405
+* Preparer #400
+* Upgrade bijection to 0.7.2 #406
+
 ### Version 0.8.0 ###
 * Removes deprecated monoid: https://github.com/twitter/algebird/pull/342
 * Use some value classes: https://github.com/twitter/algebird/pull/340

@@ -52,10 +52,14 @@ trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
 }
 
 trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
+  private[this] val className = getClass.getName
   protected var lastDump: Long = System.currentTimeMillis
   protected def softMemoryFlush: MemoryFlushPercent
   protected def flushFrequency: FlushFrequency
   protected def emptyResult: M
+
+  protected def memoryIncr: Incrementor
+  protected def timeoutIncr: Incrementor
 
   protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
   protected lazy val runtime = Runtime.getRuntime
@@ -66,7 +70,12 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   }
 
   def tick: Future[M] = {
-    if (timedOut || memoryWaterMark) {
+    if (timedOut) {
+      timeoutIncr.incr
+      lastDump = System.currentTimeMillis // reset the timeout condition
+      flush
+    } else if (memoryWaterMark) {
+      memoryIncr.incr
       lastDump = System.currentTimeMillis // reset the timeout condition
       flush
     } else {

@@ -24,7 +24,9 @@ class NullSummerProperties extends PropSpec with PropertyChecks with Matchers {
 
   property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]]) =>
-      val summer = new NullSummer[Int, Long]()
+      val tuplesIn = Counter("tuplesIn")
+      val tuplesOut = Counter("tuplesOut")
+      val summer = new NullSummer[Int, Long](tuplesIn, tuplesOut)
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }

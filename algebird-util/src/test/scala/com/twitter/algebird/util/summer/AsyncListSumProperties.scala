@@ -16,21 +16,69 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
+import org.scalatest.{ Matchers, PropSpec }
 
 class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers {
 
-  import AsyncSummerLaws._
+  import com.twitter.algebird.util.summer.AsyncSummerLaws._
 
-  property("Summing with and without the summer should match") {
+  property("NonCompactingList Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
       flushFrequency: FlushFrequency,
       bufferSize: BufferSize,
       memoryFlushPercent: MemoryFlushPercent) =>
-      val summer = new AsyncListSum[Int, Long](bufferSize, flushFrequency, memoryFlushPercent, workPool)
+      val timeOutCounter = Counter("timeOut")
+      val sizeCounter = Counter("size")
+      val memoryCounter = Counter("memory")
+      val insertOp = Counter("insertOp")
+      val insertFails = Counter("insertFails")
+      val tuplesIn = Counter("tuplesIn")
+      val tuplesOut = Counter("tuplesOut")
+      val summer = new AsyncListSum[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        insertOp,
+        insertFails,
+        sizeCounter,
+        tuplesIn,
+        tuplesOut,
+        workPool,
+        Compact(false),
+        CompactionSize(0))
       assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }
 
+  property("CompactingList Summing with and without the summer should match") {
+    forAll { (inputs: List[List[(Int, Long)]],
+      flushFrequency: FlushFrequency,
+      bufferSize: BufferSize,
+      memoryFlushPercent: MemoryFlushPercent,
+      compactionSize: CompactionSize) =>
+      val timeOutCounter = Counter("timeOut")
+      val sizeCounter = Counter("size")
+      val memoryCounter = Counter("memory")
+      val insertOp = Counter("insertOp")
+      val insertFails = Counter("insertFails")
+      val tuplesIn = Counter("tuplesIn")
+      val tuplesOut = Counter("tuplesOut")
+      val summer = new AsyncListSum[Int, Long](bufferSize,
+        flushFrequency,
+        memoryFlushPercent,
+        memoryCounter,
+        timeOutCounter,
+        insertOp,
+        insertFails,
+        sizeCounter,
+        tuplesIn,
+        tuplesOut,
+        workPool,
+        Compact(true),
+        compactionSize)
+      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
+    }
+  }
 }

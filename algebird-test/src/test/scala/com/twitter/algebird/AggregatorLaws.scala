@@ -29,7 +29,7 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
       ps <- present.arbitrary
     } yield new Aggregator[A, B, C] {
       def prepare(a: A) = pp(a)
-      def reduce(l: B, r: B) = sg.plus(l, r)
+      def semigroup = sg
       def present(b: B) = ps(b)
     }
   }
@@ -49,9 +49,61 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("composing two Aggregators is correct") {
-    forAll { (in: List[Int], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[Int, Double, String]) =>
+    forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
       val c = GeneratedTupleAggregator.from2(ag1, ag2)
       assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+    }
+  }
+
+  property("Applicative composing two Aggregators is correct") {
+    forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
+      type AggInt[T] = Aggregator[Int, _, T]
+      val c = Applicative.join[AggInt, Int, String](ag1, ag2)
+      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+    }
+  }
+
+  property("Aggregator.zip composing two Aggregators is correct") {
+    forAll { (in: List[(Int, String)], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[String, Set[String], Double]) =>
+      val c = ag1.zip(ag2)
+      val (as, bs) = in.unzip
+      assert(in.isEmpty || c(in) == (ag1(as), ag2(bs)))
+    }
+  }
+
+  property("Aggregator.lift works for empty sequences") {
+    forAll { (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
+      val liftedAg = ag.lift
+      assert(in.isEmpty && liftedAg(in) == None || liftedAg(in) == Some(ag(in)))
+    }
+  }
+
+  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
+    for {
+      pp <- prepare.arbitrary
+      ps <- present.arbitrary
+    } yield new MonoidAggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def monoid = m
+      def present(b: B) = ps(b)
+    }
+  }
+
+  property("MonoidAggregator.sumBefore is correct") {
+    forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
+      val liftedAg = ag.sumBefore
+      assert(liftedAg(in) == ag(in.flatten))
+    }
+  }
+
+  property("Aggregator.applyCumulatively is correct") {
+    forAll{ (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
+      val cumulative: List[Int] = ag.applyCumulatively(in)
+      assert(cumulative.size == in.size)
+      assert(cumulative.zipWithIndex.forall{
+        case (sum, i) =>
+          sum == ag.apply(in.take(i + 1))
+      })
     }
   }
 }

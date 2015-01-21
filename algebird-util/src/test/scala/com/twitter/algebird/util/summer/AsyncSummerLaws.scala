@@ -46,6 +46,11 @@ object AsyncSummerLaws {
       .map { x => MemoryFlushPercent(x) }
   }
 
+  implicit def arbCompactSize = Arbitrary {
+    Gen.choose(1, 10)
+      .map { x => CompactionSize(x) }
+  }
+
   def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   def summingWithAndWithoutSummerShouldMatch[K, V: Semigroup](asyncSummer: AsyncSummer[(K, V), Iterable[(K, V)]], inputs: List[List[(K, V)]]) = {

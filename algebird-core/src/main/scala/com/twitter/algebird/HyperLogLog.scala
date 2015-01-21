@@ -207,7 +207,7 @@ sealed abstract class HLL extends java.io.Serializable {
 
     val e = factor * z
     // There are large and small value corrections from the paper
-    // We stopped using the small value corrections since when using Long's
+    // We stopped using the large value corrections since when using Long's
     // there was pathalogically bad results. See https://github.com/twitter/algebird/issues/284
     if (e <= smallE) {
       smallEstimate(e)
@@ -441,9 +441,8 @@ object HyperLogLogAggregator {
     new HyperLogLogAggregator(monoid)
   }
 
-  def sizeAggregator(bits: Int): Aggregator[Array[Byte], HLL, Double] = {
+  def sizeAggregator(bits: Int): MonoidAggregator[Array[Byte], HLL, Double] =
     apply(bits).andThenPresent(_.estimatedSize)
-  }
 }
 
 case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {

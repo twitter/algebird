@@ -17,10 +17,12 @@ package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
 import com.twitter.util.{ Duration, Future, FuturePool }
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ ArrayBlockingQueue, ConcurrentHashMap }
+
 import scala.collection.mutable.ListBuffer
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
+import scala.collection.mutable.{ Set => MSet, ListBuffer }
 
 /**
  * @author Ian O Connell
@@ -42,6 +44,9 @@ case class RollOverFrequency(toLong: Long)
 case class HeavyHittersPercent(toFloat: Float)
 
 class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency) {
+
+  import CMSHasherImplicits._
+
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
   private[this] final val hh = new java.util.HashMap[Int, Long]()
@@ -52,9 +57,9 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   private[this] final val rollOverFrequency = roFreq.toLong
   private[this] final var countsTable = Array.fill(WIDTH * DEPTH)(0L)
 
-  private[this] final val hashes: IndexedSeq[CMSHash] = {
+  private[this] final val hashes: IndexedSeq[CMSHash[Long]] = {
     val r = new scala.util.Random(5)
-    (0 until DEPTH).map { _ => CMSHash(r.nextInt, 0, WIDTH) }
+    (0 until DEPTH).map { _ => CMSHash[Long](r.nextInt, 0, WIDTH) }
   }.toIndexedSeq
 
   @inline
@@ -171,17 +176,55 @@ object HeavyHittersCachingSummer {
   val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
   val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
 
-  def apply[Key, Value](flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new HeavyHittersCachingSummer[Key, Value](DEFAULT_HH_PERCENT, DEFAULT_UPDATE_FREQUENCY, DEFAULT_ROLL_OVER_FREQUENCY, flushFrequency, softMemoryFlush, backingSummer)
+  def apply[Key, Value](flushFrequency: FlushFrequency,
+    softMemoryFlush: MemoryFlushPercent,
+    memoryIncr: Incrementor,
+    timeoutIncr: Incrementor,
+    tuplesOut: Incrementor,
+    insertOp: Incrementor,
+    sizeIncr: Incrementor,
+    backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
+    new HeavyHittersCachingSummer[Key, Value](DEFAULT_HH_PERCENT,
+      DEFAULT_UPDATE_FREQUENCY,
+      DEFAULT_ROLL_OVER_FREQUENCY,
+      flushFrequency,
+      softMemoryFlush,
+      memoryIncr,
+      timeoutIncr,
+      insertOp,
+      backingSummer)
 
-  def apply[Key, Value](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency,
-    flushFrequency: FlushFrequency, softMemoryFlush: MemoryFlushPercent, backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
-    new HeavyHittersCachingSummer[Key, Value](hhPct, updateFreq, roFreq, flushFrequency, softMemoryFlush, backingSummer)
+  def apply[Key, Value](hhPct: HeavyHittersPercent,
+    updateFreq: UpdateFrequency,
+    roFreq: RollOverFrequency,
+    flushFrequency: FlushFrequency,
+    softMemoryFlush: MemoryFlushPercent,
+    memoryIncr: Incrementor,
+    timeoutIncr: Incrementor,
+    tuplesOut: Incrementor,
+    insertOp: Incrementor,
+    sizeIncr: Incrementor,
+    backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]) =
+    new HeavyHittersCachingSummer[Key, Value](hhPct,
+      updateFreq,
+      roFreq,
+      flushFrequency,
+      softMemoryFlush,
+      memoryIncr,
+      timeoutIncr,
+      insertOp,
+      backingSummer)
 
 }
 
-class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency, override val flushFrequency: FlushFrequency,
+class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent,
+  updateFreq: UpdateFrequency,
+  roFreq: RollOverFrequency,
+  override val flushFrequency: FlushFrequency,
   override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
   backingSummer: AsyncSummer[(K, V), Iterable[(K, V)]])
   extends AsyncSummer[(K, V), Iterable[(K, V)]]
   with WithFlushConditions[(K, V), Iterable[(K, V)]] {
@@ -195,6 +238,8 @@ class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: Up
   private[this] final val approxHH = new ApproxHHTracker(hhPct, updateFreq, roFreq)
 
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
+    //todo not sure if need to increment as backing summer may already be doing it
+    insertOp.incr
     val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 
     if (!hh.isEmpty) {
@@ -210,3 +255,4 @@ class HeavyHittersCachingSummer[K, V](hhPct: HeavyHittersPercent, updateFreq: Up
     }
   }
 }
+

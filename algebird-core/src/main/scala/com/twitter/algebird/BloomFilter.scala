@@ -54,7 +54,16 @@ object BloomFilter {
   def optimalNumHashes(numEntries: Int, width: Int): Int = math.ceil(width / numEntries * math.log(2)).toInt
 
   // Compute optimal width: m = - n ln(p) / (ln(2))^2
-  def optimalWidth(numEntries: Int, fpProb: Double): Int = math.ceil(-1 * numEntries * math.log(fpProb) / math.log(2) / math.log(2)).toInt
+  def optimalWidth(numEntries: Int, fpProb: Double): Int = {
+    val widthEstimate = math.ceil(-1 * numEntries * math.log(fpProb) / math.log(2) / math.log(2)).toInt
+
+    if (widthEstimate == Int.MaxValue) {
+      throw new java.lang.IllegalArgumentException(
+        "BloomFilter cannot guarantee the specified false positive probability for the number of entries!")
+    }
+
+    return widthEstimate
+  }
 }
 
 /**

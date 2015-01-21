@@ -37,6 +37,8 @@ For example, average, moving average, max/min, set
 
 ## Community and Documentation
 
+This, and all [github.com/twitter](https://github.com/twitter) projects, are under the [Twitter Open Source Code of Conduct](https://engineering.twitter.com/opensource/code-of-conduct). Additionally, see the [Typelevel Code of Conduct](http://typelevel.org/conduct) for specific examples of harassing behavior that are not tolerated.
+
 To learn more and find links to tutorials and information around the web, check out the [Algebird Wiki](https://github.com/twitter/algebird/wiki).
 
 The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
@@ -45,7 +47,7 @@ Discussion occurs primarily on the [Algebird mailing list](https://groups.google
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.8.1`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.9.0`.
 
 Current published artifacts are
 
@@ -82,7 +84,7 @@ The answer is a mix of the following:
 * ellchow <http://github.com/ellchow>
 * Mike Gagnon <https://twitter.com/MichaelNGagnon>
 * Moses Nakamura <https://twitter.com/mnnakamura>
-* Steven Nobel <http://twitter.com/snoble>
+* Steven Noble <http://twitter.com/snoble>
 * Sam Ritchie <http://twitter.com/sritchie>
 * Ashutosh Singhal <http://twitter.com/daashu>
 * Argyris Zymnis <http://twitter.com/argyris>
