@@ -19,8 +19,8 @@ import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFl
 import java.util.{ List => JList, Map => JMap }
 
 import scala.annotation.implicitNotFound
-import scala.util.{Failure, Success, Try}
-import scala.concurrent.{Future, ExecutionContext}
+import scala.util.{ Failure, Success, Try }
+import scala.concurrent.{ Future, ExecutionContext }
 import collection.GenTraversable
 
 /**
@@ -99,7 +99,7 @@ object Monad {
     override def map[T, U](t: Try[T])(fn: T => U): Try[U] = t.map(fn)
     override def join[T, U](t: Try[T], u: Try[U]): Try[(T, U)] =
       // make the common case fast:
-      if(t.isSuccess && u.isSuccess) Success((t.get, u.get))
+      if (t.isSuccess && u.isSuccess) Success((t.get, u.get))
       else (t, u) match {
         case (Failure(e), _) => Failure(e)
         case (_, Failure(e)) => Failure(e)

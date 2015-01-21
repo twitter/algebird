@@ -318,7 +318,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
         topCms.frequency(otherItem.toK[K]).estimate should be(0)
         // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
         topCms.innerProduct(topCms).estimate should be(1)
-    }
+      }
     }
 
     "estimate heavy hitters" in {
