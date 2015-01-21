@@ -22,8 +22,25 @@ import com.twitter.util.{ Future, Return, Try }
 object UtilAlgebras {
   implicit val futureMonad: Monad[Future] = new Monad[Future] {
     def apply[T](v: T) = Future.value(v)
-    override def map[T, U](m: Future[T])(fn: T => U) = m.map(fn)
     def flatMap[T, U](m: Future[T])(fn: T => Future[U]) = m.flatMap(fn)
+    /*
+     * We override join with more efficient implementations than
+     * just using flatMap
+     */
+    override def join[T, U](a: Future[T], b: Future[U]): Future[(T, U)] =
+      a.join(b)
+    override def join[T, U, V](t: Future[T], u: Future[U], v: Future[V]) =
+      Future.join(t, u, v)
+    override def join[T, U, V, W](t: Future[T], u: Future[U], v: Future[V], w: Future[W]) =
+      Future.join(t, u, v, w)
+    override def join[T, U, V, W, X](t: Future[T], u: Future[U], v: Future[V], w: Future[W], x: Future[X]) =
+      Future.join(t, u, v, w, x)
+    override def map[T, U](m: Future[T])(fn: T => U) = m.map(fn)
+    /*
+     * We override sequence with more efficient implementations than
+     * just using flatMap
+     */
+    override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] = Future.collect(fs)
   }
   implicit val tryMonad: Monad[Try] = new Monad[Try] {
     def apply[T](v: T) = Return(v)
@@ -31,15 +48,15 @@ object UtilAlgebras {
     def flatMap[T, U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)
   }
 
-  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] = new MonadSemigroup[T, Future]
-  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new MonadMonoid[T, Future]
-  implicit def futureGroup[T: Group]: Group[Future[T]] = new MonadGroup[T, Future]
-  implicit def futureRing[T: Ring]: Ring[Future[T]] = new MonadRing[T, Future]
-  implicit def futureField[T: Field]: Field[Future[T]] = new MonadField[T, Future]
+  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] = new ApplicativeSemigroup[T, Future]
+  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new ApplicativeMonoid[T, Future]
+  implicit def futureGroup[T: Group]: Group[Future[T]] = new ApplicativeGroup[T, Future]
+  implicit def futureRing[T: Ring]: Ring[Future[T]] = new ApplicativeRing[T, Future]
+  implicit def futureField[T: Field]: Field[Future[T]] = new ApplicativeField[T, Future]
 
-  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] = new MonadSemigroup[T, Try]
-  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new MonadMonoid[T, Try]
-  implicit def tryGroup[T: Group]: Group[Try[T]] = new MonadGroup[T, Try]
-  implicit def tryRing[T: Ring]: Ring[Try[T]] = new MonadRing[T, Try]
-  implicit def tryField[T: Field]: Field[Try[T]] = new MonadField[T, Try]
+  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] = new ApplicativeSemigroup[T, Try]
+  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new ApplicativeMonoid[T, Try]
+  implicit def tryGroup[T: Group]: Group[Try[T]] = new ApplicativeGroup[T, Try]
+  implicit def tryRing[T: Ring]: Ring[Try[T]] = new ApplicativeRing[T, Try]
+  implicit def tryField[T: Field]: Field[Try[T]] = new ApplicativeField[T, Try]
 }
