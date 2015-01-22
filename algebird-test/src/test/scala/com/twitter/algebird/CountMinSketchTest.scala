@@ -5,18 +5,22 @@ import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
+import CmsTestImplicits._
+import CustomEquality._
 
+import scala.reflect.ClassTag
 import scala.util.Random
 
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
+
   import BaseProperties._
 
   val DELTA = 1E-8
   val EPS = 0.005
   val SEED = 1
 
-  private def createArbitrary[K: Numeric](cmsMonoid: CMSMonoid[K]): Arbitrary[CMS[K]] = {
-    val k = implicitly[Numeric[K]]
+  private def createArbitrary[K: FromIntLike](cmsMonoid: CMSMonoid[K]): Arbitrary[CMS[K]] = {
+    val k = implicitly[FromIntLike[K]]
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
     }
@@ -40,15 +44,28 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
     monoidLaws[CMS[Long]]
   }
 
+  property("CountMinSketch[Array[Byte]] is a Monoid") {
+    implicit val cmsMonoid = CMS.monoid[Array[Byte]](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Array[Byte]](cmsMonoid)
+    monoidLaws[CMS[Array[Byte]]]
+  }
+
   property("CountMinSketch[BigInt] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[BigInt](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
     monoidLaws[CMS[BigInt]]
   }
 
+  property("CountMinSketch[String] is a Monoid") {
+    implicit val cmsMonoid = CMS.monoid[String](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[String](cmsMonoid)
+    monoidLaws[CMS[String]]
+  }
+
 }
 
 class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
+
   import BaseProperties._
 
   val DELTA = 1E-8
@@ -56,8 +73,8 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   val SEED = 1
   val HEAVY_HITTERS_PCT = 0.1
 
-  private def createArbitrary[K: Numeric](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {
-    val k = implicitly[Numeric[K]]
+  private def createArbitrary[K: FromIntLike](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {
+    val k = implicitly[FromIntLike[K]]
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
     }
@@ -81,10 +98,22 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
     monoidLaws[TopCMS[Long]]
   }
 
+  property("TopPctCms[Array[Byte]] is a Monoid") {
+    implicit val cmsMonoid = TopPctCMS.monoid[Array[Byte]](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Array[Byte]](cmsMonoid)
+    monoidLaws[TopCMS[Array[Byte]]]
+  }
+
   property("TopPctCms[BigInt] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
     monoidLaws[TopCMS[BigInt]]
+  }
+
+  property("TopPctCms[String] is a Monoid") {
+    implicit val cmsMonoid = TopPctCMS.monoid[String](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[String](cmsMonoid)
+    monoidLaws[TopCMS[String]]
   }
 
 }
@@ -110,7 +139,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 
     // When we run contramap on a CMS[K] monoid supplying f, then the result should be a CMS[L] monoid.
     val targetCMSMonoid: CMSMonoid[Double] = sourceCMSMonoid.contramap((d: Double) => f(d))
-    targetCMSMonoid shouldBe a [CMSMonoid[_]] // Can't test CMSMonoid[Double] specifically because of type erasure.
+    targetCMSMonoid shouldBe a[CMSMonoid[_]] // Can't test CMSMonoid[Double] specifically because of type erasure.
 
     // Additionally we perform a basic smoke test of the resulting CMS monoid.
     // This test mimics the "exactly compute frequencies in a small stream" scenario in the full-fledged CMS spec.
@@ -139,11 +168,11 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 class CMSShortTest extends CMSTest[Short]
 class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
+class CMSArrayByteTest extends CMSTest[Array[Byte]]
 class CMSBigIntTest extends CMSTest[BigInt]
+class CMSStringTest extends CMSTest[String]
 
-abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import TestImplicits._
+abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -162,16 +191,20 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
   /**
    * Returns the exact frequency of {x} in {data}.
    */
-  def exactFrequency(data: Seq[K], x: K): Long = data.count(_ == x)
+  def exactFrequency(data: Seq[K], x: K): Long =
+    if (implicitly[ClassTag[K]].runtimeClass.isArray)
+      data.count(_.asInstanceOf[Array[_]].toSeq == x.asInstanceOf[Array[_]].toSeq)
+    else data.count(_ == x)
 
   /**
    * Returns the exact inner product between two data streams, when the streams
    * are viewed as count vectors.
    */
   def exactInnerProduct(data1: Seq[K], data2: Seq[K]): Long = {
-    val counts1 = data1.groupBy(x => x).mapValues(_.size)
-    val counts2 = data2.groupBy(x => x).mapValues(_.size)
-
+    val groupFunc =
+      if (implicitly[ClassTag[K]].runtimeClass.isArray) (x: K) => x.asInstanceOf[Array[_]].toSeq else (x: K) => x
+    val counts1 = data1.groupBy(groupFunc).mapValues(_.size)
+    val counts2 = data2.groupBy(groupFunc).mapValues(_.size)
     (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
   }
 
@@ -193,7 +226,7 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
    */
   def createRandomStream(size: Int, range: Int, rnd: Random = RAND): Seq[K] = {
     require(size > 0)
-    (1 to size).map { _ => rnd.nextInt(range) }.toK[K]
+    (1 to size).map { _ => rnd.nextInt(range).toK[K] }
   }
 
   "A Count-Min sketch implementing CMSCounting" should {
@@ -214,6 +247,9 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val cms = COUNTING_CMS_MONOID.create(data)
 
       (0 to 100).foreach { _ =>
+        // Instead of drawing randomly from the full `range`, we could also pick a random element from `data` instead.
+        // Think: `val x = data(RAND.nextInt(data.length))`.  However, the current test will also pick elements that
+        // are not in `data`, and for those elements the CMS invariants should still hold.
         val x = RAND.nextInt(range).toK[K]
         val exact = exactFrequency(data, x)
         val approx = cms.frequency(x).estimate
@@ -395,32 +431,33 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
     "(when adding CMS instances) drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
-      cms1.heavyHitters should be(Set(1, 2))
+      import CustomEquality._
+      cms1.heavyHitters should equal(Set(1, 2).toK[K])
 
       val cms2 = cms1 ++ monoid.create(2.toK[K])
-      cms2.heavyHitters should be(Set(2))
+      cms2.heavyHitters should equal(Set(2).toK[K])
 
       val cms3 = cms2 ++ monoid.create(1.toK[K])
-      cms3.heavyHitters should be(Set(1, 2))
+      cms3.heavyHitters should equal(Set(1, 2).toK[K])
 
       val cms4 = cms3 ++ monoid.create(Seq(0, 0, 0, 0, 0, 0).toK[K])
-      cms4.heavyHitters should be(Set(0))
+      cms4.heavyHitters should equal(Set(0).toK[K])
     }
 
     "(when adding individual items) drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
-      cms1.heavyHitters should be(Set(1, 2))
+      cms1.heavyHitters should equal(Set(1, 2).toK[K])
 
       val cms2 = cms1 + 2.toK[K]
-      cms2.heavyHitters should be(Set(2))
+      cms2.heavyHitters should equal(Set(2).toK[K])
 
       val cms3 = cms2 + 1.toK[K]
-      cms3.heavyHitters should be(Set(1, 2))
+      cms3.heavyHitters should equal(Set(1, 2).toK[K])
 
       val heaviest = 0.toK[K]
       val cms4 = cms3 + heaviest + heaviest + heaviest + heaviest + heaviest + heaviest
-      cms4.heavyHitters should be(Set(heaviest))
+      cms4.heavyHitters should equal(Set(heaviest))
     }
 
     "(when adding CMS instances) merge heavy hitters correctly [GH-353 regression test]" in {
@@ -457,7 +494,7 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val aggregated = cms1 ++ cms2 ++ cms3 ++ cms4
 
       val single = monoid.create(singleData)
-      aggregated.heavyHitters should be(single.heavyHitters)
+      aggregated.heavyHitters should equal(single.heavyHitters)
       aggregated.heavyHitters contains (3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
@@ -465,32 +502,32 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
-      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
       val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
-      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
       val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
-      cms3.heavyHitters should be(Set(5))
+      cms3.heavyHitters should equal(Set(5).toK[K])
 
       val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
-      cms4.heavyHitters should be(Set[K]())
+      cms4.heavyHitters should equal(Set[K]())
     }
 
     "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
-      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
       val cms2 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
-      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
       val cms3 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
-      cms3.heavyHitters should be(Set(5))
+      cms3.heavyHitters should equal(Set(5).toK[K])
 
       val cms4 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
-      cms4.heavyHitters should be(Set[K]())
+      cms4.heavyHitters should equal(Set[K]())
     }
 
   }
@@ -545,29 +582,29 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val heavyHittersN = 2
       val monoid = TopNCMS.monoid[K](EPS, DELTA, SEED, heavyHittersN)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
-      cms1.heavyHitters should be(Set(1, 2))
+      cms1.heavyHitters should equal(Set(1, 2).toK[K])
       val cms2 = cms1 ++ monoid.create(Seq(3, 3, 3).toK[K])
-      cms2.heavyHitters should be(Set(2, 3))
+      cms2.heavyHitters should equal(Set(2, 3).toK[K])
       val cms3 = cms2 ++ monoid.create(Seq(1, 1, 1).toK[K])
-      cms3.heavyHitters should be(Set(3, 1))
+      cms3.heavyHitters should equal(Set(3, 1).toK[K])
       val cms4 = cms3 ++ monoid.create(Seq(6, 6, 6, 6, 6, 6).toK[K])
-      cms4.heavyHitters should be(Set(1, 6))
+      cms4.heavyHitters should equal(Set(1, 6).toK[K])
     }
 
     "(when adding individual items) drop old heavy hitters when new heavy hitters replace them" in {
       val monoid = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3)
       val cms1 = monoid.create(Seq(1, 2, 2).toK[K])
-      cms1.heavyHitters should be(Set(1, 2))
+      cms1.heavyHitters should equal(Set(1, 2).toK[K])
 
       val cms2 = cms1 + 2.toK[K]
-      cms2.heavyHitters should be(Set(2))
+      cms2.heavyHitters should equal(Set(2).toK[K])
 
       val cms3 = cms2 + 1.toK[K]
-      cms3.heavyHitters should be(Set(1, 2))
+      cms3.heavyHitters should equal(Set(1, 2).toK[K])
 
       val heaviest = 0.toK[K]
       val cms4 = cms3 + heaviest + heaviest + heaviest + heaviest + heaviest + heaviest
-      cms4.heavyHitters should be(Set(heaviest))
+      cms4.heavyHitters should equal(Set(heaviest))
     }
 
     // This test documents the order bias of top-N CMS, i.e. it's a negative test case.
@@ -606,7 +643,7 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val aggregated = cms1 ++ cms2 ++ cms3 ++ cms4
 
       val single = monoid.create(singleData)
-      aggregated.heavyHitters shouldNot be(single.heavyHitters)
+      aggregated.heavyHitters shouldNot equal(single.heavyHitters)
       aggregated.heavyHitters shouldNot contain(3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
@@ -646,7 +683,7 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val aggregated = cms3 + 3.toK[K] + 8.toK[K] + 8.toK[K] + 8.toK[K] + 9.toK[K] + 9.toK[K] // "++ data4"
 
       val single = monoid.create(singleData)
-      aggregated.heavyHitters should be(single.heavyHitters)
+      aggregated.heavyHitters should equal(single.heavyHitters)
       aggregated.heavyHitters should contain(3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
@@ -654,38 +691,38 @@ abstract class CMSTest[K: CMSHasher: Numeric] extends WordSpec with Matchers wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
-      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
       val cms2 = TopNCMS.monoid[K](EPS, DELTA, SEED, 4).create(data1)
-      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
       val cms3 = TopNCMS.monoid[K](EPS, DELTA, SEED, 3).create(data1)
-      cms3.heavyHitters should be(Set(3, 4, 5))
+      cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
 
       val cms4 = TopNCMS.monoid[K](EPS, DELTA, SEED, 2).create(data1)
-      cms4.heavyHitters should be(Set(4, 5))
+      cms4.heavyHitters should equal(Set(4, 5).toK[K])
 
       val cms5 = TopNCMS.monoid[K](EPS, DELTA, SEED, 1).create(data1)
-      cms5.heavyHitters should be(Set(5))
+      cms5.heavyHitters should equal(Set(5).toK[K])
     }
 
     "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val cms1 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 5).apply(data1)
-      cms1.heavyHitters should be(Set(1, 2, 3, 4, 5))
+      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
       val cms2 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 4).apply(data1)
-      cms2.heavyHitters should be(Set(2, 3, 4, 5))
+      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
       val cms3 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 3).apply(data1)
-      cms3.heavyHitters should be(Set(3, 4, 5))
+      cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
 
       val cms4 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 2).apply(data1)
-      cms4.heavyHitters should be(Set(4, 5))
+      cms4.heavyHitters should equal(Set(4, 5).toK[K])
 
       val cms5 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 1).apply(data1)
-      cms5.heavyHitters should be(Set(5))
+      cms5.heavyHitters should equal(Set(5).toK[K])
     }
 
   }
@@ -779,11 +816,11 @@ class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
 class CMSHasherShortSpec extends CMSHasherSpec[Short]
 class CMSHasherIntSpec extends CMSHasherSpec[Int]
 class CMSHasherLongSpec extends CMSHasherSpec[Long]
+class CMSHasherArrayByteSpec extends CMSHasherSpec[Array[Byte]]
 class CMSHasherBigIntSpec extends CMSHasherSpec[BigInt]
+class CMSHasherStringSpec extends CMSHasherSpec[String]
 
-abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with Matchers {
-
-  import TestImplicits._
+abstract class CMSHasherSpec[K: CMSHasher: FromIntLike] extends PropSpec with PropertyChecks with Matchers {
 
   property("returns positive hashes (i.e. slots) only") {
     forAll { (a: Int, b: Int, width: Int, x: Int) =>
@@ -835,21 +872,22 @@ class LegacyCMSSpec extends WordSpec with Matchers {
 
 }
 
-object TestImplicits {
+object CmsTestImplicits {
 
   // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
   // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
   // with the existing `to[Col]` method in Scala.
+
   implicit class IntCast(x: Int) {
-    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
+    def toK[T: FromIntLike]: T = implicitly[FromIntLike[T]].fromInt(x)
   }
 
   implicit class SeqCast(xs: Seq[Int]) {
-    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
+    def toK[T: FromIntLike]: Seq[T] = xs map { _.toK[T] }
   }
 
   implicit class SetCast(xs: Set[Int]) {
-    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
+    def toK[T: FromIntLike]: Set[T] = xs map { _.toK[T] }
   }
 
 }

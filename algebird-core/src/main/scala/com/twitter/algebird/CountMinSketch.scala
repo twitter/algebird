@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.immutable.SortedSet
+import scala.reflect.ClassTag
 
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
@@ -116,6 +117,14 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Mon
    */
   def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
+  /**
+   * Creates a CMS monoid of type `L` from a CMS monoid of type `K`, given a "translation" function `f: L => K`.
+   *
+   * If, for example, you have a type `L` that is not supported out of the box by the CMS implementation in Algebird
+   * -- unlike e.g. `Long`, `Array[Byte]`, `String` -- but you can provide a function to, say, convert `L` into an
+   * `Array[Byte]` (a typical serialization operation), then `contramap` can convert a `CMSMonoid[Array[Byte]]` into the
+   * desired `CMSMonoid[L]`.
+   */
   def contramap[L](f: L => K): CMSMonoid[L] = {
     implicit val hashingL: CMSHasher[L] = implicitly[CMSHasher[K]].on(f)
     new CMSMonoid[L](eps, delta, seed)
@@ -650,7 +659,7 @@ sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
 /**
  * Zero element.  Used for initialization.
  */
-case class TopCMSZero[K](override val cms: CMS[K], params: TopCMSParams[K])
+case class TopCMSZero[K: ClassTag](override val cms: CMS[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set.empty[K]
@@ -664,7 +673,7 @@ case class TopCMSZero[K](override val cms: CMS[K], params: TopCMSParams[K])
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class TopCMSItem[K](item: K, override val cms: CMS[K], params: TopCMSParams[K])
+case class TopCMSItem[K: ClassTag](item: K, override val cms: CMS[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set(item)
@@ -686,13 +695,13 @@ case class TopCMSItem[K](item: K, override val cms: CMS[K], params: TopCMSParams
 
 object TopCMSInstance {
 
-  def apply[K](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
+  def apply[K: ClassTag](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
     TopCMSInstance[K](cms, HeavyHitters.empty[K], params)
   }
 
 }
 
-case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
+case class TopCMSInstance[K: ClassTag](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override def heavyHitters: Set[K] = hhs.items
@@ -720,7 +729,7 @@ case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], par
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
-abstract class HeavyHittersLogic[K] extends java.io.Serializable {
+abstract class HeavyHittersLogic[K: ClassTag] extends java.io.Serializable {
 
   implicit val orderingHeavyHitterK = HeavyHitter.ordering[K]
 
@@ -753,7 +762,7 @@ abstract class HeavyHittersLogic[K] extends java.io.Serializable {
  * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
  * This parameter can thus control the memory footprint required for tracking heavy hitters.
  */
-case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
+case class TopPctLogic[K: ClassTag](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
 
   require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
@@ -775,7 +784,7 @@ case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] 
  *
  * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
  */
-case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
+case class TopNLogic[K: ClassTag](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
@@ -807,13 +816,13 @@ case class HeavyHitters[K](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Seria
 
 object HeavyHitters {
 
-  def empty[K]: HeavyHitters[K] = HeavyHitters(emptyHhs)
+  def empty[K: ClassTag]: HeavyHitters[K] = HeavyHitters(emptyHhs)
 
-  private def emptyHhs[K]: SortedSet[HeavyHitter[K]] = SortedSet[HeavyHitter[K]]()(HeavyHitter.ordering[K])
+  private def emptyHhs[K: ClassTag]: SortedSet[HeavyHitter[K]] = SortedSet[HeavyHitter[K]]()(HeavyHitter.ordering[K])
 
-  def from[K](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = hhs.foldLeft(empty[K])(_ + _)
+  def from[K: ClassTag](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = hhs.foldLeft(empty[K])(_ + _)
 
-  def from[K](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
+  def from[K: ClassTag](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
 
 }
 
@@ -821,13 +830,23 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
 
 object HeavyHitter {
 
+  import scala.reflect._
+
   // Note that we can't define the ordering on `count` only.  We use a set to track heavy hitters, where equality means
   // two elements are identical.  If we were to use `count` only, we would label different items in heavy hitters as
   // identical simply because they have the same count (and such false duplicates may happen easily in practice).  For
   // this reason we need to add another dimension to the ordering to prevent such false duplicates.  For this second
   // dimension we use an item's default Java hash code because we do not want to introduce an `Ordering` constraint.
-  def ordering[K]: Ordering[HeavyHitter[K]] =
-    Ordering.by[HeavyHitter[K], (Long, Int)] { hh => (hh.count, hh.item.hashCode()) }
+  def ordering[K: ClassTag]: Ordering[HeavyHitter[K]] = {
+    val ct = implicitly[ClassTag[K]]
+    ct match {
+      // We must special-case Array instances because here, unfortunately, `Array(1).hashCode != Array(1).hashCode`.
+      case _ if ct.runtimeClass.isArray =>
+        Ordering.by[HeavyHitter[K], (Long, Int)] { hh => (hh.count, hh.item.asInstanceOf[Array[_]].toSeq.hashCode()) }
+      case _ =>
+        Ordering.by[HeavyHitter[K], (Long, Int)] { hh => (hh.count, hh.item.hashCode()) }
+    }
+  }
 
 }
 
@@ -851,7 +870,7 @@ object HeavyHitter {
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
+class TopPctCMSMonoid[K: ClassTag](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopPctLogic[K](heavyHittersPct)
@@ -886,25 +905,25 @@ class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Mo
 
 object TopPctCMS {
 
-  def monoid[K: CMSHasher](eps: Double,
+  def monoid[K: ClassTag: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
-  def monoid[K: CMSHasher](depth: Int,
+  def monoid[K: ClassTag: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
-  def aggregator[K: CMSHasher](eps: Double,
+  def aggregator[K: ClassTag: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
-  def aggregator[K: CMSHasher](depth: Int,
+  def aggregator[K: ClassTag: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
@@ -915,10 +934,15 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopPctCMSAggregator[K: ClassTag](cmsMonoid: TopPctCMSMonoid[K])
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
   def monoid = cmsMonoid
+
   def prepare(value: K): TopCMS[K] = monoid.create(value)
+
   def present(cms: TopCMS[K]): TopCMS[K] = cms
+
 }
 
 /**
@@ -965,7 +989,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidA
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
+class TopNCMSMonoid[K: ClassTag](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopNLogic[K](heavyHittersN)
@@ -998,25 +1022,25 @@ class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[Top
 
 object TopNCMS {
 
-  def monoid[K: CMSHasher](eps: Double,
+  def monoid[K: ClassTag: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
 
-  def monoid[K: CMSHasher](depth: Int,
+  def monoid[K: ClassTag: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
-  def aggregator[K: CMSHasher](eps: Double,
+  def aggregator[K: ClassTag: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
     new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
 
-  def aggregator[K: CMSHasher](depth: Int,
+  def aggregator[K: ClassTag: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
@@ -1027,8 +1051,9 @@ object TopNCMS {
 /**
  * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
  */
-case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
+case class TopNCMSAggregator[K: ClassTag](cmsMonoid: TopNCMSMonoid[K])
   extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
   val monoid = cmsMonoid
 
   def prepare(value: K): TopCMS[K] = monoid.create(value)
