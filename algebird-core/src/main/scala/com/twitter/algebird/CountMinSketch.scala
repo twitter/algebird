@@ -1151,10 +1151,9 @@ object CMSHasherImplicits {
       CMSHasherArrayByte.hash(a, b, width)(x.toByteArray)
   }
 
-  // TODO: We should support hashing Strings directly, but we'd need another type to showcase CMS[K]->CMS[L] in tests.
-  // implicit object CMSHasherString extends CMSHasher[String] {
-  //  override def hash(a: Int, b: Int, width: Int)(x: String): Int =
-  //    CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
-  //}
+  implicit object CMSHasherString extends CMSHasher[String] {
+    override def hash(a: Int, b: Int, width: Int)(x: String): Int =
+      CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
+  }
 
 }
