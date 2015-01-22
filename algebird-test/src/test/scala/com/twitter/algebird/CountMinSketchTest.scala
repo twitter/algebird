@@ -89,36 +89,49 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-// TODO: This is IMHO not a good way to test the CMS[K]->CMS[L] functionality.  But it was the quickest test to write.
-//       We should come up with a different testing approach.  Unfortunately, I haven't found an elegant way yet to
-//       plug CMS[K]->CMS[L] conversion into our "parameterized" CMSTest[K] abstract class below.
-class CMSStringTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+/**
+ * Verifies contramap functionality, which allows us to translate `CMS[K]` into `CMS[L]`, given `f: L => K`.
+ */
+class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  val DELTA = 1E-10
-  val EPS = 0.001
-  val SEED = 1
+  "translates CMS[K] into CMS[L], given a function f: L => K" in {
+    // Given a "source" CMS[K] monoid...
+    val sourceCMSMonoid = {
+      val anyDelta = 1E-10
+      val anyEps = 0.001
+      val anySeed = 1
+      CMS.monoid[Array[Byte]](anyEps, anyDelta, anySeed)
+    }
+    // ...and a translation function from L to K.
+    def f(d: Double): Array[Byte] = {
+      val l: Long = java.lang.Double.doubleToLongBits(d)
+      java.nio.ByteBuffer.allocate(8).putLong(l).array()
+    }
 
-  val COUNTING_CMS_MONOID = CMS.monoid[Array[Byte]](EPS, DELTA, SEED).contramap((s: String) => s.getBytes("UTF-8"))
+    // When we run contramap on a CMS[K] monoid supplying f, then the result should be a CMS[L] monoid.
+    val targetCMSMonoid: CMSMonoid[Double] = sourceCMSMonoid.contramap((d: Double) => f(d))
+    targetCMSMonoid shouldBe a [CMSMonoid[_]] // Can't test CMSMonoid[Double] specifically because of type erasure.
 
-  "exactly compute frequencies in a small stream" in {
-    val one = COUNTING_CMS_MONOID.create("one")
-    one.frequency("one").estimate should be(1)
-    one.frequency("two").estimate should be(0)
-    val two = COUNTING_CMS_MONOID.create("two")
-    two.frequency("one").estimate should be(0)
-    two.frequency("two").estimate should be(1)
-    val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
+    // Additionally we perform a basic smoke test of the resulting CMS monoid.
+    // This test mimics the "exactly compute frequencies in a small stream" scenario in the full-fledged CMS spec.
+    val one = targetCMSMonoid.create(1.0)
+    one.frequency(1.0).estimate should be(1)
+    one.frequency(2.0).estimate should be(0)
+    val two = targetCMSMonoid.create(2.0)
+    two.frequency(1.0).estimate should be(0)
+    two.frequency(2.0).estimate should be(1)
+    val cms = targetCMSMonoid.plus(targetCMSMonoid.plus(one, two), two)
 
-    cms.frequency("zero").estimate should be(0)
-    cms.frequency("one").estimate should be(1)
-    cms.frequency("two").estimate should be(2)
+    cms.frequency(0.0).estimate should be(0)
+    cms.frequency(1.0).estimate should be(1)
+    cms.frequency(2.0).estimate should be(2)
 
-    val three = COUNTING_CMS_MONOID.create(Seq("one", "one", "one"))
-    three.frequency("one").estimate should be(3)
-    val four = COUNTING_CMS_MONOID.create(Seq("one", "one", "one", "one"))
-    four.frequency("one").estimate should be(4)
-    val cms2 = COUNTING_CMS_MONOID.plus(four, three)
-    cms2.frequency("one").estimate should be(7)
+    val three = targetCMSMonoid.create(Seq(1.0, 1.0, 1.0))
+    three.frequency(1.0).estimate should be(3)
+    val four = targetCMSMonoid.create(Seq(1.0, 1.0, 1.0, 1.0))
+    four.frequency(1.0).estimate should be(4)
+    val cms2 = targetCMSMonoid.plus(four, three)
+    cms2.frequency(1.0).estimate should be(7)
   }
 
 }
