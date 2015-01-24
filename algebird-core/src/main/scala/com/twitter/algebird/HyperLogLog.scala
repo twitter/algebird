@@ -451,3 +451,15 @@ case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends Monoi
   def prepare(value: Array[Byte]) = monoid.create(value)
   def present(hll: HLL) = hll
 }
+
+case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
+  extends EventuallyMonoidAggregator[A, HLL, Set[A], Long] {
+
+  def presentLeft(hll: HLL) = hll.approximateSize.estimate
+
+  def mustConvert(set: Set[A]) = set.size > maxSetSize
+  def convert(set: Set[A]) = leftSemigroup.batchCreate(set.map(toBytes))
+
+  val leftSemigroup = new HyperLogLogMonoid(hllBits)
+  val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
+}
