@@ -4,20 +4,28 @@ import sbt._
 
 object GenTupleAggregators {
   def gen(dir: File) = {
-    val place = dir / "com" / "twitter" / "algebird" / "GeneratedTupleAggregators.scala"
-    IO.write(place,
+    val tupleAggPlace = dir / "com" / "twitter" / "algebird" / "GeneratedTupleAggregators.scala"
+    IO.write(tupleAggPlace,
 """package com.twitter.algebird
 
 object GeneratedTupleAggregator extends GeneratedTupleAggregator
 
 trait GeneratedTupleAggregator {
-""" + genAggregators(22) + "\n" + "}")
+""" + genMethods(22, "implicit def", None) + "\n" + "}")
 
-    Seq(place)
+    val multiAggPlace = dir / "com" / "twitter" / "algebird" / "MultiAggregator.scala"
+    IO.write(multiAggPlace,
+"""package com.twitter.algebird
+
+object MultiAggregator {
+""" + genMethods(22, "def", Some("apply")) + "\n" + "}")
+
+    Seq(tupleAggPlace, multiAggPlace)
   }
 
-  def genAggregators(max: Int): String = {
+  def genMethods(max: Int, defStr: String, name: Option[String]): String = {
     (2 to max).map(i => {
+      val methodName = name.getOrElse("from%d".format(i))
       val nums = (1 to i)
       val bs = nums.map("B" + _).mkString(", ")
       val cs = nums.map("C" + _).mkString(", ")
@@ -30,13 +38,13 @@ trait GeneratedTupleAggregator {
       val tupleCs = "Tuple%d[%s]".format(i, cs)
 
       """
-implicit def from%d[A, %s, %s](aggs: Tuple%d[%s]): Aggregator[A, %s, %s] = {
+%s %s[A, %s, %s](aggs: Tuple%d[%s]): Aggregator[A, %s, %s] = {
   new Aggregator[A, %s, %s] {
     def prepare(a: A) = (%s)
     val semigroup = %s
     def present(b: %s) = (%s)
   }
-}""".format(i, bs, cs, i, aggs, tupleBs, tupleCs,
+}""".format(defStr, methodName, bs, cs, i, aggs, tupleBs, tupleCs,
             tupleBs, tupleCs,
             prepares,
             semigroup,
