@@ -206,20 +206,19 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
     forAll(
       (Gen.choose(1, 709), "depth"),
       (Gen.choose(minWidth, 10000), "width"),
-      (Gen.choose(Int.MinValue, Int.MaxValue), "seed")
-    ) { (depth: Int, width: Int, seed: Int) =>
-      val cms1: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.01).create(data1)
-      cms1.heavyHitters should equal(Set(1.0, 2.0, 3.0, 4.0, 5.0))
+      (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+        val cms1: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.01).create(data1)
+        cms1.heavyHitters should equal(Set(1.0, 2.0, 3.0, 4.0, 5.0))
 
-      val cms2: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.1).create(data1)
-      cms2.heavyHitters should equal(Set(2.0, 3.0, 4.0, 5.0))
+        val cms2: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.1).create(data1)
+        cms2.heavyHitters should equal(Set(2.0, 3.0, 4.0, 5.0))
 
-      val cms3: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.3).create(data1)
-      cms3.heavyHitters should equal(Set(5.0))
+        val cms3: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.3).create(data1)
+        cms3.heavyHitters should equal(Set(5.0))
 
-      val cms4: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.9).create(data1)
-      cms4.heavyHitters should equal(Set.empty[Double])
-    }
+        val cms4: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.9).create(data1)
+        cms4.heavyHitters should equal(Set.empty[Double])
+      }
   }
 
 }
@@ -560,33 +559,53 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
     "exactly compute heavy hitters when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
-      val cms1 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.01).create(data1)
-      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
+      val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
+      val minWidth =
+        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
+        else data1.distinct.size
 
-      val cms2 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.1).create(data1)
-      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
+      forAll(
+        (Gen.choose(minDepth, 709), "depth"),
+        (Gen.choose(minWidth, 10000), "width"),
+        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+          val cms1 = TopPctCMS.monoid[K](depth, width, seed, 0.01).create(data1)
+          cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
-      val cms3 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.3).create(data1)
-      cms3.heavyHitters should equal(Set(5).toK[K])
+          val cms2 = TopPctCMS.monoid[K](depth, width, seed, 0.1).create(data1)
+          cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
-      val cms4 = TopPctCMS.monoid[K](EPS, DELTA, SEED, 0.9).create(data1)
-      cms4.heavyHitters should equal(Set[K]())
+          val cms3 = TopPctCMS.monoid[K](depth, width, seed, 0.3).create(data1)
+          cms3.heavyHitters should equal(Set(5).toK[K])
+
+          val cms4 = TopPctCMS.monoid[K](depth, width, seed, 0.9).create(data1)
+          cms4.heavyHitters should equal(Set[K]())
+        }
     }
 
     "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
-      val cms1 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.01).apply(data1)
-      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
+      val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
+      val minWidth =
+        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
+        else data1.distinct.size
 
-      val cms2 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.1).apply(data1)
-      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
+      forAll(
+        (Gen.choose(minDepth, 709), "depth"),
+        (Gen.choose(minWidth, 10000), "width"),
+        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+          val cms1 = TopPctCMS.aggregator[K](depth, width, seed, 0.01).apply(data1)
+          cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
-      val cms3 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.3).apply(data1)
-      cms3.heavyHitters should equal(Set(5).toK[K])
+          val cms2 = TopPctCMS.aggregator[K](depth, width, seed, 0.1).apply(data1)
+          cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
-      val cms4 = TopPctCMS.aggregator[K](EPS, DELTA, SEED, 0.9).apply(data1)
-      cms4.heavyHitters should equal(Set[K]())
+          val cms3 = TopPctCMS.aggregator[K](depth, width, seed, 0.3).apply(data1)
+          cms3.heavyHitters should equal(Set(5).toK[K])
+
+          val cms4 = TopPctCMS.aggregator[K](depth, width, seed, 0.9).apply(data1)
+          cms4.heavyHitters should equal(Set[K]())
+        }
     }
 
   }
@@ -749,39 +768,59 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
     "exactly compute heavy hitters when created a from single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
-      val cms1 = TopNCMS.monoid[K](EPS, DELTA, SEED, 5).create(data1)
-      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
+      val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
+      val minWidth =
+        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
+        else data1.distinct.size
 
-      val cms2 = TopNCMS.monoid[K](EPS, DELTA, SEED, 4).create(data1)
-      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
+      forAll(
+        (Gen.choose(minDepth, 709), "depth"),
+        (Gen.choose(minWidth, 10000), "width"),
+        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+          val cms1 = TopNCMS.monoid[K](depth, width, seed, 5).create(data1)
+          cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
-      val cms3 = TopNCMS.monoid[K](EPS, DELTA, SEED, 3).create(data1)
-      cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
+          val cms2 = TopNCMS.monoid[K](depth, width, seed, 4).create(data1)
+          cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
-      val cms4 = TopNCMS.monoid[K](EPS, DELTA, SEED, 2).create(data1)
-      cms4.heavyHitters should equal(Set(4, 5).toK[K])
+          val cms3 = TopNCMS.monoid[K](depth, width, seed, 3).create(data1)
+          cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
 
-      val cms5 = TopNCMS.monoid[K](EPS, DELTA, SEED, 1).create(data1)
-      cms5.heavyHitters should equal(Set(5).toK[K])
+          val cms4 = TopNCMS.monoid[K](depth, width, seed, 2).create(data1)
+          cms4.heavyHitters should equal(Set(4, 5).toK[K])
+
+          val cms5 = TopNCMS.monoid[K](depth, width, seed, 1).create(data1)
+          cms5.heavyHitters should equal(Set(5).toK[K])
+        }
     }
 
     "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
-      val cms1 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 5).apply(data1)
-      cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
+      val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
+      val minWidth =
+        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
+        else data1.distinct.size
 
-      val cms2 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 4).apply(data1)
-      cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
+      forAll(
+        (Gen.choose(minDepth, 709), "depth"),
+        (Gen.choose(minWidth, 10000), "width"),
+        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+          val cms1 = TopNCMS.aggregator[K](depth, width, seed, 5).apply(data1)
+          cms1.heavyHitters should equal(Set(1, 2, 3, 4, 5).toK[K])
 
-      val cms3 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 3).apply(data1)
-      cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
+          val cms2 = TopNCMS.aggregator[K](depth, width, seed, 4).apply(data1)
+          cms2.heavyHitters should equal(Set(2, 3, 4, 5).toK[K])
 
-      val cms4 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 2).apply(data1)
-      cms4.heavyHitters should equal(Set(4, 5).toK[K])
+          val cms3 = TopNCMS.aggregator[K](depth, width, seed, 3).apply(data1)
+          cms3.heavyHitters should equal(Set(3, 4, 5).toK[K])
 
-      val cms5 = TopNCMS.aggregator[K](EPS, DELTA, SEED, 1).apply(data1)
-      cms5.heavyHitters should equal(Set(5).toK[K])
+          val cms4 = TopNCMS.aggregator[K](depth, width, seed, 2).apply(data1)
+          cms4.heavyHitters should equal(Set(4, 5).toK[K])
+
+          val cms5 = TopNCMS.aggregator[K](depth, width, seed, 2).apply(data1)
+          cms5.heavyHitters should equal(Set(4, 5).toK[K])
+        }
     }
 
   }
