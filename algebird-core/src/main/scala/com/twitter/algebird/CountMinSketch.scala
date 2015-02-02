@@ -62,15 +62,25 @@ import scala.reflect.ClassTag
 /**
  * Monoid for adding [[CMS]] sketches.
  *
+ * =Usage=
+ *
  * `eps` and `delta` are parameters that bound the error of each query estimate. For example, errors in
  * answering point queries (e.g., how often has element x appeared in the stream described by the sketch?)
  * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
  * some factor depending on eps."
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as `Array[Byte]`, and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
  *
  * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
@@ -840,10 +850,20 @@ object HeavyHitter {
 /**
  * Monoid for Top-% based [[TopCMS]] sketches.
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * =Usage=
+ *
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as `Array[Byte]`, and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
  *
  * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
  * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
@@ -960,10 +980,18 @@ case class TopPctCMSAggregator[K: ClassTag](cmsMonoid: TopPctCMSMonoid[K])
  *
  * =Usage=
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as `Array[Byte]`, and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
  *
  * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
  * @param heavyHittersN The maximum number of heavy hitters to track.
@@ -1054,6 +1082,19 @@ case class TopNCMSAggregator[K: ClassTag](cmsMonoid: TopNCMSMonoid[K])
  * family of the form:
  *
  * `h(x) = [a * x + b (mod p)] (mod m)`
+ *
+ * As a requirement for using CMS you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to
+ * count.  Algebird ships with several such implicits for commonly used types `K` such as [[Long]] and [[BigInt]]:
+ *
+ * {{{
+ * import com.twitter.algebird.CMSHasherImplicits._
+ * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as `Array[Byte]`, and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of `contramap`
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
  */
 trait CMSHasher[K] extends java.io.Serializable {
 
@@ -1078,6 +1119,17 @@ trait CMSHasher[K] extends java.io.Serializable {
    *
    * {{{
    * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
+   * }}}
+   *
+   * Example of creating a CMSHasher for the unsupported type `K=Double`:
+   *
+   * {{{
+   * def f(d: Double): Array[Byte] = {
+   *   val l: Long = java.lang.Double.doubleToLongBits(d)
+   *   java.nio.ByteBuffer.allocate(8).putLong(l).array()
+   * }
+   *
+   * implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => f(d))
    * }}}
    */
   def contramap[L](f: L => K)(implicit hasher: CMSHasher[K]) = on(f)
