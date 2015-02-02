@@ -119,7 +119,7 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
 }
 
 /**
- * Verifies contramap functionality, which allows us to translate `CMS[K]` into `CMS[L]`, given `f: L => K`.
+ * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
  */
 class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -161,6 +161,105 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
     four.frequency(1.0).estimate should be(4)
     val cms2 = targetCMSMonoid.plus(four, three)
     cms2.frequency(1.0).estimate should be(7)
+  }
+
+  "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
+    // Given a "source" CMSHasher[K]
+    val sourceHasher: CMSHasher[Array[Byte]] = CMSHasherArrayByte
+    // and a translation function from L to K.
+    def f(d: Double): Array[Byte] = {
+      val l: Long = java.lang.Double.doubleToLongBits(d)
+      java.nio.ByteBuffer.allocate(8).putLong(l).array()
+    }
+
+    // When we run contramap on a CMSHasher[K] supplying f,
+    // then the result should be a CMSHasher[L]...
+    val targetHasher: CMSHasher[Double] = sourceHasher.contramap((d: Double) => f(d))
+    targetHasher shouldBe an[CMSHasher[_]] // Can't test CMSHasher[Double] specifically because of type erasure.
+
+    // ...and hashing should work correctly (this is only a smoke test).
+    val a = 4
+    val b = 0
+    val width = 1234
+    targetHasher.hash(a, b, width)(4.2) should be(206)
+  }
+
+  "supports, via contramap, creating CMS monoids for such types K that are not supported out of the box" in {
+    // Given a "source" CMSHasher[K] which is supported out of the box
+    val sourceHasher: CMSHasher[Array[Byte]] = CMSHasherArrayByte
+    // and a translation function from L to K
+    def f(d: Double): Array[Byte] = {
+      val l: Long = java.lang.Double.doubleToLongBits(d)
+      java.nio.ByteBuffer.allocate(8).putLong(l).array()
+    }
+
+    // When we create a monoid for an unsupported type K (here: Double)
+    implicit val hasherDouble = sourceHasher.contramap((d: Double) => f(d))
+    val doubleMonoid: CMSMonoid[Double] = {
+      val anyDelta = 1E-10
+      val anyEps = 0.001
+      val anySeed = 1
+      CMS.monoid[Double](anyEps, anyDelta, anySeed)
+    }
+
+    // Then we should be able to create CMS monoids for K.
+    // To verify this we perform a basic smoke test of the resulting monoids.  This test mimics the "exactly compute
+    // frequencies in a small stream" scenario in the full-fledged CMS spec.
+    val one = doubleMonoid.create(1.0)
+    one.frequency(1.0).estimate should be(1)
+    one.frequency(2.0).estimate should be(0)
+    val two = doubleMonoid.create(2.0)
+    two.frequency(1.0).estimate should be(0)
+    two.frequency(2.0).estimate should be(1)
+    val cms = doubleMonoid.plus(doubleMonoid.plus(one, two), two)
+
+    cms.frequency(0.0).estimate should be(0)
+    cms.frequency(1.0).estimate should be(1)
+    cms.frequency(2.0).estimate should be(2)
+
+    val three = doubleMonoid.create(Seq(1.0, 1.0, 1.0))
+    three.frequency(1.0).estimate should be(3)
+    val four = doubleMonoid.create(Seq(1.0, 1.0, 1.0, 1.0))
+    four.frequency(1.0).estimate should be(4)
+    val cms2 = doubleMonoid.plus(four, three)
+    cms2.frequency(1.0).estimate should be(7)
+  }
+
+  "supports, via contramap, creating TopPctCMS monoids for such types K that are not supported out of the box" in {
+    // Given a "source" CMSHasher[K] which is supported out of the box
+    val sourceHasher: CMSHasher[Array[Byte]] = CMSHasherArrayByte
+    // and a translation function from L to K
+    def f(d: Double): Array[Byte] = {
+      val l: Long = java.lang.Double.doubleToLongBits(d)
+      java.nio.ByteBuffer.allocate(8).putLong(l).array()
+    }
+
+    // When we create a monoid for an unsupported type K (here: Double)
+    implicit val hasherDouble = sourceHasher.contramap((d: Double) => f(d))
+
+    // Then we should be able to create TopPctCMS monoids for K.
+    // To verify this we perform a basic smoke test of the resulting monoids.  This test mimics the "exactly compute
+    // heavy hitters when created from a single, small stream" scenario in the full-fledged TopPctCMS spec.
+    val data1: Seq[Double] = Seq(1.0, 2.0, 2.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0)
+    val minWidth = data1.distinct.size
+
+    forAll(
+      (Gen.choose(1, 709), "depth"),
+      (Gen.choose(minWidth, 10000), "width"),
+      (Gen.choose(Int.MinValue, Int.MaxValue), "seed")
+    ) { (depth: Int, width: Int, seed: Int) =>
+      val cms1: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.01).create(data1)
+      cms1.heavyHitters should equal(Set(1.0, 2.0, 3.0, 4.0, 5.0))
+
+      val cms2: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.1).create(data1)
+      cms2.heavyHitters should equal(Set(2.0, 3.0, 4.0, 5.0))
+
+      val cms3: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.3).create(data1)
+      cms3.heavyHitters should equal(Set(5.0))
+
+      val cms4: TopCMS[Double] = TopPctCMS.monoid[Double](depth, width, seed, 0.9).create(data1)
+      cms4.heavyHitters should equal(Set.empty[Double])
+    }
   }
 
 }

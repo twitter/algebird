@@ -1088,6 +1088,15 @@ trait CMSHasher[K] extends java.io.Serializable {
     override def hash(a: Int, b: Int, width: Int)(x: L): Int = hasher.hash(a, b, width)(f(x))
   }
 
+  /**
+   * Given `f`, a function from `L` into `K`, creates a `CMSHasher[L]` whose hash function is equivalent to:
+   *
+   * {{{
+   * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
+   * }}}
+   */
+  def contramap[L](f: L => K)(implicit hasher: CMSHasher[K]) = on(f)
+
 }
 
 case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) extends java.io.Serializable {
