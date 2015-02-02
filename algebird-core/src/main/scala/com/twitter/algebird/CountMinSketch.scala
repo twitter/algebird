@@ -1098,6 +1098,8 @@ case class TopNCMSAggregator[K: ClassTag](cmsMonoid: TopNCMSMonoid[K])
  */
 trait CMSHasher[K] extends java.io.Serializable {
 
+  self =>
+
   /**
    * Returns `a * x + b (mod p) (mod width)`.
    */
@@ -1110,8 +1112,8 @@ trait CMSHasher[K] extends java.io.Serializable {
    * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
    * }}}
    */
-  def on[L](f: L => K)(implicit hasher: CMSHasher[K]) = new CMSHasher[L] {
-    override def hash(a: Int, b: Int, width: Int)(x: L): Int = hasher.hash(a, b, width)(f(x))
+  def on[L](f: L => K) = new CMSHasher[L] {
+    override def hash(a: Int, b: Int, width: Int)(x: L): Int = self.hash(a, b, width)(f(x))
   }
 
   /**
@@ -1132,7 +1134,7 @@ trait CMSHasher[K] extends java.io.Serializable {
    * implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => f(d))
    * }}}
    */
-  def contramap[L](f: L => K)(implicit hasher: CMSHasher[K]) = on(f)
+  def contramap[L](f: L => K) = on(f)
 
 }
 
