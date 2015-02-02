@@ -1070,8 +1070,6 @@ case class TopNCMSAggregator[K: ClassTag](cmsMonoid: TopNCMSMonoid[K])
  */
 trait CMSHasher[K] extends java.io.Serializable {
 
-  val PRIME_MODULUS = Int.MaxValue
-
   /**
    * Returns `a * x + b (mod p) (mod width)`.
    */
@@ -1120,24 +1118,20 @@ object CMSHasherImplicits {
       // Apparently a super fast way of computing x mod 2^p-1
       // See page 149 of http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
       // after Proposition 7.
-      val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
+      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
       // Modulo-ing integers is apparently twice as fast as modulo-ing Longs.
       modded.toInt % width
     }
 
   }
 
-  implicit object CMSHasherShort extends CMSHasher[Short] {
-
-    override def hash(a: Int, b: Int, width: Int)(x: Short): Int = CMSHasherInt.hash(a, b, width)(x)
-
-  }
+  implicit val cmsHasherShort: CMSHasher[Short] = CMSHasherInt.contramap(x => x.toInt)
 
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
     override def hash(a: Int, b: Int, width: Int)(x: Int): Int = {
       val unModded: Int = (x * a) + b
-      val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
+      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
       modded.toInt % width
     }
 
@@ -1180,14 +1174,8 @@ object CMSHasherImplicits {
 
   }
 
-  implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
-    override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int =
-      CMSHasherArrayByte.hash(a, b, width)(x.toByteArray)
-  }
+  implicit val cmsHasherBigInt: CMSHasher[BigInt] = CMSHasherArrayByte.contramap((x: BigInt) => x.toByteArray)
 
-  implicit object CMSHasherString extends CMSHasher[String] {
-    override def hash(a: Int, b: Int, width: Int)(x: String): Int =
-      CMSHasherArrayByte.hash(a, b, width)(x.getBytes("UTF-8"))
-  }
+  implicit val cmsHasherString: CMSHasher[String] = CMSHasherArrayByte.contramap((x: String) => x.getBytes("UTF-8"))
 
 }
