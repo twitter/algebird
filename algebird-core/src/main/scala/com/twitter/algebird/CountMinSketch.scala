@@ -117,19 +117,6 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Mon
    */
   def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
 
-  /**
-   * Creates a CMS monoid of type `L` from a CMS monoid of type `K`, given a "translation" function `f: L => K`.
-   *
-   * If, for example, you have a type `L` that is not supported out of the box by the CMS implementation in Algebird
-   * -- unlike e.g. `Long`, `Array[Byte]`, `String` -- but you can provide a function to, say, convert `L` into an
-   * `Array[Byte]` (a typical serialization operation), then `contramap` can convert a `CMSMonoid[Array[Byte]]` into the
-   * desired `CMSMonoid[L]`.
-   */
-  def contramap[L](f: L => K): CMSMonoid[L] = {
-    implicit val hashingL: CMSHasher[L] = implicitly[CMSHasher[K]].on(f)
-    new CMSMonoid[L](eps, delta, seed)
-  }
-
 }
 
 /**

@@ -123,46 +123,6 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
  */
 class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  "translates CMS[K] into CMS[L], given a function f: L => K" in {
-    // Given a "source" CMS[K] monoid...
-    val sourceCMSMonoid = {
-      val anyDelta = 1E-10
-      val anyEps = 0.001
-      val anySeed = 1
-      CMS.monoid[Array[Byte]](anyEps, anyDelta, anySeed)
-    }
-    // ...and a translation function from L to K.
-    def f(d: Double): Array[Byte] = {
-      val l: Long = java.lang.Double.doubleToLongBits(d)
-      java.nio.ByteBuffer.allocate(8).putLong(l).array()
-    }
-
-    // When we run contramap on a CMS[K] monoid supplying f, then the result should be a CMS[L] monoid.
-    val targetCMSMonoid: CMSMonoid[Double] = sourceCMSMonoid.contramap((d: Double) => f(d))
-    targetCMSMonoid shouldBe a[CMSMonoid[_]] // Can't test CMSMonoid[Double] specifically because of type erasure.
-
-    // Additionally we perform a basic smoke test of the resulting CMS monoid.
-    // This test mimics the "exactly compute frequencies in a small stream" scenario in the full-fledged CMS spec.
-    val one = targetCMSMonoid.create(1.0)
-    one.frequency(1.0).estimate should be(1)
-    one.frequency(2.0).estimate should be(0)
-    val two = targetCMSMonoid.create(2.0)
-    two.frequency(1.0).estimate should be(0)
-    two.frequency(2.0).estimate should be(1)
-    val cms = targetCMSMonoid.plus(targetCMSMonoid.plus(one, two), two)
-
-    cms.frequency(0.0).estimate should be(0)
-    cms.frequency(1.0).estimate should be(1)
-    cms.frequency(2.0).estimate should be(2)
-
-    val three = targetCMSMonoid.create(Seq(1.0, 1.0, 1.0))
-    three.frequency(1.0).estimate should be(3)
-    val four = targetCMSMonoid.create(Seq(1.0, 1.0, 1.0, 1.0))
-    four.frequency(1.0).estimate should be(4)
-    val cms2 = targetCMSMonoid.plus(four, three)
-    cms2.frequency(1.0).estimate should be(7)
-  }
-
   "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
     // Given a "source" CMSHasher[K]
     val sourceHasher: CMSHasher[Array[Byte]] = CMSHasherArrayByte
