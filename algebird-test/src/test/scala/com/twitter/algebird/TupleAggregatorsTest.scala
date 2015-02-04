@@ -9,6 +9,9 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
   val data = List(1, 3, 2, 0, 5, 6)
   val MinAgg = Aggregator.min[Int]
 
+  val longData = data.map{ _.toLong }
+  val SizeAgg = Aggregator.size
+
   "GeneratedTupleAggregators" should {
     import GeneratedTupleAggregator._
 
@@ -226,9 +229,6 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
       assert(agg(data) == Tuple22(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
-    val longData = data.map{ _.toLong }
-    val SizeAgg = Aggregator.size
-
     "Create a MonoidAggregator from a tuple of 2 MonoidAggregators" in {
       val agg: MonoidAggregator[Long, Tuple2[Long, Long], Tuple2[Long, Long]] = MultiAggregator(SizeAgg, SizeAgg)
       assert(agg(longData) == Tuple2(6, 6))
@@ -332,6 +332,642 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     "Create a MonoidAggregator from a tuple of 22 MonoidAggregators" in {
       val agg: MonoidAggregator[Long, Tuple22[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long], Tuple22[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] = MultiAggregator(SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg)
       assert(agg(longData) == Tuple22(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
+    }
+  }
+
+  "MapAggregator" should {
+    import MapAggregator._
+
+    val MinLongAgg = Aggregator.min[Int].andThenPresent{ _.toLong }
+
+    "Create an aggregator from 2 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple2[Int, Long], Map[String, Long]] = MapAggregator(
+        ("key1", MinLongAgg),
+        ("key2", SizeAgg))
+      val expectedMap = Map(
+        "key1" -> 0,
+        "key2" -> 6)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 3 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple3[Int, Long, Int], Map[String, Long]] = MapAggregator(
+        ("key1", MinLongAgg),
+        ("key2", SizeAgg),
+        ("key3", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 0,
+        "key2" -> 6,
+        "key3" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 4 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple4[Int, Long, Int, Long], Map[String, Long]] = MapAggregator(
+        ("key1", MinLongAgg),
+        ("key2", SizeAgg),
+        ("key3", MinLongAgg),
+        ("key4", SizeAgg))
+      val expectedMap = Map(
+        "key1" -> 0,
+        "key2" -> 6,
+        "key3" -> 0,
+        "key4" -> 6)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 5 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple5[Long, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 6 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple6[Long, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 7 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple7[Long, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 8 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple8[Long, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 9 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple9[Long, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 10 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple10[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 11 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple11[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 12 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple12[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 13 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple13[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 14 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple14[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 15 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple15[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 16 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple16[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 17 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple17[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 18 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple18[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg),
+        ("key18", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0,
+        "key18" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 19 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple19[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg),
+        ("key18", MinLongAgg),
+        ("key19", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0,
+        "key18" -> 0,
+        "key19" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 20 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple20[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg),
+        ("key18", MinLongAgg),
+        ("key19", MinLongAgg),
+        ("key20", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0,
+        "key18" -> 0,
+        "key19" -> 0,
+        "key20" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 21 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple21[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg),
+        ("key18", MinLongAgg),
+        ("key19", MinLongAgg),
+        ("key20", MinLongAgg),
+        ("key21", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0,
+        "key18" -> 0,
+        "key19" -> 0,
+        "key20" -> 0,
+        "key21" -> 0)
+      assert(agg(data) == expectedMap)
+    }
+
+    "Create an aggregator from 22 (key, aggregator) pairs" in {
+      val agg: Aggregator[Int, Tuple22[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg),
+        ("key2", MinLongAgg),
+        ("key3", MinLongAgg),
+        ("key4", MinLongAgg),
+        ("key5", MinLongAgg),
+        ("key6", MinLongAgg),
+        ("key7", MinLongAgg),
+        ("key8", MinLongAgg),
+        ("key9", MinLongAgg),
+        ("key10", MinLongAgg),
+        ("key11", MinLongAgg),
+        ("key12", MinLongAgg),
+        ("key13", MinLongAgg),
+        ("key14", MinLongAgg),
+        ("key15", MinLongAgg),
+        ("key16", MinLongAgg),
+        ("key17", MinLongAgg),
+        ("key18", MinLongAgg),
+        ("key19", MinLongAgg),
+        ("key20", MinLongAgg),
+        ("key21", MinLongAgg),
+        ("key22", MinLongAgg))
+      val expectedMap = Map(
+        "key1" -> 6,
+        "key2" -> 0,
+        "key3" -> 0,
+        "key4" -> 0,
+        "key5" -> 0,
+        "key6" -> 0,
+        "key7" -> 0,
+        "key8" -> 0,
+        "key9" -> 0,
+        "key10" -> 0,
+        "key11" -> 0,
+        "key12" -> 0,
+        "key13" -> 0,
+        "key14" -> 0,
+        "key15" -> 0,
+        "key16" -> 0,
+        "key17" -> 0,
+        "key18" -> 0,
+        "key19" -> 0,
+        "key20" -> 0,
+        "key21" -> 0,
+        "key22" -> 0)
+      assert(agg(data) == expectedMap)
     }
   }
 }

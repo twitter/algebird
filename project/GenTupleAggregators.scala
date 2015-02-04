@@ -22,7 +22,16 @@ object MultiAggregator {
       genMethods(22, "def", Some("apply")) + "\n" +
       genMethods(22, "def", Some("apply"), true) + "\n" + "}")
 
-    Seq(tupleAggPlace, multiAggPlace)
+    val mapAggPlace = dir / "com" / "twitter" / "algebird" / "MapAggregator.scala"
+    IO.write(mapAggPlace,
+"""package com.twitter.algebird
+
+object MapAggregator {
+""" +
+      genMapMethods(22) + "\n" +
+      genMapMethods(22, true) + "\n" + "}")
+
+    Seq(tupleAggPlace, multiAggPlace, mapAggPlace)
   }
 
   def genMethods(max: Int, defStr: String, name: Option[String], isMonoid: Boolean = false): String = {
@@ -50,6 +59,34 @@ object MultiAggregator {
   }
 }""".format(defStr, methodName, bs, cs, i, aggs, aggType, tupleBs, tupleCs,
             aggType, tupleBs, tupleCs,
+            prepares,
+            semiType, semigroup,
+            tupleBs, present)
+    }).mkString("\n")
+  }
+
+  def genMapMethods(max: Int, isMonoid: Boolean = false): String = {
+    (2 to max).map(i => {
+      val aggType = if (isMonoid) "Monoid" else ""
+      val nums = (1 to i)
+      val bs = nums.map("B" + _).mkString(", ")
+      val aggs = nums.map(x => "agg%s: Tuple2[K, %sAggregator[A, B%s, C]]".format(x, aggType, x)).mkString(", ")
+      val prepares = nums.map(x => "agg%s._2.prepare(a)".format(x)).mkString(", ")
+      val semiType = if (isMonoid) "monoid" else "semigroup"
+      val semigroups = nums.map(x => "agg%s._2.%s".format(x, semiType)).mkString(", ")
+      val semigroup = "new Tuple%d%s()(%s)".format(i, semiType.capitalize, semigroups)
+      val present = nums.map(x => "agg%s._1 -> agg%s._2.present(b._%s)".format(x, x, x)).mkString(", ")
+      val tupleBs = "Tuple%d[%s]".format(i, bs)
+
+      """
+def apply[K, A, %s, C](%s): %sAggregator[A, %s, Map[K, C]] = {
+  new %sAggregator[A, %s, Map[K, C]] {
+    def prepare(a: A) = (%s)
+    val %s = %s
+    def present(b: %s) = Map(%s)
+  }
+}""".format(bs, aggs, aggType, tupleBs,
+            aggType, tupleBs,
             prepares,
             semiType, semigroup,
             tupleBs, present)
