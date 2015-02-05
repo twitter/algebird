@@ -33,7 +33,7 @@ object SummingCache {
 /**
  * A Stateful Summer on Map[K,V] that keeps a cache of recent keys
  */
-class SummingCache[K, V] private (capacity: Int)(implicit sgv: Semigroup[V])
+class SummingCache[K, V] protected (capacity: Int)(implicit sgv: Semigroup[V])
   extends StatefulSummer[Map[K, V]] {
 
   require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
@@ -75,4 +75,19 @@ class SummingCache[K, V] private (capacity: Int)(implicit sgv: Semigroup[V])
         false
       }
   }).asScala
+}
+
+object SummingWithHitsCache {
+  def apply[K, V: Semigroup](cap: Int): SummingWithHitsCache[K, V] = new SummingWithHitsCache[K, V](cap)
+}
+/**
+ * A SummingCache that also tracks the number of key hits
+ */
+class SummingWithHitsCache[K, V] private (capacity: Int)(implicit sgv: Semigroup[V])
+  extends SummingCache[K, V](capacity)(sgv) {
+
+  def putWithHits(m: Map[K, V]): (Int, Option[Map[K, V]]) = {
+    val keyHits = m.keys.filter(cache.get(_).isDefined).size
+    (keyHits, put(m))
+  }
 }
