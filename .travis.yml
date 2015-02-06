@@ -6,4 +6,5 @@ matrix:
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
     
     - scala: 2.11.4
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test coveralls
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+      after_success: "./sbt coveralls"
