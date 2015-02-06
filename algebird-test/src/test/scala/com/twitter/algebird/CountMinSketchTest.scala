@@ -1,10 +1,12 @@
 package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers, WordSpec }
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 import org.scalacheck.{ Gen, Arbitrary }
 
 import CMSHasherImplicits._
+
+import scala.util.Random
 
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   import BaseProperties._
@@ -92,7 +94,9 @@ class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
 class CMSBigIntTest extends CMSTest[BigInt]
 
-abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers {
+abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import TestImplicits._
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -108,21 +112,6 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
   val RAND = new scala.util.Random
 
-  // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
-  // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
-  // with the existing `to[Col]` method in Scala.
-  implicit class IntCast(x: Int) {
-    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
-  }
-
-  implicit class SeqCast(xs: Seq[Int]) {
-    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
-  }
-
-  implicit class SetCast(xs: Set[Int]) {
-    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
-  }
-
   /**
    * Returns the exact frequency of {x} in {data}.
    */
@@ -136,7 +125,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     val counts1 = data1.groupBy(x => x).mapValues(_.size)
     val counts2 = data2.groupBy(x => x).mapValues(_.size)
 
-    (counts1.keys.toSet & counts2.keys.toSet).map { k => counts1(k) * counts2(k) }.sum
+    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
   }
 
   /**
@@ -148,12 +137,24 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
   }
 
+  /**
+   * Creates a random data stream.
+   *
+   * @param size Number of stream elements.
+   * @param range Elements are randomly drawn from [0, range).
+   * @return
+   */
+  def createRandomStream(size: Int, range: Int, rnd: Random = RAND): Seq[K] = {
+    require(size > 0)
+    (1 to size).map { _ => rnd.nextInt(range) }.toK[K]
+  }
+
   "A Count-Min sketch implementing CMSCounting" should {
 
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
-      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
+      val data = createRandomStream(totalCount, range)
       val cms = COUNTING_CMS_MONOID.create(data)
 
       cms.totalCount should be(totalCount)
@@ -162,7 +163,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     "estimate frequencies" in {
       val totalCount = 5678
       val range = 897
-      val data = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
+      val data = createRandomStream(totalCount, range)
       val cms = COUNTING_CMS_MONOID.create(data)
 
       (0 to 100).foreach { _ =>
@@ -180,7 +181,11 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
     "exactly compute frequencies in a small stream" in {
       val one = COUNTING_CMS_MONOID.create(1.toK[K])
+      one.frequency(1.toK[K]).estimate should be(1)
+      one.frequency(2.toK[K]).estimate should be(0)
       val two = COUNTING_CMS_MONOID.create(2.toK[K])
+      two.frequency(1.toK[K]).estimate should be(0)
+      two.frequency(2.toK[K]).estimate should be(1)
       val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
 
       cms.frequency(0.toK[K]).estimate should be(0)
@@ -196,23 +201,29 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     }
 
     "estimate inner products" in {
-      val totalCount = 5234
-      val range = 1390
-      val data1 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val data2 = (0 to (totalCount - 1)).map { _ => RAND.nextInt(range) }.toK[K]
-      val cms1 = COUNTING_CMS_MONOID.create(data1)
-      val cms2 = COUNTING_CMS_MONOID.create(data1)
+      val totalCounts = Gen.choose(1, 10000)
+      val ranges = Gen.choose(100, 2000)
 
-      val approxA = cms1.innerProduct(cms2)
-      val approx = approxA.estimate
-      val exact = exactInnerProduct(data1, data2)
-      val estimationError = approx - exact
-      val maxError = approx - approxA.min
-      val beWithinTolerance = be >= 0L and be <= maxError
+      forAll((totalCounts, "totalCount"), (ranges, "range"), minSuccessful(50)) { (totalCount: Int, range: Int) =>
+        val data1 = createRandomStream(totalCount, range)
+        val data2 = createRandomStream(totalCount, range)
+        val cms1 = COUNTING_CMS_MONOID.create(data1)
+        val cms2 = COUNTING_CMS_MONOID.create(data2)
 
-      approx should be(cms2.innerProduct(cms1).estimate)
-      approx should be >= exact
-      estimationError should beWithinTolerance
+        val approxA = cms1.innerProduct(cms2)
+        val approx = approxA.estimate
+        val exact = exactInnerProduct(data1, data2)
+        val estimationError = approx - exact
+        val maxError = approx - approxA.min
+        val beWithinTolerance = be >= 0L and be <= maxError
+
+        // We do not support negative counts, hence the lower limit of a frequency is 0 but never negative.
+        approxA.min should be >= 0L
+
+        approx should be(cms2.innerProduct(cms1).estimate)
+        approx should be >= exact
+        estimationError should beWithinTolerance
+      }
     }
 
     "exactly compute inner product of small streams" in {
@@ -271,6 +282,44 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
   }
 
   "A Top-% Count-Min sketch implementing CMSHeavyHitters" should {
+
+    "create correct sketches out of a single item" in {
+      forAll{ (x: Int) =>
+        val data = x.toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+          TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
+        }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+      }
+    }
+
+    "create correct sketches out of a single-item stream" in {
+      forAll{ (x: Int) =>
+        val data = Seq(x).toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
+          TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
+        }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+      }
+    }
 
     "estimate heavy hitters" in {
       // Simple way of making some elements appear much more often than others.
@@ -404,6 +453,44 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
     // Note: As described in https://github.com/twitter/algebird/issues/353, a top-N CMS is, in general, not able to
     // merge heavy hitters correctly.  This is because merging top-N based heavy hitters is not an associative
     // operation.
+
+    "create correct sketches out of a single item" in {
+      forAll{ (x: Int) =>
+        val data = x.toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersN = 2 // exact setting not relevant for this test
+          TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
+        }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+      }
+    }
+
+    "create correct sketches out of a single-item stream" in {
+      forAll{ (x: Int) =>
+        val data = Seq(x).toK[K]
+        val cmsMonoid = {
+          val anyHeavyHittersN = 2 // exact setting not relevant for this test
+          TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
+        }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency(x.toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = x + 1
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+      }
+    }
 
     // This test involves merging of top-N CMS instances, which is not an associative operation.  This means that the
     // success or failure of this test depends on the merging order and/or the test data characteristics.
@@ -642,6 +729,26 @@ class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+class CMSHasherShortSpec extends CMSHasherSpec[Short]
+class CMSHasherIntSpec extends CMSHasherSpec[Int]
+class CMSHasherLongSpec extends CMSHasherSpec[Long]
+class CMSHasherBigIntSpec extends CMSHasherSpec[BigInt]
+
+abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with Matchers {
+
+  import TestImplicits._
+
+  property("returns positive hashes (i.e. slots) only") {
+    forAll { (a: Int, b: Int, width: Int, x: Int) =>
+      whenever (width > 0) {
+        val hash = CMSHash[K](a, b, width)
+        hash(x.toK[K]) should be >= 0
+      }
+    }
+  }
+
+}
+
 /**
  * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
  * versions < 0.8.1.  Note that this spec is not meant to verify their actual functionality.
@@ -677,6 +784,25 @@ class LegacyCMSSpec extends WordSpec with Matchers {
       cms.heavyHitters should be(Set(0L))
     }
 
+  }
+
+}
+
+object TestImplicits {
+
+  // Convenience methods to convert from `Int` to the actual `K` type, and we prefer these conversions to be explicit
+  // (cf. JavaConverters vs. JavaConversions). We use the name `toK` to clarify the intent and to prevent name conflicts
+  // with the existing `to[Col]` method in Scala.
+  implicit class IntCast(x: Int) {
+    def toK[A: Numeric]: A = implicitly[Numeric[A]].fromInt(x)
+  }
+
+  implicit class SeqCast(xs: Seq[Int]) {
+    def toK[A: Numeric]: Seq[A] = xs map { _.toK[A] }
+  }
+
+  implicit class SetCast(xs: Set[Int]) {
+    def toK[A: Numeric]: Set[A] = xs map { _.toK[A] }
   }
 
 }

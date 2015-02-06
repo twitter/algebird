@@ -108,3 +108,53 @@ class ApplicativeOperators[A, M[_]](m: M[A])(implicit app: Applicative[M]) exten
   def join[B](mb: M[B]): M[(A, B)] = app.join(m, mb)
   def joinWith[B, C](mb: M[B])(fn: (A, B) => C): M[C] = app.joinWith(m, mb)(fn)
 }
+
+/**
+ * This is a Semigroup, for all Applicatives.
+ */
+class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T])
+  extends Semigroup[M[T]] {
+  def plus(l: M[T], r: M[T]) = ap.joinWith(l, r)(sg.plus)
+}
+
+/**
+ * This is a Monoid, for all Applicatives.
+ */
+class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
+  extends ApplicativeSemigroup[T, M] with Monoid[M[T]] {
+  lazy val zero = app(mon.zero)
+}
+
+/**
+ * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
+ * this generally works.
+ */
+class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
+  extends ApplicativeMonoid[T, M] with Group[M[T]] {
+  override def negate(v: M[T]) = app.map(v)(grp.negate)
+  override def minus(l: M[T], r: M[T]) = app.joinWith(l, r)(grp.minus)
+}
+
+/**
+ * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
+ * this generally works.
+ */
+class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
+  extends ApplicativeGroup[T, M] with Ring[M[T]] {
+  lazy val one = app(ring.one)
+  def times(l: M[T], r: M[T]) = app.joinWith(l, r)(ring.times)
+}
+
+/**
+ * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
+ * this generally works.
+ */
+class ApplicativeField[T, M[_]](implicit app: Applicative[M], fld: Field[T])
+  extends ApplicativeRing[T, M] with Field[M[T]] {
+  override def inverse(v: M[T]) = app.map(v)(fld.inverse)
+  override def div(l: M[T], r: M[T]) = app.joinWith(l, r)(fld.div)
+}
+
