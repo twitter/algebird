@@ -53,6 +53,51 @@ class SummingCacheTest extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
+class SummingWithHitsCacheTest extends SummingCacheTest {
+  import SummingCacheTest._
+
+  val RAND = new scala.util.Random
+
+  def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
+    val sc = SummingWithHitsCache[K, V](c.cap)
+    val mitems = items.map { Map(_) }
+    mitems.map { sc.putWithHits(_)._1 }.tail
+  }
+
+  property("hit rates will always be 1 for stream with the same key") {
+    forAll { (c: Capacity, values: List[Int]) =>
+      // Only run this when we have at least 2 items and non-zero cap
+      if (values.size > 1 && c.cap > 1) {
+        val key = RAND.nextInt
+        val items = values.map { (key, _) }
+        val keyHits = getHits(c, items)
+        assert(keyHits.filter{ _ != 1 }.size == 0)
+      }
+    }
+  }
+
+  property("hit rates will always be 0 when cap is 0") {
+    forAll { items: List[(Int, Int)] =>
+      // Only run this when we have at least 2 items
+      if (items.size > 1) {
+        val keyHits = getHits(Capacity(0), items)
+        assert(keyHits.filter{ _ != 0 }.size == 0)
+      }
+    }
+  }
+
+  property("hit rates in general should be between [0, 1] ") {
+    forAll { (c: Capacity, items: List[(Int, Int)]) =>
+      // Only run this when we have at least 2 items
+      if (items.size > 1) {
+        val keyHits = getHits(c, items)
+        val hitRate = keyHits.sum / items.size.toDouble
+        assert(hitRate >= 0 && hitRate <= 1)
+      }
+    }
+  }
+}
+
 class SummingQueueTest extends PropSpec with PropertyChecks with Matchers {
   val zeroCapQueue = SummingQueue[Int](0) // passes all through
 
