@@ -1,5 +1,10 @@
 language: scala
 sudo: false
-scala:
-  - 2.10.4
-  - 2.11.4
+matrix:
+  include:
+    - scala: 2.10.4
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
+    
+    - scala: 2.11.5
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+      after_success: "./sbt coveralls"
