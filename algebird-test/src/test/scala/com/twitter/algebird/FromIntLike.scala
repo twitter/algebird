@@ -12,6 +12,10 @@ trait FromIntLike[T] {
 
 object FromIntLike {
 
+  implicit object FromIntByte extends FromIntLike[Byte] {
+    override def fromInt(x: Int): Byte = x.toByte
+  }
+
   implicit object FromIntShort extends FromIntLike[Short] {
     override def fromInt(x: Int): Short = x.toShort
   }
@@ -24,8 +28,8 @@ object FromIntLike {
     override def fromInt(x: Int): Long = x.toLong
   }
 
-  implicit object FromIntArrayByte extends FromIntLike[Array[Byte]] {
-    override def fromInt(x: Int): Array[Byte] = BigInt(x).toByteArray
+  implicit object FromIntBytes extends FromIntLike[Bytes] {
+    override def fromInt(x: Int): Bytes = Bytes(BigInt(x).toByteArray)
   }
 
   implicit object FromIntBigInt extends FromIntLike[BigInt] {
