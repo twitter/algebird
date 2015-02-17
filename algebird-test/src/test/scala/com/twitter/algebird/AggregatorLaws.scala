@@ -114,7 +114,7 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   }
   property("MonoidAggregator.filter is correct") {
     forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Boolean) =>
-      assert(ag.filter(fn).apply(in) == ag.apply(in.filter(fn)))
+      assert(ag.filterBefore(fn).apply(in) == ag.apply(in.filter(fn)))
     }
   }
 }

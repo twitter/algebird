@@ -333,7 +333,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   /**
    * Only aggregate items that match a predicate
    */
-  def filter[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
+  def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
     new MonoidAggregator[A1, B, C] {
       def prepare(a: A1) = if (pred(a)) self.prepare(a) else self.monoid.zero
       def monoid = self.monoid
