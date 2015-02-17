@@ -7,7 +7,6 @@ import org.scalacheck.{ Gen, Arbitrary }
 import CMSHasherImplicits._
 import CmsTestImplicits._
 
-import scala.reflect.ClassTag
 import scala.util.Random
 
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
@@ -229,7 +228,7 @@ class CMSBigIntTest extends CMSTest[BigInt]
 class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
-abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -248,20 +247,15 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
   /**
    * Returns the exact frequency of {x} in {data}.
    */
-  def exactFrequency(data: Seq[K], x: K): Long =
-    if (implicitly[ClassTag[K]].runtimeClass.isArray)
-      data.count(_.asInstanceOf[Array[_]].toSeq == x.asInstanceOf[Array[_]].toSeq)
-    else data.count(_ == x)
+  def exactFrequency(data: Seq[K], x: K): Long = data.count(_ == x)
 
   /**
    * Returns the exact inner product between two data streams, when the streams
    * are viewed as count vectors.
    */
   def exactInnerProduct(data1: Seq[K], data2: Seq[K]): Long = {
-    val groupFunc =
-      if (implicitly[ClassTag[K]].runtimeClass.isArray) (x: K) => x.asInstanceOf[Array[_]].toSeq else (x: K) => x
-    val counts1 = data1.groupBy(groupFunc).mapValues(_.size)
-    val counts2 = data2.groupBy(groupFunc).mapValues(_.size)
+    val counts1 = data1.groupBy(identity).mapValues(_.size)
+    val counts2 = data2.groupBy(identity).mapValues(_.size)
     (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
   }
 
@@ -558,9 +552,7 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
-      val minWidth =
-        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
-        else data1.distinct.size
+      val minWidth = data1.distinct.size
 
       forAll(
         (Gen.choose(minDepth, 709), "depth"),
@@ -584,9 +576,7 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
-      val minWidth =
-        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
-        else data1.distinct.size
+      val minWidth = data1.distinct.size
 
       forAll(
         (Gen.choose(minDepth, 709), "depth"),
@@ -767,9 +757,7 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
-      val minWidth =
-        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
-        else data1.distinct.size
+      val minWidth = data1.distinct.size
 
       forAll(
         (Gen.choose(minDepth, 709), "depth"),
@@ -796,9 +784,7 @@ abstract class CMSTest[K: ClassTag: CMSHasher: FromIntLike] extends WordSpec wit
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]
 
       val minDepth = 2 // Use 2 to be on the safe side in case we happen to run into hash collisions
-      val minWidth =
-        if (implicitly[ClassTag[K]].runtimeClass.isArray) data1.map { _.asInstanceOf[Array[_]].toSeq }.distinct.size
-        else data1.distinct.size
+      val minWidth = data1.distinct.size
 
       forAll(
         (Gen.choose(minDepth, 709), "depth"),
