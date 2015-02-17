@@ -31,7 +31,10 @@ sealed trait Preparer[A, T] {
    * Filter out values that do not meet the predicate.
    * Like flatMap, this limits future aggregations to MonoidAggregator.
    */
-  def filter(fn: T => Boolean) = flatMap{ t => if (fn(t)) Some(t) else None }
+  def filter(fn: T => Boolean) = flatMap { t => if (fn(t)) Some(t) else None }
+
+  def collect[U](p: PartialFunction[T, U]): FlatMapPreparer[A, U] =
+    flatMap { t => if (p.isDefinedAt(t)) Some(p(t)) else None }
 
   /**
    * count and following methods all just call monoidAggregate with one of the standard Aggregators.
