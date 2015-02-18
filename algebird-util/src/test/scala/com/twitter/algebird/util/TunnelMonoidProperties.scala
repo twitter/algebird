@@ -18,7 +18,8 @@ package com.twitter.algebird.util
 import com.twitter.algebird._
 import com.twitter.util.{ Await, Future }
 import scala.util.Random
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
@@ -59,7 +60,7 @@ object TunnelMonoidProperties {
   }
 }
 
-class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers {
+class TunnelMonoidProperties extends PropSpec with PropertyChecks with ShouldMatchers {
   import TunnelMonoidProperties._
 
   implicit val monoid = new Monoid[Int] {

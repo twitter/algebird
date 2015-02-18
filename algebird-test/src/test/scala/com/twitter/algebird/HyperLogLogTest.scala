@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
@@ -35,7 +36,7 @@ object ReferenceHyperLogLog {
 
 }
 
-class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
+class HyperLogLogLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
   import HyperLogLog._
 
@@ -54,7 +55,7 @@ class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
-class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
+class jRhoWMatchTest extends PropSpec with PropertyChecks with ShouldMatchers {
   import HyperLogLog._
 
   implicit val hashGen = Arbitrary { Gen.containerOfN[Array, Byte](16, Arbitrary.arbitrary[Byte]) }
@@ -69,7 +70,7 @@ class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class HyperLogLogTest extends WordSpec with Matchers {
+class HyperLogLogTest extends WordSpec with ShouldMatchers {
 
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 
@@ -218,7 +219,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
 
     def verifySerialization(h: HLL) {
       assert(fromBytes(toBytes(h)) == h)
-      fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
+      fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) should equal (h)
     }
   }
 }

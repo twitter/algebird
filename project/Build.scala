@@ -136,8 +136,8 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdTest = module("test").settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.11.5",
-      "org.scalatest" %% "scalatest" % "2.2.2"
+      "org.scalacheck" %% "scalacheck" % "1.10.0",
+      "org.scalatest" %% "scalatest" % "1.9.1"
     )
   ).dependsOn(algebirdCore)
 

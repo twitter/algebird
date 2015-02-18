@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, WordSpec, PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
@@ -10,7 +11,7 @@ import org.scalacheck.Prop
 // that an ApproximateBoolean agrees with the correct Boolean at least as often
 // as it is claimed to
 
-class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
+class ApproximateLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
   import Gen.choose
 
@@ -59,7 +60,7 @@ class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
 
   implicit val approxArb: Arbitrary[ApproximateBoolean] =
     Arbitrary(Gen.oneOf(trueGen, falseGen,
-      Gen.const(ApproximateBoolean.exact(true)), Gen.const(ApproximateBoolean.exact(false))))
+      ApproximateBoolean.exact(true), ApproximateBoolean.exact(false)))
 
   property("Boolean: &&") {
     forAll { (a: ApproximateBoolean) =>
@@ -91,7 +92,7 @@ class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class ApproximateTest extends WordSpec with Matchers {
+class ApproximateTest extends WordSpec with ShouldMatchers {
 
   "Approximate" should {
     "Correctly identify exact" in {

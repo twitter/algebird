@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
@@ -11,7 +12,7 @@ object SketchMapTestImplicits {
   val HEAVY_HITTERS_COUNT = 10
 }
 
-class SketchMapLaws extends PropSpec with PropertyChecks with Matchers {
+class SketchMapLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
@@ -31,7 +32,7 @@ class SketchMapLaws extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class SketchMapTest extends WordSpec with Matchers {
+class SketchMapTest extends WordSpec with ShouldMatchers {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 

@@ -22,11 +22,12 @@ import java.util.PriorityQueue
 import scala.collection.JavaConverters._
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class TopKTests extends PropSpec with PropertyChecks with Matchers {
+class TopKTests extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
   val SIZE = 10
 

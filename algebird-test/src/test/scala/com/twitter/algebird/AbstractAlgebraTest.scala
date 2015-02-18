@@ -1,7 +1,9 @@
 package com.twitter.algebird
 
 import org.scalatest._
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop
 import com.twitter.algebird.BaseProperties._
@@ -9,7 +11,12 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import scala.Some
 
-class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
+class AbstractAlgebraTest extends PropSpec with PropertyChecks with ShouldMatchers {
+
+  // Older version of scalacheck doesn't have an arbitrary on IndexedSeq
+
+  implicit def arbIndexedSeq[T: Arbitrary]: Arbitrary[IndexedSeq[T]] =
+    Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
   property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]

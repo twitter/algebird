@@ -16,7 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
@@ -25,7 +26,7 @@ object SummingCacheTest {
   implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 1024)) yield Capacity(c) }
 }
 
-class SummingCacheTest extends PropSpec with PropertyChecks with Matchers {
+class SummingCacheTest extends PropSpec with PropertyChecks with ShouldMatchers {
   import SummingCacheTest._
 
   // Get the zero-aware map equiv
@@ -98,7 +99,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
   }
 }
 
-class SummingQueueTest extends PropSpec with PropertyChecks with Matchers {
+class SummingQueueTest extends PropSpec with PropertyChecks with ShouldMatchers {
   val zeroCapQueue = SummingQueue[Int](0) // passes all through
 
   property("0 capacity always returns") {

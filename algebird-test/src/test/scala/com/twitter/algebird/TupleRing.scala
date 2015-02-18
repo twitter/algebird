@@ -1,10 +1,11 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
-class TupleRingSpecification extends PropSpec with PropertyChecks with Matchers {
+class TupleRingSpecification extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   property("(Int,Int) is a Ring") {

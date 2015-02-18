@@ -1,10 +1,11 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyRingLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   val eventuallyRing = new EventuallyRing[Long, Int](_.asInstanceOf[Long])(_ > 10000)
@@ -18,7 +19,7 @@ class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
 }
 
 // A lossy one:
-class EventuallyMonoidLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyMonoidLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
@@ -31,7 +32,7 @@ class EventuallyMonoidLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class EventuallyTest extends WordSpec with Matchers {
+class EventuallyTest extends WordSpec with ShouldMatchers {
 
   val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
 

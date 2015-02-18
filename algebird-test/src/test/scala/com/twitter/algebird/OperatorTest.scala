@@ -1,10 +1,11 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
 import Operators._
 
-class OperatorTest extends WordSpec with Matchers {
+class OperatorTest extends WordSpec with ShouldMatchers {
 
   "Operators" should {
     "allow plus" in {

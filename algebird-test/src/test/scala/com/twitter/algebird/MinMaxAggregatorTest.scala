@@ -1,8 +1,9 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
-class MinMaxAggregatorTest extends WordSpec with Matchers {
+class MinMaxAggregatorTest extends WordSpec with ShouldMatchers {
   val data = List(1, 3, 5, 0, 7, 6)
 
   sealed trait TestElementParent

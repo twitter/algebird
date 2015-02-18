@@ -1,11 +1,12 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, WordSpec, PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 import java.io.{ ObjectOutputStream, ByteArrayOutputStream }
 
-class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
+class BloomFilterLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   val NUM_HASHES = 6
@@ -23,7 +24,7 @@ class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
+class BFHashIndices extends PropSpec with PropertyChecks with ShouldMatchers {
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
@@ -94,7 +95,7 @@ class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class BloomFilterTest extends WordSpec with Matchers {
+class BloomFilterTest extends WordSpec with ShouldMatchers {
 
   val SEED = 1
   val RAND = new scala.util.Random

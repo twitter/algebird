@@ -16,10 +16,11 @@ limitations under the License.
 package com.twitter.algebird.util
 
 import com.twitter.algebird._
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 
-class PromiseLinkMonoidProperties extends PropSpec with PropertyChecks with Matchers {
+class PromiseLinkMonoidProperties extends PropSpec with PropertyChecks with ShouldMatchers {
   property("associative") {
     def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
     def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
