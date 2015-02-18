@@ -16,10 +16,11 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 
-class AsyncListMMapSumProperties extends PropSpec with PropertyChecks with Matchers {
+class AsyncListMMapSumProperties extends PropSpec with PropertyChecks with ShouldMatchers {
 
   import AsyncSummerLaws._
 

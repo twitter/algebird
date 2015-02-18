@@ -17,11 +17,12 @@
 package com.twitter.algebird.monad
 
 import com.twitter.algebird.Monad
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
+class MonadInstanceLaws extends PropSpec with PropertyChecks with ShouldMatchers {
 
   // Mutually recursive functions
   def ping(todo: Int, acc: Int): Trampoline[Int] =

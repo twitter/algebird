@@ -1,16 +1,18 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Gen, Properties }
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Prop._
 
 import scala.collection.{ Map => ScMap }
 import scala.collection.mutable.{ Map => MMap }
 
-class CollectionSpecification extends PropSpec with PropertyChecks with Matchers {
+class CollectionSpecification extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   implicit def arbMin[T: Arbitrary]: Arbitrary[Min[T]] =

@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
@@ -10,7 +11,7 @@ import org.scalacheck.Prop
  * Numeric is basically the ring trait with ordering, so we can use it
  * below to test all the numeric traits.
  */
-class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
+class NumericSpecification extends PropSpec with PropertyChecks with ShouldMatchers {
   def plusNumericProp[T: Monoid: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]

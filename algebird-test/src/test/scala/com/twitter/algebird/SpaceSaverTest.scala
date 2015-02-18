@@ -1,10 +1,13 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen.containerOf1
 
-class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers {
+class SpaceSaverLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   // limit sizes to 100 to avoid large data structures in tests
@@ -19,7 +22,7 @@ class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers {
         implicit def ssGen(implicit sg: Semigroup[SpaceSaver[Int]]): Arbitrary[SpaceSaver[Int]] = Arbitrary {
           Gen.oneOf(
             Arbitrary.arbitrary[SSOne[Int]],
-            Gen.nonEmptyContainerOf[List, SSOne[Int]](Arbitrary.arbitrary[SSOne[Int]]).map(_.reduce(sg.plus)))
+            containerOf1[List, SSOne[Int]](arbitrary[SSOne[Int]]).map(_.reduce(sg.plus)))
         }
 
         commutativeSemigroupLawsEq[SpaceSaver[Int]] { (left, right) => (left consistentWith right) && (right consistentWith left) }
@@ -28,7 +31,7 @@ class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class SpaceSaverTest extends WordSpec with Matchers {
+class SpaceSaverTest extends WordSpec with ShouldMatchers {
   "SpaceSaver" should {
     "produce a top 20 with exact bounds" in {
       val gen = Gen.frequency((1 to 100).map{ x => (x * x, x: Gen[Int]) }: _*)

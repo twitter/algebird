@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers, WordSpec }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 import org.scalacheck.{ Gen, Arbitrary }
 
@@ -8,7 +9,7 @@ import CMSHasherImplicits._
 
 import scala.util.Random
 
-class CmsLaws extends PropSpec with PropertyChecks with Matchers {
+class CmsLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   val DELTA = 1E-8
@@ -48,7 +49,7 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
+class TopPctCmsLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   val DELTA = 1E-8
@@ -94,7 +95,7 @@ class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
 class CMSBigIntTest extends CMSTest[BigInt]
 
-abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
 
   import TestImplicits._
 
@@ -559,8 +560,8 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
       val aggregated = cms1 ++ cms2 ++ cms3 ++ cms4
 
       val single = monoid.create(singleData)
-      aggregated.heavyHitters shouldNot be(single.heavyHitters)
-      aggregated.heavyHitters shouldNot contain(3.toK[K]) // C=3 is global top 1 heavy hitter
+      aggregated.heavyHitters should not be (single.heavyHitters)
+      aggregated.heavyHitters should not contain (3.toK[K]) // C=3 is global top 1 heavy hitter
     }
 
     // Compared to adding top-N CMS instances, which is generally unsafe because of order bias (see test cases above),
@@ -645,7 +646,7 @@ abstract class CMSTest[K: Ordering: CMSHasher: Numeric] extends WordSpec with Ma
 
 }
 
-class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
+class CMSFunctionsSpec extends PropSpec with PropertyChecks with ShouldMatchers {
 
   property("roundtrips width->eps->width") {
     forAll { (i: Int) =>
@@ -690,7 +691,7 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
+class CMSParamsSpec extends PropSpec with PropertyChecks with ShouldMatchers {
 
   val AnyEps = 0.001
   val AnyDelta = 1E-5
@@ -734,7 +735,7 @@ class CMSHasherIntSpec extends CMSHasherSpec[Int]
 class CMSHasherLongSpec extends CMSHasherSpec[Long]
 class CMSHasherBigIntSpec extends CMSHasherSpec[BigInt]
 
-abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with Matchers {
+abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with PropertyChecks with ShouldMatchers {
 
   import TestImplicits._
 
@@ -753,7 +754,7 @@ abstract class CMSHasherSpec[K: CMSHasher: Numeric] extends PropSpec with Proper
  * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
  * versions < 0.8.1.  Note that this spec is not meant to verify their actual functionality.
  */
-class LegacyCMSSpec extends WordSpec with Matchers {
+class LegacyCMSSpec extends WordSpec with ShouldMatchers {
 
   import legacy.CountMinSketchMonoid
 

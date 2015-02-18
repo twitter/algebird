@@ -17,23 +17,28 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
 import java.util.Arrays
 
-class QTreeLaws extends PropSpec with PropertyChecks with Matchers {
+class QTreeLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   implicit val qtSemigroup = new QTreeSemigroup[Long](6)
@@ -49,7 +54,7 @@ class QTreeLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class QTreeTest extends WordSpec with Matchers {
+class QTreeTest extends WordSpec with ShouldMatchers {
   def randomList(n: Long) = {
     (1L to n).map{ i => math.random }
   }

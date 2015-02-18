@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
 class FoldTest extends WordSpec {
 

@@ -18,11 +18,12 @@ package com.twitter.algebird.util
 
 import com.twitter.algebird.MonadLaws.monadLaws
 import com.twitter.util.{ Await, Future, Throw, Return, Try }
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Arbitrary, Properties }
 
-class UtilAlgebraProperties extends PropSpec with PropertyChecks with Matchers {
+class UtilAlgebraProperties extends PropSpec with PropertyChecks with ShouldMatchers {
   import UtilAlgebras._
 
   def toOption[T](f: Future[T]): Option[T] =

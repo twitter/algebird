@@ -1,14 +1,16 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 import java.lang.AssertionError
 import java.util.Arrays
 
-class SGDLaws extends PropSpec with PropertyChecks with Matchers {
+class SGDLaws extends PropSpec with PropertyChecks with ShouldMatchers {
   import BaseProperties._
 
   implicit val sgdMonoid = new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
@@ -28,7 +30,7 @@ class SGDLaws extends PropSpec with PropertyChecks with Matchers {
     b <- Gen.choose(-10.0, 10.0)
   ) yield SGDWeights(cnt, Vector(m, b))
 
-  val zeroGen = Gen.const(SGDZero)
+  val zeroGen = SGDZero
 
   implicit val sgdPos = Arbitrary(sgdPosGen)
   implicit val sgdWArb = Arbitrary(sgdWGen)

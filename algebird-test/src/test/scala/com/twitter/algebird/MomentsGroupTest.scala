@@ -1,8 +1,9 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers
 
-class MomentsGroupTest extends WordSpec with Matchers {
+class MomentsGroupTest extends WordSpec with ShouldMatchers {
 
   /**
    * Given a list of doubles, create a Moments object to hold
