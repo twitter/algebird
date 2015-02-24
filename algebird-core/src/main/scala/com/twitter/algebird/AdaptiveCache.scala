@@ -75,10 +75,10 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.
   extends StatefulSummer[Map[K, V]] {
 
   require(maxCapacity >= 0, "Cannot have negative capacity")
-  var currentCapacity = 1
+  private var currentCapacity = 1
 
-  var summingCache = new SummingCache[K, V](currentCapacity)
-  val sentinelCache = new SentinelCache[K, V]
+  private var summingCache = new SummingCache[K, V](currentCapacity)
+  private val sentinelCache = new SentinelCache[K, V]
 
   override def semigroup = summingCache.semigroup
 
