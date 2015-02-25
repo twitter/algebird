@@ -20,7 +20,7 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
 
-class ApplicativeProperties extends PropSpec with PropertyChecks with Matchers {
+class ApplicativeProperties extends CheckProperties {
   import ApplicativeLaws._
   import Monad._ // for Monad instances
   import MonadLaws._ // for Arbitrary instances

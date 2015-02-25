@@ -22,7 +22,7 @@ import org.scalacheck.{ Gen, Arbitrary }
 
 import Monad.{ pureOp, operators }
 
-class MonadProperties extends PropSpec with PropertyChecks with Matchers {
+class MonadProperties extends CheckProperties {
   import MonadLaws._
 
   property("list") {

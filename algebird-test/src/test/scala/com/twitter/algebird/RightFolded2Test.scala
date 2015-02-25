@@ -1,13 +1,12 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.Prop._
+import org.scalacheck.{ Arbitrary, Gen }
 
 import scala.annotation.tailrec
 
-class RightFolded2Test extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class RightFolded2Test extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   def monFold(i: Int, l: Long) = l + i.toLong
   def mapFn(l: Long) = l / 2
@@ -73,7 +72,7 @@ class RightFolded2Test extends PropSpec with PropertyChecks with Matchers {
   property("RightFolded2 sum works as expected") {
     forAll { (ls: List[RightFolded2[Int, Long, Long]]) =>
       val accSum = accOf(rightFoldedMonoid.sum(ls)).getOrElse(0L)
-      assert(sum(ls)(monFold)(mapFn) == accSum)
+      sum(ls)(monFold)(mapFn) == accSum
     }
   }
 }

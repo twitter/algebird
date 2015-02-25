@@ -1,17 +1,13 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Arbitrary, Gen, Properties }
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Arbitrary, Gen }
+
+import scala.collection.mutable.{ Map => MMap }
+import scala.collection.{ Map => ScMap }
 import org.scalacheck.Prop._
 
-import scala.collection.{ Map => ScMap }
-import scala.collection.mutable.{ Map => MMap }
-
-class CollectionSpecification extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class CollectionSpecification extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit def arbMin[T: Arbitrary]: Arbitrary[Min[T]] =
     Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
@@ -77,7 +73,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   property("List plus") {
     forAll { (a: List[Int], b: List[Int]) =>
       val mon = implicitly[Monoid[List[Int]]]
-      assert((a ++ b == mon.plus(a, b)) && (mon.zero == List[Int]()))
+      ((a ++ b == mon.plus(a, b)) && (mon.zero == List[Int]()))
     }
   }
 
@@ -91,7 +87,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   property("Seq plus") {
     forAll { (a: Seq[Int], b: Seq[Int]) =>
       val mon = implicitly[Monoid[Seq[Int]]]
-      assert((a ++ b == mon.plus(a, b)) && (mon.zero == Seq[Int]()))
+      ((a ++ b == mon.plus(a, b)) && (mon.zero == Seq[Int]()))
     }
   }
 
@@ -106,7 +102,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   property("Set plus") {
     forAll { (a: Set[Int], b: Set[Int]) =>
       val mon = implicitly[Monoid[Set[Int]]]
-      assert((a ++ b == mon.plus(a, b)) && (mon.zero == Set[Int]()))
+      ((a ++ b == mon.plus(a, b)) && (mon.zero == Set[Int]()))
     }
   }
 
@@ -133,10 +129,10 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
       .map { map: Map[K, V] => MMap(map.toSeq: _*): MMap[K, V] }
   }
 
-  def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit rng: Ring[ScMap[Int, Int]], arbMap: Arbitrary[M]) {
+  def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit rng: Ring[ScMap[Int, Int]], arbMap: Arbitrary[M]) = {
     forAll { (a: M, b: M) =>
       // Subsets because zeros are removed from the times/plus values
-      assert((rng.times(a, b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
+      ((rng.times(a, b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
         (rng.plus(a, b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
         (rng.plus(a, a).keys == (a.filter { kv => (kv._2 + kv._2) != 0 }).keys))
     }
@@ -222,21 +218,21 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
 
   property("MapAlgebra.removeZeros works") {
     forAll { (m: Map[Int, Int]) =>
-      assert(MapAlgebra.removeZeros(m).values.toSet.contains(0) == false)
+      (MapAlgebra.removeZeros(m).values.toSet.contains(0) == false)
     }
   }
 
   property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") {
     forAll { (m: Map[Int, Int]) =>
-      assert(Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m)))
+      (Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m)))
     }
   }
 
   property("sumByKey works") {
     forAll { (keys: List[Int], values: List[Int]) =>
-      import Operators._
+      import com.twitter.algebird.Operators._
       val tupList = keys.zip(values)
-      assert(tupList.sumByKey.filter { _._2 != 0 } ==
+      (tupList.sumByKey.filter { _._2 != 0 } ==
         tupList.groupBy { _._1 }
         .mapValues { v => v.map { _._2 }.sum }
         .filter { _._2 != 0 })
@@ -246,20 +242,20 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
   property("MapAlgebra.dot works") {
     forAll { (m1: Map[Int, Int], m2: Map[Int, Int]) =>
       // .toList below is to make sure we don't remove duplicate values
-      assert(MapAlgebra.dot(m1, m2) ==
+      (MapAlgebra.dot(m1, m2) ==
         (m1.keySet ++ m2.keySet).toList.map { k => m1.getOrElse(k, 0) * m2.getOrElse(k, 0) }.sum)
     }
   }
 
   property("MapAlgebra.toGraph is correct") {
     forAll { (l: Set[(Int, Int)]) =>
-      assert(MapAlgebra.toGraph(l).toIterable.flatMap { case (k, sv) => sv.map { v => (k, v) } }.toSet == l)
+      (MapAlgebra.toGraph(l).toIterable.flatMap { case (k, sv) => sv.map { v => (k, v) } }.toSet == l)
     }
   }
 
   property("MapAlgebra.sparseEquiv is correct") {
     forAll { (l: Map[Int, String], empties: Set[Int]) =>
-      whenever(!empties.isEmpty) {
+      (!empties.isEmpty) ==> {
         val mapEq = MapAlgebra.sparseEquiv[Int, String]
         mapEq.equiv(l -- empties, l ++ empties.map(_ -> "").toMap) && !mapEq.equiv(
           l -- empties,
@@ -272,13 +268,13 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
     forAll { (m: Map[Int, Int]) =>
       val m2 = MapAlgebra.invert(m)
       val m3 = Monoid.sum(for ((v, ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
-      assert(m3 == m)
+      (m3 == m)
     }
   }
 
   property("MapAlgebra.invertExact works") {
     forAll { (m: Map[Option[Int], Set[Int]]) =>
-      assert(MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined))
+      (MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined))
     }
   }
 
@@ -288,7 +284,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
       val m1after = m3.mapValues { vw => vw._1 }.filter { _._2.isDefined }.mapValues { _.get }
       val m2after = m3.mapValues { vw => vw._2 }.filter { _._2.isDefined }.mapValues { _.get }
       val m1Orm2 = (m1.keySet | m2.keySet)
-      assert((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))
+      ((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))
     }
   }
 
@@ -297,7 +293,7 @@ class CollectionSpecification extends PropSpec with PropertyChecks with Matchers
 
   property("MapAlgebra.mergeLookup works") {
     forAll { (items: Set[Int]) =>
-      assert(mapEq.equiv(
+      (mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
         Map(
           (None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0))))) && mapEq.equiv(

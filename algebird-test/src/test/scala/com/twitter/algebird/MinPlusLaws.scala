@@ -29,7 +29,7 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
-class MinPlusLaws extends PropSpec with PropertyChecks with Matchers {
+class MinPlusLaws extends CheckProperties {
   import BaseProperties._
 
   implicit val mpint: Arbitrary[MinPlus[Int]] = Arbitrary {

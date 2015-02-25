@@ -33,7 +33,7 @@ import org.scalacheck.Gen.choose
 
 import java.util.Arrays
 
-class QTreeLaws extends PropSpec with PropertyChecks with Matchers {
+class QTreeLaws extends CheckProperties {
   import BaseProperties._
 
   implicit val qtSemigroup = new QTreeSemigroup[Long](6)
