@@ -19,7 +19,7 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird.CheckProperties
 import org.scalacheck.Prop._
 
-class HeavyHittersCachingSummerProperties extends CheckProperties  {
+class HeavyHittersCachingSummerProperties extends CheckProperties {
   import com.twitter.algebird.util.summer.AsyncSummerLaws._
 
   property("Summing with and without the summer should match") {
