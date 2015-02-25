@@ -227,11 +227,27 @@ class HyperLogLogTest extends WordSpec with Matchers {
     "correctly downsize sparse HLL" in {
       testDownsize(10)(10, 7)
       testDownsize(10)(14, 4)
+      testDownsize(10)(12, 12)
+      
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(15, 3)
+      }
     }
 
     "correctly downsize dense HLL" in {
       testDownsize(10000)(10, 7)
       testDownsize(10000)(14, 4)
+      testDownsize(10000)(12, 12)
+
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(15, 3)
+      }
     }
 
     def verifySerialization(h: HLL) {
