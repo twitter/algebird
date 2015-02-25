@@ -100,8 +100,11 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.
 
       summingCache = new SummingWithHitsCache(currentCapacity)
       grew = true
+
       if (currentCapacity == maxCapacity)
         sentinelCache.stopGrowing
+      else
+        sentinelCache.clear
     }
     (grew, ret)
   }
