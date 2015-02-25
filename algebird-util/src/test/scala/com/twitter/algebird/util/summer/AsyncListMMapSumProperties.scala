@@ -17,6 +17,7 @@
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird.CheckProperties
+import org.scalacheck.Prop.forAll
 
 class AsyncListMMapSumProperties extends CheckProperties {
 

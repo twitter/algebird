@@ -27,7 +27,7 @@ class NullSummerProperties extends CheckProperties {
       val tuplesIn = Counter("tuplesIn")
       val tuplesOut = Counter("tuplesOut")
       val summer = new NullSummer[Int, Long](tuplesIn, tuplesOut)
-      s1ummingWithAndWithoutSummerShouldMatch(summer, inputs)
+      summingWithAndWithoutSummerShouldMatch(summer, inputs)
     }
   }
 

@@ -59,6 +59,7 @@ object TunnelMonoidProperties {
 
 class TunnelMonoidPropertiesextends extends CheckProperties {
 
+  import TunnelMonoidProperties._
   implicit val monoid = new Monoid[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer
