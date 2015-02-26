@@ -96,7 +96,9 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Array Monoid laws") {
-    monoidLaws[Array[Int]]
+    monoidLawsEq[Array[Int]]{
+      case (a,b) => a.deep == b.deep
+    }
   }
 
   property("Set plus") {
