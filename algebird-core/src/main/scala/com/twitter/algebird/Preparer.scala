@@ -9,7 +9,7 @@ package com.twitter.algebird
  * Uses of Preparer will always start with a call to Preparer[A], and end with a call to
  * monoidAggregate or a related method, to produce an Aggregator instance.
  */
-sealed trait Preparer[A, T] {
+sealed trait Preparer[A, T] extends java.io.Serializable {
   /**
    * Produce a new MonoidAggregator which includes the Preparer's transformation chain in its prepare stage.
    */
