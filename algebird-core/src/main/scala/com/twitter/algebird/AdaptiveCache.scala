@@ -20,8 +20,8 @@ package com.twitter.algebird
  * @author Avi Bryant
  */
 
-import collection.mutable.{ ListBuffer, HashMap }
-import ref.{ SoftReference, ReferenceQueue }
+import collection.mutable.HashMap
+import ref.SoftReference
 
 /**
  * This is a summing cache whose goal is to grow until we run out of memory,
@@ -30,35 +30,26 @@ import ref.{ SoftReference, ReferenceQueue }
  * we don't put anything here we care about.
  */
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
-  class Cell(var value: V)
+  private val map = new SoftReference(new HashMap[K, V]())
 
-  private val queue = new ref.ReferenceQueue
-  private val map = new HashMap[K, ref.SoftReference[Cell]]()
-  private var grow = true
+  def size = map.get.map{_.size}.getOrElse(0)
 
-  def size = map.size
+  def clear { map.get.foreach{_.clear} }
 
-  def clear { map.clear }
-
-  def stopGrowing {
-    grow = false
-    clear
-  }
+  def stopGrowing { map.clear }
 
   def put(in: Map[K, V]) {
-    if (grow) {
-      if (queue.poll.isDefined) {
-        stopGrowing
-      } else {
-        in.foreach {
-          case (k, v) =>
-            map.get(k).flatMap { _.get } match {
-              case Some(cell) =>
-                cell.value = sgv.plus(cell.value, v)
-              case _ =>
-                map.put(k, new ref.SoftReference(new Cell(v), queue))
-            }
-        }
+    if (map.get.isDefined) {
+      in.foreach {
+        case (k, v) =>
+          val newValue =
+            map
+              .get
+              .flatMap{_.get(k)}
+              .map{oldV => sgv.plus(oldV, v)}
+              .getOrElse(v)
+
+          map.get.foreach{_.put(k, newValue)}
       }
     }
   }
@@ -73,7 +64,7 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
  * plus some margin, without running out of RAM, then this indicates that we
  * have enough headroom to double the capacity.
  */
-class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.5)
+class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.0)
   extends StatefulSummer[Map[K, V]] {
 
   require(maxCapacity >= 0, "Cannot have negative capacity")
@@ -82,11 +73,10 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.
   private var summingCache = new SummingWithHitsCache[K, V](currentCapacity)
   private val sentinelCache = new SentinelCache[K, V]
 
-  private def update(evicted: Option[Map[K, V]]): (Boolean, Option[Map[K, V]]) = {
+  private def update(evicted: Option[Map[K, V]]) = {
     evicted.foreach{ e => sentinelCache.put(e) }
 
     var ret = evicted
-    var grew = false
 
     if (currentCapacity < maxCapacity &&
       sentinelCache.size > (currentCapacity * growthMargin)) {
@@ -99,29 +89,18 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.
       }
 
       summingCache = new SummingWithHitsCache(currentCapacity)
-      grew = true
 
       if (currentCapacity == maxCapacity)
         sentinelCache.stopGrowing
       else
         sentinelCache.clear
     }
-    (grew, ret)
+    ret
   }
 
   override def semigroup = summingCache.semigroup
 
-  override def put(m: Map[K, V]): Option[Map[K, V]] = {
-    val (grew, ret) = update(summingCache.put(m))
-    ret
-  }
-
-  //return (hits, grew, evicted)
-  def putWithStats(m: Map[K, V]): (Int, Boolean, Option[Map[K, V]]) = {
-    val (hits, evicted) = summingCache.putWithHits(m)
-    val (grew, ret) = update(evicted)
-    (hits, grew, ret)
-  }
+  override def put(m: Map[K, V]): Option[Map[K, V]] = update(summingCache.put(m))
 
   override def flush: Option[Map[K, V]] = {
     val ret = summingCache.flush
@@ -130,4 +109,18 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 1.
   }
 
   def isFlushed = summingCache.isFlushed
+
+  private var maxReportedSentinelSize = 0
+  case class Stats(hits: Int, cacheGrowth: Int, sentinelGrowth: Int)
+  def putWithStats(m: Map[K, V]): (Stats, Option[Map[K, V]]) = {
+    val oldCapacity = currentCapacity
+    val (hits, evicted) = summingCache.putWithHits(m)
+    val ret = update(evicted)
+    var sentinelGrowth = 0
+    if(sentinelCache.size > maxReportedSentinelSize) {
+      sentinelGrowth = sentinelCache.size - maxReportedSentinelSize
+      maxReportedSentinelSize = sentinelCache.size
+    }
+    (Stats(hits, currentCapacity - oldCapacity, sentinelGrowth), ret)
+  }
 }
