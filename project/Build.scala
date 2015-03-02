@@ -155,11 +155,11 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdUtil = module("util").settings(
     libraryDependencies += "com.twitter" %% "util-core" % "6.20.0"
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
   lazy val algebirdBijection = module("bijection").settings(
     libraryDependencies += "com.twitter" %% "bijection-core" % "0.7.2"
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
 }
 
 

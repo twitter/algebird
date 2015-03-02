@@ -16,12 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Prop._
-
-class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers {
-  import BaseVectorSpaceProperties._
+class VectorSpaceProperties extends CheckProperties {
+  import com.twitter.algebird.BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait
   def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) = {

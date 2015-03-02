@@ -16,12 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
+import org.scalacheck.Prop._
 
-class ResetTest extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class ResetTest extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit def resetArb[T: Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {
     Arbitrary.arbitrary[T].map { t =>
@@ -44,12 +43,12 @@ class ResetTest extends PropSpec with PropertyChecks with Matchers {
   property("ResetState[Int] works as expected") {
     forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
       val result = Monoid.plus(Monoid.plus(a, b), c)
-      assert(((a, b, c) match {
+      ((a, b, c) match {
         case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x + y + z)
         case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x + y + z)
         case (_, ResetValue(y), SetValue(z)) => ResetValue(y + z)
         case (_, _, ResetValue(z)) => ResetValue(z)
-      }) == result)
+      }) == result
     }
   }
 }

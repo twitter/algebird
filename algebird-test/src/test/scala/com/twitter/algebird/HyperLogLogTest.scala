@@ -35,7 +35,7 @@ object ReferenceHyperLogLog {
 
 }
 
-class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
+class HyperLogLogLaws extends CheckProperties {
   import BaseProperties._
   import HyperLogLog._
 

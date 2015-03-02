@@ -1,18 +1,16 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, WordSpec, PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
-import org.scalacheck.Prop
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.{ Matchers, WordSpec }
+import org.scalacheck.Prop._
 
 // TODO add tests for scala check that uses a statistical test to check
 // that an ApproximateBoolean agrees with the correct Boolean at least as often
 // as it is claimed to
 
-class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
-  import Gen.choose
+class ApproximateLaws extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
+  import org.scalacheck.Gen.choose
 
   implicit val approxGen =
     Arbitrary {
@@ -30,11 +28,11 @@ class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
   property("always contain estimate") {
     forAll {
       (ap1: Approximate[Long], ap2: Approximate[Long]) =>
-        assert(((ap1 + ap2) ~ (ap1.estimate + ap2.estimate)) &&
+        ((ap1 + ap2) ~ (ap1.estimate + ap2.estimate)) &&
           ((ap1 * ap2) ~ (ap1.estimate * ap2.estimate)) &&
           ap1 ~ (ap1.estimate) &&
           ap2 ~ (ap2.estimate) &&
-          ((ap1 + (ap1.negate)) ~ 0L) && ((ap2 + (ap2.negate)) ~ 0L))
+          ((ap1 + (ap1.negate)) ~ 0L) && ((ap2 + (ap2.negate)) ~ 0L)
     }
   }
   def boundsAreOrdered[N](ap: Approximate[N]) = {
@@ -50,7 +48,7 @@ class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
         (ap1 * ap2).probWithinBounds <=
           Ordering[Double].min(ap1.probWithinBounds, ap2.probWithinBounds)
 
-        assert(boundsAreOrdered(ap1 * ap2) && boundsAreOrdered(ap1 + ap2))
+        boundsAreOrdered(ap1 * ap2) && boundsAreOrdered(ap1 + ap2)
     }
   }
 
@@ -63,30 +61,30 @@ class ApproximateLaws extends PropSpec with PropertyChecks with Matchers {
 
   property("Boolean: &&") {
     forAll { (a: ApproximateBoolean) =>
-      assert(((a && ApproximateBoolean.exact(false)) == ApproximateBoolean.exact(false)) &&
+      ((a && ApproximateBoolean.exact(false)) == ApproximateBoolean.exact(false)) &&
         // Make sure when it is false, we don't lose precision:
-        (a && ApproximateBoolean(false, a.withProb / 2.0)).withProb >= (a.withProb / 2.0))
+        (a && ApproximateBoolean(false, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
     }
   }
 
   property("Boolean: ||") {
     forAll { (a: ApproximateBoolean) =>
-      assert((a || ApproximateBoolean.exact(true)) == ApproximateBoolean.exact(true) &&
+      (a || ApproximateBoolean.exact(true)) == ApproximateBoolean.exact(true) &&
         // Make sure when it is true, we don't lose precision:
-        (a || ApproximateBoolean(true, a.withProb / 2.0)).withProb >= (a.withProb / 2.0))
+        (a || ApproximateBoolean(true, a.withProb / 2.0)).withProb >= (a.withProb / 2.0)
     }
   }
 
   property("logic works") {
     forAll { (a: ApproximateBoolean, b: ApproximateBoolean) =>
-      assert((a ^ b).isTrue == (a.isTrue ^ b.isTrue) &&
+      (a ^ b).isTrue == (a.isTrue ^ b.isTrue) &&
         (a ^ b).withProb >= (a.withProb * b.withProb) &&
         (a || b).isTrue == (a.isTrue || b.isTrue) &&
         (a || b).withProb >= (a.withProb * b.withProb) &&
         (a && b).isTrue == (a.isTrue && b.isTrue) &&
         (a && b).withProb >= (a.withProb * b.withProb) &&
         (a.not).isTrue == (!(a.isTrue)) &&
-        (a.not.withProb) == a.withProb)
+        (a.not.withProb) == a.withProb
     }
   }
 }
@@ -95,11 +93,10 @@ class ApproximateTest extends WordSpec with Matchers {
 
   "Approximate" should {
     "Correctly identify exact" in {
-      assert(Approximate.exact(1.0) ~ 1.0)
-      assert(Approximate.exact(1.0).boundsContain(1.0))
-
-      assert(!(Approximate.exact(1.0).boundsContain(1.1)))
-      assert(!(Approximate.exact(1.0) ~ 1.1))
+      (Approximate.exact(1.0) ~ 1.0) &&
+        Approximate.exact(1.0).boundsContain(1.0) &&
+        !Approximate.exact(1.0).boundsContain(1.1) &&
+        (!(Approximate.exact(1.0) ~ 1.1))
     }
   }
 }

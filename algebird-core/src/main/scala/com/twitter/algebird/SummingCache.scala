@@ -83,7 +83,7 @@ object SummingWithHitsCache {
 /**
  * A SummingCache that also tracks the number of key hits
  */
-class SummingWithHitsCache[K, V] (capacity: Int)(implicit sgv: Semigroup[V])
+class SummingWithHitsCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
   extends SummingCache[K, V](capacity)(sgv) {
 
   def putWithHits(m: Map[K, V]): (Int, Option[Map[K, V]]) = {

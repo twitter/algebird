@@ -1,15 +1,10 @@
 package com.twitter.algebird
 
-import org.scalatest._
+import org.scalacheck.Prop._
+import org.scalacheck.{ Arbitrary, Gen }
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
-import java.lang.AssertionError
-import java.util.Arrays
-
-class SGDLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class SGDLaws extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit val sgdMonoid = new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
   val zeroStepMonoid = new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
@@ -46,7 +41,7 @@ class SGDLaws extends PropSpec with PropertyChecks with Matchers {
       val b = w.weights(1)
       val y = m * x + b
 
-      assert(y.isInfinity || {
+      (y.isInfinity || {
         val pos = (y, IndexedSeq(x))
         val grad = SGD.linearGradient(w.weights, pos)
         (scala.math.abs(grad(0)) < eps) && (scala.math.abs(grad(1)) < eps)
@@ -56,7 +51,7 @@ class SGDLaws extends PropSpec with PropertyChecks with Matchers {
 
   property("Gradient at x=0 has zero first component") {
     forAll { (w: SGDWeights, y: Double) =>
-      assert(SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0)
+      (SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0)
     }
   }
 
@@ -64,7 +59,7 @@ class SGDLaws extends PropSpec with PropertyChecks with Matchers {
     forAll {
       (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
         val next = zeroStepMonoid.newWeights(w, pos.pos.head)
-        assert(next.weights == w.weights && next.count == (w.count + 1L))
+        (next.weights == w.weights && next.count == (w.count + 1L))
     }
   }
 
@@ -78,7 +73,7 @@ class SGDLaws extends PropSpec with PropertyChecks with Matchers {
     forAll {
       (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
         val next = oneStepMonoid.newWeights(w, pos.pos.head)
-        assert(next.weights == minus(w.weights, SGD.linearGradient(w.weights, pos.pos.head)))
+        next.weights == minus(w.weights, SGD.linearGradient(w.weights, pos.pos.head))
     }
   }
 }
