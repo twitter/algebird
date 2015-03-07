@@ -21,6 +21,7 @@ object AlgebirdBuild extends Build {
     ),
 
     parallelExecution in Test := true,
+    javaOptions in Test += "-Xms4G",
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
