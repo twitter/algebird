@@ -119,8 +119,9 @@ object HyperLogLog {
     h match {
       case SparseHLL(bits, maxRhow) =>
         val jLen = (bits + 7) / 8
-        assert(jLen >= 1)
-        assert(jLen <= 3)
+        assert(jLen >= 1, "Shouldn't be possible to attempt to serialize 0 bytes")
+        assert(jLen < 5, "We at most support an integer in writing our length, which is 4 bytes")
+
         val buf = new Array[Byte](1 + 1 + (jLen + 1) * maxRhow.size)
         val byteBuf = ByteBuffer
           .wrap(buf)
@@ -131,6 +132,7 @@ object HyperLogLog {
           bb.put((j & 0xff).toByte)
           if (jLen >= 2) bb.put(((j >> 8) & 0xff).toByte)
           if (jLen >= 3) bb.put(((j >> 16) & 0xff).toByte)
+          if (jLen >= 4) bb.put(((j >> 24) & 0xff).toByte)
           bb.put(rhow.get)
         }
         buf
@@ -170,6 +172,7 @@ object HyperLogLog {
         case 1 => (bb.get.toInt & 0xff)
         case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
         case 3 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
+        case 4 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16) + ((bb.get.toInt & 0xff) << 24)
       }
       val rhow = bb.get
       j -> Max(rhow)
