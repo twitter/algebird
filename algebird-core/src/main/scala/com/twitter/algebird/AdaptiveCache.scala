@@ -111,8 +111,8 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
   def isFlushed = summingCache.isFlushed
 
   private var maxReportedSentinelSize = 0
-  case class Stats(hits: Int, cacheGrowth: Int, sentinelGrowth: Int)
-  def putWithStats(m: Map[K, V]): (Stats, Option[Map[K, V]]) = {
+  case class CacheStats(hits: Int, cacheGrowth: Int, sentinelGrowth: Int)
+  def putWithStats(m: Map[K, V]): (CacheStats, Option[Map[K, V]]) = {
     val oldCapacity = currentCapacity
     val (hits, evicted) = summingCache.putWithHits(m)
     val ret = update(evicted)
@@ -121,6 +121,6 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
       sentinelGrowth = sentinelCache.size - maxReportedSentinelSize
       maxReportedSentinelSize = sentinelCache.size
     }
-    (Stats(hits, currentCapacity - oldCapacity, sentinelGrowth), ret)
+    (CacheStats(hits, currentCapacity - oldCapacity, sentinelGrowth), ret)
   }
 }
