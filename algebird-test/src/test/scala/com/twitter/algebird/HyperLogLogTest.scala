@@ -153,6 +153,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
     }
     "Correctly serialize" in {
       (4 to 28).foreach { bits =>
+        println(bits) // Hack to get around the "No output has been received in the last 10 minutes" Travis timeout
         val mon = new HyperLogLogMonoid(bits)
         // Zero
         verifySerialization(mon.zero)
