@@ -22,9 +22,9 @@ object AlgebirdBuild extends Build {
 
     parallelExecution in Test := true,
 
-    javaOptions += "-XX:MaxPermSize=2048m",
+    javaOptions += "-XX:MaxPermSize=4096m",
 
-    javaOptions += "-Xmx2048m",
+    javaOptions += "-Xmx4096m",
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 

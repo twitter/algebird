@@ -152,7 +152,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       }
     }
     "Correctly serialize" in {
-      (4 to 31).foreach { bits =>
+      (4 to 28).foreach { bits =>
         val mon = new HyperLogLogMonoid(bits)
         // Zero
         verifySerialization(mon.zero)
