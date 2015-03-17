@@ -24,10 +24,10 @@ case class ReadOnlyBoxedArrayByte(private val inArray: Array[Byte]) {
   private[algebird] def getArray = inArray
   // Need to do underlying array equality sensibly
   override def equals(o: Any) = {
-    if (o.isInstanceOf[ReadOnlyBoxedArrayByte]) {
-      val oAsTpe = o.asInstanceOf[ReadOnlyBoxedArrayByte]
-      java.util.Arrays.equals(inArray, oAsTpe.inArray)
-    } else false
+    o match {
+      case ReadOnlyBoxedArray(that) => java.util.Arrays.equals(inArray, that)
+      case _ => false
+    }
   }
 }
 
@@ -214,7 +214,7 @@ sealed abstract class HLL extends java.io.Serializable {
 
   def approximateSize = asApprox(initialEstimate)
 
-  def estimatedSize: Double = initialEstimate.toDouble
+  def estimatedSize: Double = initialEstimate
 
   lazy val initialEstimate: Double = {
 
