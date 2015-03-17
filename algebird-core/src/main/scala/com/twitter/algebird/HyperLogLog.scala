@@ -18,6 +18,19 @@ package com.twitter.algebird
 
 import java.nio.ByteBuffer
 
+case class ReadOnlyBoxedArrayByte(private val inArray: Array[Byte]) {
+  def apply(idx: Int) = inArray.apply(idx)
+  def size = inArray.size
+  private[algebird] def getArray = inArray
+  // Need to do underlying array equality sensibly
+  override def equals(o: Any) = {
+    if (o.isInstanceOf[ReadOnlyBoxedArrayByte]) {
+      val oAsTpe = o.asInstanceOf[ReadOnlyBoxedArrayByte]
+      java.util.Arrays.equals(inArray, oAsTpe.inArray)
+    } else false
+  }
+}
+
 /** A super lightweight (hopefully) version of BitSet */
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
@@ -70,7 +83,8 @@ object HyperLogLog {
     buf
   }
 
-  def twopow(i: Int): Double = scala.math.pow(2.0, i)
+  @inline
+  def twopow(i: Int): Double = java.lang.Math.pow(2.0, i)
 
   /**
    * the value 'j' is equal to <w_0, w_1 ... w_(bits-1)>
@@ -135,19 +149,18 @@ object HyperLogLog {
         }
         buf
 
-      case DenseHLL(bits, v) => ((2: Byte) +: bits.toByte +: v).toArray
+      case DenseHLL(bits, v) =>
+        val bb = ByteBuffer.allocate(v.size + 2)
+        bb.put(2: Byte)
+        bb.put(bits.toByte)
+        bb.put(v.getArray)
+        bb.array
     }
   }
 
   // Make sure to be reversible so fromBytes(toBytes(x)) == x
-  def fromBytes(bytes: Array[Byte]): HLL = {
-    val bb = ByteBuffer.wrap(bytes)
-    bb.get.toInt match {
-      case 2 => DenseHLL(bb.get, bytes.toIndexedSeq.tail.tail)
-      case 3 => sparseFromByteBuffer(bb)
-      case n => throw new Exception("Unrecognized HLL type: " + n)
-    }
-  }
+  def fromBytes(bytes: Array[Byte]): HLL =
+    fromByteBuffer(ByteBuffer.wrap(bytes))
 
   def fromByteBuffer(bb: ByteBuffer): HLL = {
     bb.get.toInt match {
@@ -155,7 +168,7 @@ object HyperLogLog {
         val bits = bb.get
         val buf = new Array[Byte](bb.remaining)
         bb.get(buf)
-        DenseHLL(bits, buf)
+        DenseHLL(bits, ReadOnlyBoxedArrayByte(buf))
       case 3 => sparseFromByteBuffer(bb)
       case n => throw new Exception("Unrecognized HLL type: " + n)
     }
@@ -201,11 +214,15 @@ sealed abstract class HLL extends java.io.Serializable {
 
   def approximateSize = asApprox(initialEstimate)
 
-  def estimatedSize = approximateSize.estimate.toDouble
+  def estimatedSize: Double = initialEstimate.toDouble
 
-  private def initialEstimate = {
+  lazy val initialEstimate: Double = {
 
-    val e = factor * z
+    val sizeDouble: Double = size.toDouble
+    val smallE = 5 * sizeDouble / 2.0
+    val factor = alpha(bits) * sizeDouble * sizeDouble
+
+    val e: Double = factor * z
     // There are large and small value corrections from the paper
     // We stopped using the large value corrections since when using Long's
     // there was pathalogically bad results. See https://github.com/twitter/algebird/issues/284
@@ -224,10 +241,6 @@ sealed abstract class HLL extends java.io.Serializable {
     val prob3StdDev = 0.9972
     Approximate(lowerBound, v.toLong, upperBound, prob3StdDev)
   }
-
-  private def factor = alpha(bits) * size.toDouble * size.toDouble
-
-  private def smallE = 5 * size / 2.0
 
   private def smallEstimate(e: Double): Double = {
     if (zeroCnt == 0) {
@@ -329,31 +342,35 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
         if (allMaxRhow.size * 16 <= size) {
           SparseHLL(bits, allMaxRhow)
         } else {
-          DenseHLL(bits, sparseMapToSequence(allMaxRhow))
+          DenseHLL(bits, sparseMapToArray(allMaxRhow))
         }
 
       case DenseHLL(bits, oldV) =>
         assert(oldV.size == size, "Incompatible HLL size: " + oldV.size + " != " + size)
-        val newV = maxRhow.foldLeft(oldV) {
-          case (v, (j, rhow)) =>
-            if (rhow.get > v(j)) {
-              v.updated(j, rhow.get)
-            } else {
-              v
-            }
-        }
-        DenseHLL(bits, newV)
+        val newContents: Array[Byte] = oldV.getArray.clone
+        val siz = newContents.size
 
+        maxRhow.foreach {
+          case (idx, maxB) =>
+            val existing: Byte = newContents(idx)
+            val other: Byte = maxRhow(idx).get
+
+            if (other > existing)
+              newContents.update(idx, other)
+        }
+
+        DenseHLL(bits, ReadOnlyBoxedArrayByte(newContents))
     }
   }
 
-  def sparseMapToSequence(values: Map[Int, Max[Byte]]): IndexedSeq[Byte] = {
+  def sparseMapToArray(values: Map[Int, Max[Byte]]): ReadOnlyBoxedArrayByte = {
     val array = Array.fill[Byte](size)(0: Byte)
     values.foreach { case (j, rhow) => array.update(j, rhow.get) }
-    array.toIndexedSeq
+    ReadOnlyBoxedArrayByte(array)
   }
 
-  lazy val toDenseHLL = DenseHLL(bits, sparseMapToSequence(maxRhow))
+  lazy val toDenseHLL = DenseHLL(bits, sparseMapToArray(maxRhow))
+
   def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
     maxRhow.foreach {
@@ -378,17 +395,28 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class DenseHLL(bits: Int, v: IndexedSeq[Byte]) extends HLL {
+case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
 
   assert(v.size == (1 << bits), "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
 
   def size = v.size
 
-  lazy val zeroCnt = v.count { _ == 0 }
-
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
-  lazy val z = 1.0 / (v.map { mj => HyperLogLog.twopow(-mj) }.sum)
+
+  val (zeroCnt, z) = {
+    var count: Int = 0
+    var res: Double = 0
+    v.getArray.foreach { mj: Byte =>
+      if (mj == 0) {
+        count += 1
+        res += 1.0
+      } else {
+        res += java.lang.Math.pow(2.0, -mj)
+      }
+    }
+    (count, 1.0 / res)
+  }
 
   def +(other: HLL): HLL = {
 
@@ -398,13 +426,22 @@ case class DenseHLL(bits: Int, v: IndexedSeq[Byte]) extends HLL {
 
       case DenseHLL(_, ov) =>
         assert(ov.size == v.size, "Incompatible HLL size: " + ov.size + " != " + v.size)
-        DenseHLL(bits,
-          v
-            .view
-            .zip(ov)
-            .map { case (rhow, oRhow) => rhow max oRhow }
-            .toIndexedSeq)
 
+        val siz: Int = ov.size
+        val newContents: Array[Byte] = new Array[Byte](siz)
+
+        val other: Array[Byte] = ov.getArray
+        val thisArray: Array[Byte] = v.getArray
+
+        var indx: Int = 0
+        while (indx < siz) {
+          val rhow = thisArray(indx)
+          val oRhow = other(indx)
+          newContents.update(indx, rhow max oRhow)
+          indx += 1
+        }
+
+        DenseHLL(bits, ReadOnlyBoxedArrayByte(newContents))
     }
   }
 
@@ -412,7 +449,7 @@ case class DenseHLL(bits: Int, v: IndexedSeq[Byte]) extends HLL {
   def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
     var idx = 0
-    v.foreach { maxb =>
+    v.getArray.foreach { maxb =>
       buffer.update(idx, (buffer(idx)) max maxb)
       idx += 1
     }
@@ -426,14 +463,8 @@ case class DenseHLL(bits: Int, v: IndexedSeq[Byte]) extends HLL {
       val newRhoW = reducedV(newJ)
       reducedV.update(newJ, modifiedRhoW max newRhoW)
     }
-    DenseHLL(reducedBits, new IndexedSeqArrayByte(reducedV))
+    DenseHLL(reducedBits, ReadOnlyBoxedArrayByte(reducedV))
   }
-}
-
-class IndexedSeqArrayByte(buf: Array[Byte]) extends scala.collection.IndexedSeq[Byte] {
-  def length = buf.length
-  def apply(idx: Int): Byte = buf.apply(idx)
-  override def stringPrefix = "Array"
 }
 
 /*
@@ -458,7 +489,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
     existing.updateInto(buffer)
     iter.foreach { _.updateInto(buffer) }
 
-    DenseHLL(bits, new IndexedSeqArrayByte(buffer))
+    DenseHLL(bits, ReadOnlyBoxedArrayByte(buffer))
   }
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
