@@ -1,6 +1,8 @@
 package com.twitter.algebird
 
 import java.util.PriorityQueue
+import scala.collection.generic.CanBuildFrom
+
 /**
  * Aggregators compose well.
  *
@@ -174,6 +176,28 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     reduceOption(inputs.map(prepare))
       .map(present)
 
+  /**
+   * This returns the cumulative sum of its inputs, in the same order.
+   * If the inputs are empty, the result will be empty too.
+   */
+  def cumulativeIterator(inputs: Iterator[A]): Iterator[C] =
+    inputs
+      .scanLeft(None: Option[B]) {
+        case (None, a) => Some(prepare(a))
+        case (Some(b), a) => Some(append(b, a))
+      }
+      .collect { case Some(b) => present(b) }
+
+  /**
+   * This returns the cumulative sum of its inputs, in the same order.
+   * If the inputs are empty, the result will be empty too.
+   */
+  def applyCumulatively[In <: TraversableOnce[A], Out](inputs: In)(implicit bf: CanBuildFrom[In, C, Out]): Out = {
+    val builder = bf()
+    builder ++= cumulativeIterator(inputs.toIterator)
+    builder.result
+  }
+
   def append(l: B, r: A): B = reduce(l, prepare(r))
 
   def appendAll(old: B, items: TraversableOnce[A]): B =
@@ -201,6 +225,22 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     GeneratedTupleAggregator.from2((this, that))
 
   /**
+   * This allows you to join two aggregators into one that takes a tuple input,
+   * which in turn allows you to chain .composePrepare onto the result if you have
+   * an initial input that has to be prepared differently for each of the joined aggregators.
+   *
+   * The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+   */
+  def zip[A2, B2, C2](ag2: Aggregator[A2, B2, C2]): Aggregator[(A, A2), (B, B2), (C, C2)] = {
+    val ag1 = this
+    new Aggregator[(A, A2), (B, B2), (C, C2)] {
+      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+    }
+  }
+
+  /**
    * An Aggregator can be converted to a Fold, but not vice-versa
    * Note, a Fold is more constrained so only do this if you require
    * joining a Fold with an Aggregator to produce a Fold
@@ -212,6 +252,13 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     },
     None,
     { _.map(self.present(_)) })
+
+  def lift: MonoidAggregator[A, Option[B], Option[C]] =
+    new MonoidAggregator[A, Option[B], Option[C]] {
+      def prepare(input: A): Option[B] = Some(self.prepare(input))
+      def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
+      def monoid = new OptionMonoid[B]()(self.semigroup)
+    }
 }
 
 /**
@@ -244,7 +291,7 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
     GeneratedTupleAggregator.from5(m1, m2, m3, m4, m5)
 }
 
-trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] {
+trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   def monoid: Monoid[B]
   def semigroup = monoid
   final override def reduce(items: TraversableOnce[B]): B =
@@ -268,6 +315,13 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] {
       def present(b: B) = self.present(b)
     }
   }
+
+  def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
+    new MonoidAggregator[TraversableOnce[A], B, C] {
+      def monoid: Monoid[B] = self.monoid
+      def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
+      def present(reduction: B): C = self.present(reduction)
+    }
 }
 
 trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {

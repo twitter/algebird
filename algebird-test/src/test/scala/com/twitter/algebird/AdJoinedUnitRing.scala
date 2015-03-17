@@ -17,11 +17,10 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalacheck.Prop._
 
-class AdjoinedRingSpecification extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class AdjoinedRingSpecification extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit def adjoined[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] = Arbitrary {
     implicitly[Arbitrary[T]].arbitrary.map { t => AdjoinedUnit(t) }
@@ -29,7 +28,7 @@ class AdjoinedRingSpecification extends PropSpec with PropertyChecks with Matche
   // AdjoinedUnit requires this method to be correct, so it is tested here:
   property("intTimes works correctly") {
     forAll { (bi0: BigInt, bi1: BigInt) =>
-      assert(Group.intTimes(bi0, bi1) == (bi0 * bi1))
+      Group.intTimes(bi0, bi1) == (bi0 * bi1)
     }
   }
 

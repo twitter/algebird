@@ -1,12 +1,13 @@
 package com.twitter.algebird
 
-import org.scalatest.{ DiagrammedAssertions, WordSpec, PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
-import java.io.{ ObjectOutputStream, ByteArrayOutputStream }
+import java.io.{ ByteArrayOutputStream, ObjectOutputStream }
 
-class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.{ Matchers, WordSpec }
+import org.scalacheck.Prop._
+
+class BloomFilterLaws extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   val NUM_HASHES = 6
   val WIDTH = 32
@@ -23,7 +24,7 @@ class BloomFilterLaws extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
+class BFHashIndices extends CheckProperties {
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
@@ -39,8 +40,8 @@ class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
 
   property("Indices are non negative") {
     forAll { (hash: BFHash, v: Long) =>
-      hash.apply(v.toString).foreach { e =>
-        assert(e >= 0)
+      hash.apply(v.toString).forall { e =>
+        e >= 0
       }
     }
   }
@@ -89,7 +90,7 @@ class BFHashIndices extends PropSpec with PropertyChecks with Matchers {
       val s = v.toString
       val (hash, negativeHash) = pair
       val indices = negativeHash.apply(s)
-      assert(indices == hash.apply(s) || indices.exists(_ < 0))
+      indices == hash.apply(s) || indices.exists(_ < 0)
     }
   }
 }

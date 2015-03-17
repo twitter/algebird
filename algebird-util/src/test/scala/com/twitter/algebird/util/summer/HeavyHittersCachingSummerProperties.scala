@@ -16,11 +16,11 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import com.twitter.algebird.CheckProperties
+import org.scalacheck.Prop._
 
-class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks with Matchers {
-  import AsyncSummerLaws._
+class HeavyHittersCachingSummerProperties extends CheckProperties {
+  import com.twitter.algebird.util.summer.AsyncSummerLaws._
 
   property("Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
@@ -56,7 +56,7 @@ class HeavyHittersCachingSummerProperties extends PropSpec with PropertyChecks w
         insertOp,
         sizeCounter,
         summer)
-      assert(summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
+      (summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
     }
   }
 

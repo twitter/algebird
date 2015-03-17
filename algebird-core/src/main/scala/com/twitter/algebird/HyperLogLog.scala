@@ -240,6 +240,73 @@ sealed abstract class HLL extends java.io.Serializable {
    * Set each item in the given buffer to the max of this and the buffer
    */
   def updateInto(buffer: Array[Byte]): Unit
+
+  /**
+   * Returns the modified value of rhoW at j, taking into account the
+   * extra run of bits added to rho due to reduction in the length of j.
+   *
+   * @param currentJ    j for which modified rhoW is needed
+   * @param currentRhoW Current rhoW value for j
+   * @param reducedBits New length of j
+   * @param reducedSize New size (passed in to avoid repeated computation)
+   * @param bitMask     Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
+   * @param buf         Byte array (passed in to avoid repeated allocation)
+   *
+   * @return  New value of rhoW
+   */
+  protected def getModifiedRhoW(currentJ: Int, currentRhoW: Byte,
+    reducedBits: Int, reducedSize: Int,
+    bitMask: Int, buf: Array[Byte]): Byte = {
+    if (currentRhoW == 0)
+      // rhoW not set, skip
+      currentRhoW
+    else if (currentJ < reducedSize)
+      // the MSBs are guaranteed to be all zero, so we can just add the difference to rhoW
+      (currentRhoW + (bits - reducedBits)).toByte
+    else {
+      // find the number of leading zeros
+      // we use bitMask to force rhoW to stop after going through (bits - reducedBits) bits
+      ByteBuffer.wrap(buf).putInt(Integer.reverse(currentJ | bitMask))
+      HyperLogLog.rhoW(BitSetLite(buf), reducedBits)
+    }
+  }
+
+  /**
+   * Returns a new HLL instance with reduced size
+   *
+   * [[http://research.neustar.biz/2012/09/12/set-operations-on-hlls-of-different-sizes/]]
+   *
+   * [[http://research.neustar.biz/2013/03/25/hyperloglog-engineering-choosing-the-right-bits/]]
+   *
+   * @param reducedBits The new number of bits to use
+   *
+   * @return  New HLL instance with reduced size
+   */
+  def downsize(reducedBits: Int): HLL = {
+    require(reducedBits > 3 && reducedBits <= bits, s"Use at least 4, and at most $bits bits")
+    if (reducedBits == bits)
+      this
+    else {
+      val reducedSize = 1 << reducedBits
+      // bit mask to set MSBs to 1. Makes rhoW exit fast
+      val bitMask = 0xFFFFFFFF << bits
+      val buf = new Array[Byte](4)
+
+      downsize(reducedBits, reducedSize, bitMask, buf)
+    }
+  }
+
+  /**
+   * Returns a new HLL instance with reduced size
+   *
+   * @param reducedBits The new number of bits to use (for the length of j)
+   * @param reducedSize New size (passed in to avoid repeated computation)
+   * @param bitMask     Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
+   * @param buf         Byte array (passed in to avoid repeated allocation)
+   *
+   * @return  New HLL instance with reduced size
+   */
+  protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL
 }
 
 case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
@@ -294,6 +361,18 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
         buffer.update(idx, buffer(idx) max (maxb.get))
     }
   }
+
+  override protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL = {
+    val reducedMaxRhoW = collection.mutable.Map.empty[Int, Byte]
+    maxRhow.foreach {
+      case (j, rhoW) =>
+        val modifiedRhoW = getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
+        val newJ = j % reducedSize
+        val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
+        reducedMaxRhoW += (newJ -> (newRhoW max modifiedRhoW))
+    }
+    SparseHLL(reducedBits, reducedMaxRhoW.toMap.mapValues(Max(_)))
+  }
 }
 
 /**
@@ -337,6 +416,17 @@ case class DenseHLL(bits: Int, v: IndexedSeq[Byte]) extends HLL {
       buffer.update(idx, (buffer(idx)) max maxb)
       idx += 1
     }
+  }
+
+  override def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL = {
+    val reducedV = Array.fill[Byte](reducedSize)(0: Byte)
+    for (i <- 0 until size) {
+      val modifiedRhoW = getModifiedRhoW(i, v(i), reducedBits, reducedSize, bitMask, buf)
+      val newJ = i % reducedSize
+      val newRhoW = reducedV(newJ)
+      reducedV.update(newJ, modifiedRhoW max newRhoW)
+    }
+    DenseHLL(reducedBits, new IndexedSeqArrayByte(reducedV))
   }
 }
 

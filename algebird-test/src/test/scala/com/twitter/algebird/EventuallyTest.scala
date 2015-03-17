@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyRingLaws extends CheckProperties {
   import BaseProperties._
 
   val eventuallyRing = new EventuallyRing[Long, Int](_.asInstanceOf[Long])(_ > 10000)
@@ -18,7 +18,7 @@ class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
 }
 
 // A lossy one:
-class EventuallyMonoidLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyMonoidLaws extends CheckProperties {
   import BaseProperties._
 
   val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)

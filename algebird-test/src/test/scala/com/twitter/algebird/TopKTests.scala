@@ -16,18 +16,16 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import com.twitter.algebird.mutable.PriorityQueueMonoid
 import java.util.PriorityQueue
+
+import com.twitter.algebird.mutable.PriorityQueueMonoid
+import org.scalacheck.Arbitrary
+import org.scalacheck.Prop._
 
 import scala.collection.JavaConverters._
 
-import org.scalatest._
-
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
-
-class TopKTests extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class TopKTests extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
   val SIZE = 10
 
   implicit def qmonoid = new PriorityQueueMonoid[Int](SIZE)
@@ -49,7 +47,7 @@ class TopKTests extends PropSpec with PropertyChecks with Matchers {
 
   property("PriorityQueueMonoid works") {
     forAll { (items: List[List[Int]]) =>
-      assert(pqIsCorrect(items))
+      pqIsCorrect(items)
     }
   }
   /**
@@ -74,7 +72,7 @@ class TopKTests extends PropSpec with PropertyChecks with Matchers {
   property("TopKMonoid works") {
     forAll { (its: List[List[Int]]) =>
       val correct = its.flatten.sorted.take(SIZE)
-      assert(Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) }).items, correct))
+      Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) }).items, correct)
     }
   }
 

@@ -35,7 +35,7 @@ object ReferenceHyperLogLog {
 
 }
 
-class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
+class HyperLogLogLaws extends CheckProperties {
   import BaseProperties._
   import HyperLogLog._
 
@@ -111,6 +111,14 @@ class HyperLogLogTest extends WordSpec with Matchers {
     val errorMult = scala.math.pow(2.0, sets) - 1.0
     assert(scala.math.abs(exact - approxIntersect(bits, data)) / exact < errorMult *
       aveErrorOf(bits))
+  }
+  def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
+    val data = (0 until dataSize).map { i => r.nextLong }
+    val exact = exactCount(data).toDouble
+    val hll = new HyperLogLogMonoid(oldBits)
+    val oldHll = hll.sum(data.map { hll(_) })
+    val newHll = oldHll.downsize(newBits)
+    assert(scala.math.abs(exact - newHll.estimatedSize) / exact < 3.5 * aveErrorOf(newBits))
   }
 
   "HyperLogLog" should {
@@ -214,6 +222,32 @@ class HyperLogLogTest extends WordSpec with Matchers {
         val estimate = aggregator(data.map(int2Bytes(_)))
         assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(bits))
       })
+    }
+
+    "correctly downsize sparse HLL" in {
+      testDownsize(10)(10, 7)
+      testDownsize(10)(14, 4)
+      testDownsize(10)(12, 12)
+      
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(15, 3)
+      }
+    }
+
+    "correctly downsize dense HLL" in {
+      testDownsize(10000)(10, 7)
+      testDownsize(10000)(14, 4)
+      testDownsize(10000)(12, 12)
+
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(15, 3)
+      }
     }
 
     def verifySerialization(h: HLL) {

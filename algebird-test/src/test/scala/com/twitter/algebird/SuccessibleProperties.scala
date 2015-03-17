@@ -16,12 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Arbitrary, Properties }
-
-class SuccessibleProperties extends PropSpec with PropertyChecks with Matchers {
-  import SuccessibleLaws.{ successibleLaws => laws }
+class SuccessibleProperties extends CheckProperties {
+  import com.twitter.algebird.SuccessibleLaws.{ successibleLaws => laws }
 
   property("Int is Successible") {
     laws[Int]
