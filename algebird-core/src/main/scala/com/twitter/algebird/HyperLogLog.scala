@@ -25,7 +25,7 @@ case class ReadOnlyBoxedArrayByte(private val inArray: Array[Byte]) {
   // Need to do underlying array equality sensibly
   override def equals(o: Any) = {
     o match {
-      case ReadOnlyBoxedArray(that) => java.util.Arrays.equals(inArray, that)
+      case ReadOnlyBoxedArrayByte(that) => java.util.Arrays.equals(inArray, that)
       case _ => false
     }
   }
@@ -407,13 +407,20 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
   val (zeroCnt, z) = {
     var count: Int = 0
     var res: Double = 0
-    v.getArray.foreach { mj: Byte =>
+
+    // goto while loop to avoid closure
+    val arr: Array[Byte] = v.getArray
+    val arrSize: Int = arr.size
+    var idx: Int = 0
+    while (idx < arrSize) {
+      val mj = arr(idx)
       if (mj == 0) {
         count += 1
         res += 1.0
       } else {
         res += java.lang.Math.pow(2.0, -mj)
       }
+      idx += 1
     }
     (count, 1.0 / res)
   }
@@ -448,8 +455,13 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
   val toDenseHLL = this
   def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
-    var idx = 0
-    v.getArray.foreach { maxb =>
+
+    val arr: Array[Byte] = v.getArray
+    val arrSize: Int = arr.size
+    var idx: Int = 0
+
+    while (idx < arrSize) {
+      val maxb = arr(idx)
       buffer.update(idx, (buffer(idx)) max maxb)
       idx += 1
     }
