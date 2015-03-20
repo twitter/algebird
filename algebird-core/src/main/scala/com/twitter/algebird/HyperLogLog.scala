@@ -216,7 +216,7 @@ sealed abstract class HLL extends java.io.Serializable {
 
   def estimatedSize: Double = initialEstimate
 
-  lazy val initialEstimate: Double = {
+  private lazy val initialEstimate: Double = {
 
     val sizeDouble: Double = size.toDouble
     val smallE = 5 * sizeDouble / 2.0
@@ -404,7 +404,7 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
 
-  val (zeroCnt, z) = {
+  lazy val (zeroCnt, z) = {
     var count: Int = 0
     var res: Double = 0
 
