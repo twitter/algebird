@@ -112,6 +112,8 @@ sealed abstract class BF extends java.io.Serializable {
 
   def +(other: String): BF
 
+  def checkAndAdd(item: String): (BF, ApproximateBoolean)
+
   def contains(item: String): ApproximateBoolean
 
   // Estimates the cardinality of the set of elements that have been
@@ -128,6 +130,8 @@ case class BFZero(hashes: BFHash, width: Int) extends BF {
   def ++(other: BF) = other
 
   def +(other: String) = BFItem(other, hashes, width)
+
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
 
   def contains(item: String) = ApproximateBoolean.exactFalse
 
@@ -149,6 +153,8 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   }
 
   def +(other: String) = this ++ BFItem(other, hashes, width)
+
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exact(other == item))
 
   def contains(x: String) = ApproximateBoolean.exact(item == x)
 
@@ -187,6 +193,11 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
       width)
   }
 
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
+    val containedApproximate = this.contains(other)
+    (this + other, containedApproximate)
+  }
+
   def contains(item: String): ApproximateBoolean = dense.contains(item)
 
   def size: Approximate[Long] = dense.size
@@ -223,6 +234,12 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
     BFInstance(hashes,
       bits ++ bitsToActivate,
       width)
+  }
+
+  def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
+    val bitsToActivate = BitSet(hashes(item): _*)
+    val contained = this.contains(item)
+    (BFInstance(hashes, bits ++ bitsToActivate, width), contained)
   }
 
   def bitSetContains(bs: BitSet, il: Int*): Boolean = {

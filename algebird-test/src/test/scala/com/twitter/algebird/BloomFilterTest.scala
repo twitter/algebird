@@ -207,4 +207,32 @@ class BloomFilterTest extends WordSpec with Matchers {
       assert(index >= 0)
     }
   }
+
+  "BloomFilter method `checkAndAdd`" should {
+
+    "be identical to method `+`" in {
+      (0 to 100).foreach {
+        _ =>
+          {
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = bfMonoid.create(entries: _*)
+            val bfWithCheckAndAdd = entries
+              .map { entry => (entry, bfMonoid.create(entry)) }
+              .foldLeft((bfMonoid.zero, bfMonoid.zero)) {
+                case ((left, leftAlt), (entry, right)) =>
+                  val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
+                  left.contains(entry) shouldBe contained
+                  (left + entry, newLeftAlt)
+              }
+
+            entries.foreach { i =>
+              assert(bf.contains(i.toString).isTrue)
+            }
+          }
+      }
+    }
+  }
+
 }
