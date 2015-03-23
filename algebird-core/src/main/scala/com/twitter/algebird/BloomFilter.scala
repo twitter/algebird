@@ -154,7 +154,13 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
 
   def +(other: String) = this ++ BFItem(other, hashes, width)
 
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exact(other == item))
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
+    if (other == item) {
+      (this, ApproximateBoolean.exactTrue)
+    } else {
+      (this + other, ApproximateBoolean.exactFalse)
+    }
+  }
 
   def contains(x: String) = ApproximateBoolean.exact(item == x)
 
@@ -237,13 +243,13 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
-    val bitsToActivate = BitSet(hashes(item): _*)
     val contained = this.contains(item)
-    (BFInstance(hashes, bits ++ bitsToActivate, width), contained)
+    (this.+(item), contained)
   }
 
   def bitSetContains(bs: BitSet, il: Int*): Boolean = {
-    il.map{ i: Int => bs.contains(i) }.reduce{ _ && _ }
+    il.foreach { i => if (!bs.contains(i)) return false }
+    true
   }
 
   def contains(item: String) = {

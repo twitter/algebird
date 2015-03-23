@@ -49,7 +49,7 @@ object HyperLogLog {
     pairLongs2Bytes(l0, l1)
   }
 
-  def pairLongs2Bytes(l0: Long, l1: Long): Array[Byte] = {
+  private[algebird] def pairLongs2Bytes(l0: Long, l1: Long): Array[Byte] = {
     val buf = new Array[Byte](16)
     ByteBuffer
       .wrap(buf)
