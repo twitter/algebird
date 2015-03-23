@@ -235,7 +235,12 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   def +(item: String): BFInstance = {
-    val bitsToActivate = BitSet(hashes(item): _*)
+    val itemHashes = hashes(item)
+    this.+(itemHashes: _*)
+  }
+
+  private def +(itemHashes: Int*): BFInstance = {
+    val bitsToActivate = BitSet(itemHashes: _*)
 
     BFInstance(hashes,
       bits ++ bitsToActivate,
@@ -243,17 +248,23 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
-    val contained = this.contains(item)
-    (this.+(item), contained)
+    val itemHashes = hashes(item)
+    val contained = this.contains(itemHashes: _*)
+    (this.+(itemHashes: _*), contained)
   }
 
-  def bitSetContains(bs: BitSet, il: Int*): Boolean = {
+  private def bitSetContains(bs: BitSet, il: Int*): Boolean = {
     il.foreach { i => if (!bs.contains(i)) return false }
     true
   }
 
-  def contains(item: String) = {
-    if (bitSetContains(bits, hashes(item): _*)) {
+  def contains(item: String): ApproximateBoolean = {
+    val itemHashes = hashes(item)
+    contains(itemHashes: _*)
+  }
+
+  private def contains(itemHashes: Int*): ApproximateBoolean = {
+    if (bitSetContains(bits, itemHashes: _*)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
       // p = (1 - e^(-numHashes * setCardinality / width))^numHashes
