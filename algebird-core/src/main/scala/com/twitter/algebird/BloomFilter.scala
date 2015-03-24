@@ -199,10 +199,7 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
       width)
   }
 
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
-    val containedApproximate = this.contains(other)
-    (this + other, containedApproximate)
-  }
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = dense.checkAndAdd(other)
 
   def contains(item: String): ApproximateBoolean = dense.contains(item)
 
@@ -263,7 +260,7 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
     contains(itemHashes: _*)
   }
 
-  private def contains(itemHashes: Int*): ApproximateBoolean = {
+  private[algebird] def contains(itemHashes: Int*): ApproximateBoolean = {
     if (bitSetContains(bits, itemHashes: _*)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
