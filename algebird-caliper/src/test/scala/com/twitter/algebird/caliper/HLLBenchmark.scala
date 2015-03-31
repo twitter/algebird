@@ -7,7 +7,6 @@ import com.twitter.bijection._
 import java.util.concurrent.Executors
 import com.twitter.algebird.util._
 import com.google.caliper.{ Param, SimpleBenchmark }
-import com.twitter.algebird.{ HyperLogLogMonoid, ReadOnlyBoxedArrayByte }
 import java.nio.ByteBuffer
 
 import scala.math._
@@ -19,7 +18,7 @@ class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
     else {
       val buffer = new Array[Byte](size)
       items.foreach { _.updateInto(buffer) }
-      Some(DenseHLL(bits, ReadOnlyBoxedArrayByte(buffer)))
+      Some(DenseHLL(bits, Bytes(buffer)))
     }
 }
 
