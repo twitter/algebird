@@ -41,12 +41,15 @@ final case class Bytes(array: Array[Byte]) extends java.io.Serializable {
    * intentionally do not create a defensive, immutable copy because of performance considerations).
    */
   override def equals(that: Any): Boolean = that match {
-    case Bytes(thatArray) => array sameElements thatArray
+    case Bytes(thatArray) => java.util.Arrays.equals(array, thatArray)
     case _ => false
   }
 
   override def toString: String = array.map(_.toString).mkString("Bytes(", ",", ")")
 
+  def apply(idx: Int) = array.apply(idx)
+
+  def size = array.size
 }
 
 object Bytes {
@@ -54,7 +57,7 @@ object Bytes {
   private val HashSeed = 0
 
   implicit val ordering: Ordering[Bytes] = new Ordering[Bytes] {
-    def compare(a: Bytes, b: Bytes): Int = ByteBuffer.wrap(a.array) compareTo ByteBuffer.wrap(b.array)
+    def compare(a: Bytes, b: Bytes): Int = ByteBuffer.wrap(a.array).compareTo(ByteBuffer.wrap(b.array))
   }
 
 }

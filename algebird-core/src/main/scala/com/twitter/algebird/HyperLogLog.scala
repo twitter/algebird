@@ -18,19 +18,6 @@ package com.twitter.algebird
 
 import java.nio.ByteBuffer
 
-case class ReadOnlyBoxedArrayByte(private val inArray: Array[Byte]) {
-  def apply(idx: Int) = inArray.apply(idx)
-  def size = inArray.size
-  private[algebird] def getArray = inArray
-  // Need to do underlying array equality sensibly
-  override def equals(o: Any) = {
-    o match {
-      case ReadOnlyBoxedArrayByte(that) => java.util.Arrays.equals(inArray, that)
-      case _ => false
-    }
-  }
-}
-
 /** A super lightweight (hopefully) version of BitSet */
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
@@ -153,7 +140,7 @@ object HyperLogLog {
         val bb = ByteBuffer.allocate(v.size + 2)
         bb.put(2: Byte)
         bb.put(bits.toByte)
-        bb.put(v.getArray)
+        bb.put(v.array)
         bb.array
     }
   }
@@ -168,7 +155,7 @@ object HyperLogLog {
         val bits = bb.get
         val buf = new Array[Byte](bb.remaining)
         bb.get(buf)
-        DenseHLL(bits, ReadOnlyBoxedArrayByte(buf))
+        DenseHLL(bits, Bytes(buf))
       case 3 => sparseFromByteBuffer(bb)
       case n => throw new Exception("Unrecognized HLL type: " + n)
     }
@@ -347,7 +334,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 
       case DenseHLL(bits, oldV) =>
         assert(oldV.size == size, "Incompatible HLL size: " + oldV.size + " != " + size)
-        val newContents: Array[Byte] = oldV.getArray.clone
+        val newContents: Array[Byte] = oldV.array.clone
         val siz = newContents.size
 
         maxRhow.foreach {
@@ -359,14 +346,14 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
               newContents.update(idx, other)
         }
 
-        DenseHLL(bits, ReadOnlyBoxedArrayByte(newContents))
+        DenseHLL(bits, Bytes(newContents))
     }
   }
 
-  def sparseMapToArray(values: Map[Int, Max[Byte]]): ReadOnlyBoxedArrayByte = {
+  def sparseMapToArray(values: Map[Int, Max[Byte]]): Bytes = {
     val array = Array.fill[Byte](size)(0: Byte)
     values.foreach { case (j, rhow) => array.update(j, rhow.get) }
-    ReadOnlyBoxedArrayByte(array)
+    Bytes(array)
   }
 
   lazy val toDenseHLL = DenseHLL(bits, sparseMapToArray(maxRhow))
@@ -395,7 +382,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
+case class DenseHLL(bits: Int, v: Bytes) extends HLL {
 
   assert(v.size == (1 << bits), "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
 
@@ -409,7 +396,7 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
     var res: Double = 0
 
     // goto while loop to avoid closure
-    val arr: Array[Byte] = v.getArray
+    val arr: Array[Byte] = v.array
     val arrSize: Int = arr.size
     var idx: Int = 0
     while (idx < arrSize) {
@@ -437,8 +424,8 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
         val siz: Int = ov.size
         val newContents: Array[Byte] = new Array[Byte](siz)
 
-        val other: Array[Byte] = ov.getArray
-        val thisArray: Array[Byte] = v.getArray
+        val other: Array[Byte] = ov.array
+        val thisArray: Array[Byte] = v.array
 
         var indx: Int = 0
         while (indx < siz) {
@@ -448,7 +435,7 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
           indx += 1
         }
 
-        DenseHLL(bits, ReadOnlyBoxedArrayByte(newContents))
+        DenseHLL(bits, Bytes(newContents))
     }
   }
 
@@ -456,7 +443,7 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
   def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
 
-    val arr: Array[Byte] = v.getArray
+    val arr: Array[Byte] = v.array
     val arrSize: Int = arr.size
     var idx: Int = 0
 
@@ -475,7 +462,7 @@ case class DenseHLL(bits: Int, v: ReadOnlyBoxedArrayByte) extends HLL {
       val newRhoW = reducedV(newJ)
       reducedV.update(newJ, modifiedRhoW max newRhoW)
     }
-    DenseHLL(reducedBits, ReadOnlyBoxedArrayByte(reducedV))
+    DenseHLL(reducedBits, Bytes(reducedV))
   }
 }
 
@@ -501,7 +488,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
     existing.updateInto(buffer)
     iter.foreach { _.updateInto(buffer) }
 
-    DenseHLL(bits, ReadOnlyBoxedArrayByte(buffer))
+    DenseHLL(bits, Bytes(buffer))
   }
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
