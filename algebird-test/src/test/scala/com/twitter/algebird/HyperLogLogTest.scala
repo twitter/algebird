@@ -228,7 +228,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       testDownsize(10)(10, 7)
       testDownsize(10)(14, 4)
       testDownsize(10)(12, 12)
-      
+
       intercept[IllegalArgumentException] {
         testDownsize(10)(9, 13)
       }

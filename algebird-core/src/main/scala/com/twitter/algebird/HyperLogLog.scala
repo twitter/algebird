@@ -337,13 +337,14 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
         val newContents: Array[Byte] = oldV.array.clone
         val siz = newContents.size
 
-        maxRhow.foreach {
-          case (idx, maxB) =>
-            val existing: Byte = newContents(idx)
-            val other: Byte = maxRhow(idx).get
+        val iter: Iterator[(Int, Max[Byte])] = maxRhow.iterator
+        while (iter.hasNext) {
+          val (idx, maxB) = iter.next
+          val existing: Byte = newContents(idx)
+          val other: Byte = maxRhow(idx).get
 
-            if (other > existing)
-              newContents.update(idx, other)
+          if (other > existing)
+            newContents.update(idx, other)
         }
 
         DenseHLL(bits, Bytes(newContents))
