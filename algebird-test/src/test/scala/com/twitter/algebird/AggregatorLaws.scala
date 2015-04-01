@@ -106,13 +106,14 @@ class AggregatorLaws extends CheckProperties {
   }
   property("MonoidAggregator.either is correct") {
     forAll { (in: List[(Int, Int)], agl: MonoidAggregator[Int, Int, Int], agr: MonoidAggregator[Int, Int, Int]) =>
-      assert(agl.zip(agr).apply(in) ==
-        agl.either(agr).apply(in.flatMap { case (l, r) => List(Left(l), Right(r)) }))
+      agl.zip(agr).apply(in) ==
+        agl.either(agr).apply(in.flatMap { case (l, r) => List(Left(l), Right(r)) })
     }
   }
+
   property("MonoidAggregator.filter is correct") {
     forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Boolean) =>
-      assert(ag.filterBefore(fn).apply(in) == ag.apply(in.filter(fn)))
+      ag.filterBefore(fn).apply(in) == ag.apply(in.filter(fn))
     }
   }
 }

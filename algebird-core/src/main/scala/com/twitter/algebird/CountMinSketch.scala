@@ -122,7 +122,7 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Mon
   /**
    * Creates a sketch out of a single item.
    */
-  def create(item: K): CMS[K] = CMSItem[K](item, params)
+  def create(item: K): CMS[K] = CMSItem[K](item, 1L, params)
 
   /**
    * Creates a sketch out of multiple items.
@@ -426,7 +426,7 @@ case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) 
 
   override val totalCount: Long = 0L
 
-  override def +(item: K, count: Long): CMS[K] = CMSInstance[K](params) + (item, count)
+  override def +(item: K, count: Long): CMS[K] = CMSItem[K](item, count, params)
 
   override def ++(other: CMS[K]): CMS[K] = other
 
@@ -439,9 +439,7 @@ case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) 
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class CMSItem[K](item: K, override val params: CMSParams[K]) extends CMS[K](params) {
-
-  override val totalCount: Long = 1L
+case class CMSItem[K](item: K, override val totalCount: Long, override val params: CMSParams[K]) extends CMS[K](params) {
 
   override def +(x: K, count: Long): CMS[K] = CMSInstance[K](params) + item + (x, count)
 

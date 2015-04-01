@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 

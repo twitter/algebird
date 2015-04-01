@@ -338,7 +338,7 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
       val totalCounts = Gen.choose(1, 10000)
       val ranges = Gen.choose(100, 2000)
 
-      forAll((totalCounts, "totalCount"), (ranges, "range"), minSuccessful(50)) { (totalCount: Int, range: Int) =>
+      forAll((totalCounts, "totalCount"), (ranges, "range"), minSuccessful(10)) { (totalCount: Int, range: Int) =>
         val data1 = createRandomStream(totalCount, range)
         val data2 = createRandomStream(totalCount, range)
         val cms1 = COUNTING_CMS_MONOID.create(data1)
