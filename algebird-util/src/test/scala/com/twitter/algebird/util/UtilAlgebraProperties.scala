@@ -17,7 +17,7 @@
 package com.twitter.algebird.util
 
 import com.twitter.algebird.CheckProperties
-import com.twitter.algebird.MonadLaws.monadLaws
+import com.twitter.algebird.ChainableCallbackCollectorBuilderLaws.monadLaws
 import com.twitter.util.{ Await, Future, Return, Try }
 import org.scalacheck.Arbitrary
 
@@ -41,13 +41,13 @@ class UtilAlgebraProperties extends CheckProperties {
       Arbitrary.arbitrary[T].map { l => Return(l) }
     }
 
-  property("futureMonad") {
+  property("futureChainableCallbackCollectorBuilder") {
     monadLaws[Future, Int, String, Long] { (f1, f2) =>
       toOption(f1) == toOption(f2)
     }
   }
 
-  property("tryMonad") {
+  property("tryChainableCallbackCollectorBuilder") {
     monadLaws[Try, Int, String, Long]()
   }
 

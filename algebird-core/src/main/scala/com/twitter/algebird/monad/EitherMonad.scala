@@ -16,11 +16,11 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.Monad
+import com.twitter.algebird.ChainableCallbackCollectorBuilder
 
-// Monad for either, used for modeling Error where L is the type of the error
-object EitherMonad {
-  class Error[L] extends Monad[({ type RightType[R] = Either[L, R] })#RightType] {
+// ChainableCallbackCollectorBuilder for either, used for modeling Error where L is the type of the error
+object EitherChainableCallbackCollectorBuilder {
+  class Error[L] extends ChainableCallbackCollectorBuilder[({ type RightType[R] = Either[L, R] })#RightType] {
     def apply[R](r: R) = Right(r)
 
     def flatMap[T, U](self: Either[L, T])(next: T => Either[L, U]): Either[L, U] =
@@ -29,7 +29,7 @@ object EitherMonad {
     override def map[T, U](self: Either[L, T])(fn: T => U): Either[L, U] =
       self.right.map(fn)
   }
-  implicit def monad[L]: Monad[({ type RightT[R] = Either[L, R] })#RightT] = new Error[L]
+  implicit def monad[L]: ChainableCallbackCollectorBuilder[({ type RightT[R] = Either[L, R] })#RightT] = new Error[L]
 
   def assert[L](truth: Boolean, failure: => L): Either[L, Unit] = if (truth) Right(()) else Left(failure)
 }

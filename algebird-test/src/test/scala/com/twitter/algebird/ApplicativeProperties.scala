@@ -22,8 +22,8 @@ import org.scalacheck.Properties
 
 class ApplicativeProperties extends CheckProperties {
   import ApplicativeLaws._
-  import Monad._ // for Monad instances
-  import MonadLaws._ // for Arbitrary instances
+  import ChainableCallbackCollectorBuilder._ // for ChainableCallbackCollectorBuilder instances
+  import ChainableCallbackCollectorBuilderLaws._ // for Arbitrary instances
 
   property("list") {
     applicativeLaws[List, Int, String, Long]()

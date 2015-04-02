@@ -16,11 +16,11 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.Monad
+import com.twitter.algebird.ChainableCallbackCollectorBuilder
 
 // TODO this is general, move somewhere better
 
-// Reader Monad, represents a series of operations that mutate some environment
+// Reader ChainableCallbackCollectorBuilder, represents a series of operations that mutate some environment
 // type (the input to the function)
 
 sealed trait Reader[-Env, +T] {
@@ -62,10 +62,10 @@ object Reader {
   def const[T](t: T): Reader[Any, T] = ConstantReader(t)
   implicit def apply[E, T](fn: (E) => T): Reader[E, T] = ReaderFn(fn)
 
-  class ReaderM[Env] extends Monad[({ type Result[T] = Reader[Env, T] })#Result] {
+  class ReaderM[Env] extends ChainableCallbackCollectorBuilder[({ type Result[T] = Reader[Env, T] })#Result] {
     def apply[T](t: T) = ConstantReader(t)
     def flatMap[T, U](self: Reader[Env, T])(next: T => Reader[Env, U]) = self.flatMap(next)
     override def map[T, U](self: Reader[Env, T])(fn: T => U) = self.map(fn)
   }
-  implicit def monad[Env]: Monad[({ type Result[T] = Reader[Env, T] })#Result] = new ReaderM[Env]
+  implicit def monad[Env]: ChainableCallbackCollectorBuilder[({ type Result[T] = Reader[Env, T] })#Result] = new ReaderM[Env]
 }

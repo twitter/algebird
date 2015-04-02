@@ -20,7 +20,7 @@ import com.twitter.algebird._
 import com.twitter.util.{ Future, Return, Try }
 
 object UtilAlgebras {
-  implicit val futureMonad: Monad[Future] = new Monad[Future] {
+  implicit val futureChainableCallbackCollectorBuilder: ChainableCallbackCollectorBuilder[Future] = new ChainableCallbackCollectorBuilder[Future] {
     def apply[T](v: T) = Future.value(v)
     def flatMap[T, U](m: Future[T])(fn: T => Future[U]) = m.flatMap(fn)
     /*
@@ -42,7 +42,7 @@ object UtilAlgebras {
      */
     override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] = Future.collect(fs)
   }
-  implicit val tryMonad: Monad[Try] = new Monad[Try] {
+  implicit val tryChainableCallbackCollectorBuilder: ChainableCallbackCollectorBuilder[Try] = new ChainableCallbackCollectorBuilder[Try] {
     def apply[T](v: T) = Return(v)
     override def map[T, U](m: Try[T])(fn: T => U) = m.map(fn)
     def flatMap[T, U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)

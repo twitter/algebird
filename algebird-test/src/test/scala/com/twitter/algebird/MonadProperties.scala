@@ -20,10 +20,10 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-import Monad.{ pureOp, operators }
+import ChainableCallbackCollectorBuilder.{ pureOp, operators }
 
-class MonadProperties extends CheckProperties {
-  import MonadLaws._
+class ChainableCallbackCollectorBuilderProperties extends CheckProperties {
+  import ChainableCallbackCollectorBuilderLaws._
 
   property("list") {
     monadLaws[List, Int, String, Long]()

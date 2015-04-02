@@ -16,7 +16,7 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.Monad
+import com.twitter.algebird.ChainableCallbackCollectorBuilder
 
 // A simple trampoline implementation which we copied for the State monad
 sealed trait Trampoline[+A] {
@@ -47,7 +47,7 @@ object Trampoline {
    * returning function
    */
   def call[A](layzee: => Trampoline[A]): Trampoline[A] = FlatMapped(unit, { (u: Unit) => layzee })
-  implicit val Monad: Monad[Trampoline] = new Monad[Trampoline] {
+  implicit val ChainableCallbackCollectorBuilder: ChainableCallbackCollectorBuilder[Trampoline] = new ChainableCallbackCollectorBuilder[Trampoline] {
     def apply[A](a: A) = Done(a)
     def flatMap[A, B](start: Trampoline[A])(fn: A => Trampoline[B]) = start.flatMap(fn)
   }

@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 class FunctorProperties extends CheckProperties {
   import com.twitter.algebird.FunctorLaws._
-  import com.twitter.algebird.Monad._ // for Arbitrary instances
+  import com.twitter.algebird.ChainableCallbackCollectorBuilder._ // for Arbitrary instances
 
   property("list") {
     functorLaws[List, Int, String, Long]()
