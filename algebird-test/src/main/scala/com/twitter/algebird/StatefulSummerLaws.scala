@@ -20,7 +20,7 @@ object StatefulSummerLaws {
   import BaseProperties.isNonZero
 
   // Law1:
-  def zeroEquiv[V: Semigroup: Equiv](v0: Option[V], v1: Option[V]): Boolean = {
+  def zeroEquiv[V: HasAdditionOperator: Equiv](v0: Option[V], v1: Option[V]): Boolean = {
     val v0NonZero = v0.exists(isNonZero(_))
     val v1NonZero = v1.exists(isNonZero(_))
     if (!(v0NonZero || v1NonZero)) {
@@ -30,9 +30,9 @@ object StatefulSummerLaws {
       (for (a <- v0; b <- v1; eq = Equiv[V].equiv(a, b)) yield eq).getOrElse(false)
     }
   }
-  def sumIsPreserved[V: Semigroup: Equiv](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
+  def sumIsPreserved[V: HasAdditionOperator: Equiv](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
     summer.flush
-    val sg = Semigroup.sumOption(items)
+    val sg = HasAdditionOperator.sumOption(items)
     val wsummer = Monoid.plus(Monoid.sum(items.map { summer.put(_) }.filter { _.isDefined }), summer.flush)
     zeroEquiv(sg, wsummer) && summer.isFlushed
   }

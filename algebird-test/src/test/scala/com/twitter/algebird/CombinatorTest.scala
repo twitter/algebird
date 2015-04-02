@@ -28,8 +28,8 @@ class CombinatorTest extends CheckProperties {
     Arbitrary.arbitrary[T].map { t => Max(t) }
   }
 
-  implicit val sg: Semigroup[(Max[Int], List[Int])] =
-    new SemigroupCombinator({ (m: Max[Int], l: List[Int]) =>
+  implicit val sg: HasAdditionOperator[(Max[Int], List[Int])] =
+    new HasAdditionOperatorCombinator({ (m: Max[Int], l: List[Int]) =>
       val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
       l.sortWith { (l, r) =>
         val (sl, sr) = (sortfn(l), sortfn(r))
@@ -54,7 +54,7 @@ class CombinatorTest extends CheckProperties {
       ) yield mond.plus(mond.zero, (m, l))
     }
 
-  property("SemigroupCombinator with mod sortfn forms a Semigroup") {
+  property("HasAdditionOperatorCombinator with mod sortfn forms a HasAdditionOperator") {
     semigroupLaws[(Max[Int], List[Int])]
   }
 

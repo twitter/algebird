@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird.bijection
 
-import com.twitter.algebird.{ Field, Group, Monoid, Ring, Semigroup }
+import com.twitter.algebird.{ Field, Group, Monoid, Ring, HasAdditionOperator }
 import com.twitter.bijection.{ AbstractBijection, Bijection, ImplicitBijection, Conversion, Reverse }
 
 import Conversion.asMethod // "as" syntax
@@ -28,14 +28,14 @@ import Conversion.asMethod // "as" syntax
  *  @author Sam Ritchie
  */
 
-class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], bij: ImplicitBijection[T, U]) extends Semigroup[U] {
+class BijectedHasAdditionOperator[T, U](implicit val sg: HasAdditionOperator[T], bij: ImplicitBijection[T, U]) extends HasAdditionOperator[U] {
   def bijection: Bijection[U, T] = bij.bijection.inverse
   override def plus(l: U, r: U): U = sg.plus(l.as[T], r.as[T]).as[U]
   override def sumOption(iter: TraversableOnce[U]): Option[U] =
     sg.sumOption(iter.map { _.as[T] }).map(_.as[U])
 }
 
-class BijectedMonoid[T, U](implicit val monoid: Monoid[T], bij: ImplicitBijection[T, U]) extends BijectedSemigroup[T, U] with Monoid[U] {
+class BijectedMonoid[T, U](implicit val monoid: Monoid[T], bij: ImplicitBijection[T, U]) extends BijectedHasAdditionOperator[T, U] with Monoid[U] {
   override def zero: U = monoid.zero.as[U]
 }
 
@@ -57,10 +57,10 @@ class BijectedField[T, U](implicit val field: Field[T], bij: ImplicitBijection[T
 }
 
 trait AlgebirdBijections {
-  implicit def semigroupBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Semigroup[T], Semigroup[U]] =
-    new AbstractBijection[Semigroup[T], Semigroup[U]] {
-      override def apply(sg: Semigroup[T]) = new BijectedSemigroup[T, U]()(sg, bij)
-      override def invert(sg: Semigroup[U]) = new BijectedSemigroup[U, T]()(sg, Reverse(bij.bijection))
+  implicit def semigroupBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[HasAdditionOperator[T], HasAdditionOperator[U]] =
+    new AbstractBijection[HasAdditionOperator[T], HasAdditionOperator[U]] {
+      override def apply(sg: HasAdditionOperator[T]) = new BijectedHasAdditionOperator[T, U]()(sg, bij)
+      override def invert(sg: HasAdditionOperator[U]) = new BijectedHasAdditionOperator[U, T]()(sg, Reverse(bij.bijection))
     }
 
   implicit def monoidBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Monoid[T], Monoid[U]] =

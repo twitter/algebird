@@ -18,12 +18,12 @@ class CollectionSpecification extends CheckProperties {
   implicit def arbAndVal: Arbitrary[AndVal] =
     Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => AndVal(b) } }
 
-  property("MinSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Min[Int]]
+  property("MinHasAdditionOperator is a commutative semigroup") {
+    commutativeHasAdditionOperatorLaws[Min[Int]]
   }
 
-  property("MaxSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Max[Int]]
+  property("MaxHasAdditionOperator is a commutative semigroup") {
+    commutativeHasAdditionOperatorLaws[Max[Int]]
   }
 
   property("OrValMonoid is a commutative monoid") {
@@ -46,11 +46,11 @@ class CollectionSpecification extends CheckProperties {
     monoidLaws[Max[List[Int]]]
   }
 
-  property("Either is a Semigroup") {
+  property("Either is a HasAdditionOperator") {
     semigroupLaws[Either[String, Int]]
   }
 
-  property("Either is a Semigroup, with a Right non-monoid semigroup") {
+  property("Either is a HasAdditionOperator, with a Right non-monoid semigroup") {
     semigroupLaws[Either[String, Max[Int]]]
   }
 
@@ -204,7 +204,7 @@ class CollectionSpecification extends CheckProperties {
   implicit def arbIndexedSeq[T: Arbitrary]: Arbitrary[IndexedSeq[T]] =
     Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq } }
 
-  property("IndexedSeq (of a Semigroup) is a semigroup") {
+  property("IndexedSeq (of a HasAdditionOperator) is a semigroup") {
     semigroupLaws[IndexedSeq[Max[Int]]]
   }
 

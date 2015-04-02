@@ -16,7 +16,7 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.{ ChainableCallbackCollectorBuilder, Semigroup }
+import com.twitter.algebird.{ ChainableCallbackCollectorBuilder, HasAdditionOperator }
 
 /**
  * ChainableCallbackCollectorBuilder to handle mutating input state and possible failures.
@@ -25,9 +25,9 @@ import com.twitter.algebird.{ ChainableCallbackCollectorBuilder, Semigroup }
  * to compose carefully.
  */
 sealed trait StateWithError[S, +F, +T] {
-  def join[F1 >: F, U](that: StateWithError[S, F1, U], mergeErr: (F1, F1) => F1, mergeState: (S, S) => S): StateWithError[S, F1, (T, U)] = join(that)(Semigroup.from(mergeErr), Semigroup.from(mergeState))
+  def join[F1 >: F, U](that: StateWithError[S, F1, U], mergeErr: (F1, F1) => F1, mergeState: (S, S) => S): StateWithError[S, F1, (T, U)] = join(that)(HasAdditionOperator.from(mergeErr), HasAdditionOperator.from(mergeState))
 
-  def join[F1 >: F, U](that: StateWithError[S, F1, U])(implicit sgf: Semigroup[F1], sgs: Semigroup[S]): // TODO: deep joins could blow the stack, not yet using trampoline here
+  def join[F1 >: F, U](that: StateWithError[S, F1, U])(implicit sgf: HasAdditionOperator[F1], sgs: HasAdditionOperator[S]): // TODO: deep joins could blow the stack, not yet using trampoline here
   StateWithError[S, F1, (T, U)] = StateFn({ (requested: S) =>
     (run(requested), that.run(requested)) match {
       case (Right((s1, r1)), Right((s2, r2))) => Right((sgs.plus(s1, s2), (r1, r2)))

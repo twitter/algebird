@@ -19,24 +19,24 @@ package com.twitter.algebird
 /**
  * A Stateful summer is something that is potentially more efficient
  * (a buffer, a cache, etc...) that has the same result as a sum:
- * Law 1: Semigroup.sumOption(items) ==
+ * Law 1: HasAdditionOperator.sumOption(items) ==
  *   (Monoid.plus(items.map { stateful.put(_) }.filter { _.isDefined }, stateful.flush) &&
  *     stateful.isFlushed)
  * Law 2: isFlushed == flush.isEmpty
  * @author Oscar Boykin
  */
 trait StatefulSummer[V] extends Buffered[V, V] {
-  def semigroup: Semigroup[V]
+  def semigroup: HasAdditionOperator[V]
 }
 
 /**
  * Sum the entire iterator one item at a time. Only emits on flush
  * you should probably prefer BufferedSumAll
  */
-class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
+class SumAll[V](implicit override val semigroup: HasAdditionOperator[V]) extends StatefulSummer[V] {
   var summed: Option[V] = None
   def put(item: V) = {
-    summed = Semigroup.plus(summed, Some(item))
+    summed = HasAdditionOperator.plus(summed, Some(item))
     None
   }
   def flush = {
@@ -47,7 +47,7 @@ class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulS
   def isFlushed = summed.isEmpty
 }
 
-class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V])
+class BufferedSumAll[V](size: Int)(implicit override val semigroup: HasAdditionOperator[V])
   extends ArrayBufferedOperation[V, V](size)
   with StatefulSummer[V]
   with BufferedReduce[V] {

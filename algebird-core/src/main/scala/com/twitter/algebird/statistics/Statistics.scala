@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird.statistics
 
-import com.twitter.algebird.{ Semigroup, Monoid, Group, Ring }
+import com.twitter.algebird.{ HasAdditionOperator, Monoid, Group, Ring }
 
 /**
  * These wrappers can be used to collect statistics around usage of monoids
@@ -24,9 +24,9 @@ import com.twitter.algebird.{ Semigroup, Monoid, Group, Ring }
  * @author Julien Le Dem
  */
 
-/** collect statistics about the calls to the wrapped Semigroup */
-class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigroup: Semigroup[T])
-  extends Semigroup[T] {
+/** collect statistics about the calls to the wrapped HasAdditionOperator */
+class StatisticsHasAdditionOperator[T](threadSafe: Boolean = true)(implicit wrappedHasAdditionOperator: HasAdditionOperator[T])
+  extends HasAdditionOperator[T] {
 
   private[this] final val plusCallsCount = Counter(threadSafe)
   private[this] final val sumOptionCallsStats = new IterCallStatistics(threadSafe)
@@ -38,11 +38,11 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
 
   override def plus(x: T, y: T) = {
     plusCallsCount.increment
-    Semigroup.plus(x, y)
+    HasAdditionOperator.plus(x, y)
   }
 
   override def sumOption(iter: TraversableOnce[T]): Option[T] =
-    sumOptionCallsStats.measure(iter) { Semigroup.sumOption(_) }
+    sumOptionCallsStats.measure(iter) { HasAdditionOperator.sumOption(_) }
 
   override def toString =
     "plus calls: " + plusCallsCount + "\n" +
@@ -50,10 +50,10 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see StatisticsHasAdditionOperator
  */
 class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Monoid[T])
-  extends StatisticsSemigroup[T](threadSafe) with Monoid[T] {
+  extends StatisticsHasAdditionOperator[T](threadSafe) with Monoid[T] {
 
   private[this] final val zeroCallsCount = Counter(threadSafe)
   private[this] final val sumCallsStats = new IterCallStatistics(threadSafe)
@@ -78,7 +78,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see StatisticsHasAdditionOperator
  */
 class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
   extends StatisticsMonoid[T](threadSafe) with Group[T] {
@@ -107,7 +107,7 @@ class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see StatisticsHasAdditionOperator
  */
 class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
   extends StatisticsGroup[T](threadSafe) with Ring[T] {

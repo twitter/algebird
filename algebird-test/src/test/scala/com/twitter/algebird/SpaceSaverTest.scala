@@ -8,7 +8,7 @@ class SpaceSaverLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
   // limit sizes to 100 to avoid large data structures in tests
-  property("SpaceSaver is a Semigroup") {
+  property("SpaceSaver is a HasAdditionOperator") {
     forAll(Gen.choose(2, 100)){ capacity =>
       forAll(Gen.choose(1, 100)){ range =>
 
@@ -16,13 +16,13 @@ class SpaceSaverLaws extends CheckProperties {
         implicit val ssGenOne: Arbitrary[SSOne[Int]] = Arbitrary {
           for (key <- Gen.frequency((1 to range).map{ x => (x * x, x: Gen[Int]) }: _*)) yield SpaceSaver(capacity, key).asInstanceOf[SSOne[Int]]
         }
-        implicit def ssGen(implicit sg: Semigroup[SpaceSaver[Int]]): Arbitrary[SpaceSaver[Int]] = Arbitrary {
+        implicit def ssGen(implicit sg: HasAdditionOperator[SpaceSaver[Int]]): Arbitrary[SpaceSaver[Int]] = Arbitrary {
           Gen.oneOf(
             Arbitrary.arbitrary[SSOne[Int]],
             Gen.nonEmptyContainerOf[List, SSOne[Int]](Arbitrary.arbitrary[SSOne[Int]]).map(_.reduce(sg.plus)))
         }
 
-        commutativeSemigroupLawsEq[SpaceSaver[Int]] { (left, right) => (left consistentWith right) && (right consistentWith left) }
+        commutativeHasAdditionOperatorLawsEq[SpaceSaver[Int]] { (left, right) => (left consistentWith right) && (right consistentWith left) }
       }
     }
   }
@@ -36,7 +36,7 @@ class SpaceSaverTest extends WordSpec with Matchers {
       val exactCounts = items.groupBy(identity).mapValues(_.size)
 
       // simulate a distributed system with 10 mappers and 1 reducer
-      val sg = new SpaceSaverSemigroup[Int]
+      val sg = new SpaceSaverHasAdditionOperator[Int]
       items.grouped(10).map{
         _
           .iterator

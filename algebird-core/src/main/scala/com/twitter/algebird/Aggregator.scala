@@ -22,8 +22,8 @@ object Aggregator extends java.io.Serializable {
   /**
    * Using Aggregator.prepare,present you can add to this aggregator
    */
-  def fromReduce[T](red: (T, T) => T): Aggregator[T, T, T] = fromSemigroup(Semigroup.from(red))
-  def fromSemigroup[T](implicit sg: Semigroup[T]): Aggregator[T, T, T] = new Aggregator[T, T, T] {
+  def fromReduce[T](red: (T, T) => T): Aggregator[T, T, T] = fromHasAdditionOperator(HasAdditionOperator.from(red))
+  def fromHasAdditionOperator[T](implicit sg: HasAdditionOperator[T]): Aggregator[T, T, T] = new Aggregator[T, T, T] {
     def prepare(input: T) = input
     def semigroup = sg
     def present(reduction: T) = reduction
@@ -142,7 +142,7 @@ object Aggregator extends java.io.Serializable {
  */
 trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
   def prepare(input: A): B
-  def semigroup: Semigroup[B]
+  def semigroup: HasAdditionOperator[B]
   def present(reduction: B): C
 
   /* *****
@@ -235,7 +235,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     val ag1 = this
     new Aggregator[(A, A2), (B, B2), (C, C2)] {
       def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      val semigroup = new Tuple2HasAdditionOperator()(ag1.semigroup, ag2.semigroup)
       def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
     }
   }

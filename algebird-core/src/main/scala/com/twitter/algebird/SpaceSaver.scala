@@ -11,7 +11,7 @@ object SpaceSaver {
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
-  implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
+  implicit def spaceSaverSemiGroup[T]: HasAdditionOperator[SpaceSaver[T]] = new SpaceSaverHasAdditionOperator[T]
 }
 
 /**
@@ -177,7 +177,7 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
   }
 }
 
-class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
+class SpaceSaverHasAdditionOperator[T] extends HasAdditionOperator[SpaceSaver[T]] {
 
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
 }

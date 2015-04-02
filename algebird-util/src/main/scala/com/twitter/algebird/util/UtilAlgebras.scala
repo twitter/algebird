@@ -48,13 +48,13 @@ object UtilAlgebras {
     def flatMap[T, U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)
   }
 
-  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] = new ApplicativeSemigroup[T, Future]
+  implicit def futureHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Future[T]] = new ApplicativeHasAdditionOperator[T, Future]
   implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new ApplicativeMonoid[T, Future]
   implicit def futureGroup[T: Group]: Group[Future[T]] = new ApplicativeGroup[T, Future]
   implicit def futureRing[T: Ring]: Ring[Future[T]] = new ApplicativeRing[T, Future]
   implicit def futureField[T: Field]: Field[Future[T]] = new ApplicativeField[T, Future]
 
-  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] = new ApplicativeSemigroup[T, Try]
+  implicit def tryHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Try[T]] = new ApplicativeHasAdditionOperator[T, Try]
   implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new ApplicativeMonoid[T, Try]
   implicit def tryGroup[T: Group]: Group[Try[T]] = new ApplicativeGroup[T, Try]
   implicit def tryRing[T: Ring]: Ring[Try[T]] = new ApplicativeRing[T, Try]

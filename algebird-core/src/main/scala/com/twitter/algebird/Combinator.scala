@@ -36,13 +36,13 @@ import scala.math.Equiv
  *
  * Seems like an open topic here.... you are obliged to think on your own about this.
  */
-class SemigroupCombinator[A: Semigroup, B: Semigroup](fold: (A, B) => B) extends Semigroup[(A, B)] {
+class HasAdditionOperatorCombinator[A: HasAdditionOperator, B: HasAdditionOperator](fold: (A, B) => B) extends HasAdditionOperator[(A, B)] {
   def plus(left: (A, B), right: (A, B)) = {
-    val first = Semigroup.plus(left._1, right._1)
-    (first, fold(first, Semigroup.plus(left._2, right._2)))
+    val first = HasAdditionOperator.plus(left._1, right._1)
+    (first, fold(first, HasAdditionOperator.plus(left._2, right._2)))
   }
 }
 
-class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B) extends SemigroupCombinator[A, B](fold) with Monoid[(A, B)] {
+class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B) extends HasAdditionOperatorCombinator[A, B](fold) with Monoid[(A, B)] {
   def zero = (Monoid.zero[A], Monoid.zero[B])
 }

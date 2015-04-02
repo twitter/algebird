@@ -20,7 +20,7 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
 
   implicit val hllMonoid = new HyperLogLogMonoid(24)
 
-  def genSummers[K, V: Semigroup] = Map(
+  def genSummers[K, V: HasAdditionOperator] = Map(
     "AsyncNonCompactListSum" -> new AsyncListSum[K, V](bufferSize,
       flushFrequency,
       memoryFlushPercent,

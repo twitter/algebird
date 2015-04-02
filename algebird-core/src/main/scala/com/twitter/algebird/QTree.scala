@@ -63,7 +63,7 @@ object QTree {
   def apply(k: Double): QTree[Double] = apply(k -> k)
 }
 
-class QTreeSemigroup[A: Monoid](k: Int) extends Semigroup[QTree[A]] {
+class QTreeHasAdditionOperator[A: Monoid](k: Int) extends HasAdditionOperator[QTree[A]] {
   def plus(left: QTree[A], right: QTree[A]) = left.merge(right).compress(k)
 }
 

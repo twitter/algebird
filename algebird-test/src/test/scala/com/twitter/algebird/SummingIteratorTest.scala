@@ -35,8 +35,8 @@ object SummingIteratorTest {
 
 class SummingIteratorTest extends PropSpec with PropertyChecks with Matchers {
   import SummingIteratorTest._
-  def sumEquiv[V: Semigroup: Equiv](it0: Iterator[V], it1: Iterator[V]): Boolean =
-    StatefulSummerLaws.zeroEquiv(Semigroup.sumOption(it0), Semigroup.sumOption(it1))
+  def sumEquiv[V: HasAdditionOperator: Equiv](it0: Iterator[V], it1: Iterator[V]): Boolean =
+    StatefulSummerLaws.zeroEquiv(HasAdditionOperator.sumOption(it0), HasAdditionOperator.sumOption(it1))
 
   case class Capacity(c: Int)
   implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 10240)) yield Capacity(c) }

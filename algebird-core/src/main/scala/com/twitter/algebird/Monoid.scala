@@ -31,7 +31,7 @@ import scala.collection.{ Map => ScMap }
  */
 
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
-trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
+trait Monoid[@specialized(Int, Long, Float, Double) T] extends HasAdditionOperator[T] {
   def zero: T //additive identity
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v: T) {
@@ -58,7 +58,7 @@ abstract class AbstractMonoid[T] extends Monoid[T]
  * Some(5) + Some(3) == Some(8)
  * Some(5) + None == Some(5)
  */
-class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
+class OptionMonoid[T](implicit semi: HasAdditionOperator[T]) extends Monoid[Option[T]] {
   def zero = None
   def plus(left: Option[T], right: Option[T]): Option[T] = {
     if (left.isEmpty) {
@@ -71,10 +71,10 @@ class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
   }
   override def sumOption(items: TraversableOnce[Option[T]]): Option[Option[T]] =
     if (items.isEmpty) None
-    else Some(Semigroup.sumOption(items.filter(_.isDefined).map { _.get }))
+    else Some(HasAdditionOperator.sumOption(items.filter(_.isDefined).map { _.get }))
 }
 
-class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R]) extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L, R]] {
+class EitherMonoid[L, R](implicit semigroupl: HasAdditionOperator[L], monoidr: Monoid[R]) extends EitherHasAdditionOperator[L, R]()(semigroupl, monoidr) with Monoid[Either[L, R]] {
   override lazy val zero = Right(monoidr.zero)
 }
 
@@ -124,7 +124,7 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
  * The resulting array will be as long as the longest array (with its elements duplicated)
  * zero is an empty array
  */
-class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array[T]] {
+class ArrayMonoid[T: ClassTag](implicit semi: HasAdditionOperator[T]) extends Monoid[Array[T]] {
 
   //additive identity
   override def isNonZero(v: Array[T]): Boolean = v.nonEmpty
@@ -225,7 +225,7 @@ object AndValMonoid extends Monoid[AndVal] {
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon: Monoid[T]) = mon.zero
-  // strictly speaking, same as Semigroup, but most interesting examples
+  // strictly speaking, same as HasAdditionOperator, but most interesting examples
   // are monoids, and code already depends on this:
   def plus[T](l: T, r: T)(implicit monoid: Monoid[T]): T = monoid.plus(l, r)
   def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.assertNotZero(v)
@@ -257,7 +257,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
     if (i == 0) {
       mon.zero
     } else {
-      Semigroup.intTimes(i, v)(mon)
+      HasAdditionOperator.intTimes(i, v)(mon)
     }
   }
 
@@ -277,16 +277,16 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit val doubleMonoid: Monoid[Double] = DoubleField
   implicit val jdoubleMonoid: Monoid[JDouble] = JDoubleField
   implicit val stringMonoid: Monoid[String] = StringMonoid
-  implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
+  implicit def optionMonoid[T: HasAdditionOperator]: Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]
-  implicit def arrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) = new ArrayMonoid[T]
+  implicit def arrayMonoid[T: ClassTag](implicit semi: HasAdditionOperator[T]) = new ArrayMonoid[T]
   implicit def indexedSeqMonoid[T: Monoid]: Monoid[IndexedSeq[T]] = new IndexedSeqMonoid[T]
   implicit def jlistMonoid[T]: Monoid[JList[T]] = new JListMonoid[T]
   implicit def setMonoid[T]: Monoid[Set[T]] = new SetMonoid[T]
-  implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new MapMonoid[K, V]
-  implicit def scMapMonoid[K, V: Semigroup]: Monoid[ScMap[K, V]] = new ScMapMonoid[K, V]
-  implicit def jmapMonoid[K, V: Semigroup]: Monoid[JMap[K, V]] = new JMapMonoid[K, V]
-  implicit def eitherMonoid[L: Semigroup, R: Monoid]: Monoid[Either[L, R]] = new EitherMonoid[L, R]
+  implicit def mapMonoid[K, V: HasAdditionOperator]: Monoid[Map[K, V]] = new MapMonoid[K, V]
+  implicit def scMapMonoid[K, V: HasAdditionOperator]: Monoid[ScMap[K, V]] = new ScMapMonoid[K, V]
+  implicit def jmapMonoid[K, V: HasAdditionOperator]: Monoid[JMap[K, V]] = new JMapMonoid[K, V]
+  implicit def eitherMonoid[L: HasAdditionOperator, R: Monoid]: Monoid[Either[L, R]] = new EitherMonoid[L, R]
   implicit def function1Monoid[T]: Monoid[Function1[T, T]] = new Function1Monoid[T]
 }

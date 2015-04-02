@@ -81,7 +81,7 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
     lift(Aggregator.min[T])
   }
 
-  def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
+  def sumOption(implicit sg: HasAdditionOperator[T]) = lift(Aggregator.fromHasAdditionOperator(sg))
   def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
 
@@ -148,7 +148,7 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
     aggregate(Aggregator.min[T])
   }
 
-  def sum(implicit sg: Semigroup[T]) = aggregate(Aggregator.fromSemigroup(sg))
+  def sum(implicit sg: HasAdditionOperator[T]) = aggregate(Aggregator.fromHasAdditionOperator(sg))
   def reduce(fn: (T, T) => T) = aggregate(Aggregator.fromReduce(fn))
 }
 

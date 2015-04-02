@@ -23,11 +23,11 @@ import scala.collection.{ Map => ScMap }
 import scala.annotation.{ implicitNotFound, tailrec }
 
 /**
- * Semigroup:
+ * HasAdditionOperator:
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
  */
-@implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
-trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serializable {
+@implicitNotFound(msg = "Cannot find HasAdditionOperator type class for ${T}")
+trait HasAdditionOperator[@specialized(Int, Long, Float, Double) T] extends java.io.Serializable {
   def plus(l: T, r: T): T
   /**
    * override this if there is a faster way to do this sum than reduceLeftOption on plus
@@ -37,7 +37,7 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serial
 }
 
 // For Java interop so they get the default sumOption
-abstract class AbstractSemigroup[T] extends Semigroup[T]
+abstract class AbstractHasAdditionOperator[T] extends HasAdditionOperator[T]
 
 /**
  * Either semigroup is useful for error handling.
@@ -46,7 +46,7 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
  * but if exactly one is Left, we return that value (to keep the error condition).
  * Typically, the left value will be a string representing the errors.
  */
-class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R]) extends Semigroup[Either[L, R]] {
+class EitherHasAdditionOperator[L, R](implicit semigroupl: HasAdditionOperator[L], semigroupr: HasAdditionOperator[R]) extends HasAdditionOperator[Either[L, R]] {
 
   override def plus(l: Either[L, R], r: Either[L, R]) = {
     if (l.isLeft) {
@@ -68,26 +68,26 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
   }
 }
 
-object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
+object HasAdditionOperator extends GeneratedHasAdditionOperatorImplicits with ProductHasAdditionOperators {
   // This pattern is really useful for typeclasses
-  def plus[T](l: T, r: T)(implicit semi: Semigroup[T]) = semi.plus(l, r)
+  def plus[T](l: T, r: T)(implicit semi: HasAdditionOperator[T]) = semi.plus(l, r)
   // Left sum: (((a + b) + c) + d)
-  def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]): Option[T] =
+  def sumOption[T](iter: TraversableOnce[T])(implicit sg: HasAdditionOperator[T]): Option[T] =
     sg.sumOption(iter)
 
-  def from[T](associativeFn: (T, T) => T): Semigroup[T] = new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
+  def from[T](associativeFn: (T, T) => T): HasAdditionOperator[T] = new HasAdditionOperator[T] { def plus(l: T, r: T) = associativeFn(l, r) }
 
   /**
    * Same as v + v + v .. + v (i times in total)
    * requires i > 0, wish we had PositiveBigInt as a class
    */
-  def intTimes[T](i: BigInt, v: T)(implicit sg: Semigroup[T]): T = {
-    require(i > 0, "Cannot do non-positive products with a Semigroup, try Monoid/Group.intTimes")
+  def intTimes[T](i: BigInt, v: T)(implicit sg: HasAdditionOperator[T]): T = {
+    require(i > 0, "Cannot do non-positive products with a HasAdditionOperator, try Monoid/Group.intTimes")
     intTimesRec(i - 1, v, 0, (v, Vector[T]()))
   }
 
   @tailrec
-  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(implicit sg: Semigroup[T]): T = {
+  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(implicit sg: HasAdditionOperator[T]): T = {
     if (i == 0) {
       vaccMemo._1
     } else {
@@ -105,7 +105,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   }
 
   // Returns (2^power) * v = (2^(power - 1) v + 2^(power - 1) v)
-  private def timesPow2[T](power: Int, v: T, memo: Vector[T])(implicit sg: Semigroup[T]): (T, Vector[T]) = {
+  private def timesPow2[T](power: Int, v: T, memo: Vector[T])(implicit sg: HasAdditionOperator[T]): (T, Vector[T]) = {
     val size = memo.size
     require(power >= 0, "power cannot be negative")
     if (power == 0) {
@@ -126,31 +126,31 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
     }
   }
 
-  implicit val nullSemigroup: Semigroup[Null] = NullGroup
-  implicit val unitSemigroup: Semigroup[Unit] = UnitGroup
-  implicit val boolSemigroup: Semigroup[Boolean] = BooleanField
-  implicit val jboolSemigroup: Semigroup[JBool] = JBoolField
-  implicit val intSemigroup: Semigroup[Int] = IntRing
-  implicit val jintSemigroup: Semigroup[JInt] = JIntRing
-  implicit val shortSemigroup: Semigroup[Short] = ShortRing
-  implicit val jshortSemigroup: Semigroup[JShort] = JShortRing
-  implicit val longSemigroup: Semigroup[Long] = LongRing
-  implicit val bigIntSemigroup: Semigroup[BigInt] = BigIntRing
-  implicit val jlongSemigroup: Semigroup[JLong] = JLongRing
-  implicit val floatSemigroup: Semigroup[Float] = FloatField
-  implicit val jfloatSemigroup: Semigroup[JFloat] = JFloatField
-  implicit val doubleSemigroup: Semigroup[Double] = DoubleField
-  implicit val jdoubleSemigroup: Semigroup[JDouble] = JDoubleField
-  implicit val stringSemigroup: Semigroup[String] = StringMonoid
-  implicit def optionSemigroup[T: Semigroup]: Semigroup[Option[T]] = new OptionMonoid[T]
-  implicit def listSemigroup[T]: Semigroup[List[T]] = new ListMonoid[T]
-  implicit def seqSemigroup[T]: Semigroup[Seq[T]] = new SeqMonoid[T]
-  implicit def indexedSeqSemigroup[T: Semigroup]: Semigroup[IndexedSeq[T]] = new IndexedSeqSemigroup[T]
-  implicit def jlistSemigroup[T]: Semigroup[JList[T]] = new JListMonoid[T]
-  implicit def setSemigroup[T]: Semigroup[Set[T]] = new SetMonoid[T]
-  implicit def mapSemigroup[K, V: Semigroup]: Semigroup[Map[K, V]] = new MapMonoid[K, V]
-  implicit def scMapSemigroup[K, V: Semigroup]: Semigroup[ScMap[K, V]] = new ScMapMonoid[K, V]
-  implicit def jmapSemigroup[K, V: Semigroup]: Semigroup[JMap[K, V]] = new JMapMonoid[K, V]
-  implicit def eitherSemigroup[L: Semigroup, R: Semigroup]: Semigroup[Either[L, R]] = new EitherSemigroup[L, R]
-  implicit def function1Semigroup[T]: Semigroup[Function1[T, T]] = new Function1Monoid[T]
+  implicit val nullHasAdditionOperator: HasAdditionOperator[Null] = NullGroup
+  implicit val unitHasAdditionOperator: HasAdditionOperator[Unit] = UnitGroup
+  implicit val boolHasAdditionOperator: HasAdditionOperator[Boolean] = BooleanField
+  implicit val jboolHasAdditionOperator: HasAdditionOperator[JBool] = JBoolField
+  implicit val intHasAdditionOperator: HasAdditionOperator[Int] = IntRing
+  implicit val jintHasAdditionOperator: HasAdditionOperator[JInt] = JIntRing
+  implicit val shortHasAdditionOperator: HasAdditionOperator[Short] = ShortRing
+  implicit val jshortHasAdditionOperator: HasAdditionOperator[JShort] = JShortRing
+  implicit val longHasAdditionOperator: HasAdditionOperator[Long] = LongRing
+  implicit val bigIntHasAdditionOperator: HasAdditionOperator[BigInt] = BigIntRing
+  implicit val jlongHasAdditionOperator: HasAdditionOperator[JLong] = JLongRing
+  implicit val floatHasAdditionOperator: HasAdditionOperator[Float] = FloatField
+  implicit val jfloatHasAdditionOperator: HasAdditionOperator[JFloat] = JFloatField
+  implicit val doubleHasAdditionOperator: HasAdditionOperator[Double] = DoubleField
+  implicit val jdoubleHasAdditionOperator: HasAdditionOperator[JDouble] = JDoubleField
+  implicit val stringHasAdditionOperator: HasAdditionOperator[String] = StringMonoid
+  implicit def optionHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Option[T]] = new OptionMonoid[T]
+  implicit def listHasAdditionOperator[T]: HasAdditionOperator[List[T]] = new ListMonoid[T]
+  implicit def seqHasAdditionOperator[T]: HasAdditionOperator[Seq[T]] = new SeqMonoid[T]
+  implicit def indexedSeqHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[IndexedSeq[T]] = new IndexedSeqHasAdditionOperator[T]
+  implicit def jlistHasAdditionOperator[T]: HasAdditionOperator[JList[T]] = new JListMonoid[T]
+  implicit def setHasAdditionOperator[T]: HasAdditionOperator[Set[T]] = new SetMonoid[T]
+  implicit def mapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[Map[K, V]] = new MapMonoid[K, V]
+  implicit def scMapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[ScMap[K, V]] = new ScMapMonoid[K, V]
+  implicit def jmapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[JMap[K, V]] = new JMapMonoid[K, V]
+  implicit def eitherHasAdditionOperator[L: HasAdditionOperator, R: HasAdditionOperator]: HasAdditionOperator[Either[L, R]] = new EitherHasAdditionOperator[L, R]
+  implicit def function1HasAdditionOperator[T]: HasAdditionOperator[Function1[T, T]] = new Function1Monoid[T]
 }

@@ -17,14 +17,14 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
+ * Note that this works similar to HasAdditionOperator[Map[Int,T]] not like HasAdditionOperator[List[T]]
  * This does element-wise operations, like standard vector math, not concatenation,
- * like Semigroup[String] or Semigroup[List[T]]
+ * like HasAdditionOperator[String] or HasAdditionOperator[List[T]]
  *
  * If l.size != r.size, then only sums the elements up to the index min(l.size, r.size); appends
  * the remainder to the result.
  */
-class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
+class IndexedSeqHasAdditionOperator[T](implicit semi: HasAdditionOperator[T]) extends HasAdditionOperator[IndexedSeq[T]] {
 
   def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
     // We need summands to be the same length
@@ -46,7 +46,7 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
   }
 }
 
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with Monoid[IndexedSeq[T]] {
+class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqHasAdditionOperator[T] with Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) =
     v.exists { t => mont.isNonZero(t) }

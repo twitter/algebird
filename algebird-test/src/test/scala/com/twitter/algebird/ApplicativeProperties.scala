@@ -48,9 +48,9 @@ class ApplicativeProperties extends CheckProperties {
   }
   // Applicative algebras:
   import BaseProperties._
-  property("Applicative Semigroup") {
-    implicit val optSg = new ApplicativeSemigroup[Int, Option]
-    implicit val listSg = new ApplicativeSemigroup[String, List]
+  property("Applicative HasAdditionOperator") {
+    implicit val optSg = new ApplicativeHasAdditionOperator[Int, Option]
+    implicit val listSg = new ApplicativeHasAdditionOperator[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     semigroupLaws[Option[Int]] && isAssociative[List[String]]
   }

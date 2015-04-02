@@ -97,16 +97,16 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  * if you use scala immutable maps, this operation is much faster
  * TODO extend this to Group, Ring
  */
-class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
+class JMapMonoid[K, V: HasAdditionOperator] extends Monoid[JMap[K, V]] {
   override lazy val zero = new java.util.HashMap[K, V](0)
 
-  val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
+  val nonZero: (V => Boolean) = implicitly[HasAdditionOperator[V]] match {
     case mon: Monoid[_] => mon.isNonZero(_)
     case _ => (_ => true)
   }
 
   override def isNonZero(x: JMap[K, V]) =
-    !x.isEmpty && (implicitly[Semigroup[V]] match {
+    !x.isEmpty && (implicitly[HasAdditionOperator[V]] match {
       case mon: Monoid[_] =>
         x.values.asScala.exists { v =>
           mon.isNonZero(v)
@@ -115,7 +115,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
     })
   override def plus(x: JMap[K, V], y: JMap[K, V]) = {
     val (big, small, bigOnLeft) = if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
-    val vsemi = implicitly[Semigroup[V]]
+    val vsemi = implicitly[HasAdditionOperator[V]]
     val result = new java.util.HashMap[K, V](big.size + small.size)
     result.putAll(big)
     small.entrySet.asScala.foreach { kv =>

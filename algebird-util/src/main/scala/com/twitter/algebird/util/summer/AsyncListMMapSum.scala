@@ -38,7 +38,7 @@ class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
   tuplesOut: Incrementor,
   insertOp: Incrementor,
   sizeIncr: Incrementor,
-  workPool: FuturePool)(implicit sg: Semigroup[Value])
+  workPool: FuturePool)(implicit sg: HasAdditionOperator[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")

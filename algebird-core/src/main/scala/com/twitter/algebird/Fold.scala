@@ -310,7 +310,7 @@ object Fold {
   /**
    * For a semigroup, if we get more than 0 items, use plus
    */
-  def sumOption[T](implicit sg: Semigroup[T]): Fold[T, Option[T]] =
+  def sumOption[T](implicit sg: HasAdditionOperator[T]): Fold[T, Option[T]] =
     Fold.foldLeft(None: Option[T]) {
       case (None, i) => Some(i)
       case (Some(l), r) => Some(sg.plus(l, r))

@@ -24,7 +24,7 @@ trait MapOperations[K, V, M <: ScMap[K, V]] {
   def fromMutable(mut: MMap[K, V]): M
 }
 
-abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: Semigroup[V])
+abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: HasAdditionOperator[V])
   extends Monoid[M] with MapOperations[K, V, M] {
 
   val nonZero: (V => Boolean) = semigroup match {
@@ -79,7 +79,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
           case (k, v) =>
             val oldVOpt = mutable.get(k)
             // sorry for the micro optimization here: avoiding a closure
-            val newV = if (oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
+            val newV = if (oldVOpt.isEmpty) v else HasAdditionOperator.plus(oldVOpt.get, v)
             if (nonZero(newV))
               mutable.update(k, newV)
             else
@@ -90,14 +90,14 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     }
 }
 
-class MapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, Map[K, V]] {
+class MapMonoid[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapMonoid[K, V, Map[K, V]] {
   override lazy val zero = Map[K, V]()
   override def add(oldMap: Map[K, V], kv: (K, V)) = oldMap + kv
   override def remove(oldMap: Map[K, V], k: K) = oldMap - k
   override def fromMutable(mut: MMap[K, V]): Map[K, V] = new MutableBackedMap(mut)
 }
 
-class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K, V]] {
+class ScMapMonoid[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapMonoid[K, V, ScMap[K, V]] {
   override lazy val zero = ScMap[K, V]()
   override def add(oldMap: ScMap[K, V], kv: (K, V)) = oldMap + kv
   override def remove(oldMap: ScMap[K, V], k: K) = oldMap - k
@@ -186,7 +186,7 @@ object MapAlgebra {
     m filter { case (_, v) => Monoid.isNonZero(v) }
 
   // groupBy ks, sum all the vs
-  def sumByKey[K, V: Semigroup](pairs: TraversableOnce[(K, V)]): Map[K, V] =
+  def sumByKey[K, V: HasAdditionOperator](pairs: TraversableOnce[(K, V)]): Map[K, V] =
     Monoid.sum(pairs map { Map(_) })
 
   // Consider this as edges from k -> v, produce a Map[K,Set[V]]

@@ -21,7 +21,7 @@ import org.scalacheck.Prop._
 
 class PreparerLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: HasAdditionOperator[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary

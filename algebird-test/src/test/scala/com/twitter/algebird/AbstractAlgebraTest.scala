@@ -31,7 +31,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     }
   }
 
-  property("An OptionMonoid based on a Semigroup should be able to sum") {
+  property("An OptionMonoid based on a HasAdditionOperator should be able to sum") {
     val maxMonoid = implicitly[Monoid[Option[Max[Int]]]]
     val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
     forAll { intList: List[Option[Int]] =>
@@ -59,8 +59,8 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
   }
 
   property("First/Last should work properly") {
-    val fsg = implicitly[Semigroup[First[Int]]]
-    val lsg = implicitly[Semigroup[Last[Int]]]
+    val fsg = implicitly[HasAdditionOperator[First[Int]]]
+    val lsg = implicitly[HasAdditionOperator[Last[Int]]]
     forAll { intList: List[Int] =>
       !intList.isEmpty ==> {
         val first = intList.map(First(_)).reduceLeft(fsg.plus _)
@@ -94,9 +94,9 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
         // when right is bigger
         val right = rightBase ++ remainder
 
-        Semigroup.plus(left, rightBase) == sumBase ++ remainder &&
-          Semigroup.plus(leftBase, rightBase) == sumBase &&
-          Semigroup.plus(leftBase, right) == sumBase ++ remainder
+        HasAdditionOperator.plus(left, rightBase) == sumBase ++ remainder &&
+          HasAdditionOperator.plus(leftBase, rightBase) == sumBase &&
+          HasAdditionOperator.plus(leftBase, right) == sumBase ++ remainder
       }
     }
   }
