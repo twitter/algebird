@@ -39,15 +39,15 @@ class HyperLogLogLaws extends CheckProperties {
   import BaseProperties._
   import HyperLogLog._
 
-  implicit val hllMonoid = new HyperLogLogMonoid(5) //5 bits
+  implicit val hllHasAdditionOperatorAndZero = new HyperLogLogHasAdditionOperatorAndZero(5) //5 bits
 
   implicit val hllGen = Arbitrary {
     for (
       v <- Gen.choose(0, 10000)
-    ) yield (hllMonoid(v))
+    ) yield (hllHasAdditionOperatorAndZero(v))
   }
 
-  property("HyperLogLog is a Monoid") {
+  property("HyperLogLog is a HasAdditionOperatorAndZero") {
     monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
   }
 
@@ -77,7 +77,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
 
   def exactCount[T](it: Iterable[T]): Int = it.toSet.size
   def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]) = {
-    val hll = new HyperLogLogMonoid(bits)
+    val hll = new HyperLogLogHasAdditionOperatorAndZero(bits)
     hll.sizeOf(hll.sum(it.map { hll(_) })).estimate.toDouble
   }
 
@@ -87,7 +87,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
     it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
   }
   def approxIntersect[T <% Array[Byte]](bits: Int, it: Seq[Iterable[T]]): Double = {
-    val hll = new HyperLogLogMonoid(bits)
+    val hll = new HyperLogLogHasAdditionOperatorAndZero(bits)
     //Map each iterable to a HLL instance:
     val seqHlls = it.map { iter => hll.sum(iter.view.map { hll(_) }) }
     hll.intersectionSize(seqHlls).estimate.toDouble
@@ -115,7 +115,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
   def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
     val data = (0 until dataSize).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
-    val hll = new HyperLogLogMonoid(oldBits)
+    val hll = new HyperLogLogHasAdditionOperatorAndZero(oldBits)
     val oldHll = hll.sum(data.map { hll(_) })
     val newHll = oldHll.downsize(newBits)
     assert(scala.math.abs(exact - newHll.estimatedSize) / exact < 3.5 * aveErrorOf(newBits))
@@ -143,8 +143,8 @@ class HyperLogLogTest extends WordSpec with Matchers {
     "count intersections of 4" in { testLongIntersection(10, 4) }
 
     "throw error for differently sized HLL instances" in {
-      val bigMon = new HyperLogLogMonoid(5)
-      val smallMon = new HyperLogLogMonoid(4)
+      val bigMon = new HyperLogLogHasAdditionOperatorAndZero(5)
+      val smallMon = new HyperLogLogHasAdditionOperatorAndZero(4)
       val larger = bigMon(1) // uses implicit long2Bytes to make 8 byte array
       val smaller = smallMon(1) // uses implicit int2Bytes to make 4 byte array
       intercept[AssertionError] {
@@ -153,7 +153,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
     }
     "Correctly serialize" in {
       (4 to 20).foreach { bits =>
-        val mon = new HyperLogLogMonoid(bits)
+        val mon = new HyperLogLogHasAdditionOperatorAndZero(bits)
         // Zero
         verifySerialization(mon.zero)
         // One j
@@ -161,14 +161,14 @@ class HyperLogLogTest extends WordSpec with Matchers {
         // Two j's
         verifySerialization(mon(12) + mon(13))
         // Many j's
-        val manyJ = Monoid.sum((1 to 1000 by 77).map(mon(_)))(mon)
+        val manyJ = HasAdditionOperatorAndZero.sum((1 to 1000 by 77).map(mon(_)))(mon)
         verifySerialization(manyJ)
         // Explicitly dense
         verifySerialization(manyJ.toDenseHLL)
       }
     }
     "be consistent for sparse vs. dense" in {
-      val mon = new HyperLogLogMonoid(12)
+      val mon = new HyperLogLogHasAdditionOperatorAndZero(12)
       val data = (1 to 100).map { _ => r.nextLong }
       val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       // Now the ith entry of partialSums (0-based) is an HLL structure for i underlying elements
@@ -182,7 +182,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       }
     }
     "properly convert to dense" in {
-      val mon = new HyperLogLogMonoid(10)
+      val mon = new HyperLogLogHasAdditionOperatorAndZero(10)
       val data = (1 to 200).map { _ => r.nextLong }
       val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       partialSums.foreach { hll =>
@@ -194,7 +194,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       }
     }
     "properly do a batch create" in {
-      val mon = new HyperLogLogMonoid(10)
+      val mon = new HyperLogLogHasAdditionOperatorAndZero(10)
       val data = (1 to 200).map { _ => r.nextLong }
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) => seq :+ (seq.last + mon(value)) }
       (1 to 200).map { n =>

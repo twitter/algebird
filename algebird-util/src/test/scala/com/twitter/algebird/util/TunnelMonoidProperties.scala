@@ -20,11 +20,11 @@ import com.twitter.util.{ Await, Future }
 
 import scala.util.Random
 
-object TunnelMonoidProperties {
-  def testTunnelMonoid[I, V](makeRandomInput: Int => I,
+object TunnelHasAdditionOperatorAndZeroProperties {
+  def testTunnelHasAdditionOperatorAndZero[I, V](makeRandomInput: Int => I,
     makeTunnel: I => V,
-    collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(implicit monoid: Monoid[I],
-      superMonoid: Monoid[V]) = {
+    collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(implicit monoid: HasAdditionOperatorAndZero[I],
+      superHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[V]) = {
     val r = new Random
     val numbers = (1 to 40).map { _ => makeRandomInput(r.nextInt) }
     def helper(seeds: Seq[I], toFeed: I) = {
@@ -35,9 +35,9 @@ object TunnelMonoidProperties {
         if (size > 2) {
           val (tun1, tun2) = tunnels.splitAt(r.nextInt(size - 2))
           val (of2, rest) = tun2.splitAt(2)
-          process(tun1 ++ (Monoid.plus(of2.head, of2.tail.head) +: rest))
+          process(tun1 ++ (HasAdditionOperatorAndZero.plus(of2.head, of2.tail.head) +: rest))
         } else if (size == 2) {
-          Monoid.plus(tunnels.head, tunnels.tail.head)
+          HasAdditionOperatorAndZero.plus(tunnels.head, tunnels.tail.head)
         } else {
           tunnels.head
         }
@@ -57,10 +57,10 @@ object TunnelMonoidProperties {
   }
 }
 
-class TunnelMonoidPropertiesextends extends CheckProperties {
+class TunnelHasAdditionOperatorAndZeroPropertiesextends extends CheckProperties {
 
-  import TunnelMonoidProperties._
-  implicit val monoid = new Monoid[Int] {
+  import TunnelHasAdditionOperatorAndZeroProperties._
+  implicit val monoid = new HasAdditionOperatorAndZero[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer
   }
@@ -70,6 +70,6 @@ class TunnelMonoidPropertiesextends extends CheckProperties {
     def collapseFinalValues(finalTunnel: Tunnel[Int], tunnels: Seq[Tunnel[Int]], toFeed: Int) =
       finalTunnel(toFeed) +: tunnels.map { _.future }
 
-    testTunnelMonoid[Int, Tunnel[Int]](identity, makeTunnel, collapseFinalValues)
+    testTunnelHasAdditionOperatorAndZero[Int, Tunnel[Int]](identity, makeTunnel, collapseFinalValues)
   }
 }

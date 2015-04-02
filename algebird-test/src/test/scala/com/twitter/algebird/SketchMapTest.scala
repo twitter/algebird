@@ -17,14 +17,14 @@ class SketchMapLaws extends CheckProperties {
   import HyperLogLog.int2Bytes
 
   val params = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
-  implicit val smMonoid = SketchMap.monoid[Int, Long](params)
+  implicit val smHasAdditionOperatorAndZero = SketchMap.monoid[Int, Long](params)
   implicit val smGen = Arbitrary {
-    for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
+    for (key: Int <- Gen.choose(0, 10000)) yield (smHasAdditionOperatorAndZero.create((key, 1L)))
   }
 
   // TODO: SketchMap's heavy hitters are not strictly associative (approximately they are)
-  property("SketchMap is a Monoid") {
-    commutativeMonoidLawsEq[SketchMap[Int, Long]] { (left, right) =>
+  property("SketchMap is a HasAdditionOperatorAndZero") {
+    commutativeHasAdditionOperatorAndZeroLawsEq[SketchMap[Int, Long]] { (left, right) =>
       (left.valuesTable == right.valuesTable) &&
         (left.totalValue == right.totalValue)
     }
@@ -103,8 +103,8 @@ class SketchMapTest extends WordSpec with Matchers {
     }
 
     "use custom monoid" in {
-      // Monoid that takes the smaller number.
-      val smallerMonoid: Monoid[Long] = new Monoid[Long] {
+      // HasAdditionOperatorAndZero that takes the smaller number.
+      val smallerHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Long] = new HasAdditionOperatorAndZero[Long] {
         override def zero: Long = Long.MaxValue
         override def plus(first: Long, second: Long): Long = {
           if (first < second) {
@@ -119,12 +119,12 @@ class SketchMapTest extends WordSpec with Matchers {
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
 
-      val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
+      val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerHasAdditionOperatorAndZero)
 
       val sm1 = monoid.create((100, 10L))
       assert(monoid.heavyHitters(sm1) == List((100, 10L)))
 
-      // Summing should yield the smaller number, via smallerMonoid.
+      // Summing should yield the smaller number, via smallerHasAdditionOperatorAndZero.
       val sm2 = monoid.plus(sm1, monoid.create((100, 5L)))
       assert(monoid.heavyHitters(sm2) == List((100, 5L)))
 

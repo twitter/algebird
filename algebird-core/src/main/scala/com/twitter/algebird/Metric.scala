@@ -32,13 +32,13 @@ import scala.annotation.implicitNotFound
  */
 object Metric {
   def apply[V: Metric](v1: V, v2: V): Double = implicitly[Metric[V]].apply(v1, v2)
-  def norm[V: Metric: Monoid](v: V) = apply(v, Monoid.zero[V])
+  def norm[V: Metric: HasAdditionOperatorAndZero](v: V) = apply(v, HasAdditionOperatorAndZero.zero[V])
   def from[V](f: (V, V) => Double) = new Metric[V] {
     def apply(v1: V, v2: V) = f(v1, v2)
   }
 
   // See http://en.wikipedia.org/wiki/Minkowski_distance
-  def minkowskiIterable[V: Monoid: Metric](p: Double): Metric[Iterable[V]] = Metric.from{
+  def minkowskiIterable[V: HasAdditionOperatorAndZero: Metric](p: Double): Metric[Iterable[V]] = Metric.from{
     (a: Iterable[V], b: Iterable[V]) =>
 
       // TODO: copied from IndexedSeq.scala
@@ -47,7 +47,7 @@ object Metric {
       def pad(v: Iterable[V]) = {
         val diff = maxSize - v.size
         if (diff > 0) {
-          v ++ (Iterator.fill(diff)(Monoid.zero[V]))
+          v ++ (Iterator.fill(diff)(HasAdditionOperatorAndZero.zero[V]))
         } else {
           v
         }
@@ -62,24 +62,24 @@ object Metric {
       math.pow(outP, 1.0 / p)
   }
 
-  def L1Iterable[V: Monoid: Metric] = minkowskiIterable[V](1.0)
-  def L2Iterable[V: Monoid: Metric] = minkowskiIterable[V](2.0)
+  def L1Iterable[V: HasAdditionOperatorAndZero: Metric] = minkowskiIterable[V](1.0)
+  def L2Iterable[V: HasAdditionOperatorAndZero: Metric] = minkowskiIterable[V](2.0)
   // TODO: Implement Linf, using an ordering on V
 
-  def minkowskiMap[K, V: Monoid: Metric](p: Double): Metric[Map[K, V]] = Metric.from{
+  def minkowskiMap[K, V: HasAdditionOperatorAndZero: Metric](p: Double): Metric[Map[K, V]] = Metric.from{
     (a: Map[K, V], b: Map[K, V]) =>
       val outP = (a.keySet ++ b.keySet)
         .map{ key: K =>
-          val v1 = a.getOrElse(key, Monoid.zero[V])
-          val v2 = b.getOrElse(key, Monoid.zero[V])
+          val v1 = a.getOrElse(key, HasAdditionOperatorAndZero.zero[V])
+          val v2 = b.getOrElse(key, HasAdditionOperatorAndZero.zero[V])
           math.pow(implicitly[Metric[V]].apply(v1, v2), p)
         }
         .sum
       math.pow(outP, 1.0 / p)
   }
 
-  def L1Map[K, V: Monoid: Metric] = minkowskiMap[K, V](1.0)
-  def L2Map[K, V: Monoid: Metric] = minkowskiMap[K, V](2.0)
+  def L1Map[K, V: HasAdditionOperatorAndZero: Metric] = minkowskiMap[K, V](1.0)
+  def L2Map[K, V: HasAdditionOperatorAndZero: Metric] = minkowskiMap[K, V](2.0)
 
   // Implicit values
   implicit val doubleMetric = Metric.from((a: Double, b: Double) => math.abs(a - b))
@@ -96,8 +96,8 @@ object Metric {
   implicit val jBoolMetric = Metric.from((x: JBool, y: JBool) => if (x ^ y) 1.0 else 0.0)
 
   // If you don't want to use L2 as your default metrics, you need to override these
-  implicit def iterableMetric[V: Monoid: Metric] = L2Iterable[V]
-  implicit def mapMetric[K, V: Monoid: Metric] = L2Map[K, V]
+  implicit def iterableMetric[V: HasAdditionOperatorAndZero: Metric] = L2Iterable[V]
+  implicit def mapMetric[K, V: HasAdditionOperatorAndZero: Metric] = L2Map[K, V]
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")

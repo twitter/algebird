@@ -34,14 +34,14 @@ package com.twitter.algebird
  */
 object RightFolded2 {
   def monoid[In, Out: Group](foldfn: (In, Out) => Out) =
-    new RightFolded2Monoid[In, Out, Out](foldfn, identity _)
+    new RightFolded2HasAdditionOperatorAndZero[In, Out, Out](foldfn, identity _)
 
   def monoid[In, Out, Acc: Group](trans: (Out) => Acc)(foldfn: (In, Out) => Out) =
-    new RightFolded2Monoid[In, Out, Acc](foldfn, trans)
+    new RightFolded2HasAdditionOperatorAndZero[In, Out, Acc](foldfn, trans)
 }
 
-class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(implicit grpAcc: Group[Acc])
-  extends Monoid[RightFolded2[In, Out, Acc]] {
+class RightFolded2HasAdditionOperatorAndZero[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(implicit grpAcc: Group[Acc])
+  extends HasAdditionOperatorAndZero[RightFolded2[In, Out, Acc]] {
   val zero = RightFoldedZero2
 
   def init(i: Out) = RightFoldedValue2[In, Out, Acc](i, accfn(i), Nil)

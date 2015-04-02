@@ -94,8 +94,8 @@ object Ring extends GeneratedRingImplicits with ProductRings {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng: Ring[T]) = rng.one
   def times[T](l: T, r: T)(implicit rng: Ring[T]) = rng.times(l, r)
-  def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] =
-    Monoid.from[T](ring.one)(ring.times _)
+  def asTimesHasAdditionOperatorAndZero[T](implicit ring: Ring[T]): HasAdditionOperatorAndZero[T] =
+    HasAdditionOperatorAndZero.from[T](ring.one)(ring.times _)
   // Left product: (((a * b) * c) * d)
   def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) = {
     // avoid touching one unless we need to (some items are pseudo-rings)

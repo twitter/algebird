@@ -43,6 +43,6 @@ class HasAdditionOperatorCombinator[A: HasAdditionOperator, B: HasAdditionOperat
   }
 }
 
-class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B) extends HasAdditionOperatorCombinator[A, B](fold) with Monoid[(A, B)] {
-  def zero = (Monoid.zero[A], Monoid.zero[B])
+class HasAdditionOperatorAndZeroCombinator[A: HasAdditionOperatorAndZero, B: HasAdditionOperatorAndZero](fold: (A, B) => B) extends HasAdditionOperatorCombinator[A, B](fold) with HasAdditionOperatorAndZero[(A, B)] {
+  def zero = (HasAdditionOperatorAndZero.zero[A], HasAdditionOperatorAndZero.zero[B])
 }

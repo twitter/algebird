@@ -19,7 +19,7 @@ import scala.annotation.tailrec
 
 case class TopK[N](size: Int, items: List[N], max: Option[N])
 
-object TopKMonoid extends java.io.Serializable {
+object TopKHasAdditionOperatorAndZero extends java.io.Serializable {
   // Does a merge sort and returns the reversed list
   @tailrec
   private[algebird] def mergeSortR[T](acc: List[T], list1: List[T], list2: List[T],
@@ -44,11 +44,11 @@ object TopKMonoid extends java.io.Serializable {
  * A top-k monoid that is much faster than SortedListTake
  * equivalent to: (left ++ right).sorted.take(k)
  * but doesn't do a total sort
- * If you can handle the mutability, mutable.PriorityQueueMonoid is even faster.
+ * If you can handle the mutability, mutable.PriorityQueueHasAdditionOperatorAndZero is even faster.
  *
  * NOTE!!!! This assumes the inputs are already sorted! resorting each time kills speed
  */
-class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
+class TopKHasAdditionOperatorAndZero[T](k: Int)(implicit ord: Ordering[T]) extends HasAdditionOperatorAndZero[TopK[T]] {
 
   require(k > 0, "TopK requires at least K>0")
 
@@ -75,7 +75,7 @@ class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
     }
   }
   protected def merge(bigger: TopK[T], smaller: TopK[T]): TopK[T] = {
-    import TopKMonoid.mergeSortR
+    import TopKHasAdditionOperatorAndZero.mergeSortR
     // This is the internal loop that does one comparison:
     val newItems = mergeSortR(Nil, bigger.items, smaller.items, k)
     val max = newItems.headOption

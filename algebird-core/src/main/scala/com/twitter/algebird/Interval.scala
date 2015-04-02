@@ -56,7 +56,7 @@ object Interval extends java.io.Serializable {
   type ExLowExUp[T] = Intersection[ExclusiveLower, ExclusiveUpper, T]
   type ExLowInUp[T] = Intersection[ExclusiveLower, InclusiveUpper, T]
 
-  implicit def monoid[T]: Monoid[Interval[T]] = Monoid.from[Interval[T]](Universe[T]()) { _ && _ }
+  implicit def monoid[T]: HasAdditionOperatorAndZero[Interval[T]] = HasAdditionOperatorAndZero.from[Interval[T]](Universe[T]()) { _ && _ }
 
   // Automatically convert from an either
   implicit def fromEither[L[t] <: Interval[t], R[t] <: Interval[t], T](either: Either[L[T], R[T]]): Interval[T] =

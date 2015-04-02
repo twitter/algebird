@@ -39,8 +39,8 @@ case class SketchMapHash[K](hasher: CMSHash[Long], seed: Int)(implicit serializa
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V])
-  extends Monoid[SketchMap[K, V]] {
+class SketchMapHasAdditionOperatorAndZero[K, V](val params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: HasAdditionOperatorAndZero[V])
+  extends HasAdditionOperatorAndZero[SketchMap[K, V]] {
 
   /**
    * A zero Sketch Map is one with zero elements.
@@ -48,13 +48,13 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
   val zero: SketchMap[K, V] = SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
-    val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
+    val newValuesTable = HasAdditionOperatorAndZero.plus(left.valuesTable, right.valuesTable)
     val newHeavyHitters = left.heavyHitterKeys.toSet ++ right.heavyHitterKeys
 
     SketchMap(
       newValuesTable,
       params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
-      Monoid.plus(left.totalValue, right.totalValue))
+      HasAdditionOperatorAndZero.plus(left.totalValue, right.totalValue))
   }
 
   override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
@@ -63,9 +63,9 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
       val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
       val maxBuffer = 1000
       def sumBuffer: Unit = {
-        val newValuesTable = Monoid.sum(buffer.iterator.map(_.valuesTable))
-        val heavyHittersSet = Monoid.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
-        val newtotalValue = Monoid.sum(buffer.iterator.map(_.totalValue))
+        val newValuesTable = HasAdditionOperatorAndZero.sum(buffer.iterator.map(_.valuesTable))
+        val heavyHittersSet = HasAdditionOperatorAndZero.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
+        val newtotalValue = HasAdditionOperatorAndZero.sum(buffer.iterator.map(_.totalValue))
         buffer.clear()
         buffer += SketchMap(
           newValuesTable,
@@ -91,7 +91,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
    */
   def create(data: Seq[(K, V)]): SketchMap[K, V] = {
     val heavyHitters = data.map { _._1 }
-    val totalValue = Monoid.sum(data.map { _._2 })
+    val totalValue = HasAdditionOperatorAndZero.sum(data.map { _._2 })
     val initTable = AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
     val newTable = (0 to (params.depth - 1)).foldLeft(initTable) {
@@ -100,7 +100,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
           case (innerTable, (key, value)) =>
             val pos = (row, params.hashes(row)(key))
             val currValue: V = innerTable.getValue(pos)
-            innerTable.updated(pos, Monoid.plus(currValue, value))
+            innerTable.updated(pos, HasAdditionOperatorAndZero.plus(currValue, value))
         }
     }
 
@@ -194,7 +194,7 @@ object SketchMapParams {
  * number of heavy hitters stored is based on the heavyHittersCount set in
  * params.
  *
- * Use SketchMapMonoid to create instances of this class.
+ * Use SketchMapHasAdditionOperatorAndZero to create instances of this class.
  */
 
 object SketchMap {
@@ -204,10 +204,10 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] =
-    new SketchMapMonoid(params)(valueOrdering, monoid)
+  def monoid[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: HasAdditionOperatorAndZero[V]): SketchMapHasAdditionOperatorAndZero[K, V] =
+    new SketchMapHasAdditionOperatorAndZero(params)(valueOrdering, monoid)
 
-  def aggregator[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
+  def aggregator[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: HasAdditionOperatorAndZero[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
 }
 
@@ -220,8 +220,8 @@ case class SketchMap[K, V](
  * An Aggregator for the SketchMap.
  * Can be created using SketchMap.aggregator
  */
-case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid: SketchMapMonoid[K, V])(implicit valueOrdering: Ordering[V], valueMonoid: Monoid[V]) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
-  val monoid = skmMonoid
+case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmHasAdditionOperatorAndZero: SketchMapHasAdditionOperatorAndZero[K, V])(implicit valueOrdering: Ordering[V], valueHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[V]) extends HasAdditionOperatorAndZeroAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+  val monoid = skmHasAdditionOperatorAndZero
 
   def prepare(value: (K, V)) = monoid.create(value)
   def present(skm: SketchMap[K, V]) = skm

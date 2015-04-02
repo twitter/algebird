@@ -21,7 +21,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 object SummingIteratorTest {
-  implicit def mapEquiv[K, V: Monoid: Equiv]: Equiv[Map[K, V]] = Equiv.fromFunction { (l, r) =>
+  implicit def mapEquiv[K, V: HasAdditionOperatorAndZero: Equiv]: Equiv[Map[K, V]] = Equiv.fromFunction { (l, r) =>
     val zl = MapAlgebra.removeZeros(l)
     val zr = MapAlgebra.removeZeros(r)
     zl.size == zr.size && {

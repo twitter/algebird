@@ -37,8 +37,8 @@ class CombinatorTest extends CheckProperties {
       }
     })
 
-  implicit val mond: Monoid[(Max[Int], List[Int])] =
-    new MonoidCombinator({ (m: Max[Int], l: List[Int]) =>
+  implicit val mond: HasAdditionOperatorAndZero[(Max[Int], List[Int])] =
+    new HasAdditionOperatorAndZeroCombinator({ (m: Max[Int], l: List[Int]) =>
       val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
       l.sortWith { (l, r) =>
         val (sl, sr) = (sortfn(l), sortfn(r))
@@ -58,13 +58,13 @@ class CombinatorTest extends CheckProperties {
     semigroupLaws[(Max[Int], List[Int])]
   }
 
-  property("MonoidCombinator with mod sortfn forms a Monoid") {
+  property("HasAdditionOperatorAndZeroCombinator with mod sortfn forms a HasAdditionOperatorAndZero") {
     monoidLaws[(Max[Int], List[Int])]
   }
 
   // Now test the expected use case: top-K by appearances:
-  implicit val monTopK: Monoid[(Map[Int, Int], Set[Int])] =
-    new MonoidCombinator({ (m: Map[Int, Int], top: Set[Int]) =>
+  implicit val monTopK: HasAdditionOperatorAndZero[(Map[Int, Int], Set[Int])] =
+    new HasAdditionOperatorAndZeroCombinator({ (m: Map[Int, Int], top: Set[Int]) =>
       top.toList.sortWith { (l, r) =>
         val lc = m(l)
         val rc = m(r)
@@ -81,7 +81,7 @@ class CombinatorTest extends CheckProperties {
         m = smallvals.groupBy { s => s }.mapValues { _.size }
       ) yield monTopK.plus(monTopK.zero, (m, smallvals.toSet))
     }
-  property("MonoidCombinator with top-K forms a Monoid") {
+  property("HasAdditionOperatorAndZeroCombinator with top-K forms a HasAdditionOperatorAndZero") {
     monoidLaws[(Map[Int, Int], Set[Int])]
   }
 

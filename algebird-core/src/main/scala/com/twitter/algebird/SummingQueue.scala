@@ -57,7 +57,7 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: H
       queueOption.flatMap { queue =>
         if (!queue.offer(item)) {
           // Queue is full, do the work:
-          Monoid.plus(flush, Some(item))
+          HasAdditionOperatorAndZero.plus(flush, Some(item))
         } else {
           // We are in the queue
           None

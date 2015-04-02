@@ -63,7 +63,7 @@ class JavaBoxedTests extends CheckProperties {
     implicitly[Arbitrary[List[T]]].arbitrary.map { _.asJava }
   }
 
-  property("JList is a Monoid") {
+  property("JList is a HasAdditionOperatorAndZero") {
     monoidLaws[JList[Int]]
   }
 
@@ -71,11 +71,11 @@ class JavaBoxedTests extends CheckProperties {
     implicitly[Arbitrary[Map[K, V]]].arbitrary.map { _.filter { kv => isNonZero[V](kv._2) }.asJava }
   }
 
-  property("JMap[String,Int] is a Monoid") {
+  property("JMap[String,Int] is a HasAdditionOperatorAndZero") {
     isAssociative[JMap[String, Int]] && weakZero[JMap[String, Int]]
   }
 
-  property("JMap[String,String] is a Monoid") {
+  property("JMap[String,String] is a HasAdditionOperatorAndZero") {
     isAssociative[JMap[String, String]] && weakZero[JMap[String, String]]
   }
 

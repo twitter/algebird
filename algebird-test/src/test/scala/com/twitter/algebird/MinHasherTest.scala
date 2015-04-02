@@ -6,14 +6,14 @@ import org.scalatest.{ Matchers, _ }
 class MinHasherTest extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val mhMonoid = new MinHasher32(0.5, 512)
+  implicit val mhHasAdditionOperatorAndZero = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary {
     for (
       v <- Gen.choose(0, 10000)
-    ) yield (mhMonoid.init(v))
+    ) yield (mhHasAdditionOperatorAndZero.init(v))
   }
 
-  property("MinHasher is a Monoid") {
+  property("MinHasher is a HasAdditionOperatorAndZero") {
     monoidLawsEq[MinHashSignature]{ (a, b) => a.bytes.toList == b.bytes.toList }
   }
 }

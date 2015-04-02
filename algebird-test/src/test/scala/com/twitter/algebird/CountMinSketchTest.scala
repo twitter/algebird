@@ -17,46 +17,46 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   val EPS = 0.005
   val SEED = 1
 
-  private def createArbitrary[K: FromIntLike](cmsMonoid: CMSMonoid[K]): Arbitrary[CMS[K]] = {
+  private def createArbitrary[K: FromIntLike](cmsHasAdditionOperatorAndZero: CMSHasAdditionOperatorAndZero[K]): Arbitrary[CMS[K]] = {
     val k = implicitly[FromIntLike[K]]
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
+      for (v <- Gen.choose(0, 10000)) yield cmsHasAdditionOperatorAndZero.create(k.fromInt(v))
     }
   }
 
-  property("CountMinSketch[Short] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Short](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+  property("CountMinSketch[Short] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[Short](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Short](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[Short]]
   }
 
-  property("CountMinSketch[Int] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+  property("CountMinSketch[Int] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[Int](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Int](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[Int]]
   }
 
-  property("CountMinSketch[Long] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Long](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+  property("CountMinSketch[Long] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[Long](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Long](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[Long]]
   }
 
-  property("CountMinSketch[BigInt] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[BigInt](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+  property("CountMinSketch[BigInt] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[BigInt](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[BigInt](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[BigInt]]
   }
 
-  property("CountMinSketch[String] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[String](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[String](cmsMonoid)
+  property("CountMinSketch[String] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[String](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[String](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[String]]
   }
 
-  property("CountMinSketch[Bytes] is a Monoid") {
-    implicit val cmsMonoid = CMS.monoid[Bytes](EPS, DELTA, SEED)
-    implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
+  property("CountMinSketch[Bytes] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = CMS.monoid[Bytes](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[Bytes](cmsHasAdditionOperatorAndZero)
     monoidLaws[CMS[Bytes]]
   }
 
@@ -71,46 +71,46 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   val SEED = 1
   val HEAVY_HITTERS_PCT = 0.1
 
-  private def createArbitrary[K: FromIntLike](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {
+  private def createArbitrary[K: FromIntLike](cmsHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[K]): Arbitrary[TopCMS[K]] = {
     val k = implicitly[FromIntLike[K]]
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield cmsMonoid.create(k.fromInt(v))
+      for (v <- Gen.choose(0, 10000)) yield cmsHasAdditionOperatorAndZero.create(k.fromInt(v))
     }
   }
 
-  property("TopPctCms[Short] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+  property("TopPctCms[Short] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Short](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[Short]]
   }
 
-  property("TopPctCms[Int] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+  property("TopPctCms[Int] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Int](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[Int]]
   }
 
-  property("TopPctCms[Long] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+  property("TopPctCms[Long] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Long](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[Long]]
   }
 
-  property("TopPctCms[BigInt] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+  property("TopPctCms[BigInt] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[BigInt](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[BigInt]]
   }
 
-  property("TopPctCms[String] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[String](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[String](cmsMonoid)
+  property("TopPctCms[String] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[String](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[String](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[String]]
   }
 
-  property("TopPctCms[Bytes] is a Monoid") {
-    implicit val cmsMonoid = TopPctCMS.monoid[Bytes](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
-    implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
+  property("TopPctCms[Bytes] is a HasAdditionOperatorAndZero") {
+    implicit val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[Bytes](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[Bytes](cmsHasAdditionOperatorAndZero)
     monoidLaws[TopCMS[Bytes]]
   }
 
@@ -148,7 +148,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 
     // When we create a monoid for L
     implicit val hasherBytes = sourceHasher.contramap((d: Seq[Byte]) => f(d))
-    val bytesMonoid: CMSMonoid[Seq[Byte]] = {
+    val bytesHasAdditionOperatorAndZero: CMSHasAdditionOperatorAndZero[Seq[Byte]] = {
       val anyDelta = 1E-10
       val anyEps = 0.001
       val anySeed = 1
@@ -159,23 +159,23 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
     // To verify this we perform a basic smoke test of the resulting monoids.  This test mimics the "exactly compute
     // frequencies in a small stream" scenario in the full-fledged CMS spec.
     val oneKey = Seq(1).toK[Byte]
-    val one = bytesMonoid.create(oneKey)
+    val one = bytesHasAdditionOperatorAndZero.create(oneKey)
     one.frequency(oneKey).estimate should be(1)
     one.frequency(Seq(2).toK[Byte]).estimate should be(0)
-    val two = bytesMonoid.create(Seq(2).toK[Byte])
+    val two = bytesHasAdditionOperatorAndZero.create(Seq(2).toK[Byte])
     two.frequency(oneKey).estimate should be(0)
     two.frequency(Seq(2).toK[Byte]).estimate should be(1)
-    val cms = bytesMonoid.plus(bytesMonoid.plus(one, two), two)
+    val cms = bytesHasAdditionOperatorAndZero.plus(bytesHasAdditionOperatorAndZero.plus(one, two), two)
 
     cms.frequency(Seq(0).toK[Byte]).estimate should be(0)
     cms.frequency(oneKey).estimate should be(1)
     cms.frequency(Seq(2).toK[Byte]).estimate should be(2)
 
-    val three = bytesMonoid.create(Seq(oneKey, oneKey, oneKey))
+    val three = bytesHasAdditionOperatorAndZero.create(Seq(oneKey, oneKey, oneKey))
     three.frequency(oneKey).estimate should be(3)
-    val four = bytesMonoid.create(Seq(oneKey, oneKey, oneKey, oneKey))
+    val four = bytesHasAdditionOperatorAndZero.create(Seq(oneKey, oneKey, oneKey, oneKey))
     four.frequency(oneKey).estimate should be(4)
-    val cms2 = bytesMonoid.plus(four, three)
+    val cms2 = bytesHasAdditionOperatorAndZero.plus(four, three)
     cms2.frequency(oneKey).estimate should be(7)
   }
 
@@ -420,11 +420,11 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
     "create correct sketches out of a single item" in {
       forAll{ (x: Int) =>
         val data = x.toK[K]
-        val cmsMonoid = {
+        val cmsHasAdditionOperatorAndZero = {
           val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
           TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
         }
-        val topCms = cmsMonoid.create(data)
+        val topCms = cmsHasAdditionOperatorAndZero.create(data)
         topCms.totalCount should be(1)
         topCms.cms.totalCount should be(1)
         topCms.frequency(x.toK[K]).estimate should be(1)
@@ -439,11 +439,11 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
     "create correct sketches out of a single-item stream" in {
       forAll{ (x: Int) =>
         val data = Seq(x).toK[K]
-        val cmsMonoid = {
+        val cmsHasAdditionOperatorAndZero = {
           val anyHeavyHittersPct = 0.1 // exact setting not relevant for this test
           TopPctCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersPct)
         }
-        val topCms = cmsMonoid.create(data)
+        val topCms = cmsHasAdditionOperatorAndZero.create(data)
         topCms.totalCount should be(1)
         topCms.cms.totalCount should be(1)
         topCms.frequency(x.toK[K]).estimate should be(1)
@@ -607,11 +607,11 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
     "create correct sketches out of a single item" in {
       forAll{ (x: Int) =>
         val data = x.toK[K]
-        val cmsMonoid = {
+        val cmsHasAdditionOperatorAndZero = {
           val anyHeavyHittersN = 2 // exact setting not relevant for this test
           TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
         }
-        val topCms = cmsMonoid.create(data)
+        val topCms = cmsHasAdditionOperatorAndZero.create(data)
         topCms.totalCount should be(1)
         topCms.cms.totalCount should be(1)
         topCms.frequency(x.toK[K]).estimate should be(1)
@@ -626,11 +626,11 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
     "create correct sketches out of a single-item stream" in {
       forAll{ (x: Int) =>
         val data = Seq(x).toK[K]
-        val cmsMonoid = {
+        val cmsHasAdditionOperatorAndZero = {
           val anyHeavyHittersN = 2 // exact setting not relevant for this test
           TopNCMS.monoid[K](EPS, DELTA, SEED, anyHeavyHittersN)
         }
-        val topCms = cmsMonoid.create(data)
+        val topCms = cmsHasAdditionOperatorAndZero.create(data)
         topCms.totalCount should be(1)
         topCms.cms.totalCount should be(1)
         topCms.frequency(x.toK[K]).estimate should be(1)
@@ -916,18 +916,18 @@ abstract class CMSHasherSpec[K: CMSHasher: FromIntLike] extends PropSpec with Pr
 }
 
 /**
- * This spec verifies that we provide legacy types for the CMS and CountMinSketchMonoid classes we had in Algebird
+ * This spec verifies that we provide legacy types for the CMS and CountMinSketchHasAdditionOperatorAndZero classes we had in Algebird
  * versions < 0.8.1.  Note that this spec is not meant to verify their actual functionality.
  */
 class LegacyCMSSpec extends WordSpec with Matchers {
 
-  import legacy.CountMinSketchMonoid
+  import legacy.CountMinSketchHasAdditionOperatorAndZero
 
   val DELTA = 1E-10
   val EPS = 0.001
   val SEED = 1
 
-  val CMS_MONOID: CountMinSketchMonoid = CountMinSketchMonoid(EPS, DELTA, SEED)
+  val CMS_MONOID: CountMinSketchHasAdditionOperatorAndZero = CountMinSketchHasAdditionOperatorAndZero(EPS, DELTA, SEED)
 
   "The legacy package" should {
 
@@ -938,14 +938,14 @@ class LegacyCMSSpec extends WordSpec with Matchers {
     }
 
     "provide a legacy type for the CMS monoid implementation in Algebird versions < 0.8.1" in {
-      val cmsMonoid: CountMinSketchMonoid = {
+      val cmsHasAdditionOperatorAndZero: CountMinSketchHasAdditionOperatorAndZero = {
         val eps = 0.001
         val delta = 1E-5
         val seed = 1
         val heavyHittersPct = 0.1
-        CountMinSketchMonoid(eps, delta, seed, heavyHittersPct)
+        CountMinSketchHasAdditionOperatorAndZero(eps, delta, seed, heavyHittersPct)
       }
-      val cms = cmsMonoid.create(Seq(0L, 0L))
+      val cms = cmsHasAdditionOperatorAndZero.create(Seq(0L, 0L))
       cms.frequency(0L).estimate should be (2)
       cms.heavyHitters should be(Set(0L))
     }

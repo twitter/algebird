@@ -46,13 +46,13 @@ class IndexedSeqHasAdditionOperator[T](implicit semi: HasAdditionOperator[T]) ex
   }
 }
 
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqHasAdditionOperator[T] with Monoid[IndexedSeq[T]] {
+class IndexedSeqHasAdditionOperatorAndZero[T](implicit mont: HasAdditionOperatorAndZero[T]) extends IndexedSeqHasAdditionOperator[T] with HasAdditionOperatorAndZero[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) =
     v.exists { t => mont.isNonZero(t) }
 }
 
-class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T]()(grp)
+class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqHasAdditionOperatorAndZero[T]()(grp)
   with Group[IndexedSeq[T]] {
   override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map { grp.negate(_) }
 }

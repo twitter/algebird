@@ -26,12 +26,12 @@ class CollectionSpecification extends CheckProperties {
     commutativeHasAdditionOperatorLaws[Max[Int]]
   }
 
-  property("OrValMonoid is a commutative monoid") {
-    commutativeMonoidLaws[OrVal]
+  property("OrValHasAdditionOperatorAndZero is a commutative monoid") {
+    commutativeHasAdditionOperatorAndZeroLaws[OrVal]
   }
 
-  property("AndValMonoid is a commutative monoid") {
-    commutativeMonoidLaws[AndVal]
+  property("AndValHasAdditionOperatorAndZero is a commutative monoid") {
+    commutativeHasAdditionOperatorAndZeroLaws[AndVal]
   }
 
   property("Min[Int] is a monoid") {
@@ -54,7 +54,7 @@ class CollectionSpecification extends CheckProperties {
     semigroupLaws[Either[String, Max[Int]]]
   }
 
-  property("Option Monoid laws") {
+  property("Option HasAdditionOperatorAndZero laws") {
     monoidLaws[Option[Int]] && monoidLaws[Option[String]]
   }
 
@@ -72,12 +72,12 @@ class CollectionSpecification extends CheckProperties {
 
   property("List plus") {
     forAll { (a: List[Int], b: List[Int]) =>
-      val mon = implicitly[Monoid[List[Int]]]
+      val mon = implicitly[HasAdditionOperatorAndZero[List[Int]]]
       ((a ++ b == mon.plus(a, b)) && (mon.zero == List[Int]()))
     }
   }
 
-  property("List Monoid laws") {
+  property("List HasAdditionOperatorAndZero laws") {
     monoidLaws[List[Int]]
   }
 
@@ -86,16 +86,16 @@ class CollectionSpecification extends CheckProperties {
 
   property("Seq plus") {
     forAll { (a: Seq[Int], b: Seq[Int]) =>
-      val mon = implicitly[Monoid[Seq[Int]]]
+      val mon = implicitly[HasAdditionOperatorAndZero[Seq[Int]]]
       ((a ++ b == mon.plus(a, b)) && (mon.zero == Seq[Int]()))
     }
   }
 
-  property("Seq Monoid laws") {
+  property("Seq HasAdditionOperatorAndZero laws") {
     monoidLaws[Seq[Int]]
   }
 
-  property("Array Monoid laws") {
+  property("Array HasAdditionOperatorAndZero laws") {
     monoidLawsEq[Array[Int]]{
       case (a, b) => a.deep == b.deep
     }
@@ -103,29 +103,29 @@ class CollectionSpecification extends CheckProperties {
 
   property("Set plus") {
     forAll { (a: Set[Int], b: Set[Int]) =>
-      val mon = implicitly[Monoid[Set[Int]]]
+      val mon = implicitly[HasAdditionOperatorAndZero[Set[Int]]]
       ((a ++ b == mon.plus(a, b)) && (mon.zero == Set[Int]()))
     }
   }
 
-  property("Set Monoid laws") {
+  property("Set HasAdditionOperatorAndZero laws") {
     monoidLaws[Set[Int]]
   }
 
-  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
-    val mv = implicitly[Monoid[V]]
+  implicit def mapArb[K: Arbitrary, V: Arbitrary: HasAdditionOperatorAndZero] = Arbitrary {
+    val mv = implicitly[HasAdditionOperatorAndZero[V]]
     implicitly[Arbitrary[Map[K, V]]]
       .arbitrary
       .map { _.filter { kv => mv.isNonZero(kv._2) } }
   }
 
-  implicit def scMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
+  implicit def scMapArb[K: Arbitrary, V: Arbitrary: HasAdditionOperatorAndZero] = Arbitrary {
     mapArb[K, V]
       .arbitrary
       .map { map: Map[K, V] => map: ScMap[K, V] }
   }
 
-  implicit def mMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
+  implicit def mMapArb[K: Arbitrary, V: Arbitrary: HasAdditionOperatorAndZero] = Arbitrary {
     mapArb[K, V]
       .arbitrary
       .map { map: Map[K, V] => MMap(map.toSeq: _*): MMap[K, V] }
@@ -152,15 +152,15 @@ class CollectionSpecification extends CheckProperties {
     mapPlusTimesKeys[MMap[Int, Int]]
   }
 
-  property("Map[Int,Int] Monoid laws") {
+  property("Map[Int,Int] HasAdditionOperatorAndZero laws") {
     isAssociative[Map[Int, Int]] && weakZero[Map[Int, Int]]
   }
 
-  property("ScMap[Int,Int] Monoid laws") {
+  property("ScMap[Int,Int] HasAdditionOperatorAndZero laws") {
     isAssociative[ScMap[Int, Int]] && weakZero[ScMap[Int, Int]]
   }
 
-  property("MMap[Int,Int] Monoid laws") {
+  property("MMap[Int,Int] HasAdditionOperatorAndZero laws") {
     isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
   }
 
@@ -176,15 +176,15 @@ class CollectionSpecification extends CheckProperties {
     hasAdditiveInversesDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
   }
 
-  property("Map[Int,String] Monoid laws") {
+  property("Map[Int,String] HasAdditionOperatorAndZero laws") {
     isAssociative[Map[Int, String]] && weakZero[Map[Int, String]]
   }
 
-  property("ScMap[Int,String] Monoid laws") {
+  property("ScMap[Int,String] HasAdditionOperatorAndZero laws") {
     isAssociative[ScMap[Int, String]] && weakZero[ScMap[Int, String]]
   }
 
-  property("MMap[Int,String] Monoid laws") {
+  property("MMap[Int,String] HasAdditionOperatorAndZero laws") {
     isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[Int, Int]]
   }
 
@@ -214,7 +214,7 @@ class CollectionSpecification extends CheckProperties {
     pseudoRingLaws[IndexedSeq[Int]]
   }
 
-  property("Either is a Monoid") {
+  property("Either is a HasAdditionOperatorAndZero") {
     monoidLaws[Either[String, Int]]
   }
 
@@ -224,9 +224,9 @@ class CollectionSpecification extends CheckProperties {
     }
   }
 
-  property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") {
+  property("HasAdditionOperatorAndZero.sum performs w/ or w/o MapAlgebra.removeZeros") {
     forAll { (m: Map[Int, Int]) =>
-      (Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m)))
+      (HasAdditionOperatorAndZero.sum(m) == HasAdditionOperatorAndZero.sum(MapAlgebra.removeZeros(m)))
     }
   }
 
@@ -269,7 +269,7 @@ class CollectionSpecification extends CheckProperties {
   property("MapAlgebra.invert works") {
     forAll { (m: Map[Int, Int]) =>
       val m2 = MapAlgebra.invert(m)
-      val m3 = Monoid.sum(for ((v, ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
+      val m3 = HasAdditionOperatorAndZero.sum(for ((v, ks) <- m2.toIterable; k <- ks.toIterable) yield Map(k -> v))
       (m3 == m)
     }
   }
@@ -298,7 +298,7 @@ class CollectionSpecification extends CheckProperties {
       (mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
         Map(
-          (None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0))))) && mapEq.equiv(
+          (None: Option[Int]) -> HasAdditionOperatorAndZero.sum(items.map(x => square(x).getOrElse(0))))) && mapEq.equiv(
           MapAlgebra.mergeLookup[Int, Int, Int](items)(square)(identity),
           MapAlgebra.sumByKey(
             items.map(x => x -> square(x).getOrElse(0)))))

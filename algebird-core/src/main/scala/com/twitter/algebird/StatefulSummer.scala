@@ -20,7 +20,7 @@ package com.twitter.algebird
  * A Stateful summer is something that is potentially more efficient
  * (a buffer, a cache, etc...) that has the same result as a sum:
  * Law 1: HasAdditionOperator.sumOption(items) ==
- *   (Monoid.plus(items.map { stateful.put(_) }.filter { _.isDefined }, stateful.flush) &&
+ *   (HasAdditionOperatorAndZero.plus(items.map { stateful.put(_) }.filter { _.isDefined }, stateful.flush) &&
  *     stateful.isFlushed)
  * Law 2: isFlushed == flush.isEmpty
  * @author Oscar Boykin

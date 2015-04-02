@@ -50,7 +50,7 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    val outputs = squeue.put(Monoid.sum(vals.map { i =>
+    val outputs = squeue.put(HasAdditionOperatorAndZero.sum(vals.map { i =>
       tuplesIn.incr
       Map(i)
     })).getOrElse(Map.empty)
@@ -78,7 +78,7 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
         if (!queue.offer(item)) {
           sizeIncr.incr
           // Queue is full, do the work:
-          Monoid.plus(flush, Some(item))
+          HasAdditionOperatorAndZero.plus(flush, Some(item))
         } else {
           // We are in the queue
           None

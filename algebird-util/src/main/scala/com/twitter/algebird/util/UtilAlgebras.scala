@@ -49,13 +49,13 @@ object UtilAlgebras {
   }
 
   implicit def futureHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Future[T]] = new ApplicativeHasAdditionOperator[T, Future]
-  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new ApplicativeMonoid[T, Future]
+  implicit def futureHasAdditionOperatorAndZero[T: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[Future[T]] = new ApplicativeHasAdditionOperatorAndZero[T, Future]
   implicit def futureGroup[T: Group]: Group[Future[T]] = new ApplicativeGroup[T, Future]
   implicit def futureRing[T: Ring]: Ring[Future[T]] = new ApplicativeRing[T, Future]
   implicit def futureField[T: Field]: Field[Future[T]] = new ApplicativeField[T, Future]
 
   implicit def tryHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Try[T]] = new ApplicativeHasAdditionOperator[T, Try]
-  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new ApplicativeMonoid[T, Try]
+  implicit def tryHasAdditionOperatorAndZero[T: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[Try[T]] = new ApplicativeHasAdditionOperatorAndZero[T, Try]
   implicit def tryGroup[T: Group]: Group[Try[T]] = new ApplicativeGroup[T, Try]
   implicit def tryRing[T: Ring]: Ring[Try[T]] = new ApplicativeRing[T, Try]
   implicit def tryField[T: Field]: Field[Try[T]] = new ApplicativeField[T, Try]

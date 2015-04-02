@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird.statistics
 
-import com.twitter.algebird.{ HasAdditionOperator, Monoid, Group, Ring }
+import com.twitter.algebird.{ HasAdditionOperator, HasAdditionOperatorAndZero, Group, Ring }
 
 /**
  * These wrappers can be used to collect statistics around usage of monoids
@@ -52,8 +52,8 @@ class StatisticsHasAdditionOperator[T](threadSafe: Boolean = true)(implicit wrap
 /**
  * @see StatisticsHasAdditionOperator
  */
-class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Monoid[T])
-  extends StatisticsHasAdditionOperator[T](threadSafe) with Monoid[T] {
+class StatisticsHasAdditionOperatorAndZero[T](threadSafe: Boolean = true)(implicit wrappedHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[T])
+  extends StatisticsHasAdditionOperator[T](threadSafe) with HasAdditionOperatorAndZero[T] {
 
   private[this] final val zeroCallsCount = Counter(threadSafe)
   private[this] final val sumCallsStats = new IterCallStatistics(threadSafe)
@@ -65,11 +65,11 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
 
   override def zero = {
     zeroCallsCount.increment
-    Monoid.zero
+    HasAdditionOperatorAndZero.zero
   }
 
   override def sum(vs: TraversableOnce[T]): T =
-    sumCallsStats.measure(vs) { Monoid.sum(_) }
+    sumCallsStats.measure(vs) { HasAdditionOperatorAndZero.sum(_) }
 
   override def toString =
     super.toString + "\n" +
@@ -81,7 +81,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
  * @see StatisticsHasAdditionOperator
  */
 class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
-  extends StatisticsMonoid[T](threadSafe) with Group[T] {
+  extends StatisticsHasAdditionOperatorAndZero[T](threadSafe) with Group[T] {
 
   private[this] final val negateCallsCount = Counter(threadSafe)
   private[this] final val minusCallsCount = Counter(threadSafe)

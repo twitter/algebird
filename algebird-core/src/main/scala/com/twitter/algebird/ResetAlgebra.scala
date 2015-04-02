@@ -27,10 +27,10 @@ case class SetValue[+A](get: A) extends ResetState[A]
 case class ResetValue[+A](get: A) extends ResetState[A]
 
 object ResetState {
-  implicit def monoid[A: Monoid]: Monoid[ResetState[A]] = new ResetStateMonoid[A]
+  implicit def monoid[A: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[ResetState[A]] = new ResetStateHasAdditionOperatorAndZero[A]
 }
 
-class ResetStateMonoid[A](implicit monoid: Monoid[A]) extends Monoid[ResetState[A]] {
+class ResetStateHasAdditionOperatorAndZero[A](implicit monoid: HasAdditionOperatorAndZero[A]) extends HasAdditionOperatorAndZero[ResetState[A]] {
   def zero = SetValue(monoid.zero)
   def plus(left: ResetState[A], right: ResetState[A]) = {
     (left, right) match {

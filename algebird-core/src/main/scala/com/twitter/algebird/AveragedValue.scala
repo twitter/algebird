@@ -19,8 +19,8 @@ package com.twitter.algebird
 object AveragedValue {
   implicit val group = AveragedGroup
   def aggregator: Aggregator[Double, AveragedValue, Double] = Averager
-  def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
-    Aggregator.prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
+  def numericAggregator[N](implicit num: Numeric[N]): HasAdditionOperatorAndZeroAggregator[N, AveragedValue, Double] =
+    Aggregator.prepareHasAdditionOperatorAndZero { n: N => AveragedValue(num.toDouble(n)) }
       .andThenPresent(_.value)
 
   def apply[V <% Double](v: V) = new AveragedValue(1L, v)
@@ -70,7 +70,7 @@ object AveragedGroup extends Group[AveragedValue] {
   }
 }
 
-object Averager extends MonoidAggregator[Double, AveragedValue, Double] {
+object Averager extends HasAdditionOperatorAndZeroAggregator[Double, AveragedValue, Double] {
   val monoid = AveragedGroup
   def prepare(value: Double) = AveragedValue(value)
   def present(average: AveragedValue) = average.value

@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * A QTree provides an approximate Map[Double,A:Monoid] suitable for range queries, quantile queries,
+ * A QTree provides an approximate Map[Double,A:HasAdditionOperatorAndZero] suitable for range queries, quantile queries,
  * and combinations of these (for example, if you use a numeric A, you can derive the inter-quartile mean).
  *
  * It is loosely related to the Q-Digest data structure from http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf,
@@ -38,7 +38,7 @@ package com.twitter.algebird
  */
 
 object QTree {
-  def apply[A: Monoid](kv: (Double, A), level: Int = -16): QTree[A] = {
+  def apply[A: HasAdditionOperatorAndZero](kv: (Double, A), level: Int = -16): QTree[A] = {
     QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
       level,
       1,
@@ -47,7 +47,7 @@ object QTree {
       None)
   }
 
-  def apply[A: Monoid](kv: (Long, A)): QTree[A] = {
+  def apply[A: HasAdditionOperatorAndZero](kv: (Long, A)): QTree[A] = {
     QTree(kv._1,
       0,
       1,
@@ -63,7 +63,7 @@ object QTree {
   def apply(k: Double): QTree[Double] = apply(k -> k)
 }
 
-class QTreeHasAdditionOperator[A: Monoid](k: Int) extends HasAdditionOperator[QTree[A]] {
+class QTreeHasAdditionOperator[A: HasAdditionOperatorAndZero](k: Int) extends HasAdditionOperator[QTree[A]] {
   def plus(left: QTree[A], right: QTree[A]) = left.merge(right).compress(k)
 }
 
@@ -73,7 +73,7 @@ case class QTree[A](
   count: Long, //the total count for this node and all of its children
   sum: A, //the sum at just this node (*not* including its children)
   lowerChild: Option[QTree[A]],
-  upperChild: Option[QTree[A]])(implicit monoid: Monoid[A]) {
+  upperChild: Option[QTree[A]])(implicit monoid: HasAdditionOperatorAndZero[A]) {
 
   require(offset >= 0, "QTree can not accept negative values")
 

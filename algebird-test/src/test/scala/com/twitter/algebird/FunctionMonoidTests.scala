@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalacheck.{ Arbitrary, Prop }
 
-class FunctionMonoidTests extends CheckProperties {
+class FunctionHasAdditionOperatorAndZeroTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
   // Generates an arbitrary linear function of the form f(x) = a * x + b,

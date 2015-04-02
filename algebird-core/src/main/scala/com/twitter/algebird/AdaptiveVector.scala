@@ -83,7 +83,7 @@ object AdaptiveVector {
 
   private class AVHasAdditionOperator[V: HasAdditionOperator] extends HasAdditionOperator[AdaptiveVector[V]] {
     private def valueIsNonZero(v: V): Boolean = implicitly[HasAdditionOperator[V]] match {
-      case m: Monoid[_] => m.isNonZero(v)
+      case m: HasAdditionOperatorAndZero[_] => m.isNonZero(v)
       case _ => true
     }
 
@@ -114,23 +114,23 @@ object AdaptiveVector {
       }
     }
   }
-  private class AVMonoid[V: Monoid] extends AVHasAdditionOperator[V] with Monoid[AdaptiveVector[V]] {
-    val zero = AdaptiveVector.fill[V](0)(Monoid.zero[V])
+  private class AVHasAdditionOperatorAndZero[V: HasAdditionOperatorAndZero] extends AVHasAdditionOperator[V] with HasAdditionOperatorAndZero[AdaptiveVector[V]] {
+    val zero = AdaptiveVector.fill[V](0)(HasAdditionOperatorAndZero.zero[V])
     override def isNonZero(v: AdaptiveVector[V]) = !isZero(v)
 
     def isZero(v: AdaptiveVector[V]) = (v.size == 0) || {
-      val sparseAreZero = if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
+      val sparseAreZero = if (HasAdditionOperatorAndZero.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
       sparseAreZero &&
-        v.denseIterator.forall { idxv => !Monoid.isNonZero(idxv._2) }
+        v.denseIterator.forall { idxv => !HasAdditionOperatorAndZero.isNonZero(idxv._2) }
     }
   }
-  private class AVGroup[V: Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
+  private class AVGroup[V: Group] extends AVHasAdditionOperatorAndZero[V] with Group[AdaptiveVector[V]] {
     override def negate(v: AdaptiveVector[V]) =
       fromVector(toVector(v).map(Group.negate(_)), Group.negate(v.sparseValue))
   }
 
   implicit def semigroup[V: HasAdditionOperator]: HasAdditionOperator[AdaptiveVector[V]] = new AVHasAdditionOperator[V]
-  implicit def monoid[V: Monoid]: Monoid[AdaptiveVector[V]] = new AVMonoid[V]
+  implicit def monoid[V: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[AdaptiveVector[V]] = new AVHasAdditionOperatorAndZero[V]
   implicit def group[V: Group]: Group[AdaptiveVector[V]] = new AVGroup[V]
 
   /*

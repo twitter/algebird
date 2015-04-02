@@ -17,12 +17,12 @@ class DecayedValueLaws extends CheckProperties {
         val noise = rand.nextDouble * params.maxNoise * rand.nextInt.signum
         DecayedValue.build(params.mean + (params.mean * noise), t, params.halfLife)
       }
-      val result = decayedMonoid.sum(data)
+      val result = decayedHasAdditionOperatorAndZero.sum(data)
       approxEq(fn(result, params), params.mean)
     }
   }
 
-  implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
+  implicit val decayedHasAdditionOperatorAndZero = DecayedValue.monoidWithEpsilon(0.001)
   case class Params(mean: Double, halfLife: Double, count: Int, maxNoise: Double)
 
   property("for large HL and count, average(f(t)=x)=x") {

@@ -30,7 +30,7 @@ sealed trait MinPlus[+V] extends Any with java.io.Serializable
 case object MinPlusZero extends MinPlus[Nothing]
 case class MinPlusValue[V](get: V) extends AnyVal with MinPlus[V]
 
-class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends Ring[MinPlus[V]] {
+class MinPlusSemiring[V](implicit monoid: HasAdditionOperatorAndZero[V], ord: Ordering[V]) extends Ring[MinPlus[V]] {
   override def zero = MinPlusZero
   override def negate(mv: MinPlus[V]) =
     sys.error("MinPlus is a semi-ring, there is no additive inverse")
@@ -54,5 +54,5 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
 }
 
 object MinPlus extends java.io.Serializable {
-  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] = new MinPlusSemiring[V]
+  implicit def semiring[V: HasAdditionOperatorAndZero: Ordering]: Ring[MinPlus[V]] = new MinPlusSemiring[V]
 }

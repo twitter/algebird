@@ -43,6 +43,6 @@ class RichTraversable[T](t: TraversableOnce[T]) {
   def sumByKey[K, V](implicit ev: <:<[T, (K, V)], sg: HasAdditionOperator[V]): Map[K, V] =
     MapAlgebra.sumByKey(t.map { _.asInstanceOf[(K, V)] })
 
-  def monoidSum(implicit monoid: Monoid[T]) = Monoid.sum(t)
+  def monoidSum(implicit monoid: HasAdditionOperatorAndZero[T]) = HasAdditionOperatorAndZero.sum(t)
   def ringProduct(implicit ring: Ring[T]) = Ring.product(t)
 }

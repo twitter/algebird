@@ -1,7 +1,7 @@
 package com.twitter.algebird.caliper
 
 import com.google.caliper.{ Param, SimpleBenchmark }
-import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSMonoid }
+import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSHasAdditionOperatorAndZero }
 
 /**
  * Benchmarks the Count-Min sketch implementation in Algebird.
@@ -33,9 +33,9 @@ class CMSBenchmark extends SimpleBenchmark {
   val maxBits: Int = 0
 
   var random: scala.util.Random = _
-  var cmsLongMonoid: TopPctCMSMonoid[Long] = _
-  var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
-  var cmsStringMonoid: TopPctCMSMonoid[String] = _
+  var cmsLongHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[Long] = _
+  var cmsBigIntHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[BigInt] = _
+  var cmsStringHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[String] = _
   var inputsBigInt: Seq[BigInt] = _
   var inputsString: Seq[String] = _
 
@@ -43,9 +43,9 @@ class CMSBenchmark extends SimpleBenchmark {
     // Required import of implicit values (e.g. for BigInt- or Long-backed CMS instances)
     import CMSHasherImplicits._
 
-    cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, heavyHittersPct)
-    cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, heavyHittersPct)
-    cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, heavyHittersPct)
+    cmsLongHasAdditionOperatorAndZero = TopPctCMS.monoid[Long](eps, delta, Seed, heavyHittersPct)
+    cmsBigIntHasAdditionOperatorAndZero = TopPctCMS.monoid[BigInt](eps, delta, Seed, heavyHittersPct)
+    cmsStringHasAdditionOperatorAndZero = TopPctCMS.monoid[String](eps, delta, Seed, heavyHittersPct)
 
     random = new scala.util.Random
 
@@ -59,7 +59,7 @@ class CMSBenchmark extends SimpleBenchmark {
   def timePlusOfFirstHundredIntegersWithLongCms(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      (1 to operations).view.foldLeft(cmsLongMonoid.zero)((l, r) => { l ++ cmsLongMonoid.create(r) })
+      (1 to operations).view.foldLeft(cmsLongHasAdditionOperatorAndZero.zero)((l, r) => { l ++ cmsLongHasAdditionOperatorAndZero.create(r) })
       dummy += 1
     }
     dummy
@@ -69,7 +69,7 @@ class CMSBenchmark extends SimpleBenchmark {
   def timePlusOfFirstHundredIntegersWithBigIntCms(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      (1 to operations).view.foldLeft(cmsBigIntMonoid.zero)((l, r) => { l ++ cmsBigIntMonoid.create(r) })
+      (1 to operations).view.foldLeft(cmsBigIntHasAdditionOperatorAndZero.zero)((l, r) => { l ++ cmsBigIntHasAdditionOperatorAndZero.create(r) })
       dummy += 1
     }
     dummy
@@ -79,7 +79,7 @@ class CMSBenchmark extends SimpleBenchmark {
   def timePlusOfRandom2048BitNumbersWithBigIntCms(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      inputsBigInt.view.foldLeft(cmsBigIntMonoid.zero)((l, r) => l ++ cmsBigIntMonoid.create(r))
+      inputsBigInt.view.foldLeft(cmsBigIntHasAdditionOperatorAndZero.zero)((l, r) => l ++ cmsBigIntHasAdditionOperatorAndZero.create(r))
       dummy += 1
     }
     dummy
@@ -89,7 +89,7 @@ class CMSBenchmark extends SimpleBenchmark {
   def timePlusOfRandom2048BitNumbersWithStringCms(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      inputsString.view.foldLeft(cmsStringMonoid.zero)((l, r) => l ++ cmsStringMonoid.create(r))
+      inputsString.view.foldLeft(cmsStringHasAdditionOperatorAndZero.zero)((l, r) => l ++ cmsStringHasAdditionOperatorAndZero.create(r))
       dummy += 1
     }
     dummy

@@ -32,17 +32,17 @@ class ResetTest extends CheckProperties {
     }
   }
 
-  property("ResetState[Int] forms a Monoid") {
+  property("ResetState[Int] forms a HasAdditionOperatorAndZero") {
     monoidLaws[ResetState[Int]]
   }
 
-  property("ResetState[String] forms a Monoid") {
+  property("ResetState[String] forms a HasAdditionOperatorAndZero") {
     monoidLaws[ResetState[String]]
   }
 
   property("ResetState[Int] works as expected") {
     forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
-      val result = Monoid.plus(Monoid.plus(a, b), c)
+      val result = HasAdditionOperatorAndZero.plus(HasAdditionOperatorAndZero.plus(a, b), c)
       ((a, b, c) match {
         case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x + y + z)
         case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x + y + z)

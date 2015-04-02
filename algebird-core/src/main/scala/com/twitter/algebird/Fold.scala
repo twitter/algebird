@@ -304,7 +304,7 @@ object Fold {
   /**
    * A Fold that returns the sum of a numeric sequence. Does not protect against overflow.
    */
-  def sum[I](implicit numeric: Monoid[I]): Fold[I, I] =
+  def sum[I](implicit numeric: HasAdditionOperatorAndZero[I]): Fold[I, I] =
     Fold.foldLeft(numeric.zero) { case (x, i) => numeric.plus(x, i) }
 
   /**

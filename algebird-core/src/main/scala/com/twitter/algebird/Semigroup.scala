@@ -82,7 +82,7 @@ object HasAdditionOperator extends GeneratedHasAdditionOperatorImplicits with Pr
    * requires i > 0, wish we had PositiveBigInt as a class
    */
   def intTimes[T](i: BigInt, v: T)(implicit sg: HasAdditionOperator[T]): T = {
-    require(i > 0, "Cannot do non-positive products with a HasAdditionOperator, try Monoid/Group.intTimes")
+    require(i > 0, "Cannot do non-positive products with a HasAdditionOperator, try HasAdditionOperatorAndZero/Group.intTimes")
     intTimesRec(i - 1, v, 0, (v, Vector[T]()))
   }
 
@@ -141,16 +141,16 @@ object HasAdditionOperator extends GeneratedHasAdditionOperatorImplicits with Pr
   implicit val jfloatHasAdditionOperator: HasAdditionOperator[JFloat] = JFloatField
   implicit val doubleHasAdditionOperator: HasAdditionOperator[Double] = DoubleField
   implicit val jdoubleHasAdditionOperator: HasAdditionOperator[JDouble] = JDoubleField
-  implicit val stringHasAdditionOperator: HasAdditionOperator[String] = StringMonoid
-  implicit def optionHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Option[T]] = new OptionMonoid[T]
-  implicit def listHasAdditionOperator[T]: HasAdditionOperator[List[T]] = new ListMonoid[T]
-  implicit def seqHasAdditionOperator[T]: HasAdditionOperator[Seq[T]] = new SeqMonoid[T]
+  implicit val stringHasAdditionOperator: HasAdditionOperator[String] = StringHasAdditionOperatorAndZero
+  implicit def optionHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Option[T]] = new OptionHasAdditionOperatorAndZero[T]
+  implicit def listHasAdditionOperator[T]: HasAdditionOperator[List[T]] = new ListHasAdditionOperatorAndZero[T]
+  implicit def seqHasAdditionOperator[T]: HasAdditionOperator[Seq[T]] = new SeqHasAdditionOperatorAndZero[T]
   implicit def indexedSeqHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[IndexedSeq[T]] = new IndexedSeqHasAdditionOperator[T]
-  implicit def jlistHasAdditionOperator[T]: HasAdditionOperator[JList[T]] = new JListMonoid[T]
-  implicit def setHasAdditionOperator[T]: HasAdditionOperator[Set[T]] = new SetMonoid[T]
-  implicit def mapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[Map[K, V]] = new MapMonoid[K, V]
-  implicit def scMapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[ScMap[K, V]] = new ScMapMonoid[K, V]
-  implicit def jmapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[JMap[K, V]] = new JMapMonoid[K, V]
+  implicit def jlistHasAdditionOperator[T]: HasAdditionOperator[JList[T]] = new JListHasAdditionOperatorAndZero[T]
+  implicit def setHasAdditionOperator[T]: HasAdditionOperator[Set[T]] = new SetHasAdditionOperatorAndZero[T]
+  implicit def mapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[Map[K, V]] = new MapHasAdditionOperatorAndZero[K, V]
+  implicit def scMapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[ScMap[K, V]] = new ScMapHasAdditionOperatorAndZero[K, V]
+  implicit def jmapHasAdditionOperator[K, V: HasAdditionOperator]: HasAdditionOperator[JMap[K, V]] = new JMapHasAdditionOperatorAndZero[K, V]
   implicit def eitherHasAdditionOperator[L: HasAdditionOperator, R: HasAdditionOperator]: HasAdditionOperator[Either[L, R]] = new EitherHasAdditionOperator[L, R]
-  implicit def function1HasAdditionOperator[T]: HasAdditionOperator[Function1[T, T]] = new Function1Monoid[T]
+  implicit def function1HasAdditionOperator[T]: HasAdditionOperator[Function1[T, T]] = new Function1HasAdditionOperatorAndZero[T]
 }

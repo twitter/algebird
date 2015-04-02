@@ -24,17 +24,17 @@ trait MapOperations[K, V, M <: ScMap[K, V]] {
   def fromMutable(mut: MMap[K, V]): M
 }
 
-abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: HasAdditionOperator[V])
-  extends Monoid[M] with MapOperations[K, V, M] {
+abstract class GenericMapHasAdditionOperatorAndZero[K, V, M <: ScMap[K, V]](implicit val semigroup: HasAdditionOperator[V])
+  extends HasAdditionOperatorAndZero[M] with MapOperations[K, V, M] {
 
   val nonZero: (V => Boolean) = semigroup match {
-    case mon: Monoid[_] => mon.isNonZero(_)
+    case mon: HasAdditionOperatorAndZero[_] => mon.isNonZero(_)
     case _ => (_ => true)
   }
 
   override def isNonZero(x: M) =
     !x.isEmpty && (semigroup match {
-      case mon: Monoid[_] => x.valuesIterator.exists { v =>
+      case mon: HasAdditionOperatorAndZero[_] => x.valuesIterator.exists { v =>
         mon.isNonZero(v)
       }
       case _ => true
@@ -90,14 +90,14 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     }
 }
 
-class MapMonoid[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapMonoid[K, V, Map[K, V]] {
+class MapHasAdditionOperatorAndZero[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapHasAdditionOperatorAndZero[K, V, Map[K, V]] {
   override lazy val zero = Map[K, V]()
   override def add(oldMap: Map[K, V], kv: (K, V)) = oldMap + kv
   override def remove(oldMap: Map[K, V], k: K) = oldMap - k
   override def fromMutable(mut: MMap[K, V]): Map[K, V] = new MutableBackedMap(mut)
 }
 
-class ScMapMonoid[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapMonoid[K, V, ScMap[K, V]] {
+class ScMapHasAdditionOperatorAndZero[K, V](implicit semigroup: HasAdditionOperator[V]) extends GenericMapHasAdditionOperatorAndZero[K, V, ScMap[K, V]] {
   override lazy val zero = ScMap[K, V]()
   override def add(oldMap: ScMap[K, V], kv: (K, V)) = oldMap + kv
   override def remove(oldMap: ScMap[K, V], k: K) = oldMap - k
@@ -117,12 +117,12 @@ private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V]) extends M
 /**
  * You can think of this as a Sparse vector group
  */
-class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group)
+class MapGroup[K, V](implicit val group: Group[V]) extends MapHasAdditionOperatorAndZero[K, V]()(group)
   with Group[Map[K, V]] {
   override def negate(kv: Map[K, V]) = kv.mapValues { v => group.negate(v) }
 }
 
-class ScMapGroup[K, V](implicit val group: Group[V]) extends ScMapMonoid[K, V]()(group)
+class ScMapGroup[K, V](implicit val group: Group[V]) extends ScMapHasAdditionOperatorAndZero[K, V]()(group)
   with Group[ScMap[K, V]] {
   override def negate(kv: ScMap[K, V]) = kv.mapValues { v => group.negate(v) }
 }
@@ -166,7 +166,7 @@ object MapAlgebra {
         r.get(k).exists(Equiv[V].equiv(_, v))
     }
 
-  implicit def sparseEquiv[K, V: Monoid: Equiv]: Equiv[Map[K, V]] = {
+  implicit def sparseEquiv[K, V: HasAdditionOperatorAndZero: Equiv]: Equiv[Map[K, V]] = {
     Equiv.fromFunction { (m1, m2) =>
       val cleanM1 = removeZeros(m1)
       val cleanM2 = removeZeros(m2)
@@ -174,28 +174,28 @@ object MapAlgebra {
     }
   }
 
-  def mergeLookup[T, U, V: Monoid](keys: TraversableOnce[T])(lookup: T => Option[V])(present: T => U): Map[U, V] =
+  def mergeLookup[T, U, V: HasAdditionOperatorAndZero](keys: TraversableOnce[T])(lookup: T => Option[V])(present: T => U): Map[U, V] =
     sumByKey {
       keys.map { k =>
-        present(k) -> lookup(k).getOrElse(Monoid.zero[V])
+        present(k) -> lookup(k).getOrElse(HasAdditionOperatorAndZero.zero[V])
       }
     }
 
   // Returns a new map with zero-value entries removed
-  def removeZeros[K, V: Monoid](m: Map[K, V]): Map[K, V] =
-    m filter { case (_, v) => Monoid.isNonZero(v) }
+  def removeZeros[K, V: HasAdditionOperatorAndZero](m: Map[K, V]): Map[K, V] =
+    m filter { case (_, v) => HasAdditionOperatorAndZero.isNonZero(v) }
 
   // groupBy ks, sum all the vs
   def sumByKey[K, V: HasAdditionOperator](pairs: TraversableOnce[(K, V)]): Map[K, V] =
-    Monoid.sum(pairs map { Map(_) })
+    HasAdditionOperatorAndZero.sum(pairs map { Map(_) })
 
   // Consider this as edges from k -> v, produce a Map[K,Set[V]]
   def toGraph[K, V](pairs: TraversableOnce[(K, V)]): Map[K, Set[V]] =
-    Monoid.sum(pairs.map { case (k, v) => Map(k -> Set(v)) })
+    HasAdditionOperatorAndZero.sum(pairs.map { case (k, v) => Map(k -> Set(v)) })
 
   /** join the keys of two maps (similar to outer-join in a DB) */
   def join[K, V, W](map1: Map[K, V], map2: Map[K, W]): Map[K, (Option[V], Option[W])] =
-    Monoid.plus(map1.mapValues { v => (List(v), List[W]()) },
+    HasAdditionOperatorAndZero.plus(map1.mapValues { v => (List(v), List[W]()) },
       map2.mapValues { w => (List[V](), List(w)) })
       .mapValues { case (v, w) => (v.headOption, w.headOption) }
 
@@ -207,7 +207,7 @@ object MapAlgebra {
     def nonEmptyIter[T](i: Iterable[T]): Iterable[Option[T]] =
       if (i.isEmpty) Iterable(None) else { i.map { Some(_) } }
 
-    Monoid.sum {
+    HasAdditionOperatorAndZero.sum {
       for (
         (k, sv) <- m.view.toIterable;
         v <- nonEmptyIter(sv)
@@ -218,8 +218,8 @@ object MapAlgebra {
    * Invert the Common case of exactly one value for each key
    */
   def invert[K, V](m: Map[K, V]): Map[V, Set[K]] =
-    Monoid.sum(m.view.toIterable.map { case (k, v) => Map(v -> Set(k)) })
+    HasAdditionOperatorAndZero.sum(m.view.toIterable.map { case (k, v) => Map(v -> Set(k)) })
 
-  def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: Monoid[V]): V =
-    Monoid.sum(mring.times(left, right).values)
+  def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: HasAdditionOperatorAndZero[V]): V =
+    HasAdditionOperatorAndZero.sum(mring.times(left, right).values)
 }

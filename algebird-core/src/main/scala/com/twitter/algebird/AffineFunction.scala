@@ -32,9 +32,9 @@ case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializabl
  * If we did the "lexigraphically correct" thing, which might be (f+g)(x) = f(g(x))
  * then we would wind up reversing the list in the sum.
  * (f1 + f2)(x) = f2(f1(x)) so that:
- * listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
+ * listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (HasAdditionOperatorAndZero.sum(listOfFn))(x)
  */
-class AffineFunctionMonoid[R](implicit ring: Ring[R]) extends Monoid[AffineFunction[R]] {
+class AffineFunctionHasAdditionOperatorAndZero[R](implicit ring: Ring[R]) extends HasAdditionOperatorAndZero[AffineFunction[R]] {
   lazy val zero = AffineFunction[R](ring.one, ring.zero)
   def plus(f: AffineFunction[R], g: AffineFunction[R]) = {
     // (f+g)(x) = g(f(x))
@@ -46,5 +46,5 @@ class AffineFunctionMonoid[R](implicit ring: Ring[R]) extends Monoid[AffineFunct
 }
 
 object AffineFunction extends java.io.Serializable {
-  implicit def monoid[R: Ring]: Monoid[AffineFunction[R]] = new AffineFunctionMonoid[R]
+  implicit def monoid[R: Ring]: HasAdditionOperatorAndZero[AffineFunction[R]] = new AffineFunctionHasAdditionOperatorAndZero[R]
 }

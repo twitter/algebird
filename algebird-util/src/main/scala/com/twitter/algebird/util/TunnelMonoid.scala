@@ -19,16 +19,16 @@ import com.twitter.algebird._
 import com.twitter.util.{ Future, Promise, Return }
 
 /**
- * This Monoid allows code to depends on the results of asynchronous
+ * This HasAdditionOperatorAndZero allows code to depends on the results of asynchronous
  * computation. It is relatively common to have code which takes a
- * Monoid and elements, but applies the computation in an opaque way
+ * HasAdditionOperatorAndZero and elements, but applies the computation in an opaque way
  * (a cache, for example). This allows the code handing over the
  * elements (in this case, Tunnel objects) to depend on the result
- * of the Monoid's computation. Note that this code does not depend
- * on any particular Monoid -- that dependency is strictly when the Tunnel
- * objects are created. This is the async analogue of Function1Monoid.
+ * of the HasAdditionOperatorAndZero's computation. Note that this code does not depend
+ * on any particular HasAdditionOperatorAndZero -- that dependency is strictly when the Tunnel
+ * objects are created. This is the async analogue of Function1HasAdditionOperatorAndZero.
  */
-class TunnelMonoid[V] extends Monoid[Tunnel[V]] {
+class TunnelHasAdditionOperatorAndZero[V] extends HasAdditionOperatorAndZero[Tunnel[V]] {
   def zero = {
     val promise = new Promise[V]
     Tunnel(promise, promise)
@@ -47,7 +47,7 @@ class TunnelMonoid[V] extends Monoid[Tunnel[V]] {
  * The tunnel class represents a piece of computation that depends on the
  * fulfilment of a promise. IMPORTANT: see apply, but Tunnels are mutable,
  * and can only be fulfilled once. They are generally not reusable. Reusing
- * a Tunnel in computation by a TunnelMonoid will cause the promise to be
+ * a Tunnel in computation by a TunnelHasAdditionOperatorAndZero will cause the promise to be
  * fulfilled more than once which will most likely lead to errors.
  */
 case class Tunnel[V](future: Future[V], promise: Promise[V]) {
@@ -61,7 +61,7 @@ case class Tunnel[V](future: Future[V], promise: Promise[V]) {
    * This takes in a value and updates the promise, fulfilling the chain
    * of futures which depends on this final promise. IMPORTANT: this can
    * only be called once. In this way, it is dangerous to reuse Tunnel
-   * objects in Monoid code that might reuse objects.
+   * objects in HasAdditionOperatorAndZero code that might reuse objects.
    */
   def apply(v: V): Future[V] = {
     Tunnel.properPromiseUpdate(promise, v)
@@ -70,13 +70,13 @@ case class Tunnel[V](future: Future[V], promise: Promise[V]) {
 }
 
 object Tunnel {
-  implicit def monoid[V]: TunnelMonoid[V] = new TunnelMonoid[V]
+  implicit def monoid[V]: TunnelHasAdditionOperatorAndZero[V] = new TunnelHasAdditionOperatorAndZero[V]
 
   /**
-   * This lifts a value into a Tunnel. This is where the Monoidic
-   * computation underlying a TunnelMonoid actually happens.
+   * This lifts a value into a Tunnel. This is where the HasAdditionOperatorAndZeroic
+   * computation underlying a TunnelHasAdditionOperatorAndZero actually happens.
    */
-  def toIncrement[V](v: V)(implicit monoid: Monoid[V]) = {
+  def toIncrement[V](v: V)(implicit monoid: HasAdditionOperatorAndZero[V]) = {
     val promise = new Promise[V]
     Tunnel(promise.map { monoid.plus(_, v) }, promise)
   }

@@ -152,10 +152,10 @@ object Approximate {
   // negate fails: x - x != 0, because with some probability the bound is bad.
   // distributive fails because a*b + a*c ignores that a is either in or out
   // of the bound, and counts it idependently.
-  implicit def monoid[N](implicit n: Numeric[N]): Monoid[Approximate[N]] = {
+  implicit def monoid[N](implicit n: Numeric[N]): HasAdditionOperatorAndZero[Approximate[N]] = {
     // avoid capturing the Numeric:
     val z = Approximate.zero[N]
-    new Monoid[Approximate[N]] {
+    new HasAdditionOperatorAndZero[Approximate[N]] {
       val zero = z
       override def isNonZero(v: Approximate[N]) = !v.isZero
       def plus(left: Approximate[N], right: Approximate[N]) = left + right

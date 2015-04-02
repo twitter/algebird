@@ -10,7 +10,7 @@ import com.google.caliper.{ Param, SimpleBenchmark }
 import java.nio.ByteBuffer
 
 import scala.math._
-class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
+class OldHasAdditionOperatorAndZero(bits: Int) extends HyperLogLogHasAdditionOperatorAndZero(bits) {
   import HyperLogLog._
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
@@ -23,8 +23,8 @@ class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
 }
 
 class HllBenchmark extends SimpleBenchmark {
-  var hllMonoid: HyperLogLogMonoid = _
-  var oldHllMonoid: HyperLogLogMonoid = _
+  var hllHasAdditionOperatorAndZero: HyperLogLogHasAdditionOperatorAndZero = _
+  var oldHllHasAdditionOperatorAndZero: HyperLogLogHasAdditionOperatorAndZero = _
 
   @Param(Array("12", "14", "24"))
   val numBits: Int = 0
@@ -39,15 +39,15 @@ class HllBenchmark extends SimpleBenchmark {
   var inputData: Seq[Seq[HLL]] = _
 
   override def setUp {
-    hllMonoid = new HyperLogLogMonoid(numBits)
+    hllHasAdditionOperatorAndZero = new HyperLogLogHasAdditionOperatorAndZero(numBits)
 
-    oldHllMonoid = new OldMonoid(numBits)
+    oldHllHasAdditionOperatorAndZero = new OldHasAdditionOperatorAndZero(numBits)
 
     val rng = new Random(3)
 
     val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
     def setSize = rng.nextInt(10) + 1 // 1 -> 10
-    def hll(elements: Set[Long]): HLL = hllMonoid.batchCreate(elements)(byteEncoder)
+    def hll(elements: Set[Long]): HLL = hllHasAdditionOperatorAndZero.batchCreate(elements)(byteEncoder)
 
     val inputIntermediate = (0L until numElements).map { _ =>
       val setElements = (0 until setSize).map{ _ => rng.nextInt(1000).toLong }.toSet
@@ -59,7 +59,7 @@ class HllBenchmark extends SimpleBenchmark {
   def timeSumOption(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      inputData.foreach(hllMonoid.sumOption(_))
+      inputData.foreach(hllHasAdditionOperatorAndZero.sumOption(_))
       dummy += 1
     }
     dummy
@@ -68,7 +68,7 @@ class HllBenchmark extends SimpleBenchmark {
   def timeOldSumOption(reps: Int): Int = {
     var dummy = 0
     while (dummy < reps) {
-      inputData.foreach(oldHllMonoid.sumOption(_))
+      inputData.foreach(oldHllHasAdditionOperatorAndZero.sumOption(_))
       dummy += 1
     }
     dummy
@@ -78,7 +78,7 @@ class HllBenchmark extends SimpleBenchmark {
     var dummy = 0
     while (dummy < reps) {
       inputData.foreach { vals =>
-        vals.reduce(hllMonoid.plus(_, _))
+        vals.reduce(hllHasAdditionOperatorAndZero.plus(_, _))
       }
       dummy += 1
     }

@@ -29,7 +29,7 @@ package com.twitter.algebird
  *   Right(x) + Left(y)  = Left(convert(x)+y)
  *   Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y)
  *                         Right(x+y) otherwise.
- * EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously,
+ * EventuallyHasAdditionOperatorAndZero, EventuallyGroup, and EventuallyRing are defined analogously,
  * with the contract that convert respect the appropriate structure.
  *
  * @param E eventual type
@@ -122,17 +122,17 @@ class EventuallyHasAdditionOperator[E, O](convert: O => E)(mustConvert: O => Boo
 /**
  * @see EventuallyHasAdditionOperator
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lHasAdditionOperator: HasAdditionOperator[E], rMonoid: Monoid[O]) extends EventuallyHasAdditionOperator[E, O](convert)(mustConvert)
-  with Monoid[Either[E, O]] {
+class EventuallyHasAdditionOperatorAndZero[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lHasAdditionOperator: HasAdditionOperator[E], rHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[O]) extends EventuallyHasAdditionOperator[E, O](convert)(mustConvert)
+  with HasAdditionOperatorAndZero[Either[E, O]] {
 
-  override def zero = Right(Monoid.zero[O])
+  override def zero = Right(HasAdditionOperatorAndZero.zero[O])
 
 }
 
 /**
  * @see EventuallyHasAdditionOperator
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyHasAdditionOperatorAndZero[E, O](convert)(mustConvert)
   with Group[Either[E, O]] {
 
   override def negate(x: Either[E, O]) = {
@@ -142,7 +142,7 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     }
   }
 
-  override def left(e: E) = if (Monoid.isNonZero(e)) Left(e) else zero
+  override def left(e: E) = if (HasAdditionOperatorAndZero.isNonZero(e)) Left(e) else zero
 
 }
 

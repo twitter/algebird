@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird.bijection
 
-import com.twitter.algebird.{ Field, Group, Monoid, Ring, HasAdditionOperator }
+import com.twitter.algebird.{ Field, Group, HasAdditionOperatorAndZero, Ring, HasAdditionOperator }
 import com.twitter.bijection.{ AbstractBijection, Bijection, ImplicitBijection, Conversion, Reverse }
 
 import Conversion.asMethod // "as" syntax
@@ -35,11 +35,11 @@ class BijectedHasAdditionOperator[T, U](implicit val sg: HasAdditionOperator[T],
     sg.sumOption(iter.map { _.as[T] }).map(_.as[U])
 }
 
-class BijectedMonoid[T, U](implicit val monoid: Monoid[T], bij: ImplicitBijection[T, U]) extends BijectedHasAdditionOperator[T, U] with Monoid[U] {
+class BijectedHasAdditionOperatorAndZero[T, U](implicit val monoid: HasAdditionOperatorAndZero[T], bij: ImplicitBijection[T, U]) extends BijectedHasAdditionOperator[T, U] with HasAdditionOperatorAndZero[U] {
   override def zero: U = monoid.zero.as[U]
 }
 
-class BijectedGroup[T, U](implicit val group: Group[T], bij: ImplicitBijection[T, U]) extends BijectedMonoid[T, U] with Group[U] {
+class BijectedGroup[T, U](implicit val group: Group[T], bij: ImplicitBijection[T, U]) extends BijectedHasAdditionOperatorAndZero[T, U] with Group[U] {
   override def negate(u: U): U = group.negate(u.as[T]).as[U]
   override def minus(l: U, r: U): U = group.minus(l.as[T], r.as[T]).as[U]
 }
@@ -63,10 +63,10 @@ trait AlgebirdBijections {
       override def invert(sg: HasAdditionOperator[U]) = new BijectedHasAdditionOperator[U, T]()(sg, Reverse(bij.bijection))
     }
 
-  implicit def monoidBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Monoid[T], Monoid[U]] =
-    new AbstractBijection[Monoid[T], Monoid[U]] {
-      override def apply(mon: Monoid[T]) = new BijectedMonoid[T, U]()(mon, bij)
-      override def invert(mon: Monoid[U]) = new BijectedMonoid[U, T]()(mon, Reverse(bij.bijection))
+  implicit def monoidBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[HasAdditionOperatorAndZero[T], HasAdditionOperatorAndZero[U]] =
+    new AbstractBijection[HasAdditionOperatorAndZero[T], HasAdditionOperatorAndZero[U]] {
+      override def apply(mon: HasAdditionOperatorAndZero[T]) = new BijectedHasAdditionOperatorAndZero[T, U]()(mon, bij)
+      override def invert(mon: HasAdditionOperatorAndZero[U]) = new BijectedHasAdditionOperatorAndZero[U, T]()(mon, Reverse(bij.bijection))
     }
 
   implicit def groupBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Group[T], Group[U]] =

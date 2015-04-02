@@ -25,19 +25,19 @@ object Max {
     HasAdditionOperator.from[Max[T]] { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
 
   // Zero should have the property that it <= all T
-  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Max[T]] =
-    Monoid.from(Max(zero)) { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
+  def monoid[T](zero: => T)(implicit ord: Ordering[T]): HasAdditionOperatorAndZero[Max[T]] =
+    HasAdditionOperatorAndZero.from(Max(zero)) { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
 
   def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)
 
-  implicit def intMonoid: Monoid[Max[Int]] = monoid(Int.MinValue)
-  implicit def longMonoid: Monoid[Max[Long]] = monoid(Long.MinValue)
-  implicit def doubleMonoid: Monoid[Max[Double]] = monoid(Double.MinValue)
-  implicit def floatMonoid: Monoid[Max[Float]] = monoid(Float.MinValue)
+  implicit def intHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Max[Int]] = monoid(Int.MinValue)
+  implicit def longHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Max[Long]] = monoid(Long.MinValue)
+  implicit def doubleHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Max[Double]] = monoid(Double.MinValue)
+  implicit def floatHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Max[Float]] = monoid(Float.MinValue)
 
   // These have a lower bound, but not an upperbound, so the Max forms a monoid:
-  implicit def stringMonoid: Monoid[Max[String]] = monoid("")
-  implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] = monoid[List[T]](Nil)(new Ordering[List[T]] {
+  implicit def stringHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Max[String]] = monoid("")
+  implicit def listHasAdditionOperatorAndZero[T: Ordering]: HasAdditionOperatorAndZero[Max[List[T]]] = monoid[List[T]](Nil)(new Ordering[List[T]] {
     @tailrec
     final override def compare(left: List[T], right: List[T]): Int = {
       (left, right) match {
@@ -60,15 +60,15 @@ object Min {
     HasAdditionOperator.from[Min[T]] { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
 
   // Zero should have the property that it >= all T
-  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
-    Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
+  def monoid[T](zero: => T)(implicit ord: Ordering[T]): HasAdditionOperatorAndZero[Min[T]] =
+    HasAdditionOperatorAndZero.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
 
   def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
 
-  implicit def intMonoid: Monoid[Min[Int]] = monoid(Int.MaxValue)
-  implicit def longMonoid: Monoid[Min[Long]] = monoid(Long.MaxValue)
-  implicit def doubleMonoid: Monoid[Min[Double]] = monoid(Double.MaxValue)
-  implicit def floatMonoid: Monoid[Min[Float]] = monoid(Float.MaxValue)
+  implicit def intHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Min[Int]] = monoid(Int.MaxValue)
+  implicit def longHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Min[Long]] = monoid(Long.MaxValue)
+  implicit def doubleHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Min[Double]] = monoid(Double.MaxValue)
+  implicit def floatHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[Min[Float]] = monoid(Float.MaxValue)
 }
 
 // Not ordered by type, but ordered by order in which we see them:

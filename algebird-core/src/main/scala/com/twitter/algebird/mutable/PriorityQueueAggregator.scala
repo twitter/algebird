@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird.mutable
 
-import com.twitter.algebird.MonoidAggregator
+import com.twitter.algebird.HasAdditionOperatorAndZeroAggregator
 import scala.collection.JavaConverters._
 
 import java.util.PriorityQueue
@@ -26,13 +26,13 @@ import java.util.PriorityQueue
  * an immutable view before using it, as is done in PriorityQueueToListAggregator
  */
 abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A])
-  extends MonoidAggregator[A, PriorityQueue[A], C] {
+  extends HasAdditionOperatorAndZeroAggregator[A, PriorityQueue[A], C] {
   /*
    you need to override:
   def present(q: PriorityQueue[A]): B
    */
 
-  val monoid = new PriorityQueueMonoid[A](max)
+  val monoid = new PriorityQueueHasAdditionOperatorAndZero[A](max)
   final def prepare(a: A) = monoid.build(a)
 }
 

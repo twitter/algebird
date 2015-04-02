@@ -6,8 +6,8 @@ import org.scalacheck.{ Arbitrary, Gen }
 class SGDLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val sgdMonoid = new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
-  val zeroStepMonoid = new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
+  implicit val sgdHasAdditionOperatorAndZero = new SGDHasAdditionOperatorAndZero(SGD.constantStep(0.001), SGD.linearGradient)
+  val zeroStepHasAdditionOperatorAndZero = new SGDHasAdditionOperatorAndZero(SGD.constantStep(0.0), SGD.linearGradient)
 
   val (m, b) = (2.0, 4.0)
   val eps = 1e-3
@@ -31,7 +31,7 @@ class SGDLaws extends CheckProperties {
     Gen.oneOf(sgdWGen, sgdPosGen, zeroGen)
   }
 
-  property("is a Monoid") {
+  property("is a HasAdditionOperatorAndZero") {
     monoidLaws[SGD[(Double, IndexedSeq[Double])]]
   }
 
@@ -58,7 +58,7 @@ class SGDLaws extends CheckProperties {
   property("Zero-step leaves Weights unchanged") {
     forAll {
       (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
-        val next = zeroStepMonoid.newWeights(w, pos.pos.head)
+        val next = zeroStepHasAdditionOperatorAndZero.newWeights(w, pos.pos.head)
         (next.weights == w.weights && next.count == (w.count + 1L))
     }
   }
@@ -67,12 +67,12 @@ class SGDLaws extends CheckProperties {
     x.zip(y).map { case (x: Double, y: Double) => x - y }
   }
 
-  val oneStepMonoid = new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
+  val oneStepHasAdditionOperatorAndZero = new SGDHasAdditionOperatorAndZero(SGD.constantStep(1.0), SGD.linearGradient)
 
   property("unit step can be undone by adding gradient") {
     forAll {
       (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
-        val next = oneStepMonoid.newWeights(w, pos.pos.head)
+        val next = oneStepHasAdditionOperatorAndZero.newWeights(w, pos.pos.head)
         next.weights == minus(w.weights, SGD.linearGradient(w.weights, pos.pos.head))
     }
   }

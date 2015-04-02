@@ -43,8 +43,8 @@ object Moments {
   implicit val group = MomentsGroup
   val aggregator = MomentsAggregator
 
-  def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
-    Aggregator.prepareMonoid { n: N => Moments(num.toDouble(n)) }
+  def numericAggregator[N](implicit num: Numeric[N]): HasAdditionOperatorAndZeroAggregator[N, Moments, Moments] =
+    Aggregator.prepareHasAdditionOperatorAndZero { n: N => Moments(num.toDouble(n)) }
 
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
@@ -131,7 +131,7 @@ object MomentsGroup extends Group[Moments] {
   }
 }
 
-object MomentsAggregator extends MonoidAggregator[Double, Moments, Moments] {
+object MomentsAggregator extends HasAdditionOperatorAndZeroAggregator[Double, Moments, Moments] {
   val monoid = MomentsGroup
 
   def prepare(input: Double): Moments = Moments(input)

@@ -16,21 +16,21 @@ limitations under the License.
 
 package com.twitter.algebird.matrix
 import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
-import com.twitter.algebird.{ Monoid, AdaptiveVector }
+import com.twitter.algebird.{ HasAdditionOperatorAndZero, AdaptiveVector }
 
 object SparseColumnMatrix {
-  def fromSeqMap[V: Monoid](cols: Int, data: IndexedSeq[MMap[Int, V]]) = {
-    val monoidZero = implicitly[Monoid[V]].zero
+  def fromSeqMap[V: HasAdditionOperatorAndZero](cols: Int, data: IndexedSeq[MMap[Int, V]]) = {
+    val monoidZero = implicitly[HasAdditionOperatorAndZero[V]].zero
     SparseColumnMatrix(data.map { mm =>
       AdaptiveVector.fromMap(mm.toMap, monoidZero, cols)
     }.toIndexedSeq)
   }
 }
 
-case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVector[V]]) extends AdaptiveMatrix[V] {
+case class SparseColumnMatrix[V: HasAdditionOperatorAndZero](rowsByColumns: IndexedSeq[AdaptiveVector[V]]) extends AdaptiveMatrix[V] {
   /** Row is the outer Seq, the columns are the inner vectors. */
 
-  val valueMonoid = implicitly[Monoid[V]]
+  val valueHasAdditionOperatorAndZero = implicitly[HasAdditionOperatorAndZero[V]]
 
   override def rows: Int = rowsByColumns.size
 
@@ -51,14 +51,14 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
       while (iter.hasNext) {
         val (col, value) = iter.next
         val indx = row * lcols + col
-        buffer(indx) = valueMonoid.plus(buffer(indx), value)
+        buffer(indx) = valueHasAdditionOperatorAndZero.plus(buffer(indx), value)
       }
       row += 1
     }
   }
 
   def toDense: DenseMatrix[V] = {
-    val buf = ArrayBuffer.fill(size)(valueMonoid.zero)
+    val buf = ArrayBuffer.fill(size)(valueHasAdditionOperatorAndZero.zero)
     updateInto(buf)
     DenseMatrix(rows, cols, buf)
   }

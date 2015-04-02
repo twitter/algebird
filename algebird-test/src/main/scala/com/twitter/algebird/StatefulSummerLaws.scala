@@ -33,7 +33,7 @@ object StatefulSummerLaws {
   def sumIsPreserved[V: HasAdditionOperator: Equiv](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
     summer.flush
     val sg = HasAdditionOperator.sumOption(items)
-    val wsummer = Monoid.plus(Monoid.sum(items.map { summer.put(_) }.filter { _.isDefined }), summer.flush)
+    val wsummer = HasAdditionOperatorAndZero.plus(HasAdditionOperatorAndZero.sum(items.map { summer.put(_) }.filter { _.isDefined }), summer.flush)
     zeroEquiv(sg, wsummer) && summer.isFlushed
   }
   // Law 2:

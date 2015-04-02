@@ -10,7 +10,7 @@ package object legacy {
    *
    * =Usage=
    *
-   * You typically create instances of this type via [[CountMinSketchMonoid]].
+   * You typically create instances of this type via [[CountMinSketchHasAdditionOperatorAndZero]].
    */
   @deprecated("You should use TopCMS[Long] instead of legacy.CMS", since = "0.8.1")
   type CMS = TopCMS[Long]
@@ -21,22 +21,22 @@ package object legacy {
    *
    * =Usage=
    *
-   * You typically create instances of this type via `CountMinSketchMonoid.apply()`, see example below.
+   * You typically create instances of this type via `CountMinSketchHasAdditionOperatorAndZero.apply()`, see example below.
    *
    * =Example=
    *
    * {{{
-   * import com.twitter.algebird.legacy.CountMinSketchMonoid
+   * import com.twitter.algebird.legacy.CountMinSketchHasAdditionOperatorAndZero
    *
-   * // Pre-0.8.1 you would have used `new CountMinSketchMonoid(EPS, DELTA, SEED)` (note the `new`).
-   * val cmsMonoid: CountMinSketchMonoid = CountMinSketchMonoid(EPS, DELTA, SEED)
+   * // Pre-0.8.1 you would have used `new CountMinSketchHasAdditionOperatorAndZero(EPS, DELTA, SEED)` (note the `new`).
+   * val cmsHasAdditionOperatorAndZero: CountMinSketchHasAdditionOperatorAndZero = CountMinSketchHasAdditionOperatorAndZero(EPS, DELTA, SEED)
    * }}}
    *
    * =Implementation details=
    *
-   * This type is an alias for `TopPctCMSMonoid[Long]` (see [[TopPctCMSMonoid]]).
+   * This type is an alias for `TopPctCMSHasAdditionOperatorAndZero[Long]` (see [[TopPctCMSHasAdditionOperatorAndZero]]).
    */
-  @deprecated("You should use TopPctCMSMonoid[Long] instead of legacy.CountMinSketchMonoid", since = "0.8.1")
-  type CountMinSketchMonoid = TopPctCMSMonoid[Long]
+  @deprecated("You should use TopPctCMSHasAdditionOperatorAndZero[Long] instead of legacy.CountMinSketchHasAdditionOperatorAndZero", since = "0.8.1")
+  type CountMinSketchHasAdditionOperatorAndZero = TopPctCMSHasAdditionOperatorAndZero[Long]
 
 }

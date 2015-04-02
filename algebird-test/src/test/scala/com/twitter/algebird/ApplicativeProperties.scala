@@ -55,9 +55,9 @@ class ApplicativeProperties extends CheckProperties {
     semigroupLaws[Option[Int]] && isAssociative[List[String]]
   }
 
-  property("Applicative Monoid") {
-    implicit val optSg = new ApplicativeMonoid[Int, Option]
-    implicit val listSg = new ApplicativeMonoid[String, List]
+  property("Applicative HasAdditionOperatorAndZero") {
+    implicit val optSg = new ApplicativeHasAdditionOperatorAndZero[Int, Option]
+    implicit val listSg = new ApplicativeHasAdditionOperatorAndZero[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     monoidLaws[Option[Int]] && validZero[List[String]]
   }

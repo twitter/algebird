@@ -19,12 +19,12 @@ import com.twitter.algebird._
 import com.twitter.util.Promise
 
 /**
- * This Monoid allows code to depend on the result of computation asynchronously.
- * This is a slightly less general version of the TunnelMonoid. See the documentation
- * for TunnelMonoid for general motivation. NOTE: the Promise will be fulfilled with
+ * This HasAdditionOperatorAndZero allows code to depend on the result of computation asynchronously.
+ * This is a slightly less general version of the TunnelHasAdditionOperatorAndZero. See the documentation
+ * for TunnelHasAdditionOperatorAndZero for general motivation. NOTE: the Promise will be fulfilled with
  * the value just before the PromiseLink is calculated.
  */
-class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { //TODo(jcoveney) rename PromiseLink
+class PromiseLinkHasAdditionOperatorAndZero[V](monoid: HasAdditionOperatorAndZero[V]) extends HasAdditionOperatorAndZero[PromiseLink[V]] { //TODo(jcoveney) rename PromiseLink
   def zero = PromiseLink(new Promise, monoid.zero)
 
   def plus(older: PromiseLink[V], newer: PromiseLink[V]): PromiseLink[V] = {
@@ -43,15 +43,15 @@ class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { /
  * fulfilling the Promise with the value just before the value is added in.
  */
 case class PromiseLink[V](promise: Promise[V], value: V) {
-  def completeWithStartingValue(startingV: V)(implicit monoid: Monoid[V]): V = {
+  def completeWithStartingValue(startingV: V)(implicit monoid: HasAdditionOperatorAndZero[V]): V = {
     Tunnel.properPromiseUpdate(promise, startingV)
     monoid.plus(startingV, value)
   }
 }
 
 object PromiseLink {
-  implicit def monoid[V](implicit innerMonoid: Monoid[V]): PromiseLinkMonoid[V] =
-    new PromiseLinkMonoid[V](innerMonoid)
+  implicit def monoid[V](implicit innerHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[V]): PromiseLinkHasAdditionOperatorAndZero[V] =
+    new PromiseLinkHasAdditionOperatorAndZero[V](innerHasAdditionOperatorAndZero)
 
   def toPromiseLink[V](value: V) = PromiseLink(new Promise, value)
 }
