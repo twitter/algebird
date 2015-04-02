@@ -19,35 +19,35 @@ package com.twitter.algebird
 /**
  * Classes that support algebraic structures with dynamic switching between
  * two representations, the original type O and the eventual type E.
- * In the case of Semigroup, we specify
- * - Two Semigroups eventualSemigroup and originalSemigroup
- * - A Semigroup homomorphism convert: O => E
+ * In the case of HasAdditionOperator, we specify
+ * - Two HasAdditionOperators eventualHasAdditionOperator and originalHasAdditionOperator
+ * - A HasAdditionOperator homomorphism convert: O => E
  * - A conditional mustConvert: O => Boolean
- * Then we get a Semigroup[Either[E,O]], where:
+ * Then we get a HasAdditionOperator[Either[E,O]], where:
  *   Left(x)  + Left(y)  = Left(x+y)
  *   Left(x)  + Right(y) = Left(x+convert(y))
  *   Right(x) + Left(y)  = Left(convert(x)+y)
  *   Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y)
  *                         Right(x+y) otherwise.
- * EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously,
+ * EventuallyHasAdditionOperatorAndZero, EventuallyGroup, and EventuallyRing are defined analogously,
  * with the contract that convert respect the appropriate structure.
  *
  * @param E eventual type
  * @param O original type
  */
-class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
+class EventuallyHasAdditionOperator[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit eventualHasAdditionOperator: HasAdditionOperator[E], originalHasAdditionOperator: HasAdditionOperator[O]) extends HasAdditionOperator[Either[E, O]] {
 
   import scala.collection.mutable.Buffer
 
   override def plus(x: Either[E, O], y: Either[E, O]) = {
     x match {
       case Left(xe) => y match {
-        case Left(ye) => left(Semigroup.plus(xe, ye))
-        case Right(yo) => left(Semigroup.plus(xe, convert(yo)))
+        case Left(ye) => left(HasAdditionOperator.plus(xe, ye))
+        case Right(yo) => left(HasAdditionOperator.plus(xe, convert(yo)))
       }
       case Right(xo) => y match {
-        case Left(ye) => left(Semigroup.plus(convert(xo), ye))
-        case Right(yo) => conditionallyConvert(Semigroup.plus(xo, yo))
+        case Left(ye) => left(HasAdditionOperator.plus(convert(xo), ye))
+        case Right(yo) => conditionallyConvert(HasAdditionOperator.plus(xo, yo))
       }
     }
   }
@@ -57,9 +57,9 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
   /**
    * used to avoid materializing the entire input in memory
    */
-  private[this] final def checkSize[T: Semigroup](buffer: Buffer[T]) {
+  private[this] final def checkSize[T: HasAdditionOperator](buffer: Buffer[T]) {
     if (buffer.size > maxBuffer) {
-      val sum = Semigroup.sumOption(buffer)
+      val sum = HasAdditionOperator.sumOption(buffer)
       buffer.clear
       sum.foreach(buffer += _)
     }
@@ -76,7 +76,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
 
       def toEventualBuffer(buffer: Buffer[O]): Buffer[E] = {
         val newBuffer = Buffer[E]()
-        Semigroup.sumOption(buffer).foreach((sum) => newBuffer += convert(sum))
+        HasAdditionOperator.sumOption(buffer).foreach((sum) => newBuffer += convert(sum))
         newBuffer
       }
 
@@ -101,8 +101,8 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
         }
       }
     }) match { // finally apply sumOption accordingly
-      case Left(be) => Semigroup.sumOption(be).map(left(_))
-      case Right(bo) => Semigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
+      case Left(be) => HasAdditionOperator.sumOption(be).map(left(_))
+      case Right(bo) => HasAdditionOperator.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
     }
   }
 
@@ -120,19 +120,19 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
 }
 
 /**
- * @see EventuallySemigroup
+ * @see EventuallyHasAdditionOperator
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lSemigroup: Semigroup[E], rMonoid: Monoid[O]) extends EventuallySemigroup[E, O](convert)(mustConvert)
-  with Monoid[Either[E, O]] {
+class EventuallyHasAdditionOperatorAndZero[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lHasAdditionOperator: HasAdditionOperator[E], rHasAdditionOperatorAndZero: HasAdditionOperatorAndZero[O]) extends EventuallyHasAdditionOperator[E, O](convert)(mustConvert)
+  with HasAdditionOperatorAndZero[Either[E, O]] {
 
-  override def zero = Right(Monoid.zero[O])
+  override def zero = Right(HasAdditionOperatorAndZero.zero[O])
 
 }
 
 /**
- * @see EventuallySemigroup
+ * @see EventuallyHasAdditionOperator
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyHasAdditionOperatorAndZero[E, O](convert)(mustConvert)
   with Group[Either[E, O]] {
 
   override def negate(x: Either[E, O]) = {
@@ -142,12 +142,12 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     }
   }
 
-  override def left(e: E) = if (Monoid.isNonZero(e)) Left(e) else zero
+  override def left(e: E) = if (HasAdditionOperatorAndZero.isNonZero(e)) Left(e) else zero
 
 }
 
 /**
- * @see EventuallySemigroup
+ * @see EventuallyHasAdditionOperator
  */
 class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lRing: Ring[E], rRing: Ring[O]) extends EventuallyGroup[E, O](convert)(mustConvert)
   with Ring[Either[E, O]] {

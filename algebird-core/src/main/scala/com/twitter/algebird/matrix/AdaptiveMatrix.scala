@@ -17,14 +17,14 @@ limitations under the License.
 package com.twitter.algebird.matrix
 
 import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
-import com.twitter.algebird.{ AdaptiveVector, Monoid }
+import com.twitter.algebird.{ AdaptiveVector, HasAdditionOperatorAndZero }
 
 /**
  * A Matrix structure that is designed to hide moving between sparse and dense representations
  * Initial support here is focused on a dense row count with a sparse set of columns
  */
 
-abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
+abstract class AdaptiveMatrix[V: HasAdditionOperatorAndZero] extends Serializable {
   def rows: Int
   def cols: Int
   def size = rows * cols
@@ -37,19 +37,19 @@ abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
 }
 
 object AdaptiveMatrix {
-  def zero[V: Monoid](rows: Int, cols: Int) = fill(rows, cols)(implicitly[Monoid[V]].zero)
+  def zero[V: HasAdditionOperatorAndZero](rows: Int, cols: Int) = fill(rows, cols)(implicitly[HasAdditionOperatorAndZero[V]].zero)
 
-  def fill[V: Monoid](rows: Int, cols: Int)(fill: V): AdaptiveMatrix[V] = {
+  def fill[V: HasAdditionOperatorAndZero](rows: Int, cols: Int)(fill: V): AdaptiveMatrix[V] = {
     SparseColumnMatrix(Vector.fill(rows)(AdaptiveVector.fill[V](cols)(fill)))
   }
 
-  def empty[V: Monoid](): AdaptiveMatrix[V] = {
+  def empty[V: HasAdditionOperatorAndZero](): AdaptiveMatrix[V] = {
     SparseColumnMatrix(IndexedSeq[AdaptiveVector[V]]())
   }
 
   // The adaptive monoid to swap between sparse modes.
-  implicit def monoid[V: Monoid]: Monoid[AdaptiveMatrix[V]] = new Monoid[AdaptiveMatrix[V]] {
-    private[this] final val innerZero = implicitly[Monoid[V]].zero
+  implicit def monoid[V: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[AdaptiveMatrix[V]] = new HasAdditionOperatorAndZero[AdaptiveMatrix[V]] {
+    private[this] final val innerZero = implicitly[HasAdditionOperatorAndZero[V]].zero
 
     override def zero: AdaptiveMatrix[V] = SparseColumnMatrix[V](IndexedSeq[AdaptiveVector[V]]())
 
@@ -74,7 +74,7 @@ object AdaptiveMatrix {
           val curMap: MMap[Int, V] = storage(indx)
           AdaptiveVector.toMap(contents).foreach {
             case (col, value) =>
-              curMap.update(col, Monoid.plus(value, curMap.getOrElse(col, innerZero)))
+              curMap.update(col, HasAdditionOperatorAndZero.plus(value, curMap.getOrElse(col, innerZero)))
           }
       }
     }

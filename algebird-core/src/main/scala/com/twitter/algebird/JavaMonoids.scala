@@ -81,7 +81,7 @@ object JBoolField extends Field[JBool] {
  * Since Lists are mutable, this always makes a full copy. Prefer scala immutable Lists
  * if you use scala immutable lists, the tail of the result of plus is always the right argument
  */
-class JListMonoid[T] extends Monoid[JList[T]] {
+class JListHasAdditionOperatorAndZero[T] extends HasAdditionOperatorAndZero[JList[T]] {
   override def isNonZero(x: JList[T]) = !x.isEmpty
   override lazy val zero = new java.util.ArrayList[T](0)
   override def plus(x: JList[T], y: JList[T]) = {
@@ -97,17 +97,17 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  * if you use scala immutable maps, this operation is much faster
  * TODO extend this to Group, Ring
  */
-class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
+class JMapHasAdditionOperatorAndZero[K, V: HasAdditionOperator] extends HasAdditionOperatorAndZero[JMap[K, V]] {
   override lazy val zero = new java.util.HashMap[K, V](0)
 
-  val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
-    case mon: Monoid[_] => mon.isNonZero(_)
+  val nonZero: (V => Boolean) = implicitly[HasAdditionOperator[V]] match {
+    case mon: HasAdditionOperatorAndZero[_] => mon.isNonZero(_)
     case _ => (_ => true)
   }
 
   override def isNonZero(x: JMap[K, V]) =
-    !x.isEmpty && (implicitly[Semigroup[V]] match {
-      case mon: Monoid[_] =>
+    !x.isEmpty && (implicitly[HasAdditionOperator[V]] match {
+      case mon: HasAdditionOperatorAndZero[_] =>
         x.values.asScala.exists { v =>
           mon.isNonZero(v)
         }
@@ -115,7 +115,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
     })
   override def plus(x: JMap[K, V], y: JMap[K, V]) = {
     val (big, small, bigOnLeft) = if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
-    val vsemi = implicitly[Semigroup[V]]
+    val vsemi = implicitly[HasAdditionOperator[V]]
     val result = new java.util.HashMap[K, V](big.size + small.size)
     result.putAll(big)
     small.entrySet.asScala.foreach { kv =>

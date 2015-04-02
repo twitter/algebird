@@ -38,10 +38,10 @@ object DecayedValue extends java.io.Serializable {
     }
   }
 
-  def monoidWithEpsilon(eps: Double): Monoid[DecayedValue] = new DecayedValueMonoid(eps)
+  def monoidWithEpsilon(eps: Double): HasAdditionOperatorAndZero[DecayedValue] = new DecayedValueHasAdditionOperatorAndZero(eps)
 }
 
-case class DecayedValueMonoid(eps: Double) extends Monoid[DecayedValue] {
+case class DecayedValueHasAdditionOperatorAndZero(eps: Double) extends HasAdditionOperatorAndZero[DecayedValue] {
   override val zero = DecayedValue(0.0, Double.NegativeInfinity)
   override def plus(left: DecayedValue, right: DecayedValue) =
     if (left < right) {

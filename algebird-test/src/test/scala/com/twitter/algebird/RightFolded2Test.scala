@@ -11,15 +11,15 @@ class RightFolded2Test extends CheckProperties {
   def monFold(i: Int, l: Long) = l + i.toLong
   def mapFn(l: Long) = l / 2
 
-  implicit val rightFoldedMonoid = RightFolded2.monoid[Int, Long, Long](mapFn)(monFold)
+  implicit val rightFoldedHasAdditionOperatorAndZero = RightFolded2.monoid[Int, Long, Long](mapFn)(monFold)
 
-  def rightFolded2Value[In, Out, Acc](implicit arbout: Arbitrary[Out], mon: RightFolded2Monoid[In, Out, Acc]): Gen[RightFoldedValue2[In, Out, Acc]] =
+  def rightFolded2Value[In, Out, Acc](implicit arbout: Arbitrary[Out], mon: RightFolded2HasAdditionOperatorAndZero[In, Out, Acc]): Gen[RightFoldedValue2[In, Out, Acc]] =
     for (v <- arbout.arbitrary) yield mon.init(v)
 
-  def rightFolded2ToFold[In, Out, Acc](implicit arbin: Arbitrary[In], mon: RightFolded2Monoid[In, Out, Acc]): Gen[RightFoldedToFold2[In]] =
+  def rightFolded2ToFold[In, Out, Acc](implicit arbin: Arbitrary[In], mon: RightFolded2HasAdditionOperatorAndZero[In, Out, Acc]): Gen[RightFoldedToFold2[In]] =
     for (v <- arbin.arbitrary) yield mon.toFold(v)
 
-  implicit def rightFolded2[In, Out, Acc](implicit arbin: Arbitrary[In], arbout: Arbitrary[Out], mon: RightFolded2Monoid[In, Out, Acc]): Arbitrary[RightFolded2[In, Out, Acc]] =
+  implicit def rightFolded2[In, Out, Acc](implicit arbin: Arbitrary[In], arbout: Arbitrary[Out], mon: RightFolded2HasAdditionOperatorAndZero[In, Out, Acc]): Arbitrary[RightFolded2[In, Out, Acc]] =
     Arbitrary { Gen.oneOf(rightFolded2Value[In, Out, Acc], rightFolded2ToFold[In, Out, Acc]) }
 
   property("RightFolded2 is a monoid") {
@@ -71,7 +71,7 @@ class RightFolded2Test extends CheckProperties {
 
   property("RightFolded2 sum works as expected") {
     forAll { (ls: List[RightFolded2[Int, Long, Long]]) =>
-      val accSum = accOf(rightFoldedMonoid.sum(ls)).getOrElse(0L)
+      val accSum = accOf(rightFoldedHasAdditionOperatorAndZero.sum(ls)).getOrElse(0L)
       sum(ls)(monFold)(mapFn) == accSum
     }
   }

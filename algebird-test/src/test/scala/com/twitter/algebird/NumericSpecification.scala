@@ -11,8 +11,8 @@ import org.scalacheck.Prop
  * below to test all the numeric traits.
  */
 class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
-  def plusNumericProp[T: Monoid: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
-    val mon = implicitly[Monoid[T]]
+  def plusNumericProp[T: HasAdditionOperatorAndZero: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
+    val mon = implicitly[HasAdditionOperatorAndZero[T]]
     val num = implicitly[Numeric[T]]
     num.plus(a, b) == mon.plus(a, b)
   }
@@ -32,8 +32,8 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     plusNumericProp[Float]
   }
 
-  def zeroNumericProp[T: Monoid: Group: Numeric: Arbitrary] = Prop.forAll { (a: T) =>
-    val mon = implicitly[Monoid[T]]
+  def zeroNumericProp[T: HasAdditionOperatorAndZero: Group: Numeric: Arbitrary] = Prop.forAll { (a: T) =>
+    val mon = implicitly[HasAdditionOperatorAndZero[T]]
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
     (a == mon.plus(mon.zero, a)) &&
@@ -42,8 +42,8 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
       (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero })
   }
 
-  def zeroProps[T: Monoid: Numeric] = {
-    val mon = implicitly[Monoid[T]]
+  def zeroProps[T: HasAdditionOperatorAndZero: Numeric] = {
+    val mon = implicitly[HasAdditionOperatorAndZero[T]]
     val num = implicitly[Numeric[T]]
     (num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon.nonZeroOption(mon.zero) == None)
   }

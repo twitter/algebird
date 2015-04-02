@@ -38,10 +38,10 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 object SummingQueue {
-  def apply[V: Semigroup](cap: Int): SummingQueue[V] = new SummingQueue(cap)
+  def apply[V: HasAdditionOperator](cap: Int): SummingQueue[V] = new SummingQueue(cap)
 }
 
-class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: Semigroup[V])
+class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: HasAdditionOperator[V])
   extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
@@ -57,7 +57,7 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
       queueOption.flatMap { queue =>
         if (!queue.offer(item)) {
           // Queue is full, do the work:
-          Monoid.plus(flush, Some(item))
+          HasAdditionOperatorAndZero.plus(flush, Some(item))
         } else {
           // We are in the queue
           None
@@ -74,7 +74,7 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
     queueOption.flatMap { queue =>
       val toSum = ListBuffer[V]()
       queue.drainTo(toSum.asJava)
-      Semigroup.sumOption(toSum)
+      HasAdditionOperator.sumOption(toSum)
     }
   }
   def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)

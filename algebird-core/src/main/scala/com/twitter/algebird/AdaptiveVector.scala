@@ -81,9 +81,9 @@ object AdaptiveVector {
     if (v.sparseValue == sv) v
     else fromVector(toVector(v), sv)
 
-  private class AVSemigroup[V: Semigroup] extends Semigroup[AdaptiveVector[V]] {
-    private def valueIsNonZero(v: V): Boolean = implicitly[Semigroup[V]] match {
-      case m: Monoid[_] => m.isNonZero(v)
+  private class AVHasAdditionOperator[V: HasAdditionOperator] extends HasAdditionOperator[AdaptiveVector[V]] {
+    private def valueIsNonZero(v: V): Boolean = implicitly[HasAdditionOperator[V]] match {
+      case m: HasAdditionOperatorAndZero[_] => m.isNonZero(v)
       case _ => true
     }
 
@@ -96,41 +96,41 @@ object AdaptiveVector {
         val maxSize = Ordering[Int].max(left.size, right.size)
         (left, right) match {
           case (DenseVector(lv, ls, ld), DenseVector(rv, rs, rd)) =>
-            val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
+            val vec = HasAdditionOperator.plus[IndexedSeq[V]](lv, rv) match {
               case v: Vector[_] => v.asInstanceOf[Vector[V]]
               case notV => Vector(notV: _*)
             }
             fromVector(vec, ls)
 
           case _ if valueIsNonZero(left.sparseValue) =>
-            fromVector(Vector(Semigroup.plus(toVector(left): IndexedSeq[V],
+            fromVector(Vector(HasAdditionOperator.plus(toVector(left): IndexedSeq[V],
               toVector(right): IndexedSeq[V]): _*),
               left.sparseValue)
           case _ => // sparse is zero:
-            fromMap(Semigroup.plus(toMap(left), toMap(right)),
+            fromMap(HasAdditionOperator.plus(toMap(left), toMap(right)),
               left.sparseValue,
               maxSize)
         }
       }
     }
   }
-  private class AVMonoid[V: Monoid] extends AVSemigroup[V] with Monoid[AdaptiveVector[V]] {
-    val zero = AdaptiveVector.fill[V](0)(Monoid.zero[V])
+  private class AVHasAdditionOperatorAndZero[V: HasAdditionOperatorAndZero] extends AVHasAdditionOperator[V] with HasAdditionOperatorAndZero[AdaptiveVector[V]] {
+    val zero = AdaptiveVector.fill[V](0)(HasAdditionOperatorAndZero.zero[V])
     override def isNonZero(v: AdaptiveVector[V]) = !isZero(v)
 
     def isZero(v: AdaptiveVector[V]) = (v.size == 0) || {
-      val sparseAreZero = if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
+      val sparseAreZero = if (HasAdditionOperatorAndZero.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
       sparseAreZero &&
-        v.denseIterator.forall { idxv => !Monoid.isNonZero(idxv._2) }
+        v.denseIterator.forall { idxv => !HasAdditionOperatorAndZero.isNonZero(idxv._2) }
     }
   }
-  private class AVGroup[V: Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
+  private class AVGroup[V: Group] extends AVHasAdditionOperatorAndZero[V] with Group[AdaptiveVector[V]] {
     override def negate(v: AdaptiveVector[V]) =
       fromVector(toVector(v).map(Group.negate(_)), Group.negate(v.sparseValue))
   }
 
-  implicit def semigroup[V: Semigroup]: Semigroup[AdaptiveVector[V]] = new AVSemigroup[V]
-  implicit def monoid[V: Monoid]: Monoid[AdaptiveVector[V]] = new AVMonoid[V]
+  implicit def semigroup[V: HasAdditionOperator]: HasAdditionOperator[AdaptiveVector[V]] = new AVHasAdditionOperator[V]
+  implicit def monoid[V: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[AdaptiveVector[V]] = new AVHasAdditionOperatorAndZero[V]
   implicit def group[V: Group]: Group[AdaptiveVector[V]] = new AVGroup[V]
 
   /*

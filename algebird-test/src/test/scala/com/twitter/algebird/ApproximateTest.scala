@@ -21,7 +21,7 @@ class ApproximateLaws extends CheckProperties {
       ) yield Approximate(v0, v1, v2, 0.9)
     }
 
-  property("is a Monoid") {
+  property("is a HasAdditionOperatorAndZero") {
     monoidLaws[Approximate[Long]]
   }
 

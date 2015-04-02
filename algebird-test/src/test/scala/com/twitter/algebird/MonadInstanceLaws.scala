@@ -19,7 +19,7 @@ package com.twitter.algebird.monad
 import com.twitter.algebird.CheckProperties
 import org.scalacheck.Prop._
 
-class MonadInstanceLaws extends CheckProperties {
+class ChainableCallbackCollectorBuilderInstanceLaws extends CheckProperties {
 
   // Mutually recursive functions
   def ping(todo: Int, acc: Int): Trampoline[Int] =

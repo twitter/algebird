@@ -57,7 +57,7 @@ package com.twitter.algebird
  */
 
 /**
- * Monoid for adding [[CMS]] sketches.
+ * HasAdditionOperatorAndZero for adding [[CMS]] sketches.
  *
  * =Usage=
  *
@@ -100,7 +100,7 @@ package com.twitter.algebird
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
-class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
+class CMSHasAdditionOperatorAndZero[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends HasAdditionOperatorAndZero[CMS[K]] {
 
   val params = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
@@ -134,8 +134,8 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Mon
 /**
  * An Aggregator for [[CMS]].  Can be created using [[CMS.aggregator]].
  */
-case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
-  val monoid = cmsMonoid
+case class CMSAggregator[K](cmsHasAdditionOperatorAndZero: CMSHasAdditionOperatorAndZero[K]) extends HasAdditionOperatorAndZeroAggregator[K, CMS[K], CMS[K]] {
+  val monoid = cmsHasAdditionOperatorAndZero
 
   def prepare(value: K): CMS[K] = monoid.create(value)
 
@@ -351,9 +351,9 @@ trait CMSHeavyHitters[K] {
 
 object CMS {
 
-  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSHasAdditionOperatorAndZero[K] = new CMSHasAdditionOperatorAndZero[K](eps, delta, seed)
 
-  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
+  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSHasAdditionOperatorAndZero[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
 
   def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
@@ -393,7 +393,7 @@ object CMS {
  * import com.twitter.algebird.CMSHasherImplicits._
  *
  * // Creates a monoid for a CMS that can count `Long` elements.
- * val cmsMonoid: CMSMonoid[Long] = {
+ * val cmsHasAdditionOperatorAndZero: CMSHasAdditionOperatorAndZero[Long] = {
  *   val eps = 0.001
  *   val delta = 1E-10
  *   val seed = 1
@@ -401,7 +401,7 @@ object CMS {
  * }
  *
  * // Creates a CMS instance that has counted the element `1L`.
- * val cms: CMS[Long] = cmsMonoid.create(1L)
+ * val cms: CMS[Long] = cmsHasAdditionOperatorAndZero.create(1L)
  *
  * // Estimates the frequency of `1L`
  * val estimate: Approximate[Long] = cms.frequency(1L)
@@ -566,7 +566,7 @@ object CMSInstance {
      */
     def ++(other: CountsTable[K]): CountsTable[K] = {
       require((depth, width) == (other.depth, other.width), "Tables must have the same dimensions.")
-      val iil: IndexedSeq[IndexedSeq[Long]] = Monoid.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
+      val iil: IndexedSeq[IndexedSeq[Long]] = HasAdditionOperatorAndZero.plus[IndexedSeq[IndexedSeq[Long]]](counts, other.counts)
       def toVector[V](is: IndexedSeq[V]): Vector[V] = is match {
         case v: Vector[_] => v.asInstanceOf[Vector[V]]
         case _ => Vector(is: _*)
@@ -610,7 +610,7 @@ case class TopCMSParams[K](logic: HeavyHittersLogic[K])
  * import com.twitter.algebird.CMSHasherImplicits._
  *
  * // Creates a monoid for a CMS that can count `Long` elements.
- * val topPctCMSMonoid: TopPctCMSMonoid[Long] = {
+ * val topPctCMSHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[Long] = {
  *   val eps = 0.001
  *   val delta = 1E-10
  *   val seed = 1
@@ -619,7 +619,7 @@ case class TopCMSParams[K](logic: HeavyHittersLogic[K])
  * }
  *
  * // Creates a TopCMS instance that has counted the element `1L`.
- * val topCMS: TopCMS[Long] = topPctCMSMonoid.create(1L)
+ * val topCMS: TopCMS[Long] = topPctCMSHasAdditionOperatorAndZero.create(1L)
  *
  * // Estimates the frequency of `1L`
  * val estimate: Approximate[Long] = topCMS.frequency(1L)
@@ -817,7 +817,7 @@ object HeavyHitters {
 case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
 
 /**
- * Monoid for Top-% based [[TopCMS]] sketches.
+ * HasAdditionOperatorAndZero for Top-% based [[TopCMS]] sketches.
  *
  * =Usage=
  *
@@ -851,7 +851,7 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
+class TopPctCMSHasAdditionOperatorAndZero[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends HasAdditionOperatorAndZero[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopPctLogic[K](heavyHittersPct)
@@ -889,13 +889,13 @@ object TopPctCMS {
   def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
-    heavyHittersPct: Double): TopPctCMSMonoid[K] =
-    new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
+    heavyHittersPct: Double): TopPctCMSHasAdditionOperatorAndZero[K] =
+    new TopPctCMSHasAdditionOperatorAndZero[K](CMS(eps, delta, seed), heavyHittersPct)
 
   def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
-    heavyHittersPct: Double): TopPctCMSMonoid[K] =
+    heavyHittersPct: Double): TopPctCMSHasAdditionOperatorAndZero[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
   def aggregator[K: CMSHasher](eps: Double,
@@ -915,10 +915,10 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopPctCMSAggregator[K](cmsHasAdditionOperatorAndZero: TopPctCMSHasAdditionOperatorAndZero[K])
+  extends HasAdditionOperatorAndZeroAggregator[K, TopCMS[K], TopCMS[K]] {
 
-  def monoid = cmsMonoid
+  def monoid = cmsHasAdditionOperatorAndZero
 
   def prepare(value: K): TopCMS[K] = monoid.create(value)
 
@@ -927,7 +927,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
 }
 
 /**
- * Monoid for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
+ * HasAdditionOperatorAndZero for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
  *
  * =Warning: Adding top-N CMS instances (`++`) is an unsafe operation=
  *
@@ -983,7 +983,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
+class TopNCMSHasAdditionOperatorAndZero[K](cms: CMS[K], heavyHittersN: Int = 100) extends HasAdditionOperatorAndZero[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopNLogic[K](heavyHittersN)
@@ -1019,13 +1019,13 @@ object TopNCMS {
   def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
-    heavyHittersN: Int): TopNCMSMonoid[K] =
-    new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
+    heavyHittersN: Int): TopNCMSHasAdditionOperatorAndZero[K] =
+    new TopNCMSHasAdditionOperatorAndZero[K](CMS(eps, delta, seed), heavyHittersN)
 
   def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
-    heavyHittersN: Int): TopNCMSMonoid[K] =
+    heavyHittersN: Int): TopNCMSHasAdditionOperatorAndZero[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
   def aggregator[K: CMSHasher](eps: Double,
@@ -1045,10 +1045,10 @@ object TopNCMS {
 /**
  * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
  */
-case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopNCMSAggregator[K](cmsHasAdditionOperatorAndZero: TopNCMSHasAdditionOperatorAndZero[K])
+  extends HasAdditionOperatorAndZeroAggregator[K, TopCMS[K], TopCMS[K]] {
 
-  val monoid = cmsMonoid
+  val monoid = cmsHasAdditionOperatorAndZero
 
   def prepare(value: K): TopCMS[K] = monoid.create(value)
 

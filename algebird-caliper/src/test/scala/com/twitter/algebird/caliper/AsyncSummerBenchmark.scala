@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 
 import com.google.caliper.{Param, SimpleBenchmark}
-import com.twitter.algebird.{HyperLogLogMonoid, _}
+import com.twitter.algebird.{HyperLogLogHasAdditionOperatorAndZero, _}
 import com.twitter.algebird.util.summer._
 import com.twitter.bijection._
 import com.twitter.util.{Await, Duration, FuturePool}
@@ -18,9 +18,9 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
   val executor = Executors.newFixedThreadPool(4)
   val workPool = FuturePool(executor)
 
-  implicit val hllMonoid = new HyperLogLogMonoid(24)
+  implicit val hllHasAdditionOperatorAndZero = new HyperLogLogHasAdditionOperatorAndZero(24)
 
-  def genSummers[K, V: Semigroup] = Map(
+  def genSummers[K, V: HasAdditionOperator] = Map(
     "AsyncNonCompactListSum" -> new AsyncListSum[K, V](bufferSize,
       flushFrequency,
       memoryFlushPercent,
@@ -69,7 +69,7 @@ class AsyncSummerBenchmark extends SimpleBenchmark {
 
   var summers: Map[String, AsyncSummer[(Long, HLL), Map[Long, HLL]]] = _
 
-  def hll[T](t: T)(implicit monoid: HyperLogLogMonoid, inj: Injection[T, Array[Byte]]): HLL = monoid.create(inj(t))
+  def hll[T](t: T)(implicit monoid: HyperLogLogHasAdditionOperatorAndZero, inj: Injection[T, Array[Byte]]): HLL = monoid.create(inj(t))
 
   @Param(Array("10", "100", "1000", "10000"))
   val numInputKeys: Int = 0

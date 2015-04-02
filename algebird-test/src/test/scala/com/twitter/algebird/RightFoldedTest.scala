@@ -16,7 +16,7 @@ class RightFoldedTest extends CheckProperties {
   implicit def rightFolded[In: Arbitrary, Out: Arbitrary]: Arbitrary[RightFolded[In, Out]] =
     Arbitrary { Gen.oneOf(rightFoldedValue[Out].arbitrary, rightFoldedToFold[In].arbitrary) }
 
-  implicit val rightFoldedMonoid = RightFolded.monoid[Int, Long] { (i, l) => l + i.toLong }
+  implicit val rightFoldedHasAdditionOperatorAndZero = RightFolded.monoid[Int, Long] { (i, l) => l + i.toLong }
 
   property("RightFolded is a monoid") {
     monoidLaws[RightFolded[Int, Long]]

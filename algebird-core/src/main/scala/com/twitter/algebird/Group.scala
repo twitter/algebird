@@ -28,7 +28,7 @@ import scala.math.Equiv
  */
 
 @implicitNotFound(msg = "Cannot find Group type class for ${T}")
-trait Group[@specialized(Int, Long, Float, Double) T] extends Monoid[T] {
+trait Group[@specialized(Int, Long, Float, Double) T] extends HasAdditionOperatorAndZero[T] {
   // must override negate or minus (or both)
   def negate(v: T): T = minus(zero, v)
   def minus(l: T, r: T): T = plus(l, negate(r))
@@ -61,7 +61,7 @@ object NullGroup extends ConstantGroup[Null](null)
  * negate Some(5) == Some(-5)
  * Note: Some(0) and None are equivalent under this Group
  */
-class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
+class OptionGroup[T](implicit group: Group[T]) extends OptionHasAdditionOperatorAndZero[T]
   with Group[Option[T]] {
 
   override def isNonZero(opt: Option[T]): Boolean =
@@ -76,7 +76,7 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T]
  * negate is defined as the negation of each element of the array.
  */
 class ArrayGroup[T: ClassTag](implicit grp: Group[T])
-  extends ArrayMonoid[T]() with Group[Array[T]] {
+  extends ArrayHasAdditionOperatorAndZero[T]() with Group[Array[T]] {
   override def negate(g: Array[T]): Array[T] = g.map {
     grp.negate(_)
   }.toArray
@@ -93,9 +93,9 @@ object Group extends GeneratedGroupImplicits with ProductGroups {
   /** Same as v + v + v .. + v (i times in total) */
   def intTimes[T](i: BigInt, v: T)(implicit grp: Group[T]): T =
     if (i < 0) {
-      Monoid.intTimes(-i, grp.negate(v))
+      HasAdditionOperatorAndZero.intTimes(-i, grp.negate(v))
     } else {
-      Monoid.intTimes(i, v)(grp)
+      HasAdditionOperatorAndZero.intTimes(i, v)(grp)
     }
 
   implicit val nullGroup: Group[Null] = NullGroup

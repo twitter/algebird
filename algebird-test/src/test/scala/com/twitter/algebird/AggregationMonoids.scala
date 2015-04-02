@@ -4,7 +4,7 @@ import org.scalacheck.{ Gen, Arbitrary }
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 
-class AggregationMonoidSpecification extends CheckProperties {
+class AggregationHasAdditionOperatorAndZeroSpecification extends CheckProperties {
   import BaseProperties._
   import Gen.choose
 
@@ -17,9 +17,9 @@ class AggregationMonoidSpecification extends CheckProperties {
     } yield DecayedValue(a, b)
   }
 
-  implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
+  implicit val decayedHasAdditionOperatorAndZero = DecayedValue.monoidWithEpsilon(0.001)
 
-  property("DecayedValue Monoid laws") {
+  property("DecayedValue HasAdditionOperatorAndZero laws") {
     monoidLawsEq[DecayedValue] { (dvl, dvr) =>
       approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
     }

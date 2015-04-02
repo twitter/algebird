@@ -22,8 +22,8 @@ import org.scalacheck.Properties
 
 class ApplicativeProperties extends CheckProperties {
   import ApplicativeLaws._
-  import Monad._ // for Monad instances
-  import MonadLaws._ // for Arbitrary instances
+  import ChainableCallbackCollectorBuilder._ // for ChainableCallbackCollectorBuilder instances
+  import ChainableCallbackCollectorBuilderLaws._ // for Arbitrary instances
 
   property("list") {
     applicativeLaws[List, Int, String, Long]()
@@ -48,16 +48,16 @@ class ApplicativeProperties extends CheckProperties {
   }
   // Applicative algebras:
   import BaseProperties._
-  property("Applicative Semigroup") {
-    implicit val optSg = new ApplicativeSemigroup[Int, Option]
-    implicit val listSg = new ApplicativeSemigroup[String, List]
+  property("Applicative HasAdditionOperator") {
+    implicit val optSg = new ApplicativeHasAdditionOperator[Int, Option]
+    implicit val listSg = new ApplicativeHasAdditionOperator[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     semigroupLaws[Option[Int]] && isAssociative[List[String]]
   }
 
-  property("Applicative Monoid") {
-    implicit val optSg = new ApplicativeMonoid[Int, Option]
-    implicit val listSg = new ApplicativeMonoid[String, List]
+  property("Applicative HasAdditionOperatorAndZero") {
+    implicit val optSg = new ApplicativeHasAdditionOperatorAndZero[Int, Option]
+    implicit val listSg = new ApplicativeHasAdditionOperatorAndZero[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     monoidLaws[Option[Int]] && validZero[List[String]]
   }

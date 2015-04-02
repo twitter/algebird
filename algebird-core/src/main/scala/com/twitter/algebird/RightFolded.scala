@@ -26,7 +26,7 @@ package com.twitter.algebird
  */
 object RightFolded {
   def monoid[In, Out](foldfn: (In, Out) => Out) =
-    new Monoid[RightFolded[In, Out]] {
+    new HasAdditionOperatorAndZero[RightFolded[In, Out]] {
 
       val zero = RightFoldedZero
 

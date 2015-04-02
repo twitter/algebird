@@ -3,7 +3,7 @@ package com.twitter.algebird.legacy
 import com.twitter.algebird.TopPctCMS
 
 /**
- * Creates instances of type `CountMinSketchMonoid` (which is a type alias for the legacy class of the same name in
+ * Creates instances of type `CountMinSketchHasAdditionOperatorAndZero` (which is a type alias for the legacy class of the same name in
  * Algebird versions < 0.8.1).
  *
  * =Deprecated since 0.8.1=
@@ -12,17 +12,17 @@ import com.twitter.algebird.TopPctCMS
  *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
- * val cmsMonoid = TopPctCMS.monoid[Long](...)
+ * val cmsHasAdditionOperatorAndZero = TopPctCMS.monoid[Long](...)
  * }}}
  */
-object CountMinSketchMonoid {
+object CountMinSketchHasAdditionOperatorAndZero {
 
   import com.twitter.algebird.CMSHasherImplicits._
 
   @deprecated(
-    "You should use TopPctCMS.monoid[Long]() instead of legacy.CountMinSketchMonoid, and import CMSHasherImplicits._",
+    "You should use TopPctCMS.monoid[Long]() instead of legacy.CountMinSketchHasAdditionOperatorAndZero, and import CMSHasherImplicits._",
     since = "0.8.1")
-  def apply(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01): CountMinSketchMonoid =
+  def apply(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01): CountMinSketchHasAdditionOperatorAndZero =
     TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
 
 }

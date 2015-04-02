@@ -17,10 +17,10 @@ limitations under the License.
 package com.twitter.algebird.matrix
 import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
 
-import com.twitter.algebird.Monoid
+import com.twitter.algebird.HasAdditionOperatorAndZero
 
-case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSeq[V]) extends AdaptiveMatrix[V] {
-  val valueMonoid = implicitly[Monoid[V]]
+case class DenseMatrix[V: HasAdditionOperatorAndZero](rows: Int, cols: Int, rowsByColumns: IndexedSeq[V]) extends AdaptiveMatrix[V] {
+  val valueHasAdditionOperatorAndZero = implicitly[HasAdditionOperatorAndZero[V]]
 
   private[this] def tupToIndex(position: (Int, Int)) = position._1 * cols + position._2
 
@@ -33,7 +33,7 @@ case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSe
     var indx = 0
     val lsize = size
     while (indx < lsize) {
-      buffer(indx) = valueMonoid.plus(buffer(indx), rowsByColumns(indx))
+      buffer(indx) = valueHasAdditionOperatorAndZero.plus(buffer(indx), rowsByColumns(indx))
       indx += 1
     }
   }

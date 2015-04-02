@@ -21,7 +21,7 @@ import org.scalacheck.Prop._
 
 class PreparerLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: HasAdditionOperator[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
@@ -46,11 +46,11 @@ class PreparerLaws extends CheckProperties {
     }
   }
 
-  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
+  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: HasAdditionOperatorAndZero[B], present: Arbitrary[B => C]): Arbitrary[HasAdditionOperatorAndZeroAggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
-    } yield new MonoidAggregator[A, B, C] {
+    } yield new HasAdditionOperatorAndZeroAggregator[A, B, C] {
       def prepare(a: A) = pp(a)
       def monoid = m
       def present(b: B) = ps(b)
@@ -58,14 +58,14 @@ class PreparerLaws extends CheckProperties {
   }
 
   property("flatten before aggregate is correct") {
-    forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
+    forAll{ (in: List[List[Int]], ag: HasAdditionOperatorAndZeroAggregator[Int, Int, Int]) =>
       val flattenedAg = Preparer[List[Int]].flatten.aggregate(ag)
       flattenedAg(in) == ag(in.flatten)
     }
   }
 
   property("map, flatMap, and split all together are correct") {
-    forAll{ (in: List[Int], mapFn: (Int => Int), flatMapFn: (Int => List[Int]), ag1: MonoidAggregator[Int, Int, Int], ag2: MonoidAggregator[Int, Int, Int]) =>
+    forAll{ (in: List[Int], mapFn: (Int => Int), flatMapFn: (Int => List[Int]), ag1: HasAdditionOperatorAndZeroAggregator[Int, Int, Int], ag2: HasAdditionOperatorAndZeroAggregator[Int, Int, Int]) =>
       val ag =
         Preparer[Int]
           .map(mapFn)

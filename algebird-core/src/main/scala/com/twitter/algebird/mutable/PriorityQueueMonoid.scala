@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird.mutable
 
-import com.twitter.algebird.Monoid
+import com.twitter.algebird.HasAdditionOperatorAndZero
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -29,9 +29,9 @@ import java.util.PriorityQueue
  * This is MUCH Faster for Top-K algorithms
  * Note this is MUTABLE. When you put something in plus, it is changed!
  */
-class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid[PriorityQueue[K]] {
+class PriorityQueueHasAdditionOperatorAndZero[K](max: Int)(implicit ord: Ordering[K]) extends HasAdditionOperatorAndZero[PriorityQueue[K]] {
 
-  require(max > 0, "PriorityQueueMonoid requires keeping at least 1 item")
+  require(max > 0, "PriorityQueueHasAdditionOperatorAndZero requires keeping at least 1 item")
   // Java throws if you try to make a queue size 0
   protected val MINQUEUESIZE = 1
   def build(k: K): PriorityQueue[K] = {

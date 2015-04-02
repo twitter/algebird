@@ -3,7 +3,7 @@ package com.twitter.algebird
 import java.nio._
 
 /**
- * MinHasher as a Monoid operates on this class to avoid the too generic Array[Byte].
+ * MinHasher as a HasAdditionOperatorAndZero operates on this class to avoid the too generic Array[Byte].
  * The bytes are assumed to be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is
  * because a ByteBuffer is used internally in MinHasher and it can wrap Array[Byte].
  */
@@ -54,7 +54,7 @@ object MinHasher {
  * This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
  * http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
  */
-abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: Numeric[H]) extends Monoid[MinHashSignature] {
+abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: Numeric[H]) extends HasAdditionOperatorAndZero[MinHashSignature] {
 
   /** The number of bytes used for each hash in the signature */
   def hashSize: Int
@@ -76,7 +76,7 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
     (1 to numHashFunctions).map{ i => MurmurHash128(r.nextLong) }
   }
 
-  /** Signature for empty set, needed to be a proper Monoid */
+  /** Signature for empty set, needed to be a proper HasAdditionOperatorAndZero */
   val zero: MinHashSignature = MinHashSignature(buildArray{ maxHash })
 
   /** Set union */

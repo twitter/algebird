@@ -20,7 +20,7 @@ import com.twitter.algebird._
 import com.twitter.util.{ Future, Return, Try }
 
 object UtilAlgebras {
-  implicit val futureMonad: Monad[Future] = new Monad[Future] {
+  implicit val futureChainableCallbackCollectorBuilder: ChainableCallbackCollectorBuilder[Future] = new ChainableCallbackCollectorBuilder[Future] {
     def apply[T](v: T) = Future.value(v)
     def flatMap[T, U](m: Future[T])(fn: T => Future[U]) = m.flatMap(fn)
     /*
@@ -42,20 +42,20 @@ object UtilAlgebras {
      */
     override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] = Future.collect(fs)
   }
-  implicit val tryMonad: Monad[Try] = new Monad[Try] {
+  implicit val tryChainableCallbackCollectorBuilder: ChainableCallbackCollectorBuilder[Try] = new ChainableCallbackCollectorBuilder[Try] {
     def apply[T](v: T) = Return(v)
     override def map[T, U](m: Try[T])(fn: T => U) = m.map(fn)
     def flatMap[T, U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)
   }
 
-  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] = new ApplicativeSemigroup[T, Future]
-  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new ApplicativeMonoid[T, Future]
+  implicit def futureHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Future[T]] = new ApplicativeHasAdditionOperator[T, Future]
+  implicit def futureHasAdditionOperatorAndZero[T: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[Future[T]] = new ApplicativeHasAdditionOperatorAndZero[T, Future]
   implicit def futureGroup[T: Group]: Group[Future[T]] = new ApplicativeGroup[T, Future]
   implicit def futureRing[T: Ring]: Ring[Future[T]] = new ApplicativeRing[T, Future]
   implicit def futureField[T: Field]: Field[Future[T]] = new ApplicativeField[T, Future]
 
-  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] = new ApplicativeSemigroup[T, Try]
-  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new ApplicativeMonoid[T, Try]
+  implicit def tryHasAdditionOperator[T: HasAdditionOperator]: HasAdditionOperator[Try[T]] = new ApplicativeHasAdditionOperator[T, Try]
+  implicit def tryHasAdditionOperatorAndZero[T: HasAdditionOperatorAndZero]: HasAdditionOperatorAndZero[Try[T]] = new ApplicativeHasAdditionOperatorAndZero[T, Try]
   implicit def tryGroup[T: Group]: Group[Try[T]] = new ApplicativeGroup[T, Try]
   implicit def tryRing[T: Ring]: Ring[Try[T]] = new ApplicativeRing[T, Try]
   implicit def tryField[T: Field]: Field[Try[T]] = new ApplicativeField[T, Try]

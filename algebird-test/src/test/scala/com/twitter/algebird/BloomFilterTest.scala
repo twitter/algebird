@@ -13,13 +13,13 @@ class BloomFilterLaws extends CheckProperties {
   val WIDTH = 32
   val SEED = 1
 
-  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH, SEED)
+  implicit val bfHasAdditionOperatorAndZero = new BloomFilterHasAdditionOperatorAndZero(NUM_HASHES, WIDTH, SEED)
   implicit val bfGen =
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
+      for (v <- Gen.choose(0, 10000)) yield (bfHasAdditionOperatorAndZero.create(v.toString))
     }
 
-  property("BloomFilter is a Monoid") {
+  property("BloomFilter is a HasAdditionOperatorAndZero") {
     monoidLaws[BF]
   }
 }
@@ -106,10 +106,10 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 100).foreach{
         _ =>
           {
-            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val bfHasAdditionOperatorAndZero = new BloomFilterHasAdditionOperatorAndZero(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-            val bf = bfMonoid.create(entries: _*)
+            val bf = bfHasAdditionOperatorAndZero.create(entries: _*)
 
             entries.foreach{ i =>
               assert(bf.contains(i.toString).isTrue)
@@ -128,10 +128,10 @@ class BloomFilterTest extends WordSpec with Matchers {
               {
                 val numEntries = RAND.nextInt(10) + 1
 
-                val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
+                val bfHasAdditionOperatorAndZero = BloomFilter(numEntries, fpProb, SEED)
 
                 val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
-                val bf = bfMonoid.create(entries.drop(1): _*)
+                val bf = bfHasAdditionOperatorAndZero.create(entries.drop(1): _*)
 
                 if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
               }
@@ -145,10 +145,10 @@ class BloomFilterTest extends WordSpec with Matchers {
     }
 
     "approximate cardinality" in {
-      val bfMonoid = BloomFilterMonoid(10, 100000, SEED)
+      val bfHasAdditionOperatorAndZero = BloomFilterHasAdditionOperatorAndZero(10, 100000, SEED)
       Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
         val items = (1 until exactCardinality).map { _.toString }
-        val bf = bfMonoid.create(items: _*)
+        val bf = bfHasAdditionOperatorAndZero.create(items: _*)
         val size = bf.size
 
         assert(size ~ exactCardinality)

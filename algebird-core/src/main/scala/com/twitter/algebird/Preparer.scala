@@ -11,9 +11,9 @@ package com.twitter.algebird
  */
 sealed trait Preparer[A, T] extends java.io.Serializable {
   /**
-   * Produce a new MonoidAggregator which includes the Preparer's transformation chain in its prepare stage.
+   * Produce a new HasAdditionOperatorAndZeroAggregator which includes the Preparer's transformation chain in its prepare stage.
    */
-  def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C]
+  def monoidAggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[T, B, C]): HasAdditionOperatorAndZeroAggregator[A, B, C]
 
   /**
    * Produce a new Preparer that chains this one-to-many transformation.
@@ -29,7 +29,7 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
 
   /**
    * Filter out values that do not meet the predicate.
-   * Like flatMap, this limits future aggregations to MonoidAggregator.
+   * Like flatMap, this limits future aggregations to HasAdditionOperatorAndZeroAggregator.
    */
   def filter(fn: T => Boolean) = flatMap { t => if (fn(t)) Some(t) else None }
 
@@ -57,10 +57,10 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
   def uniqueCount = monoidAggregate(Aggregator.uniqueCount)
 
   /**
-   * transform a given Aggregator into a MonoidAggregator by lifting the reduce and present stages
+   * transform a given Aggregator into a HasAdditionOperatorAndZeroAggregator by lifting the reduce and present stages
    * into Option space
    */
-  def lift[B, C](aggregator: Aggregator[T, B, C]): MonoidAggregator[A, Option[B], Option[C]] =
+  def lift[B, C](aggregator: Aggregator[T, B, C]): HasAdditionOperatorAndZeroAggregator[A, Option[B], Option[C]] =
     monoidAggregate(aggregator.lift)
 
   /**
@@ -81,7 +81,7 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
     lift(Aggregator.min[T])
   }
 
-  def sumOption(implicit sg: Semigroup[T]) = lift(Aggregator.fromSemigroup(sg))
+  def sumOption(implicit sg: HasAdditionOperator[T]) = lift(Aggregator.fromHasAdditionOperator(sg))
   def reduceOption(fn: (T, T) => T) = lift(Aggregator.fromReduce(fn))
 }
 
@@ -106,7 +106,7 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
   def flatMap[U](fn: T => TraversableOnce[U]) =
     FlatMapPreparer[A, U](fn.compose(prepareFn))
 
-  def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C] =
+  def monoidAggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[T, B, C]): HasAdditionOperatorAndZeroAggregator[A, B, C] =
     aggregator.composePrepare(prepareFn)
 
   /**
@@ -148,7 +148,7 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
     aggregate(Aggregator.min[T])
   }
 
-  def sum(implicit sg: Semigroup[T]) = aggregate(Aggregator.fromSemigroup(sg))
+  def sum(implicit sg: HasAdditionOperator[T]) = aggregate(Aggregator.fromHasAdditionOperator(sg))
   def reduce(fn: (T, T) => T) = aggregate(Aggregator.fromReduce(fn))
 }
 
@@ -166,14 +166,14 @@ object MapPreparer {
     val prepareFn = (a: A) => a
     override def map[U](fn: A => U) = MapPreparer(fn)
     override def flatMap[U](fn: A => TraversableOnce[U]) = FlatMapPreparer(fn)
-    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) = aggregator
+    override def monoidAggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[A, B, C]) = aggregator
     override def aggregate[B, C](aggregator: Aggregator[A, B, C]) = aggregator
   }
 }
 
 /**
  * A Preparer that has had one or more flatMap operations applied.
- * It can only accept MonoidAggregators.
+ * It can only accept HasAdditionOperatorAndZeroAggregators.
  */
 trait FlatMapPreparer[A, T] extends Preparer[A, T] {
 
@@ -185,19 +185,19 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
   def flatMap[U](fn: T => TraversableOnce[U]) =
     FlatMapPreparer { a: A => prepareFn(a).flatMap(fn) }
 
-  def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C] =
+  def monoidAggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[T, B, C]): HasAdditionOperatorAndZeroAggregator[A, B, C] =
     aggregator.sumBefore.composePrepare(prepareFn)
 
   /**
    * alias of monoidAggregate for convenience
-   * unlike MapPreparer's aggregate, can only take MonoidAggregator
+   * unlike MapPreparer's aggregate, can only take HasAdditionOperatorAndZeroAggregator
    */
-  def aggregate[B, C](aggregator: MonoidAggregator[T, B, C]) = monoidAggregate(aggregator)
+  def aggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[T, B, C]) = monoidAggregate(aggregator)
 
   /**
-   * Like monoidAggregate, but using an implicit Monoid to construct the Aggregator
+   * Like monoidAggregate, but using an implicit HasAdditionOperatorAndZero to construct the Aggregator
    */
-  def sum(implicit monoid: Monoid[T]) = monoidAggregate(Aggregator.fromMonoid(monoid))
+  def sum(implicit monoid: HasAdditionOperatorAndZero[T]) = monoidAggregate(Aggregator.fromHasAdditionOperatorAndZero(monoid))
 
   /**
    * Split the processing into two parallel aggregations.
@@ -208,7 +208,7 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
    * We really need to generate N versions of this for 3-way, 4-way etc splits.
    */
 
-  def split[B1, B2, C1, C2](fn: FlatMapPreparer[TraversableOnce[T], T] => (MonoidAggregator[TraversableOnce[T], B1, C1], MonoidAggregator[TraversableOnce[T], B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
+  def split[B1, B2, C1, C2](fn: FlatMapPreparer[TraversableOnce[T], T] => (HasAdditionOperatorAndZeroAggregator[TraversableOnce[T], B1, C1], HasAdditionOperatorAndZeroAggregator[TraversableOnce[T], B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(FlatMapPreparer.identity[T])
     a1.join(a2).composePrepare(prepareFn)
   }
@@ -233,6 +233,6 @@ object FlatMapPreparer {
     override def flatMap[U](fn: A => TraversableOnce[U]) =
       FlatMapPreparer{ a: TraversableOnce[A] => a.flatMap(fn) }
 
-    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) = aggregator.sumBefore
+    override def monoidAggregate[B, C](aggregator: HasAdditionOperatorAndZeroAggregator[A, B, C]) = aggregator.sumBefore
   }
 }

@@ -28,17 +28,17 @@ import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 object SummingCache {
-  def apply[K, V: Semigroup](cap: Int): SummingCache[K, V] = new SummingCache[K, V](cap)
+  def apply[K, V: HasAdditionOperator](cap: Int): SummingCache[K, V] = new SummingCache[K, V](cap)
 }
 /**
  * A Stateful Summer on Map[K,V] that keeps a cache of recent keys
  */
-class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
+class SummingCache[K, V](capacity: Int)(implicit sgv: HasAdditionOperator[V])
   extends StatefulSummer[Map[K, V]] {
 
   require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
 
-  override val semigroup = new MapMonoid[K, V]
+  override val semigroup = new MapHasAdditionOperatorAndZero[K, V]
   protected def optNonEmpty(m: Map[K, V]) = if (m.isEmpty) None else Some(m)
 
   override def put(m: Map[K, V]): Option[Map[K, V]] = {
@@ -78,12 +78,12 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
 }
 
 object SummingWithHitsCache {
-  def apply[K, V: Semigroup](cap: Int): SummingWithHitsCache[K, V] = new SummingWithHitsCache[K, V](cap)
+  def apply[K, V: HasAdditionOperator](cap: Int): SummingWithHitsCache[K, V] = new SummingWithHitsCache[K, V](cap)
 }
 /**
  * A SummingCache that also tracks the number of key hits
  */
-class SummingWithHitsCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
+class SummingWithHitsCache[K, V](capacity: Int)(implicit sgv: HasAdditionOperator[V])
   extends SummingCache[K, V](capacity)(sgv) {
 
   def putWithHits(m: Map[K, V]): (Int, Option[Map[K, V]]) = {

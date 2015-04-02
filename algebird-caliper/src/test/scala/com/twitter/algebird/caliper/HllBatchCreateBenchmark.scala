@@ -1,7 +1,7 @@
 package com.twitter.algebird.caliper
 
 import com.google.caliper.{ SimpleBenchmark, Param }
-import com.twitter.algebird.HyperLogLogMonoid
+import com.twitter.algebird.HyperLogLogHasAdditionOperatorAndZero
 import com.twitter.bijection._
 import java.nio.ByteBuffer
 
@@ -21,10 +21,10 @@ class HllBatchCreateBenchmark extends SimpleBenchmark {
   }
 
   def timeBatchCreate(reps: Int): Int = {
-    val hllMonoid = new HyperLogLogMonoid(bits)
+    val hllHasAdditionOperatorAndZero = new HyperLogLogHasAdditionOperatorAndZero(bits)
     var dummy = 0
     while (dummy < reps) {
-      val hll = hllMonoid.batchCreate(set)(byteEncoder.toFunction)
+      val hll = hllHasAdditionOperatorAndZero.batchCreate(set)(byteEncoder.toFunction)
       dummy += 1
     }
     dummy

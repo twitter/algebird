@@ -47,7 +47,7 @@ object BloomFilter {
   def apply(numEntries: Int, fpProb: Double, seed: Int = 0) = {
     val width = BloomFilter.optimalWidth(numEntries, fpProb)
     val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
-    BloomFilterMonoid(numHashes, width, seed)
+    BloomFilterHasAdditionOperatorAndZero(numHashes, width, seed)
   }
 
   // Compute optimal number of hashes: k = m/n ln(2)
@@ -76,7 +76,7 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Monoid[BF] {
+case class BloomFilterHasAdditionOperatorAndZero(numHashes: Int, width: Int, seed: Int) extends HasAdditionOperatorAndZero[BF] {
   val hashes: BFHash = BFHash(numHashes, width, seed)
 
   val zero: BF = BFZero(hashes, width)
@@ -347,13 +347,13 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
   }
 }
 
-case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggregator[String, BF, BF] {
-  val monoid = bfMonoid
+case class BloomFilterAggregator(bfHasAdditionOperatorAndZero: BloomFilterHasAdditionOperatorAndZero) extends HasAdditionOperatorAndZeroAggregator[String, BF, BF] {
+  val monoid = bfHasAdditionOperatorAndZero
 
   def prepare(value: String) = monoid.create(value)
   def present(bf: BF) = bf
 }
 
 object BloomFilterAggregator {
-  def apply(numHashes: Int, width: Int, seed: Int = 0): BloomFilterAggregator = BloomFilterAggregator(BloomFilterMonoid(numHashes, width, seed))
+  def apply(numHashes: Int, width: Int, seed: Int = 0): BloomFilterAggregator = BloomFilterAggregator(BloomFilterHasAdditionOperatorAndZero(numHashes, width, seed))
 }

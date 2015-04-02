@@ -42,7 +42,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   tuplesOut: Incrementor,
   workPool: FuturePool,
   compact: Compact,
-  compatSize: CompactionSize)(implicit sg: Semigroup[Value])
+  compatSize: CompactionSize)(implicit sg: HasAdditionOperator[Value])
   extends AsyncSummer[(Key, Value), Map[Key, Value]]
   with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
@@ -73,7 +73,7 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
   protected override val emptyResult = Map.empty[Key, Value]
   private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
-  val fSg: Semigroup[Future[Value]] = implicitly[Semigroup[Future[Value]]]
+  val fSg: HasAdditionOperator[Future[Value]] = implicitly[HasAdditionOperator[Future[Value]]]
   private[this] val innerBuffSize = bufferSize.v
   private[this] val compatSizeInt = compatSize.toInt
 

@@ -33,7 +33,7 @@ class SummingCacheTest extends CheckProperties {
   import SummingIteratorTest.mapEquiv
 
   // Maps are tricky to compare equality for since zero values are often removed
-  def test[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
+  def test[K, V: HasAdditionOperatorAndZero](c: Capacity, items: List[(K, V)]) = {
     val sc = SummingCache[K, V](c.cap)
     val mitems = items.map { Map(_) }
     implicit val mapEq = mapEquiv[K, V]
@@ -59,7 +59,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
 
   val RAND = new scala.util.Random
 
-  def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
+  def getHits[K, V: HasAdditionOperatorAndZero](c: Capacity, items: List[(K, V)]) = {
     val sc = SummingWithHitsCache[K, V](c.cap)
     val mitems = items.map { Map(_) }
     mitems.map { sc.putWithHits(_)._1 }.tail

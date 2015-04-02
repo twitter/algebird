@@ -36,7 +36,7 @@ import java.util.Arrays
 class QTreeLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val qtSemigroup = new QTreeSemigroup[Long](6)
+  implicit val qtHasAdditionOperator = new QTreeHasAdditionOperator[Long](6)
   implicit val qtGen = Arbitrary {
     for (
       v <- choose(0L, 10000L)
@@ -55,8 +55,8 @@ class QTreeTest extends WordSpec with Matchers {
   }
 
   def buildQTree(k: Int, list: Seq[Double]) = {
-    val qtSemigroup = new QTreeSemigroup[Double](k)
-    list.map{ QTree(_) }.reduce{ qtSemigroup.plus(_, _) }
+    val qtHasAdditionOperator = new QTreeHasAdditionOperator[Double](k)
+    list.map{ QTree(_) }.reduce{ qtHasAdditionOperator.plus(_, _) }
   }
 
   def trueQuantile(list: Seq[Double], q: Double) = {

@@ -16,18 +16,18 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.{ Monad, Semigroup }
+import com.twitter.algebird.{ ChainableCallbackCollectorBuilder, HasAdditionOperator }
 
 /**
- * Monad to handle mutating input state and possible failures.
+ * ChainableCallbackCollectorBuilder to handle mutating input state and possible failures.
  * This is used to interact in the planning phase with existing
  * mutable APIs (like storm or cascading), but retain the ability
  * to compose carefully.
  */
 sealed trait StateWithError[S, +F, +T] {
-  def join[F1 >: F, U](that: StateWithError[S, F1, U], mergeErr: (F1, F1) => F1, mergeState: (S, S) => S): StateWithError[S, F1, (T, U)] = join(that)(Semigroup.from(mergeErr), Semigroup.from(mergeState))
+  def join[F1 >: F, U](that: StateWithError[S, F1, U], mergeErr: (F1, F1) => F1, mergeState: (S, S) => S): StateWithError[S, F1, (T, U)] = join(that)(HasAdditionOperator.from(mergeErr), HasAdditionOperator.from(mergeState))
 
-  def join[F1 >: F, U](that: StateWithError[S, F1, U])(implicit sgf: Semigroup[F1], sgs: Semigroup[S]): // TODO: deep joins could blow the stack, not yet using trampoline here
+  def join[F1 >: F, U](that: StateWithError[S, F1, U])(implicit sgf: HasAdditionOperator[F1], sgs: HasAdditionOperator[S]): // TODO: deep joins could blow the stack, not yet using trampoline here
   StateWithError[S, F1, (T, U)] = StateFn({ (requested: S) =>
     (run(requested), that.run(requested)) match {
       case (Right((s1, r1)), Right((s2, r2))) => Right((sgs.plus(s1, s2), (r1, r2)))
@@ -47,7 +47,7 @@ sealed trait StateWithError[S, +F, +T] {
   def map[U](fn: (T) => U): StateWithError[S, F, U] =
     FlatMappedState(this, { (t: T) => StateWithError.const(fn(t)) })
 }
-/** Simple wrapper of a function in the Monad */
+/** Simple wrapper of a function in the ChainableCallbackCollectorBuilder */
 final case class StateFn[S, F, T](fn: S => Either[F, (S, T)]) extends StateWithError[S, F, T] {
   def run(state: S) = fn(state)
 }
@@ -99,14 +99,14 @@ object StateWithError {
       StateFn({ (s: S) => fn(i).right.map { (s, _) } })
     }
   }
-  // TODO this should move to Monad and work for any Monad
+  // TODO this should move to ChainableCallbackCollectorBuilder and work for any ChainableCallbackCollectorBuilder
   def toKleisli[S] = new FunctionLifter[S]
 
   implicit def apply[S, F, T](fn: S => Either[F, (S, T)]): StateWithError[S, F, T] = StateFn(fn)
-  implicit def monad[S, F]: Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] =
-    new StateFMonad[F, S]
+  implicit def monad[S, F]: ChainableCallbackCollectorBuilder[({ type Result[T] = StateWithError[S, F, T] })#Result] =
+    new StateFChainableCallbackCollectorBuilder[F, S]
 
-  class StateFMonad[F, S] extends Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] {
+  class StateFChainableCallbackCollectorBuilder[F, S] extends ChainableCallbackCollectorBuilder[({ type Result[T] = StateWithError[S, F, T] })#Result] {
     def apply[T](const: T) = { (s: S) => Right((s, const)) }
     def flatMap[T, U](earlier: StateWithError[S, F, T])(next: T => StateWithError[S, F, U]) = earlier.flatMap(next)
   }

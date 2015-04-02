@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 import java.util.PriorityQueue
 
-import com.twitter.algebird.mutable.PriorityQueueMonoid
+import com.twitter.algebird.mutable.PriorityQueueHasAdditionOperatorAndZero
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
@@ -28,7 +28,7 @@ class TopKTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
   val SIZE = 10
 
-  implicit def qmonoid = new PriorityQueueMonoid[Int](SIZE)
+  implicit def qmonoid = new PriorityQueueHasAdditionOperatorAndZero[Int](SIZE)
   implicit def queueArb = Arbitrary {
     implicitly[Arbitrary[List[Int]]].arbitrary.map { qmonoid.build(_) }
   }
@@ -42,10 +42,10 @@ class TopKTests extends CheckProperties {
   def pqIsCorrect(items: List[List[Int]]): Boolean = {
     val correct = items.flatten.sorted.take(SIZE)
     // Have to do this last since this monoid is mutating inputs
-    q2l(Monoid.sum(items.map { l => qmonoid.build(l) })) == correct
+    q2l(HasAdditionOperatorAndZero.sum(items.map { l => qmonoid.build(l) })) == correct
   }
 
-  property("PriorityQueueMonoid works") {
+  property("PriorityQueueHasAdditionOperatorAndZero works") {
     forAll { (items: List[List[Int]]) =>
       pqIsCorrect(items)
     }
@@ -59,24 +59,24 @@ class TopKTests extends CheckProperties {
     pqPriorBugs.forall(pqIsCorrect(_))
   }
 
-  property("PriorityQueueMonoid is a Monoid") {
+  property("PriorityQueueHasAdditionOperatorAndZero is a HasAdditionOperatorAndZero") {
     monoidLawsEq[PriorityQueue[Int]](eqFn)
   }
 
-  implicit def tkmonoid = new TopKMonoid[Int](SIZE)
+  implicit def tkmonoid = new TopKHasAdditionOperatorAndZero[Int](SIZE)
 
   implicit def topkArb = Arbitrary {
     implicitly[Arbitrary[List[Int]]].arbitrary.map { tkmonoid.build(_) }
   }
 
-  property("TopKMonoid works") {
+  property("TopKHasAdditionOperatorAndZero works") {
     forAll { (its: List[List[Int]]) =>
       val correct = its.flatten.sorted.take(SIZE)
-      Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) }).items, correct)
+      Equiv[List[Int]].equiv(HasAdditionOperatorAndZero.sum(its.map { l => tkmonoid.build(l) }).items, correct)
     }
   }
 
-  property("TopKMonoid is a Monoid") {
+  property("TopKHasAdditionOperatorAndZero is a HasAdditionOperatorAndZero") {
     monoidLawsEq[PriorityQueue[Int]](eqFn)
   }
 

@@ -16,26 +16,26 @@ object Aggregator extends java.io.Serializable {
   /**
    * This is a trivial aggregator that always returns a single value
    */
-  def const[T](t: T): MonoidAggregator[Any, Unit, T] =
-    prepareMonoid { _: Any => () }
+  def const[T](t: T): HasAdditionOperatorAndZeroAggregator[Any, Unit, T] =
+    prepareHasAdditionOperatorAndZero { _: Any => () }
       .andThenPresent(_ => t)
   /**
    * Using Aggregator.prepare,present you can add to this aggregator
    */
-  def fromReduce[T](red: (T, T) => T): Aggregator[T, T, T] = fromSemigroup(Semigroup.from(red))
-  def fromSemigroup[T](implicit sg: Semigroup[T]): Aggregator[T, T, T] = new Aggregator[T, T, T] {
+  def fromReduce[T](red: (T, T) => T): Aggregator[T, T, T] = fromHasAdditionOperator(HasAdditionOperator.from(red))
+  def fromHasAdditionOperator[T](implicit sg: HasAdditionOperator[T]): Aggregator[T, T, T] = new Aggregator[T, T, T] {
     def prepare(input: T) = input
     def semigroup = sg
     def present(reduction: T) = reduction
   }
-  def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T, T, T] = prepareMonoid(identity[T])
+  def fromHasAdditionOperatorAndZero[T](implicit mon: HasAdditionOperatorAndZero[T]): HasAdditionOperatorAndZeroAggregator[T, T, T] = prepareHasAdditionOperatorAndZero(identity[T])
   // Uses the product from the ring
   def fromRing[T](implicit rng: Ring[T]): RingAggregator[T, T, T] = fromRing[T, T](rng, identity[T])
 
-  def fromMonoid[F, T](implicit mon: Monoid[T], prep: F => T): MonoidAggregator[F, T, T] =
-    prepareMonoid(prep)(mon)
+  def fromHasAdditionOperatorAndZero[F, T](implicit mon: HasAdditionOperatorAndZero[T], prep: F => T): HasAdditionOperatorAndZeroAggregator[F, T, T] =
+    prepareHasAdditionOperatorAndZero(prep)(mon)
 
-  def prepareMonoid[F, T](prep: F => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] = new MonoidAggregator[F, T, T] {
+  def prepareHasAdditionOperatorAndZero[F, T](prep: F => T)(implicit m: HasAdditionOperatorAndZero[T]): HasAdditionOperatorAndZeroAggregator[F, T, T] = new HasAdditionOperatorAndZeroAggregator[F, T, T] {
     def prepare(input: F) = prep(input)
     def monoid = m
     def present(reduction: T) = reduction
@@ -50,19 +50,19 @@ object Aggregator extends java.io.Serializable {
   /**
    * How many items satisfy a predicate
    */
-  def count[T](pred: T => Boolean): MonoidAggregator[T, Long, Long] =
-    prepareMonoid { t: T => if (pred(t)) 1L else 0L }
+  def count[T](pred: T => Boolean): HasAdditionOperatorAndZeroAggregator[T, Long, Long] =
+    prepareHasAdditionOperatorAndZero { t: T => if (pred(t)) 1L else 0L }
 
   /**
    * Do any items satisfy some predicate
    */
-  def exists[T](pred: T => Boolean): MonoidAggregator[T, Boolean, Boolean] =
-    prepareMonoid(pred)(OrVal.unboxedMonoid)
+  def exists[T](pred: T => Boolean): HasAdditionOperatorAndZeroAggregator[T, Boolean, Boolean] =
+    prepareHasAdditionOperatorAndZero(pred)(OrVal.unboxedHasAdditionOperatorAndZero)
   /**
    * Do all items satisfy a predicate
    */
-  def forall[T](pred: T => Boolean): MonoidAggregator[T, Boolean, Boolean] =
-    prepareMonoid(pred)(AndVal.unboxedMonoid)
+  def forall[T](pred: T => Boolean): HasAdditionOperatorAndZeroAggregator[T, Boolean, Boolean] =
+    prepareHasAdditionOperatorAndZero(pred)(AndVal.unboxedHasAdditionOperatorAndZero)
   /**
    * Take the first (left most in reduce order) item found
    */
@@ -90,35 +90,35 @@ object Aggregator extends java.io.Serializable {
   /**
    * This returns the number of items we find
    */
-  def size: MonoidAggregator[Any, Long, Long] =
-    prepareMonoid { (_: Any) => 1L }
+  def size: HasAdditionOperatorAndZeroAggregator[Any, Long, Long] =
+    prepareHasAdditionOperatorAndZero { (_: Any) => 1L }
   /**
    * Take the smallest `count` items using a heap
    */
-  def sortedTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
+  def sortedTake[T: Ordering](count: Int): HasAdditionOperatorAndZeroAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)
   /**
    * Take the largest `count` items using a heap
    */
-  def sortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
+  def sortedReverseTake[T: Ordering](count: Int): HasAdditionOperatorAndZeroAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
   /**
    * Put everything in a List. Note, this could fill the memory if the List is very large.
    */
-  def toList[T]: MonoidAggregator[T, List[T], List[T]] =
-    prepareMonoid { t: T => List(t) }
+  def toList[T]: HasAdditionOperatorAndZeroAggregator[T, List[T], List[T]] =
+    prepareHasAdditionOperatorAndZero { t: T => List(t) }
   /**
    * Put everything in a Set. Note, this could fill the memory if the Set is very large.
    */
-  def toSet[T]: MonoidAggregator[T, Set[T], Set[T]] =
-    prepareMonoid { t: T => Set(t) }
+  def toSet[T]: HasAdditionOperatorAndZeroAggregator[T, Set[T], Set[T]] =
+    prepareHasAdditionOperatorAndZero { t: T => Set(t) }
 
   /**
    * This builds an in-memory Set, and then finally gets the size of that set.
    * This may not be scalable if the Uniques are very large. You might check the
    * HyperLogLog Aggregator to get an approximate version of this that is scalable.
    */
-  def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
+  def uniqueCount[T]: HasAdditionOperatorAndZeroAggregator[T, Set[T], Int] =
     toSet[T].andThenPresent(_.size)
 }
 
@@ -142,7 +142,7 @@ object Aggregator extends java.io.Serializable {
  */
 trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
   def prepare(input: A): B
-  def semigroup: Semigroup[B]
+  def semigroup: HasAdditionOperator[B]
   def present(reduction: B): C
 
   /* *****
@@ -165,8 +165,8 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
   def reduceOption(items: TraversableOnce[B]): Option[B] = semigroup.sumOption(items)
 
   /**
-   * This may error if inputs are empty (for Monoid Aggregators it never will, instead
-   * you see present(Monoid.zero[B])
+   * This may error if inputs are empty (for HasAdditionOperatorAndZero Aggregators it never will, instead
+   * you see present(HasAdditionOperatorAndZero.zero[B])
    */
   def apply(inputs: TraversableOnce[A]): C = present(reduce(inputs.map(prepare)))
   /**
@@ -235,7 +235,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     val ag1 = this
     new Aggregator[(A, A2), (B, B2), (C, C2)] {
       def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      val semigroup = new Tuple2HasAdditionOperator()(ag1.semigroup, ag2.semigroup)
       def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
     }
   }
@@ -253,11 +253,11 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     None,
     { _.map(self.present(_)) })
 
-  def lift: MonoidAggregator[A, Option[B], Option[C]] =
-    new MonoidAggregator[A, Option[B], Option[C]] {
+  def lift: HasAdditionOperatorAndZeroAggregator[A, Option[B], Option[C]] =
+    new HasAdditionOperatorAndZeroAggregator[A, Option[B], Option[C]] {
       def prepare(input: A): Option[B] = Some(self.prepare(input))
       def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
-      def monoid = new OptionMonoid[B]()(self.semigroup)
+      def monoid = new OptionHasAdditionOperatorAndZero[B]()(self.semigroup)
     }
 }
 
@@ -291,25 +291,25 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
     GeneratedTupleAggregator.from5(m1, m2, m3, m4, m5)
 }
 
-trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
-  def monoid: Monoid[B]
+trait HasAdditionOperatorAndZeroAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
+  def monoid: HasAdditionOperatorAndZero[B]
   def semigroup = monoid
   final override def reduce(items: TraversableOnce[B]): B =
     monoid.sum(items)
 
   def appendAll(items: TraversableOnce[A]): B = reduce(items.map(prepare))
 
-  override def andThenPresent[D](present2: C => D): MonoidAggregator[A, B, D] = {
+  override def andThenPresent[D](present2: C => D): HasAdditionOperatorAndZeroAggregator[A, B, D] = {
     val self = this
-    new MonoidAggregator[A, B, D] {
+    new HasAdditionOperatorAndZeroAggregator[A, B, D] {
       def prepare(a: A) = self.prepare(a)
       def monoid = self.monoid
       def present(b: B) = present2(self.present(b))
     }
   }
-  override def composePrepare[A2](prepare2: A2 => A): MonoidAggregator[A2, B, C] = {
+  override def composePrepare[A2](prepare2: A2 => A): HasAdditionOperatorAndZeroAggregator[A2, B, C] = {
     val self = this
-    new MonoidAggregator[A2, B, C] {
+    new HasAdditionOperatorAndZeroAggregator[A2, B, C] {
       def prepare(a: A2) = self.prepare(prepare2(a))
       def monoid = self.monoid
       def present(b: B) = self.present(b)
@@ -317,35 +317,35 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   }
 
   /**
-   * Build a MonoidAggregator that either takes left or right input
+   * Build a HasAdditionOperatorAndZeroAggregator that either takes left or right input
    * and outputs the pair from both
    */
-  def either[A2, B2, C2](that: MonoidAggregator[A2, B2, C2]): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
-    new MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] {
+  def either[A2, B2, C2](that: HasAdditionOperatorAndZeroAggregator[A2, B2, C2]): HasAdditionOperatorAndZeroAggregator[Either[A, A2], (B, B2), (C, C2)] =
+    new HasAdditionOperatorAndZeroAggregator[Either[A, A2], (B, B2), (C, C2)] {
       def prepare(e: Either[A, A2]) = e match {
         case Left(a) => (self.prepare(a), that.monoid.zero)
         case Right(a2) => (self.monoid.zero, that.prepare(a2))
       }
-      val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
+      val monoid = new Tuple2HasAdditionOperatorAndZero[B, B2]()(self.monoid, that.monoid)
       def present(bs: (B, B2)) = (self.present(bs._1), that.present(bs._2))
     }
 
   /**
    * Only aggregate items that match a predicate
    */
-  def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
-    new MonoidAggregator[A1, B, C] {
+  def filterBefore[A1 <: A](pred: A1 => Boolean): HasAdditionOperatorAndZeroAggregator[A1, B, C] =
+    new HasAdditionOperatorAndZeroAggregator[A1, B, C] {
       def prepare(a: A1) = if (pred(a)) self.prepare(a) else self.monoid.zero
       def monoid = self.monoid
       def present(b: B) = self.present(b)
     }
   /**
    * This maps the inputs to Bs, then sums them, effectively flattening
-   * the inputs to the MonoidAggregator
+   * the inputs to the HasAdditionOperatorAndZeroAggregator
    */
-  def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
-    new MonoidAggregator[TraversableOnce[A], B, C] {
-      def monoid: Monoid[B] = self.monoid
+  def sumBefore: HasAdditionOperatorAndZeroAggregator[TraversableOnce[A], B, C] =
+    new HasAdditionOperatorAndZeroAggregator[TraversableOnce[A], B, C] {
+      def monoid: HasAdditionOperatorAndZero[B] = self.monoid
       def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
       def present(reduction: B): C = self.present(reduction)
     }
@@ -357,17 +357,17 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
    *
    * The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
    */
-  def zip[A2, B2, C2](ag2: MonoidAggregator[A2, B2, C2]): MonoidAggregator[(A, A2), (B, B2), (C, C2)] = {
+  def zip[A2, B2, C2](ag2: HasAdditionOperatorAndZeroAggregator[A2, B2, C2]): HasAdditionOperatorAndZeroAggregator[(A, A2), (B, B2), (C, C2)] = {
     val ag1 = self
-    new MonoidAggregator[(A, A2), (B, B2), (C, C2)] {
+    new HasAdditionOperatorAndZeroAggregator[(A, A2), (B, B2), (C, C2)] {
       def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
+      val monoid = new Tuple2HasAdditionOperatorAndZero[B, B2]()(ag1.monoid, ag2.monoid)
       def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
     }
   }
 }
 
-trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {
+trait RingAggregator[-A, B, +C] extends HasAdditionOperatorAndZeroAggregator[A, B, C] {
   def ring: Ring[B]
-  def monoid = Ring.asTimesMonoid(ring)
+  def monoid = Ring.asTimesHasAdditionOperatorAndZero(ring)
 }

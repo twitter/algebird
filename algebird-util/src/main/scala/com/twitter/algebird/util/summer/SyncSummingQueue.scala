@@ -35,7 +35,7 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   sizeIncr: Incrementor,
   insertOps: Incrementor,
   tuplesIn: Incrementor,
-  tuplesOut: Incrementor)(implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+  tuplesOut: Incrementor)(implicit semigroup: HasAdditionOperator[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
   protected override val emptyResult = Map.empty[Key, Value]
@@ -50,7 +50,7 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    val outputs = squeue.put(Monoid.sum(vals.map { i =>
+    val outputs = squeue.put(HasAdditionOperatorAndZero.sum(vals.map { i =>
       tuplesIn.incr
       Map(i)
     })).getOrElse(Map.empty)
@@ -60,7 +60,7 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   }
 }
 
-class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incrementor)(override implicit val semigroup: Semigroup[V])
+class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incrementor)(override implicit val semigroup: HasAdditionOperator[V])
   extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
@@ -78,7 +78,7 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
         if (!queue.offer(item)) {
           sizeIncr.incr
           // Queue is full, do the work:
-          Monoid.plus(flush, Some(item))
+          HasAdditionOperatorAndZero.plus(flush, Some(item))
         } else {
           // We are in the queue
           None
@@ -95,7 +95,7 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
     queueOption.flatMap { queue =>
       val toSum = ListBuffer[V]()
       queue.drainTo(toSum.asJava)
-      Semigroup.sumOption(toSum)
+      HasAdditionOperator.sumOption(toSum)
     }
   }
   def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)

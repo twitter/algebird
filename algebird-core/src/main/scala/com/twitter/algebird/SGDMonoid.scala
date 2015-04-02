@@ -78,16 +78,16 @@ object SGDPos {
 case class SGDPos[+Pos](val pos: List[Pos]) extends SGD[Pos]
 
 /**
- * Basically a specific implementation of the RightFoldedMonoid
+ * Basically a specific implementation of the RightFoldedHasAdditionOperatorAndZero
  * gradient is the gradient of the function to be minimized
  * To use this, you need to insert an initial weight SGDWeights
  * before you start adding SGDPos objects. Otherwise you will
  * just be doing list concatenation.
  */
-class SGDMonoid[Pos](stepfn: (Long, IndexedSeq[Double]) => Double,
+class SGDHasAdditionOperatorAndZero[Pos](stepfn: (Long, IndexedSeq[Double]) => Double,
   gradient: (IndexedSeq[Double], Pos) => IndexedSeq[Double])
 
-  extends Monoid[SGD[Pos]] {
+  extends HasAdditionOperatorAndZero[SGD[Pos]] {
 
   val zero = SGDZero
 

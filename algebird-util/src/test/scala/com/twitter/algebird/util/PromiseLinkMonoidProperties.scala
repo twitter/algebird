@@ -18,7 +18,7 @@ package com.twitter.algebird.util
 import com.twitter.algebird._
 import org.scalacheck.Prop._
 
-class PromiseLinkMonoidProperties extends CheckProperties {
+class PromiseLinkHasAdditionOperatorAndZeroProperties extends CheckProperties {
   property("associative") {
     def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
     def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
@@ -26,6 +26,6 @@ class PromiseLinkMonoidProperties extends CheckProperties {
       finalTunnel.promise +: tunnels.map { _.promise }
     }
 
-    TunnelMonoidProperties.testTunnelMonoid(identity, makeTunnel, collapseFinalValues)
+    TunnelHasAdditionOperatorAndZeroProperties.testTunnelHasAdditionOperatorAndZero(identity, makeTunnel, collapseFinalValues)
   }
 }

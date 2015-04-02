@@ -1,7 +1,7 @@
 package com.twitter.algebird.caliper
 
 import com.google.caliper.{ SimpleBenchmark, Param }
-import com.twitter.algebird.{ HyperLogLogMonoid, HLL }
+import com.twitter.algebird.{ HyperLogLogHasAdditionOperatorAndZero, HLL }
 import com.twitter.bijection._
 import java.nio.ByteBuffer
 
@@ -20,11 +20,11 @@ class HLLPresentBenchmark extends SimpleBenchmark {
   implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
 
   override def setUp {
-    val hllMonoid = new HyperLogLogMonoid(bits)
+    val hllHasAdditionOperatorAndZero = new HyperLogLogHasAdditionOperatorAndZero(bits)
     val r = new scala.util.Random(12345L)
     data = (0 until numHLL).map { _ =>
       val input = (0 until max).map(_ => r.nextLong).toSet
-      hllMonoid.batchCreate(input)(byteEncoder.toFunction)
+      hllHasAdditionOperatorAndZero.batchCreate(input)(byteEncoder.toFunction)
     }.toIndexedSeq
 
   }

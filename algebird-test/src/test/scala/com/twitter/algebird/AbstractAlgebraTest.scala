@@ -7,8 +7,8 @@ import org.scalacheck.Prop._
 
 class AbstractAlgebraTest extends CheckProperties with Matchers {
 
-  property("A Monoid should be able to sum") {
-    val monoid = implicitly[Monoid[Int]]
+  property("A HasAdditionOperatorAndZero should be able to sum") {
+    val monoid = implicitly[HasAdditionOperatorAndZero[Int]]
     forAll { intList: List[Int] =>
       intList.sum == monoid.sum(intList)
     }
@@ -21,8 +21,8 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     }
   }
 
-  property("An OptionMonoid should be able to sum") {
-    val monoid = implicitly[Monoid[Option[Int]]]
+  property("An OptionHasAdditionOperatorAndZero should be able to sum") {
+    val monoid = implicitly[HasAdditionOperatorAndZero[Option[Int]]]
 
     forAll { intList: List[Option[Int]] =>
       val flattenedList = intList.flatMap(x => x)
@@ -31,9 +31,9 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     }
   }
 
-  property("An OptionMonoid based on a Semigroup should be able to sum") {
-    val maxMonoid = implicitly[Monoid[Option[Max[Int]]]]
-    val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
+  property("An OptionHasAdditionOperatorAndZero based on a HasAdditionOperator should be able to sum") {
+    val maxHasAdditionOperatorAndZero = implicitly[HasAdditionOperatorAndZero[Option[Max[Int]]]]
+    val minHasAdditionOperatorAndZero = implicitly[HasAdditionOperatorAndZero[Option[Min[Int]]]]
     forAll { intList: List[Option[Int]] =>
       val minList = intList.map {
         _ match {
@@ -52,15 +52,15 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
       val expectedMax = if (!flattenedList.isEmpty) Some(Max(flattenedList.max)) else None
       val expectedMin = if (!flattenedList.isEmpty) Some(Min(flattenedList.min)) else None
 
-      expectedMax == maxMonoid.sum(maxList) &&
-        expectedMin == minMonoid.sum(minList)
+      expectedMax == maxHasAdditionOperatorAndZero.sum(maxList) &&
+        expectedMin == minHasAdditionOperatorAndZero.sum(minList)
 
     }
   }
 
   property("First/Last should work properly") {
-    val fsg = implicitly[Semigroup[First[Int]]]
-    val lsg = implicitly[Semigroup[Last[Int]]]
+    val fsg = implicitly[HasAdditionOperator[First[Int]]]
+    val lsg = implicitly[HasAdditionOperator[Last[Int]]]
     forAll { intList: List[Int] =>
       !intList.isEmpty ==> {
         val first = intList.map(First(_)).reduceLeft(fsg.plus _)
@@ -94,15 +94,15 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
         // when right is bigger
         val right = rightBase ++ remainder
 
-        Semigroup.plus(left, rightBase) == sumBase ++ remainder &&
-          Semigroup.plus(leftBase, rightBase) == sumBase &&
-          Semigroup.plus(leftBase, right) == sumBase ++ remainder
+        HasAdditionOperator.plus(left, rightBase) == sumBase ++ remainder &&
+          HasAdditionOperator.plus(leftBase, rightBase) == sumBase &&
+          HasAdditionOperator.plus(leftBase, right) == sumBase ++ remainder
       }
     }
   }
 
-  property("An ArrayMonoid should sum") {
-    val monoid = new ArrayMonoid[Int]
+  property("An ArrayHasAdditionOperatorAndZero should sum") {
+    val monoid = new ArrayHasAdditionOperatorAndZero[Int]
     forAll { intList: List[Int] =>
       val (l, r) = intList.splitAt(intList.size / 2)
       val left = l.padTo(math.max(l.size, r.size), 0)
@@ -121,7 +121,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("a user-defined product monoid should work") {
     case class Metrics(count: Int, largestValue: Option[Max[Int]])
-    implicit val MetricsMonoid = Monoid(Metrics.apply _, Metrics.unapply _)
+    implicit val MetricsHasAdditionOperatorAndZero = HasAdditionOperatorAndZero(Metrics.apply _, Metrics.unapply _)
     implicit val metricsGen = Arbitrary {
       for {
         count <- Gen.choose(0, 10000)
@@ -129,6 +129,6 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
       } yield Metrics(count, largest)
     }
 
-    commutativeMonoidLaws[Metrics]
+    commutativeHasAdditionOperatorAndZeroLaws[Metrics]
   }
 }

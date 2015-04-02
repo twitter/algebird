@@ -32,7 +32,7 @@ case class BitSetLite(in: Array[Byte]) {
 }
 
 /**
- * Implementation of the HyperLogLog approximate counting as a Monoid
+ * Implementation of the HyperLogLog approximate counting as a HasAdditionOperatorAndZero
  * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
  *
  * HyperLogLog: the analysis of a near-optimal cardinality estimation algorithm
@@ -325,7 +325,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 
       case sparse @ SparseHLL(_, oMaxRhow) =>
         assert(sparse.size == size, "Incompatible HLL size: " + sparse.size + " != " + size)
-        val allMaxRhow = Monoid.plus(maxRhow, oMaxRhow)
+        val allMaxRhow = HasAdditionOperatorAndZero.plus(maxRhow, oMaxRhow)
         if (allMaxRhow.size * 16 <= size) {
           SparseHLL(bits, allMaxRhow)
         } else {
@@ -381,7 +381,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 }
 
 /**
- * These are the individual instances which the Monoid knows how to add
+ * These are the individual instances which the HasAdditionOperatorAndZero knows how to add
  */
 case class DenseHLL(bits: Int, v: Bytes) extends HLL {
 
@@ -390,7 +390,7 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
   def size = v.size
 
   // Named from the parameter in the paper, probably never useful to anyone
-  // except HyperLogLogMonoid
+  // except HyperLogLogHasAdditionOperatorAndZero
 
   lazy val (zeroCnt, z) = {
     var count: Int = 0
@@ -471,7 +471,7 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
  * which means each HLLInstance is about 2^{12} = 4kb per instance.
  */
-class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
+class HyperLogLogHasAdditionOperatorAndZero(val bits: Int) extends HasAdditionOperatorAndZero[HLL] {
   import HyperLogLog._
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
@@ -480,7 +480,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
 
   def apply[T <% Array[Byte]](t: T) = create(t)
 
-  val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
+  val zero: HLL = SparseHLL(bits, HasAdditionOperatorAndZero.zero[Map[Int, Max[Byte]]])
 
   def plus(left: HLL, right: HLL) = left + right
 
@@ -558,16 +558,16 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
 
 object HyperLogLogAggregator {
   def apply(bits: Int): HyperLogLogAggregator = {
-    val monoid = new HyperLogLogMonoid(bits)
+    val monoid = new HyperLogLogHasAdditionOperatorAndZero(bits)
     new HyperLogLogAggregator(monoid)
   }
 
-  def sizeAggregator(bits: Int): MonoidAggregator[Array[Byte], HLL, Double] =
+  def sizeAggregator(bits: Int): HasAdditionOperatorAndZeroAggregator[Array[Byte], HLL, Double] =
     apply(bits).andThenPresent(_.estimatedSize)
 }
 
-case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {
-  val monoid = hllMonoid
+case class HyperLogLogAggregator(val hllHasAdditionOperatorAndZero: HyperLogLogHasAdditionOperatorAndZero) extends HasAdditionOperatorAndZeroAggregator[Array[Byte], HLL, HLL] {
+  val monoid = hllHasAdditionOperatorAndZero
 
   def prepare(value: Array[Byte]) = monoid.create(value)
   def present(hll: HLL) = hll
