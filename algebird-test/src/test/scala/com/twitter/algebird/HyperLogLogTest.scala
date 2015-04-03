@@ -152,16 +152,19 @@ class HyperLogLogTest extends WordSpec with Matchers {
       }
     }
     "Correctly serialize" in {
-      (4 to 20).foreach { bits =>
+      (4 to 28).foreach { bits =>
+        println("HyperLogLogTest - Serialization #1: " + bits) // Hack to get around the "No output has been received in the last 10 minutes" Travis timeout
         val mon = new HyperLogLogMonoid(bits)
         // Zero
         verifySerialization(mon.zero)
         // One j
         verifySerialization(mon(12))
+        println("HyperLogLogTest - Serialization #2: " + bits) // Hack to get around the "No output has been received in the last 10 minutes" Travis timeout
         // Two j's
         verifySerialization(mon(12) + mon(13))
         // Many j's
         val manyJ = Monoid.sum((1 to 1000 by 77).map(mon(_)))(mon)
+        println("HyperLogLogTest - Serialization #3: " + bits) // Hack to get around the "No output has been received in the last 10 minutes" Travis timeout
         verifySerialization(manyJ)
         // Explicitly dense
         verifySerialization(manyJ.toDenseHLL)
