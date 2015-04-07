@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import org.scalacheck.{Gen, Arbitrary}
+
 class VectorSpaceProperties extends CheckProperties {
   import com.twitter.algebird.BaseVectorSpaceProperties._
 
@@ -30,6 +32,8 @@ class VectorSpaceProperties extends CheckProperties {
       }
     }
   }
+
+  implicit val genDouble = Arbitrary{Gen.choose(-1.0E50, 1.0E50)}
 
   property("map int double scaling") {
     vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
