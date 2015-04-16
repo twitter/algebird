@@ -38,6 +38,9 @@ package com.twitter.algebird
  */
 
 object QTree {
+  /**
+   * level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
+   */
   def apply[A](kv: (Double, A), level: Int = -16): QTree[A] =
     QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
       level,
@@ -55,10 +58,31 @@ object QTree {
       None)
 
   /**
-   * The common case of wanting a count and sum for the same value
+   * The common case of wanting an offset and sum for the same value
+   * This is useful if you want to query the mean inside a range later.
+   * If you truly just care about the counts/histogram, see the value method.
    */
   def apply(k: Long): QTree[Long] = apply(k -> k)
+  /**
+   * uses 1/65636 as the bin size, if you want to control that see other apply
+   * or value methods.
+   *
+   * This is useful if you want to query the mean inside a range later.
+   * If you truly just care about the counts/histogram, see the value method.
+   */
   def apply(k: Double): QTree[Double] = apply(k -> k)
+
+  /**
+   * If you are sure you only care about the approximate histogram
+   * features of QTree, you can save some space by using QTree[Unit]
+   */
+  def value(v: Long): QTree[Unit] = apply(v -> ())
+  /**
+   * If you are sure you only care about the approximate histogram
+   * features of QTree, you can save some space by using QTree[Unit]
+   * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
+   */
+  def value(v: Double, level: Int = -16): QTree[Unit] = apply(v -> (), level)
 }
 
 class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extends Semigroup[QTree[A]] {
@@ -120,7 +144,6 @@ case class QTree[A](
    * for this tree's root and the other tree's root, and return its
    * level (that is, the power of 2 for the interval).
    */
-
   private def commonAncestorLevel(other: QTree[A]) = {
     val minLevel = level.min(other.level)
     val leftOffset = offset << (level - minLevel)
@@ -134,7 +157,14 @@ case class QTree[A](
     ancestorLevel.max(level).max(other.level)
   }
 
-  def merge(other: QTree[A])(implicit monoid: Monoid[A]) = {
+  /**
+   * This merges with another QTree but DOES NOT compress.
+   * You should probably never use this and instead use
+   * QTreeSemigroup.plus(a, b) or .sumOption. Strongly
+   * prefer sumOption if you can, as it is much more efficient
+   * due to compressing less frequently.
+   */
+  def merge(other: QTree[A])(implicit monoid: Monoid[A]): QTree[A] = {
     val commonAncestor = commonAncestorLevel(other)
     val left = extendToLevel(commonAncestor)
     val right = other.extendToLevel(commonAncestor)
@@ -158,8 +188,15 @@ case class QTree[A](
       case (left, None) => left
     }
 
+  /**
+   * give lower and upper bounds respectively of the percentile
+   * value given. For instance, quantileBounds(0.5) would give
+   * an estimate of the median.
+   */
   def quantileBounds(p: Double): (Double, Double) = {
     val rank = math.floor(count * p).toLong
+    // get is safe below, because findRankLowerBound only returns
+    // None if rank > count, but due to construction rank <= count
     (findRankLowerBound(rank).get, findRankUpperBound(rank).get)
   }
 
@@ -190,6 +227,10 @@ case class QTree[A](
     }
   }
 
+  /**
+   * Get the bounds on the sums within a range (not percentile)
+   * This along with the rangeCountBounds can tell you the mean over a range
+   */
   def rangeSumBounds(from: Double, to: Double)(implicit monoid: Monoid[A]): (A, A) = {
     if (from <= lowerBound && to >= upperBound) {
       val s = totalSum
@@ -204,6 +245,9 @@ case class QTree[A](
     }
   }
 
+  /**
+   * Return upper and lower bounds on the counts that appear in a given range
+   */
   def rangeCountBounds(from: Double, to: Double): (Long, Long) = {
     if (from <= lowerBound && to >= upperBound) {
       val s = count
@@ -217,6 +261,12 @@ case class QTree[A](
     }
   }
 
+  /**
+   * Users should never need to call this if they are adding QTrees using the Semigroup
+   * This makes sure no element in the tree has count less than
+   * the total count / 2^k. That means after this call there
+   * are at most 2^k nodes, but usually fewer.
+   */
   def compress(k: Int)(implicit m: Monoid[A]): QTree[A] = {
     val minCount = count >> k
     if ((minCount > 1L) || (count < 1L)) {
@@ -256,11 +306,19 @@ case class QTree[A](
     case n @ None => n // make sure we pass the same ref out
   }
 
+  /**
+   * How many total nodes are there in the QTree.
+   * Not meaningful for learning statistics, but interesting
+   * to estimate serialization size.
+   */
   def size: Int = {
     val childSizes = mapChildrenWithDefault(0){ _.size }
     1 + childSizes._1 + childSizes._2
   }
 
+  /**
+   * Total sum over the entire tree.
+   */
   def totalSum(implicit monoid: Monoid[A]): A = {
     val childSums = mapChildrenWithDefault(monoid.zero){ _.totalSum }
     monoid.plus(sum, monoid.plus(childSums._1, childSums._2))
@@ -276,6 +334,9 @@ case class QTree[A](
     count - childCounts._1 - childCounts._2
   }
 
+  /**
+   * A debug method that prints the QTree to standard out using print/println
+   */
   def dump {
     for (i <- (20 to level by -1))
       print(" ")
@@ -288,14 +349,20 @@ case class QTree[A](
     upperChild.foreach{ _.dump }
   }
 
-  def interQuartileMean(implicit n: Numeric[A]): (Double, Double) = {
-    implicit val monoid: Monoid[A] = Ring.numericRing[A]
+  /**
+   * This gives you the mean for the middle 50%-ile.
+   * This probably only makes sense if the Monoid[A] is
+   * equivalent to addition in Numeric[A], which is only
+   * used to convert to Double at the end
+   */
+  def interQuartileMean(implicit n: Numeric[A], m: Monoid[A]): (Double, Double) = {
     val (l25, u25) = quantileBounds(0.25)
     val (l75, u75) = quantileBounds(0.75)
-    val (ll, lu) = rangeSumBounds(l25, l75)
-    val (ul, uu) = rangeSumBounds(u25, u75)
-    val (llc, luc) = rangeCountBounds(l25, l75)
-    val (ulc, uuc) = rangeCountBounds(u25, u75)
+    val (ll, _) = rangeSumBounds(l25, l75)
+    val (_, uu) = rangeSumBounds(u25, u75)
+    // in the denominator, we chose the opposite to keep the bound:
+    val (_, luc) = rangeCountBounds(l25, l75)
+    val (ulc, _) = rangeCountBounds(u25, u75)
 
     (n.toDouble(ll) / luc, n.toDouble(uu) / ulc)
   }
