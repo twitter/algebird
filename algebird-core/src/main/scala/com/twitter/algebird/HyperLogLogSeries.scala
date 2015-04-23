@@ -16,7 +16,26 @@ limitations under the License.
 
 package com.twitter.algebird
 
+/**
+ * HLLSeries can produce a HyperLogLog counter for any window into the past,
+ * using a constant factor more space than HyperLogLog.
+ *
+ * For each hash bucket, rather than keeping a single max RhoW value, it keeps
+ * every RhoW value it has seen, and the max timestamp where it saw that value.
+ * This allows it to reconstruct an HLL as it would be had it started at zero at
+ * any given point in the past, and seen the same updates this structure has seen.
+ *
+ * @param bits The number of bits to use
+ * @param rows Vector of maps of RhoW -> max timestamp where it was seen
+ *
+ * @return  New HLLSeries
+ */
 case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
+  /**
+   * @param since Timestamp from which to reconstruct the HLL
+   *
+   * @return New HLLSeries only including RhoWs for values seen at or after the given timestamp
+   */
   def since(threshold: Long) =
     HLLSeries(
       bits,
@@ -32,6 +51,21 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
       }.reduce{ _ + _ }
 }
 
+/**
+ * =Example Usage=
+ *
+ * val hllSeriesMonoid = new HyperLogLogSeriesMonoid(bits)
+ *
+ * val examples: Seq[Array[Byte], Long]
+ * val series = examples
+ *                .map { case (bytes, timestamp) =>
+ *                  hllSeriesMonoid.create(bytes, timestamp)
+ *                }
+ *                .reduce { hllSeriesMonoid.plus(_,_) }
+ *
+ * val estimate1 = series.since(timestamp1.toLong).toHLL.estimatedSize
+ * val estimate2 = series.since(timestamp2.toLong).toHLL.estimatedSize
+ */
 class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
   import HyperLogLog._
 
