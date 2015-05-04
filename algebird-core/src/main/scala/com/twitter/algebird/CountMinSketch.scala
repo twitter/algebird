@@ -16,8 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.immutable.SortedSet
-
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -61,15 +59,30 @@ import scala.collection.immutable.SortedSet
 /**
  * Monoid for adding [[CMS]] sketches.
  *
+ * =Usage=
+ *
  * `eps` and `delta` are parameters that bound the error of each query estimate. For example, errors in
  * answering point queries (e.g., how often has element x appeared in the stream described by the sketch?)
  * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
  * some factor depending on eps."
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
+ *
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
+ * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
+ * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
+ * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
  * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
@@ -80,14 +93,14 @@ import scala.collection.immutable.SortedSet
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.  Other possibilities
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
-class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
+class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
 
   val params = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
@@ -109,7 +122,7 @@ class CMSMonoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int) e
   /**
    * Creates a sketch out of a single item.
    */
-  def create(item: K): CMS[K] = CMSItem[K](item, params)
+  def create(item: K): CMS[K] = CMSItem[K](item, 1L, params)
 
   /**
    * Creates a sketch out of multiple items.
@@ -338,22 +351,21 @@ trait CMSHeavyHitters[K] {
 
 object CMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] =
-    new CMSMonoid[K](eps, delta, seed)
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
+  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
     new CMSAggregator[K](monoid(eps, delta, seed))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
 
   /**
    * Returns a fresh, zeroed CMS instance.
    */
-  def apply[K: Ordering: CMSHasher](eps: Double, delta: Double, seed: Int): CMS[K] = {
+  def apply[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMS[K] = {
     val params = {
       val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
       CMSParams(hashes, eps, delta)
@@ -397,7 +409,7 @@ object CMS {
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class CMS[K: Ordering](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
+sealed abstract class CMS[K](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
 
   override val eps: Double = params.eps
 
@@ -410,11 +422,11 @@ sealed abstract class CMS[K: Ordering](val params: CMSParams[K]) extends java.io
 /**
  * Zero element.  Used for initialization.
  */
-case class CMSZero[K: Ordering](override val params: CMSParams[K]) extends CMS[K](params) {
+case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) {
 
   override val totalCount: Long = 0L
 
-  override def +(item: K, count: Long): CMS[K] = CMSInstance[K](params) + (item, count)
+  override def +(item: K, count: Long): CMS[K] = CMSItem[K](item, count, params)
 
   override def ++(other: CMS[K]): CMS[K] = other
 
@@ -427,9 +439,7 @@ case class CMSZero[K: Ordering](override val params: CMSParams[K]) extends CMS[K
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) extends CMS[K](params) {
-
-  override val totalCount: Long = 1L
+case class CMSItem[K](item: K, override val totalCount: Long, override val params: CMSParams[K]) extends CMS[K](params) {
 
   override def +(x: K, count: Long): CMS[K] = CMSInstance[K](params) + item + (x, count)
 
@@ -450,7 +460,7 @@ case class CMSItem[K: Ordering](item: K, override val params: CMSParams[K]) exte
 /**
  * The general Count-Min sketch structure, used for holding any number of elements.
  */
-case class CMSInstance[K: Ordering](countsTable: CMSInstance.CountsTable[K],
+case class CMSInstance[K](countsTable: CMSInstance.CountsTable[K],
   override val totalCount: Long,
   override val params: CMSParams[K]) extends CMS[K](params) {
 
@@ -517,7 +527,7 @@ object CMSInstance {
   /**
    * Initializes a [[CMSInstance]] with all zeroes, i.e. nothing has been counted yet.
    */
-  def apply[K: Ordering](params: CMSParams[K]): CMSInstance[K] = {
+  def apply[K](params: CMSParams[K]): CMSInstance[K] = {
     val countsTable = CountsTable[K](CMSFunctions.depth(params.delta), CMSFunctions.width(params.eps))
     CMSInstance[K](countsTable, 0, params)
   }
@@ -570,14 +580,14 @@ object CMSInstance {
     /**
      * Creates a new [[CountsTable]] with counts initialized to all zeroes.
      */
-    def apply[K: Ordering](depth: Int, width: Int): CountsTable[K] =
+    def apply[K](depth: Int, width: Int): CountsTable[K] =
       CountsTable[K](Vector.fill[Long](depth, width)(0L))
 
   }
 
 }
 
-case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
+case class TopCMSParams[K](logic: HeavyHittersLogic[K])
 
 /**
  * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
@@ -620,7 +630,7 @@ case class TopCMSParams[K: Ordering](logic: HeavyHittersLogic[K])
  *
  * @tparam K The type used to identify the elements to be counted.
  */
-sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[K])
+sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
   extends java.io.Serializable with CMSCounting[K, TopCMS] with CMSHeavyHitters[K] {
 
   override val eps: Double = cms.eps
@@ -645,8 +655,7 @@ sealed abstract class TopCMS[K: Ordering](val cms: CMS[K], params: TopCMSParams[
 /**
  * Zero element.  Used for initialization.
  */
-case class TopCMSZero[K: Ordering](override val cms: CMS[K], params: TopCMSParams[K])
-  extends TopCMS[K](cms, params) {
+case class TopCMSZero[K](override val cms: CMS[K], params: TopCMSParams[K]) extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set.empty[K]
 
@@ -659,8 +668,7 @@ case class TopCMSZero[K: Ordering](override val cms: CMS[K], params: TopCMSParam
 /**
  * Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.
  */
-case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: TopCMSParams[K])
-  extends TopCMS[K](cms, params) {
+case class TopCMSItem[K](item: K, override val cms: CMS[K], params: TopCMSParams[K]) extends TopCMS[K](cms, params) {
 
   override val heavyHitters: Set[K] = Set(item)
 
@@ -681,13 +689,13 @@ case class TopCMSItem[K: Ordering](item: K, override val cms: CMS[K], params: To
 
 object TopCMSInstance {
 
-  def apply[K: Ordering](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
+  def apply[K](cms: CMS[K], params: TopCMSParams[K]): TopCMSInstance[K] = {
     TopCMSInstance[K](cms, HeavyHitters.empty[K], params)
   }
 
 }
 
-case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
+case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], params: TopCMSParams[K])
   extends TopCMS[K](cms, params) {
 
   override def heavyHitters: Set[K] = hhs.items
@@ -715,7 +723,7 @@ case class TopCMSInstance[K: Ordering](override val cms: CMS[K], hhs: HeavyHitte
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
-abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
+abstract class HeavyHittersLogic[K] extends java.io.Serializable {
 
   def updateHeavyHitters(oldCms: CMS[K], newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
@@ -746,13 +754,13 @@ abstract class HeavyHittersLogic[K: Ordering] extends java.io.Serializable {
  * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
  * This parameter can thus control the memory footprint required for tracking heavy hitters.
  */
-case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
+case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
 
   require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val minCount = heavyHittersPct * cms.totalCount
-    HeavyHitters[K](hitters.hhs.dropWhile { _.count < minCount })
+    HeavyHitters[K](hitters.hhs.filter { _.count >= minCount })
   }
 
 }
@@ -768,12 +776,13 @@ case class TopPctLogic[K: Ordering](heavyHittersPct: Double) extends HeavyHitter
  *
  * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
  */
-case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[K] {
+case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
-    HeavyHitters[K](hitters.hhs.takeRight(heavyHittersN))
+    val sorted = hitters.hhs.toSeq.sortBy(hh => hh.count).takeRight(heavyHittersN)
+    HeavyHitters[K](sorted.toSet)
   }
 
 }
@@ -781,7 +790,7 @@ case class TopNLogic[K: Ordering](heavyHittersN: Int) extends HeavyHittersLogic[
 /**
  * Containers for holding heavy hitter items and their associated counts.
  */
-case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends java.io.Serializable {
+case class HeavyHitters[K](hhs: Set[HeavyHitter[K]]) extends java.io.Serializable {
 
   def -(hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters[K](hhs - hh)
 
@@ -795,34 +804,40 @@ case class HeavyHitters[K: Ordering](hhs: SortedSet[HeavyHitter[K]]) extends jav
 
 object HeavyHitters {
 
-  def empty[K: Ordering]: HeavyHitters[K] = HeavyHitters(emptyHhs)
+  def empty[K]: HeavyHitters[K] = HeavyHitters(emptyHhs)
 
-  private def emptyHhs[K: Ordering]: SortedSet[HeavyHitter[K]] = {
-    implicit val heavyHitterOrdering = HeavyHitter.ordering[K]
-    SortedSet[HeavyHitter[K]]()
-  }
+  private def emptyHhs[K]: Set[HeavyHitter[K]] = Set[HeavyHitter[K]]()
 
-  def from[K: Ordering](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = HeavyHitters(hhs.foldLeft(emptyHhs)(_ + _))
+  def from[K](hhs: Set[HeavyHitter[K]]): HeavyHitters[K] = hhs.foldLeft(empty[K])(_ + _)
 
-  def from[K: Ordering](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
+  def from[K](hh: HeavyHitter[K]): HeavyHitters[K] = HeavyHitters(emptyHhs + hh)
 
 }
 
 case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
 
-object HeavyHitter {
-
-  def ordering[K: Ordering]: Ordering[HeavyHitter[K]] = Ordering.by { hh: HeavyHitter[K] => (hh.count, hh.item) }
-
-}
-
 /**
  * Monoid for Top-% based [[TopCMS]] sketches.
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * =Usage=
+ *
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
+ *
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
+ * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
+ * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
+ * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
  * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
  * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
@@ -831,12 +846,12 @@ object HeavyHitter {
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
+class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopPctLogic[K](heavyHittersPct)
@@ -871,25 +886,25 @@ class TopPctCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersPct: Double = 0.01) 
 
 object TopPctCMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double,
+  def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int,
+  def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
+  def aggregator[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
+  def aggregator[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersPct: Double): TopPctCMSAggregator[K] =
@@ -900,10 +915,15 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
   def monoid = cmsMonoid
+
   def prepare(value: K): TopCMS[K] = monoid.create(value)
+
   def present(cms: TopCMS[K]): TopCMS[K] = cms
+
 }
 
 /**
@@ -934,10 +954,23 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidA
  *
  * =Usage=
  *
- * Implicit conversions for commonly used types for `K` such as [[Long]] and [[BigInt]]:
+ * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
+ * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]]:
+ *
  * {{{
  * import com.twitter.algebird.CMSHasherImplicits._
  * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
+ *
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
+ * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
+ * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
+ * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
  * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
  * @param heavyHittersN The maximum number of heavy hitters to track.
@@ -945,12 +978,12 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends MonoidA
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
  *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require [[Ordering]] and [[CMSHasher]] context bounds for `K`, see [[CMSHasherImplicits]] for available
- *           implicits that can be imported.
+ *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
+ *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
+class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
 
   val params: TopCMSParams[K] = {
     val logic = new TopNLogic[K](heavyHittersN)
@@ -983,25 +1016,25 @@ class TopNCMSMonoid[K: Ordering](cms: CMS[K], heavyHittersN: Int = 100) extends 
 
 object TopNCMS {
 
-  def monoid[K: Ordering: CMSHasher](eps: Double,
+  def monoid[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     new TopNCMSMonoid[K](CMS(eps, delta, seed), heavyHittersN)
 
-  def monoid[K: Ordering: CMSHasher](depth: Int,
+  def monoid[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
-  def aggregator[K: Ordering: CMSHasher](eps: Double,
+  def aggregator[K: CMSHasher](eps: Double,
     delta: Double,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
     new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
 
-  def aggregator[K: Ordering: CMSHasher](depth: Int,
+  def aggregator[K: CMSHasher](depth: Int,
     width: Int,
     seed: Int,
     heavyHittersN: Int): TopNCMSAggregator[K] =
@@ -1014,6 +1047,7 @@ object TopNCMS {
  */
 case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
   extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
   val monoid = cmsMonoid
 
   def prepare(value: K): TopCMS[K] = monoid.create(value)
@@ -1027,15 +1061,64 @@ case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
  * family of the form:
  *
  * `h(x) = [a * x + b (mod p)] (mod m)`
+ *
+ * As a requirement for using CMS you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to
+ * count.  Algebird ships with several such implicits for commonly used types `K` such as [[Long]] and [[BigInt]]:
+ *
+ * {{{
+ * import com.twitter.algebird.CMSHasherImplicits._
+ * }}}
+ *
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
+ * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of `contramap`
+ * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
+ * starting point.
  */
 trait CMSHasher[K] extends java.io.Serializable {
 
-  val PRIME_MODULUS = Int.MaxValue
+  self =>
 
   /**
    * Returns `a * x + b (mod p) (mod width)`.
    */
   def hash(a: Int, b: Int, width: Int)(x: K): Int
+
+  /**
+   * Given `f`, a function from `L` into `K`, creates a `CMSHasher[L]` whose hash function is equivalent to:
+   *
+   * {{{
+   * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
+   * }}}
+   */
+  def on[L](f: L => K) = new CMSHasher[L] {
+    override def hash(a: Int, b: Int, width: Int)(x: L): Int = self.hash(a, b, width)(f(x))
+  }
+
+  /**
+   * Given `f`, a function from `L` into `K`, creates a `CMSHasher[L]` whose hash function is equivalent to:
+   *
+   * {{{
+   * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
+   * }}}
+   *
+   * Be aware that the use of contramap may come at a cost (e.g. increased time) due to the translation calls between
+   * `K` and `L`.
+   *
+   * =Usage=
+   *
+   * The following example creates a CMSHasher for the unsupported type `K=Double`:
+   *
+   * {{{
+   * def f(d: Double): Array[Byte] = {
+   *   val l: Long = java.lang.Double.doubleToLongBits(d)
+   *   java.nio.ByteBuffer.allocate(8).putLong(l).array()
+   * }
+   *
+   * implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => f(d))
+   * }}}
+   */
+  def contramap[L](f: L => K) = on(f)
 
 }
 
@@ -1060,64 +1143,68 @@ object CMSHasherImplicits {
       // Apparently a super fast way of computing x mod 2^p-1
       // See page 149 of http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
       // after Proposition 7.
-      val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
+      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
       // Modulo-ing integers is apparently twice as fast as modulo-ing Longs.
       modded.toInt % width
     }
 
   }
 
-  implicit object CMSHasherShort extends CMSHasher[Short] {
-
-    override def hash(a: Int, b: Int, width: Int)(x: Short): Int = CMSHasherInt.hash(a, b, width)(x)
-
-  }
+  implicit val cmsHasherShort: CMSHasher[Short] = CMSHasherInt.contramap(x => x.toInt)
 
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
     override def hash(a: Int, b: Int, width: Int)(x: Int): Int = {
       val unModded: Int = (x * a) + b
-      val modded: Long = (unModded + (unModded >> 32)) & PRIME_MODULUS
+      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
       modded.toInt % width
     }
 
   }
 
+  /**
+   * =Implementation details=
+   *
+   * This hash function is based upon Murmur3.  Note that the original CMS paper requires
+   * `d` (depth) pair-wise independent hash functions;  in the specific case of Murmur3 we argue that it is sufficient
+   * to pass `d` different seed values to Murmur3 to achieve a similar effect.
+   *
+   * To seed Murmur3 we use only `a`, which is a randomly drawn `Int` via [[scala.util.Random]] in the CMS code.
+   * What is important to note is that we intentionally ignore `b`.  Why?  We need to ensure that we seed Murmur3 with
+   * a random value, notably one that is uniformly distributed.  Somewhat surprisingly, combining two random values
+   * (such as `a` and `b` in our case) typically worsens the "randomness" of the combination, i.e. the combination is
+   * less uniformly distributed as either of its original inputs.  Hence the combination of two random values is
+   * discouraged in this context, notably if the two random inputs were generated from the same source anyways, which
+   * is the case for us because we use Scala's PRNG only.
+   *
+   * For further details please refer to the discussion
+   * [[http://stackoverflow.com/questions/3956478/understanding-randomness Understanding Randomness]] on
+   * StackOverflow.
+   *
+   * @param a Must be a random value, typically created via [[scala.util.Random]].
+   * @param b Ignored by this particular hash function, see the reasoning above for the justification.
+   * @param width Width of the CMS counting table, i.e. the width/size of each row in the counting table.
+   * @param x Item to be hashed.
+   * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
+   */
+  private def hashBytes(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
+    val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
+    // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+    // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+    val positiveHash = hash & Int.MaxValue
+    positiveHash % width
+  }
+
   implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
+    override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int = hashBytes(a, b, width)(x.toByteArray)
+  }
 
-    /**
-     * =Implementation details=
-     *
-     * This hash function is based upon Murmur3.  Note that the original CMS paper requires
-     * `d` (depth) pair-wise independent hash functions;  in the specific case of Murmur3 we argue that it is sufficient
-     * to pass `d` different seed values to Murmur3 to achieve a similar effect.
-     *
-     * To seed Murmur3 we use only `a`, which is a randomly drawn `Int` via [[scala.util.Random]] in the CMS code.
-     * What is important to note is that we intentionally ignore `b`.  Why?  We need to ensure that we seed Murmur3 with
-     * a random value, notably one that is uniformly distributed.  Somewhat surprisingly, combining two random values
-     * (such as `a` and `b` in our case) typically worsens the "randomness" of the combination, i.e. the combination is
-     * less uniformly distributed as either of its original inputs.  Hence the combination of two random values is
-     * discouraged in this context, notably if the two random inputs were generated from the same source anyways, which
-     * is the case for us because we use Scala's PRNG only.
-     *
-     * For further details please refer to the discussion
-     * [[http://stackoverflow.com/questions/3956478/understanding-randomness Understanding Randomness]] on
-     * StackOverflow.
-     *
-     * @param a Must be a random value, typically created via [[scala.util.Random]].
-     * @param b Ignored by this particular hash function, see the reasoning above for the justification.
-     * @param width Width of the CMS counting table, i.e. the width/size of each row in the counting table.
-     * @param x Item to be hashed.
-     * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
-     */
-    override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int = {
-      val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
-      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
-      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
-      val positiveHash = hash & Int.MaxValue
-      positiveHash % width
-    }
+  implicit object CMSHasherString extends CMSHasher[String] {
+    override def hash(a: Int, b: Int, width: Int)(x: String): Int = hashBytes(a, b, width)(x.getBytes("UTF-8"))
+  }
 
+  implicit object CMSHasherBytes extends CMSHasher[Bytes] {
+    override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int = hashBytes(a, b, width)(x.array)
   }
 
 }

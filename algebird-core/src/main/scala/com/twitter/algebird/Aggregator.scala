@@ -316,12 +316,55 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     }
   }
 
+  /**
+   * Build a MonoidAggregator that either takes left or right input
+   * and outputs the pair from both
+   */
+  def either[A2, B2, C2](that: MonoidAggregator[A2, B2, C2]): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
+    new MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] {
+      def prepare(e: Either[A, A2]) = e match {
+        case Left(a) => (self.prepare(a), that.monoid.zero)
+        case Right(a2) => (self.monoid.zero, that.prepare(a2))
+      }
+      val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
+      def present(bs: (B, B2)) = (self.present(bs._1), that.present(bs._2))
+    }
+
+  /**
+   * Only aggregate items that match a predicate
+   */
+  def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
+    new MonoidAggregator[A1, B, C] {
+      def prepare(a: A1) = if (pred(a)) self.prepare(a) else self.monoid.zero
+      def monoid = self.monoid
+      def present(b: B) = self.present(b)
+    }
+  /**
+   * This maps the inputs to Bs, then sums them, effectively flattening
+   * the inputs to the MonoidAggregator
+   */
   def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
     new MonoidAggregator[TraversableOnce[A], B, C] {
       def monoid: Monoid[B] = self.monoid
       def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
       def present(reduction: B): C = self.present(reduction)
     }
+
+  /**
+   * This allows you to join two aggregators into one that takes a tuple input,
+   * which in turn allows you to chain .composePrepare onto the result if you have
+   * an initial input that has to be prepared differently for each of the joined aggregators.
+   *
+   * The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+   */
+  def zip[A2, B2, C2](ag2: MonoidAggregator[A2, B2, C2]): MonoidAggregator[(A, A2), (B, B2), (C, C2)] = {
+    val ag1 = self
+    new MonoidAggregator[(A, A2), (B, B2), (C, C2)] {
+      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
+      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+    }
+  }
 }
 
 trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {

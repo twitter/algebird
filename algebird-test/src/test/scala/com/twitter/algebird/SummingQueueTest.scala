@@ -32,9 +32,11 @@ class SummingCacheTest extends CheckProperties {
   // Get the zero-aware map equiv
   import SummingIteratorTest.mapEquiv
 
+  def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K, V]] = SummingCache[K, V](c.cap)
+
   // Maps are tricky to compare equality for since zero values are often removed
   def test[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
-    val sc = SummingCache[K, V](c.cap)
+    val sc = newCache[K, V](c)
     val mitems = items.map { Map(_) }
     implicit val mapEq = mapEquiv[K, V]
     StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
@@ -52,6 +54,12 @@ class SummingCacheTest extends CheckProperties {
       test(c, items)
     }
   }
+}
+
+class AdaptiveCacheTest extends SummingCacheTest {
+  import SummingCacheTest._
+
+  override def newCache[K, V: Monoid](c: Capacity) = new AdaptiveCache[K, V](c.cap)
 }
 
 class SummingWithHitsCacheTest extends SummingCacheTest {

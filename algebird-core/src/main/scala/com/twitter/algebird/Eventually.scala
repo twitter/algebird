@@ -168,3 +168,38 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit 
   }
 
 }
+
+trait AbstractEventuallyAggregator[A, E, O, C]
+  extends Aggregator[A, Either[E, O], C] {
+  def prepare(a: A) = Right(rightAggregator.prepare(a))
+  def present(b: Either[E, O]) = b match {
+    case Right(o) => rightAggregator.present(o)
+    case Left(e) => presentLeft(e)
+  }
+
+  def presentLeft(e: E): C
+
+  def convert(o: O): E
+  def mustConvert(o: O): Boolean
+
+  def leftSemigroup: Semigroup[E]
+  def rightAggregator: Aggregator[A, O, C]
+}
+
+trait EventuallyAggregator[A, E, O, C]
+  extends AbstractEventuallyAggregator[A, E, O, C] {
+
+  //avoid init order issues and cyclical references
+  @transient lazy val semigroup =
+    new EventuallySemigroup[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.semigroup)
+}
+
+trait EventuallyMonoidAggregator[A, E, O, C]
+  extends AbstractEventuallyAggregator[A, E, O, C]
+  with MonoidAggregator[A, Either[E, O], C] {
+
+  def rightAggregator: MonoidAggregator[A, O, C]
+
+  @transient lazy val monoid =
+    new EventuallyMonoid[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.monoid)
+}

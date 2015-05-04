@@ -228,7 +228,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       testDownsize(10)(10, 7)
       testDownsize(10)(14, 4)
       testDownsize(10)(12, 12)
-      
+
       intercept[IllegalArgumentException] {
         testDownsize(10)(9, 13)
       }
@@ -253,6 +253,36 @@ class HyperLogLogTest extends WordSpec with Matchers {
     def verifySerialization(h: HLL) {
       assert(fromBytes(toBytes(h)) == h)
       fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
+    }
+  }
+
+  "SetSizeAggregator" should {
+    "work as an Aggregator and return exact size when <= maxSetSize" in {
+      List(5, 7, 10).foreach(i => {
+        val maxSetSize = 10000
+        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
+
+        val maxUniqueDataSize = maxSetSize / 2
+        val data = (0 to maxUniqueDataSize).map { _ => r.nextInt(1000) }
+        val exact = exactCount(data).toDouble
+        val result = aggregator(data)
+        assert(result == exact)
+      })
+    }
+
+    "work as an Aggregator and return approximate size when > maxSetSize" in {
+      List(5, 7, 10).foreach(i => {
+        val maxSetSize = 10000
+        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
+
+        val maxUniqueDataSize = maxSetSize + i
+        val data = 0 to maxUniqueDataSize
+        val exact = exactCount(data).toDouble
+
+        val estimate = aggregator(data)
+        assert(estimate != exact)
+        assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(i))
+      })
     }
   }
 }

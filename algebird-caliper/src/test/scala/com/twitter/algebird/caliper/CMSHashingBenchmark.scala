@@ -1,6 +1,6 @@
 package com.twitter.algebird.caliper
 
-import com.google.caliper.{Param, SimpleBenchmark}
+import com.google.caliper.{ Param, SimpleBenchmark }
 
 /**
  * Benchmarks the hashing algorithms used by Count-Min sketch for CMS[BigInt].
@@ -33,7 +33,7 @@ class CMSHashingBenchmark extends SimpleBenchmark {
   /**
    * Width of the counting table.
    */
-  @Param(Array("11" /* eps = 0.271 */ , "544" /* eps = 0.005 */ , "2719" /* eps = 1E-3 */ , "271829" /* eps = 1E-5 */))
+  @Param(Array("11" /* eps = 0.271 */ , "544" /* eps = 0.005 */ , "2719" /* eps = 1E-3 */ , "271829" /* eps = 1E-5 */ ))
   val width: Int = 0
 
   /**
@@ -54,7 +54,7 @@ class CMSHashingBenchmark extends SimpleBenchmark {
   override def setUp() {
     random = new scala.util.Random
     // We draw numbers randomly from a 2^maxBits address space.
-    inputs = (1 to operations).view.map { _ => scala.math.BigInt(maxBits, random)}
+    inputs = (1 to operations).view.map { _ => scala.math.BigInt(maxBits, random) }
   }
 
   private def murmurHashScala(a: Int, b: Int, width: Int)(x: BigInt) = {
@@ -82,7 +82,7 @@ class CMSHashingBenchmark extends SimpleBenchmark {
   def timeBrokenCurrentHashWithRandomMaxBitsNumbers(operations: Int): Int = {
     var dummy = 0
     while (dummy < operations) {
-      inputs.foreach { input => brokenCurrentHash(a, b, width)(input)}
+      inputs.foreach { input => brokenCurrentHash(a, b, width)(input) }
       dummy += 1
     }
     dummy
@@ -91,7 +91,7 @@ class CMSHashingBenchmark extends SimpleBenchmark {
   def timeMurmurHashScalaWithRandomMaxBitsNumbers(operations: Int): Int = {
     var dummy = 0
     while (dummy < operations) {
-      inputs.foreach { input => murmurHashScala(a, b, width)(input)}
+      inputs.foreach { input => murmurHashScala(a, b, width)(input) }
       dummy += 1
     }
     dummy
