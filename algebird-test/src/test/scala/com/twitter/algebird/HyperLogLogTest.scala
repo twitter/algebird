@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Gen, Arbitrary, Prop }
 
 import scala.collection.BitSet
 
@@ -51,6 +51,12 @@ class HyperLogLogLaws extends CheckProperties {
     monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
   }
 
+  property("bitsForError and error match") {
+    Prop.forAll(Gen.choose(0.0001, 0.999)) { err =>
+      val bits = HyperLogLog.bitsForError(err)
+      (HyperLogLog.error(bits) <= err) && (HyperLogLog.error(bits - 1) > err)
+    }
+  }
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
