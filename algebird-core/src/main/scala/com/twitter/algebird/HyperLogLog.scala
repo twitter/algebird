@@ -46,6 +46,10 @@ object HyperLogLog {
   def hash(input: Array[Byte]): Array[Byte] = {
     val seed = 12345678
     val (l0, l1) = MurmurHash128(seed)(input)
+    pairLongs2Bytes(l0, l1)
+  }
+
+  private[algebird] def pairLongs2Bytes(l0: Long, l1: Long): Array[Byte] = {
     val buf = new Array[Byte](16)
     ByteBuffer
       .wrap(buf)
@@ -547,7 +551,16 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
     }
 
   def create(example: Array[Byte]): HLL = {
-    val hashed = hash(example)
+    val hashBytes = hash(example)
+    createFromHashBytes(hashBytes)
+  }
+
+  def createFromHashLongs(l0: Long, l1: Long): HLL = {
+    val hashBytes = pairLongs2Bytes(l0, l1)
+    createFromHashBytes(hashBytes)
+  }
+
+  def createFromHashBytes(hashed: Array[Byte]): HLL = {
     val (j, rhow) = jRhoW(hashed, bits)
     SparseHLL(bits, Map(j -> Max(rhow)))
   }
