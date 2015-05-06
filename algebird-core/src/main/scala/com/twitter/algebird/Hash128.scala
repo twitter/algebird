@@ -36,6 +36,8 @@ trait Hash128[-K] {
  * lest we break serialized HLLs)
  */
 object Hash128 {
+  def hash[K](k: K)(implicit h: Hash128[K]): (Long, Long) = h.hash(k)
+
   val DefaultSeed = 12345678L
 
   def murmur128ArrayByte(seed: Long): Hash128[Array[Byte]] = new Hash128[Array[Byte]] {
@@ -54,7 +56,7 @@ object Hash128 {
    * but has been more commonly used in HLL.
    */
   def murmur128Utf8String(seed: Long): Hash128[String] =
-    murmur128Array(seed).contramap(_.getBytes("UTF-8"))
+    murmur128ArrayByte(seed).contramap(_.getBytes("UTF-8"))
 
   def murmur128Int(seed: Long): Hash128[Int] = new Hash128[Int] {
     def hash(k: Int) = MurmurHash128(seed)(k)

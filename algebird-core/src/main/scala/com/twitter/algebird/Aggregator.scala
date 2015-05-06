@@ -120,6 +120,14 @@ object Aggregator extends java.io.Serializable {
    */
   def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
     toSet[T].andThenPresent(_.size)
+
+  /**
+   * This uses an exact set for up to 100 items,
+   * then HyperLogLog (HLL) with an 1.2% standard error which uses at most 8192 bytes
+   * for each HLL. For more control, see HyperLogLogAggregator.
+   */
+  def approximateUniqueCount[T: Hash128]: MonoidAggregator[T, Either[HLL, Set[T]], Long] =
+    SetSizeHashAggregator[T](hllBits = 13, maxSetSize = 100)
 }
 
 /**

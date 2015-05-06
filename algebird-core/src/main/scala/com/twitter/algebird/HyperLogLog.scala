@@ -44,8 +44,7 @@ object HyperLogLog {
   val hashSize = 128
 
   def hash(input: Array[Byte]): Array[Byte] = {
-    val seed = 12345678
-    val (l0, l1) = MurmurHash128(seed)(input)
+    val (l0, l1) = Hash128.arrayByteHash.hash(input)
     pairLongs2Bytes(l0, l1)
   }
 
@@ -520,6 +519,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
 
   val size = 1 << bits
 
+  @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
   def apply[T <% Array[Byte]](t: T) = create(t)
 
   val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
@@ -565,6 +565,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
     SparseHLL(bits, Map(j -> Max(rhow)))
   }
 
+  @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
   def batchCreate[T <% Array[Byte]](instances: Iterable[T]): HLL = {
     val allMaxRhow = instances
       .map { x => jRhoW(hash(x), bits) }
@@ -575,6 +576,11 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
     } else {
       SparseHLL(bits, allMaxRhow).toDenseHLL
     }
+  }
+
+  def toHLL[K](k: K)(implicit hash128: Hash128[K]): HLL = {
+    val (a, b) = hash128.hash(k)
+    createFromHashLongs(a, b)
   }
 
   final def estimateSize(hll: HLL): Double = {
@@ -607,6 +613,9 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
   }
 }
 
+/**
+ * This object makes it easier to create Aggregator instances that use HLL
+ */
 object HyperLogLogAggregator {
   def apply(bits: Int): HyperLogLogAggregator = {
     val monoid = new HyperLogLogMonoid(bits)
@@ -618,7 +627,7 @@ object HyperLogLogAggregator {
    * approximate data structure itself. This is convenient, but cannot
    * be combined later with another unique count like an HLL could.
    *
-   * @param bits is the log of the size the HLL. See:
+   * @param bits is the log of the size the HLL.
    */
   def sizeAggregator(bits: Int): MonoidAggregator[Array[Byte], HLL, Double] =
     apply(bits).andThenPresent(_.estimatedSize)
@@ -635,13 +644,29 @@ object HyperLogLogAggregator {
    *
    * Cutting the error in half takes 4x the size.
    */
-  def withError(err: Double): HyperLogLogAggregator = apply(HyperLogLog.bitsForError(err))
+  def withError[K: Hash128](err: Double): GenHLLAggregator[K] =
+    withBits(HyperLogLog.bitsForError(err))
+
+  /**
+   * This creates an HLL for type K, that uses (2^bits) bytes to store
+   */
+  def withBits[K](bits: Int)(implicit hash128: Hash128[K]): GenHLLAggregator[K] = {
+    val monoid = new HyperLogLogMonoid(bits)
+    GenHLLAggregator(monoid, hash128)
+  }
   /**
    * Give an approximate set size (not the HLL) based on inputs of Array[Byte]
    * see HyperLogLog.bitsForError for a size table based on the error
+   * see SetSizeHashAggregator for a version that uses exact sets up to a given size
    */
-  def sizeWithError(err: Double): MonoidAggregator[Array[Byte], HLL, Double] =
-    withError(err).andThenPresent(_.estimatedSize)
+  def sizeWithError[K](err: Double)(implicit hash128: Hash128[K]): MonoidAggregator[K, HLL, Long] =
+    withError(err).andThenPresent(_.estimatedSize.toLong)
+}
+
+case class GenHLLAggregator[K](val hllMonoid: HyperLogLogMonoid, val hash: Hash128[K]) extends MonoidAggregator[K, HLL, HLL] {
+  def monoid = hllMonoid
+  def prepare(k: K) = hllMonoid.toHLL(k)(hash)
+  def present(hll: HLL) = hll
 }
 
 case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends MonoidAggregator[Array[Byte], HLL, HLL] {
@@ -658,6 +683,18 @@ case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toB
 
   def mustConvert(set: Set[A]) = set.size > maxSetSize
   def convert(set: Set[A]) = leftSemigroup.batchCreate(set.map(toBytes))
+
+  val leftSemigroup = new HyperLogLogMonoid(hllBits)
+  val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
+}
+
+case class SetSizeHashAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit hash: Hash128[A])
+  extends EventuallyMonoidAggregator[A, HLL, Set[A], Long] {
+
+  def presentLeft(hll: HLL) = hll.approximateSize.estimate
+
+  def mustConvert(set: Set[A]) = set.size > maxSetSize
+  def convert(set: Set[A]) = leftSemigroup.sum(set.iterator.map { a => leftSemigroup.toHLL(a)(hash) })
 
   val leftSemigroup = new HyperLogLogMonoid(hllBits)
   val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
