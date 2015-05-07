@@ -676,26 +676,31 @@ case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid) extends Monoi
   def present(hll: HLL) = hll
 }
 
-case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
+/**
+ * convert is not not implemented here
+ */
+abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
   extends EventuallyMonoidAggregator[A, HLL, Set[A], Long] {
 
   def presentLeft(hll: HLL) = hll.approximateSize.estimate
 
   def mustConvert(set: Set[A]) = set.size > maxSetSize
-  def convert(set: Set[A]) = leftSemigroup.batchCreate(set.map(toBytes))
 
   val leftSemigroup = new HyperLogLogMonoid(hllBits)
   val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
 }
 
+case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
+  extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
+  def convert(set: Set[A]) = leftSemigroup.batchCreate(set.map(toBytes))
+}
+
+/**
+ * Use a Hash128 when converting to HLL, rather than an implicit conversion to Array[Byte]
+ * Unifying with SetSizeAggregator would be nice, but since they only differ in an implicit
+ * parameter, scala seems to be giving me errors.
+ */
 case class SetSizeHashAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit hash: Hash128[A])
-  extends EventuallyMonoidAggregator[A, HLL, Set[A], Long] {
-
-  def presentLeft(hll: HLL) = hll.approximateSize.estimate
-
-  def mustConvert(set: Set[A]) = set.size > maxSetSize
+  extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
   def convert(set: Set[A]) = leftSemigroup.sum(set.iterator.map { a => leftSemigroup.toHLL(a)(hash) })
-
-  val leftSemigroup = new HyperLogLogMonoid(hllBits)
-  val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
 }
