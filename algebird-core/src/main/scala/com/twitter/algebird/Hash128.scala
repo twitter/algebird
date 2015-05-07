@@ -20,7 +20,7 @@ package com.twitter.algebird
  * A typeclass to represent hashing to 128 bits.
  * Used for HLL, but possibly other applications
  */
-trait Hash128[-K] {
+trait Hash128[-K] extends java.io.Serializable {
   def hash(k: K): (Long, Long)
   def contramap[L](fn: L => K): Hash128[L] = {
     val self = this
@@ -35,7 +35,7 @@ trait Hash128[-K] {
  * of 12345678 (for no good reason, but it should not be changed
  * lest we break serialized HLLs)
  */
-object Hash128 {
+object Hash128 extends java.io.Serializable {
   def hash[K](k: K)(implicit h: Hash128[K]): (Long, Long) = h.hash(k)
 
   val DefaultSeed = 12345678L
