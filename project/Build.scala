@@ -148,7 +148,7 @@ object AlgebirdBuild extends Build {
    * use cappi::benchmarkOnly com.twitter.algebird.caliper.HllBenchmark
    */
   lazy val algebirdCaliper = module("caliper").settings(
-     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.7.2"),
+     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.8.0"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
       fork in run := true
     ).settings(cappiSettings : _*).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
@@ -158,7 +158,7 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.7.2"
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.8.0"
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 }
 
