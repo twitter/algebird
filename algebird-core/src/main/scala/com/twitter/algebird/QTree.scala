@@ -370,6 +370,6 @@ case class QTree[A](
 
 case class QTreeAggregator(percentile: Double, k: Int) extends Aggregator[Double, QTree[Double], (Double, Double)] {
   def prepare(input: Double) = QTree(input)
-  def semigroup = new QTreeSemigroup[Double](2)
+  def semigroup = new QTreeSemigroup[Double](k)
   def present(qt: QTree[Double]) = qt.quantileBounds(percentile)
 }
