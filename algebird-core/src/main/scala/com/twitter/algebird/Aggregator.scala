@@ -120,6 +120,13 @@ object Aggregator extends java.io.Serializable {
    */
   def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
     toSet[T].andThenPresent(_.size)
+
+  /**
+   * Returns the bounds of a given percentile where the percentile is between (0,1]
+   * The items that are iterated over cannot be negative.
+   */
+  def approximatePercentileBounds(percentile: Double, k: Int): QTreeAggregator =
+    QTreeAggregator(percentile, k)
 }
 
 /**

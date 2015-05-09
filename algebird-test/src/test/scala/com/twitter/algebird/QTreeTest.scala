@@ -69,6 +69,14 @@ class QTreeTest extends WordSpec with Matchers {
     list.filter{ _ >= from }.filter{ _ < to }.sum
   }
 
+  def aggregate(list: Seq[Double], agg: QTreeAggregator): (Double, Double) = {
+    val r = list
+      .map(agg.prepare(_))
+      .reduce(agg.semigroup.plus(_, _))
+
+    agg.present(r)
+  }
+
   for (k <- (1 to 6))
     ("QTree with sizeHint 2^" + k) should {
       "always contain the true quantile within its bounds" in {
@@ -96,4 +104,15 @@ class QTreeTest extends WordSpec with Matchers {
         assert(qt.size <= (1 << (k + 2)))
       }
     }
+
+  ("A QTreeAggregator") should {
+    for (quantile <- List(0, .01, .5, .777777777, .99))
+      "work as an aggregator with a small stream with quantile set as " + quantile in {
+        val list = randomList(10000)
+        val (lower, upper) = aggregate(list, QTreeAggregator(quantile, 3))
+        val truth = trueQuantile(list, quantile)
+        assert(truth >= lower)
+        assert(truth <= upper)
+      }
+  }
 }
