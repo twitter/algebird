@@ -368,8 +368,29 @@ case class QTree[A](
   }
 }
 
-case class QTreeAggregator(percentile: Double, k: Int) extends Aggregator[Double, QTree[Double], (Double, Double)] {
-  def prepare(input: Double) = QTree(input)
-  def semigroup = new QTreeSemigroup[Double](k)
+trait QTreeAggregatorLike[T] {
+  val percentile: Double
+  val k: Int
+  implicit val num: Numeric[T]
+
+  def prepare(input: T) = QTree(num.toDouble(input))
+  val semigroup = new QTreeSemigroup[Double](k)
+}
+
+object QTreeAggregator {
+  val DefaultK = 9
+}
+
+case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Double], (Double, Double)]
+  with QTreeAggregatorLike[T] {
+
   def present(qt: QTree[Double]) = qt.quantileBounds(percentile)
+}
+
+case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Double], Double]
+  with QTreeAggregatorLike[T] {
+
+  def present(qt: QTree[Double]) = qt.quantileBounds(percentile)._1
 }

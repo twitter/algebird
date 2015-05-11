@@ -59,7 +59,7 @@ class QTreeTest extends WordSpec with Matchers {
     list.map{ QTree(_) }.reduce{ qtSemigroup.plus(_, _) }
   }
 
-  def trueQuantile(list: Seq[Double], q: Double) = {
+  def trueQuantile[T: Numeric](list: Seq[T], q: Double): T = {
     val rank = math.floor(q * list.size).toInt
     val sorted = list.toList.sorted
     sorted(rank)
@@ -69,7 +69,8 @@ class QTreeTest extends WordSpec with Matchers {
     list.filter{ _ >= from }.filter{ _ < to }.sum
   }
 
-  def aggregate(list: Seq[Double], agg: QTreeAggregator): (Double, Double) = {
+  def aggregate[T](list: Seq[T], quantile: Double)(implicit num: Numeric[T]): (Double, Double) = {
+    val agg = QTreeAggregator(quantile)
     val r = list
       .map(agg.prepare(_))
       .reduce(agg.semigroup.plus(_, _))
@@ -105,14 +106,21 @@ class QTreeTest extends WordSpec with Matchers {
       }
     }
 
-  ("A QTreeAggregator") should {
-    for (quantile <- List(0, .01, .5, .777777777, .99))
-      "work as an aggregator with a small stream with quantile set as " + quantile in {
+  for (quantile <- List(0, .05, .5, .777777777, .95))
+    ("A QTreeAggregator with quantile set as " + quantile) should {
+      "work as an aggregator for doubles with a small stream" in {
         val list = randomList(10000)
-        val (lower, upper) = aggregate(list, QTreeAggregator(quantile, 3))
+        val (lower, upper) = aggregate(list, quantile)
         val truth = trueQuantile(list, quantile)
         assert(truth >= lower)
         assert(truth <= upper)
       }
-  }
+      "work as an aggregator for longs with a small stream" in {
+        val list = randomList(10000).map(i => (i * 1000l).toLong)
+        val (lower, upper) = aggregate(list, quantile)
+        val truth = trueQuantile(list, quantile)
+        assert(truth >= lower)
+        assert(truth <= upper)
+      }
+    }
 }

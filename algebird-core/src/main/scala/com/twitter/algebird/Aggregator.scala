@@ -122,11 +122,14 @@ object Aggregator extends java.io.Serializable {
     toSet[T].andThenPresent(_.size)
 
   /**
-   * Returns the bounds of a given percentile where the percentile is between (0,1]
+   * Returns the lower bound of a given percentile where the percentile is between (0,1]
    * The items that are iterated over cannot be negative.
    */
-  def approximatePercentileBounds(percentile: Double, k: Int): QTreeAggregator =
-    QTreeAggregator(percentile, k)
+  def approximatePercentile[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregatorLowerBound[T] =
+    QTreeAggregatorLowerBound[T](percentile, k)
+
+  def approximatePercentileBounds[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregator[T] =
+    QTreeAggregator[T](percentile, k)
 }
 
 /**
