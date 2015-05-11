@@ -1,6 +1,7 @@
 # Algebird #
 
 ### Version 0.10.0 ###
+* CMS: add contramap to convert CMS[K] to CMS[L], add support for String and Bytes, remove Ordering context bound for K #399
 * EventuallyAggregator and variants #407
 * Add MultiAggregator.apply #408
 * Return a MonoidAggregator from MultiAggregator when possible #409
