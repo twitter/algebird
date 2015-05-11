@@ -194,6 +194,8 @@ case class QTree[A](
    * an estimate of the median.
    */
   def quantileBounds(p: Double): (Double, Double) = {
+    require(p >= 0.0 && p < 1.0, "The given percentile must be of the form 0 <= p < 1.0")
+
     val rank = math.floor(count * p).toLong
     // get is safe below, because findRankLowerBound only returns
     // None if rank > count, but due to construction rank <= count
