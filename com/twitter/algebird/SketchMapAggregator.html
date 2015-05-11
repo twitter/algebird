@@ -41,7 +41,7 @@
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An Aggregator for the SketchMap.
 Can be created using SketchMap.aggregator
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala" target="_blank">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/SketchMap.scala" target="_blank">SketchMap.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[(<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>), <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>]], <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[(<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>), <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -326,6 +326,23 @@ If the inputs are empty, the result will be empty too.
       <p class="shortcomment cmt">This returns the cumulative sum of its inputs, in the same order.</p><div class="fullcomment"><div class="comment cmt"><p>This returns the cumulative sum of its inputs, in the same order.
 If the inputs are empty, the result will be empty too.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#either" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="either[A2,B2,C2](that:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[Either[A,A2],(B,B2),(C,C2)]"></a>
+      <a id="either[A2,B2,C2](MonoidAggregator[A2,B2,C2]):MonoidAggregator[Either[(K,V),A2],(SketchMap[K,V],B2),(SketchMap[K,V],C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">either</span><span class="tparams">[<span name="A2">A2</span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="that">that: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.either.A2">A2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.B2">B2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.C2">C2</span>]</span>)</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.Either">Either</span>[(<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>), <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.A2">A2</span>], (<a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.B2">B2</span>), (<a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.C2">C2</span>)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Build a MonoidAggregator that either takes left or right input
+and outputs the pair from both
+</p><div class="fullcomment"><div class="comment cmt"><p>Build a MonoidAggregator that either takes left or right input
+and outputs the pair from both
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -339,6 +356,21 @@ If the inputs are empty, the result will be empty too.
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#filterBefore" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="filterBefore[A1&lt;:A](pred:A1=&gt;Boolean):com.twitter.algebird.MonoidAggregator[A1,B,C]"></a>
+      <a id="filterBefore[A1&lt;:(K,V)]((A1)⇒Boolean):MonoidAggregator[A1,SketchMap[K,V],SketchMap[K,V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filterBefore</span><span class="tparams">[<span name="A1">A1 &lt;: (<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>)</span>]</span><span class="params">(<span name="pred">pred: (<span class="extype" name="com.twitter.algebird.MonoidAggregator.filterBefore.A1">A1</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.filterBefore.A1">A1</span>, <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Only aggregate items that match a predicate
+</p><div class="fullcomment"><div class="comment cmt"><p>Only aggregate items that match a predicate
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -586,7 +618,11 @@ else reduce the items
         <span class="name">sumBefore</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[(<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>)], <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>]]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a></dd></dl></div>
+      <p class="shortcomment cmt">This maps the inputs to Bs, then sums them, effectively flattening
+the inputs to the MonoidAggregator
+</p><div class="fullcomment"><div class="comment cmt"><p>This maps the inputs to Bs, then sums them, effectively flattening
+the inputs to the MonoidAggregator
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -676,6 +712,23 @@ joining a Fold with an Aggregator to produce a Fold
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#zip" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="zip[A2,B2,C2](ag2:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[(A,A2),(B,B2),(C,C2)]"></a>
+      <a id="zip[A2,B2,C2](MonoidAggregator[A2,B2,C2]):MonoidAggregator[((K,V),A2),(SketchMap[K,V],B2),(SketchMap[K,V],C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zip</span><span class="tparams">[<span name="A2">A2</span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="ag2">ag2: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.A2">A2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.B2">B2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.C2">C2</span>]</span>)</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[((<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>), <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.A2">A2</span>), (<a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.B2">B2</span>), (<a href="SketchMap.html" class="extype" name="com.twitter.algebird.SketchMap">SketchMap</a>[<span class="extype" name="com.twitter.algebird.SketchMapAggregator.K">K</span>, <span class="extype" name="com.twitter.algebird.SketchMapAggregator.V">V</span>], <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.C2">C2</span>)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .</p><div class="fullcomment"><div class="comment cmt"><p>This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .composePrepare onto the result if you have
+an initial input that has to be prepared differently for each of the joined aggregators.</p><p>The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a></dd></dl></div>
     </li><li name="com.twitter.algebird.Aggregator#zip" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="zip[A2,B2,C2](ag2:com.twitter.algebird.Aggregator[A2,B2,C2]):com.twitter.algebird.Aggregator[(A,A2),(B,B2),(C,C2)]"></a>
       <a id="zip[A2,B2,C2](Aggregator[A2,B2,C2]):Aggregator[((K,V),A2),(SketchMap[K,V],B2),(SketchMap[K,V],C2)]"></a>

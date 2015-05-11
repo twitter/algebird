@@ -39,7 +39,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -95,6 +95,19 @@
       </h4>
       <p class="comment cmt">For use from Java/minimizing code bloat in scala
 </p>
+    </li><li name="com.twitter.algebird.AbstractEventuallyAggregator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AbstractEventuallyAggregator[A,E,O,C]extendsAggregator[A,Either[E,O],C]"></a>
+      <a id="AbstractEventuallyAggregator[A,E,O,C]:AbstractEventuallyAggregator[A,E,O,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractEventuallyAggregator.html"><span class="name">AbstractEventuallyAggregator</span></a><span class="tparams">[<span name="A">A</span>, <span name="E">E</span>, <span name="O">O</span>, <span name="C">C</span>]</span><span class="result"> extends <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator.A">A</span>, <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator.E">E</span>, <span class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator.O">O</span>], <span class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator.C">C</span>]</span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.AbstractField" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="AbstractField[T]extendsField[T]"></a>
       <a id="AbstractField[T]:AbstractField[T]"></a>
@@ -188,6 +201,20 @@
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.AdaptiveCache" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AdaptiveCache[K,V]extendsStatefulSummer[Map[K,V]]"></a>
+      <a id="AdaptiveCache[K,V]:AdaptiveCache[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AdaptiveCache.html"><span class="name">AdaptiveCache</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This is a wrapper around SummingCache that attempts to grow the capacity
+by up to some maximum, as long as there's enough RAM.</p>
     </li><li name="com.twitter.algebird.AdaptiveVector" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="AdaptiveVector[V]extendsIndexedSeq[V]"></a>
       <a id="AdaptiveVector[V]:AdaptiveVector[V]"></a>
@@ -628,6 +655,19 @@ designed to be use in the stackable pattern with ArrayBufferedOperation
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.Bytes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BytesextendsSerializablewithProductwithSerializable"></a>
+      <a id="Bytes:Bytes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Bytes.html"><span class="name">Bytes</span></a><span class="params">(<span name="array">array: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A wrapper for <code>Array[Byte]</code> that provides sane implementations of <code>hashCode</code>, <code>equals</code>, and <code>toString</code>.</p>
     </li><li name="com.twitter.algebird.CMS" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="CMS[K]extendsSerializablewithCMSCounting[K,com.twitter.algebird.CMS]"></a>
       <a id="CMS[K]:CMS[K]"></a>
@@ -676,7 +716,7 @@ designed to be use in the stackable pattern with ArrayBufferedOperation
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="CMSHash.html"><span class="name">CMSHash</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Int">Int</span></span>, <span name="b">b: <span class="extype" name="scala.Int">Int</span></span>, <span name="width">width: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$53">evidence$53: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSHash.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="CMSHash.html"><span class="name">CMSHash</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Int">Int</span></span>, <span name="b">b: <span class="extype" name="scala.Int">Int</span></span>, <span name="width">width: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$16">evidence$16: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSHash.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -716,7 +756,7 @@ family of the form:</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="CMSInstance.html"><span class="name">CMSInstance</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="countsTable">countsTable: <a href="CMSInstance$$CountsTable.html" class="extype" name="com.twitter.algebird.CMSInstance.CountsTable">CountsTable</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>]</span>, <span name="totalCount">totalCount: <span class="extype" name="scala.Long">Long</span></span>, <span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$17">evidence$17: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="CMSInstance.html"><span class="name">CMSInstance</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="countsTable">countsTable: <a href="CMSInstance$$CountsTable.html" class="extype" name="com.twitter.algebird.CMSInstance.CountsTable">CountsTable</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>]</span>, <span name="totalCount">totalCount: <span class="extype" name="scala.Long">Long</span></span>, <span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSInstance.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">The general Count-Min sketch structure, used for holding any number of elements.</p>
@@ -729,7 +769,7 @@ family of the form:</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="CMSItem.html"><span class="name">CMSItem</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="item">item: <span class="extype" name="com.twitter.algebird.CMSItem.K">K</span></span>, <span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSItem.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$16">evidence$16: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.CMSItem.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSItem.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="CMSItem.html"><span class="name">CMSItem</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="item">item: <span class="extype" name="com.twitter.algebird.CMSItem.K">K</span></span>, <span name="totalCount">totalCount: <span class="extype" name="scala.Long">Long</span></span>, <span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSItem.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSItem.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.</p>
@@ -768,7 +808,7 @@ family of the form:</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="CMSZero.html"><span class="name">CMSZero</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSZero.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$15">evidence$15: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.CMSZero.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSZero.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="CMSZero.html"><span class="name">CMSZero</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMSZero.K">K</span>]</span>)</span><span class="result"> extends <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSZero.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Zero element.</p>
@@ -846,7 +886,7 @@ family of the form:</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="DenseHLL.html"><span class="name">DenseHLL</span></a><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="DenseHLL.html"><span class="name">DenseHLL</span></a><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a></span>)</span><span class="result"> extends <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">These are the individual instances which the Monoid knows how to add
@@ -916,6 +956,19 @@ family of the form:</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.EventuallyAggregator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EventuallyAggregator[A,E,O,C]extendsAbstractEventuallyAggregator[A,E,O,C]"></a>
+      <a id="EventuallyAggregator[A,E,O,C]:EventuallyAggregator[A,E,O,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallyAggregator.html"><span class="name">EventuallyAggregator</span></a><span class="tparams">[<span name="A">A</span>, <span name="E">E</span>, <span name="O">O</span>, <span name="C">C</span>]</span><span class="result"> extends <a href="AbstractEventuallyAggregator.html" class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator">AbstractEventuallyAggregator</a>[<span class="extype" name="com.twitter.algebird.EventuallyAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.EventuallyAggregator.E">E</span>, <span class="extype" name="com.twitter.algebird.EventuallyAggregator.O">O</span>, <span class="extype" name="com.twitter.algebird.EventuallyAggregator.C">C</span>]</span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.EventuallyGroup" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="EventuallyGroup[E,O]extendsEventuallyMonoid[E,O]withGroup[Either[E,O]]"></a>
       <a id="EventuallyGroup[E,O]:EventuallyGroup[E,O]"></a>
@@ -942,6 +995,19 @@ family of the form:</p>
       </span>
       </h4>
       <p class="comment cmt"></p>
+    </li><li name="com.twitter.algebird.EventuallyMonoidAggregator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EventuallyMonoidAggregator[A,E,O,C]extendsAbstractEventuallyAggregator[A,E,O,C]withMonoidAggregator[A,Either[E,O],C]"></a>
+      <a id="EventuallyMonoidAggregator[A,E,O,C]:EventuallyMonoidAggregator[A,E,O,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EventuallyMonoidAggregator.html"><span class="name">EventuallyMonoidAggregator</span></a><span class="tparams">[<span name="A">A</span>, <span name="E">E</span>, <span name="O">O</span>, <span name="C">C</span>]</span><span class="result"> extends <a href="AbstractEventuallyAggregator.html" class="extype" name="com.twitter.algebird.AbstractEventuallyAggregator">AbstractEventuallyAggregator</a>[<span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.E">E</span>, <span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.O">O</span>, <span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.C">C</span>] with <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.A">A</span>, <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.E">E</span>, <span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.O">O</span>], <span class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.EventuallyRing" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="EventuallyRing[E,O]extendsEventuallyGroup[E,O]withRing[Either[E,O]]"></a>
       <a id="EventuallyRing[E,O]:EventuallyRing[E,O]"></a>
@@ -1233,6 +1299,20 @@ if (import Functor.</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.HLLSeries" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HLLSeriesextendsProductwithSerializable"></a>
+      <a id="HLLSeries:HLLSeries"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HLLSeries.html"><span class="name">HLLSeries</span></a><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="rows">rows: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Long">Long</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">HLLSeries can produce a HyperLogLog counter for any window into the past,
+using a constant factor more space than HyperLogLog.</p>
     </li><li name="com.twitter.algebird.HashingTrickMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="HashingTrickMonoid[V]extendsMonoid[com.twitter.algebird.AdaptiveVector[V]]"></a>
       <a id="HashingTrickMonoid[V]:HashingTrickMonoid[V]"></a>
@@ -1268,7 +1348,7 @@ if (import Functor.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="HeavyHitters.html"><span class="name">HeavyHitters</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.collection.immutable.SortedSet">SortedSet</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$29">evidence$29: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="HeavyHitters.html"><span class="name">HeavyHitters</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Containers for holding heavy hitter items and their associated counts.</p>
@@ -1311,6 +1391,19 @@ if (import Functor.</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.HyperLogLogSeriesMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HyperLogLogSeriesMonoidextendsMonoid[com.twitter.algebird.HLLSeries]"></a>
+      <a id="HyperLogLogSeriesMonoid:HyperLogLogSeriesMonoid"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="HyperLogLogSeriesMonoid.html"><span class="name">HyperLogLogSeriesMonoid</span></a><span class="result"> extends <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="HLLSeries.html" class="extype" name="com.twitter.algebird.HLLSeries">HLLSeries</a>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">val hllSeriesMonoid = new HyperLogLogSeriesMonoid(bits)</p>
     </li><li name="com.twitter.algebird.InclusiveLower" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="InclusiveLower[T]extendsInterval[T]withLower[T]withProductwithSerializable"></a>
       <a id="InclusiveLower[T]:InclusiveLower[T]"></a>
@@ -1334,19 +1427,6 @@ if (import Functor.</p>
       </span>
       <span class="symbol">
         <a href="InclusiveUpper.html"><span class="name">InclusiveUpper</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="upper">upper: <span class="extype" name="com.twitter.algebird.InclusiveUpper.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ordering">ordering: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.InclusiveUpper.T">T</span>]</span>)</span><span class="result"> extends <a href="Interval.html" class="extype" name="com.twitter.algebird.Interval">Interval</a>[<span class="extype" name="com.twitter.algebird.InclusiveUpper.T">T</span>] with <a href="Upper.html" class="extype" name="com.twitter.algebird.Upper">Upper</a>[<span class="extype" name="com.twitter.algebird.InclusiveUpper.T">T</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      </h4>
-      
-    </li><li name="com.twitter.algebird.IndexedSeqArrayByte" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="IndexedSeqArrayByteextendsIndexedSeq[Byte]"></a>
-      <a id="IndexedSeqArrayByte:IndexedSeqArrayByte"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="IndexedSeqArrayByte.html"><span class="name">IndexedSeqArrayByte</span></a><span class="result"> extends <span class="extype" name="scala.collection.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
       </span>
       </h4>
       
@@ -1943,7 +2023,7 @@ Some(5) + None == Some(5)
       </h4>
       <p class="comment cmt">This is a typeclass to represent things which are countable down.</p>
     </li><li name="com.twitter.algebird.Preparer" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="Preparer[A,T]extendsAnyRef"></a>
+      <a id="Preparer[A,T]extendsSerializable"></a>
       <a id="Preparer[A,T]:Preparer[A,T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -1951,7 +2031,7 @@ Some(5) + None == Some(5)
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="Preparer.html"><span class="name">Preparer</span></a><span class="tparams">[<span name="A">A</span>, <span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <a href="Preparer.html"><span class="name">Preparer</span></a><span class="tparams">[<span name="A">A</span>, <span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Preparer is a way to build up an Aggregator through composition using a
@@ -3208,7 +3288,7 @@ and composing &quot;outwards&quot; in both directions.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="QTree.html"><span class="name">QTree</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <span class="extype" name="scala.Long">Long</span></span>, <span name="level">level: <span class="extype" name="scala.Int">Int</span></span>, <span name="count">count: <span class="extype" name="scala.Long">Long</span></span>, <span name="sum">sum: <span class="extype" name="com.twitter.algebird.QTree.A">A</span></span>, <span name="lowerChild">lowerChild: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.A">A</span>]]</span>, <span name="upperChild">upperChild: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.A">A</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="monoid">monoid: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTree.A">A</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="QTree.html"><span class="name">QTree</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="offset">offset: <span class="extype" name="scala.Long">Long</span></span>, <span name="level">level: <span class="extype" name="scala.Int">Int</span></span>, <span name="count">count: <span class="extype" name="scala.Long">Long</span></span>, <span name="sum">sum: <span class="extype" name="com.twitter.algebird.QTree.A">A</span></span>, <span name="lowerChild">lowerChild: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.A">A</span>]]</span>, <span name="upperChild">upperChild: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.A">A</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -3561,6 +3641,20 @@ before you start adding SGDPos objects.</p>
       </h4>
       <p class="comment cmt">This is a combinator on semigroups, after you do the plus, you transform B with a fold function
 This will not be valid for all fold functions.</p>
+    </li><li name="com.twitter.algebird.SentinelCache" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SentinelCache[K,V]extendsAnyRef"></a>
+      <a id="SentinelCache[K,V]:SentinelCache[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SentinelCache.html"><span class="name">SentinelCache</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">This is a summing cache whose goal is to grow until we run out of memory,
+at which point it clears itself and stops growing.</p>
     </li><li name="com.twitter.algebird.SeqMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SeqMonoid[T]extendsMonoid[Seq[T]]"></a>
       <a id="SeqMonoid[T]:SeqMonoid[T]"></a>
@@ -3587,6 +3681,19 @@ This will not be valid for all fold functions.</p>
       </span>
       </h4>
       <p class="comment cmt">Set union monoid.</p>
+    </li><li name="com.twitter.algebird.SetSizeAggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SetSizeAggregator[A]extendsEventuallyMonoidAggregator[A,com.twitter.algebird.HLL,Set[A],Long]withProductwithSerializable"></a>
+      <a id="SetSizeAggregator[A]:SetSizeAggregator[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SetSizeAggregator.html"><span class="name">SetSizeAggregator</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="hllBits">hllBits: <span class="extype" name="scala.Int">Int</span></span>, <span name="maxSetSize">maxSetSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="toBytes">toBytes: (<span class="extype" name="com.twitter.algebird.SetSizeAggregator.A">A</span>) ⇒ <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <a href="EventuallyMonoidAggregator.html" class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator">EventuallyMonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.SetSizeAggregator.A">A</span>, <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="com.twitter.algebird.SetSizeAggregator.A">A</span>], <span class="extype" name="scala.Long">Long</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.SetValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SetValue[+A]extendsResetState[A]withProductwithSerializable"></a>
       <a id="SetValue[+A]:SetValue[A]"></a>
@@ -3797,6 +3904,20 @@ This will not be valid for all fold functions.</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.SummingWithHitsCache" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SummingWithHitsCache[K,V]extendsSummingCache[K,V]"></a>
+      <a id="SummingWithHitsCache[K,V]:SummingWithHitsCache[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingWithHitsCache.html"><span class="name">SummingWithHitsCache</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A SummingCache that also tracks the number of key hits
+</p>
     </li><li name="com.twitter.algebird.TimesOp" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TimesOp[T]extendsAnyRef"></a>
       <a id="TimesOp[T]:TimesOp[T]"></a>
@@ -3833,7 +3954,7 @@ and (b) tracking the heavy hitters among these elements.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopCMSInstance.html"><span class="name">TopCMSInstance</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>, <span name="hhs">hhs: <a href="HeavyHitters.html" class="extype" name="com.twitter.algebird.HeavyHitters">HeavyHitters</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$25">evidence$25: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopCMSInstance.html"><span class="name">TopCMSInstance</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>, <span name="hhs">hhs: <a href="HeavyHitters.html" class="extype" name="com.twitter.algebird.HeavyHitters">HeavyHitters</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSInstance.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -3846,7 +3967,7 @@ and (b) tracking the heavy hitters among these elements.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopCMSItem.html"><span class="name">TopCMSItem</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="item">item: <span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span></span>, <span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$23">evidence$23: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopCMSItem.html"><span class="name">TopCMSItem</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="item">item: <span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span></span>, <span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSItem.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Used for holding a single element, to avoid repeatedly adding elements from sparse counts tables.</p>
@@ -3859,7 +3980,7 @@ and (b) tracking the heavy hitters among these elements.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopCMSParams.html"><span class="name">TopCMSParams</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="logic">logic: <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopCMSParams.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$20">evidence$20: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopCMSParams.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopCMSParams.html"><span class="name">TopCMSParams</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="logic">logic: <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopCMSParams.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -3872,7 +3993,7 @@ and (b) tracking the heavy hitters among these elements.</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopCMSZero.html"><span class="name">TopCMSZero</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$22">evidence$22: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopCMSZero.html"><span class="name">TopCMSZero</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>]</span>, <span name="params">params: <a href="TopCMSParams.html" class="extype" name="com.twitter.algebird.TopCMSParams">TopCMSParams</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>]</span>)</span><span class="result"> extends <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopCMSZero.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Zero element.</p>
@@ -3938,7 +4059,7 @@ equivalent to: (left ++ right).</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopNLogic.html"><span class="name">TopNLogic</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$28">evidence$28: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>]</span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopNLogic.html"><span class="name">TopNLogic</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Tracks the top N heavy hitters, where <code>N</code> is defined by <code>heavyHittersN</code>.</p>
@@ -3977,7 +4098,7 @@ equivalent to: (left ++ right).</p>
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TopPctLogic.html"><span class="name">TopPctLogic</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersPct">heavyHittersPct: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$27">evidence$27: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopPctLogic.K">K</span>]</span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopPctLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TopPctLogic.html"><span class="name">TopPctLogic</span></a><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersPct">heavyHittersPct: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopPctLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       <p class="comment cmt">Finds all heavy hitters, i.</p>
@@ -5471,6 +5592,19 @@ equivalent to: (left ++ right).</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.Bytes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Bytes"></a>
+      <a id="Bytes:Bytes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Bytes$.html"><span class="name">Bytes</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.CMS" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="CMS"></a>
       <a id="CMS:CMS"></a>
@@ -5597,7 +5731,7 @@ equivalent to: (left ++ right).</p>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="FlatMapPreparer$.html"><span class="name">FlatMapPreparer</span></a>
+        <a href="FlatMapPreparer$.html"><span class="name">FlatMapPreparer</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -5677,19 +5811,6 @@ equivalent to: (left ++ right).</p>
       </span>
       <span class="symbol">
         <a href="Group$.html"><span class="name">Group</span></a><span class="result"> extends <a href="GeneratedGroupImplicits.html" class="extype" name="com.twitter.algebird.GeneratedGroupImplicits">GeneratedGroupImplicits</a> with <a href="ProductGroups.html" class="extype" name="com.twitter.algebird.ProductGroups">ProductGroups</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      </h4>
-      
-    </li><li name="com.twitter.algebird.HeavyHitter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="HeavyHitter"></a>
-      <a id="HeavyHitter:HeavyHitter"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="HeavyHitter$.html"><span class="name">HeavyHitter</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -5862,6 +5983,19 @@ equivalent to: (left ++ right).</p>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.MapAggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MapAggregator"></a>
+      <a id="MapAggregator:MapAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MapAggregator$.html"><span class="name">MapAggregator</span></a>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.MapAlgebra" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MapAlgebra"></a>
       <a id="MapAlgebra:MapAlgebra"></a>
@@ -5884,7 +6018,7 @@ equivalent to: (left ++ right).</p>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="MapPreparer$.html"><span class="name">MapPreparer</span></a>
+        <a href="MapPreparer$.html"><span class="name">MapPreparer</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -6145,7 +6279,7 @@ equivalent to: (left ++ right).</p>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="Preparer$.html"><span class="name">Preparer</span></a>
+        <a href="Preparer$.html"><span class="name">Preparer</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -6478,6 +6612,19 @@ implicit ordering and monoid.</p>
       </span>
       <span class="symbol">
         <a href="SummingQueue$.html"><span class="name">SummingQueue</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="com.twitter.algebird.SummingWithHitsCache" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SummingWithHitsCache"></a>
+      <a id="SummingWithHitsCache:SummingWithHitsCache"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SummingWithHitsCache$.html"><span class="name">SummingWithHitsCache</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       

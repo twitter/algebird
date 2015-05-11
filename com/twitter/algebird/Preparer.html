@@ -35,7 +35,7 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Preparer</span><span class="tparams">[<span name="A">A</span>, <span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">Preparer</span><span class="tparams">[<span name="A">A</span>, <span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -44,9 +44,9 @@ more natural API: it allows you to start with the input type and describe a seri
 of transformations and aggregations from there, rather than starting from the aggregation
 and composing &quot;outwards&quot; in both directions.</p><p>Uses of Preparer will always start with a call to Preparer[A], and end with a call to
 monoidAggregate or a related method, to produce an Aggregator instance.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/Preparer.scala" target="_blank">Preparer.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/Preparer.scala" target="_blank">Preparer.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
           <div class="subClasses hiddenContent"><a href="FlatMapPreparer.html" class="extype" name="com.twitter.algebird.FlatMapPreparer">FlatMapPreparer</a>, <a href="MapPreparer.html" class="extype" name="com.twitter.algebird.MapPreparer">MapPreparer</a></div>
@@ -67,7 +67,7 @@ monoidAggregate or a related method, to produce an Aggregator instance.
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.Preparer"><span>Preparer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.Preparer"><span>Preparer</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -222,6 +222,19 @@ to those done using monoids.
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.Preparer#collect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="collect[U](p:PartialFunction[T,U]):com.twitter.algebird.FlatMapPreparer[A,U]"></a>
+      <a id="collect[U](PartialFunction[T,U]):FlatMapPreparer[A,U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">collect</span><span class="tparams">[<span name="U">U</span>]</span><span class="params">(<span name="p">p: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="com.twitter.algebird.Preparer.T">T</span>, <span class="extype" name="com.twitter.algebird.Preparer.collect.U">U</span>]</span>)</span><span class="result">: <a href="FlatMapPreparer.html" class="extype" name="com.twitter.algebird.FlatMapPreparer">FlatMapPreparer</a>[<span class="extype" name="com.twitter.algebird.Preparer.A">A</span>, <span class="extype" name="com.twitter.algebird.Preparer.collect.U">U</span>]</span>
+      </span>
+      </h4>
+      
     </li><li name="com.twitter.algebird.Preparer#count" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="count(pred:T=&gt;Boolean):com.twitter.algebird.MonoidAggregator[A,Long,Long]"></a>
       <a id="count((T)⇒Boolean):MonoidAggregator[A,Long,Long]"></a>
@@ -705,7 +718,9 @@ into Option space
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

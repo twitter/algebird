@@ -35,12 +35,12 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">HeavyHitters</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.collection.immutable.SortedSet">SortedSet</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$29">evidence$29: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">HeavyHitters</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Containers for holding heavy hitter items and their associated counts.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -81,7 +81,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.HeavyHitters#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(hhs:scala.collection.immutable.SortedSet[com.twitter.algebird.HeavyHitter[K]])(implicitevidence$29:Ordering[K]):com.twitter.algebird.HeavyHitters[K]"></a>
+      <a id="&lt;init&gt;(hhs:Set[com.twitter.algebird.HeavyHitter[K]]):com.twitter.algebird.HeavyHitters[K]"></a>
       <a id="&lt;init&gt;:HeavyHitters[K]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -89,7 +89,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">HeavyHitters</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.collection.immutable.SortedSet">SortedSet</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]</span>)</span>
+        <span class="name">HeavyHitters</span><span class="params">(<span name="hhs">hhs: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>)</span>
       </span>
       </h4>
       
@@ -284,15 +284,15 @@
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.twitter.algebird.HeavyHitters#hhs" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="hhs:scala.collection.immutable.SortedSet[com.twitter.algebird.HeavyHitter[K]]"></a>
-      <a id="hhs:SortedSet[HeavyHitter[K]]"></a>
+      <a id="hhs:Set[com.twitter.algebird.HeavyHitter[K]]"></a>
+      <a id="hhs:Set[HeavyHitter[K]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">hhs</span><span class="result">: <span class="extype" name="scala.collection.immutable.SortedSet">SortedSet</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>
+        <span class="name">hhs</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitters.K">K</span>]]</span>
       </span>
       </h4>
       

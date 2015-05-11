@@ -39,7 +39,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implementation of the HyperLogLog approximate counting as a Monoid</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implementation of the HyperLogLog approximate counting as a Monoid</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -176,6 +176,21 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.HyperLogLog#bitsForError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bitsForError(err:Double):Int"></a>
+      <a id="bitsForError(Double):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bitsForError</span><span class="params">(<span name="err">err: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">This gives you a number of bits to use to have a given standard
+error
+</p>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -221,7 +236,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.HyperLogLog#error" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.HyperLogLog#error" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="error(bits:Int):Double"></a>
       <a id="error(Int):Double"></a>
       <h4 class="signature">
@@ -233,7 +248,28 @@
         <span class="name">error</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">The true error is distributed like a Gaussian with
+this standard deviation.</p><div class="fullcomment"><div class="comment cmt"><p>The true error is distributed like a Gaussian with
+this standard deviation.
+let m = 2^bits. The size of the HLL is m bytes.</p><p>bits | size | error
+  9       512     0.0460
+ 10      1024    0.0325
+ 11      2048    0.0230
+ 12      4096    0.0163
+ 13      8192    0.0115
+ 14      16384   0.0081
+ 15      32768   0.0057
+ 16      65536   0.0041
+ 17      131072  0.0029
+ 18      262144  0.0020
+ 19      524288  0.0014
+ 20      1048576 0.0010</p><p> Keep in mind, to store N distinct longs, you only need 8N bytes.
+ See SetSizeAggregator for an approach that uses an exact set
+ when the cardinality is small, and switches to HLL after we have
+ enough items. Ideally, you would keep an exact set until it is
+ smaller to store the HLL (but actually since we use sparse vectors
+ to store the HLL, a small HLL takes a lot less than the size above).
+</p></div></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -500,7 +536,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.HyperLogLog#twopow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.HyperLogLog#twopow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="twopow(i:Int):Double"></a>
       <a id="twopow(Int):Double"></a>
       <h4 class="signature">
@@ -512,7 +548,10 @@
         <span class="name">twopow</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
       </span>
       </h4>
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@inline</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

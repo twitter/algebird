@@ -47,7 +47,7 @@ dyadic intervals (https://en.wikipedia.org/wiki/Interval_(mathematics)#Dyadic_in
 count at the root. Any sub-trees that do not meet this criteria have their children pruned and become leaves.
 (It's important that they not be pruned away entirely, but that we keep a fringe of low-count leaves that can
 gain weight over time and ultimately split again when warranted).</p><p>Quantile and range queries both give hard upper and lower bounds; the true result will be somewhere in the range given.</p><p>Keys must be &gt;= 0.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/QTree.scala" target="_blank">QTree.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/QTree.scala" target="_blank">QTree.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -158,7 +158,7 @@ gain weight over time and ultimately split again when warranted).</p><p>Quantile
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply(k:Double):com.twitter.algebird.QTree[Double]"></a>
       <a id="apply(Double):QTree[Double]"></a>
       <h4 class="signature">
@@ -170,8 +170,12 @@ gain weight over time and ultimately split again when warranted).</p><p>Quantile
         <span class="name">apply</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4>
-      
-    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">uses 1/65636 as the bin size, if you want to control that see other apply
+or value methods.</p><div class="fullcomment"><div class="comment cmt"><p>uses 1/65636 as the bin size, if you want to control that see other apply
+or value methods.</p><p>This is useful if you want to query the mean inside a range later.
+If you truly just care about the counts/histogram, see the value method.
+</p></div></div>
+    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply(k:Long):com.twitter.algebird.QTree[Long]"></a>
       <a id="apply(Long):QTree[Long]"></a>
       <h4 class="signature">
@@ -183,34 +187,38 @@ gain weight over time and ultimately split again when warranted).</p><p>Quantile
         <span class="name">apply</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="scala.Long">Long</span>]</span>
       </span>
       </h4>
-      <p class="shortcomment cmt">The common case of wanting a count and sum for the same value
+      <p class="shortcomment cmt">The common case of wanting an offset and sum for the same value
+This is useful if you want to query the mean inside a range later.</p><div class="fullcomment"><div class="comment cmt"><p>The common case of wanting an offset and sum for the same value
+This is useful if you want to query the mean inside a range later.
+If you truly just care about the counts/histogram, see the value method.
+</p></div></div>
+    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[A](kv:(Long,A)):com.twitter.algebird.QTree[A]"></a>
+      <a id="apply[A]((Long,A)):QTree[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="kv">kv: (<span class="extype" name="scala.Long">Long</span>, <span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>)</span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[A](kv:(Double,A),level:Int):com.twitter.algebird.QTree[A]"></a>
+      <a id="apply[A]((Double,A),Int):QTree[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="kv">kv: (<span class="extype" name="scala.Double">Double</span>, <span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>)</span>, <span name="level">level: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">16</span></span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
 </p>
-    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply[A](kv:(Long,A))(implicitevidence$2:com.twitter.algebird.Monoid[A]):com.twitter.algebird.QTree[A]"></a>
-      <a id="apply[A]((Long,A))(Monoid[A]):QTree[A]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="kv">kv: (<span class="extype" name="scala.Long">Long</span>, <span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>)</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>
-      </span>
-      </h4>
-      
-    </li><li name="com.twitter.algebird.QTree#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply[A](kv:(Double,A),level:Int)(implicitevidence$1:com.twitter.algebird.Monoid[A]):com.twitter.algebird.QTree[A]"></a>
-      <a id="apply[A]((Double,A),Int)(Monoid[A]):QTree[A]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="kv">kv: (<span class="extype" name="scala.Double">Double</span>, <span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>)</span>, <span name="level">level: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">16</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTree.apply.A">A</span>]</span>
-      </span>
-      </h4>
-      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -392,6 +400,37 @@ gain weight over time and ultimately split again when warranted).</p><p>Quantile
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.QTree#value" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="value(v:Double,level:Int):com.twitter.algebird.QTree[Unit]"></a>
+      <a id="value(Double,Int):QTree[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">value</span><span class="params">(<span name="v">v: <span class="extype" name="scala.Double">Double</span></span>, <span name="level">level: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">16</span></span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If you are sure you only care about the approximate histogram
+features of QTree, you can save some space by using QTree[Unit]
+level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
+</p>
+    </li><li name="com.twitter.algebird.QTree#value" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="value(v:Long):com.twitter.algebird.QTree[Unit]"></a>
+      <a id="value(Long):QTree[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">value</span><span class="params">(<span name="v">v: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If you are sure you only care about the approximate histogram
+features of QTree, you can save some space by using QTree[Unit]
+</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

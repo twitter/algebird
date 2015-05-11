@@ -44,12 +44,12 @@
 Law 1: Semigroup.sumOption(items) ==
   (Monoid.plus(items.map { stateful.put(_) }.filter { _.isDefined }, stateful.flush) &amp;&amp;
     stateful.isFlushed)
-Law 2: isFlushed == flush.isEmpty</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/StatefulSummer.scala" target="_blank">StatefulSummer.scala</a></dd></dl><div class="toggleContainer block">
+Law 2: isFlushed == flush.isEmpty</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/StatefulSummer.scala" target="_blank">StatefulSummer.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a>[<span class="extype" name="com.twitter.algebird.StatefulSummer.V">V</span>, <span class="extype" name="com.twitter.algebird.StatefulSummer.V">V</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
-          <div class="subClasses hiddenContent"><a href="BufferedSumAll.html" class="extype" name="com.twitter.algebird.BufferedSumAll">BufferedSumAll</a>, <a href="util/summer/CustomSummingQueue.html" class="extype" name="com.twitter.algebird.util.summer.CustomSummingQueue">CustomSummingQueue</a>, <a href="SumAll.html" class="extype" name="com.twitter.algebird.SumAll">SumAll</a>, <a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>, <a href="SummingQueue.html" class="extype" name="com.twitter.algebird.SummingQueue">SummingQueue</a></div>
+          <div class="subClasses hiddenContent"><a href="AdaptiveCache.html" class="extype" name="com.twitter.algebird.AdaptiveCache">AdaptiveCache</a>, <a href="BufferedSumAll.html" class="extype" name="com.twitter.algebird.BufferedSumAll">BufferedSumAll</a>, <a href="util/summer/CustomSummingQueue.html" class="extype" name="com.twitter.algebird.util.summer.CustomSummingQueue">CustomSummingQueue</a>, <a href="SumAll.html" class="extype" name="com.twitter.algebird.SumAll">SumAll</a>, <a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>, <a href="SummingQueue.html" class="extype" name="com.twitter.algebird.SummingQueue">SummingQueue</a>, <a href="SummingWithHitsCache.html" class="extype" name="com.twitter.algebird.SummingWithHitsCache">SummingWithHitsCache</a></div>
         </div></div>
         
 

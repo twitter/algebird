@@ -39,7 +39,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/QTree.scala" target="_blank">QTree.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/QTree.scala" target="_blank">QTree.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -80,7 +80,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.QTreeSemigroup#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(k:Int)(implicitevidence$3:com.twitter.algebird.Monoid[A]):com.twitter.algebird.QTreeSemigroup[A]"></a>
+      <a id="&lt;init&gt;(k:Int)(implicitunderlyingMonoid:com.twitter.algebird.Monoid[A]):com.twitter.algebird.QTreeSemigroup[A]"></a>
       <a id="&lt;init&gt;:QTreeSemigroup[A]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -88,7 +88,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">QTreeSemigroup</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]</span>)</span>
+        <span class="name">QTreeSemigroup</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="underlyingMonoid">underlyingMonoid: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]</span>)</span>
       </span>
       </h4>
       
@@ -198,6 +198,19 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.QTreeSemigroup#compressBatchSize" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="compressBatchSize:Int"></a>
+      <a id="compressBatchSize:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">compressBatchSize</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Override this if you want to change how frequently sumOption calls compress</p>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -334,8 +347,8 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.QTreeSemigroup">QTreeSemigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
-    </li><li name="com.twitter.algebird.Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="sumOption(iter:TraversableOnce[T]):Option[T]"></a>
+    </li><li name="com.twitter.algebird.QTreeSemigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sumOption(items:TraversableOnce[com.twitter.algebird.QTree[A]]):Option[com.twitter.algebird.QTree[A]]"></a>
       <a id="sumOption(TraversableOnce[QTree[A]]):Option[QTree[A]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -343,12 +356,12 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">sumOption</span><span class="params">(<span name="iter">iter: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]]</span>
+        <span class="name">sumOption</span><span class="params">(<span name="items">items: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="QTree.html" class="extype" name="com.twitter.algebird.QTree">QTree</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]]</span>
       </span>
       </h4>
       <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
 </p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.QTreeSemigroup">QTreeSemigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -375,6 +388,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.QTreeSemigroup#underlyingMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="underlyingMonoid:com.twitter.algebird.Monoid[A]"></a>
+      <a id="underlyingMonoid:Monoid[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">underlyingMonoid</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.QTreeSemigroup.A">A</span>]</span>
+      </span>
+      </h4>
+      
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

@@ -43,7 +43,7 @@
 the counting table behind the scenes is backed by <span class="extype" name="Long">Long</span> values (at least in the current implementation), and thus
 the returned frequency estimates are always instances of <code>Approximate[Long]</code>.
 </p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>The type used to identify the elements to be counted.
-</p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd><div class="block">Example:
+</p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd><div class="block">Example:
                <ol><li class="cmt"><p></p><pre><span class="cmt">// Implicits that enabling CMS-hashing of `Long` values.</span>
 <span class="kw">import</span> com.twitter.algebird.CMSHasherImplicits._
 
@@ -104,7 +104,7 @@ the returned frequency estimates are always instances of <code>Approximate[Long]
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.CMS#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(params:com.twitter.algebird.CMSParams[K])(implicitevidence$14:Ordering[K]):com.twitter.algebird.CMS[K]"></a>
+      <a id="&lt;init&gt;(params:com.twitter.algebird.CMSParams[K]):com.twitter.algebird.CMS[K]"></a>
       <a id="&lt;init&gt;:CMS[K]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -112,7 +112,7 @@ the returned frequency estimates are always instances of <code>Approximate[Long]
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">CMS</span><span class="params">(<span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMS.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.CMS.K">K</span>]</span>)</span>
+        <span class="name">CMS</span><span class="params">(<span name="params">params: <a href="CMSParams.html" class="extype" name="com.twitter.algebird.CMSParams">CMSParams</a>[<span class="extype" name="com.twitter.algebird.CMS.K">K</span>]</span>)</span>
       </span>
       </h4>
       <p class="shortcomment cmt"></p>

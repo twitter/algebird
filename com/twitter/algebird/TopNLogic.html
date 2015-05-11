@@ -35,7 +35,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">TopNLogic</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$28">evidence$28: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>]</span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">TopNLogic</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
@@ -44,7 +44,7 @@ regard to heavy hitters) when merging instances.  This means merging heavy hitte
 incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are being
 merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely is
 the end result biased towards these heavy hitters.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd><dt>See also</dt><dd><span class="cmt"><p>Discussion in <a href="https://github.com/twitter/algebird/issues/353" target="_blank">Algebird issue 353</a>
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd><dt>See also</dt><dd><span class="cmt"><p>Discussion in <a href="https://github.com/twitter/algebird/issues/353" target="_blank">Algebird issue 353</a>
 </p></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="HeavyHittersLogic.html" class="extype" name="com.twitter.algebird.HeavyHittersLogic">HeavyHittersLogic</a>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
@@ -86,7 +86,7 @@ the end result biased towards these heavy hitters.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.TopNLogic#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(heavyHittersN:Int)(implicitevidence$28:Ordering[K]):com.twitter.algebird.TopNLogic[K]"></a>
+      <a id="&lt;init&gt;(heavyHittersN:Int):com.twitter.algebird.TopNLogic[K]"></a>
       <a id="&lt;init&gt;:TopNLogic[K]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -94,7 +94,7 @@ the end result biased towards these heavy hitters.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">TopNLogic</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopNLogic.K">K</span>]</span>)</span>
+        <span class="name">TopNLogic</span><span class="params">(<span name="heavyHittersN">heavyHittersN: <span class="extype" name="scala.Int">Int</span></span>)</span>
       </span>
       </h4>
       

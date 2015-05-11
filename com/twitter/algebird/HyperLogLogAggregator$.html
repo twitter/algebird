@@ -39,7 +39,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -318,7 +318,7 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.HyperLogLogAggregator#sizeAggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.HyperLogLogAggregator#sizeAggregator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="sizeAggregator(bits:Int):com.twitter.algebird.MonoidAggregator[Array[Byte],com.twitter.algebird.HLL,Double]"></a>
       <a id="sizeAggregator(Int):MonoidAggregator[Array[Byte],HLL,Double]"></a>
       <h4 class="signature">
@@ -330,7 +330,28 @@
         <span class="name">sizeAggregator</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>], <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a>, <span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4>
-      
+      <p class="shortcomment cmt">Create an Aggregator that returns the estimate size, not the HLL
+approximate data structure itself.</p><div class="fullcomment"><div class="comment cmt"><p>Create an Aggregator that returns the estimate size, not the HLL
+approximate data structure itself. This is convenient, but cannot
+be combined later with another unique count like an HLL could.
+</p></div><dl class="paramcmts block"><dt class="param">bits</dt><dd class="cmt"><p>is the log of the size the HLL. See:
+</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.HyperLogLogAggregator#sizeWithError" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sizeWithError(err:Double):com.twitter.algebird.MonoidAggregator[Array[Byte],com.twitter.algebird.HLL,Double]"></a>
+      <a id="sizeWithError(Double):MonoidAggregator[Array[Byte],HLL,Double]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sizeWithError</span><span class="params">(<span name="err">err: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="MonoidAggregator.html" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>], <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a>, <span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Give an approximate set size (not the HLL) based on inputs of Array[Byte]
+see HyperLogLog.</p><div class="fullcomment"><div class="comment cmt"><p>Give an approximate set size (not the HLL) based on inputs of Array[Byte]
+see HyperLogLog.bitsForError for a size table based on the error
+</p></div></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -414,6 +435,25 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.HyperLogLogAggregator#withError" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withError(err:Double):com.twitter.algebird.HyperLogLogAggregator"></a>
+      <a id="withError(Double):HyperLogLogAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withError</span><span class="params">(<span name="err">err: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="HyperLogLogAggregator.html" class="extype" name="com.twitter.algebird.HyperLogLogAggregator">HyperLogLogAggregator</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Give a HyperLogLog Aggregator that have the given error.</p><div class="fullcomment"><div class="comment cmt"><p>Give a HyperLogLog Aggregator that have the given error.
+It is up to you, using bitsForError, to see if the size is
+still practical for your application.</p><p>0.016 (1.6%), 4    KB
+0.006 (0.6%), 32   KB
+0.002 (0.2%), 256  KB
+0.001 (0.1%), 1024 KB</p><p>Cutting the error in half takes 4x the size.
+</p></div></div>
     </li></ol>
             </div>
 

@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>HeavyHitter - com.twitter.algebird.HeavyHitter</title>
-          <meta name="description" content="HeavyHitter - com.twitter.algebird.HeavyHitter" />
-          <meta name="keywords" content="HeavyHitter com.twitter.algebird.HeavyHitter" />
+          <title>AdaptiveCache - com.twitter.algebird.AdaptiveCache</title>
+          <meta name="description" content="AdaptiveCache - com.twitter.algebird.AdaptiveCache" />
+          <meta name="keywords" content="AdaptiveCache com.twitter.algebird.AdaptiveCache" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -12,7 +12,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../index.html';
-            var hash = 'com.twitter.algebird.HeavyHitter$';
+            var hash = 'com.twitter.algebird.AdaptiveCache';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -22,26 +22,33 @@
    	  </script>
     
         </head>
-        <body class="value">
+        <body class="type">
       <div id="definition">
-        <a href="HeavyHitter.html" title="Go to companion"><img src="../../../lib/object_to_class_big.png" /></a>
+        <img src="../../../lib/class_big.png" />
         <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.twitter">twitter</a>.<a href="package.html" class="extype" name="com.twitter.algebird">algebird</a></p>
-        <h1><a href="HeavyHitter.html" title="Go to companion">HeavyHitter</a></h1>
+        <h1>AdaptiveCache</h1>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">HeavyHitter</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">AdaptiveCache</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>This is a wrapper around SummingCache that attempts to grow the capacity
+by up to some maximum, as long as there's enough RAM.
+It determines that there's enough RAM to grow by maintaining a SentinelCache
+which keeps caching and summing the evicted values.
+Once the SentinelCache has grown to the same size as the current cache,
+plus some margin, without running out of RAM, then this indicates that we
+have enough headroom to double the capacity.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/AdaptiveCache.scala" target="_blank">AdaptiveCache.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]], <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -59,7 +66,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.HeavyHitter"><span>HeavyHitter</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.AdaptiveCache"><span>AdaptiveCache</span></li><li class="in" name="com.twitter.algebird.StatefulSummer"><span>StatefulSummer</span></li><li class="in" name="com.twitter.algebird.Buffered"><span>Buffered</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -77,9 +84,41 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.twitter.algebird.AdaptiveCache#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(maxCapacity:Int,growthMargin:Double)(implicitevidence$1:com.twitter.algebird.Semigroup[V]):com.twitter.algebird.AdaptiveCache[K,V]"></a>
+      <a id="&lt;init&gt;:AdaptiveCache[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AdaptiveCache</span><span class="params">(<span name="maxCapacity">maxCapacity: <span class="extype" name="scala.Int">Int</span></span>, <span name="growthMargin">growthMargin: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">3.0</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]</span>)</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.twitter.algebird.AdaptiveCache.CacheStats" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CacheStatsextendsProductwithSerializable"></a>
+      <a id="CacheStats:CacheStats"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AdaptiveCache$CacheStats.html"><span class="name">CacheStats</span></a><span class="params">(<span name="hits">hits: <span class="extype" name="scala.Int">Int</span></span>, <span name="cacheGrowth">cacheGrowth: <span class="extype" name="scala.Int">Int</span></span>, <span name="sentinelGrowth">sentinelGrowth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
 
         
 
@@ -227,6 +266,19 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.AdaptiveCache#flush" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flush:Option[Map[K,V]]"></a>
+      <a id="flush:Option[Map[K,V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flush</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AdaptiveCache">AdaptiveCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -253,6 +305,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.AdaptiveCache#isFlushed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isFlushed:Boolean"></a>
+      <a id="isFlushed:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isFlushed</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AdaptiveCache">AdaptiveCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -305,19 +370,45 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.HeavyHitter#ordering" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ordering[K](implicitevidence$34:Ordering[K]):Ordering[com.twitter.algebird.HeavyHitter[K]]"></a>
-      <a id="ordering[K](Ordering[K]):Ordering[HeavyHitter[K]]"></a>
+    </li><li name="com.twitter.algebird.AdaptiveCache#put" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="put(m:Map[K,V]):Option[Map[K,V]]"></a>
+      <a id="put(Map[K,V]):Option[Map[K,V]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">ordering</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.HeavyHitter.ordering.K">K</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Ordering">Ordering</span>[<a href="HeavyHitter.html" class="extype" name="com.twitter.algebird.HeavyHitter">HeavyHitter</a>[<span class="extype" name="com.twitter.algebird.HeavyHitter.ordering.K">K</span>]]</span>
+        <span class="name">put</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AdaptiveCache">AdaptiveCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.AdaptiveCache#putWithStats" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="putWithStats(m:Map[K,V]):(AdaptiveCache.this.CacheStats,Option[Map[K,V]])"></a>
+      <a id="putWithStats(Map[K,V]):(CacheStats,Option[Map[K,V]])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putWithStats</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]</span>)</span><span class="result">: (<a href="AdaptiveCache$CacheStats.html" class="extype" name="com.twitter.algebird.AdaptiveCache.CacheStats">CacheStats</a>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]])</span>
       </span>
       </h4>
       
+    </li><li name="com.twitter.algebird.AdaptiveCache#semigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroup:com.twitter.algebird.MapMonoid[K,V]"></a>
+      <a id="semigroup:MapMonoid[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">semigroup</span><span class="result">: <a href="MapMonoid.html" class="extype" name="com.twitter.algebird.MapMonoid">MapMonoid</a>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AdaptiveCache">AdaptiveCache</a> → <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -410,8 +501,10 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+        <div class="parent" name="com.twitter.algebird.StatefulSummer">
+              <h3>Inherited from <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</h3>
+            </div><div class="parent" name="com.twitter.algebird.Buffered">
+              <h3>Inherited from <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.AdaptiveCache.K">K</span>, <span class="extype" name="com.twitter.algebird.AdaptiveCache.V">V</span>]]</h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
             </div><div class="parent" name="scala.AnyRef">

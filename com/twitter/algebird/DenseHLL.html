@@ -35,12 +35,12 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">DenseHLL</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">DenseHLL</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a></span>)</span><span class="result"> extends <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>These are the individual instances which the Monoid knows how to add
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala" target="_blank">HyperLogLog.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -81,7 +81,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.DenseHLL#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(bits:Int,v:IndexedSeq[Byte]):com.twitter.algebird.DenseHLL"></a>
+      <a id="&lt;init&gt;(bits:Int,v:com.twitter.algebird.Bytes):com.twitter.algebird.DenseHLL"></a>
       <a id="&lt;init&gt;:DenseHLL"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -89,7 +89,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">DenseHLL</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span>
+        <span class="name">DenseHLL</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a></span>)</span>
       </span>
       </h4>
       
@@ -238,6 +238,39 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.DenseHLL#downsize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="downsize(reducedBits:Int,reducedSize:Int,bitMask:Int,buf:Array[Byte]):com.twitter.algebird.HLL"></a>
+      <a id="downsize(Int,Int,Int,Array[Byte]):HLL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">downsize</span><span class="params">(<span name="reducedBits">reducedBits: <span class="extype" name="scala.Int">Int</span></span>, <span name="reducedSize">reducedSize: <span class="extype" name="scala.Int">Int</span></span>, <span name="bitMask">bitMask: <span class="extype" name="scala.Int">Int</span></span>, <span name="buf">buf: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result">: <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns a new HLL instance with reduced size
+</p><div class="fullcomment"><div class="comment cmt"><p>Returns a new HLL instance with reduced size
+</p></div><dl class="paramcmts block"><dt class="param">reducedBits</dt><dd class="cmt"><p>The new number of bits to use (for the length of j)</p></dd><dt class="param">reducedSize</dt><dd class="cmt"><p>New size (passed in to avoid repeated computation)</p></dd><dt class="param">bitMask</dt><dd class="cmt"><p>Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)</p></dd><dt class="param">buf</dt><dd class="cmt"><p>Byte array (passed in to avoid repeated allocation)
+</p></dd><dt>returns</dt><dd class="cmt"><p>New HLL instance with reduced size
+</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.DenseHLL">DenseHLL</a> → <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.HLL#downsize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="downsize(reducedBits:Int):com.twitter.algebird.HLL"></a>
+      <a id="downsize(Int):HLL"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">downsize</span><span class="params">(<span name="reducedBits">reducedBits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns a new HLL instance with reduced size</p><div class="fullcomment"><div class="comment cmt"><p>Returns a new HLL instance with reduced size</p><p><a href="http://research.neustar.biz/2012/09/12/set-operations-on-hlls-of-different-sizes/" target="_blank">http://research.neustar.biz/2012/09/12/set-operations-on-hlls-of-different-sizes/</a></p><p><a href="http://research.neustar.biz/2013/03/25/hyperloglog-engineering-choosing-the-right-bits/" target="_blank">http://research.neustar.biz/2013/03/25/hyperloglog-engineering-choosing-the-right-bits/</a>
+</p></div><dl class="paramcmts block"><dt class="param">reducedBits</dt><dd class="cmt"><p>The new number of bits to use
+</p></dd><dt>returns</dt><dd class="cmt"><p>New HLL instance with reduced size
+</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -296,6 +329,24 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.HLL#getModifiedRhoW" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getModifiedRhoW(currentJ:Int,currentRhoW:Byte,reducedBits:Int,reducedSize:Int,bitMask:Int,buf:Array[Byte]):Byte"></a>
+      <a id="getModifiedRhoW(Int,Byte,Int,Int,Int,Array[Byte]):Byte"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getModifiedRhoW</span><span class="params">(<span name="currentJ">currentJ: <span class="extype" name="scala.Int">Int</span></span>, <span name="currentRhoW">currentRhoW: <span class="extype" name="scala.Byte">Byte</span></span>, <span name="reducedBits">reducedBits: <span class="extype" name="scala.Int">Int</span></span>, <span name="reducedSize">reducedSize: <span class="extype" name="scala.Int">Int</span></span>, <span name="bitMask">bitMask: <span class="extype" name="scala.Int">Int</span></span>, <span name="buf">buf: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Byte">Byte</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns the modified value of rhoW at j, taking into account the
+extra run of bits added to rho due to reduction in the length of j.</p><div class="fullcomment"><div class="comment cmt"><p>Returns the modified value of rhoW at j, taking into account the
+extra run of bits added to rho due to reduction in the length of j.
+</p></div><dl class="paramcmts block"><dt class="param">currentJ</dt><dd class="cmt"><p>j for which modified rhoW is needed</p></dd><dt class="param">currentRhoW</dt><dd class="cmt"><p>Current rhoW value for j</p></dd><dt class="param">reducedBits</dt><dd class="cmt"><p>New length of j</p></dd><dt class="param">reducedSize</dt><dd class="cmt"><p>New size (passed in to avoid repeated computation)</p></dd><dt class="param">bitMask</dt><dd class="cmt"><p>Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)</p></dd><dt class="param">buf</dt><dd class="cmt"><p>Byte array (passed in to avoid repeated allocation)
+</p></dd><dt>returns</dt><dd class="cmt"><p>New value of rhoW
+</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -403,15 +454,15 @@
 </p><div class="fullcomment"><div class="comment cmt"><p>Set each item in the given buffer to the max of this and the buffer
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.DenseHLL">DenseHLL</a> → <a href="HLL.html" class="extype" name="com.twitter.algebird.HLL">HLL</a></dd></dl></div>
     </li><li name="com.twitter.algebird.DenseHLL#v" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="v:IndexedSeq[Byte]"></a>
-      <a id="v:IndexedSeq[Byte]"></a>
+      <a id="v:com.twitter.algebird.Bytes"></a>
+      <a id="v:Bytes"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">v</span><span class="result">: <span class="extype" name="scala.IndexedSeq">IndexedSeq</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
+        <span class="name">v</span><span class="result">: <a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a></span>
       </span>
       </h4>
       

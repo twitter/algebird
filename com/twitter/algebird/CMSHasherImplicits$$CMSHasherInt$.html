@@ -39,7 +39,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="scala.Int">Int</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -150,19 +150,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.CMSHasher#PRIME_MODULUS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="PRIME_MODULUS:Int"></a>
-      <a id="PRIME_MODULUS:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PRIME_MODULUS</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -195,6 +182,25 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.CMSHasher#contramap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="contramap[L](f:L=&gt;K):com.twitter.algebird.CMSHasher[L]"></a>
+      <a id="contramap[L]((L)⇒Int):CMSHasher[L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contramap</span><span class="tparams">[<span name="L">L</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="com.twitter.algebird.CMSHasher.contramap.L">L</span>) ⇒ <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSHasher.contramap.L">L</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Given <code>f</code>, a function from <code>L</code> into <code>K</code>, creates a <code>CMSHasher[L]</code> whose hash function is equivalent to:</p><div class="fullcomment"><div class="comment cmt"><p>Given <code>f</code>, a function from <code>L</code> into <code>K</code>, creates a <code>CMSHasher[L]</code> whose hash function is equivalent to:</p><pre><span class="kw">def</span> hash(a: <span class="std">Int</span>, b: <span class="std">Int</span>, width: <span class="std">Int</span>)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))</pre><p>Be aware that the use of contramap may come at a cost (e.g. increased time) due to the translation calls between
+<code>K</code> and <code>L</code>.</p><h3>Usage</h3><p>The following example creates a CMSHasher for the unsupported type <code>K=Double</code>:</p><pre><span class="kw">def</span> f(d: <span class="std">Double</span>): <span class="std">Array</span>[<span class="std">Byte</span>] = {
+  <span class="kw">val</span> l: <span class="std">Long</span> = java.lang.<span class="std">Double</span>.doubleToLongBits(d)
+  java.nio.ByteBuffer.allocate(<span class="num">8</span>).putLong(l).array()
+}
+
+<span class="kw">implicit</span> <span class="kw">val</span> cmsHasherDouble: CMSHasher[<span class="std">Double</span>] = CMSHasherArrayByte.contramap((d: <span class="std">Double</span>) <span class="kw">=&gt;</span> f(d))</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -332,6 +338,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.CMSHasher#on" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="on[L](f:L=&gt;K):com.twitter.algebird.CMSHasher[L]"></a>
+      <a id="on[L]((L)⇒Int):CMSHasher[L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">on</span><span class="tparams">[<span name="L">L</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="com.twitter.algebird.CMSHasher.on.L">L</span>) ⇒ <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSHasher.on.L">L</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Given <code>f</code>, a function from <code>L</code> into <code>K</code>, creates a <code>CMSHasher[L]</code> whose hash function is equivalent to:</p><div class="fullcomment"><div class="comment cmt"><p>Given <code>f</code>, a function from <code>L</code> into <code>K</code>, creates a <code>CMSHasher[L]</code> whose hash function is equivalent to:</p><pre><span class="kw">def</span> hash(a: <span class="std">Int</span>, b: <span class="std">Int</span>, width: <span class="std">Int</span>)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

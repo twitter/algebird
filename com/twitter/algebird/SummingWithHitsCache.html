@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>CMSHasherShort - com.twitter.algebird.CMSHasherImplicits.CMSHasherShort</title>
-          <meta name="description" content="CMSHasherShort - com.twitter.algebird.CMSHasherImplicits.CMSHasherShort" />
-          <meta name="keywords" content="CMSHasherShort com.twitter.algebird.CMSHasherImplicits.CMSHasherShort" />
+          <title>SummingWithHitsCache - com.twitter.algebird.SummingWithHitsCache</title>
+          <meta name="description" content="SummingWithHitsCache - com.twitter.algebird.SummingWithHitsCache" />
+          <meta name="keywords" content="SummingWithHitsCache com.twitter.algebird.SummingWithHitsCache" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -12,7 +12,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../index.html';
-            var hash = 'com.twitter.algebird.CMSHasherImplicits$$CMSHasherShort$';
+            var hash = 'com.twitter.algebird.SummingWithHitsCache';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -22,26 +22,27 @@
    	  </script>
     
         </head>
-        <body class="value">
+        <body class="type">
       <div id="definition">
-        <img src="../../../lib/object_big.png" />
-        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.twitter">twitter</a>.<a href="package.html" class="extype" name="com.twitter.algebird">algebird</a>.<a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a></p>
-        <h1>CMSHasherShort</h1>
+        <a href="SummingWithHitsCache$.html" title="Go to companion"><img src="../../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.twitter">twitter</a>.<a href="package.html" class="extype" name="com.twitter.algebird">algebird</a></p>
+        <h1><a href="SummingWithHitsCache$.html" title="Go to companion">SummingWithHitsCache</a></h1>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">object</span>
+        <span class="modifier"></span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">CMSHasherShort</span><span class="result"> extends <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="scala.Short">Short</span>]</span>
+        <span class="name">SummingWithHitsCache</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A SummingCache that also tracks the number of key hits
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/SummingCache.scala" target="_blank">SummingCache.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="scala.Short">Short</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>], <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]], <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -59,7 +60,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.CMSHasherImplicits.CMSHasherShort"><span>CMSHasherShort</span></li><li class="in" name="com.twitter.algebird.CMSHasher"><span>CMSHasher</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.SummingWithHitsCache"><span>SummingWithHitsCache</span></li><li class="in" name="com.twitter.algebird.SummingCache"><span>SummingCache</span></li><li class="in" name="com.twitter.algebird.StatefulSummer"><span>StatefulSummer</span></li><li class="in" name="com.twitter.algebird.Buffered"><span>Buffered</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -77,7 +78,23 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.twitter.algebird.SummingWithHitsCache#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(capacity:Int)(implicitsgv:com.twitter.algebird.Semigroup[V]):com.twitter.algebird.SummingWithHitsCache[K,V]"></a>
+      <a id="&lt;init&gt;:SummingWithHitsCache[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SummingWithHitsCache</span><span class="params">(<span name="capacity">capacity: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="sgv">sgv: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>)</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
 
         
 
@@ -150,19 +167,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.CMSHasher#PRIME_MODULUS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="PRIME_MODULUS:Int"></a>
-      <a id="PRIME_MODULUS:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PRIME_MODULUS</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -176,6 +180,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#cache" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cache:scala.collection.mutable.Map[K,V]"></a>
+      <a id="cache:Map[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cache</span><span class="result">: <span class="extype" name="scala.collection.mutable.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -240,6 +257,19 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#flush" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flush:Option[Map[K,V]]"></a>
+      <a id="flush:Option[Map[K,V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flush</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -253,20 +283,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.CMSHasherImplicits.CMSHasherShort#hash" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hash(a:Int,b:Int,width:Int)(x:Short):Int"></a>
-      <a id="hash(Int,Int,Int)(Short):Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hash</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Int">Int</span></span>, <span name="b">b: <span class="extype" name="scala.Int">Int</span></span>, <span name="width">width: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Short">Short</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns <code>a * x + b (mod p) (mod width)</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Returns <code>a * x + b (mod p) (mod width)</code>.
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.CMSHasherImplicits.CMSHasherShort">CMSHasherShort</a> → <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -280,6 +296,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#isFlushed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isFlushed:Boolean"></a>
+      <a id="isFlushed:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isFlushed</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -293,6 +322,19 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#lastEvicted" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lastEvicted:Map[K,V]"></a>
+      <a id="lastEvicted:Map[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lastEvicted</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -332,6 +374,58 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#optNonEmpty" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="optNonEmpty(m:Map[K,V]):Option[Map[K,V]]"></a>
+      <a id="optNonEmpty(Map[K,V]):Option[Map[K,V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">optNonEmpty</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingCache#put" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="put(m:Map[K,V]):Option[Map[K,V]]"></a>
+      <a id="put(Map[K,V]):Option[Map[K,V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">put</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a> → <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.SummingWithHitsCache#putWithHits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="putWithHits(m:Map[K,V]):(Int,Option[Map[K,V]])"></a>
+      <a id="putWithHits(Map[K,V]):(Int,Option[Map[K,V]])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putWithHits</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>)</span><span class="result">: (<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]])</span>
+      </span>
+      </h4>
+      
+    </li><li name="com.twitter.algebird.SummingCache#semigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroup:com.twitter.algebird.MapMonoid[K,V]"></a>
+      <a id="semigroup:MapMonoid[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">semigroup</span><span class="result">: <a href="MapMonoid.html" class="extype" name="com.twitter.algebird.MapMonoid">MapMonoid</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a> → <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -424,8 +518,12 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.twitter.algebird.CMSHasher">
-              <h3>Inherited from <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="scala.Short">Short</span>]</h3>
+        <div class="parent" name="com.twitter.algebird.SummingCache">
+              <h3>Inherited from <a href="SummingCache.html" class="extype" name="com.twitter.algebird.SummingCache">SummingCache</a>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]</h3>
+            </div><div class="parent" name="com.twitter.algebird.StatefulSummer">
+              <h3>Inherited from <a href="StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]]</h3>
+            </div><div class="parent" name="com.twitter.algebird.Buffered">
+              <h3>Inherited from <a href="Buffered.html" class="extype" name="com.twitter.algebird.Buffered">Buffered</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.SummingWithHitsCache.K">K</span>, <span class="extype" name="com.twitter.algebird.SummingWithHitsCache.V">V</span>]]</h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
             </div><div class="parent" name="scala.AnyRef">

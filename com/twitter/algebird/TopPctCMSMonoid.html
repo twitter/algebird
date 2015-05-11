@@ -39,15 +39,24 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Monoid for Top-% based <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a> sketches.</p><p>Implicit conversions for commonly used types for <code>K</code> such as <span class="extype" name="Long">Long</span> and <span class="extype" name="BigInt">BigInt</span>:</p><pre><span class="kw">import</span> com.twitter.algebird.CMSHasherImplicits._</pre></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Monoid for Top-% based <a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a> sketches.</p><h3>Usage</h3><p>The type <code>K</code> is the type of items you want to count.  You must provide an implicit <code>CMSHasher[K]</code> for <code>K</code>,  and
+Algebird ships with several such implicits for commonly used types such as <span class="extype" name="Long">Long</span> and <span class="extype" name="BigInt">BigInt</span>:</p><pre><span class="kw">import</span> com.twitter.algebird.CMSHasherImplicits._</pre><p>If your type <code>K</code> is not supported out of the box, you have two options: 1) You provide a &quot;translation&quot; function to
+convert items of your (unsupported) type <code>K</code> to a supported type such as <span class="extype" name="Double">Double</span>, and then use the <code>contramap</code>
+function of <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> to create the required <code>CMSHasher[K]</code> for your type (see the documentation of <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>
+for an example); 2) You implement a <code>CMSHasher[K]</code> from scratch, using the existing CMSHasher implementations as a
+starting point.</p><p>Note: Because Arrays in Scala/Java not have sane <code>equals</code> and <code>hashCode</code> implementations, you cannot safely use types
+such as <code>Array[Byte]</code>.  Extra work is required for Arrays.  For example, you may opt to convert <code>Array[T]</code> to a
+<code>Seq[T]</code> via <code>toSeq</code>, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
+<a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a>, to safely wrap an <code>Array[Byte]</code> for use with CMS.
+</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
           user names, you could map each username to a unique numeric ID expressed as a <code>Long</code>, and then count the
           occurrences of those <code>Long</code>s with a CMS of type <code>K=Long</code>.  Note that this mapping between the elements of
           your problem domain and their identifiers used for counting via CMS should be bijective.
-          We require <span class="extype" name="Ordering">Ordering</span> and <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> context bounds for <code>K</code>, see <a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a> for available
-          implicits that can be imported.
+          We require a <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> context bound for <code>K</code>, see <a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a> for available implicits that
+          can be imported.
           Which type K should you pick in practice?  For domains that have less than <code>2^64<code> unique elements, you'd
           typically use <span class="extype" name="Long">Long</span>.  For larger domains you can try <span class="extype" name="BigInt">BigInt</span>, for example.
-</code></code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+</code></code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopPctCMSMonoid.K">K</span>]], <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="TopCMS.html" class="extype" name="com.twitter.algebird.TopCMS">TopCMS</a>[<span class="extype" name="com.twitter.algebird.TopPctCMSMonoid.K">K</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -88,7 +97,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.TopPctCMSMonoid#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(cms:com.twitter.algebird.CMS[K],heavyHittersPct:Double)(implicitevidence$35:Ordering[K]):com.twitter.algebird.TopPctCMSMonoid[K]"></a>
+      <a id="&lt;init&gt;(cms:com.twitter.algebird.CMS[K],heavyHittersPct:Double):com.twitter.algebird.TopPctCMSMonoid[K]"></a>
       <a id="&lt;init&gt;:TopPctCMSMonoid[K]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -96,7 +105,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">TopPctCMSMonoid</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopPctCMSMonoid.K">K</span>]</span>, <span name="heavyHittersPct">heavyHittersPct: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.01</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.TopPctCMSMonoid.K">K</span>]</span>)</span>
+        <span class="name">TopPctCMSMonoid</span><span class="params">(<span name="cms">cms: <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.TopPctCMSMonoid.K">K</span>]</span>, <span name="heavyHittersPct">heavyHittersPct: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.01</span></span>)</span>
       </span>
       </h4>
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">cms</dt><dd class="cmt"><p>A <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a> instance, which is used for the counting and the frequency estimation performed by this class.</p></dd><dt class="param">heavyHittersPct</dt><dd class="cmt"><p>A threshold for finding heavy hitters, i.e., elements that appear at least

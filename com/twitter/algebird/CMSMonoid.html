@@ -39,20 +39,29 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Monoid for adding <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a> sketches.</p><p><code>eps</code> and <code>delta</code> are parameters that bound the error of each query estimate. For example, errors in
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Monoid for adding <a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a> sketches.</p><h3>Usage</h3><p><code>eps</code> and <code>delta</code> are parameters that bound the error of each query estimate. For example, errors in
 answering point queries (e.g., how often has element x appeared in the stream described by the sketch?)
 are often of the form: &quot;with probability p &gt;= 1 - delta, the estimate is close to the truth by
-some factor depending on eps.&quot;</p><p>Implicit conversions for commonly used types for <code>K</code> such as <span class="extype" name="Long">Long</span> and <span class="extype" name="BigInt">BigInt</span>:</p><pre><span class="kw">import</span> com.twitter.algebird.CMSHasherImplicits._</pre></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
+some factor depending on eps.&quot;</p><p>The type <code>K</code> is the type of items you want to count.  You must provide an implicit <code>CMSHasher[K]</code> for <code>K</code>,  and
+Algebird ships with several such implicits for commonly used types such as <span class="extype" name="Long">Long</span> and <span class="extype" name="BigInt">BigInt</span>:</p><pre><span class="kw">import</span> com.twitter.algebird.CMSHasherImplicits._</pre><p>If your type <code>K</code> is not supported out of the box, you have two options: 1) You provide a &quot;translation&quot; function to
+convert items of your (unsupported) type <code>K</code> to a supported type such as <span class="extype" name="Double">Double</span>, and then use the <code>contramap</code>
+function of <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> to create the required <code>CMSHasher[K]</code> for your type (see the documentation of <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>
+for an example); 2) You implement a <code>CMSHasher[K]</code> from scratch, using the existing CMSHasher implementations as a
+starting point.</p><p>Note: Because Arrays in Scala/Java not have sane <code>equals</code> and <code>hashCode</code> implementations, you cannot safely use types
+such as <code>Array[Byte]</code>.  Extra work is required for Arrays.  For example, you may opt to convert <code>Array[T]</code> to a
+<code>Seq[T]</code> via <code>toSeq</code>, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
+<a href="Bytes.html" class="extype" name="com.twitter.algebird.Bytes">Bytes</a>, to safely wrap an <code>Array[Byte]</code> for use with CMS.
+</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
           user names, you could map each username to a unique numeric ID expressed as a <code>Long</code>, and then count the
           occurrences of those <code>Long</code>s with a CMS of type <code>K=Long</code>.  Note that this mapping between the elements of
           your problem domain and their identifiers used for counting via CMS should be bijective.
-          We require <span class="extype" name="Ordering">Ordering</span> and <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> context bounds for <code>K</code>, see <a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a> for available
-          implicits that can be imported.
+          We require a <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a> context bound for <code>K</code>, see <a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a> for available implicits that
+          can be imported.
           Which type K should you pick in practice?  For domains that have less than <code>2^64<code> unique elements, you'd
           typically use <span class="extype" name="Long">Long</span>.  For larger domains you can try <span class="extype" name="BigInt">BigInt</span>, for example.  Other possibilities
           include Spire's </code>SafeLong<code> and </code>Numerical<code> data types (https://github.com/non/spire), though Algebird does
           not include the required implicits for CMS-hashing (cf. <a href="CMSHasherImplicits$.html" class="extype" name="com.twitter.algebird.CMSHasherImplicits">CMSHasherImplicits</a>.
-</code></code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.9.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
+</code></code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/0.10.0/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala" target="_blank">CountMinSketch.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSMonoid.K">K</span>]], <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="CMS.html" class="extype" name="com.twitter.algebird.CMS">CMS</a>[<span class="extype" name="com.twitter.algebird.CMSMonoid.K">K</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -93,7 +102,7 @@ some factor depending on eps.&quot;</p><p>Implicit conversions for commonly used
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.twitter.algebird.CMSMonoid#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(eps:Double,delta:Double,seed:Int)(implicitevidence$1:Ordering[K],implicitevidence$2:com.twitter.algebird.CMSHasher[K]):com.twitter.algebird.CMSMonoid[K]"></a>
+      <a id="&lt;init&gt;(eps:Double,delta:Double,seed:Int)(implicitevidence$1:com.twitter.algebird.CMSHasher[K]):com.twitter.algebird.CMSMonoid[K]"></a>
       <a id="&lt;init&gt;:CMSMonoid[K]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -101,7 +110,7 @@ some factor depending on eps.&quot;</p><p>Implicit conversions for commonly used
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">CMSMonoid</span><span class="params">(<span name="eps">eps: <span class="extype" name="scala.Double">Double</span></span>, <span name="delta">delta: <span class="extype" name="scala.Double">Double</span></span>, <span name="seed">seed: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.CMSMonoid.K">K</span>]</span>, <span name="arg1">arg1: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSMonoid.K">K</span>]</span>)</span>
+        <span class="name">CMSMonoid</span><span class="params">(<span name="eps">eps: <span class="extype" name="scala.Double">Double</span></span>, <span name="delta">delta: <span class="extype" name="scala.Double">Double</span></span>, <span name="seed">seed: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="CMSHasher.html" class="extype" name="com.twitter.algebird.CMSHasher">CMSHasher</a>[<span class="extype" name="com.twitter.algebird.CMSMonoid.K">K</span>]</span>)</span>
       </span>
       </h4>
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">eps</dt><dd class="cmt"><p>One-sided error bound on the error of each point query, i.e. frequency estimate.</p></dd><dt class="param">delta</dt><dd class="cmt"><p>A bound on the probability that a query estimate does not lie within some small interval
