@@ -109,11 +109,12 @@ class QTreeTest extends WordSpec with Matchers {
   for (quantile <- List(0, .05, .5, .777777777, .95))
     ("A QTreeAggregator with quantile set as " + quantile) should {
       "work as an aggregator for doubles with a small stream" in {
-        val list = randomList(10000)
+        val list = randomList(10000).map(_ * 100)
         val (lower, upper) = aggregate(list, quantile)
         val truth = trueQuantile(list, quantile)
-        assert(truth >= lower)
-        assert(truth <= upper)
+        val jitter = 1
+        assert(truth >= (lower - jitter))
+        assert(truth <= (upper + jitter))
       }
       "work as an aggregator for longs with a small stream" in {
         val list = randomList(10000).map(i => (i * 1000l).toLong)
