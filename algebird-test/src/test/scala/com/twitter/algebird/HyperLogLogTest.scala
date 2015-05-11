@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Gen, Arbitrary, Prop }
 
 import scala.collection.BitSet
 
@@ -35,7 +35,7 @@ object ReferenceHyperLogLog {
 
 }
 
-class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
+class HyperLogLogLaws extends CheckProperties {
   import BaseProperties._
   import HyperLogLog._
 
@@ -51,6 +51,12 @@ class HyperLogLogLaws extends PropSpec with PropertyChecks with Matchers {
     monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
   }
 
+  property("bitsForError and error match") {
+    Prop.forAll(Gen.choose(0.0001, 0.999)) { err =>
+      val bits = HyperLogLog.bitsForError(err)
+      (HyperLogLog.error(bits) <= err) && (HyperLogLog.error(bits - 1) > err)
+    }
+  }
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
@@ -111,6 +117,14 @@ class HyperLogLogTest extends WordSpec with Matchers {
     val errorMult = scala.math.pow(2.0, sets) - 1.0
     assert(scala.math.abs(exact - approxIntersect(bits, data)) / exact < errorMult *
       aveErrorOf(bits))
+  }
+  def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
+    val data = (0 until dataSize).map { i => r.nextLong }
+    val exact = exactCount(data).toDouble
+    val hll = new HyperLogLogMonoid(oldBits)
+    val oldHll = hll.sum(data.map { hll(_) })
+    val newHll = oldHll.downsize(newBits)
+    assert(scala.math.abs(exact - newHll.estimatedSize) / exact < 3.5 * aveErrorOf(newBits))
   }
 
   "HyperLogLog" should {
@@ -216,9 +230,65 @@ class HyperLogLogTest extends WordSpec with Matchers {
       })
     }
 
+    "correctly downsize sparse HLL" in {
+      testDownsize(10)(10, 7)
+      testDownsize(10)(14, 4)
+      testDownsize(10)(12, 12)
+
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10)(15, 3)
+      }
+    }
+
+    "correctly downsize dense HLL" in {
+      testDownsize(10000)(10, 7)
+      testDownsize(10000)(14, 4)
+      testDownsize(10000)(12, 12)
+
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(9, 13)
+      }
+      intercept[IllegalArgumentException] {
+        testDownsize(10000)(15, 3)
+      }
+    }
+
     def verifySerialization(h: HLL) {
       assert(fromBytes(toBytes(h)) == h)
       fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
+    }
+  }
+
+  "SetSizeAggregator" should {
+    "work as an Aggregator and return exact size when <= maxSetSize" in {
+      List(5, 7, 10).foreach(i => {
+        val maxSetSize = 10000
+        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
+
+        val maxUniqueDataSize = maxSetSize / 2
+        val data = (0 to maxUniqueDataSize).map { _ => r.nextInt(1000) }
+        val exact = exactCount(data).toDouble
+        val result = aggregator(data)
+        assert(result == exact)
+      })
+    }
+
+    "work as an Aggregator and return approximate size when > maxSetSize" in {
+      List(5, 7, 10).foreach(i => {
+        val maxSetSize = 10000
+        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
+
+        val maxUniqueDataSize = maxSetSize + i
+        val data = 0 to maxUniqueDataSize
+        val exact = exactCount(data).toDouble
+
+        val estimate = aggregator(data)
+        assert(estimate != exact)
+        assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(i))
+      })
     }
   }
 }

@@ -9,7 +9,7 @@ package com.twitter.algebird
  * Uses of Preparer will always start with a call to Preparer[A], and end with a call to
  * monoidAggregate or a related method, to produce an Aggregator instance.
  */
-sealed trait Preparer[A, T] {
+sealed trait Preparer[A, T] extends java.io.Serializable {
   /**
    * Produce a new MonoidAggregator which includes the Preparer's transformation chain in its prepare stage.
    */
@@ -31,7 +31,10 @@ sealed trait Preparer[A, T] {
    * Filter out values that do not meet the predicate.
    * Like flatMap, this limits future aggregations to MonoidAggregator.
    */
-  def filter(fn: T => Boolean) = flatMap{ t => if (fn(t)) Some(t) else None }
+  def filter(fn: T => Boolean) = flatMap { t => if (fn(t)) Some(t) else None }
+
+  def collect[U](p: PartialFunction[T, U]): FlatMapPreparer[A, U] =
+    flatMap { t => if (p.isDefinedAt(t)) Some(p(t)) else None }
 
   /**
    * count and following methods all just call monoidAggregate with one of the standard Aggregators.

@@ -112,6 +112,8 @@ sealed abstract class BF extends java.io.Serializable {
 
   def +(other: String): BF
 
+  def checkAndAdd(item: String): (BF, ApproximateBoolean)
+
   def contains(item: String): ApproximateBoolean
 
   // Estimates the cardinality of the set of elements that have been
@@ -128,6 +130,8 @@ case class BFZero(hashes: BFHash, width: Int) extends BF {
   def ++(other: BF) = other
 
   def +(other: String) = BFItem(other, hashes, width)
+
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
 
   def contains(item: String) = ApproximateBoolean.exactFalse
 
@@ -149,6 +153,14 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
   }
 
   def +(other: String) = this ++ BFItem(other, hashes, width)
+
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
+    if (other == item) {
+      (this, ApproximateBoolean.exactTrue)
+    } else {
+      (this + other, ApproximateBoolean.exactFalse)
+    }
+  }
 
   def contains(x: String) = ApproximateBoolean.exact(item == x)
 
@@ -187,6 +199,8 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
       width)
   }
 
+  def checkAndAdd(other: String): (BF, ApproximateBoolean) = dense.checkAndAdd(other)
+
   def contains(item: String): ApproximateBoolean = dense.contains(item)
 
   def size: Approximate[Long] = dense.size
@@ -218,19 +232,36 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
   }
 
   def +(item: String): BFInstance = {
-    val bitsToActivate = BitSet(hashes(item): _*)
+    val itemHashes = hashes(item)
+    this.+(itemHashes: _*)
+  }
+
+  private def +(itemHashes: Int*): BFInstance = {
+    val bitsToActivate = BitSet(itemHashes: _*)
 
     BFInstance(hashes,
       bits ++ bitsToActivate,
       width)
   }
 
-  def bitSetContains(bs: BitSet, il: Int*): Boolean = {
-    il.map{ i: Int => bs.contains(i) }.reduce{ _ && _ }
+  def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
+    val itemHashes = hashes(item)
+    val contained = this.contains(itemHashes: _*)
+    (this.+(itemHashes: _*), contained)
   }
 
-  def contains(item: String) = {
-    if (bitSetContains(bits, hashes(item): _*)) {
+  private def bitSetContains(bs: BitSet, il: Int*): Boolean = {
+    il.foreach { i => if (!bs.contains(i)) return false }
+    true
+  }
+
+  def contains(item: String): ApproximateBoolean = {
+    val itemHashes = hashes(item)
+    contains(itemHashes: _*)
+  }
+
+  private[algebird] def contains(itemHashes: Int*): ApproximateBoolean = {
+    if (bitSetContains(bits, itemHashes: _*)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
       // p = (1 - e^(-numHashes * setCardinality / width))^numHashes

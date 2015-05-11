@@ -1,17 +1,12 @@
 package com.twitter.algebird.statistics
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Arbitrary, Properties }
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import com.twitter.algebird.CheckProperties
+import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
-import org.scalatest._
+import org.scalatest.{ Matchers, _ }
 
-import com.twitter.algebird.BaseProperties
-
-class StatisticsRingLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class StatisticsRingLaws extends CheckProperties with Matchers {
+  import com.twitter.algebird.BaseProperties._
 
   val statsRing = new StatisticsRing[Int]
   val gen = for (v <- choose(0, 1 << 30)) yield v
@@ -22,8 +17,8 @@ class StatisticsRingLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class StatisticsMonoidLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class StatisticsMonoidLaws extends CheckProperties with Matchers {
+  import com.twitter.algebird.BaseProperties._
 
   val statsMonoid = new StatisticsMonoid[Int]
 

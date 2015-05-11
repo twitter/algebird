@@ -15,12 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Arbitrary, Properties }
-
-class PredecessibleTests extends PropSpec with PropertyChecks with Matchers {
-  import PredecessibleLaws.{ predessibleLaws => laws }
+class PredecessibleTests extends CheckProperties {
+  import com.twitter.algebird.PredecessibleLaws.{ predessibleLaws => laws }
 
   property("Int is Predecessible") {
     laws[Int]

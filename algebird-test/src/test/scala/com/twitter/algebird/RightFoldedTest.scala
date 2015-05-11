@@ -1,11 +1,9 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Arbitrary, Gen }
 
-class RightFoldedTest extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class RightFoldedTest extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit def rightFoldedValue[Out: Arbitrary]: Arbitrary[RightFoldedValue[Out]] =
     Arbitrary {

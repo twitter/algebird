@@ -1,4 +1,5 @@
-## Algebird [![Build Status](https://secure.travis-ci.org/twitter/algebird.png)](http://travis-ci.org/twitter/algebird)
+## Algebird [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird) [![Coverage status](https://img.shields.io/coveralls/twitter/algebird/develop.svg)](https://coveralls.io/r/twitter/algebird?branch=develop)
+ 		
 
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Storm](https://github.com/nathanmarz/storm)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
@@ -47,17 +48,17 @@ Discussion occurs primarily on the [Algebird mailing list](https://groups.google
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.9.0`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.10.0`.
 
 Current published artifacts are
 
-* `algebird-core_2.9.3`
+* `algebird-core_2.11`
 * `algebird-core_2.10`
-* `algebird-test_2.9.3`
+* `algebird-test_2.11`
 * `algebird-test_2.10`
-* `algebird-util_2.9.3`
+* `algebird-util_2.11`
 * `algebird-util_2.10`
-* `algebird-bijection_2.9.3`
+* `algebird-bijection_2.11`
 * `algebird-bijection_2.10`
 
 The suffix denotes the scala version.
@@ -68,7 +69,7 @@ The suffix denotes the scala version.
 We didn't know about it when we started this code, but it seems like we're more focused on
 large scale analytics.
 
-> Why not use Scalaz's [Monoid](https://github.com/scalaz/scalaz/blob/master/core/src/main/scala/scalaz/Monoid.scala) trait?
+> Why not use Scalaz's [Monoid](http://docs.typelevel.org/api/scalaz/stable/7.0.4/doc/#scalaz.Monoid) trait?
 
 The answer is a mix of the following:
 * The trait itself is tiny, we just need zero and plus, it is the implementations for all the types that are important. We wrote a code generator to derive instances for all the tuples, and by hand wrote monoids for List, Set, Option, Map, and several other objects used for counting (DecayedValue for exponential decay, AveragedValue for averaging, HyperLogLog for approximate cardinality counting). It's the instances that are useful in scalding and elsewhere.
@@ -82,7 +83,7 @@ The answer is a mix of the following:
 * Avi Bryant <http://twitter.com/avibryant>
 * Edwin Chen <http://twitter.com/echen>
 * ellchow <http://github.com/ellchow>
-* Mike Gagnon <https://twitter.com/MichaelNGagnon>
+* Mike Gagnon <https://twitter.com/gmike>
 * Moses Nakamura <https://twitter.com/mnnakamura>
 * Steven Noble <http://twitter.com/snoble>
 * Sam Ritchie <http://twitter.com/sritchie>

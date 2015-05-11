@@ -11,8 +11,8 @@ import com.typesafe.sbt.SbtScalariform._
 object AlgebirdBuild extends Build {
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
-    scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.10.4", "2.11.5"),
+    scalaVersion := "2.10.5",
+    crossScalaVersions := Seq("2.10.5", "2.11.5"),
     ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
@@ -98,7 +98,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.9.0" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.10.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -148,18 +148,18 @@ object AlgebirdBuild extends Build {
    * use cappi::benchmarkOnly com.twitter.algebird.caliper.HllBenchmark
    */
   lazy val algebirdCaliper = module("caliper").settings(
-     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.7.2"),
+     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.8.0"),
       javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
       fork in run := true
     ).settings(cappiSettings : _*).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
 
   lazy val algebirdUtil = module("util").settings(
     libraryDependencies += "com.twitter" %% "util-core" % "6.20.0"
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
   lazy val algebirdBijection = module("bijection").settings(
-    libraryDependencies += "com.twitter" %% "bijection-core" % "0.7.2"
-  ).dependsOn(algebirdCore, algebirdTest % "test->compile")
+    libraryDependencies += "com.twitter" %% "bijection-core" % "0.8.0"
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
 }
 
 
