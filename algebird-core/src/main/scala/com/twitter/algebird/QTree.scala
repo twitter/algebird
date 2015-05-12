@@ -374,7 +374,6 @@ trait QTreeAggregatorLike[T] {
   val percentile: Double
   val k: Int
   implicit val num: Numeric[T]
-
   def prepare(input: T) = QTree(num.toDouble(input))
   val semigroup = new QTreeSemigroup[Double](k)
 }
