@@ -59,24 +59,14 @@ class QTreeTest extends WordSpec with Matchers {
     list.map{ QTree(_) }.reduce{ qtSemigroup.plus(_, _) }
   }
 
-  def trueQuantile[T: Numeric](list: Seq[T], q: Double): T = {
+  def trueQuantile[T: Ordering](list: Seq[T], q: Double): T = {
     val rank = math.floor(q * list.size).toInt
     val sorted = list.toList.sorted
     sorted(rank)
   }
 
-  def trueRangeSum(list: Seq[Double], from: Double, to: Double) = {
+  def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
     list.filter{ _ >= from }.filter{ _ < to }.sum
-  }
-
-  def aggregate[T](list: Seq[T], quantile: Double)(implicit num: Numeric[T]): (Double, Double) = {
-    val agg = QTreeAggregator(quantile)
-    val r = list
-      .map(agg.prepare(_))
-      .reduce(agg.semigroup.plus(_, _))
-
-    agg.present(r)
-  }
 
   for (k <- (1 to 6))
     ("QTree with sizeHint 2^" + k) should {
@@ -109,19 +99,18 @@ class QTreeTest extends WordSpec with Matchers {
   for (quantile <- List(0, .05, .5, .777777777, .95))
     ("A QTreeAggregator with quantile set as " + quantile) should {
       "work as an aggregator for doubles with a small stream" in {
-        val list = randomList(10000).map(_ * 100)
-        val (lower, upper) = aggregate(list, quantile)
+        val list = randomList(10000).map(i => math.round(i * 100).toDouble)
+        val agg = QTreeAggregator(quantile)(implicitly[Numeric[Double]])
+        val interval = agg(list)
         val truth = trueQuantile(list, quantile)
-        val jitter = 1
-        assert(truth >= (lower - jitter))
-        assert(truth <= (upper + jitter))
+        assert(interval.contains(truth))
       }
       "work as an aggregator for longs with a small stream" in {
         val list = randomList(10000).map(i => (i * 1000l).toLong)
-        val (lower, upper) = aggregate(list, quantile)
+        val agg = QTreeAggregator(quantile)(implicitly[Numeric[Long]])
+        val interval = agg(list)
         val truth = trueQuantile(list, quantile)
-        assert(truth >= lower)
-        assert(truth <= upper)
+        assert(interval.contains(truth))
       }
     }
 }

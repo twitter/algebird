@@ -374,8 +374,8 @@ trait QTreeAggregatorLike[T] {
   val percentile: Double
   val k: Int
   implicit val num: Numeric[T]
-  def prepare(input: T) = QTree(num.toDouble(input))
-  val semigroup = new QTreeSemigroup[Double](k)
+  def prepare(input: T) = QTree.value(num.toDouble(input))
+  val semigroup = new QTreeSemigroup[Unit](k)
 }
 
 object QTreeAggregator {
@@ -383,15 +383,18 @@ object QTreeAggregator {
 }
 
 case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
-  extends Aggregator[T, QTree[Double], (Double, Double)]
+  extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
   with QTreeAggregatorLike[T] {
 
-  def present(qt: QTree[Double]) = qt.quantileBounds(percentile)
+  def present(qt: QTree[Unit]) = {
+    val (lower, upper) = qt.quantileBounds(percentile)
+    Intersection(InclusiveLower(lower), InclusiveUpper(upper))
+  }
 }
 
 case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
-  extends Aggregator[T, QTree[Double], Double]
+  extends Aggregator[T, QTree[Unit], Double]
   with QTreeAggregatorLike[T] {
 
-  def present(qt: QTree[Double]) = qt.quantileBounds(percentile)._1
+  def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1
 }
