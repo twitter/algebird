@@ -382,6 +382,11 @@ object QTreeAggregator {
   val DefaultK = 9
 }
 
+/**
+ * QTree aggregator is an aggregator that can be used to find the approximate percentile bounds.
+ * The items that are iterated over to produce this approximation cannot be negative.
+ * Returns an Intersection which represents the bounded approximation.
+ */
 case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
   extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
   with QTreeAggregatorLike[T] {
@@ -392,6 +397,12 @@ case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.Defau
   }
 }
 
+/**
+ * QTreeAggregatorLowerBound is an aggregator that is used to find an appoximate percentile.
+ * This is similar to a QTreeAggregator, but is a convenience because instead of returning an Intersection,
+ * it instead returns the lower bound of the percentile.
+ * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
+ */
 case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
   extends Aggregator[T, QTree[Unit], Double]
   with QTreeAggregatorLike[T] {
