@@ -194,6 +194,8 @@ case class QTree[A](
    * an estimate of the median.
    */
   def quantileBounds(p: Double): (Double, Double) = {
+    require(p >= 0.0 && p < 1.0, "The given percentile must be of the form 0 <= p < 1.0")
+
     val rank = math.floor(count * p).toLong
     // get is safe below, because findRankLowerBound only returns
     // None if rank > count, but due to construction rank <= count
@@ -366,4 +368,44 @@ case class QTree[A](
 
     (n.toDouble(ll) / luc, n.toDouble(uu) / ulc)
   }
+}
+
+trait QTreeAggregatorLike[T] {
+  val percentile: Double
+  val k: Int
+  implicit val num: Numeric[T]
+  def prepare(input: T) = QTree.value(num.toDouble(input))
+  val semigroup = new QTreeSemigroup[Unit](k)
+}
+
+object QTreeAggregator {
+  val DefaultK = 9
+}
+
+/**
+ * QTree aggregator is an aggregator that can be used to find the approximate percentile bounds.
+ * The items that are iterated over to produce this approximation cannot be negative.
+ * Returns an Intersection which represents the bounded approximation.
+ */
+case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
+  with QTreeAggregatorLike[T] {
+
+  def present(qt: QTree[Unit]) = {
+    val (lower, upper) = qt.quantileBounds(percentile)
+    Intersection(InclusiveLower(lower), InclusiveUpper(upper))
+  }
+}
+
+/**
+ * QTreeAggregatorLowerBound is an aggregator that is used to find an appoximate percentile.
+ * This is similar to a QTreeAggregator, but is a convenience because instead of returning an Intersection,
+ * it instead returns the lower bound of the percentile.
+ * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
+ */
+case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Unit], Double]
+  with QTreeAggregatorLike[T] {
+
+  def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1
 }
