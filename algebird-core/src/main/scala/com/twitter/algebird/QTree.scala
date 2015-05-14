@@ -38,10 +38,11 @@ package com.twitter.algebird
  */
 
 object QTree {
+  val DefaultLevel: Int = -16
   /**
    * level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
    */
-  def apply[A](kv: (Double, A), level: Int = -16): QTree[A] =
+  def apply[A](kv: (Double, A), level: Int = DefaultLevel): QTree[A] =
     QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
       level,
       1,
@@ -82,7 +83,7 @@ object QTree {
    * features of QTree, you can save some space by using QTree[Unit]
    * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
    */
-  def value(v: Double, level: Int = -16): QTree[Unit] = apply(v -> (), level)
+  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] = apply(v -> (), level)
 }
 
 class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extends Semigroup[QTree[A]] {
@@ -371,11 +372,19 @@ case class QTree[A](
 }
 
 trait QTreeAggregatorLike[T] {
-  val percentile: Double
-  val k: Int
-  implicit val num: Numeric[T]
-  def prepare(input: T) = QTree.value(num.toDouble(input))
-  val semigroup = new QTreeSemigroup[Unit](k)
+  def percentile: Double
+  /**
+   * This is the depth parameter for the QTreeSemigroup
+   */
+  def k: Int
+  /**
+   * We convert T to a Double, then the Double is converted
+   * to a Long by using a 2^level bucket size.
+   */
+  def level: Int = QTree.DefaultLevel
+  implicit def num: Numeric[T]
+  def prepare(input: T) = QTree.value(num.toDouble(input), level)
+  def semigroup = new QTreeSemigroup[Unit](k)
 }
 
 object QTreeAggregator {
