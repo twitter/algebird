@@ -253,7 +253,7 @@ sealed abstract class HLL extends java.io.Serializable {
     val e: Double = factor * z
     // There are large and small value corrections from the paper
     // We stopped using the large value corrections since when using Long's
-    // there was pathalogically bad results. See https://github.com/twitter/algebird/issues/284
+    // there was pathologically bad results. See https://github.com/twitter/algebird/issues/284
     if (e <= smallE) {
       smallEstimate(e)
     } else {
@@ -644,7 +644,10 @@ object HyperLogLogAggregator {
    *
    * Cutting the error in half takes 4x the size.
    */
-  def withError[K: Hash128](err: Double): GenHLLAggregator[K] =
+  def withError(err: Double): HyperLogLogAggregator =
+    apply(HyperLogLog.bitsForError(err))
+
+  def withErrorGeneric[K: Hash128](err: Double): GenHLLAggregator[K] =
     withBits(HyperLogLog.bitsForError(err))
 
   /**
@@ -659,8 +662,11 @@ object HyperLogLogAggregator {
    * see HyperLogLog.bitsForError for a size table based on the error
    * see SetSizeHashAggregator for a version that uses exact sets up to a given size
    */
-  def sizeWithError[K](err: Double)(implicit hash128: Hash128[K]): MonoidAggregator[K, HLL, Long] =
-    withError(err).andThenPresent(_.estimatedSize.toLong)
+  def sizeWithError(err: Double): MonoidAggregator[Array[Byte], HLL, Double] =
+    withError(err).andThenPresent(_.estimatedSize)
+
+  def sizeWithErrorGeneric[K](err: Double)(implicit hash128: Hash128[K]): MonoidAggregator[K, HLL, Long] =
+    withErrorGeneric(err).andThenPresent(_.estimatedSize.toLong)
 }
 
 case class GenHLLAggregator[K](val hllMonoid: HyperLogLogMonoid, val hash: Hash128[K]) extends MonoidAggregator[K, HLL, HLL] {

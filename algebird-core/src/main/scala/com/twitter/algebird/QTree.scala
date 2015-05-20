@@ -38,10 +38,11 @@ package com.twitter.algebird
  */
 
 object QTree {
+  val DefaultLevel: Int = -16
   /**
    * level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
    */
-  def apply[A](kv: (Double, A), level: Int = -16): QTree[A] =
+  def apply[A](kv: (Double, A), level: Int = DefaultLevel): QTree[A] =
     QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
       level,
       1,
@@ -82,7 +83,7 @@ object QTree {
    * features of QTree, you can save some space by using QTree[Unit]
    * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
    */
-  def value(v: Double, level: Int = -16): QTree[Unit] = apply(v -> (), level)
+  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] = apply(v -> (), level)
 }
 
 class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extends Semigroup[QTree[A]] {
@@ -194,6 +195,8 @@ case class QTree[A](
    * an estimate of the median.
    */
   def quantileBounds(p: Double): (Double, Double) = {
+    require(p >= 0.0 && p < 1.0, "The given percentile must be of the form 0 <= p < 1.0")
+
     val rank = math.floor(count * p).toLong
     // get is safe below, because findRankLowerBound only returns
     // None if rank > count, but due to construction rank <= count
@@ -366,4 +369,52 @@ case class QTree[A](
 
     (n.toDouble(ll) / luc, n.toDouble(uu) / ulc)
   }
+}
+
+trait QTreeAggregatorLike[T] {
+  def percentile: Double
+  /**
+   * This is the depth parameter for the QTreeSemigroup
+   */
+  def k: Int
+  /**
+   * We convert T to a Double, then the Double is converted
+   * to a Long by using a 2^level bucket size.
+   */
+  def level: Int = QTree.DefaultLevel
+  implicit def num: Numeric[T]
+  def prepare(input: T) = QTree.value(num.toDouble(input), level)
+  def semigroup = new QTreeSemigroup[Unit](k)
+}
+
+object QTreeAggregator {
+  val DefaultK = 9
+}
+
+/**
+ * QTree aggregator is an aggregator that can be used to find the approximate percentile bounds.
+ * The items that are iterated over to produce this approximation cannot be negative.
+ * Returns an Intersection which represents the bounded approximation.
+ */
+case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
+  with QTreeAggregatorLike[T] {
+
+  def present(qt: QTree[Unit]) = {
+    val (lower, upper) = qt.quantileBounds(percentile)
+    Intersection(InclusiveLower(lower), InclusiveUpper(upper))
+  }
+}
+
+/**
+ * QTreeAggregatorLowerBound is an aggregator that is used to find an appoximate percentile.
+ * This is similar to a QTreeAggregator, but is a convenience because instead of returning an Intersection,
+ * it instead returns the lower bound of the percentile.
+ * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
+ */
+case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
+  extends Aggregator[T, QTree[Unit], Double]
+  with QTreeAggregatorLike[T] {
+
+  def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1
 }

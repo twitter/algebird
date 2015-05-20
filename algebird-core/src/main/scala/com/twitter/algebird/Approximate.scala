@@ -22,6 +22,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
 
   def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
 
+  def unary_! : ApproximateBoolean = not
+
   def ^(that: ApproximateBoolean): ApproximateBoolean = {
     // This is true with probability > withProb * that.withProb
     // The answer is also correct if both are wrong, which is
