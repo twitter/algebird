@@ -20,8 +20,13 @@ import scala.collection.JavaConverters._
 
 import java.util.PriorityQueue
 
-abstract class PriorityQueueAggregator[A,+B](max: Int)(implicit ord: Ordering[A])
-  extends MonoidAggregator[A,PriorityQueue[A],B] {
+/**
+ * This gives you the `max` smallest items. If you want the biggest reverse the Ordering.
+ * Note that PriorityQueue is mutable so it is a good idea to copy this into
+ * an immutable view before using it, as is done in PriorityQueueToListAggregator
+ */
+abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A])
+  extends MonoidAggregator[A, PriorityQueue[A], C] {
   /*
    you need to override:
   def present(q: PriorityQueue[A]): B
@@ -35,7 +40,7 @@ abstract class PriorityQueueAggregator[A,+B](max: Int)(implicit ord: Ordering[A]
  * Should probably be your default Top-K implementation
  */
 class PriorityQueueToListAggregator[A](max: Int)(implicit ord: Ordering[A])
-  extends PriorityQueueAggregator[A,List[A]](max) {
+  extends PriorityQueueAggregator[A, List[A]](max) {
   def present(q: PriorityQueue[A]) = q.iterator.asScala.toList.sorted
 }
 

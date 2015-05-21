@@ -2,11 +2,11 @@
 package com.twitter.algebird
 
 /**
-* Combine 2 semigroups into a product semigroup
-*/
-class Tuple2Semigroup[A, B](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B]) extends Semigroup[(A, B)] {
-  override def plus(l : (A, B), r : (A, B)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2))
-  override def sumOption(to : TraversableOnce[(A, B)]) = {
+ * Combine 2 semigroups into a product semigroup
+ */
+class Tuple2Semigroup[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B]) extends Semigroup[(A, B)] {
+  override def plus(l: (A, B), r: (A, B)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2))
+  override def sumOption(to: TraversableOnce[(A, B)]) = {
     val buf = new ArrayBufferedOperation[(A, B), (A, B)](1000) with BufferedReduce[(A, B)] {
       def operate(items: Seq[(A, B)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get)
@@ -17,40 +17,40 @@ class Tuple2Semigroup[A, B](implicit asemigroup : Semigroup[A], bsemigroup : Sem
 }
 
 /**
-* Combine 2 monoids into a product monoid
-*/
-class Tuple2Monoid[A, B](implicit amonoid : Monoid[A], bmonoid : Monoid[B]) extends Monoid[(A, B)] {
+ * Combine 2 monoids into a product monoid
+ */
+class Tuple2Monoid[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B]) extends Monoid[(A, B)] {
   override def zero = (amonoid.zero, bmonoid.zero)
-  override def plus(l : (A, B), r : (A, B)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2))
+  override def plus(l: (A, B), r: (A, B)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2))
 }
 
 /**
-* Combine 2 groups into a product group
-*/
-class Tuple2Group[A, B](implicit agroup : Group[A], bgroup : Group[B]) extends Group[(A, B)] {
+ * Combine 2 groups into a product group
+ */
+class Tuple2Group[A, B](implicit agroup: Group[A], bgroup: Group[B]) extends Group[(A, B)] {
   override def zero = (agroup.zero, bgroup.zero)
-  override def negate(v : (A, B)) = (agroup.negate(v._1), bgroup.negate(v._2))
-  override def plus(l : (A, B), r : (A, B)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2))
-  override def minus(l : (A, B), r : (A, B)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2))
+  override def negate(v: (A, B)) = (agroup.negate(v._1), bgroup.negate(v._2))
+  override def plus(l: (A, B), r: (A, B)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2))
+  override def minus(l: (A, B), r: (A, B)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2))
 }
 
 /**
-* Combine 2 rings into a product ring
-*/
-class Tuple2Ring[A, B](implicit aring : Ring[A], bring : Ring[B]) extends Ring[(A, B)] {
+ * Combine 2 rings into a product ring
+ */
+class Tuple2Ring[A, B](implicit aring: Ring[A], bring: Ring[B]) extends Ring[(A, B)] {
   override def zero = (aring.zero, bring.zero)
   override def one = (aring.one, bring.one)
-  override def negate(v : (A, B)) = (aring.negate(v._1), bring.negate(v._2))
-  override def plus(l : (A, B), r : (A, B)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2))
-  override def minus(l : (A, B), r : (A, B)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2))
-  override def times(l : (A, B), r : (A, B)) = (aring.times(l._1, r._1), bring.times(l._2, r._2))
+  override def negate(v: (A, B)) = (aring.negate(v._1), bring.negate(v._2))
+  override def plus(l: (A, B), r: (A, B)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2))
+  override def minus(l: (A, B), r: (A, B)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2))
+  override def times(l: (A, B), r: (A, B)) = (aring.times(l._1, r._1), bring.times(l._2, r._2))
 }
 /**
-* Combine 3 semigroups into a product semigroup
-*/
-class Tuple3Semigroup[A, B, C](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C]) extends Semigroup[(A, B, C)] {
-  override def plus(l : (A, B, C), r : (A, B, C)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3))
-  override def sumOption(to : TraversableOnce[(A, B, C)]) = {
+ * Combine 3 semigroups into a product semigroup
+ */
+class Tuple3Semigroup[A, B, C](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C]) extends Semigroup[(A, B, C)] {
+  override def plus(l: (A, B, C), r: (A, B, C)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3))
+  override def sumOption(to: TraversableOnce[(A, B, C)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C), (A, B, C)](1000) with BufferedReduce[(A, B, C)] {
       def operate(items: Seq[(A, B, C)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get)
@@ -61,40 +61,40 @@ class Tuple3Semigroup[A, B, C](implicit asemigroup : Semigroup[A], bsemigroup : 
 }
 
 /**
-* Combine 3 monoids into a product monoid
-*/
-class Tuple3Monoid[A, B, C](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C]) extends Monoid[(A, B, C)] {
+ * Combine 3 monoids into a product monoid
+ */
+class Tuple3Monoid[A, B, C](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C]) extends Monoid[(A, B, C)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero)
-  override def plus(l : (A, B, C), r : (A, B, C)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3))
+  override def plus(l: (A, B, C), r: (A, B, C)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3))
 }
 
 /**
-* Combine 3 groups into a product group
-*/
-class Tuple3Group[A, B, C](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C]) extends Group[(A, B, C)] {
+ * Combine 3 groups into a product group
+ */
+class Tuple3Group[A, B, C](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C]) extends Group[(A, B, C)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero)
-  override def negate(v : (A, B, C)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3))
-  override def plus(l : (A, B, C), r : (A, B, C)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3))
-  override def minus(l : (A, B, C), r : (A, B, C)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3))
+  override def negate(v: (A, B, C)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3))
+  override def plus(l: (A, B, C), r: (A, B, C)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3))
+  override def minus(l: (A, B, C), r: (A, B, C)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3))
 }
 
 /**
-* Combine 3 rings into a product ring
-*/
-class Tuple3Ring[A, B, C](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C]) extends Ring[(A, B, C)] {
+ * Combine 3 rings into a product ring
+ */
+class Tuple3Ring[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C]) extends Ring[(A, B, C)] {
   override def zero = (aring.zero, bring.zero, cring.zero)
   override def one = (aring.one, bring.one, cring.one)
-  override def negate(v : (A, B, C)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3))
-  override def plus(l : (A, B, C), r : (A, B, C)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3))
-  override def minus(l : (A, B, C), r : (A, B, C)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3))
-  override def times(l : (A, B, C), r : (A, B, C)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3))
+  override def negate(v: (A, B, C)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3))
+  override def plus(l: (A, B, C), r: (A, B, C)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3))
+  override def minus(l: (A, B, C), r: (A, B, C)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3))
+  override def times(l: (A, B, C), r: (A, B, C)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3))
 }
 /**
-* Combine 4 semigroups into a product semigroup
-*/
-class Tuple4Semigroup[A, B, C, D](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D]) extends Semigroup[(A, B, C, D)] {
-  override def plus(l : (A, B, C, D), r : (A, B, C, D)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4))
-  override def sumOption(to : TraversableOnce[(A, B, C, D)]) = {
+ * Combine 4 semigroups into a product semigroup
+ */
+class Tuple4Semigroup[A, B, C, D](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D]) extends Semigroup[(A, B, C, D)] {
+  override def plus(l: (A, B, C, D), r: (A, B, C, D)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4))
+  override def sumOption(to: TraversableOnce[(A, B, C, D)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D), (A, B, C, D)](1000) with BufferedReduce[(A, B, C, D)] {
       def operate(items: Seq[(A, B, C, D)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get)
@@ -105,40 +105,40 @@ class Tuple4Semigroup[A, B, C, D](implicit asemigroup : Semigroup[A], bsemigroup
 }
 
 /**
-* Combine 4 monoids into a product monoid
-*/
-class Tuple4Monoid[A, B, C, D](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D]) extends Monoid[(A, B, C, D)] {
+ * Combine 4 monoids into a product monoid
+ */
+class Tuple4Monoid[A, B, C, D](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D]) extends Monoid[(A, B, C, D)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero)
-  override def plus(l : (A, B, C, D), r : (A, B, C, D)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4))
+  override def plus(l: (A, B, C, D), r: (A, B, C, D)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4))
 }
 
 /**
-* Combine 4 groups into a product group
-*/
-class Tuple4Group[A, B, C, D](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D]) extends Group[(A, B, C, D)] {
+ * Combine 4 groups into a product group
+ */
+class Tuple4Group[A, B, C, D](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D]) extends Group[(A, B, C, D)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero)
-  override def negate(v : (A, B, C, D)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4))
-  override def plus(l : (A, B, C, D), r : (A, B, C, D)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4))
-  override def minus(l : (A, B, C, D), r : (A, B, C, D)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4))
+  override def negate(v: (A, B, C, D)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4))
+  override def plus(l: (A, B, C, D), r: (A, B, C, D)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4))
+  override def minus(l: (A, B, C, D), r: (A, B, C, D)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4))
 }
 
 /**
-* Combine 4 rings into a product ring
-*/
-class Tuple4Ring[A, B, C, D](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D]) extends Ring[(A, B, C, D)] {
+ * Combine 4 rings into a product ring
+ */
+class Tuple4Ring[A, B, C, D](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D]) extends Ring[(A, B, C, D)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one)
-  override def negate(v : (A, B, C, D)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4))
-  override def plus(l : (A, B, C, D), r : (A, B, C, D)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4))
-  override def minus(l : (A, B, C, D), r : (A, B, C, D)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4))
-  override def times(l : (A, B, C, D), r : (A, B, C, D)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4))
+  override def negate(v: (A, B, C, D)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4))
+  override def plus(l: (A, B, C, D), r: (A, B, C, D)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4))
+  override def minus(l: (A, B, C, D), r: (A, B, C, D)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4))
+  override def times(l: (A, B, C, D), r: (A, B, C, D)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4))
 }
 /**
-* Combine 5 semigroups into a product semigroup
-*/
-class Tuple5Semigroup[A, B, C, D, E](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E]) extends Semigroup[(A, B, C, D, E)] {
-  override def plus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E)]) = {
+ * Combine 5 semigroups into a product semigroup
+ */
+class Tuple5Semigroup[A, B, C, D, E](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E]) extends Semigroup[(A, B, C, D, E)] {
+  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E), (A, B, C, D, E)](1000) with BufferedReduce[(A, B, C, D, E)] {
       def operate(items: Seq[(A, B, C, D, E)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get)
@@ -149,40 +149,40 @@ class Tuple5Semigroup[A, B, C, D, E](implicit asemigroup : Semigroup[A], bsemigr
 }
 
 /**
-* Combine 5 monoids into a product monoid
-*/
-class Tuple5Monoid[A, B, C, D, E](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E]) extends Monoid[(A, B, C, D, E)] {
+ * Combine 5 monoids into a product monoid
+ */
+class Tuple5Monoid[A, B, C, D, E](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E]) extends Monoid[(A, B, C, D, E)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero)
-  override def plus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5))
+  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5))
 }
 
 /**
-* Combine 5 groups into a product group
-*/
-class Tuple5Group[A, B, C, D, E](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E]) extends Group[(A, B, C, D, E)] {
+ * Combine 5 groups into a product group
+ */
+class Tuple5Group[A, B, C, D, E](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E]) extends Group[(A, B, C, D, E)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero)
-  override def negate(v : (A, B, C, D, E)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5))
-  override def plus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5))
-  override def minus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5))
+  override def negate(v: (A, B, C, D, E)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5))
+  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5))
+  override def minus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5))
 }
 
 /**
-* Combine 5 rings into a product ring
-*/
-class Tuple5Ring[A, B, C, D, E](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E]) extends Ring[(A, B, C, D, E)] {
+ * Combine 5 rings into a product ring
+ */
+class Tuple5Ring[A, B, C, D, E](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E]) extends Ring[(A, B, C, D, E)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one)
-  override def negate(v : (A, B, C, D, E)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5))
-  override def plus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5))
-  override def minus(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5))
-  override def times(l : (A, B, C, D, E), r : (A, B, C, D, E)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5))
+  override def negate(v: (A, B, C, D, E)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5))
+  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5))
+  override def minus(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5))
+  override def times(l: (A, B, C, D, E), r: (A, B, C, D, E)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5))
 }
 /**
-* Combine 6 semigroups into a product semigroup
-*/
-class Tuple6Semigroup[A, B, C, D, E, F](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F]) extends Semigroup[(A, B, C, D, E, F)] {
-  override def plus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F)]) = {
+ * Combine 6 semigroups into a product semigroup
+ */
+class Tuple6Semigroup[A, B, C, D, E, F](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F]) extends Semigroup[(A, B, C, D, E, F)] {
+  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F), (A, B, C, D, E, F)](1000) with BufferedReduce[(A, B, C, D, E, F)] {
       def operate(items: Seq[(A, B, C, D, E, F)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get)
@@ -193,40 +193,40 @@ class Tuple6Semigroup[A, B, C, D, E, F](implicit asemigroup : Semigroup[A], bsem
 }
 
 /**
-* Combine 6 monoids into a product monoid
-*/
-class Tuple6Monoid[A, B, C, D, E, F](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F]) extends Monoid[(A, B, C, D, E, F)] {
+ * Combine 6 monoids into a product monoid
+ */
+class Tuple6Monoid[A, B, C, D, E, F](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F]) extends Monoid[(A, B, C, D, E, F)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6))
+  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6))
 }
 
 /**
-* Combine 6 groups into a product group
-*/
-class Tuple6Group[A, B, C, D, E, F](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F]) extends Group[(A, B, C, D, E, F)] {
+ * Combine 6 groups into a product group
+ */
+class Tuple6Group[A, B, C, D, E, F](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F]) extends Group[(A, B, C, D, E, F)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero)
-  override def negate(v : (A, B, C, D, E, F)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6))
-  override def plus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6))
-  override def minus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6))
+  override def negate(v: (A, B, C, D, E, F)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6))
+  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6))
+  override def minus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6))
 }
 
 /**
-* Combine 6 rings into a product ring
-*/
-class Tuple6Ring[A, B, C, D, E, F](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F]) extends Ring[(A, B, C, D, E, F)] {
+ * Combine 6 rings into a product ring
+ */
+class Tuple6Ring[A, B, C, D, E, F](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F]) extends Ring[(A, B, C, D, E, F)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one)
-  override def negate(v : (A, B, C, D, E, F)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6))
-  override def plus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6))
-  override def minus(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6))
-  override def times(l : (A, B, C, D, E, F), r : (A, B, C, D, E, F)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6))
+  override def negate(v: (A, B, C, D, E, F)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6))
+  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6))
+  override def minus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6))
+  override def times(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6))
 }
 /**
-* Combine 7 semigroups into a product semigroup
-*/
-class Tuple7Semigroup[A, B, C, D, E, F, G](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G]) extends Semigroup[(A, B, C, D, E, F, G)] {
-  override def plus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G)]) = {
+ * Combine 7 semigroups into a product semigroup
+ */
+class Tuple7Semigroup[A, B, C, D, E, F, G](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G]) extends Semigroup[(A, B, C, D, E, F, G)] {
+  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G), (A, B, C, D, E, F, G)](1000) with BufferedReduce[(A, B, C, D, E, F, G)] {
       def operate(items: Seq[(A, B, C, D, E, F, G)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get)
@@ -237,40 +237,40 @@ class Tuple7Semigroup[A, B, C, D, E, F, G](implicit asemigroup : Semigroup[A], b
 }
 
 /**
-* Combine 7 monoids into a product monoid
-*/
-class Tuple7Monoid[A, B, C, D, E, F, G](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G]) extends Monoid[(A, B, C, D, E, F, G)] {
+ * Combine 7 monoids into a product monoid
+ */
+class Tuple7Monoid[A, B, C, D, E, F, G](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G]) extends Monoid[(A, B, C, D, E, F, G)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7))
+  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7))
 }
 
 /**
-* Combine 7 groups into a product group
-*/
-class Tuple7Group[A, B, C, D, E, F, G](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G]) extends Group[(A, B, C, D, E, F, G)] {
+ * Combine 7 groups into a product group
+ */
+class Tuple7Group[A, B, C, D, E, F, G](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G]) extends Group[(A, B, C, D, E, F, G)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7))
-  override def plus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7))
-  override def minus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7))
+  override def negate(v: (A, B, C, D, E, F, G)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7))
+  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7))
+  override def minus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7))
 }
 
 /**
-* Combine 7 rings into a product ring
-*/
-class Tuple7Ring[A, B, C, D, E, F, G](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G]) extends Ring[(A, B, C, D, E, F, G)] {
+ * Combine 7 rings into a product ring
+ */
+class Tuple7Ring[A, B, C, D, E, F, G](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G]) extends Ring[(A, B, C, D, E, F, G)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one)
-  override def negate(v : (A, B, C, D, E, F, G)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7))
-  override def plus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7))
-  override def minus(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7))
-  override def times(l : (A, B, C, D, E, F, G), r : (A, B, C, D, E, F, G)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7))
+  override def negate(v: (A, B, C, D, E, F, G)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7))
+  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7))
+  override def minus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7))
+  override def times(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7))
 }
 /**
-* Combine 8 semigroups into a product semigroup
-*/
-class Tuple8Semigroup[A, B, C, D, E, F, G, H](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H]) extends Semigroup[(A, B, C, D, E, F, G, H)] {
-  override def plus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H)]) = {
+ * Combine 8 semigroups into a product semigroup
+ */
+class Tuple8Semigroup[A, B, C, D, E, F, G, H](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H]) extends Semigroup[(A, B, C, D, E, F, G, H)] {
+  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H), (A, B, C, D, E, F, G, H)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get)
@@ -281,40 +281,40 @@ class Tuple8Semigroup[A, B, C, D, E, F, G, H](implicit asemigroup : Semigroup[A]
 }
 
 /**
-* Combine 8 monoids into a product monoid
-*/
-class Tuple8Monoid[A, B, C, D, E, F, G, H](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H]) extends Monoid[(A, B, C, D, E, F, G, H)] {
+ * Combine 8 monoids into a product monoid
+ */
+class Tuple8Monoid[A, B, C, D, E, F, G, H](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H]) extends Monoid[(A, B, C, D, E, F, G, H)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8))
+  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8))
 }
 
 /**
-* Combine 8 groups into a product group
-*/
-class Tuple8Group[A, B, C, D, E, F, G, H](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H]) extends Group[(A, B, C, D, E, F, G, H)] {
+ * Combine 8 groups into a product group
+ */
+class Tuple8Group[A, B, C, D, E, F, G, H](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H]) extends Group[(A, B, C, D, E, F, G, H)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8))
-  override def plus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8))
-  override def minus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8))
+  override def negate(v: (A, B, C, D, E, F, G, H)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8))
+  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8))
+  override def minus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8))
 }
 
 /**
-* Combine 8 rings into a product ring
-*/
-class Tuple8Ring[A, B, C, D, E, F, G, H](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H]) extends Ring[(A, B, C, D, E, F, G, H)] {
+ * Combine 8 rings into a product ring
+ */
+class Tuple8Ring[A, B, C, D, E, F, G, H](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H]) extends Ring[(A, B, C, D, E, F, G, H)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8))
-  override def plus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8))
-  override def minus(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8))
-  override def times(l : (A, B, C, D, E, F, G, H), r : (A, B, C, D, E, F, G, H)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8))
+  override def negate(v: (A, B, C, D, E, F, G, H)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8))
+  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8))
+  override def minus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8))
+  override def times(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8))
 }
 /**
-* Combine 9 semigroups into a product semigroup
-*/
-class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I]) extends Semigroup[(A, B, C, D, E, F, G, H, I)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I)]) = {
+ * Combine 9 semigroups into a product semigroup
+ */
+class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I]) extends Semigroup[(A, B, C, D, E, F, G, H, I)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I), (A, B, C, D, E, F, G, H, I)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get)
@@ -325,40 +325,40 @@ class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](implicit asemigroup : Semigroup
 }
 
 /**
-* Combine 9 monoids into a product monoid
-*/
-class Tuple9Monoid[A, B, C, D, E, F, G, H, I](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I]) extends Monoid[(A, B, C, D, E, F, G, H, I)] {
+ * Combine 9 monoids into a product monoid
+ */
+class Tuple9Monoid[A, B, C, D, E, F, G, H, I](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I]) extends Monoid[(A, B, C, D, E, F, G, H, I)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9))
+  override def plus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9))
 }
 
 /**
-* Combine 9 groups into a product group
-*/
-class Tuple9Group[A, B, C, D, E, F, G, H, I](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I]) extends Group[(A, B, C, D, E, F, G, H, I)] {
+ * Combine 9 groups into a product group
+ */
+class Tuple9Group[A, B, C, D, E, F, G, H, I](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I]) extends Group[(A, B, C, D, E, F, G, H, I)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9))
-  override def plus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9))
-  override def minus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9))
+  override def negate(v: (A, B, C, D, E, F, G, H, I)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9))
+  override def plus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9))
+  override def minus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9))
 }
 
 /**
-* Combine 9 rings into a product ring
-*/
-class Tuple9Ring[A, B, C, D, E, F, G, H, I](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I]) extends Ring[(A, B, C, D, E, F, G, H, I)] {
+ * Combine 9 rings into a product ring
+ */
+class Tuple9Ring[A, B, C, D, E, F, G, H, I](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I]) extends Ring[(A, B, C, D, E, F, G, H, I)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9))
-  override def plus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9))
-  override def minus(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9))
-  override def times(l : (A, B, C, D, E, F, G, H, I), r : (A, B, C, D, E, F, G, H, I)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9))
+  override def negate(v: (A, B, C, D, E, F, G, H, I)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9))
+  override def plus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9))
+  override def minus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9))
+  override def times(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9))
 }
 /**
-* Combine 10 semigroups into a product semigroup
-*/
-class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J)]) = {
+ * Combine 10 semigroups into a product semigroup
+ */
+class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J), (A, B, C, D, E, F, G, H, I, J)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get)
@@ -369,40 +369,40 @@ class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](implicit asemigroup : Semig
 }
 
 /**
-* Combine 10 monoids into a product monoid
-*/
-class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J]) extends Monoid[(A, B, C, D, E, F, G, H, I, J)] {
+ * Combine 10 monoids into a product monoid
+ */
+class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J]) extends Monoid[(A, B, C, D, E, F, G, H, I, J)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10))
 }
 
 /**
-* Combine 10 groups into a product group
-*/
-class Tuple10Group[A, B, C, D, E, F, G, H, I, J](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J]) extends Group[(A, B, C, D, E, F, G, H, I, J)] {
+ * Combine 10 groups into a product group
+ */
+class Tuple10Group[A, B, C, D, E, F, G, H, I, J](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J]) extends Group[(A, B, C, D, E, F, G, H, I, J)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10))
 }
 
 /**
-* Combine 10 rings into a product ring
-*/
-class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J]) extends Ring[(A, B, C, D, E, F, G, H, I, J)] {
+ * Combine 10 rings into a product ring
+ */
+class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J]) extends Ring[(A, B, C, D, E, F, G, H, I, J)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J), r : (A, B, C, D, E, F, G, H, I, J)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10))
 }
 /**
-* Combine 11 semigroups into a product semigroup
-*/
-class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K)]) = {
+ * Combine 11 semigroups into a product semigroup
+ */
+class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K), (A, B, C, D, E, F, G, H, I, J, K)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get)
@@ -413,40 +413,40 @@ class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](implicit asemigroup : Se
 }
 
 /**
-* Combine 11 monoids into a product monoid
-*/
-class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K)] {
+ * Combine 11 monoids into a product monoid
+ */
+class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11))
 }
 
 /**
-* Combine 11 groups into a product group
-*/
-class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K]) extends Group[(A, B, C, D, E, F, G, H, I, J, K)] {
+ * Combine 11 groups into a product group
+ */
+class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K]) extends Group[(A, B, C, D, E, F, G, H, I, J, K)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11))
 }
 
 /**
-* Combine 11 rings into a product ring
-*/
-class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K)] {
+ * Combine 11 rings into a product ring
+ */
+class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K), r : (A, B, C, D, E, F, G, H, I, J, K)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11))
 }
 /**
-* Combine 12 semigroups into a product semigroup
-*/
-class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L)]) = {
+ * Combine 12 semigroups into a product semigroup
+ */
+class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L), (A, B, C, D, E, F, G, H, I, J, K, L)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get)
@@ -457,40 +457,40 @@ class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](implicit asemigroup :
 }
 
 /**
-* Combine 12 monoids into a product monoid
-*/
-class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] {
+ * Combine 12 monoids into a product monoid
+ */
+class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12))
 }
 
 /**
-* Combine 12 groups into a product group
-*/
-class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L)] {
+ * Combine 12 groups into a product group
+ */
+class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12))
 }
 
 /**
-* Combine 12 rings into a product ring
-*/
-class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] {
+ * Combine 12 rings into a product ring
+ */
+class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L), r : (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12))
 }
 /**
-* Combine 13 semigroups into a product semigroup
-*/
-class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M)]) = {
+ * Combine 13 semigroups into a product semigroup
+ */
+class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M), (A, B, C, D, E, F, G, H, I, J, K, L, M)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get)
@@ -501,40 +501,40 @@ class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit asemigrou
 }
 
 /**
-* Combine 13 monoids into a product monoid
-*/
-class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
+ * Combine 13 monoids into a product monoid
+ */
+class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13))
 }
 
 /**
-* Combine 13 groups into a product group
-*/
-class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
+ * Combine 13 groups into a product group
+ */
+class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13))
 }
 
 /**
-* Combine 13 rings into a product ring
-*/
-class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
+ * Combine 13 rings into a product ring
+ */
+class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M), r : (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13))
 }
 /**
-* Combine 14 semigroups into a product semigroup
-*/
-class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]) = {
+ * Combine 14 semigroups into a product semigroup
+ */
+class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N), (A, B, C, D, E, F, G, H, I, J, K, L, M, N)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get)
@@ -545,40 +545,40 @@ class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit asemig
 }
 
 /**
-* Combine 14 monoids into a product monoid
-*/
-class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
+ * Combine 14 monoids into a product monoid
+ */
+class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14))
 }
 
 /**
-* Combine 14 groups into a product group
-*/
-class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
+ * Combine 14 groups into a product group
+ */
+class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14))
 }
 
 /**
-* Combine 14 rings into a product ring
-*/
-class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
+ * Combine 14 rings into a product ring
+ */
+class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14))
 }
 /**
-* Combine 15 semigroups into a product semigroup
-*/
-class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]) = {
+ * Combine 15 semigroups into a product semigroup
+ */
+class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get)
@@ -589,40 +589,40 @@ class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit ase
 }
 
 /**
-* Combine 15 monoids into a product monoid
-*/
-class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
+ * Combine 15 monoids into a product monoid
+ */
+class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15))
 }
 
 /**
-* Combine 15 groups into a product group
-*/
-class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
+ * Combine 15 groups into a product group
+ */
+class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15))
 }
 
 /**
-* Combine 15 rings into a product ring
-*/
-class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
+ * Combine 15 rings into a product ring
+ */
+class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15))
 }
 /**
-* Combine 16 semigroups into a product semigroup
-*/
-class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]) = {
+ * Combine 16 semigroups into a product semigroup
+ */
+class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get)
@@ -633,40 +633,40 @@ class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit 
 }
 
 /**
-* Combine 16 monoids into a product monoid
-*/
-class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
+ * Combine 16 monoids into a product monoid
+ */
+class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16))
 }
 
 /**
-* Combine 16 groups into a product group
-*/
-class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
+ * Combine 16 groups into a product group
+ */
+class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16))
 }
 
 /**
-* Combine 16 rings into a product ring
-*/
-class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
+ * Combine 16 rings into a product ring
+ */
+class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16))
 }
 /**
-* Combine 17 semigroups into a product semigroup
-*/
-class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]) = {
+ * Combine 17 semigroups into a product semigroup
+ */
+class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get)
@@ -677,40 +677,40 @@ class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implic
 }
 
 /**
-* Combine 17 monoids into a product monoid
-*/
-class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
+ * Combine 17 monoids into a product monoid
+ */
+class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17))
 }
 
 /**
-* Combine 17 groups into a product group
-*/
-class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
+ * Combine 17 groups into a product group
+ */
+class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17))
 }
 
 /**
-* Combine 17 rings into a product ring
-*/
-class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
+ * Combine 17 rings into a product ring
+ */
+class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17))
 }
 /**
-* Combine 18 semigroups into a product semigroup
-*/
-class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]) = {
+ * Combine 18 semigroups into a product semigroup
+ */
+class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get, rsemigroup.sumOption(items.iterator.map(_._18)).get)
@@ -721,40 +721,40 @@ class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](imp
 }
 
 /**
-* Combine 18 monoids into a product monoid
-*/
-class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
+ * Combine 18 monoids into a product monoid
+ */
+class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero, rmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18))
 }
 
 /**
-* Combine 18 groups into a product group
-*/
-class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
+ * Combine 18 groups into a product group
+ */
+class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero, rgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18))
 }
 
 /**
-* Combine 18 rings into a product ring
-*/
-class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
+ * Combine 18 rings into a product ring
+ */
+class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero, rring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one, rring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18))
 }
 /**
-* Combine 19 semigroups into a product semigroup
-*/
-class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]) = {
+ * Combine 19 semigroups into a product semigroup
+ */
+class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get, rsemigroup.sumOption(items.iterator.map(_._18)).get, ssemigroup.sumOption(items.iterator.map(_._19)).get)
@@ -765,40 +765,40 @@ class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 }
 
 /**
-* Combine 19 monoids into a product monoid
-*/
-class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
+ * Combine 19 monoids into a product monoid
+ */
+class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero, rmonoid.zero, smonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19))
 }
 
 /**
-* Combine 19 groups into a product group
-*/
-class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
+ * Combine 19 groups into a product group
+ */
+class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero, rgroup.zero, sgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19))
 }
 
 /**
-* Combine 19 rings into a product ring
-*/
-class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
+ * Combine 19 rings into a product ring
+ */
+class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero, rring.zero, sring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one, rring.one, sring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19))
 }
 /**
-* Combine 20 semigroups into a product semigroup
-*/
-class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]) = {
+ * Combine 20 semigroups into a product semigroup
+ */
+class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get, rsemigroup.sumOption(items.iterator.map(_._18)).get, ssemigroup.sumOption(items.iterator.map(_._19)).get, tsemigroup.sumOption(items.iterator.map(_._20)).get)
@@ -809,40 +809,40 @@ class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 }
 
 /**
-* Combine 20 monoids into a product monoid
-*/
-class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
+ * Combine 20 monoids into a product monoid
+ */
+class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero, rmonoid.zero, smonoid.zero, tmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20))
 }
 
 /**
-* Combine 20 groups into a product group
-*/
-class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
+ * Combine 20 groups into a product group
+ */
+class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero, rgroup.zero, sgroup.zero, tgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20))
 }
 
 /**
-* Combine 20 rings into a product ring
-*/
-class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
+ * Combine 20 rings into a product ring
+ */
+class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero, rring.zero, sring.zero, tring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one, rring.one, sring.one, tring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20))
 }
 /**
-* Combine 21 semigroups into a product semigroup
-*/
-class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T], usemigroup : Semigroup[U]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20), usemigroup.plus(l._21, r._21))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]) = {
+ * Combine 21 semigroups into a product semigroup
+ */
+class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T], usemigroup: Semigroup[U]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20), usemigroup.plus(l._21, r._21))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get, rsemigroup.sumOption(items.iterator.map(_._18)).get, ssemigroup.sumOption(items.iterator.map(_._19)).get, tsemigroup.sumOption(items.iterator.map(_._20)).get, usemigroup.sumOption(items.iterator.map(_._21)).get)
@@ -853,40 +853,40 @@ class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 }
 
 /**
-* Combine 21 monoids into a product monoid
-*/
-class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T], umonoid : Monoid[U]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
+ * Combine 21 monoids into a product monoid
+ */
+class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T], umonoid: Monoid[U]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero, rmonoid.zero, smonoid.zero, tmonoid.zero, umonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20), umonoid.plus(l._21, r._21))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20), umonoid.plus(l._21, r._21))
 }
 
 /**
-* Combine 21 groups into a product group
-*/
-class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T], ugroup : Group[U]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
+ * Combine 21 groups into a product group
+ */
+class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T], ugroup: Group[U]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero, rgroup.zero, sgroup.zero, tgroup.zero, ugroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20), ugroup.negate(v._21))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20), ugroup.plus(l._21, r._21))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20), ugroup.minus(l._21, r._21))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20), ugroup.negate(v._21))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20), ugroup.plus(l._21, r._21))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20), ugroup.minus(l._21, r._21))
 }
 
 /**
-* Combine 21 rings into a product ring
-*/
-class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T], uring : Ring[U]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
+ * Combine 21 rings into a product ring
+ */
+class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T], uring: Ring[U]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero, rring.zero, sring.zero, tring.zero, uring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one, rring.one, sring.one, tring.one, uring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20), uring.negate(v._21))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20), uring.plus(l._21, r._21))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20), uring.minus(l._21, r._21))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20), uring.times(l._21, r._21))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20), uring.negate(v._21))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20), uring.plus(l._21, r._21))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20), uring.minus(l._21, r._21))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20), uring.times(l._21, r._21))
 }
 /**
-* Combine 22 semigroups into a product semigroup
-*/
-class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T], usemigroup : Semigroup[U], vsemigroup : Semigroup[V]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20), usemigroup.plus(l._21, r._21), vsemigroup.plus(l._22, r._22))
-  override def sumOption(to : TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]) = {
+ * Combine 22 semigroups into a product semigroup
+ */
+class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T], usemigroup: Semigroup[U], vsemigroup: Semigroup[V]) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3), dsemigroup.plus(l._4, r._4), esemigroup.plus(l._5, r._5), fsemigroup.plus(l._6, r._6), gsemigroup.plus(l._7, r._7), hsemigroup.plus(l._8, r._8), isemigroup.plus(l._9, r._9), jsemigroup.plus(l._10, r._10), ksemigroup.plus(l._11, r._11), lsemigroup.plus(l._12, r._12), msemigroup.plus(l._13, r._13), nsemigroup.plus(l._14, r._14), osemigroup.plus(l._15, r._15), psemigroup.plus(l._16, r._16), qsemigroup.plus(l._17, r._17), rsemigroup.plus(l._18, r._18), ssemigroup.plus(l._19, r._19), tsemigroup.plus(l._20, r._20), usemigroup.plus(l._21, r._21), vsemigroup.plus(l._22, r._22))
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]) = {
     val buf = new ArrayBufferedOperation[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)](1000) with BufferedReduce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
       def operate(items: Seq[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]) =
         (asemigroup.sumOption(items.iterator.map(_._1)).get, bsemigroup.sumOption(items.iterator.map(_._2)).get, csemigroup.sumOption(items.iterator.map(_._3)).get, dsemigroup.sumOption(items.iterator.map(_._4)).get, esemigroup.sumOption(items.iterator.map(_._5)).get, fsemigroup.sumOption(items.iterator.map(_._6)).get, gsemigroup.sumOption(items.iterator.map(_._7)).get, hsemigroup.sumOption(items.iterator.map(_._8)).get, isemigroup.sumOption(items.iterator.map(_._9)).get, jsemigroup.sumOption(items.iterator.map(_._10)).get, ksemigroup.sumOption(items.iterator.map(_._11)).get, lsemigroup.sumOption(items.iterator.map(_._12)).get, msemigroup.sumOption(items.iterator.map(_._13)).get, nsemigroup.sumOption(items.iterator.map(_._14)).get, osemigroup.sumOption(items.iterator.map(_._15)).get, psemigroup.sumOption(items.iterator.map(_._16)).get, qsemigroup.sumOption(items.iterator.map(_._17)).get, rsemigroup.sumOption(items.iterator.map(_._18)).get, ssemigroup.sumOption(items.iterator.map(_._19)).get, tsemigroup.sumOption(items.iterator.map(_._20)).get, usemigroup.sumOption(items.iterator.map(_._21)).get, vsemigroup.sumOption(items.iterator.map(_._22)).get)
@@ -897,378 +897,378 @@ class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 }
 
 /**
-* Combine 22 monoids into a product monoid
-*/
-class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T], umonoid : Monoid[U], vmonoid : Monoid[V]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
+ * Combine 22 monoids into a product monoid
+ */
+class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T], umonoid: Monoid[U], vmonoid: Monoid[V]) extends Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
   override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero, hmonoid.zero, imonoid.zero, jmonoid.zero, kmonoid.zero, lmonoid.zero, mmonoid.zero, nmonoid.zero, omonoid.zero, pmonoid.zero, qmonoid.zero, rmonoid.zero, smonoid.zero, tmonoid.zero, umonoid.zero, vmonoid.zero)
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20), umonoid.plus(l._21, r._21), vmonoid.plus(l._22, r._22))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (amonoid.plus(l._1, r._1), bmonoid.plus(l._2, r._2), cmonoid.plus(l._3, r._3), dmonoid.plus(l._4, r._4), emonoid.plus(l._5, r._5), fmonoid.plus(l._6, r._6), gmonoid.plus(l._7, r._7), hmonoid.plus(l._8, r._8), imonoid.plus(l._9, r._9), jmonoid.plus(l._10, r._10), kmonoid.plus(l._11, r._11), lmonoid.plus(l._12, r._12), mmonoid.plus(l._13, r._13), nmonoid.plus(l._14, r._14), omonoid.plus(l._15, r._15), pmonoid.plus(l._16, r._16), qmonoid.plus(l._17, r._17), rmonoid.plus(l._18, r._18), smonoid.plus(l._19, r._19), tmonoid.plus(l._20, r._20), umonoid.plus(l._21, r._21), vmonoid.plus(l._22, r._22))
 }
 
 /**
-* Combine 22 groups into a product group
-*/
-class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T], ugroup : Group[U], vgroup : Group[V]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
+ * Combine 22 groups into a product group
+ */
+class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T], ugroup: Group[U], vgroup: Group[V]) extends Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
   override def zero = (agroup.zero, bgroup.zero, cgroup.zero, dgroup.zero, egroup.zero, fgroup.zero, ggroup.zero, hgroup.zero, igroup.zero, jgroup.zero, kgroup.zero, lgroup.zero, mgroup.zero, ngroup.zero, ogroup.zero, pgroup.zero, qgroup.zero, rgroup.zero, sgroup.zero, tgroup.zero, ugroup.zero, vgroup.zero)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20), ugroup.negate(v._21), vgroup.negate(v._22))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20), ugroup.plus(l._21, r._21), vgroup.plus(l._22, r._22))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20), ugroup.minus(l._21, r._21), vgroup.minus(l._22, r._22))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5), fgroup.negate(v._6), ggroup.negate(v._7), hgroup.negate(v._8), igroup.negate(v._9), jgroup.negate(v._10), kgroup.negate(v._11), lgroup.negate(v._12), mgroup.negate(v._13), ngroup.negate(v._14), ogroup.negate(v._15), pgroup.negate(v._16), qgroup.negate(v._17), rgroup.negate(v._18), sgroup.negate(v._19), tgroup.negate(v._20), ugroup.negate(v._21), vgroup.negate(v._22))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.plus(l._1, r._1), bgroup.plus(l._2, r._2), cgroup.plus(l._3, r._3), dgroup.plus(l._4, r._4), egroup.plus(l._5, r._5), fgroup.plus(l._6, r._6), ggroup.plus(l._7, r._7), hgroup.plus(l._8, r._8), igroup.plus(l._9, r._9), jgroup.plus(l._10, r._10), kgroup.plus(l._11, r._11), lgroup.plus(l._12, r._12), mgroup.plus(l._13, r._13), ngroup.plus(l._14, r._14), ogroup.plus(l._15, r._15), pgroup.plus(l._16, r._16), qgroup.plus(l._17, r._17), rgroup.plus(l._18, r._18), sgroup.plus(l._19, r._19), tgroup.plus(l._20, r._20), ugroup.plus(l._21, r._21), vgroup.plus(l._22, r._22))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4), egroup.minus(l._5, r._5), fgroup.minus(l._6, r._6), ggroup.minus(l._7, r._7), hgroup.minus(l._8, r._8), igroup.minus(l._9, r._9), jgroup.minus(l._10, r._10), kgroup.minus(l._11, r._11), lgroup.minus(l._12, r._12), mgroup.minus(l._13, r._13), ngroup.minus(l._14, r._14), ogroup.minus(l._15, r._15), pgroup.minus(l._16, r._16), qgroup.minus(l._17, r._17), rgroup.minus(l._18, r._18), sgroup.minus(l._19, r._19), tgroup.minus(l._20, r._20), ugroup.minus(l._21, r._21), vgroup.minus(l._22, r._22))
 }
 
 /**
-* Combine 22 rings into a product ring
-*/
-class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T], uring : Ring[U], vring : Ring[V]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
+ * Combine 22 rings into a product ring
+ */
+class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T], uring: Ring[U], vring: Ring[V]) extends Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
   override def zero = (aring.zero, bring.zero, cring.zero, dring.zero, ering.zero, fring.zero, gring.zero, hring.zero, iring.zero, jring.zero, kring.zero, lring.zero, mring.zero, nring.zero, oring.zero, pring.zero, qring.zero, rring.zero, sring.zero, tring.zero, uring.zero, vring.zero)
   override def one = (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one, jring.one, kring.one, lring.one, mring.one, nring.one, oring.one, pring.one, qring.one, rring.one, sring.one, tring.one, uring.one, vring.one)
-  override def negate(v : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20), uring.negate(v._21), vring.negate(v._22))
-  override def plus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20), uring.plus(l._21, r._21), vring.plus(l._22, r._22))
-  override def minus(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20), uring.minus(l._21, r._21), vring.minus(l._22, r._22))
-  override def times(l : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20), uring.times(l._21, r._21), vring.times(l._22, r._22))
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.negate(v._1), bring.negate(v._2), cring.negate(v._3), dring.negate(v._4), ering.negate(v._5), fring.negate(v._6), gring.negate(v._7), hring.negate(v._8), iring.negate(v._9), jring.negate(v._10), kring.negate(v._11), lring.negate(v._12), mring.negate(v._13), nring.negate(v._14), oring.negate(v._15), pring.negate(v._16), qring.negate(v._17), rring.negate(v._18), sring.negate(v._19), tring.negate(v._20), uring.negate(v._21), vring.negate(v._22))
+  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.plus(l._1, r._1), bring.plus(l._2, r._2), cring.plus(l._3, r._3), dring.plus(l._4, r._4), ering.plus(l._5, r._5), fring.plus(l._6, r._6), gring.plus(l._7, r._7), hring.plus(l._8, r._8), iring.plus(l._9, r._9), jring.plus(l._10, r._10), kring.plus(l._11, r._11), lring.plus(l._12, r._12), mring.plus(l._13, r._13), nring.plus(l._14, r._14), oring.plus(l._15, r._15), pring.plus(l._16, r._16), qring.plus(l._17, r._17), rring.plus(l._18, r._18), sring.plus(l._19, r._19), tring.plus(l._20, r._20), uring.plus(l._21, r._21), vring.plus(l._22, r._22))
+  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.minus(l._1, r._1), bring.minus(l._2, r._2), cring.minus(l._3, r._3), dring.minus(l._4, r._4), ering.minus(l._5, r._5), fring.minus(l._6, r._6), gring.minus(l._7, r._7), hring.minus(l._8, r._8), iring.minus(l._9, r._9), jring.minus(l._10, r._10), kring.minus(l._11, r._11), lring.minus(l._12, r._12), mring.minus(l._13, r._13), nring.minus(l._14, r._14), oring.minus(l._15, r._15), pring.minus(l._16, r._16), qring.minus(l._17, r._17), rring.minus(l._18, r._18), sring.minus(l._19, r._19), tring.minus(l._20, r._20), uring.minus(l._21, r._21), vring.minus(l._22, r._22))
+  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) = (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4), ering.times(l._5, r._5), fring.times(l._6, r._6), gring.times(l._7, r._7), hring.times(l._8, r._8), iring.times(l._9, r._9), jring.times(l._10, r._10), kring.times(l._11, r._11), lring.times(l._12, r._12), mring.times(l._13, r._13), nring.times(l._14, r._14), oring.times(l._15, r._15), pring.times(l._16, r._16), qring.times(l._17, r._17), rring.times(l._18, r._18), sring.times(l._19, r._19), tring.times(l._20, r._20), uring.times(l._21, r._21), vring.times(l._22, r._22))
 }
 
 trait GeneratedSemigroupImplicits {
-  implicit def semigroup2[A, B](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B]) : Semigroup[(A, B)] = {
+  implicit def semigroup2[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B]): Semigroup[(A, B)] = {
     new Tuple2Semigroup[A, B]()(asemigroup, bsemigroup)
   }
 
-  implicit def semigroup3[A, B, C](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C]) : Semigroup[(A, B, C)] = {
+  implicit def semigroup3[A, B, C](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C]): Semigroup[(A, B, C)] = {
     new Tuple3Semigroup[A, B, C]()(asemigroup, bsemigroup, csemigroup)
   }
 
-  implicit def semigroup4[A, B, C, D](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D]) : Semigroup[(A, B, C, D)] = {
+  implicit def semigroup4[A, B, C, D](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D]): Semigroup[(A, B, C, D)] = {
     new Tuple4Semigroup[A, B, C, D]()(asemigroup, bsemigroup, csemigroup, dsemigroup)
   }
 
-  implicit def semigroup5[A, B, C, D, E](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E]) : Semigroup[(A, B, C, D, E)] = {
+  implicit def semigroup5[A, B, C, D, E](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E]): Semigroup[(A, B, C, D, E)] = {
     new Tuple5Semigroup[A, B, C, D, E]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup)
   }
 
-  implicit def semigroup6[A, B, C, D, E, F](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F]) : Semigroup[(A, B, C, D, E, F)] = {
+  implicit def semigroup6[A, B, C, D, E, F](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F]): Semigroup[(A, B, C, D, E, F)] = {
     new Tuple6Semigroup[A, B, C, D, E, F]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup)
   }
 
-  implicit def semigroup7[A, B, C, D, E, F, G](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G]) : Semigroup[(A, B, C, D, E, F, G)] = {
+  implicit def semigroup7[A, B, C, D, E, F, G](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G]): Semigroup[(A, B, C, D, E, F, G)] = {
     new Tuple7Semigroup[A, B, C, D, E, F, G]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup)
   }
 
-  implicit def semigroup8[A, B, C, D, E, F, G, H](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H]) : Semigroup[(A, B, C, D, E, F, G, H)] = {
+  implicit def semigroup8[A, B, C, D, E, F, G, H](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H]): Semigroup[(A, B, C, D, E, F, G, H)] = {
     new Tuple8Semigroup[A, B, C, D, E, F, G, H]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup)
   }
 
-  implicit def semigroup9[A, B, C, D, E, F, G, H, I](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I]) : Semigroup[(A, B, C, D, E, F, G, H, I)] = {
+  implicit def semigroup9[A, B, C, D, E, F, G, H, I](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I]): Semigroup[(A, B, C, D, E, F, G, H, I)] = {
     new Tuple9Semigroup[A, B, C, D, E, F, G, H, I]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup)
   }
 
-  implicit def semigroup10[A, B, C, D, E, F, G, H, I, J](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J]) : Semigroup[(A, B, C, D, E, F, G, H, I, J)] = {
+  implicit def semigroup10[A, B, C, D, E, F, G, H, I, J](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J]): Semigroup[(A, B, C, D, E, F, G, H, I, J)] = {
     new Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup)
   }
 
-  implicit def semigroup11[A, B, C, D, E, F, G, H, I, J, K](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] = {
+  implicit def semigroup11[A, B, C, D, E, F, G, H, I, J, K](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] = {
     new Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup)
   }
 
-  implicit def semigroup12[A, B, C, D, E, F, G, H, I, J, K, L](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
+  implicit def semigroup12[A, B, C, D, E, F, G, H, I, J, K, L](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
     new Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup)
   }
 
-  implicit def semigroup13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
+  implicit def semigroup13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
     new Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup)
   }
 
-  implicit def semigroup14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
+  implicit def semigroup14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
     new Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup)
   }
 
-  implicit def semigroup15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
+  implicit def semigroup15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
     new Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup)
   }
 
-  implicit def semigroup16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
+  implicit def semigroup16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
     new Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup)
   }
 
-  implicit def semigroup17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
+  implicit def semigroup17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
     new Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup)
   }
 
-  implicit def semigroup18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
+  implicit def semigroup18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
     new Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup, rsemigroup)
   }
 
-  implicit def semigroup19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
+  implicit def semigroup19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
     new Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup, rsemigroup, ssemigroup)
   }
 
-  implicit def semigroup20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
+  implicit def semigroup20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
     new Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup, rsemigroup, ssemigroup, tsemigroup)
   }
 
-  implicit def semigroup21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T], usemigroup : Semigroup[U]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
+  implicit def semigroup21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T], usemigroup: Semigroup[U]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
     new Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup, rsemigroup, ssemigroup, tsemigroup, usemigroup)
   }
 
-  implicit def semigroup22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit asemigroup : Semigroup[A], bsemigroup : Semigroup[B], csemigroup : Semigroup[C], dsemigroup : Semigroup[D], esemigroup : Semigroup[E], fsemigroup : Semigroup[F], gsemigroup : Semigroup[G], hsemigroup : Semigroup[H], isemigroup : Semigroup[I], jsemigroup : Semigroup[J], ksemigroup : Semigroup[K], lsemigroup : Semigroup[L], msemigroup : Semigroup[M], nsemigroup : Semigroup[N], osemigroup : Semigroup[O], psemigroup : Semigroup[P], qsemigroup : Semigroup[Q], rsemigroup : Semigroup[R], ssemigroup : Semigroup[S], tsemigroup : Semigroup[T], usemigroup : Semigroup[U], vsemigroup : Semigroup[V]) : Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
+  implicit def semigroup22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C], dsemigroup: Semigroup[D], esemigroup: Semigroup[E], fsemigroup: Semigroup[F], gsemigroup: Semigroup[G], hsemigroup: Semigroup[H], isemigroup: Semigroup[I], jsemigroup: Semigroup[J], ksemigroup: Semigroup[K], lsemigroup: Semigroup[L], msemigroup: Semigroup[M], nsemigroup: Semigroup[N], osemigroup: Semigroup[O], psemigroup: Semigroup[P], qsemigroup: Semigroup[Q], rsemigroup: Semigroup[R], ssemigroup: Semigroup[S], tsemigroup: Semigroup[T], usemigroup: Semigroup[U], vsemigroup: Semigroup[V]): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
     new Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup, fsemigroup, gsemigroup, hsemigroup, isemigroup, jsemigroup, ksemigroup, lsemigroup, msemigroup, nsemigroup, osemigroup, psemigroup, qsemigroup, rsemigroup, ssemigroup, tsemigroup, usemigroup, vsemigroup)
   }
 
 }
 
 trait GeneratedMonoidImplicits {
-  implicit def monoid2[A, B](implicit amonoid : Monoid[A], bmonoid : Monoid[B]) : Monoid[(A, B)] = {
+  implicit def monoid2[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B]): Monoid[(A, B)] = {
     new Tuple2Monoid[A, B]()(amonoid, bmonoid)
   }
 
-  implicit def monoid3[A, B, C](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C]) : Monoid[(A, B, C)] = {
+  implicit def monoid3[A, B, C](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C]): Monoid[(A, B, C)] = {
     new Tuple3Monoid[A, B, C]()(amonoid, bmonoid, cmonoid)
   }
 
-  implicit def monoid4[A, B, C, D](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D]) : Monoid[(A, B, C, D)] = {
+  implicit def monoid4[A, B, C, D](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D]): Monoid[(A, B, C, D)] = {
     new Tuple4Monoid[A, B, C, D]()(amonoid, bmonoid, cmonoid, dmonoid)
   }
 
-  implicit def monoid5[A, B, C, D, E](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E]) : Monoid[(A, B, C, D, E)] = {
+  implicit def monoid5[A, B, C, D, E](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E]): Monoid[(A, B, C, D, E)] = {
     new Tuple5Monoid[A, B, C, D, E]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid)
   }
 
-  implicit def monoid6[A, B, C, D, E, F](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F]) : Monoid[(A, B, C, D, E, F)] = {
+  implicit def monoid6[A, B, C, D, E, F](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F]): Monoid[(A, B, C, D, E, F)] = {
     new Tuple6Monoid[A, B, C, D, E, F]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid)
   }
 
-  implicit def monoid7[A, B, C, D, E, F, G](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G]) : Monoid[(A, B, C, D, E, F, G)] = {
+  implicit def monoid7[A, B, C, D, E, F, G](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G]): Monoid[(A, B, C, D, E, F, G)] = {
     new Tuple7Monoid[A, B, C, D, E, F, G]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid)
   }
 
-  implicit def monoid8[A, B, C, D, E, F, G, H](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H]) : Monoid[(A, B, C, D, E, F, G, H)] = {
+  implicit def monoid8[A, B, C, D, E, F, G, H](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H]): Monoid[(A, B, C, D, E, F, G, H)] = {
     new Tuple8Monoid[A, B, C, D, E, F, G, H]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid)
   }
 
-  implicit def monoid9[A, B, C, D, E, F, G, H, I](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I]) : Monoid[(A, B, C, D, E, F, G, H, I)] = {
+  implicit def monoid9[A, B, C, D, E, F, G, H, I](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I]): Monoid[(A, B, C, D, E, F, G, H, I)] = {
     new Tuple9Monoid[A, B, C, D, E, F, G, H, I]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid)
   }
 
-  implicit def monoid10[A, B, C, D, E, F, G, H, I, J](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J]) : Monoid[(A, B, C, D, E, F, G, H, I, J)] = {
+  implicit def monoid10[A, B, C, D, E, F, G, H, I, J](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J]): Monoid[(A, B, C, D, E, F, G, H, I, J)] = {
     new Tuple10Monoid[A, B, C, D, E, F, G, H, I, J]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid)
   }
 
-  implicit def monoid11[A, B, C, D, E, F, G, H, I, J, K](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K)] = {
+  implicit def monoid11[A, B, C, D, E, F, G, H, I, J, K](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K]): Monoid[(A, B, C, D, E, F, G, H, I, J, K)] = {
     new Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid)
   }
 
-  implicit def monoid12[A, B, C, D, E, F, G, H, I, J, K, L](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
+  implicit def monoid12[A, B, C, D, E, F, G, H, I, J, K, L](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
     new Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid)
   }
 
-  implicit def monoid13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
+  implicit def monoid13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
     new Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid)
   }
 
-  implicit def monoid14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
+  implicit def monoid14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
     new Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid)
   }
 
-  implicit def monoid15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
+  implicit def monoid15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
     new Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid)
   }
 
-  implicit def monoid16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
+  implicit def monoid16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
     new Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid)
   }
 
-  implicit def monoid17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
+  implicit def monoid17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
     new Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid)
   }
 
-  implicit def monoid18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
+  implicit def monoid18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
     new Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid, rmonoid)
   }
 
-  implicit def monoid19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
+  implicit def monoid19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
     new Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid, rmonoid, smonoid)
   }
 
-  implicit def monoid20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
+  implicit def monoid20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
     new Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid, rmonoid, smonoid, tmonoid)
   }
 
-  implicit def monoid21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T], umonoid : Monoid[U]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
+  implicit def monoid21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T], umonoid: Monoid[U]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
     new Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid, rmonoid, smonoid, tmonoid, umonoid)
   }
 
-  implicit def monoid22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit amonoid : Monoid[A], bmonoid : Monoid[B], cmonoid : Monoid[C], dmonoid : Monoid[D], emonoid : Monoid[E], fmonoid : Monoid[F], gmonoid : Monoid[G], hmonoid : Monoid[H], imonoid : Monoid[I], jmonoid : Monoid[J], kmonoid : Monoid[K], lmonoid : Monoid[L], mmonoid : Monoid[M], nmonoid : Monoid[N], omonoid : Monoid[O], pmonoid : Monoid[P], qmonoid : Monoid[Q], rmonoid : Monoid[R], smonoid : Monoid[S], tmonoid : Monoid[T], umonoid : Monoid[U], vmonoid : Monoid[V]) : Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
+  implicit def monoid22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D], emonoid: Monoid[E], fmonoid: Monoid[F], gmonoid: Monoid[G], hmonoid: Monoid[H], imonoid: Monoid[I], jmonoid: Monoid[J], kmonoid: Monoid[K], lmonoid: Monoid[L], mmonoid: Monoid[M], nmonoid: Monoid[N], omonoid: Monoid[O], pmonoid: Monoid[P], qmonoid: Monoid[Q], rmonoid: Monoid[R], smonoid: Monoid[S], tmonoid: Monoid[T], umonoid: Monoid[U], vmonoid: Monoid[V]): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
     new Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid, hmonoid, imonoid, jmonoid, kmonoid, lmonoid, mmonoid, nmonoid, omonoid, pmonoid, qmonoid, rmonoid, smonoid, tmonoid, umonoid, vmonoid)
   }
 
 }
 
 trait GeneratedGroupImplicits {
-  implicit def group2[A, B](implicit agroup : Group[A], bgroup : Group[B]) : Group[(A, B)] = {
+  implicit def group2[A, B](implicit agroup: Group[A], bgroup: Group[B]): Group[(A, B)] = {
     new Tuple2Group[A, B]()(agroup, bgroup)
   }
 
-  implicit def group3[A, B, C](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C]) : Group[(A, B, C)] = {
+  implicit def group3[A, B, C](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C]): Group[(A, B, C)] = {
     new Tuple3Group[A, B, C]()(agroup, bgroup, cgroup)
   }
 
-  implicit def group4[A, B, C, D](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D]) : Group[(A, B, C, D)] = {
+  implicit def group4[A, B, C, D](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D]): Group[(A, B, C, D)] = {
     new Tuple4Group[A, B, C, D]()(agroup, bgroup, cgroup, dgroup)
   }
 
-  implicit def group5[A, B, C, D, E](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E]) : Group[(A, B, C, D, E)] = {
+  implicit def group5[A, B, C, D, E](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E]): Group[(A, B, C, D, E)] = {
     new Tuple5Group[A, B, C, D, E]()(agroup, bgroup, cgroup, dgroup, egroup)
   }
 
-  implicit def group6[A, B, C, D, E, F](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F]) : Group[(A, B, C, D, E, F)] = {
+  implicit def group6[A, B, C, D, E, F](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F]): Group[(A, B, C, D, E, F)] = {
     new Tuple6Group[A, B, C, D, E, F]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup)
   }
 
-  implicit def group7[A, B, C, D, E, F, G](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G]) : Group[(A, B, C, D, E, F, G)] = {
+  implicit def group7[A, B, C, D, E, F, G](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G]): Group[(A, B, C, D, E, F, G)] = {
     new Tuple7Group[A, B, C, D, E, F, G]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup)
   }
 
-  implicit def group8[A, B, C, D, E, F, G, H](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H]) : Group[(A, B, C, D, E, F, G, H)] = {
+  implicit def group8[A, B, C, D, E, F, G, H](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H]): Group[(A, B, C, D, E, F, G, H)] = {
     new Tuple8Group[A, B, C, D, E, F, G, H]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup)
   }
 
-  implicit def group9[A, B, C, D, E, F, G, H, I](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I]) : Group[(A, B, C, D, E, F, G, H, I)] = {
+  implicit def group9[A, B, C, D, E, F, G, H, I](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I]): Group[(A, B, C, D, E, F, G, H, I)] = {
     new Tuple9Group[A, B, C, D, E, F, G, H, I]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup)
   }
 
-  implicit def group10[A, B, C, D, E, F, G, H, I, J](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J]) : Group[(A, B, C, D, E, F, G, H, I, J)] = {
+  implicit def group10[A, B, C, D, E, F, G, H, I, J](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J]): Group[(A, B, C, D, E, F, G, H, I, J)] = {
     new Tuple10Group[A, B, C, D, E, F, G, H, I, J]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup)
   }
 
-  implicit def group11[A, B, C, D, E, F, G, H, I, J, K](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K]) : Group[(A, B, C, D, E, F, G, H, I, J, K)] = {
+  implicit def group11[A, B, C, D, E, F, G, H, I, J, K](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K]): Group[(A, B, C, D, E, F, G, H, I, J, K)] = {
     new Tuple11Group[A, B, C, D, E, F, G, H, I, J, K]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup)
   }
 
-  implicit def group12[A, B, C, D, E, F, G, H, I, J, K, L](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
+  implicit def group12[A, B, C, D, E, F, G, H, I, J, K, L](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L]): Group[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
     new Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup)
   }
 
-  implicit def group13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
+  implicit def group13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
     new Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup)
   }
 
-  implicit def group14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
+  implicit def group14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
     new Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup)
   }
 
-  implicit def group15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
+  implicit def group15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
     new Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup)
   }
 
-  implicit def group16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
+  implicit def group16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
     new Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup)
   }
 
-  implicit def group17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
+  implicit def group17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
     new Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup)
   }
 
-  implicit def group18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
+  implicit def group18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
     new Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup, rgroup)
   }
 
-  implicit def group19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
+  implicit def group19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
     new Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup, rgroup, sgroup)
   }
 
-  implicit def group20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
+  implicit def group20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
     new Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup, rgroup, sgroup, tgroup)
   }
 
-  implicit def group21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T], ugroup : Group[U]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
+  implicit def group21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T], ugroup: Group[U]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
     new Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup, rgroup, sgroup, tgroup, ugroup)
   }
 
-  implicit def group22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit agroup : Group[A], bgroup : Group[B], cgroup : Group[C], dgroup : Group[D], egroup : Group[E], fgroup : Group[F], ggroup : Group[G], hgroup : Group[H], igroup : Group[I], jgroup : Group[J], kgroup : Group[K], lgroup : Group[L], mgroup : Group[M], ngroup : Group[N], ogroup : Group[O], pgroup : Group[P], qgroup : Group[Q], rgroup : Group[R], sgroup : Group[S], tgroup : Group[T], ugroup : Group[U], vgroup : Group[V]) : Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
+  implicit def group22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D], egroup: Group[E], fgroup: Group[F], ggroup: Group[G], hgroup: Group[H], igroup: Group[I], jgroup: Group[J], kgroup: Group[K], lgroup: Group[L], mgroup: Group[M], ngroup: Group[N], ogroup: Group[O], pgroup: Group[P], qgroup: Group[Q], rgroup: Group[R], sgroup: Group[S], tgroup: Group[T], ugroup: Group[U], vgroup: Group[V]): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
     new Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup, igroup, jgroup, kgroup, lgroup, mgroup, ngroup, ogroup, pgroup, qgroup, rgroup, sgroup, tgroup, ugroup, vgroup)
   }
 
 }
 
 trait GeneratedRingImplicits {
-  implicit def ring2[A, B](implicit aring : Ring[A], bring : Ring[B]) : Ring[(A, B)] = {
+  implicit def ring2[A, B](implicit aring: Ring[A], bring: Ring[B]): Ring[(A, B)] = {
     new Tuple2Ring[A, B]()(aring, bring)
   }
 
-  implicit def ring3[A, B, C](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C]) : Ring[(A, B, C)] = {
+  implicit def ring3[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C]): Ring[(A, B, C)] = {
     new Tuple3Ring[A, B, C]()(aring, bring, cring)
   }
 
-  implicit def ring4[A, B, C, D](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D]) : Ring[(A, B, C, D)] = {
+  implicit def ring4[A, B, C, D](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D]): Ring[(A, B, C, D)] = {
     new Tuple4Ring[A, B, C, D]()(aring, bring, cring, dring)
   }
 
-  implicit def ring5[A, B, C, D, E](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E]) : Ring[(A, B, C, D, E)] = {
+  implicit def ring5[A, B, C, D, E](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E]): Ring[(A, B, C, D, E)] = {
     new Tuple5Ring[A, B, C, D, E]()(aring, bring, cring, dring, ering)
   }
 
-  implicit def ring6[A, B, C, D, E, F](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F]) : Ring[(A, B, C, D, E, F)] = {
+  implicit def ring6[A, B, C, D, E, F](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F]): Ring[(A, B, C, D, E, F)] = {
     new Tuple6Ring[A, B, C, D, E, F]()(aring, bring, cring, dring, ering, fring)
   }
 
-  implicit def ring7[A, B, C, D, E, F, G](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G]) : Ring[(A, B, C, D, E, F, G)] = {
+  implicit def ring7[A, B, C, D, E, F, G](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G]): Ring[(A, B, C, D, E, F, G)] = {
     new Tuple7Ring[A, B, C, D, E, F, G]()(aring, bring, cring, dring, ering, fring, gring)
   }
 
-  implicit def ring8[A, B, C, D, E, F, G, H](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H]) : Ring[(A, B, C, D, E, F, G, H)] = {
+  implicit def ring8[A, B, C, D, E, F, G, H](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H]): Ring[(A, B, C, D, E, F, G, H)] = {
     new Tuple8Ring[A, B, C, D, E, F, G, H]()(aring, bring, cring, dring, ering, fring, gring, hring)
   }
 
-  implicit def ring9[A, B, C, D, E, F, G, H, I](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I]) : Ring[(A, B, C, D, E, F, G, H, I)] = {
+  implicit def ring9[A, B, C, D, E, F, G, H, I](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I]): Ring[(A, B, C, D, E, F, G, H, I)] = {
     new Tuple9Ring[A, B, C, D, E, F, G, H, I]()(aring, bring, cring, dring, ering, fring, gring, hring, iring)
   }
 
-  implicit def ring10[A, B, C, D, E, F, G, H, I, J](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J]) : Ring[(A, B, C, D, E, F, G, H, I, J)] = {
+  implicit def ring10[A, B, C, D, E, F, G, H, I, J](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J]): Ring[(A, B, C, D, E, F, G, H, I, J)] = {
     new Tuple10Ring[A, B, C, D, E, F, G, H, I, J]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring)
   }
 
-  implicit def ring11[A, B, C, D, E, F, G, H, I, J, K](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K]) : Ring[(A, B, C, D, E, F, G, H, I, J, K)] = {
+  implicit def ring11[A, B, C, D, E, F, G, H, I, J, K](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K]): Ring[(A, B, C, D, E, F, G, H, I, J, K)] = {
     new Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring)
   }
 
-  implicit def ring12[A, B, C, D, E, F, G, H, I, J, K, L](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
+  implicit def ring12[A, B, C, D, E, F, G, H, I, J, K, L](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] = {
     new Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring)
   }
 
-  implicit def ring13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
+  implicit def ring13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] = {
     new Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring)
   }
 
-  implicit def ring14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
+  implicit def ring14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] = {
     new Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring)
   }
 
-  implicit def ring15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
+  implicit def ring15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] = {
     new Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring)
   }
 
-  implicit def ring16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
+  implicit def ring16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] = {
     new Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring)
   }
 
-  implicit def ring17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
+  implicit def ring17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = {
     new Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring)
   }
 
-  implicit def ring18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
+  implicit def ring18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = {
     new Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring, rring)
   }
 
-  implicit def ring19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
+  implicit def ring19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = {
     new Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring, rring, sring)
   }
 
-  implicit def ring20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
+  implicit def ring20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] = {
     new Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring, rring, sring, tring)
   }
 
-  implicit def ring21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T], uring : Ring[U]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
+  implicit def ring21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T], uring: Ring[U]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] = {
     new Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring, rring, sring, tring, uring)
   }
 
-  implicit def ring22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit aring : Ring[A], bring : Ring[B], cring : Ring[C], dring : Ring[D], ering : Ring[E], fring : Ring[F], gring : Ring[G], hring : Ring[H], iring : Ring[I], jring : Ring[J], kring : Ring[K], lring : Ring[L], mring : Ring[M], nring : Ring[N], oring : Ring[O], pring : Ring[P], qring : Ring[Q], rring : Ring[R], sring : Ring[S], tring : Ring[T], uring : Ring[U], vring : Ring[V]) : Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
+  implicit def ring22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F], gring: Ring[G], hring: Ring[H], iring: Ring[I], jring: Ring[J], kring: Ring[K], lring: Ring[L], mring: Ring[M], nring: Ring[N], oring: Ring[O], pring: Ring[P], qring: Ring[Q], rring: Ring[R], sring: Ring[S], tring: Ring[T], uring: Ring[U], vring: Ring[V]): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] = {
     new Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(aring, bring, cring, dring, ering, fring, gring, hring, iring, jring, kring, lring, mring, nring, oring, pring, qring, rring, sring, tring, uring, vring)
   }
 

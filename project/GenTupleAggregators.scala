@@ -4,42 +4,92 @@ import sbt._
 
 object GenTupleAggregators {
   def gen(dir: File) = {
-    val place = dir / "com" / "twitter" / "algebird" / "GeneratedTupleAggregators.scala"
-    IO.write(place,
+    val tupleAggPlace = dir / "com" / "twitter" / "algebird" / "GeneratedTupleAggregators.scala"
+    IO.write(tupleAggPlace,
 """package com.twitter.algebird
 
 object GeneratedTupleAggregator extends GeneratedTupleAggregator
 
 trait GeneratedTupleAggregator {
-""" + genAggregators(22) + "\n" + "}")
+""" + genMethods(22, "implicit def", None) + "\n" + "}")
 
-    Seq(place)
+    val multiAggPlace = dir / "com" / "twitter" / "algebird" / "MultiAggregator.scala"
+    IO.write(multiAggPlace,
+"""package com.twitter.algebird
+
+object MultiAggregator {
+""" +
+      genMethods(22, "def", Some("apply")) + "\n" +
+      genMethods(22, "def", Some("apply"), true) + "\n" + "}")
+
+    val mapAggPlace = dir / "com" / "twitter" / "algebird" / "MapAggregator.scala"
+    IO.write(mapAggPlace,
+"""package com.twitter.algebird
+
+object MapAggregator {
+""" +
+      genMapMethods(22) + "\n" +
+      genMapMethods(22, true) + "\n" + "}")
+
+    Seq(tupleAggPlace, multiAggPlace, mapAggPlace)
   }
 
-  def genAggregators(max: Int): String = {
+  def genMethods(max: Int, defStr: String, name: Option[String], isMonoid: Boolean = false): String = {
     (2 to max).map(i => {
+      val methodName = name.getOrElse("from%d".format(i))
+      val aggType = if (isMonoid) "Monoid" else ""
       val nums = (1 to i)
-      val vs = nums.map("V" + _).mkString(", ")
-      val ts = nums.map("T" + _).mkString(", ")
-      val aggs = nums.map(x => "Aggregator[A, V%s, T%s]".format(x, x)).mkString(", ")
-      val prepares = nums.map(x => "aggs._%s.prepare(v)".format(x)).mkString(", ")
-      val reduces = nums.map(x => "aggs._%s.reduce(v1._%s, v2._%s)".format(x, x, x)).mkString(", ")
-      val present = nums.map(x => "aggs._%s.present(v._%s)".format(x, x)).mkString(", ")
-      val tupleVs = "Tuple%d[%s]".format(i, vs)
-      val tupleTs = "Tuple%d[%s]".format(i, ts)
+      val bs = nums.map("B" + _).mkString(", ")
+      val cs = nums.map("C" + _).mkString(", ")
+      val aggs = nums.map(x => "%sAggregator[A, B%s, C%s]".format(aggType, x, x)).mkString(", ")
+      val prepares = nums.map(x => "aggs._%s.prepare(a)".format(x)).mkString(", ")
+      val semiType = if (isMonoid) "monoid" else "semigroup"
+      val semigroups = nums.map(x => "aggs._%s.%s".format(x, semiType)).mkString(", ")
+      val semigroup = "new Tuple%d%s()(%s)".format(i, semiType.capitalize, semigroups)
+      val present = nums.map(x => "aggs._%s.present(b._%s)".format(x, x)).mkString(", ")
+      val tupleBs = "Tuple%d[%s]".format(i, bs)
+      val tupleCs = "Tuple%d[%s]".format(i, cs)
 
       """
-implicit def from%d[A, %s, %s](aggs: Tuple%d[%s]): Aggregator[A, %s, %s] = {
-  new Aggregator[A, %s, %s] {
-    def prepare(v: A) = (%s)
-    def reduce(v1: %s, v2: %s) = (%s)
-    def present(v: %s) = (%s)
+%s %s[A, %s, %s](aggs: Tuple%d[%s]): %sAggregator[A, %s, %s] = {
+  new %sAggregator[A, %s, %s] {
+    def prepare(a: A) = (%s)
+    val %s = %s
+    def present(b: %s) = (%s)
   }
-}""".format(i, vs, ts, i, aggs, tupleVs, tupleTs,
-            tupleVs, tupleTs,
+}""".format(defStr, methodName, bs, cs, i, aggs, aggType, tupleBs, tupleCs,
+            aggType, tupleBs, tupleCs,
             prepares,
-            tupleVs, tupleVs, reduces,
-            tupleVs, present)
+            semiType, semigroup,
+            tupleBs, present)
+    }).mkString("\n")
+  }
+
+  def genMapMethods(max: Int, isMonoid: Boolean = false): String = {
+    (2 to max).map(i => {
+      val aggType = if (isMonoid) "Monoid" else ""
+      val nums = (1 to i)
+      val bs = nums.map("B" + _).mkString(", ")
+      val aggs = nums.map(x => "agg%s: Tuple2[K, %sAggregator[A, B%s, C]]".format(x, aggType, x)).mkString(", ")
+      val prepares = nums.map(x => "agg%s._2.prepare(a)".format(x)).mkString(", ")
+      val semiType = if (isMonoid) "monoid" else "semigroup"
+      val semigroups = nums.map(x => "agg%s._2.%s".format(x, semiType)).mkString(", ")
+      val semigroup = "new Tuple%d%s()(%s)".format(i, semiType.capitalize, semigroups)
+      val present = nums.map(x => "agg%s._1 -> agg%s._2.present(b._%s)".format(x, x, x)).mkString(", ")
+      val tupleBs = "Tuple%d[%s]".format(i, bs)
+
+      """
+def apply[K, A, %s, C](%s): %sAggregator[A, %s, Map[K, C]] = {
+  new %sAggregator[A, %s, Map[K, C]] {
+    def prepare(a: A) = (%s)
+    val %s = %s
+    def present(b: %s) = Map(%s)
+  }
+}""".format(bs, aggs, aggType, tupleBs,
+            aggType, tupleBs,
+            prepares,
+            semiType, semigroup,
+            tupleBs, present)
     }).mkString("\n")
   }
 }

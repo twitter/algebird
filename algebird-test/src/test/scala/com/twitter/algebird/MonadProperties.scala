@@ -16,49 +16,36 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
-import org.scalacheck.Prop.forAll
+import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Gen, Arbitrary }
 
-import Monad.{pureOp, operators}
+import Monad.{ pureOp, operators }
 
-object MonadProperties extends Properties("Monad") {
-  import BaseProperties._
+class MonadProperties extends CheckProperties {
   import MonadLaws._
 
-  property("list") = monadLaws[List, Int, String, Long]()
-  property("option") = monadLaws[Option, Int, String, Long]()
-  property("indexedseq") = monadLaws[IndexedSeq, Int, String, Long]()
-  property("vector") = monadLaws[Vector, Int, String, Long]()
-  property("set") = monadLaws[Set, Int, String, Long]()
-  property("seq") = monadLaws[Seq, Int, String, Long]()
+  property("list") {
+    monadLaws[List, Int, String, Long]()
+  }
 
-  // Monad algebras:
-  property("Monad Semigroup") = {
-    implicit val optSg = new MonadSemigroup[Int, Option]
-    implicit val listSg = new MonadSemigroup[String, List]
-    // the + here is actually a cross-product, and testing sumOption blows up
-    semigroupLaws[Option[Int]] && isAssociative[List[String]]
+  property("option") {
+    monadLaws[Option, Int, String, Long]()
   }
-  property("Monad Monoid") = {
-    implicit val optSg = new MonadMonoid[Int, Option]
-    implicit val listSg = new MonadMonoid[String, List]
-    // the + here is actually a cross-product, and testing sumOption blows up
-    monoidLaws[Option[Int]] && validZero[List[String]]
+
+  property("indexedseq") {
+    monadLaws[IndexedSeq, Int, String, Long]()
   }
-  // These laws work for only "non-empty" monads
-  property("Monad Group") = {
-    implicit val optSg = new MonadGroup[Int, Some]
-    groupLaws[Some[Int]]
+
+  property("vector") {
+    monadLaws[Vector, Int, String, Long]()
   }
-  property("Monad Ring") = {
-    implicit val optSg = new MonadRing[Int, Some]
-    ringLaws[Some[Int]]
+
+  property("set") {
+    monadLaws[Set, Int, String, Long]()
   }
-  property("Monad Field") = {
-    implicit val optSg = new MonadField[Boolean, Some]
-    fieldLaws[Some[Boolean]]
+
+  property("seq") {
+    monadLaws[Seq, Int, String, Long]()
   }
 }

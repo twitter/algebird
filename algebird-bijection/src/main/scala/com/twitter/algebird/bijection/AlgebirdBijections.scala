@@ -32,7 +32,7 @@ class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], bij: ImplicitBiject
   def bijection: Bijection[U, T] = bij.bijection.inverse
   override def plus(l: U, r: U): U = sg.plus(l.as[T], r.as[T]).as[U]
   override def sumOption(iter: TraversableOnce[U]): Option[U] =
-    sg.sumOption(iter.map { _.as[T] }).as[Option[U]]
+    sg.sumOption(iter.map { _.as[T] }).map(_.as[U])
 }
 
 class BijectedMonoid[T, U](implicit val monoid: Monoid[T], bij: ImplicitBijection[T, U]) extends BijectedSemigroup[T, U] with Monoid[U] {

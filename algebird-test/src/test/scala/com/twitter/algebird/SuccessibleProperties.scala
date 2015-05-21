@@ -13,31 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package com.twitter.algebird
 
-import java.util.Random
+class SuccessibleProperties extends CheckProperties {
+  import com.twitter.algebird.SuccessibleLaws.{ successibleLaws => laws }
 
-import org.scalacheck.{ Arbitrary, Properties }
-import org.scalacheck.Prop.forAll
-
-import scala.annotation.tailrec
-
-object SuccessibleProperties extends Properties("Successibles") {
-  import BaseProperties._
-  import Successible._
-
-  def alwaysIncreasing[T: Successible: Ordering](start: T) = {
-    val r = new Random
-    val incrementable = implicitly[Successible[T]]
-    val ord = optionOrdering[T]
-    1.to(100).foldLeft((Some(start):Option[T], true)) { case ((oldVal, hasBeenGreater), _) =>
-      val newVal = incrementable.next(oldVal)
-      (newVal, hasBeenGreater && ord.compare(oldVal, newVal) < 0)
-    }._2
+  property("Int is Successible") {
+    laws[Int]
   }
 
-  def successibleLaws[T: Successible: Arbitrary: Ordering](start: T) = alwaysIncreasing[T](start)
+  property("Long is Successible") {
+    laws[Long]
+  }
 
-  property("Successible[Int] is a Successible") = successibleLaws[Int](0)
-  property("Successible[Long] is a Successible") = successibleLaws[Long](0L)
+  property("BigInt is Successible") {
+    laws[BigInt]
+  }
+
 }

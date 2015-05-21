@@ -25,8 +25,8 @@ import com.twitter.algebird.Monad
 
 sealed trait Reader[-Env, +T] {
   def apply(env: Env): T
-  def flatMap[E1<:Env, U](next: T => Reader[E1, U]): Reader[E1, U] =
-    FlatMappedReader[E1,T,U](this, next)
+  def flatMap[E1 <: Env, U](next: T => Reader[E1, U]): Reader[E1, U] =
+    FlatMappedReader[E1, T, U](this, next)
   def map[U](thatFn: T => U): Reader[Env, U] =
     FlatMappedReader(this, { (t: T) => ConstantReader(thatFn(t)) })
 }
@@ -34,7 +34,7 @@ sealed trait Reader[-Env, +T] {
 final case class ConstantReader[+T](get: T) extends Reader[Any, T] {
   override def apply(env: Any) = get
   override def map[U](fn: T => U) = ConstantReader(fn(get))
-  override def flatMap[E1<:Any, U](next: T => Reader[E1, U]): Reader[E1, U] = next(get)
+  override def flatMap[E1 <: Any, U](next: T => Reader[E1, U]): Reader[E1, U] = next(get)
 }
 final case class ReaderFn[E, +T](fn: E => T) extends Reader[E, T] {
   override def apply(env: E) = fn(env)
@@ -60,12 +60,12 @@ final case class FlatMappedReader[E, U, +T](first: Reader[E, U], fn: U => Reader
 
 object Reader {
   def const[T](t: T): Reader[Any, T] = ConstantReader(t)
-  implicit def apply[E,T](fn: (E) => T): Reader[E, T] = ReaderFn(fn)
+  implicit def apply[E, T](fn: (E) => T): Reader[E, T] = ReaderFn(fn)
 
-  class ReaderM[Env] extends Monad[({type Result[T] = Reader[Env,T]})#Result] {
+  class ReaderM[Env] extends Monad[({ type Result[T] = Reader[Env, T] })#Result] {
     def apply[T](t: T) = ConstantReader(t)
-    def flatMap[T,U](self: Reader[Env, T])(next: T => Reader[Env, U]) = self.flatMap(next)
-    override def map[T,U](self: Reader[Env, T])(fn: T => U) = self.map(fn)
+    def flatMap[T, U](self: Reader[Env, T])(next: T => Reader[Env, U]) = self.flatMap(next)
+    override def map[T, U](self: Reader[Env, T])(fn: T => U) = self.map(fn)
   }
-  implicit def monad[Env]: Monad[({type Result[T] = Reader[Env,T]})#Result] = new ReaderM[Env]
+  implicit def monad[Env]: Monad[({ type Result[T] = Reader[Env, T] })#Result] = new ReaderM[Env]
 }

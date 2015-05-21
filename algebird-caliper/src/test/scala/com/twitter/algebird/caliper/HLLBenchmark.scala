@@ -6,24 +6,23 @@ import com.twitter.bijection._
 
 import java.util.concurrent.Executors
 import com.twitter.algebird.util._
-import com.google.caliper.{Param, Benchmark}
-import com.twitter.algebird.HyperLogLogMonoid
+import com.google.caliper.{ Param, SimpleBenchmark }
 import java.nio.ByteBuffer
 
 import scala.math._
-class OldMonoid(bits : Int) extends HyperLogLogMonoid(bits) {
+class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
   import HyperLogLog._
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
-    if(items.isEmpty) None
+    if (items.isEmpty) None
     else {
       val buffer = new Array[Byte](size)
       items.foreach { _.updateInto(buffer) }
-      Some(DenseHLL(bits, buffer.toIndexedSeq))
+      Some(DenseHLL(bits, Bytes(buffer)))
     }
 }
 
-class HllBenchmark extends Benchmark {
+class HllBenchmark extends SimpleBenchmark {
   var hllMonoid: HyperLogLogMonoid = _
   var oldHllMonoid: HyperLogLogMonoid = _
 
@@ -50,9 +49,8 @@ class HllBenchmark extends Benchmark {
     def setSize = rng.nextInt(10) + 1 // 1 -> 10
     def hll(elements: Set[Long]): HLL = hllMonoid.batchCreate(elements)(byteEncoder)
 
-
-    val inputIntermediate = (0L until numElements).map {_ =>
-      val setElements = (0 until setSize).map{_ => rng.nextInt(1000).toLong}.toSet
+    val inputIntermediate = (0L until numElements).map { _ =>
+      val setElements = (0 until setSize).map{ _ => rng.nextInt(1000).toLong }.toSet
       (pow(numInputKeys, rng.nextFloat).toLong, List(hll(setElements)))
     }
     inputData = MapAlgebra.sumByKey(inputIntermediate).map(_._2).toSeq

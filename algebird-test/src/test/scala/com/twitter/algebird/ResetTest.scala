@@ -17,34 +17,38 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
+import org.scalacheck.Prop._
 
-object ResetTest extends Properties("ResetAlgebra") {
-  import BaseProperties._
+class ResetTest extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
-  implicit def resetArb[T:Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {
+  implicit def resetArb[T: Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {
     Arbitrary.arbitrary[T].map { t =>
       if (scala.math.random < 0.1) {
         ResetValue(t)
-      }
-      else {
+      } else {
         SetValue(t)
       }
     }
   }
 
-  property("ResetState[Int] forms a Monoid") = monoidLaws[ResetState[Int]]
-  property("ResetState[String] forms a Monoid") = monoidLaws[ResetState[String]]
-  property("ResetState[Int] works as expected") = forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
-    val result = Monoid.plus(Monoid.plus(a,b), c)
-    ((a,b,c) match {
-      case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x+y+z)
-      case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x+y+z)
-      case (_, ResetValue(y), SetValue(z)) => ResetValue(y+z)
-      case (_, _, ResetValue(z)) => ResetValue(z)
-    }) == result
+  property("ResetState[Int] forms a Monoid") {
+    monoidLaws[ResetState[Int]]
+  }
+
+  property("ResetState[String] forms a Monoid") {
+    monoidLaws[ResetState[String]]
+  }
+
+  property("ResetState[Int] works as expected") {
+    forAll { (a: ResetState[Int], b: ResetState[Int], c: ResetState[Int]) =>
+      val result = Monoid.plus(Monoid.plus(a, b), c)
+      ((a, b, c) match {
+        case (SetValue(x), SetValue(y), SetValue(z)) => SetValue(x + y + z)
+        case (ResetValue(x), SetValue(y), SetValue(z)) => ResetValue(x + y + z)
+        case (_, ResetValue(y), SetValue(z)) => ResetValue(y + z)
+        case (_, _, ResetValue(z)) => ResetValue(z)
+      }) == result
+    }
   }
 }

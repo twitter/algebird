@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
+import com.twitter.util.{ Duration, Future, FuturePool }
 import java.util.concurrent.ArrayBlockingQueue
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
@@ -26,12 +26,16 @@ import scala.collection.JavaConverters._
  */
 
 class AsyncMapSum[Key, Value](bufferSize: BufferSize,
-                                          override val flushFrequency: FlushFrequency,
-                                          override val softMemoryFlush: MemoryFlushPercent,
-                                          workPool: FuturePool)
-                                         (implicit semigroup: Semigroup[Value])
-                                          extends AsyncSummer[(Key, Value), Map[Key, Value]]
-                                          with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+  override val flushFrequency: FlushFrequency,
+  override val softMemoryFlush: MemoryFlushPercent,
+  override val memoryIncr: Incrementor,
+  override val timeoutIncr: Incrementor,
+  insertOp: Incrementor,
+  tuplesOut: Incrementor,
+  sizeIncr: Incrementor,
+  workPool: FuturePool)(implicit semigroup: Semigroup[Value])
+  extends AsyncSummer[(Key, Value), Map[Key, Value]]
+  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
@@ -41,22 +45,25 @@ class AsyncMapSum[Key, Value](bufferSize: BufferSize,
   override def isFlushed: Boolean = queue.size == 0
 
   override def flush: Future[Map[Key, Value]] = {
-    didFlush // bumps timeout on the flush conditions
     val toSum = ArrayBuffer[Map[Key, Value]]()
     queue.drainTo(toSum.asJava)
     workPool {
-      Semigroup.sumOption(toSum).getOrElse(Map.empty)
+      val result = Semigroup.sumOption(toSum).getOrElse(Map.empty)
+      tuplesOut.incrBy(result.size)
+      result
     }
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
+    insertOp.incr
+
     val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
-    if(!queue.offer(curData)) {
+    if (!queue.offer(curData)) {
       flush.map { flushRes =>
+        sizeIncr.incr //todo not sure if need to increase size
         Semigroup.plus(flushRes, curData)
       }
-    }
-    else {
+    } else {
       Future.value(Map.empty)
     }
   }

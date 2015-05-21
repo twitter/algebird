@@ -1,85 +1,134 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
-import org.scalacheck._
-import org.specs2.ScalaCheck
-import org.scalacheck.Prop
 import com.twitter.algebird.BaseProperties._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
-import scala.Some
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.Matchers
+import org.scalacheck.Prop._
 
-class AbstractAlgebraTest extends Specification with ScalaCheck {
+class AbstractAlgebraTest extends CheckProperties with Matchers {
 
-  "A Monoid should be able to sum" in {
+  property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]
-    val list = List(1,5,6,6,4,5)
-    list.sum must be_==(monoid.sum(list))
+    forAll { intList: List[Int] =>
+      intList.sum == monoid.sum(intList)
+    }
   }
-  "A Ring should be able to product" in {
+
+  property("A Ring should be able to product") {
     val ring = implicitly[Ring[Int]]
-    val list = List(1,5,6,6,4,5)
-    list.product must be_==(ring.product(list))
+    forAll { intList: List[Int] =>
+      intList.product == ring.product(intList)
+    }
   }
-  "An OptionMonoid should be able to sum" in {
+
+  property("An OptionMonoid should be able to sum") {
     val monoid = implicitly[Monoid[Option[Int]]]
-    val list = List(Some(1),None,Some(5),Some(-1),Some(7),Some(6))
-    list.flatMap(x => x).sum must_== monoid.sum(list).get
+
+    forAll { intList: List[Option[Int]] =>
+      val flattenedList = intList.flatMap(x => x)
+      val expectedResult = if (!flattenedList.isEmpty) Some(flattenedList.sum) else None
+      expectedResult == monoid.sum(intList)
+    }
   }
-  "An OptionMonoid based on a Semigroup should be able to sum" in {
+
+  property("An OptionMonoid based on a Semigroup should be able to sum") {
     val maxMonoid = implicitly[Monoid[Option[Max[Int]]]]
     val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
-    val list = List(Some(1),None,Some(5),Some(-1),Some(7),Some(6))
-    val minList = list.map { _ match {
-        case Some(x) => Some(Min(x))
-        case None => None
+    forAll { intList: List[Option[Int]] =>
+      val minList = intList.map {
+        _ match {
+          case Some(x) => Some(Min(x))
+          case None => None
+        }
       }
-    }
-    val maxList = list.map { _ match {
-        case Some(x) => Some(Max(x))
-        case None => None
+      val maxList = intList.map {
+        _ match {
+          case Some(x) => Some(Max(x))
+          case None => None
+        }
       }
-    }
 
-    Some(Max(7)) must_== maxMonoid.sum(maxList)
-    Some(Min(-1)) must_== minMonoid.sum(minList)
+      val flattenedList = intList.flatMap(x => x)
+      val expectedMax = if (!flattenedList.isEmpty) Some(Max(flattenedList.max)) else None
+      val expectedMin = if (!flattenedList.isEmpty) Some(Min(flattenedList.min)) else None
+
+      expectedMax == maxMonoid.sum(maxList) &&
+        expectedMin == minMonoid.sum(minList)
+
+    }
   }
-  "First/Last should work properly" in {
+
+  property("First/Last should work properly") {
     val fsg = implicitly[Semigroup[First[Int]]]
     val lsg = implicitly[Semigroup[Last[Int]]]
-    (List(1,2,3,4,5).map { First(_) }).reduceLeft(fsg.plus _) must be_==(First(1))
-    (List(1,2,3,4,5).map { Last(_) }).reduceLeft(lsg.plus _) must be_==(Last(5))
-  }
-  "IndexedSeq should sum" in {
-    val leftBase = IndexedSeq(Max(1),Max(2),Max(3))
-    val rightBase = IndexedSeq(Max(5),Max(1),Max(3))
-    val sumBase = IndexedSeq(Max(5),Max(2),Max(3))
-    val remainder = IndexedSeq(Max(-4))
+    forAll { intList: List[Int] =>
+      !intList.isEmpty ==> {
+        val first = intList.map(First(_)).reduceLeft(fsg.plus _)
+        val last = intList.map(Last(_)).reduceLeft(lsg.plus _)
 
-    // equal sized summands
-    Semigroup.plus(leftBase, rightBase) must_== sumBase
-
-    // when left is bigger
-    val left = leftBase ++ remainder
-    Semigroup.plus(left, rightBase) must_== sumBase ++ remainder
-
-    // when right is bigger
-    val right = rightBase ++ remainder
-    Semigroup.plus(leftBase, right) must_== sumBase ++ remainder
+        first == First(intList.head) &&
+          last == Last(intList.last)
+      }
+    }
   }
 
+  property("IndexedSeq should sum") {
+    forAll { (lIndexedSeq: IndexedSeq[Int]) =>
+      val rIndexedSeq = lIndexedSeq.map { _ => scala.util.Random.nextInt }
+      (lIndexedSeq.size == rIndexedSeq.size) ==> {
+        val leftBase = lIndexedSeq.map(Max(_))
+        val rightBase = rIndexedSeq.map(Max(_))
+        val sumBase = (0 until lIndexedSeq.size).map { idx =>
+          if (lIndexedSeq(idx) > rIndexedSeq(idx))
+            Max(lIndexedSeq(idx))
+          else
+            Max(rIndexedSeq(idx))
+        }
+        val remainder = IndexedSeq(Max(-4))
 
-  "a user-defined product monoid should work" in {
+        // equal sized summands
 
+        // when left is bigger
+        val left = leftBase ++ remainder
+
+        // when right is bigger
+        val right = rightBase ++ remainder
+
+        Semigroup.plus(left, rightBase) == sumBase ++ remainder &&
+          Semigroup.plus(leftBase, rightBase) == sumBase &&
+          Semigroup.plus(leftBase, right) == sumBase ++ remainder
+      }
+    }
+  }
+
+  property("An ArrayMonoid should sum") {
+    val monoid = new ArrayMonoid[Int]
+    forAll { intList: List[Int] =>
+      val (l, r) = intList.splitAt(intList.size / 2)
+      val left = l.padTo(math.max(l.size, r.size), 0)
+      val right = r.padTo(math.max(l.size, r.size), 0)
+
+      (left, right).zipped.map(_ + _).toArray.deep == monoid.sum(List(l.toArray, r.toArray)).deep
+    }
+  }
+
+  property("An ArrayGroup should negate") {
+    val arrayGroup = new ArrayGroup[Int]
+    forAll { intList: List[Int] =>
+      intList.map(-1 * _).toArray.deep == arrayGroup.negate(intList.toArray).deep
+    }
+  }
+
+  property("a user-defined product monoid should work") {
     case class Metrics(count: Int, largestValue: Option[Max[Int]])
     implicit val MetricsMonoid = Monoid(Metrics.apply _, Metrics.unapply _)
     implicit val metricsGen = Arbitrary {
-        for {
-          count <- Gen.choose(0,10000)
-          largest <- Gen.oneOf(None, Gen.choose(1, 100).map(n => Some(Max(n))))
-        } yield Metrics(count, largest)
-      }
+      for {
+        count <- Gen.choose(0, 10000)
+        largest <- Gen.oneOf[Option[Max[Int]]](None, Gen.choose(1, 100).map(n => Some(Max(n))))
+      } yield Metrics(count, largest)
+    }
 
-    Prop.all(commutativeMonoidLaws[Metrics])
+    commutativeMonoidLaws[Metrics]
   }
 }

@@ -4,8 +4,9 @@ import scala.collection.immutable.SortedMap
 
 object SpaceSaver {
   /**
-    * Construct SpaceSaver with given capacity containing a single item.
-    */
+   * Construct SpaceSaver with given capacity containing a single item.
+   * This is the public api to create a new SpaceSaver.
+   */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
@@ -14,45 +15,45 @@ object SpaceSaver {
 }
 
 /**
-  * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
-  * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
-  * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
-  * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
-  * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven to be mathematically correct
-  * or preserve the guarantees or benefits of the algorithm.
-  */
+ * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
+ * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
+ * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
+ * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
+ * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven
+ *  to be mathematically correct or preserve the guarantees or benefits of the algorithm.
+ */
 sealed abstract class SpaceSaver[T] {
   import SpaceSaver.ordering
 
   /**
-    * Maximum number of counters to keep (parameter "m" in the research paper).
-    */
+   * Maximum number of counters to keep (parameter "m" in the research paper).
+   */
   def capacity: Int
 
   /**
-    * Current lowest value for count
-    */
+   * Current lowest value for count
+   */
   def min: Long
 
   /**
-    * Map of item to counter, where each counter consist of a observed count and possible over-estimation (error)
-    */
+   * Map of item to counter, where each counter consists of an observed count and possible over-estimation (error)
+   */
   def counters: Map[T, (Long, Long)]
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T]
 
   /**
-    * returns the frequency estimate for the item
-    */
+   * returns the frequency estimate for the item
+   */
   def frequency(item: T): Approximate[Long] = {
     val (count, err) = counters.getOrElse(item, (min, min))
     Approximate(count - err, count, count, 1.0)
   }
 
   /**
-    * Get the elements that show up more than thres times.
-    * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
-    */
+   * Get the elements that show up more than thres times.
+   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   */
   def mostFrequent(thres: Int): Seq[(T, Approximate[Long], Boolean)] =
     counters
       .iterator
@@ -62,9 +63,9 @@ sealed abstract class SpaceSaver[T] {
       .map { case (item, (count, err)) => (item, Approximate(count - err, count, count, 1.0), thres <= count - err) }
 
   /**
-    * Get the top-k elements.
-    * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
-    */
+   * Get the top-k elements.
+   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   */
   def topK(k: Int): Seq[(T, Approximate[Long], Boolean)] = {
     require(k < capacity)
     val si = counters
@@ -76,10 +77,10 @@ sealed abstract class SpaceSaver[T] {
   }
 
   /**
-    * Check consistency with other SpaceSaver, useful for testing.
-    * Returns boolean indicating if they are consistent
-    */
-  def consistentWith(that: SpaceSaver[T]): Boolean = 
+   * Check consistency with other SpaceSaver, useful for testing.
+   * Returns boolean indicating if they are consistent
+   */
+  def consistentWith(that: SpaceSaver[T]): Boolean =
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
@@ -94,31 +95,23 @@ case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
     case other: SSOne[_] => SSMany(this).add(other)
     case other: SSMany[_] => other.add(this)
   }
-
 }
 
 object SSMany {
-  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]): SSMany[T] =
-    SSMany(capacity, counters, Some(buckets))
+  private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] =
+    SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
 
   private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
-    SSMany(capacity, counters, None)
+    SSMany(capacity, counters, bucketsFromCounters(counters))
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
     SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOption: Option[SortedMap[Long, Set[T]]]) extends SpaceSaver[T] {
-  //assert(bucketsOption.forall(_.values.map(_.size).sum == counters.size))
-
-  lazy val buckets: SortedMap[Long, Set[T]] = bucketsOption match {
-    case Some(buckets) => buckets
-    case None => SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
-  }
-
+case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
   private val exact: Boolean = counters.size < capacity
 
-  lazy val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
+  val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
 
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
@@ -163,7 +156,6 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOptio
   }
 
   // merge two stream summaries
-  // defer the creation of buckets since more pairwise merges might be necessary and buckets are not used for those
   private def merge(x: SSMany[T]): SSMany[T] = {
     require(x.capacity == capacity)
     val counters1 = Map() ++
@@ -183,11 +175,9 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], bucketsOptio
     case other: SSOne[_] => add(other)
     case other: SSMany[_] => merge(other)
   }
-
 }
 
 class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
 
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
-
 }

@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 package com.twitter.algebird.matrix
-import scala.collection.mutable.{ArrayBuffer, Map => MMap}
-import com.twitter.algebird.{Monoid, AdaptiveVector}
+import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
+import com.twitter.algebird.{ Monoid, AdaptiveVector }
 
 object SparseColumnMatrix {
   def fromSeqMap[V: Monoid](cols: Int, data: IndexedSeq[MMap[Int, V]]) = {
@@ -46,9 +46,9 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
   override def updateInto(buffer: ArrayBuffer[V]) {
     val lcols = cols
     var row = 0
-    while(row < rows) {
+    while (row < rows) {
       val iter = rowsByColumns(row).denseIterator
-      while(iter.hasNext) {
+      while (iter.hasNext) {
         val (col, value) = iter.next
         val indx = row * lcols + col
         buffer(indx) = valueMonoid.plus(buffer(indx), value)
@@ -66,7 +66,7 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
   override def toString: String = {
     val builder = new scala.collection.mutable.StringBuilder()
     builder ++= "Row: %d, Cols: %d. Dense elements:\n".format(rows, cols)
-    rowsByColumns.foreach {v =>
+    rowsByColumns.foreach { v =>
       builder ++= v.denseIterator.toList.toString
       builder ++= "\n"
     }

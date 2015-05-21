@@ -1,11 +1,9 @@
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.{ Arbitrary, Prop }
 
-object FunctionMonoidTests extends Properties("FunctionMonoid") {
-  import BaseProperties._
+class FunctionMonoidTests extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   // Generates an arbitrary linear function of the form f(x) = a * x + b,
   // where a and b are arbitrary integers.
@@ -14,20 +12,25 @@ object FunctionMonoidTests extends Properties("FunctionMonoid") {
     for (
       a <- Arbitrary.arbInt.arbitrary;
       b <- Arbitrary.arbInt.arbitrary
-    ) yield ((x : Int) => a * x + b )
+    ) yield ((x: Int) => a * x + b)
   }
 
-  property("Linear functions over the integers form a monoid under function composition") =
+  property("Linear functions over the integers form a monoid under function composition") {
     // TODO: switch the scope of the quantification?
-    forAll { (n: Int) =>
+    Prop.forAll { (n: Int) =>
       monoidLawsEq[Function1[Int, Int]] { (f1, f2) => f1(n) == f2(n) }
     }
+  }
 
   implicit def arbAffine: Arbitrary[AffineFunction[Int]] = Arbitrary[AffineFunction[Int]] {
     for (
       a <- Arbitrary.arbInt.arbitrary;
       b <- Arbitrary.arbInt.arbitrary
-    ) yield AffineFunction(a,b)
+    ) yield AffineFunction(a, b)
   }
-  property("AffineFunctions are monoids") = monoidLaws[AffineFunction[Int]]
+
+  property("AffineFunctions are monoids") {
+    monoidLaws[AffineFunction[Int]]
+  }
+
 }

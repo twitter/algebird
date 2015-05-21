@@ -1,22 +1,21 @@
 package com.twitter.algebird
 
-import org.specs2.mutable._
+import org.scalatest._
 
-class MomentsGroupTest extends Specification {
-
+class MomentsGroupTest extends WordSpec with Matchers {
 
   /**
    * Given a list of doubles, create a Moments object to hold
    * the list's central moments.
    */
-  def getMoments(xs : List[Double]) : Moments =
+  def getMoments(xs: List[Double]): Moments =
     xs.foldLeft(MomentsGroup.zero) { (m, x) => MomentsGroup.plus(m, Moments(x)) }
 
-  def testApproxEq(f1 : Double, f2 : Double) {
+  def testApproxEq(f1: Double, f2: Double) {
     if (f2 == 0)
-      f1 must be_<(1e-10)
+      assert(f1 < 1e-10)
     else
-      (scala.math.abs(f1 - f2) / scala.math.abs(f2)) must be_<(1e-10)
+      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
   }
 
   "Moments should count" in {
@@ -65,18 +64,23 @@ class MomentsGroupTest extends Specification {
   "Moments can be aggregated" in {
     val m1 = MomentsAggregator(List(1, 2, 3, 4, 5))
     testApproxEq(m1.count, 5)
-    testApproxEq(m1.mean , 3)
+    testApproxEq(m1.mean, 3)
     testApproxEq(m1.variance, 2)
     testApproxEq(m1.skewness, 0)
     testApproxEq(m1.kurtosis, -1.3)
 
     val m2 = MomentsAggregator(List(1, 1, 1, 2, 3))
     testApproxEq(m2.count, 5)
-    testApproxEq(m2.mean , 1.6)
+    testApproxEq(m2.mean, 1.6)
     testApproxEq(m2.variance, 0.64)
     testApproxEq(m2.skewness, 0.84375)
     testApproxEq(m2.kurtosis, -0.921875)
+  }
 
-
+  "Moments should not return higher-order moments for small data sets" in {
+    val m1 = MomentsAggregator(List(1, 2))
+    testApproxEq(m1.count, 2)
+    assert(m1.skewness.isNaN)
+    assert(m1.kurtosis.isNaN)
   }
 }
