@@ -33,6 +33,16 @@ object ReferenceHyperLogLog {
       (onBits.filter { _ >= bits }.min - bits + 1).toByte)
   }
 
+  def hash(input: Array[Byte]): Array[Byte] = {
+    val seed = 12345678
+    val (l0, l1) = MurmurHash128(seed)(input)
+    val buf = new Array[Byte](16)
+    java.nio.ByteBuffer
+      .wrap(buf)
+      .putLong(l0)
+      .putLong(l1)
+    buf
+  }
 }
 
 class HyperLogLogLaws extends CheckProperties {
@@ -55,6 +65,16 @@ class HyperLogLogLaws extends CheckProperties {
     Prop.forAll(Gen.choose(0.0001, 0.999)) { err =>
       val bits = HyperLogLog.bitsForError(err)
       (HyperLogLog.error(bits) <= err) && (HyperLogLog.error(bits - 1) > err)
+    }
+  }
+
+  /**
+   * We can't change the way Array[Byte] was hashed without breaking
+   * serialized HLLs
+   */
+  property("HyperLogLog.hash matches reference") {
+    Prop.forAll { a: Array[Byte] =>
+      HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq
     }
   }
 }
