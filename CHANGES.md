@@ -1,5 +1,11 @@
 # Algebird #
 
+### Version 0.10.1 ###
+* Make HLL easier to use, add Hash128 typeclass #440
+* add ! to ApproximateBoolean #442
+* add QTreeAggregator and add approximatePercentileBounds to Aggregator #443
+* Make level configurable in QTreeAggregators #444
+
 ### Version 0.10.0 ###
 * HyperLogLogSeries #295
 * CMS: add contramap to convert CMS[K] to CMS[L], add support for String and Bytes, remove Ordering context bound for K #399
