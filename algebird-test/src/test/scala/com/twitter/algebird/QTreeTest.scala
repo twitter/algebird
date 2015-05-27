@@ -79,6 +79,14 @@ class QTreeTest extends WordSpec with Matchers {
         assert(truth >= lower)
         assert(truth <= upper)
       }
+      "return correct quantile bounds for two percentile extremes" in {
+        val list = randomList(10000)
+        val qt = buildQTree(k, list)
+        val (lower, _) = qt.quantileBounds(0.0)
+        val (_, upper) = qt.quantileBounds(1.0)
+        assert(lower == 0.0)
+        assert(upper == 1.0)
+      }
       "always contain the true range sum within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
