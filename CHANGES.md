@@ -1,5 +1,8 @@
 # Algebird #
 
+### Version 0.10.2 ###
+* QTree quantileBounds assert percentile <= 1.0 #447
+
 ### Version 0.10.1 ###
 * Make HLL easier to use, add Hash128 typeclass #440
 * add ! to ApproximateBoolean #442
