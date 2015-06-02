@@ -10,7 +10,7 @@ import com.twitter.algebird.Monoid
 case class GaussianDistribution(mean: Double, sigma: Double)
 
 object GaussianDistribution {
-  implicit def monoid: Monoid[GaussianDistribution] = GaussianDistributionMonoid
+  implicit def monoid: Monoid[GaussianDistribution] = new GaussianDistributionMonoid
 }
 
 /**
