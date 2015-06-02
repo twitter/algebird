@@ -1,4 +1,4 @@
-package com.twitter.algebird
+package com.twitter.algebird.statistics
 
 import com.twitter.algebird.Monoid
 
@@ -23,6 +23,6 @@ class GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
   override def zero = new GaussianDistribution(0, 0)
 
   override def plus(left: GaussianDistribution, right: GaussianDistribution): GaussianDistribution = {
-    new GaussianDistribution(left.mean + right + mean, left.sigma + right.sigma)
+    new GaussianDistribution(left.mean + right.mean, left.sigma + right.sigma)
   }
 }
