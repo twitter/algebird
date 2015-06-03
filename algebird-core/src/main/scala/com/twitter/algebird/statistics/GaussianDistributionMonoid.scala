@@ -10,7 +10,10 @@ import com.twitter.algebird.Monoid
 case class GaussianDistribution(mean: Double, sigma: Double)
 
 object GaussianDistribution {
-  implicit def monoid: Monoid[GaussianDistribution] = new GaussianDistributionMonoid
+  implicit val monoid: Monoid[GaussianDistribution] = GaussianDistributionMonoid
+
+  def sample(r: java.util.Random): Double =
+    r.nextGaussian()
 }
 
 /**
@@ -19,10 +22,24 @@ object GaussianDistribution {
  * normally distributed, with its new mean equal to the sum of two means
  * and variance equal to the sum of two variances.
  */
-class GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
+object GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
   override def zero = new GaussianDistribution(0, 0)
 
-  override def plus(left: GaussianDistribution, right: GaussianDistribution): GaussianDistribution = {
+  override def plus(left: GaussianDistribution, right: GaussianDistribution): GaussianDistribution =
     new GaussianDistribution(left.mean + right.mean, left.sigma + right.sigma)
-  }
+
+  override def sumOption(its: TraversableOnce[GaussianDistribution]): Option[GaussianDistribution] =
+    if (its.isEmpty)
+      None
+    else {
+      var mean = 0.0
+      var sigma = 0.0
+      val it = its.toIterator
+      while (it.hasNext) {
+        val g = it.next
+        mean += g.mean
+        sigma += g.sigma
+      }
+      Some(GaussianDistribution(mean, sigma))
+    }
 }

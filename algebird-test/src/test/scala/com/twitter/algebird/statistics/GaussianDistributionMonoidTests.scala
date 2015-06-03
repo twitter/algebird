@@ -7,7 +7,7 @@ import org.scalatest._
 class GaussianDistributionMonoidTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val gaussianMonoid = new GaussianDistributionMonoid
+  implicit val gaussianMonoid = GaussianDistributionMonoid
   implicit val gaussianGenerators = Arbitrary {
     for (
       mean <- Gen.choose(0, 10000);
@@ -16,8 +16,6 @@ class GaussianDistributionMonoidTests extends CheckProperties {
   }
 
   property("GaussianDistributionMonoid is a Monoid") {
-    monoidLawsEq[GaussianDistribution]{
-      (a, b) => a.mean == b.mean && a.sigma == b.sigma
-    }
+    monoidLaws[GaussianDistribution]
   }
 }
