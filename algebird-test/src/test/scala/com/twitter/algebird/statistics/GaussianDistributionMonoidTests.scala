@@ -7,7 +7,6 @@ import org.scalatest._
 class GaussianDistributionMonoidTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val gaussianMonoid = GaussianDistributionMonoid
   implicit val gaussianGenerators = Arbitrary {
     for (
       mean <- Gen.choose(0, 10000);
