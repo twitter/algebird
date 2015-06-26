@@ -66,8 +66,17 @@ object MapAggregator {
   }
 
   def genMapMethods(max: Int, isMonoid: Boolean = false): String = {
+    val aggType = if (isMonoid) "Monoid" else ""
+
+    // there's no Semigroup[Tuple1[T]], so just use T as intermediary type instead of Tuple1[T]
+    val aggregatorForOneItem = s"""
+       |def apply[K, A, B, C](aggDef: (K, ${aggType}Aggregator[A, B, C])): ${aggType}Aggregator[A, B, Map[K, C]] = {
+       |  val (key, agg) = aggDef
+       |  agg.andThenPresent(value => Map(key -> value))
+       |}
+    """.stripMargin
+
     (2 to max).map(i => {
-      val aggType = if (isMonoid) "Monoid" else ""
       val nums = (1 to i)
       val bs = nums.map("B" + _).mkString(", ")
       val aggs = nums.map(x => "agg%s: Tuple2[K, %sAggregator[A, B%s, C]]".format(x, aggType, x)).mkString(", ")
@@ -90,6 +99,6 @@ def apply[K, A, %s, C](%s): %sAggregator[A, %s, Map[K, C]] = {
             prepares,
             semiType, semigroup,
             tupleBs, present)
-    }).mkString("\n")
+    }).mkString("\n") + aggregatorForOneItem
   }
 }

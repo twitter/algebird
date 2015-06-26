@@ -340,6 +340,13 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
 
     val MinLongAgg = Aggregator.min[Int].andThenPresent{ _.toLong }
 
+    "Create an aggregator from 1 (key, aggregator) pair" in {
+      val agg: Aggregator[Int, Long, Map[String, Long]] = MapAggregator(
+        ("key1", SizeAgg))
+      val expectedMap = Map("key1" -> 6)
+      assert(agg(data) == expectedMap)
+    }
+
     "Create an aggregator from 2 (key, aggregator) pairs" in {
       val agg: Aggregator[Int, Tuple2[Int, Long], Map[String, Long]] = MapAggregator(
         ("key1", MinLongAgg),
