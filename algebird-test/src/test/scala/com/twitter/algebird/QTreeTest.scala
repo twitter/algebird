@@ -68,6 +68,21 @@ class QTreeTest extends WordSpec with Matchers {
   def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
     list.filter{ _ >= from }.filter{ _ < to }.sum
 
+  for (k <- Seq(3, 11, 51, 101)) {
+    s"QTree with elements (1 to $k)" should {
+      val trueMedian = (1 + k) / 2
+      s"have median $trueMedian" in {
+        implicit val sg = new QTreeSemigroup[Double](k)
+
+        val l = (1 to k).map(_.toDouble)
+        val qt = l.map(QTree(_)).reduceLeft(sg.plus)
+
+        val (lower, upper) = qt.quantileBounds(0.5)
+        assert(lower < trueMedian && trueMedian < upper)
+      }
+    }
+  }
+
   for (k <- (1 to 6))
     ("QTree with sizeHint 2^" + k) should {
       "always contain the true quantile within its bounds" in {
