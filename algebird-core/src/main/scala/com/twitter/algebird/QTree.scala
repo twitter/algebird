@@ -43,20 +43,20 @@ object QTree {
    * level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
    */
   def apply[A](kv: (Double, A), level: Int = DefaultLevel): QTree[A] =
-    QTree(math.floor(kv._1 / math.pow(2.0, level)).toLong,
-      level,
-      1,
-      kv._2,
-      None,
-      None)
+    QTree(offset = math.floor(kv._1 / math.pow(2.0, level)).toLong,
+      level = level,
+      count = 1,
+      sum = kv._2,
+      lowerChild = None,
+      upperChild = None)
 
   def apply[A](kv: (Long, A)): QTree[A] =
-    QTree(kv._1,
-      0,
-      1,
-      kv._2,
-      None,
-      None)
+    QTree(offset = kv._1,
+      level = 0,
+      count = 1,
+      sum = kv._2,
+      lowerChild = None,
+      upperChild = None)
 
   /**
    * The common case of wanting an offset and sum for the same value
