@@ -57,12 +57,11 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
     sumOption.getOrElse(mon.zero)
 
   def sumOption(implicit sg: Semigroup[T], ct: ClassTag[T]): Option[T] = {
-    val partialReduce = rdd.mapPartitions({ itT => Iterator(sg.sumOption(itT)) },
+    val partialReduce: RDD[T] = rdd.mapPartitions({ itT => sg.sumOption(itT).toIterator },
       preservesPartitioning = true)
 
     val results = partialReduce.coalesce(1).mapPartitions({ it =>
-      val somes = it.filter(_.isDefined).map(_.get)
-      Iterator(sg.sumOption(somes))
+      Iterator(sg.sumOption(it))
     }, preservesPartitioning = true)
       .collect
 
