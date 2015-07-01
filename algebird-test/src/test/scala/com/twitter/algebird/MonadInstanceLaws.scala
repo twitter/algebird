@@ -16,12 +16,10 @@
 
 package com.twitter.algebird.monad
 
-import com.twitter.algebird.Monad
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import com.twitter.algebird.CheckProperties
+import org.scalacheck.Prop._
 
-class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
+class MonadInstanceLaws extends CheckProperties {
 
   // Mutually recursive functions
   def ping(todo: Int, acc: Int): Trampoline[Int] =
@@ -33,7 +31,7 @@ class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
   property("Trampoline should run without stackoverflow") {
     forAll { (b: Int) =>
       val bsmall = b % 1000000
-      assert(ping(bsmall, 0).get == (bsmall max 0))
+      ping(bsmall, 0).get == (bsmall max 0)
     }
   }
 
@@ -44,7 +42,7 @@ class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
         oldState <- StateWithError.swapState[Int](start * 2)
       } yield oldState
 
-      assert(fn(i) == Right((2 * i, i)))
+      fn(i) == Right((2 * i, i))
     }
   }
 
@@ -55,9 +53,9 @@ class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
       val comp = mons.foldLeft(init) { (old, fn) =>
         old.flatMap { x => fn } // just bind
       }
-      assert(comp(in) == (fns.foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
+      comp(in) == (fns.foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
         oldState.right.flatMap { case (s, v) => fn(s) }
-      }))
+      })
     }
   }
 
@@ -88,7 +86,7 @@ class MonadInstanceLaws extends PropSpec with PropertyChecks with Matchers {
       fns.foreach { fn =>
         m2.inc(fn(m2.item))
       }
-      assert(m1.item == m2.item)
+      m1.item == m2.item
     }
   }
 

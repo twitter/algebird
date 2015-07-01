@@ -47,7 +47,23 @@ end
 def get_class_definition(n, algebraic_structure)
   # Example: "T,U"
   type_values_commaed = TYPE_SYMBOLS.first(n).join(", ")
-  "class Product#{n}#{algebraic_structure.capitalize}[X, #{type_values_commaed}](apply: (#{type_values_commaed}) => X, unapply: X => Option[(#{type_values_commaed})])(implicit #{get_type_parameters(n, algebraic_structure)}) extends #{algebraic_structure.capitalize}[X]"
+  params = "(apply: (#{type_values_commaed}) => X, unapply: X => Option[(#{type_values_commaed})])"
+
+  extends = ["#{algebraic_structure.capitalize}[X]"]
+  parent = case algebraic_structure
+  when "monoid"
+    "Semigroup"
+  when "group"
+    "Monoid"
+  when "ring"
+    "Group"
+  end
+
+  if parent
+    extends.unshift("Product#{n}#{parent}[X, #{type_values_commaed}]#{params}")
+  end
+
+  "class Product#{n}#{algebraic_structure.capitalize}[X, #{type_values_commaed}]#{params}(implicit #{get_type_parameters(n, algebraic_structure)}) extends #{extends.join(" with ")}"
 end
 
 # This returns the parameters for each product monoid/group/ring class.
@@ -154,24 +170,17 @@ def print_class_definitions
 #{get_comment(product_size, "monoid")}
 #{get_class_definition(product_size, "monoid")} {
   #{get_constant(product_size, "monoid", "zero")}
-  #{get_operation(product_size, "monoid", "plus")}
 }
 
 #{get_comment(product_size, "group")}
 #{get_class_definition(product_size, "group")} {
-  #{get_constant(product_size, "group", "zero")}
   #{get_negate(product_size, "group")}
-  #{get_operation(product_size, "group", "plus")}
   #{get_operation(product_size, "group", "minus")}
 }
 
 #{get_comment(product_size, "ring")}
 #{get_class_definition(product_size, "ring")} {
-  #{get_constant(product_size, "ring", "zero")}
   #{get_constant(product_size, "ring", "one")}
-  #{get_negate(product_size, "ring")}
-  #{get_operation(product_size, "ring", "plus")}
-  #{get_operation(product_size, "ring", "minus")}
   #{get_operation(product_size, "ring", "times")}
 }
 EOS

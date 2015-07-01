@@ -33,14 +33,14 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   override val memoryIncr: Incrementor,
   override val timeoutIncr: Incrementor,
   sizeIncr: Incrementor,
-  putCalls: Incrementor,
+  insertOps: Incrementor,
   tuplesIn: Incrementor,
   tuplesOut: Incrementor)(implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
   protected override val emptyResult = Map.empty[Key, Value]
 
-  private[this] final val squeue: CustomSummingQueue[Map[Key, Value]] = new CustomSummingQueue(bufferSize.v, sizeIncr, putCalls)
+  private[this] final val squeue: CustomSummingQueue[Map[Key, Value]] = new CustomSummingQueue(bufferSize.v, sizeIncr, insertOps)
   override def isFlushed: Boolean = squeue.isFlushed
 
   def flush: Future[Map[Key, Value]] = {

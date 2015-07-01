@@ -20,7 +20,7 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
 
-class ApplicativeProperties extends PropSpec with PropertyChecks with Matchers {
+class ApplicativeProperties extends CheckProperties {
   import ApplicativeLaws._
   import Monad._ // for Monad instances
   import MonadLaws._ // for Arbitrary instances
@@ -45,5 +45,36 @@ class ApplicativeProperties extends PropSpec with PropertyChecks with Matchers {
   }
   property("seq") {
     applicativeLaws[Seq, Int, String, Long]()
+  }
+  // Applicative algebras:
+  import BaseProperties._
+  property("Applicative Semigroup") {
+    implicit val optSg = new ApplicativeSemigroup[Int, Option]
+    implicit val listSg = new ApplicativeSemigroup[String, List]
+    // the + here is actually a cross-product, and testing sumOption blows up
+    semigroupLaws[Option[Int]] && isAssociative[List[String]]
+  }
+
+  property("Applicative Monoid") {
+    implicit val optSg = new ApplicativeMonoid[Int, Option]
+    implicit val listSg = new ApplicativeMonoid[String, List]
+    // the + here is actually a cross-product, and testing sumOption blows up
+    monoidLaws[Option[Int]] && validZero[List[String]]
+  }
+
+  // These laws work for only "non-empty" monads
+  property("Applicative Group") {
+    implicit val optSg = new ApplicativeGroup[Int, Some]
+    groupLaws[Some[Int]]
+  }
+
+  property("Applicative Ring") {
+    implicit val optSg = new ApplicativeRing[Int, Some]
+    ringLaws[Some[Int]]
+  }
+
+  property("Applicative Field") {
+    implicit val optSg = new ApplicativeField[Boolean, Some]
+    fieldLaws[Some[Boolean]]
   }
 }

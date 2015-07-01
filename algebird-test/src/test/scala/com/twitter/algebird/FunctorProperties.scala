@@ -16,14 +16,9 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Properties
-
-class FunctorProperties extends PropSpec with PropertyChecks with Matchers {
-  import FunctorLaws._
-  import Monad._ // for Monad instances
-  import MonadLaws._ // for Arbitrary instances
+class FunctorProperties extends CheckProperties {
+  import com.twitter.algebird.FunctorLaws._
+  import com.twitter.algebird.Monad._ // for Arbitrary instances
 
   property("list") {
     functorLaws[List, Int, String, Long]()

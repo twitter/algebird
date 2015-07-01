@@ -1,11 +1,11 @@
 package com.twitter.algebird
 
+import org.scalacheck.Prop._
+import org.scalacheck.{ Arbitrary, Gen }
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
 
-class SpaceSaverLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class SpaceSaverLaws extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   // limit sizes to 100 to avoid large data structures in tests
   property("SpaceSaver is a Semigroup") {

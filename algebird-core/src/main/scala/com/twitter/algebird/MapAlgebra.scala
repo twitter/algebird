@@ -104,7 +104,7 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
   override def fromMutable(mut: MMap[K, V]): ScMap[K, V] = new MutableBackedMap(mut)
 }
 
-private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V]) extends Map[K, V] {
+private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V]) extends Map[K, V] with java.io.Serializable {
   def get(key: K) = backingMap.get(key)
 
   def iterator = backingMap.iterator

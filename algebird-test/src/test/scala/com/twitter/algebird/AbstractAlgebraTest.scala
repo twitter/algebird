@@ -1,27 +1,23 @@
 package com.twitter.algebird
 
-import org.scalatest._
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Prop
 import com.twitter.algebird.BaseProperties._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Gen
-import scala.Some
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.Matchers
+import org.scalacheck.Prop._
 
-class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
+class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]
     forAll { intList: List[Int] =>
-      assert(intList.sum == monoid.sum(intList))
+      intList.sum == monoid.sum(intList)
     }
   }
 
   property("A Ring should be able to product") {
     val ring = implicitly[Ring[Int]]
     forAll { intList: List[Int] =>
-      assert(intList.product == ring.product(intList))
+      intList.product == ring.product(intList)
     }
   }
 
@@ -31,7 +27,7 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
     forAll { intList: List[Option[Int]] =>
       val flattenedList = intList.flatMap(x => x)
       val expectedResult = if (!flattenedList.isEmpty) Some(flattenedList.sum) else None
-      assert(expectedResult == monoid.sum(intList))
+      expectedResult == monoid.sum(intList)
     }
   }
 
@@ -56,8 +52,8 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
       val expectedMax = if (!flattenedList.isEmpty) Some(Max(flattenedList.max)) else None
       val expectedMin = if (!flattenedList.isEmpty) Some(Min(flattenedList.min)) else None
 
-      assert(expectedMax == maxMonoid.sum(maxList))
-      assert(expectedMin == minMonoid.sum(minList))
+      expectedMax == maxMonoid.sum(maxList) &&
+        expectedMin == minMonoid.sum(minList)
 
     }
   }
@@ -66,12 +62,12 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
     val fsg = implicitly[Semigroup[First[Int]]]
     val lsg = implicitly[Semigroup[Last[Int]]]
     forAll { intList: List[Int] =>
-      whenever(!intList.isEmpty) {
+      !intList.isEmpty ==> {
         val first = intList.map(First(_)).reduceLeft(fsg.plus _)
         val last = intList.map(Last(_)).reduceLeft(lsg.plus _)
 
-        assert(first == First(intList.head))
-        assert(last == Last(intList.last))
+        first == First(intList.head) &&
+          last == Last(intList.last)
       }
     }
   }
@@ -79,7 +75,7 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
   property("IndexedSeq should sum") {
     forAll { (lIndexedSeq: IndexedSeq[Int]) =>
       val rIndexedSeq = lIndexedSeq.map { _ => scala.util.Random.nextInt }
-      whenever(lIndexedSeq.size == rIndexedSeq.size) {
+      (lIndexedSeq.size == rIndexedSeq.size) ==> {
         val leftBase = lIndexedSeq.map(Max(_))
         val rightBase = rIndexedSeq.map(Max(_))
         val sumBase = (0 until lIndexedSeq.size).map { idx =>
@@ -91,15 +87,16 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
         val remainder = IndexedSeq(Max(-4))
 
         // equal sized summands
-        assert(Semigroup.plus(leftBase, rightBase) == sumBase)
 
         // when left is bigger
         val left = leftBase ++ remainder
-        assert(Semigroup.plus(left, rightBase) == sumBase ++ remainder)
 
         // when right is bigger
         val right = rightBase ++ remainder
-        assert(Semigroup.plus(leftBase, right) == sumBase ++ remainder)
+
+        Semigroup.plus(left, rightBase) == sumBase ++ remainder &&
+          Semigroup.plus(leftBase, rightBase) == sumBase &&
+          Semigroup.plus(leftBase, right) == sumBase ++ remainder
       }
     }
   }
@@ -111,14 +108,14 @@ class AbstractAlgebraTest extends PropSpec with PropertyChecks with Matchers {
       val left = l.padTo(math.max(l.size, r.size), 0)
       val right = r.padTo(math.max(l.size, r.size), 0)
 
-      assert((left, right).zipped.map(_ + _).toArray.deep == monoid.sum(List(l.toArray, r.toArray)).deep)
+      (left, right).zipped.map(_ + _).toArray.deep == monoid.sum(List(l.toArray, r.toArray)).deep
     }
   }
 
   property("An ArrayGroup should negate") {
     val arrayGroup = new ArrayGroup[Int]
     forAll { intList: List[Int] =>
-      assert(intList.map(-1 * _).toArray.deep == arrayGroup.negate(intList.toArray).deep)
+      intList.map(-1 * _).toArray.deep == arrayGroup.negate(intList.toArray).deep
     }
   }
 

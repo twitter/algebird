@@ -16,10 +16,10 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.prop.PropertyChecks
-import org.scalatest.{ Matchers, PropSpec }
+import com.twitter.algebird.CheckProperties
+import org.scalacheck.Prop._
 
-class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers {
+class AsyncListSumProperties extends CheckProperties {
 
   import com.twitter.algebird.util.summer.AsyncSummerLaws._
 
@@ -48,16 +48,16 @@ class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers 
         workPool,
         Compact(false),
         CompactionSize(0))
-      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
+      (summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }
 
   property("CompactingList Summing with and without the summer should match") {
     forAll { (inputs: List[List[(Int, Long)]],
-              flushFrequency: FlushFrequency,
-              bufferSize: BufferSize,
-              memoryFlushPercent: MemoryFlushPercent,
-              compactionSize: CompactionSize) =>
+      flushFrequency: FlushFrequency,
+      bufferSize: BufferSize,
+      memoryFlushPercent: MemoryFlushPercent,
+      compactionSize: CompactionSize) =>
       val timeOutCounter = Counter("timeOut")
       val sizeCounter = Counter("size")
       val memoryCounter = Counter("memory")
@@ -78,7 +78,7 @@ class AsyncListSumProperties extends PropSpec with PropertyChecks with Matchers 
         workPool,
         Compact(true),
         compactionSize)
-      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
+      summingWithAndWithoutSummerShouldMatch(summer, inputs)
     }
   }
 }

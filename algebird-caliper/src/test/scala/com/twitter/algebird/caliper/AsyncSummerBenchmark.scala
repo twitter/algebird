@@ -4,11 +4,11 @@ import java.lang.Math._
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 
-import com.google.caliper.{Param, SimpleBenchmark}
-import com.twitter.algebird.{HyperLogLogMonoid, _}
+import com.google.caliper.{ Param, SimpleBenchmark }
+import com.twitter.algebird.{ HyperLogLogMonoid, _ }
 import com.twitter.algebird.util.summer._
 import com.twitter.bijection._
-import com.twitter.util.{Await, Duration, FuturePool}
+import com.twitter.util.{ Await, Duration, FuturePool }
 
 import scala.util.Random
 

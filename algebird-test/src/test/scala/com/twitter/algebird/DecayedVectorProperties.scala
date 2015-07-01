@@ -16,12 +16,10 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Arbitrary, Gen }
 
-class DecayedVectorProperties extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class DecayedVectorProperties extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
     for {
