@@ -162,7 +162,7 @@ object AlgebirdBuild extends Build {
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 
   lazy val algebirdSpark = module("spark").settings(
-    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.2.0" % "provided"
+    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided"
   ).dependsOn(algebirdCore, algebirdTest % "test->compile")
 }
 
