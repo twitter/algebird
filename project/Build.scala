@@ -112,7 +112,8 @@ object AlgebirdBuild extends Build {
     algebirdTest,
     algebirdCore,
     algebirdUtil,
-    algebirdBijection
+    algebirdBijection,
+    algebirdSpark
   )
 
   def module(name: String) = {
