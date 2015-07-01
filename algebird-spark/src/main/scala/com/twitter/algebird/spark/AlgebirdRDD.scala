@@ -12,16 +12,21 @@ import scala.reflect.ClassTag
  */
 class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
   /**
-   * Apply an Aggregator to return a single value for the whole RDD
+   * Apply an Aggregator to return a single value for the whole RDD.
+   * If the RDD is empty, None is returned
    */
-  def aggregate[B: ClassTag, C](agg: Aggregator[T, B, C]): C = {
-    val partialReduce: RDD[B] = rdd.mapPartitions({ itT =>
-      val itB = itT.map(agg.prepare)
-      agg.semigroup.sumOption(itB)
-        .fold(Iterator.empty: Iterator[B]) { b: B => Iterator(b) }
-    }, preservesPartitioning = true)
-    // Finish the job
-    agg.present(partialReduce.reduce(agg.reduce))
+  def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] =
+    (new AlgebirdRDD(rdd.map(agg.prepare)))
+      .sumOption(agg.semigroup, implicitly)
+      .map(agg.present)
+
+  /**
+   * This will throw if you use a non-MonoidAggregator with an empty RDD
+   */
+  def aggregate[B: ClassTag, C](agg: Aggregator[T, B, C]): C = (aggregateOption[B, C](agg), agg.semigroup) match {
+    case (Some(c), _) => c
+    case (None, m: Monoid[B]) => agg.present(m.zero)
+    case (None, _) => None.get // no such element
   }
 
   def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] = {
@@ -42,15 +47,26 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
   /**
    * Use the implicit semigroup to sum by keys
    */
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] = {
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] =
     (new PairRDDFunctions(keyed)).reduceByKey(implicitly[Semigroup[V]].plus)
-  }
+
   /**
-   * Use the implicit semigroup to sum all items
+   * Use the implicit Monoid to sum all items
    */
-  def sum(implicit sg: Semigroup[T], ct: ClassTag[T]): T =
-    rdd.mapPartitions({ itT =>
-      sg.sumOption(itT)
-        .fold(Iterator.empty: Iterator[T]) { t: T => Iterator(t) }
-    }, preservesPartitioning = true).reduce(sg.plus)
+  def sum(implicit mon: Monoid[T], ct: ClassTag[T]): T =
+    sumOption.getOrElse(mon.zero)
+
+  def sumOption(implicit sg: Semigroup[T], ct: ClassTag[T]): Option[T] = {
+    val partialReduce = rdd.mapPartitions({ itT => Iterator(sg.sumOption(itT)) },
+      preservesPartitioning = true)
+
+    val results = partialReduce.coalesce(1).mapPartitions({ it =>
+      val somes = it.filter(_.isDefined).map(_.get)
+      Iterator(sg.sumOption(somes))
+    }, preservesPartitioning = true)
+      .collect
+
+    assert(results.size == 1, s"Should only be 1 item: ${results.toList}")
+    results.head // there can only be one item now
+  }
 }
