@@ -43,6 +43,9 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
     agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] =
     aggregateByKey(Partitioner.defaultPartitioner(rdd), agg)
 
+  private def toPair[K: ClassTag, V: ClassTag](kv: RDD[(K, V)])(implicit ordK: Priority[Ordering[K], DummyImplicit]) =
+    new PairRDDFunctions(kv)(implicitly, implicitly, ordK.getPreferred.orNull)
+
   /**
    * Apply an Aggregator to the values for each key with a custom Partitioner.
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
@@ -58,8 +61,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
       it.map { case (k, v) => (k, agg.prepare(v)) }
     }, preservesPartitioning = true)
 
-    (new PairRDDFunctions(prepared)(implicitly, implicitly, ordK.getPreferred.orNull))
-      .reduceByKey(part, agg.reduce(_, _))
+    toPair(toPair(prepared)
+      .reduceByKey(part, agg.reduce(_, _)))
       .mapValues(agg.present)
   }
 
@@ -81,8 +84,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    */
   def sumByKey[K: ClassTag, V: ClassTag: Semigroup](
     part: Partitioner)(implicit ev: T <:< (K, V), ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
-    (new PairRDDFunctions(keyed)(implicitly, implicitly, ord.getPreferred.orNull))
-      .reduceByKey(part, implicitly[Semigroup[V]].plus _)
+    toPair(keyed).reduceByKey(part, implicitly[Semigroup[V]].plus _)
 
   /**
    * Use the implicit Monoid to sum all items. If RDD is empty, Monoid.zero is returned
