@@ -2,6 +2,7 @@ package com.twitter.algebird
 
 import com.twitter.algebird._
 import org.apache.spark.rdd.{ RDD, PairRDDFunctions }
+import org.apache.spark.Partitioner
 import scala.reflect.ClassTag
 /**
  * import com.twitter.algebird.spark.toAlgebird
@@ -14,6 +15,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
   /**
    * Apply an Aggregator to return a single value for the whole RDD.
    * If the RDD is empty, None is returned
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
    */
   def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] =
     (new AlgebirdRDD(rdd.map(agg.prepare)))
@@ -22,6 +25,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
 
   /**
    * This will throw if you use a non-MonoidAggregator with an empty RDD
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
    */
   def aggregate[B: ClassTag, C](agg: Aggregator[T, B, C]): C = (aggregateOption[B, C](agg), agg.semigroup) match {
     case (Some(c), _) => c
@@ -29,33 +34,66 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
     case (None, _) => None.get // no such element
   }
 
-  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] = {
-    val prepared = new PairRDDFunctions(rdd.map { t =>
-      /*
-       * We use the cast to avoid having to serialize the ev, which could also be applied
-       */
-      val tupl = t.asInstanceOf[(K, V1)]
-      (tupl._1, agg.prepare(tupl._2))
-    })
-    prepared
-      .reduceByKey(agg.reduce)
-      .map { case (k, b) => (k, agg.present(b)) }
+  /**
+   * Apply an Aggregator to the values for each key.
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
+   */
+  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](
+    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] =
+    aggregateByKey(Partitioner.defaultPartitioner(rdd), agg)
+
+  /**
+   * Apply an Aggregator to the values for each key with a custom Partitioner.
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
+   */
+  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](part: Partitioner,
+    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] = {
+    /*
+     * This mapValues implementation allows us to avoid needing the V1 ClassTag, which would
+     * be required to use the implementation in PairRDDFunctions
+     */
+    val prepared = keyed.mapPartitions({ it =>
+          it.map { case (k, v) => (k, agg.prepare(v)) }
+        }, preservesPartitioning = true)
+
+    (new PairRDDFunctions(prepared))
+      .reduceByKey(part, agg.reduce(_, _))
+      .mapValues(agg.present)
   }
 
   private def keyed[K, V](implicit ev: T <:< (K, V)): RDD[(K, V)] = rdd.asInstanceOf[RDD[(K, V)]]
 
   /**
    * Use the implicit semigroup to sum by keys
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
    */
   def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] =
-    (new PairRDDFunctions(keyed)).reduceByKey(implicitly[Semigroup[V]].plus)
+    sumByKey(Partitioner.defaultPartitioner(rdd))
 
   /**
-   * Use the implicit Monoid to sum all items
+   * Use the implicit semigroup to sum by keys with a custom Partitioner.
+   * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
+   * T.
+   */
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](part: Partitioner)(implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] =
+    (new PairRDDFunctions(keyed)).reduceByKey(part, implicitly[Semigroup[V]].plus _)
+
+  /**
+   * Use the implicit Monoid to sum all items. If RDD is empty, Monoid.zero is returned
+   * requires a commutative Monoid. To generalize to non-commutative, we need a sorted partition for
+   * T.
    */
   def sum(implicit mon: Monoid[T], ct: ClassTag[T]): T =
     sumOption.getOrElse(mon.zero)
 
+  /**
+   * Use the implicit Semigroup to sum all items. If there are no items, None is returned.
+   * requires a commutative Monoid. To generalize to non-commutative, we need a sorted partition for
+   * T.
+   */
   def sumOption(implicit sg: Semigroup[T], ct: ClassTag[T]): Option[T] = {
     val partialReduce: RDD[T] = rdd.mapPartitions({ itT => sg.sumOption(itT).toIterator },
       preservesPartitioning = true)
