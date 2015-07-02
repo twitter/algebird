@@ -40,7 +40,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * T.
    */
   def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](
-    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] =
+    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] =
     aggregateByKey(Partitioner.defaultPartitioner(rdd), agg)
 
   /**
@@ -49,7 +49,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * T.
    */
   def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](part: Partitioner,
-    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Ordering[K] = null): RDD[(K, V2)] = {
+    agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] = {
     /*
      * This mapValues implementation allows us to avoid needing the V1 ClassTag, which would
      * be required to use the implementation in PairRDDFunctions
@@ -58,7 +58,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
       it.map { case (k, v) => (k, agg.prepare(v)) }
     }, preservesPartitioning = true)
 
-    (new PairRDDFunctions(prepared))
+    (new PairRDDFunctions(prepared)(implicitly, implicitly, ordK.getPreferred.orNull))
       .reduceByKey(part, agg.reduce(_, _))
       .mapValues(agg.present)
   }
@@ -70,16 +70,19 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] =
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V), ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
     sumByKey(Partitioner.defaultPartitioner(rdd))
 
   /**
    * Use the implicit semigroup to sum by keys with a custom Partitioner.
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
+   * Unfortunately we need to use a different name than sumByKey in scala 2.11
    */
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](part: Partitioner)(implicit ev: T <:< (K, V), ord: Ordering[K] = null): RDD[(K, V)] =
-    (new PairRDDFunctions(keyed)).reduceByKey(part, implicitly[Semigroup[V]].plus _)
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](
+    part: Partitioner)(implicit ev: T <:< (K, V), ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
+    (new PairRDDFunctions(keyed)(implicitly, implicitly, ord.getPreferred.orNull))
+      .reduceByKey(part, implicitly[Semigroup[V]].plus _)
 
   /**
    * Use the implicit Monoid to sum all items. If RDD is empty, Monoid.zero is returned
