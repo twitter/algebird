@@ -7,6 +7,14 @@ import org.scalatest._
 import org.scalatest.DiagrammedAssertions._
 import scala.reflect.ClassTag
 
+package test {
+  // not needed in the algebird package, just testing the API
+  import com.twitter.algebird.spark.ToAlgebird
+  object Test {
+    def sum[T: Monoid: ClassTag](r: RDD[T]) = r.algebird.sum
+  }
+}
+
 class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
   private val master = "local[2]"
   private val appName = "algebird-rdd-test"

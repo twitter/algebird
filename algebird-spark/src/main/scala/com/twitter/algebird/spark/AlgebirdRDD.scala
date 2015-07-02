@@ -5,7 +5,7 @@ import org.apache.spark.rdd.{ RDD, PairRDDFunctions }
 import org.apache.spark.Partitioner
 import scala.reflect.ClassTag
 /**
- * import com.twitter.algebird.spark.toAlgebird
+ * import com.twitter.algebird.spark.ToAlgebird
  * to get the enrichment to do:
  * myRdd.algebird: AlgebirdRDD[T]
  *
@@ -55,8 +55,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
      * be required to use the implementation in PairRDDFunctions
      */
     val prepared = keyed.mapPartitions({ it =>
-          it.map { case (k, v) => (k, agg.prepare(v)) }
-        }, preservesPartitioning = true)
+      it.map { case (k, v) => (k, agg.prepare(v)) }
+    }, preservesPartitioning = true)
 
     (new PairRDDFunctions(prepared))
       .reduceByKey(part, agg.reduce(_, _))
