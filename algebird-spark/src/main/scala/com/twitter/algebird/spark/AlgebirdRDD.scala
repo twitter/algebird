@@ -60,7 +60,9 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
     val partialReduce: RDD[T] = rdd.mapPartitions({ itT => sg.sumOption(itT).toIterator },
       preservesPartitioning = true)
 
-    val results = partialReduce.coalesce(1).mapPartitions({ it =>
+    // my reading of the docs is that we do want a shuffle at this stage to
+    // to make sure the upstream work is done in parallel.
+    val results = partialReduce.coalesce(1, shuffle = true).mapPartitions({ it =>
       Iterator(sg.sumOption(it))
     }, preservesPartitioning = true)
       .collect
