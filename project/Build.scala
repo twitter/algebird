@@ -112,7 +112,8 @@ object AlgebirdBuild extends Build {
     algebirdTest,
     algebirdCore,
     algebirdUtil,
-    algebirdBijection
+    algebirdBijection,
+    algebirdSpark
   )
 
   def module(name: String) = {
@@ -159,6 +160,10 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdBijection = module("bijection").settings(
     libraryDependencies += "com.twitter" %% "bijection-core" % "0.8.0"
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
+
+  lazy val algebirdSpark = module("spark").settings(
+    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided"
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 }
 
