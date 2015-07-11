@@ -76,29 +76,32 @@ object MapAggregator {
        |}
     """.stripMargin
 
-    (2 to max).map(i => {
-      val nums = (1 to i)
-      val bs = nums.map("B" + _).mkString(", ")
-      val aggs = nums.map(x => "agg%s: Tuple2[K, %sAggregator[A, B%s, C]]".format(x, aggType, x)).mkString(", ")
-      val prepares = nums.map(x => "agg%s._2.prepare(a)".format(x)).mkString(", ")
-      val semiType = if (isMonoid) "monoid" else "semigroup"
-      val semigroups = nums.map(x => "agg%s._2.%s".format(x, semiType)).mkString(", ")
-      val semigroup = "new Tuple%d%s()(%s)".format(i, semiType.capitalize, semigroups)
-      val present = nums.map(x => "agg%s._1 -> agg%s._2.present(b._%s)".format(x, x, x)).mkString(", ")
-      val tupleBs = "Tuple%d[%s]".format(i, bs)
+    (2 to max).map(aggrCount => {
+      val aggrNums = 1 to aggrCount
 
-      """
-def apply[K, A, %s, C](%s): %sAggregator[A, %s, Map[K, C]] = {
-  new %sAggregator[A, %s, Map[K, C]] {
-    def prepare(a: A) = (%s)
-    val %s = %s
-    def present(b: %s) = Map(%s)
-  }
-}""".format(bs, aggs, aggType, tupleBs,
-            aggType, tupleBs,
-            prepares,
-            semiType, semigroup,
-            tupleBs, present)
+      val inputAggs = aggrNums.map(i => s"agg$i: (K, ${aggType}Aggregator[A, B$i, C])").mkString(", ")
+
+      val semigroup = if (isMonoid) "monoid" else "semigroup"
+      val semigroupType = s"Tuple${aggrCount}${semigroup.capitalize}"
+
+      val bs = aggrNums.map("B" + _).mkString(", ")
+      val tupleBs = s"Tuple${aggrCount}[$bs]"
+
+      s"""
+      |def apply[K, A, $bs, C]($inputAggs): ${aggType}Aggregator[A, $tupleBs, Map[K, C]] = {
+      |  new ${aggType}Aggregator[A, $tupleBs, Map[K, C]] {
+      |    def prepare(a: A) = (
+      |      ${aggrNums.map(i => s"agg$i._2.prepare(a)").mkString(", ")}
+      |    )
+      |    // a field for combined semigroup/monoid
+      |    val $semigroup = new $semigroupType()(
+      |      ${aggrNums.map(i => s"agg$i._2.$semigroup").mkString(", ")}
+      |    )
+      |    def present(b: $tupleBs) = Map(
+      |      ${aggrNums.map(i => s"agg$i._1 -> agg$i._2.present(b._$i)").mkString(", ")}
+      |    )
+      |  }
+      |}""".stripMargin
     }).mkString("\n") + aggregatorForOneItem
   }
 }
