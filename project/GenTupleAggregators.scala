@@ -91,14 +91,14 @@ object MapAggregator {
       |def apply[K, A, $bs, C]($inputAggs): ${aggType}Aggregator[A, $tupleBs, Map[K, C]] = {
       |  new ${aggType}Aggregator[A, $tupleBs, Map[K, C]] {
       |    def prepare(a: A) = (
-      |      ${aggrNums.map(i => s"agg$i._2.prepare(a)").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg${i}._2.prepare(a)").mkString(", ")}
       |    )
       |    // a field for combined semigroup/monoid
       |    val $semigroup = new $semigroupType()(
-      |      ${aggrNums.map(i => s"agg$i._2.$semigroup").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg${i}._2.$semigroup").mkString(", ")}
       |    )
       |    def present(b: $tupleBs) = Map(
-      |      ${aggrNums.map(i => s"agg$i._1 -> agg$i._2.present(b._$i)").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg${i}._1 -> agg${i}._2.present(b._${i})").mkString(", ")}
       |    )
       |  }
       |}""".stripMargin
