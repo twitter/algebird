@@ -81,8 +81,7 @@ object MapAggregator {
 
       val inputAggs = aggrNums.map(i => s"agg$i: (K, ${aggType}Aggregator[A, B$i, C])").mkString(", ")
 
-      val semigroup = if (isMonoid) "monoid" else "semigroup"
-      val semigroupType = s"Tuple${aggrCount}${semigroup.capitalize}"
+      val semigroupType = if (isMonoid) "monoid" else "semigroup"
 
       val bs = aggrNums.map("B" + _).mkString(", ")
       val tupleBs = s"Tuple${aggrCount}[$bs]"
@@ -93,9 +92,9 @@ object MapAggregator {
       |    def prepare(a: A) = (
       |      ${aggrNums.map(i => s"agg${i}._2.prepare(a)").mkString(", ")}
       |    )
-      |    // a field for combined semigroup/monoid
-      |    val $semigroup = new $semigroupType()(
-      |      ${aggrNums.map(i => s"agg${i}._2.$semigroup").mkString(", ")}
+      |    // a field for semigroup/monoid that combines all input aggregators
+      |    val $semigroupType = new Tuple${aggrCount}${semigroupType.capitalize}()(
+      |      ${aggrNums.map(i => s"agg${i}._2.$semigroupType").mkString(", ")}
       |    )
       |    def present(b: $tupleBs) = Map(
       |      ${aggrNums.map(i => s"agg${i}._1 -> agg${i}._2.present(b._${i})").mkString(", ")}
