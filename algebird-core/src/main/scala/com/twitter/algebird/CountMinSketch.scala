@@ -463,6 +463,7 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 case class SparseCMS[K](exactCountTable: Map[K, Long],
   override val totalCount: Long,
   override val params: CMSParams[K]) extends CMS[K](params) {
+  import SparseCMS._
 
   override def +(x: K, count: Long): CMS[K] = {
     val currentCount = exactCountTable.getOrElse(x, 0L)
@@ -471,13 +472,7 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
       // still sparse
       SparseCMS(newTable, totalCount + count, params)
     } else {
-      // Create new CMSInstace
-      var cms = CMSInstance[K](params)
-      newTable.foreach {
-        case (x, count) =>
-          cms = cms + (x, count)
-      }
-      cms
+      toDense(newTable, params)
     }
   }
 
@@ -491,13 +486,7 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
           // still sparse
           SparseCMS(newTable, totalCount + other.totalCount, params)
         } else {
-          // Create new CMSInstace
-          var cms = CMSInstance[K](params)
-          newTable.foreach {
-            case (x, count) =>
-              cms = cms + (x, count)
-          }
-          cms
+          toDense(newTable, params)
         }
 
       case other: CMSInstance[K] => other ++ this
@@ -507,7 +496,30 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
   override def frequency(x: K): Approximate[Long] = Approximate.exact(exactCountTable.getOrElse(x, 0L))
 
   override def innerProduct(other: CMS[K]): Approximate[Long] =
-    exactCountTable.map { case (x, count) => Approximate.exact(count) * other.frequency(x) }.reduce { _ + _ }
+    exactCountTable.iterator.map { case (x, count) => Approximate.exact(count) * other.frequency(x) }
+      .reduceOption { _ + _ }.getOrElse(Approximate.exact(0L))
+}
+
+object SparseCMS {
+
+  /**
+   * Creates a new [[SparseCMS]] with empty exactCountTable
+   */
+  def apply[K](params: CMSParams[K]): SparseCMS[K] = {
+    val exactCountTable = Map[K, Long]()
+    SparseCMS[K](exactCountTable, 0, params)
+  }
+
+  /**
+   * Creates a new [[CMSInstance]] from a Map[K, Long]
+   */
+  def toDense[K](exactCountTable: Map[K, Long], params: CMSParams[K]): CMS[K] = {
+    // Create new CMSInstace
+    exactCountTable.foldLeft(CMSInstance[K](params)) {
+      case (cms, (x, count)) =>
+        cms + (x, count)
+    }
+  }
 }
 
 /**
@@ -522,13 +534,10 @@ case class CMSInstance[K](countsTable: CMSInstance.CountsTable[K],
       case other: CMSZero[_] => this
       case other: CMSItem[K] => this + other.item
       case other: SparseCMS[K] =>
-        val newTotalCount = totalCount + other.totalCount
-        var cms = this
-        other.exactCountTable.foreach {
-          case (x, count) =>
-            cms = cms + (x, count)
+        other.exactCountTable.foldLeft(this) {
+          case (cms, (x, count)) =>
+            cms + (x, count)
         }
-        cms
       case other: CMSInstance[K] =>
         val newTotalCount = totalCount + other.totalCount
         CMSInstance[K](countsTable ++ other.countsTable, newTotalCount, params)
