@@ -23,13 +23,25 @@ object MultiAggregator {
       genMethods(22, "def", Some("apply"), true) + "\n" + "}")
 
     val mapAggPlace = dir / "com" / "twitter" / "algebird" / "MapAggregator.scala"
-    IO.write(mapAggPlace,
-"""package com.twitter.algebird
-
-object MapAggregator {
-""" +
-      genMapMethods(22) + "\n" +
-      genMapMethods(22, true) + "\n" + "}")
+    IO.write(
+      mapAggPlace,
+      s"""
+      |package com.twitter.algebird
+      |
+      |trait MapAggregator[A, B, K, C] extends Aggregator[A, B, Map[K, C]] {
+      |  def keys: Set[K]
+      |}
+      |
+      |trait MapMonoidAggregator[A, B, K, C] extends MonoidAggregator[A, B, Map[K, C]] {
+      |  def keys: Set[K]
+      |}
+      |
+      |object MapAggregator {
+      |  ${genMapMethods(22)}
+      |  ${genMapMethods(22, isMonoid = true)}
+      |}
+      """.stripMargin
+    )
 
     Seq(tupleAggPlace, multiAggPlace, mapAggPlace)
   }
@@ -66,39 +78,50 @@ object MapAggregator {
   }
 
   def genMapMethods(max: Int, isMonoid: Boolean = false): String = {
-    val aggType = if (isMonoid) "Monoid" else ""
+    val inputAggregatorType = if (isMonoid) "MonoidAggregator" else "Aggregator"
+    val mapAggregatorType = if (isMonoid) "MapMonoidAggregator" else "MapAggregator"
+
+    val semigroupType = if (isMonoid) "monoid" else "semigroup"
 
     // there's no Semigroup[Tuple1[T]], so just use T as intermediary type instead of Tuple1[T]
+    // TODO: keys for 1 item
     val aggregatorForOneItem = s"""
-       |def apply[K, A, B, C](aggDef: (K, ${aggType}Aggregator[A, B, C])): ${aggType}Aggregator[A, B, Map[K, C]] = {
-       |  val (key, agg) = aggDef
-       |  agg.andThenPresent(value => Map(key -> value))
+       |def apply[K, A, B, C](agg: (K, ${inputAggregatorType}[A, B, C])): ${mapAggregatorType}[A, B, K, C] = {
+       |  new ${mapAggregatorType}[A, B, K, C] {
+       |    def prepare(a: A) = agg._2.prepare(a)
+       |    val ${semigroupType} = agg._2.${semigroupType}
+       |    def present(b: B) = Map(agg._1 -> agg._2.present(b))
+       |    def keys = Set(agg._1)
+       |  }
        |}
     """.stripMargin
 
-    (2 to max).map(i => {
-      val nums = (1 to i)
-      val bs = nums.map("B" + _).mkString(", ")
-      val aggs = nums.map(x => "agg%s: Tuple2[K, %sAggregator[A, B%s, C]]".format(x, aggType, x)).mkString(", ")
-      val prepares = nums.map(x => "agg%s._2.prepare(a)".format(x)).mkString(", ")
-      val semiType = if (isMonoid) "monoid" else "semigroup"
-      val semigroups = nums.map(x => "agg%s._2.%s".format(x, semiType)).mkString(", ")
-      val semigroup = "new Tuple%d%s()(%s)".format(i, semiType.capitalize, semigroups)
-      val present = nums.map(x => "agg%s._1 -> agg%s._2.present(b._%s)".format(x, x, x)).mkString(", ")
-      val tupleBs = "Tuple%d[%s]".format(i, bs)
+    (2 to max).map(aggrCount => {
+      val aggrNums = 1 to aggrCount
 
-      """
-def apply[K, A, %s, C](%s): %sAggregator[A, %s, Map[K, C]] = {
-  new %sAggregator[A, %s, Map[K, C]] {
-    def prepare(a: A) = (%s)
-    val %s = %s
-    def present(b: %s) = Map(%s)
-  }
-}""".format(bs, aggs, aggType, tupleBs,
-            aggType, tupleBs,
-            prepares,
-            semiType, semigroup,
-            tupleBs, present)
+      val inputAggs = aggrNums.map(i => s"agg$i: (K, ${inputAggregatorType}[A, B$i, C])").mkString(", ")
+
+      val bs = aggrNums.map("B" + _).mkString(", ")
+      val tupleBs = s"Tuple${aggrCount}[$bs]"
+
+      s"""
+      |def apply[K, A, $bs, C]($inputAggs): ${mapAggregatorType}[A, $tupleBs, K, C] = {
+      |  new ${mapAggregatorType}[A, $tupleBs, K, C] {
+      |    def prepare(a: A) = (
+      |      ${aggrNums.map(i => s"agg${i}._2.prepare(a)").mkString(", ")}
+      |    )
+      |    // a field for semigroup/monoid that combines all input aggregators
+      |    val $semigroupType = new Tuple${aggrCount}${semigroupType.capitalize}()(
+      |      ${aggrNums.map(i => s"agg${i}._2.$semigroupType").mkString(", ")}
+      |    )
+      |    def present(b: $tupleBs) = Map(
+      |      ${aggrNums.map(i => s"agg${i}._1 -> agg${i}._2.present(b._${i})").mkString(", ")}
+      |    )
+      |    def keys: Set[K] = Set(
+      |      ${aggrNums.map(i => s"agg${i}._1").mkString(", ")}
+      |    )
+      |  }
+      |}""".stripMargin
     }).mkString("\n") + aggregatorForOneItem
   }
 }
