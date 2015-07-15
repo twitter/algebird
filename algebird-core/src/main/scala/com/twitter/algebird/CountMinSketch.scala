@@ -447,7 +447,7 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
     other match {
       case other: CMSZero[_] => this
       case other: CMSItem[K] => CMSInstance[K](params) + item + other.item
-      case other: CMSInstance[K] => other + item
+      case _ => other + item
     }
   }
 
@@ -455,6 +455,59 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 
   override def innerProduct(other: CMS[K]): Approximate[Long] = other.frequency(item)
 
+}
+
+/**
+ * A sparse Count-Min sketch structure, used for situations where the key is highly skewed.
+ */
+case class SparseCMS[K](exactCountTable: Map[K, Long],
+  override val totalCount: Long,
+  override val params: CMSParams[K]) extends CMS[K](params) {
+
+  override def +(x: K, count: Long): CMS[K] = {
+    val currentCount = exactCountTable.getOrElse(x, 0L)
+    val newTable = exactCountTable.updated(x, currentCount + count)
+    if (newTable.size < width * depth) {
+      // still sparse
+      SparseCMS(newTable, totalCount + count, params)
+    } else {
+      // Create new CMSInstace
+      var cms = CMSInstance[K](params)
+      newTable.foreach {
+        case (x, count) =>
+          cms = cms + (x, count)
+      }
+      cms
+    }
+  }
+
+  override def ++(other: CMS[K]): CMS[K] = {
+    other match {
+      case other: CMSZero[_] => this
+      case other: CMSItem[K] => this + other.item
+      case other: SparseCMS[K] =>
+        val newTable = exactCountTable ++ other.exactCountTable
+        if (newTable.size < width * depth) {
+          // still sparse
+          SparseCMS(newTable, totalCount + other.totalCount, params)
+        } else {
+          // Create new CMSInstace
+          var cms = CMSInstance[K](params)
+          newTable.foreach {
+            case (x, count) =>
+              cms = cms + (x, count)
+          }
+          cms
+        }
+
+      case other: CMSInstance[K] => other ++ this
+    }
+  }
+
+  override def frequency(x: K): Approximate[Long] = Approximate.exact(exactCountTable.getOrElse(x, 0L))
+
+  override def innerProduct(other: CMS[K]): Approximate[Long] =
+    exactCountTable.map { case (x, count) => Approximate.exact(count) * other.frequency(x) }.reduce { _ + _ }
 }
 
 /**
@@ -468,6 +521,14 @@ case class CMSInstance[K](countsTable: CMSInstance.CountsTable[K],
     other match {
       case other: CMSZero[_] => this
       case other: CMSItem[K] => this + other.item
+      case other: SparseCMS[K] =>
+        val newTotalCount = totalCount + other.totalCount
+        var cms = this
+        other.exactCountTable.foreach {
+          case (x, count) =>
+            cms = cms + (x, count)
+        }
+        cms
       case other: CMSInstance[K] =>
         val newTotalCount = totalCount + other.totalCount
         CMSInstance[K](countsTable ++ other.countsTable, newTotalCount, params)
