@@ -141,7 +141,8 @@ object AlgebirdBuild extends Build {
                        import com.twitter.algebird._
                        """.stripMargin('|'),
     libraryDependencies <++= (scalaVersion) { scalaVersion =>
-      Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6") ++ {
+      Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+          "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
         if (isScala210x(scalaVersion))
           Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
         else
