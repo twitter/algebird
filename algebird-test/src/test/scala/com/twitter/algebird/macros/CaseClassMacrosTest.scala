@@ -1,58 +1,45 @@
 package com.twitter.algebird.macros
 
-import org.scalatest._
 import com.twitter.algebird._
 import com.twitter.algebird.macros.caseclass._
+import com.twitter.algebird.macros.ArbitraryCaseClassMacro.arbitrary
 
-class CaseClassMacrosTest extends WordSpec with Matchers {
+import org.scalatest._
+import org.scalacheck.Arbitrary
+import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 
-  case class Foo(a: Int, b: Int)
-  case class DoubleFoo(a: Double, b: Double)
+class CaseClassMacrosTest extends PropSpec with PropertyChecks with Matchers {
+  import BaseProperties._
 
-  "SemigroupMacro" should {
-    "work" in {
-      val sg = implicitly[Semigroup[Foo]]
-      val a = Foo(1, 2)
-      val b = Foo(4, 3)
+  implicit val arbitraryFoo: Arbitrary[Foo] = arbitrary[Foo]
+  implicit val arbitraryBar: Arbitrary[Bar] = arbitrary[Bar]
 
-      assert(sg.plus(a, b) == Foo(5, 5))
-    }
+  case class Foo(a: Int, b: Short, c: Long)
+  case class Bar(a: Boolean, foo: Foo)
+
+  property("Foo is a Semigroup") {
+    semigroupLaws[Foo]
+  }
+  property("Foo is a Monoid") {
+    monoidLaws[Foo]
+  }
+  property("Foo is a Group") {
+    groupLaws[Foo]
+  }
+  property("Foo is a Ring") {
+    ringLaws[Foo]
   }
 
-  "MonoidMacro" should {
-    "work" in {
-      val m = implicitly[Monoid[Foo]]
-      val a = Foo(1, 2)
-      val b = Foo(4, 3)
-
-      assert(m.plus(a, b) == Foo(5, 5))
-      assert(m.zero == Foo(0, 0))
-    }
+  property("Bar is a Semigroup") {
+    semigroupLaws[Bar]
   }
-
-  "GroupMacro" should {
-    "work" in {
-      val g = implicitly[Group[Foo]]
-      val a = Foo(1, 2)
-      val b = Foo(4, 3)
-
-      assert(g.plus(a, b) == Foo(5, 5))
-      assert(g.zero == Foo(0, 0))
-      assert(g.negate(a) == Foo(-1, -2))
-    }
+  property("Bar is a Monoid") {
+    monoidLaws[Bar]
   }
-
-  "RingMacro" should {
-    "work" in {
-      val r = implicitly[Ring[Foo]]
-      val a = Foo(1, 2)
-      val b = Foo(4, 3)
-
-      assert(r.plus(a, b) == Foo(5, 5))
-      assert(r.zero == Foo(0, 0))
-      assert(r.negate(a) == Foo(-1, -2))
-      assert(r.one == Foo(1, 1))
-      assert(r.times(a, b) == Foo(4, 6))
-    }
+  property("Bar is a Group") {
+    groupLaws[Bar]
+  }
+  property("Bar is a Ring") {
+    ringLaws[Bar]
   }
 }

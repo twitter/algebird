@@ -155,10 +155,15 @@ object AlgebirdBuild extends Build {
   )
 
   lazy val algebirdTest = module("test").settings(
-    libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.11.5",
-      "org.scalatest" %% "scalatest" % "2.2.2"
-    )
+    libraryDependencies <++= (scalaVersion) { scalaVersion =>
+      Seq("org.scalacheck" %% "scalacheck" % "1.11.5",
+          "org.scalatest" %% "scalatest" % "2.2.2") ++ {
+        if (isScala210x(scalaVersion))
+          Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
+        else
+          Seq()
+      }
+    }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   ).dependsOn(algebirdCore)
 
   /** Uses https://github.com/softprops/cappi#readme
