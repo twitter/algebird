@@ -441,19 +441,19 @@ case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) 
  */
 case class CMSItem[K](item: K, override val totalCount: Long, override val params: CMSParams[K]) extends CMS[K](params) {
 
-  override def +(x: K, count: Long): CMS[K] = CMSInstance[K](params) + item + (x, count)
+  override def +(x: K, count: Long): CMS[K] = CMSInstance[K](params) + (item, totalCount) + (x, count)
 
   override def ++(other: CMS[K]): CMS[K] = {
     other match {
       case other: CMSZero[_] => this
-      case other: CMSItem[K] => CMSInstance[K](params) + item + other.item
+      case other: CMSItem[K] => CMSInstance[K](params) + (item, totalCount) + (other.item, other.totalCount)
       case _ => other + item
     }
   }
 
-  override def frequency(x: K): Approximate[Long] = if (item == x) Approximate.exact(1L) else Approximate.exact(0L)
+  override def frequency(x: K): Approximate[Long] = if (item == x) Approximate.exact(totalCount) else Approximate.exact(0L)
 
-  override def innerProduct(other: CMS[K]): Approximate[Long] = other.frequency(item)
+  override def innerProduct(other: CMS[K]): Approximate[Long] = Approximate.exact(totalCount) * other.frequency(item)
 
 }
 
@@ -479,7 +479,7 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
   override def ++(other: CMS[K]): CMS[K] = {
     other match {
       case other: CMSZero[_] => this
-      case other: CMSItem[K] => this + other.item
+      case other: CMSItem[K] => this + (other.item, other.totalCount)
       case other: SparseCMS[K] =>
         val newTable = exactCountTable ++ other.exactCountTable
         if (newTable.size < width * depth) {
