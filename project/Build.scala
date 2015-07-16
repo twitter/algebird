@@ -9,6 +9,17 @@ import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
+
+  val paradiseVersion = "2.0.1"
+  val quasiquotesVersion = "2.0.1"
+
+  def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
+    case version if version startsWith "2.10" => "2.10"
+    case version if version startsWith "2.11" => "2.11"
+    case _ => sys.error("unknown error")
+  }
+  def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.10"
+
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.10.5",
@@ -129,10 +140,17 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    libraryDependencies <++= (scalaVersion) { scalaVersion =>
+      Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6") ++ {
+        if (isScala210x(scalaVersion))
+          Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
+        else
+          Seq()
+      }
+    },
     sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
       GenTupleAggregators.gen(outDir)
-    }
+    }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   )
 
   lazy val algebirdTest = module("test").settings(
