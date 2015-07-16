@@ -1,6 +1,6 @@
 package com.twitter.algebird.macros
 
-import scala.language.experimental.macros
+import scala.language.experimental.{ macros => sMacros }
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
@@ -10,34 +10,36 @@ object GroupMacro {
   def caseClassGroup[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Group[T]] = {
     import c.universe._
 
-    val tpe = weakTypeOf[T]
+    macros.ensureCaseClass(c)
 
-    val isCaseClass = tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
-    if (!isCaseClass)
-      c.abort(c.enclosingPosition, s"$T is not a clase class")
-
-    val params = tpe.declarations.collect {
-      case m: MethodSymbol if m.isCaseAccessor => m
-    }.toList
-
-    val plusList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].plus(l.$param, r.$param)")
-    val zeroList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].zero")
-    val negateList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].negate(x.$param)")
-    val minusList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].minus(l.$param, r.$param)")
-
-    val companion = tpe.typeSymbol.companionSymbol
-
-    _root_.scala.Predef.println("hi")
     val res = q"""
-    _root_.scala.Predef.println("ho")
     new _root_.com.twitter.algebird.Group[$T] {
-      def plus(l: $T, r: $T): $T = $companion.apply(..$plusList)
-      def zero: $T = $companion.apply(..$zeroList)
-      override def negate(x: $T): $T = $companion.apply(..$negateList)
-      override def minus(l: $T, r: $T): $T = $companion.apply(..$minusList)
+      ${SemigroupMacro.plus(c)}
+      ${SemigroupMacro.sumOption(c)}
+      ${MonoidMacro.zero(c)}
+      ${negate(c)}
+      ${minus(c)}
     }
     """
     c.Expr[Group[T]](res)
+  }
+
+  def negate[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Tree = {
+    import c.universe._
+
+    val companion = macros.getCompanionObject(c)
+    val negateList = getParams(c).map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].negate(x.$param)")
+
+    q"override def negate(x: $T): $T = $companion.apply(..$negateList)"
+  }
+
+  def minus[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Tree = {
+    import c.universe._
+
+    val companion = getCompanionObject(c)
+    val minusList = getParams(c).map(param => q"implicitly[_root_.com.twitter.algebird.Group[$param]].minus(l.$param, r.$param)")
+
+    q"override def minus(l: $T, r: $T): $T = $companion.apply(..$minusList)"
   }
 
 }
