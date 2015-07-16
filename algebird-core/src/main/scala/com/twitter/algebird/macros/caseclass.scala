@@ -8,5 +8,4 @@ object caseclass {
   implicit def monoid[T]: Monoid[T] = macro MonoidMacro.caseClassMonoid[T]
   implicit def group[T]: Group[T] = macro GroupMacro.caseClassGroup[T]
   implicit def ring[T]: Ring[T] = macro RingMacro.caseClassRing[T]
-  implicit def field[T]: Field[T] = macro FieldMacro.caseClassField[T]
 }

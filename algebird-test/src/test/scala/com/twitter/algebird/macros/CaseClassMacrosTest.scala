@@ -55,36 +55,4 @@ class CaseClassMacrosTest extends WordSpec with Matchers {
       assert(r.times(a, b) == Foo(4, 6))
     }
   }
-
-  "FieldMacro" should {
-    "work" in {
-      val f = implicitly[Field[DoubleFoo]]
-      val a = DoubleFoo(1.0, 2.0)
-      val b = DoubleFoo(4.0, 3.0)
-
-      assert(f.plus(a, b) == DoubleFoo(5.0, 5.0))
-      assert(f.zero == DoubleFoo(0.0, 0.0))
-      assert(f.negate(a) == DoubleFoo(-1.0, -2.0))
-      assert(f.one == DoubleFoo(1.0, 1.0))
-      assert(f.times(a, b) == DoubleFoo(4.0, 6.0))
-      assert(f.div(a, b) == DoubleFoo(1.0 / 4.0, 2.0 / 3.0))
-      assert(f.inverse(b) == DoubleFoo(1.0 / 4.0, 1.0 / 3.0))
-      assert(f.inverse(b) == DoubleFoo(1.0 / 4.0, 1.0 / 3.0))
-
-      intercept[java.lang.IllegalArgumentException] {
-        f.div(a, f.zero)
-      }
-      intercept[java.lang.IllegalArgumentException] {
-        f.div(a, DoubleFoo(0.0, 5.0))
-      }
-
-      intercept[java.lang.IllegalArgumentException] {
-        f.inverse(f.zero)
-      }
-
-      intercept[java.lang.IllegalArgumentException] {
-        f.inverse(DoubleFoo(0.0, 5.0))
-      }
-    }
-  }
 }
