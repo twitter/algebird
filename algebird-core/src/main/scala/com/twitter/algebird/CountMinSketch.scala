@@ -1207,4 +1207,18 @@ object CMSHasherImplicits {
     override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int = hashBytes(a, b, width)(x.array)
   }
 
+  /**
+   * This is based on the CMSHasherBigInt found in algebird (see docs for in depth explanation):
+   * https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala#L1086
+   */
+  implicit object CMSHasherByteArray extends CMSHasher[Array[Byte]] {
+    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
+      val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
+      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+      val positiveHash = hash & Int.MaxValue
+      positiveHash % width
+    }
+  }
+
 }
