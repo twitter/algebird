@@ -441,7 +441,7 @@ case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) 
  */
 case class CMSItem[K](item: K, override val totalCount: Long, override val params: CMSParams[K]) extends CMS[K](params) {
 
-  override def +(x: K, count: Long): CMS[K] = CMSInstance[K](params) + (item, totalCount) + (x, count)
+  override def +(x: K, count: Long): CMS[K] = SparseCMS[K](params) + (item, totalCount) + (x, count)
 
   override def ++(other: CMS[K]): CMS[K] = {
     other match {

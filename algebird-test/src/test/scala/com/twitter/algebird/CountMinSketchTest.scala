@@ -116,6 +116,23 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import BaseProperties._
+
+  val DELTA = 1E-8
+  val EPS = 0.005
+  val SEED = 1
+
+  "correctly count CMSItem numbers" in {
+    val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
+    val cmsZero = cmsMonoid.zero
+    val cms = cmsZero + (1, 100) + (2, 200)
+    cms.frequency(1).estimate should be(100)
+    cms.frequency(2).estimate should be(200)
+  }
+}
+
 /**
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
  */
