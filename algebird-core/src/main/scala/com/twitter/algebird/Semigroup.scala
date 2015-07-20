@@ -22,6 +22,8 @@ import scala.collection.mutable.{ Map => MMap }
 import scala.collection.{ Map => ScMap }
 import scala.annotation.{ implicitNotFound, tailrec }
 
+import macros.caseclass._
+
 /**
  * Semigroup:
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
