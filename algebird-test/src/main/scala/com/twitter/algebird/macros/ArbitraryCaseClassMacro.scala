@@ -22,8 +22,8 @@ object ArbitraryCaseClassMacro {
       case m: MethodSymbol if m.isCaseAccessor => m
     }.toList
 
-    val getsList = params.zipWithIndex.map {
-      case (param, i) =>
+    val getsList = params.map {
+      case param =>
         fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[${param.returnType}]"
     }
 
@@ -41,9 +41,7 @@ object ArbitraryCaseClassMacro {
     import c.universe._
 
     val gen = caseClassGen(c)(T)
-    val res = q"""
-    _root_.org.scalacheck.Arbitrary($gen)
-    """
+    val res = q"_root_.org.scalacheck.Arbitrary($gen)"
 
     c.Expr[Arbitrary[T]](res)
   }

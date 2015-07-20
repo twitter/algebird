@@ -10,20 +10,26 @@ object RingMacro {
   def caseClassRing[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Ring[T]] = {
     import c.universe._
 
-    macros.ensureCaseClass(c)
+    ensureCaseClass(c)
 
-    val params = macros.getParams(c)
-    val companion = macros.getCompanionObject(c)
+    val params = getParams(c)
+    val companion = getCompanionObject(c)
 
-    val timesList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Ring[$param]].times(l.$param, r.$param)")
-    val oneList = params.map(param => q"implicitly[_root_.com.twitter.algebird.Ring[$param]].one")
+    val implicitRings = params.map {
+      param => q"implicitly[_root_.com.twitter.algebird.Ring[${param.returnType}]]"
+    }
+
+    val timesList = params.zip(implicitRings).map {
+      case (param, instance) => q"$instance.times(l.$param, r.$param)"
+    }
+    val oneList = implicitRings.map(instance => q"$instance.one")
 
     val res = q"""
     new _root_.com.twitter.algebird.Ring[$T] {
-      ${SemigroupMacro.plus(c)}
-      ${SemigroupMacro.sumOption(c)}
-      ${MonoidMacro.zero(c)}
-      ${GroupMacro.negate(c)}
+      ${SemigroupMacro.plus(c)(implicitRings)}
+      ${SemigroupMacro.sumOption(c)(implicitRings)}
+      ${MonoidMacro.zero(c)(implicitRings)}
+      ${GroupMacro.negate(c)(implicitRings)}
       def times(l: $T, r: $T): $T = $companion.apply(..$timesList)
       def one: $T = $companion.apply(..$oneList)
     }

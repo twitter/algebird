@@ -10,34 +10,43 @@ object SemigroupMacro {
   def caseClassSemigroup[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Semigroup[T]] = {
     import c.universe._
 
-    macros.ensureCaseClass(c)
+    ensureCaseClass(c)
+
+    val implicitSemigroups = getParams(c).map {
+      param => q"implicitly[_root_.com.twitter.algebird.Semigroup[${param.returnType}]]"
+    }
 
     val res = q"""
     new _root_.com.twitter.algebird.Semigroup[$T] {
-      ${plus(c)}
-      ${sumOption(c)}
+      ${plus(c)(implicitSemigroups)}
+      ${sumOption(c)(implicitSemigroups)}
     }
     """
     c.Expr[Semigroup[T]](res)
   }
 
-  def plus[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Tree = {
+  def plus[T](c: Context)(implicitInstances: List[c.Tree])(implicit T: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
     val companion = getCompanionObject(c)
-    val plusList = getParams(c).map(param => q"implicitly[_root_.com.twitter.algebird.Semigroup[$param]].plus(l.$param, r.$param)")
+    val plusList = getParams(c).zip(implicitInstances).map {
+      case (param, instance) => q"$instance.plus(l.$param, r.$param)"
+    }
 
     q"def plus(l: $T, r: $T): $T = $companion.apply(..$plusList)"
   }
 
-  def sumOption[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Tree = {
+  def sumOption[T](c: Context)(implicitInstances: List[c.Tree])(implicit T: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
     val params = getParams(c)
     val companion = getCompanionObject(c)
 
     val sumOptionsGetted: List[c.Tree] = params.map(param => q"${param.name.asInstanceOf[TermName]}.get")
-    val getSumOptions = params.map(param => q"val ${param.name.asInstanceOf[TermName]} = implicitly[_root_.com.twitter.algebird.Semigroup[$param]].sumOption(items.iterator.map(_.$param))")
+    val getSumOptions = params.zip(implicitInstances).map {
+      case (param, instance) =>
+        q"val ${param.name.asInstanceOf[TermName]} = $instance.sumOption(items.iterator.map(_.$param))"
+    }
 
     val result = q"$companion.apply(..$sumOptionsGetted)"
 
