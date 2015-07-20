@@ -53,7 +53,7 @@ object SemigroupMacro {
     val getBlock = Block(getSumOptions, result)
 
     q"""
-    override def sumOption(to: TraversableOnce[$T]): _root_.scala.Option[$T] = {
+    override def sumOption(to: _root_.scala.collection.TraversableOnce[$T]): _root_.scala.Option[$T] = {
       val buf = new _root_.com.twitter.algebird.ArrayBufferedOperation[$T,$T](1000) with _root_.com.twitter.algebird.BufferedReduce[$T] {
         def operate(items: _root_.scala.Seq[$T]): $T = {
           $getBlock
