@@ -460,17 +460,18 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 /**
  * A sparse Count-Min sketch structure, used for situations where the key is highly skewed.
  */
-case class SparseCMS[K](exactCountTable: Map[K, Long],
+case class SparseCMS[K](exactCountTable: Map[K, Long], maxExactCountOpt: Option[Int] = None,
   override val totalCount: Long,
   override val params: CMSParams[K]) extends CMS[K](params) {
   import SparseCMS._
 
+  val maxExactCount = maxExactCountOpt.getOrElse(math.max(width * depth / 100, 10))
   override def +(x: K, count: Long): CMS[K] = {
     val currentCount = exactCountTable.getOrElse(x, 0L)
     val newTable = exactCountTable.updated(x, currentCount + count)
-    if (newTable.size < width * depth) {
+    if (newTable.size < maxExactCount) {
       // still sparse
-      SparseCMS(newTable, totalCount + count, params)
+      SparseCMS(newTable, totalCount = totalCount + count, params = params)
     } else {
       toDense(newTable, params)
     }
@@ -481,10 +482,11 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
       case other: CMSZero[_] => this
       case other: CMSItem[K] => this + (other.item, other.totalCount)
       case other: SparseCMS[K] =>
+        // This SparseCMS's maxExactCount is used, so ++ is not communitive
         val newTable = exactCountTable ++ other.exactCountTable
-        if (newTable.size < width * depth) {
+        if (newTable.size < maxExactCount) {
           // still sparse
-          SparseCMS(newTable, totalCount + other.totalCount, params)
+          SparseCMS(newTable, totalCount = totalCount + other.totalCount, params = params)
         } else {
           toDense(newTable, params)
         }
@@ -507,7 +509,7 @@ object SparseCMS {
    */
   def apply[K](params: CMSParams[K]): SparseCMS[K] = {
     val exactCountTable = Map[K, Long]()
-    SparseCMS[K](exactCountTable, 0, params)
+    SparseCMS[K](exactCountTable, totalCount = 0, params = params)
   }
 
   /**
