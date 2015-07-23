@@ -720,6 +720,47 @@ case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], par
 
 }
 
+class TopCMSMonoid[K](cms: CMS[K], logic: HeavyHittersLogic[K]) extends Monoid[TopCMS[K]] {
+
+  private val params: TopCMSParams[K] = TopCMSParams(logic)
+
+  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
+
+  /**
+   * Combines the two sketches.
+   *
+   * The sketches must use the same hash functions.
+   */
+  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
+    require(left.cms.params.hashes == right.cms.params.hashes, "The sketches must use the same hash functions.")
+    left ++ right
+  }
+
+  /**
+   * Creates a sketch out of a single item.
+   */
+  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms + item, params)
+
+  /**
+   * Creates a sketch out of multiple items.
+   */
+  def create(data: Seq[K]): TopCMS[K] = {
+    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  }
+
+}
+
+class TopCMSAggregator[K](cmsMonoid: TopCMSMonoid[K])
+  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+
+  def monoid = cmsMonoid
+
+  def prepare(value: K): TopCMS[K] = monoid.create(value)
+
+  def present(cms: TopCMS[K]): TopCMS[K] = cms
+
+}
+
 /**
  * Controls how a CMS that implements [[CMSHeavyHitters]] tracks heavy hitters.
  */
@@ -758,7 +799,7 @@ case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] 
 
   require(0 < heavyHittersPct && heavyHittersPct < 1, "heavyHittersPct must lie in (0, 1)")
 
-  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
+  def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val minCount = heavyHittersPct * cms.totalCount
     HeavyHitters[K](hitters.hhs.filter { _.count >= minCount })
   }
@@ -780,7 +821,7 @@ case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
-  override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
+  def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val sorted = hitters.hhs.toSeq.sortBy(hh => hh.count).takeRight(heavyHittersN)
     HeavyHitters[K](sorted.toSet)
   }
@@ -851,38 +892,7 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends Monoid[TopCMS[K]] {
-
-  val params: TopCMSParams[K] = {
-    val logic = new TopPctLogic[K](heavyHittersPct)
-    TopCMSParams[K](logic)
-  }
-
-  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
-
-  /**
-   * Combines the two sketches.
-   *
-   * The sketches must use the same hash functions.
-   */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
-    require(left.cms.params.hashes == right.cms.params.hashes, "The sketches must use the same hash functions.")
-    left ++ right
-  }
-
-  /**
-   * Creates a sketch out of a single item.
-   */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms + item, params)
-
-  /**
-   * Creates a sketch out of multiple items.
-   */
-  def create(data: Seq[K]): TopCMS[K] = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
-
-}
+class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends TopCMSMonoid[K](cms, TopPctLogic[K](heavyHittersPct))
 
 object TopPctCMS {
 
@@ -915,16 +925,7 @@ object TopPctCMS {
 /**
  * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
  */
-case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
-
-  def monoid = cmsMonoid
-
-  def prepare(value: K): TopCMS[K] = monoid.create(value)
-
-  def present(cms: TopCMS[K]): TopCMS[K] = cms
-
-}
+case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends TopCMSAggregator(cmsMonoid)
 
 /**
  * Monoid for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
@@ -983,36 +984,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K])
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
  *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
  */
-class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends Monoid[TopCMS[K]] {
-
-  val params: TopCMSParams[K] = {
-    val logic = new TopNLogic[K](heavyHittersN)
-    TopCMSParams[K](logic)
-  }
-
-  val zero: TopCMS[K] = TopCMSZero[K](cms, params)
-
-  /**
-   * Combines the two sketches.
-   *
-   * The sketches must use the same hash functions.
-   */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
-    require(left.cms.params.hashes == right.cms.params.hashes, "The sketches must use the same hash functions.")
-    left ++ right
-  }
-
-  /**
-   * Creates a sketch out of a single item.
-   */
-  def create(item: K): TopCMS[K] = TopCMSItem[K](item, cms + item, params)
-
-  /**
-   * Creates a sketch out of multiple items.
-   */
-  def create(data: Seq[K]): TopCMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-
-}
+class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends TopCMSMonoid[K](cms, TopNLogic[K](heavyHittersN))
 
 object TopNCMS {
 
@@ -1045,14 +1017,83 @@ object TopNCMS {
 /**
  * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
  */
-case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K])
-  extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
+case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K]) extends TopCMSAggregator(cmsMonoid)
 
-  val monoid = cmsMonoid
+case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic[(K1, K2)] {
 
-  def prepare(value: K): TopCMS[K] = monoid.create(value)
+  require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
-  def present(cms: TopCMS[K]): TopCMS[K] = cms
+  def purgeHeavyHitters(cms: CMS[(K1, K2)])(hitters: HeavyHitters[(K1, K2)]): HeavyHitters[(K1, K2)] = {
+    val grouped = hitters.hhs.groupBy { hh => hh.item._1 }
+    val (underLimit, overLimit) = grouped.partition { _._2.size <= heavyHittersN }
+    val sorted = overLimit.mapValues { hhs => hhs.toSeq.sortBy { hh => hh.count } }
+    val purged = sorted.mapValues { hhs => hhs.takeRight(heavyHittersN) }
+    HeavyHitters[(K1, K2)](purged.values.flatten.toSet ++ underLimit.values.flatten.toSet)
+  }
+
+}
+
+/*
+ * Monoid for Top-N values per key in an associative [[TopCMS]].
+ *
+ * Typical use case for this might be (Country, City) pairs.  For a stream of such
+ * pairs, we might want to keep track of the most popular cities for each country.
+ *
+ * This can, of course, be achieved using a Map[Country, TopNCMS[City]], but this
+ * requires storing one CMS per distinct Country.
+ *
+ * Similarly, one could attempt to use a TopNCMS[(Country, City)], but less common
+ * countries may not make the cut if N is not "very large".
+ *
+ * ScopedTopNCMSMonoid[Country, City] will avoid having one Country drown others
+ * out, while still only using a single CMS.
+ *
+ * In general the eviction of K1 is not supported, and all distinct K1 values must
+ * be retained.  Therefore it is important to only use this Monoid when the number
+ * of distinct K1 values is known to be reasonably bounded.
+ */
+class ScopedTopNCMSMonoid[K1, K2](cms: CMS[(K1, K2)], heavyHittersN: Int = 100) extends TopCMSMonoid[(K1, K2)](cms, ScopedTopNLogic[K1, K2](heavyHittersN))
+
+object ScopedTopNCMS {
+
+  def scopedHasher[K1: CMSHasher, K2: CMSHasher] = new CMSHasher[(K1, K2)] {
+    private val k1Hasher = implicitly[CMSHasher[K1]]
+    private val k2Hasher = implicitly[CMSHasher[K2]]
+
+    def hash(a: Int, b: Int, width: Int)(x: (K1, K2)): Int = {
+      val (k1, k2) = x
+      val xs = Seq(
+        k1Hasher.hash(a, b, width)(k1),
+        k2Hasher.hash(a, b, width)(k2),
+        a,
+        b)
+      (scala.util.hashing.MurmurHash3.seqHash(xs) & Int.MaxValue) % width
+    }
+  }
+
+  def monoid[K1: CMSHasher, K2: CMSHasher](eps: Double,
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): ScopedTopNCMSMonoid[K1, K2] =
+    new ScopedTopNCMSMonoid[K1, K2](CMS(eps, delta, seed)(scopedHasher[K1, K2]), heavyHittersN)
+
+  def monoid[K1: CMSHasher, K2: CMSHasher](depth: Int,
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): ScopedTopNCMSMonoid[K1, K2] =
+    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
+
+  def aggregator[K1: CMSHasher, K2: CMSHasher](eps: Double,
+    delta: Double,
+    seed: Int,
+    heavyHittersN: Int): TopCMSAggregator[(K1, K2)] =
+    new TopCMSAggregator(monoid(eps, delta, seed, heavyHittersN))
+
+  def aggregator[K1: CMSHasher, K2: CMSHasher](depth: Int,
+    width: Int,
+    seed: Int,
+    heavyHittersN: Int): TopCMSAggregator[(K1, K2)] =
+    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
 }
 
