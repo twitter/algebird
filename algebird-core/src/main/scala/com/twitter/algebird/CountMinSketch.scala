@@ -1207,10 +1207,6 @@ object CMSHasherImplicits {
     override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int = hashBytes(a, b, width)(x.array)
   }
 
-  /**
-   * This is based on the CMSHasherBigInt found in algebird (see docs for in depth explanation):
-   * https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala#L1086
-   */
   implicit object CMSHasherByteArray extends CMSHasher[Array[Byte]] {
     override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = hashBytes(a, b, width)(x)
   }
