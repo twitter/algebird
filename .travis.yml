@@ -2,9 +2,9 @@ language: scala
 sudo: false
 matrix:
   include:
-    - scala: 2.10.4
+    - scala: 2.10.5
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
-    - scala: 2.11.5
+    - scala: 2.11.7
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
       after_success: "./sbt coveralls"
