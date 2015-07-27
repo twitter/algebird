@@ -1,42 +1,47 @@
-// package com.twitter.algebird.benchmark
+package com.twitter.algebird.benchmark
 
-// import com.google.caliper.{ SimpleBenchmark, Param }
-// import com.twitter.algebird.{ HyperLogLogMonoid, HLL }
-// import com.twitter.bijection._
-// import java.nio.ByteBuffer
+import com.twitter.algebird.{ HyperLogLogMonoid, HLL }
+import com.twitter.bijection._
+import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
 
-// class HLLPresentBenchmark {
-//   @Param(Array("5", "10", "17", "20"))
-//   val bits: Int = 0
+object HLLPresentBenchmark {
+  implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
 
-//   @Param(Array("10", "100", "500", "1000", "10000"))
-//   val max: Int = 0
+  @State(Scope.Benchmark)
+  class HLLPresentState {
 
-//   @Param(Array("10", "20", "100"))
-//   val numHLL: Int = 0
+    @Param(Array("5", "10", "17", "20"))
+    var bits: Int = 0
 
-//   var data: IndexedSeq[HLL] = _
+    @Param(Array("10", "100", "500", "1000", "10000"))
+    var max: Int = 0
 
-//   implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
+    @Param(Array("10", "20", "100"))
+    var numHLL: Int = 0
 
-//   override def setUp {
-//     val hllMonoid = new HyperLogLogMonoid(bits)
-//     val r = new scala.util.Random(12345L)
-//     data = (0 until numHLL).map { _ =>
-//       val input = (0 until max).map(_ => r.nextLong).toSet
-//       hllMonoid.batchCreate(input)(byteEncoder.toFunction)
-//     }.toIndexedSeq
+    var data: IndexedSeq[HLL] = _
+    @Setup(Level.Trial)
+    def setup(): Unit = {
+      val hllMonoid = new HyperLogLogMonoid(bits)
+      val r = new scala.util.Random(12345L)
+      data = (0 until numHLL).map { _ =>
+        val input = (0 until max).map(_ => r.nextLong).toSet
+        hllMonoid.batchCreate(input)(byteEncoder.toFunction)
+      }.toIndexedSeq
+    }
+  }
+}
 
-//   }
+class HLLPresentBenchmark {
+  import HLLPresentBenchmark._
 
-//   def timeBatchCreate(reps: Int): Int = {
-//     var dummy = 0
-//     while (dummy < reps) {
-//       data.foreach { hll =>
-//         hll.approximateSize
-//       }
-//       dummy += 1
-//     }
-//     dummy
-//   }
-// }
+  @Benchmark
+  def timeBatchCreate(state: HLLPresentState, bh: Blackhole) = {
+    state.data.foreach { hll =>
+      bh.consume(hll.approximateSize)
+    }
+  }
+}

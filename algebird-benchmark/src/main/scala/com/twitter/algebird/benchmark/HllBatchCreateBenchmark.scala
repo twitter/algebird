@@ -1,32 +1,42 @@
-// package com.twitter.algebird.benchmark
+package com.twitter.algebird.benchmark
 
-// import com.google.caliper.{ SimpleBenchmark, Param }
-// import com.twitter.algebird.HyperLogLogMonoid
-// import com.twitter.bijection._
-// import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
+import com.twitter.algebird.HyperLogLogMonoid
+import com.twitter.bijection._
 
-// class HllBatchCreateBenchmark {
-//   @Param(Array("5", "10", "17", "25"))
-//   val bits: Int = 0
+object HllBatchCreateBenchmark {
+  val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
+  val byteEncoderFn = byteEncoder.toFunction
 
-//   @Param(Array("10", "20", "30"))
-//   val max: Long = 0
+  @State(Scope.Benchmark)
+  class HLLState {
 
-//   var set: Set[Long] = _
+    @Param(Array("5", "10", "17", "25"))
+    var bits: Int = 0
 
-//   implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
+    @Param(Array("10", "20", "30"))
+    var max: Long = 0
 
-//   override def setUp {
-//     set = (0L until max).toSet
-//   }
+    var set: Set[Long] = _
 
-//   def timeBatchCreate(reps: Int): Int = {
-//     val hllMonoid = new HyperLogLogMonoid(bits)
-//     var dummy = 0
-//     while (dummy < reps) {
-//       val hll = hllMonoid.batchCreate(set)(byteEncoder.toFunction)
-//       dummy += 1
-//     }
-//     dummy
-//   }
-// }
+    var hllMonoid: HyperLogLogMonoid = _
+
+    @Setup(Level.Trial)
+    def setup(): Unit = {
+      hllMonoid = new HyperLogLogMonoid(bits)
+
+      set = (0L until max).toSet
+    }
+  }
+}
+
+class HllBatchCreateBenchmark {
+  import HllBatchCreateBenchmark._
+
+  @Benchmark
+  def timeBatchCreate(state: HLLState, bh: Blackhole) = {
+    bh.consume(state.hllMonoid.batchCreate(state.set)(byteEncoderFn))
+  }
+}

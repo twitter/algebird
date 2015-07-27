@@ -1,98 +1,89 @@
-// package com.twitter.algebird.benchmark
+package com.twitter.algebird.benchmark
 
-// import com.google.caliper.{ Param, SimpleBenchmark }
-// import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSMonoid }
+import java.util.concurrent.TimeUnit
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
+import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSMonoid }
 
-// /**
-//  * Benchmarks the Count-Min sketch implementation in Algebird.
-//  *
-//  * We benchmark different `K` types as well as different input data streams.
-//  */
-// // Once we can convince cappi (https://github.com/softprops/capp) -- the sbt plugin we use to run
-// // caliper benchmarks -- to work with the latest caliper 1.0-beta-1, we would:
-// //     - Let `CMSBenchmark` extend `Benchmark` (instead of `SimpleBenchmark`)
-// //     - Annotate `timePlus` with `@MacroBenchmark`.
-// class CMSBenchmark {
+/**
+ * Benchmarks the Count-Min sketch implementation in Algebird.
+ *
+ * We benchmark different `K` types as well as different input data streams.
+ */
 
-//   val Seed = 1
-//   val JavaCharSizeInBits = 2 * 8
+object CMSBenchmark {
 
-//   @Param(Array("0.1", "0.005"))
-//   val eps: Double = 0.0
+  @State(Scope.Benchmark)
+  class CMSState {
 
-//   @Param(Array("0.0000001" /* 1E-8 */ ))
-//   val delta: Double = 0.0
+    val Seed = 1
+    val JavaCharSizeInBits = 2 * 8
 
-//   @Param(Array("0.2"))
-//   val heavyHittersPct: Double = 0.0
+    @Param(Array("0.1", "0.005"))
+    var eps: Double = 0.0
 
-//   @Param(Array("100"))
-//   val operations: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
+    @Param(Array("0.0000001" /* 1E-8 */ ))
+    var delta: Double = 0.0
 
-//   @Param(Array("2048"))
-//   val maxBits: Int = 0
+    @Param(Array("0.2"))
+    var heavyHittersPct: Double = 0.0
 
-//   var random: scala.util.Random = _
-//   var cmsLongMonoid: TopPctCMSMonoid[Long] = _
-//   var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
-//   var cmsStringMonoid: TopPctCMSMonoid[String] = _
-//   var inputsBigInt: Seq[BigInt] = _
-//   var inputsString: Seq[String] = _
+    @Param(Array("100"))
+    var operations: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
 
-//   override def setUp() {
-//     // Required import of implicit values (e.g. for BigInt- or Long-backed CMS instances)
-//     import CMSHasherImplicits._
+    @Param(Array("2048"))
+    var maxBits: Int = 0
 
-//     cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, heavyHittersPct)
-//     cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, heavyHittersPct)
-//     cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, heavyHittersPct)
+    var random: scala.util.Random = _
+    var cmsLongMonoid: TopPctCMSMonoid[Long] = _
+    var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
+    var cmsStringMonoid: TopPctCMSMonoid[String] = _
+    var inputsBigInt: Seq[BigInt] = _
+    var inputsString: Seq[String] = _
 
-//     random = new scala.util.Random
+    @Setup(Level.Trial)
+    def setup(): Unit = {
+      // Required import of implicit values (e.g. for BigInt- or Long-backed CMS instances)
+      import CMSHasherImplicits._
 
-//     inputsString = (0 to operations).map { i => random.nextString(maxBits / JavaCharSizeInBits) }.toSeq
-//     Console.out.println(s"Created ${inputsString.size} input records for String")
-//     inputsBigInt = inputsString.map { s => BigInt(s.getBytes) }
-//     Console.out.println(s"Created ${inputsBigInt.size} input records for BigInt")
-//   }
+      cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, heavyHittersPct)
+      cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, heavyHittersPct)
+      cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, heavyHittersPct)
 
-//   // Case A (K=Long): We count the first hundred integers, i.e. [1, 100]
-//   def timePlusOfFirstHundredIntegersWithLongCms(reps: Int): Int = {
-//     var dummy = 0
-//     while (dummy < reps) {
-//       (1 to operations).view.foldLeft(cmsLongMonoid.zero)((l, r) => { l ++ cmsLongMonoid.create(r) })
-//       dummy += 1
-//     }
-//     dummy
-//   }
+      random = new scala.util.Random
 
-//   // Case B.1 (K=BigInt): We count the first hundred integers, i.e. [1, 100]
-//   def timePlusOfFirstHundredIntegersWithBigIntCms(reps: Int): Int = {
-//     var dummy = 0
-//     while (dummy < reps) {
-//       (1 to operations).view.foldLeft(cmsBigIntMonoid.zero)((l, r) => { l ++ cmsBigIntMonoid.create(r) })
-//       dummy += 1
-//     }
-//     dummy
-//   }
+      inputsString = (0 to operations).map { i => random.nextString(maxBits / JavaCharSizeInBits) }.toSeq
+      Console.out.println(s"Created ${inputsString.size} input records for String")
+      inputsBigInt = inputsString.map { s => BigInt(s.getBytes) }
+      Console.out.println(s"Created ${inputsBigInt.size} input records for BigInt")
+    }
+  }
+}
 
-//   // Case B.2 (K=BigInt): We count numbers drawn randomly from a 2^maxBits address space
-//   def timePlusOfRandom2048BitNumbersWithBigIntCms(reps: Int): Int = {
-//     var dummy = 0
-//     while (dummy < reps) {
-//       inputsBigInt.view.foldLeft(cmsBigIntMonoid.zero)((l, r) => l ++ cmsBigIntMonoid.create(r))
-//       dummy += 1
-//     }
-//     dummy
-//   }
+class CMSBenchmark {
+  import CMSBenchmark._
+  // Case A (K=Long): We count the first hundred integers, i.e. [1, 100]
+  @Benchmark
+  def timePlusOfFirstHundredIntegersWithLongCms(state: CMSState) = {
+    (1 to state.operations).view.foldLeft(state.cmsLongMonoid.zero)((l, r) => { l ++ state.cmsLongMonoid.create(r) })
+  }
 
-//   // Case C (K=String): We count strings drawn randomly from a 2^maxBits address space
-//   def timePlusOfRandom2048BitNumbersWithStringCms(reps: Int): Int = {
-//     var dummy = 0
-//     while (dummy < reps) {
-//       inputsString.view.foldLeft(cmsStringMonoid.zero)((l, r) => l ++ cmsStringMonoid.create(r))
-//       dummy += 1
-//     }
-//     dummy
-//   }
+  // Case B.1 (K=BigInt): We count the first hundred integers, i.e. [1, 100]
+  @Benchmark
+  def timePlusOfFirstHundredIntegersWithBigIntCms(state: CMSState) = {
+    (1 to state.operations).view.foldLeft(state.cmsBigIntMonoid.zero)((l, r) => { l ++ state.cmsBigIntMonoid.create(r) })
+  }
 
-// }
+  // Case B.2 (K=BigInt): We count numbers drawn randomly from a 2^maxBits address space
+  @Benchmark
+  def timePlusOfRandom2048BitNumbersWithBigIntCms(state: CMSState) = {
+    state.inputsBigInt.view.foldLeft(state.cmsBigIntMonoid.zero)((l, r) => l ++ state.cmsBigIntMonoid.create(r))
+  }
+
+  // Case C (K=String): We count strings drawn randomly from a 2^maxBits address space
+  @Benchmark
+  def timePlusOfRandom2048BitNumbersWithStringCms(state: CMSState) = {
+    state.inputsString.view.foldLeft(state.cmsStringMonoid.zero)((l, r) => l ++ state.cmsStringMonoid.create(r))
+  }
+
+}
