@@ -1279,4 +1279,8 @@ object CMSHasherImplicits {
     override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int = hashBytes(a, b, width)(x.array)
   }
 
+  implicit object CMSHasherByteArray extends CMSHasher[Array[Byte]] {
+    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = hashBytes(a, b, width)(x)
+  }
+
 }
