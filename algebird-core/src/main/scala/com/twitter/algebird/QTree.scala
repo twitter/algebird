@@ -197,36 +197,38 @@ case class QTree[A](
   def quantileBounds(p: Double): (Double, Double) = {
     require(p >= 0.0 && p <= 1.0, "The given percentile must be of the form 0 <= p <= 1.0")
 
-    val rank = math.floor(count * p).toLong
-    // get is safe below, because findRankLowerBound only returns
-    // None if rank > count, but due to construction rank <= count
-    (findRankLowerBound(rank).get, findRankUpperBound(rank).get)
+    // rank is 0-indexed and 0 <= rank < count
+    val rank = math.floor(count * p).toLong.min(count - 1)
+
+    findRankBounds(rank)
   }
 
-  private def findRankLowerBound(rank: Long): Option[Double] =
-    if (rank > count)
-      None
-    else {
-      val childCounts = mapChildrenWithDefault(0L)(_.count)
-      val parentCount = count - childCounts._1 - childCounts._2
-      lowerChild.flatMap { _.findRankLowerBound(rank - parentCount) }
-        .orElse {
-          val newRank = rank - childCounts._1 - parentCount
-          if (newRank <= 0)
-            Some(lowerBound)
-          else
-            upperChild.flatMap{ _.findRankLowerBound(newRank) }
-        }
-    }
+  /**
+   * Precondition: if 0 <= rank < count
+   */
+  private def findRankBounds(rank: Long): (Double, Double) = {
+    require(0 <= rank && rank < count)
 
-  private def findRankUpperBound(rank: Long): Option[Double] = {
-    if (rank > count)
-      None
-    else {
-      lowerChild.flatMap{ _.findRankUpperBound(rank) }.orElse {
-        val lowerCount = lowerChild.map{ _.count }.getOrElse(0L)
-        upperChild.flatMap{ _.findRankUpperBound(rank - lowerCount) }.orElse(Some(upperBound))
-      }
+    val (leftCount, rightCount) = mapChildrenWithDefault(0L)(_.count)
+    val parentCount = count - leftCount - rightCount
+
+    if (0 <= rank && rank < leftCount) {
+
+      // lowerChild.get is safe because
+      // leftCount > 0, so lowerChild is not None.
+      lowerChild.get.findRankBounds(rank)
+
+    } else if (leftCount <= rank && rank < leftCount + parentCount) {
+      (lowerBound, upperBound)
+    } else {
+      // so leftCount + parentCount <= rank < count
+
+      // upperChild.get is safe because
+      // leftCount + parentCount < count,
+      // so leftCount + (count - leftCount - rightCount) < count,
+      // so count - rightCount < count,
+      // so rightCount > 0, so upperChild is not None.
+      upperChild.get.findRankBounds(rank - leftCount - parentCount)
     }
   }
 
