@@ -89,6 +89,7 @@ package com.twitter.algebird
  *        (an interval that depends on `eps`) around the truth.
  * @param seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
+ * @param
  * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
@@ -100,11 +101,11 @@ package com.twitter.algebird
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
-class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int) extends Monoid[CMS[K]] {
+class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None) extends Monoid[CMS[K]] {
 
   val params = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
-    CMSParams(hashes, eps, delta)
+    CMSParams(hashes, eps, delta, maxExactCountOpt)
   }
 
   val zero: CMS[K] = CMSZero[K](params)
@@ -153,7 +154,7 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  *              (an interval that depends on `eps`) around the truth.
  * @tparam K The type used to identify the elements to be counted.
  */
-case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double) {
+case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double, maxExactCountOpt: Option[Int] = None) {
 
   require(0 < eps && eps < 1, "eps must lie in (0, 1)")
   require(0 < delta && delta < 1, "delta must lie in (0, 1)")
@@ -194,6 +195,12 @@ object CMSFunctions {
    * Translates from `eps` to `width`.
    */
   def width(eps: Double): Int = scala.math.ceil(truncatePrecisionError(scala.math.exp(1) / eps)).toInt
+
+  /**
+   * Compute maxExactCount from parameters or `depth` and `width`
+   */
+  def maxExactCount(maxExactCountOpt: Option[Int], depth: Int, width: Int): Int =
+    maxExactCountOpt.getOrElse(math.max(width * depth / 100, 10))
 
   // Eliminates precision errors such as the following:
   //
@@ -266,6 +273,16 @@ trait CMSCounting[K, C[_]] {
    * `eps`.
    */
   def width: Int = CMSFunctions.width(eps)
+
+  /**
+   * An Option parameter about how many exact counts a sparse CMS wants to keep
+   */
+  def maxExactCountOpt: Option[Int]
+
+  /**
+   * Number of exact counts a sparse CMS wants to keep. This number is derived from `maxExactCountOpt`.
+   */
+  def maxExactCount: Int = CMSFunctions.maxExactCount(maxExactCountOpt, depth, width)
 
   /**
    * Returns a new sketch that is the combination of this sketch and the other sketch.
@@ -351,24 +368,24 @@ trait CMSHeavyHitters[K] {
 
 object CMS {
 
-  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed)
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed, maxExactCountOpt)
 
-  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
-    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
+  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int, maxExactCountOpt: Option[Int]): CMSMonoid[K] =
+    monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, maxExactCountOpt)
 
-  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
-    new CMSAggregator[K](monoid(eps, delta, seed))
+  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None): CMSAggregator[K] =
+    new CMSAggregator[K](monoid(eps, delta, seed, maxExactCountOpt))
 
-  def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
-    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed)
+  def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int, maxExactCountOpt: Option[Int]): CMSAggregator[K] =
+    aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, maxExactCountOpt)
 
   /**
    * Returns a fresh, zeroed CMS instance.
    */
-  def apply[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMS[K] = {
+  def apply[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None): CMS[K] = {
     val params = {
       val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
-      CMSParams(hashes, eps, delta)
+      CMSParams(hashes, eps, delta, maxExactCountOpt)
     }
     CMSInstance[K](params)
   }
@@ -415,6 +432,8 @@ sealed abstract class CMS[K](val params: CMSParams[K]) extends java.io.Serializa
 
   override val delta: Double = params.delta
 
+  override val maxExactCountOpt: Option[Int] = params.maxExactCountOpt
+
   override def f2: Approximate[Long] = innerProduct(this)
 
 }
@@ -460,12 +479,11 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 /**
  * A sparse Count-Min sketch structure, used for situations where the key is highly skewed.
  */
-case class SparseCMS[K](exactCountTable: Map[K, Long], maxExactCountOpt: Option[Int] = None,
+case class SparseCMS[K](exactCountTable: Map[K, Long],
   override val totalCount: Long,
   override val params: CMSParams[K]) extends CMS[K](params) {
   import SparseCMS._
 
-  val maxExactCount = maxExactCountOpt.getOrElse(math.max(width * depth / 100, 10))
   override def +(x: K, count: Long): CMS[K] = {
     val currentCount = exactCountTable.getOrElse(x, 0L)
     val newTable = exactCountTable.updated(x, currentCount + count)
@@ -710,6 +728,8 @@ sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
   override val delta: Double = cms.delta
 
   override val totalCount: Long = cms.totalCount
+
+  override val maxExactCountOpt: Option[Int] = cms.maxExactCountOpt
 
   override def frequency(item: K): Approximate[Long] = cms.frequency(item)
 
