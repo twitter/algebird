@@ -72,10 +72,10 @@ class QTreeTest extends WordSpec with Matchers {
     s"QTree with elements (1 to $k)" should {
       val trueMedian = (1 + k) / 2
       s"have median $trueMedian" in {
-        implicit val sg = new QTreeSemigroup[Double](k)
+        implicit val sg = new QTreeSemigroup[Unit](k)
 
         val list = (1 to k).map(_.toDouble)
-        val qtree = sg.sumOption(list.map(QTree(_))).get
+        val qtree = sg.sumOption(list.map(QTree.value(_))).get
 
         val (lower, upper) = qtree.quantileBounds(0.5)
         assert(lower <= trueMedian && trueMedian <= upper)
