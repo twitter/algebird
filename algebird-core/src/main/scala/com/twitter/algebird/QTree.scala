@@ -212,22 +212,16 @@ case class QTree[A](
     val (leftCount, rightCount) = mapChildrenWithDefault(0L)(_.count)
     val parentCount = count - leftCount - rightCount
 
-    if (0 <= rank && rank < leftCount) {
-
-      // lowerChild.get is safe because
-      // leftCount > 0, so lowerChild is not None.
+    if (rank < leftCount) {
+      // Note that 0 <= rank < leftCount because of the require above.
+      // So leftCount > 0, so lowerChild is not None.
       lowerChild.get.findRankBounds(rank)
-
-    } else if (leftCount <= rank && rank < leftCount + parentCount) {
+    } else if (rank < leftCount + parentCount) {
+      // leftCount <= rank < leftCount + parentCount
       (lowerBound, upperBound)
     } else {
-      // so leftCount + parentCount <= rank < count
-
-      // upperChild.get is safe because
-      // leftCount + parentCount < count,
-      // so leftCount + (count - leftCount - rightCount) < count,
-      // so count - rightCount < count,
-      // so rightCount > 0, so upperChild is not None.
+      // Note that leftCount + parentCount <= rank < count.
+      // So rightCount > 0, so upperChild is not None.
       upperChild.get.findRankBounds(rank - leftCount - parentCount)
     }
   }
