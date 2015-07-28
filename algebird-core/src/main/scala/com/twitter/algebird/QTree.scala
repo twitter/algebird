@@ -204,7 +204,7 @@ case class QTree[A](
   }
 
   /**
-   * Precondition: if 0 <= rank < count
+   * Precondition: 0 <= rank < count
    */
   private def findRankBounds(rank: Long): (Double, Double) = {
     require(0 <= rank && rank < count)
