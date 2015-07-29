@@ -1,5 +1,17 @@
 # Algebird #
 
+### Version 0.11.0 ###
+* Move CMSHasherByteArray from scalding: https://github.com/twitter/algebird/pull/467
+* Upgrade sbt launcher script (sbt-extras): https://github.com/twitter/algebird/pull/469
+* Create case class macros for algebraic structures: https://github.com/twitter/algebird/pull/466
+* Refactor MapAggregator: https://github.com/twitter/algebird/pull/462
+* Algebird support for spark: https://github.com/twitter/algebird/pull/397
+* Add MapAggregator from 1 (key, aggregator) pair: https://github.com/twitter/algebird/pull/452
+* Remove unnecessary use of scala.math: https://github.com/twitter/algebird/pull/455
+* Don&#39;t call deprecated HyperLogLog methods in tests: https://github.com/twitter/algebird/pull/456
+* Update product_generators.rb: https://github.com/twitter/algebird/pull/457
+* Pzheng/gaussian euclidean: https://github.com/twitter/algebird/pull/448
+
 ### Version 0.10.2 ###
 * QTree quantileBounds assert percentile <= 1.0 #447
 
