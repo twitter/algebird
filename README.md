@@ -1,5 +1,5 @@
 ## Algebird [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird) [![Coverage status](https://img.shields.io/coveralls/twitter/algebird/develop.svg)](https://coveralls.io/r/twitter/algebird?branch=develop)
- 		
+
 
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Storm](https://github.com/nathanmarz/storm)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
@@ -10,7 +10,7 @@ See the [current API documentation](http://twitter.github.com/algebird) for more
 ```scala
 > ./sbt algebird-core/console
 
-Welcome to Scala version 2.9.3 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_07).
+Welcome to Scala version 2.10.5 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_40).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -21,7 +21,7 @@ scala> import com.twitter.algebird.Operators._
 import com.twitter.algebird.Operators._
 
 scala> Map(1 -> Max(2)) + Map(1 -> Max(3)) + Map(2 -> Max(4))
-res1: scala.collection.immutable.Map[Int,com.twitter.algebird.Max[Int]] = Map(2 -> Max(4), 1 -> Max(3))
+res0: scala.collection.immutable.Map[Int,com.twitter.algebird.Max[Int]] = Map(2 -> Max(4), 1 -> Max(3))
 ```
 In the above, the class Max[T] signifies that the + operator should actually be max (this is
 accomplished by providing an implicit instance of a typeclass for Max that handles +).
@@ -48,7 +48,7 @@ Discussion occurs primarily on the [Algebird mailing list](https://groups.google
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.10.2`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.11.0`.
 
 Current published artifacts are
 
@@ -91,6 +91,6 @@ The answer is a mix of the following:
 * Argyris Zymnis <http://twitter.com/argyris>
 
 ## License
-Copyright 2012 Twitter, Inc.
+Copyright 2015 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
