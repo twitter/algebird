@@ -116,10 +116,34 @@ object Aggregator extends java.io.Serializable {
   /**
    * This builds an in-memory Set, and then finally gets the size of that set.
    * This may not be scalable if the Uniques are very large. You might check the
-   * HyperLogLog Aggregator to get an approximate version of this that is scalable.
+   * approximateUniqueCount or HyperLogLog Aggregator to get an approximate version
+   * of this that is scalable.
    */
   def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
     toSet[T].andThenPresent(_.size)
+
+  /**
+   * Using a constant amount of memory, give an approximate unique count (~ 1% error).
+   * This uses an exact set for up to 100 items,
+   * then HyperLogLog (HLL) with an 1.2% standard error which uses at most 8192 bytes
+   * for each HLL. For more control, see HyperLogLogAggregator.
+   */
+  def approximateUniqueCount[T: Hash128]: MonoidAggregator[T, Either[HLL, Set[T]], Long] =
+    SetSizeHashAggregator[T](hllBits = 13, maxSetSize = 100)
+
+  /**
+   * Returns the lower bound of a given percentile where the percentile is between (0,1]
+   * The items that are iterated over cannot be negative.
+   */
+  def approximatePercentile[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregatorLowerBound[T] =
+    QTreeAggregatorLowerBound[T](percentile, k)
+
+  /**
+   * Returns the intersection of a bounded percentile where the percentile is between (0,1]
+   * The items that are iterated over cannot be negative.
+   */
+  def approximatePercentileBounds[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregator[T] =
+    QTreeAggregator[T](percentile, k)
 }
 
 /**

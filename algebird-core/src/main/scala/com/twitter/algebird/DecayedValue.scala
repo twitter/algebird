@@ -24,14 +24,14 @@ package com.twitter.algebird
 
 object DecayedValue extends java.io.Serializable {
   def build[V <% Double](value: V, time: Double, halfLife: Double) = {
-    DecayedValue(value, time * scala.math.log(2.0) / halfLife)
+    DecayedValue(value, time * math.log(2.0) / halfLife)
   }
   val zero = DecayedValue(0.0, Double.NegativeInfinity)
 
   def scale(newv: DecayedValue, oldv: DecayedValue, eps: Double) = {
     val newValue = newv.value +
-      scala.math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
-    if (scala.math.abs(newValue) > eps) {
+      math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
+    if (math.abs(newValue) > eps) {
       DecayedValue(newValue, newv.scaledTime)
     } else {
       zero

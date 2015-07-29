@@ -58,7 +58,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
   }
   override def flush: Option[Map[K, V]] = {
     // Get a copy of the cache, since it is mutable
-    val res = optNonEmpty(Map(cache.toSeq: _*))
+    val res = optNonEmpty(cache.iterator.toMap)
     cache.clear
     res
   }

@@ -59,15 +59,14 @@ class QTreeTest extends WordSpec with Matchers {
     list.map{ QTree(_) }.reduce{ qtSemigroup.plus(_, _) }
   }
 
-  def trueQuantile(list: Seq[Double], q: Double) = {
+  def trueQuantile[T: Ordering](list: Seq[T], q: Double): T = {
     val rank = math.floor(q * list.size).toInt
     val sorted = list.toList.sorted
     sorted(rank)
   }
 
-  def trueRangeSum(list: Seq[Double], from: Double, to: Double) = {
+  def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
     list.filter{ _ >= from }.filter{ _ < to }.sum
-  }
 
   for (k <- (1 to 6))
     ("QTree with sizeHint 2^" + k) should {
@@ -79,6 +78,14 @@ class QTreeTest extends WordSpec with Matchers {
         val truth = trueQuantile(list, quantile)
         assert(truth >= lower)
         assert(truth <= upper)
+      }
+      "return correct quantile bounds for two percentile extremes" in {
+        val list = randomList(10000)
+        val qt = buildQTree(k, list)
+        val (lower, _) = qt.quantileBounds(0.0)
+        val (_, upper) = qt.quantileBounds(1.0)
+        assert(lower == 0.0)
+        assert(upper == 1.0)
       }
       "always contain the true range sum within its bounds" in {
         val list = randomList(10000)
@@ -94,6 +101,24 @@ class QTreeTest extends WordSpec with Matchers {
         val list = randomList(100000)
         val qt = buildQTree(k, list)
         assert(qt.size <= (1 << (k + 2)))
+      }
+    }
+
+  for (quantile <- List(0, .05, .5, .777777777, .95))
+    ("A QTreeAggregator with quantile set as " + quantile) should {
+      "work as an aggregator for doubles with a small stream" in {
+        val list = randomList(10000).map(i => math.round(i * 100).toDouble)
+        val agg = QTreeAggregator(quantile)(implicitly[Numeric[Double]])
+        val interval = agg(list)
+        val truth = trueQuantile(list, quantile)
+        assert(interval.contains(truth))
+      }
+      "work as an aggregator for longs with a small stream" in {
+        val list = randomList(10000).map(i => (i * 1000l).toLong)
+        val agg = QTreeAggregator(quantile)(implicitly[Numeric[Long]])
+        val interval = agg(list)
+        val truth = trueQuantile(list, quantile)
+        assert(interval.contains(truth))
       }
     }
 }
