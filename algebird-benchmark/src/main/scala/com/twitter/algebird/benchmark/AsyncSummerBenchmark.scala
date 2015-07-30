@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicLong
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import org.openjdk.jmh.infra.Blackhole
 import com.twitter.algebird.{ HyperLogLogMonoid, _ }
 import com.twitter.algebird.util.summer._
 import com.twitter.bijection._

@@ -1,13 +1,10 @@
 package com.twitter.algebird.benchmark
 
 import com.twitter.algebird._
-import com.twitter.algebird.util._
 import com.twitter.bijection._
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.util.Random
-
-import scala.math._
 
 class OldQTreeSemigroup[A: Monoid](k: Int) extends QTreeSemigroup[A](k) {
   override def sumOption(items: TraversableOnce[QTree[A]]) =

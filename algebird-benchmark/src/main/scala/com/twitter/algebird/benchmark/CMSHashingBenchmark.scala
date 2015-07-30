@@ -2,7 +2,6 @@ package com.twitter.algebird.benchmark
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import org.openjdk.jmh.infra.Blackhole
 
 /**
  * Benchmarks the hashing algorithms used by Count-Min sketch for CMS[BigInt].

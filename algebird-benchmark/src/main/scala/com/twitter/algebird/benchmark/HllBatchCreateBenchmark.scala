@@ -2,7 +2,6 @@ package com.twitter.algebird.benchmark
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import org.openjdk.jmh.infra.Blackhole
 import com.twitter.algebird.HyperLogLogMonoid
 import com.twitter.bijection._
 
@@ -36,7 +35,6 @@ class HllBatchCreateBenchmark {
   import HllBatchCreateBenchmark._
 
   @Benchmark
-  def timeBatchCreate(state: HLLState, bh: Blackhole) = {
-    bh.consume(state.hllMonoid.batchCreate(state.set)(byteEncoderFn))
-  }
+  def timeBatchCreate(state: HLLState) =
+    state.hllMonoid.batchCreate(state.set)(byteEncoderFn)
 }
