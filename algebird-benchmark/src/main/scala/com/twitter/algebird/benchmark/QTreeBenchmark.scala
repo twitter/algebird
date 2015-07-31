@@ -6,18 +6,14 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.util.Random
 
-class OldQTreeSemigroup[A: Monoid](k: Int) extends QTreeSemigroup[A](k) {
-  override def sumOption(items: TraversableOnce[QTree[A]]) =
-    if (items.isEmpty) None
-    else Some(items.reduce(plus))
-}
-
 object QTreeBenchmark {
 
   @State(Scope.Benchmark)
   class QTreeState {
-    var qtree: QTreeSemigroup[Long] = _
-    var oldqtree: QTreeSemigroup[Long] = _
+    var qtreeUnit: QTreeSemigroup[Unit] = _
+
+    var qtreeLong: QTreeSemigroup[Long] = _
+    var qtreeDouble: QTreeSemigroup[Double] = _
 
     @Param(Array("5", "10", "12"))
     var depthK: Int = 0
@@ -25,17 +21,32 @@ object QTreeBenchmark {
     @Param(Array("100", "10000"))
     var numElements: Int = 0
 
-    var inputData: Seq[QTree[Long]] = _
+    var inputDataUnit: Seq[QTree[Unit]] = _
+
+    var inputDataLong: Seq[QTree[Long]] = _
+    var inputDataDouble: Seq[QTree[Double]] = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
-      qtree = new QTreeSemigroup[Long](depthK)
-      oldqtree = new OldQTreeSemigroup(depthK)
+      qtreeUnit = new QTreeSemigroup[Unit](depthK)
+      qtreeLong = new QTreeSemigroup[Long](depthK)
+      qtreeDouble = new QTreeSemigroup[Double](depthK)
 
       val rng = new Random("qtree".hashCode)
 
-      inputData = (0L until numElements).map { _ =>
+      inputDataUnit = (0L until numElements).map { _ =>
+        QTree((rng.nextInt(1000).toLong, ()))
+      }
+
+      // new rng with same seed so same inputs
+      val rng2 = new Random("qtree".hashCode)
+
+      inputDataLong = (0L until numElements).map { _ =>
         QTree(rng.nextInt(1000).toLong)
+      }
+
+      inputDataDouble = (0L until numElements).map { _ =>
+        QTree(rng.nextInt(1000).toDouble)
       }
     }
   }
@@ -47,12 +58,33 @@ class QTreeBenchmark {
   import QTreeBenchmark._
 
   @Benchmark
-  def timeSumOption(state: QTreeState) = {
-    state.qtree.sumOption(state.inputData)
+  def timeSumOptionUnit(state: QTreeState) = {
+    state.qtreeUnit.sumOption(state.inputDataUnit)
   }
 
   @Benchmark
-  def timeOldSumOption(state: QTreeState) = {
-    state.oldqtree.sumOption(state.inputData)
+  def timeSumOptionLong(state: QTreeState) = {
+    state.qtreeLong.sumOption(state.inputDataLong)
   }
+
+  @Benchmark
+  def timeSumOptionDouble(state: QTreeState) = {
+    state.qtreeDouble.sumOption(state.inputDataDouble)
+  }
+
+  @Benchmark
+  def timePlusUnit(state: QTreeState): QTree[Unit] = {
+    state.inputDataUnit.tail.foldLeft(state.inputDataUnit.head)(state.qtreeUnit.plus)
+  }
+
+  @Benchmark
+  def timePlusLong(state: QTreeState): QTree[Long] = {
+    state.inputDataLong.tail.foldLeft(state.inputDataLong.head)(state.qtreeLong.plus)
+  }
+
+  @Benchmark
+  def timePlusDouble(state: QTreeState): QTree[Double] = {
+    state.inputDataDouble.tail.foldLeft(state.inputDataDouble.head)(state.qtreeDouble.plus)
+  }
+
 }
