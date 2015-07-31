@@ -32,22 +32,29 @@ object QTreeBenchmark {
       qtreeLong = new QTreeSemigroup[Long](depthK)
       qtreeDouble = new QTreeSemigroup[Double](depthK)
 
-      val rng = new Random("qtree".hashCode)
+      inputDataUnit = {
+        val rng = new Random("qtree".hashCode)
 
-      inputDataUnit = (0L until numElements).map { _ =>
-        QTree((rng.nextInt(1000).toLong, ()))
+        (0L until numElements).map { _ =>
+          QTree((rng.nextInt(1000).toLong, ()))
+        }
       }
 
-      // new rng with same seed so same inputs
-      val rng2 = new Random("qtree".hashCode)
-
-      inputDataLong = (0L until numElements).map { _ =>
-        QTree(rng.nextInt(1000).toLong)
+      inputDataLong = {
+        val rng = new Random("qtree".hashCode)
+        (0L until numElements).map { _ =>
+          QTree(rng.nextInt(1000).toLong)
+        }
       }
 
-      inputDataDouble = (0L until numElements).map { _ =>
-        QTree(rng.nextInt(1000).toDouble)
+      inputDataDouble = {
+        val rng = new Random("qtree".hashCode)
+
+        (0L until numElements).map { _ =>
+          QTree(rng.nextInt(1000).toDouble)
+        }
       }
+
     }
   }
 }
@@ -56,7 +63,6 @@ object QTreeBenchmark {
 @BenchmarkMode(Array(Mode.AverageTime))
 class QTreeBenchmark {
   import QTreeBenchmark._
-
   @Benchmark
   def timeSumOptionUnit(state: QTreeState) = {
     state.qtreeUnit.sumOption(state.inputDataUnit)
