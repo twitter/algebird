@@ -46,10 +46,10 @@ object QTree {
     val offset = math.floor(kv._1 / math.pow(2.0, level)).toLong
     require(offset >= 0, "QTree can not accept negative values")
 
-    new QTree(offset,
+    new QTree(kv._2,
+      offset,
       level,
       1,
-      kv._2,
       null,
       null)
   }
@@ -57,10 +57,10 @@ object QTree {
   def apply[A](kv: (Long, A)): QTree[A] = {
     require(kv._1 >= 0, "QTree can not accept negative values")
 
-    new QTree(kv._1,
+    new QTree(kv._2,
+      kv._1,
       0,
       1,
-      kv._2,
       null,
       null)
   }
@@ -73,7 +73,7 @@ object QTree {
     upperChild: Option[QTree[A]]): QTree[A] = {
     require(offset >= 0, "QTree can not accept negative values")
 
-    new QTree(offset, level, count, sum, lowerChild.orNull, upperChild.orNull)
+    new QTree(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
   }
 
   /**
@@ -113,9 +113,9 @@ object QTree {
     assert(right.lowerBound == left.lowerBound, "lowerBound " + right.lowerBound + " != " + left.lowerBound)
     assert(right.level == left.level, "level " + right.level + " != " + left.level)
 
-    new QTree[A](left.offset,
+    new QTree[A](monoid.plus(left.sum, right.sum),
+      left.offset,
       left.level, left.count + right.count,
-      monoid.plus(left.sum, right.sum),
       mergeOptions(left.lowerChildNullable, right.lowerChildNullable),
       mergeOptions(left.upperChildNullable, right.upperChildNullable))
   }
@@ -157,13 +157,13 @@ class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extend
 }
 
 class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
+  _sum: A, //the sum at just this node (*not* including its children)
   _offset: Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
   _level: Int,
   _count: Long, //the total count for this node and all of its children
-  _sum: A, //the sum at just this node (*not* including its children)
   _lowerChildNullable: QTree[A],
   _upperChildNullable: QTree[A])
-  extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]] with java.io.Serializable {
+  extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]] with Serializable {
   import QTree._
 
   val range: Double =
@@ -177,6 +177,9 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
 
   def lowerChild: Option[QTree[A]] = Option(_lowerChildNullable)
   def upperChild: Option[QTree[A]] = Option(_upperChildNullable)
+
+  def this(offset: Long, level: Int, count: Long, sum: A, lowerChild: Option[QTree[A]], upperChild: Option[QTree[A]]) =
+    this(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
 
   // Helpers to access the nullable ones from inside the QTree work
   @inline private[algebird] def lowerChildNullable: QTree[A] = _lowerChildNullable
@@ -218,7 +221,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       val r = if (offset % 2 == 0) null else this
 
       val parent =
-        new QTree[A](nextOffset, nextLevel, _count, monoid.zero, l, r)
+        new QTree[A](monoid.zero, nextOffset, nextLevel, _count, l, r)
 
       parent.extendToLevel(n)
     }
@@ -367,7 +370,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   // If we don't prune we MUST return this
   private def pruneChildren(minCount: Long)(implicit m: Monoid[A]): QTree[A] =
     if (_count < minCount) {
-      new QTree[A](_offset, _level, _count, totalSum, null, null)
+      new QTree[A](totalSum, _offset, _level, _count, null, null)
     } else {
       val newLower = pruneChild(minCount, lowerChildNullable)
       val lowerNotPruned = newLower eq lowerChildNullable
@@ -376,7 +379,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       if (lowerNotPruned && upperNotPruned)
         this
       else
-        new QTree[A](_offset, _level, _count, _sum, newLower, newUpper)
+        new QTree[A](_sum, _offset, _level, _count, newLower, newUpper)
     }
 
   // If we don't prune we MUST return child
