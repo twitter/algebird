@@ -124,6 +124,7 @@ object AlgebirdBuild extends Build {
     algebirdCore,
     algebirdUtil,
     algebirdBijection,
+    algebirdBenchmark,
     algebirdSpark
   )
 
@@ -131,8 +132,7 @@ object AlgebirdBuild extends Build {
     val id = "algebird-%s".format(name)
     Project(id = id, base = file(id), settings = sharedSettings ++ Seq(
       Keys.name := id,
-      previousArtifact := youngestForwardCompatible(name)) ++
-      JmhPlugin.projectSettings
+      previousArtifact := youngestForwardCompatible(name))
     )
   }
 
@@ -167,7 +167,7 @@ object AlgebirdBuild extends Build {
     }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   ).dependsOn(algebirdCore)
 
-  lazy val algebirdBenchmark = module("benchmark").settings(
+  lazy val algebirdBenchmark = module("benchmark").settings(JmhPlugin.projectSettings:_*).settings(
      libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.8.0")
   ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile").enablePlugins(JmhPlugin)
 
