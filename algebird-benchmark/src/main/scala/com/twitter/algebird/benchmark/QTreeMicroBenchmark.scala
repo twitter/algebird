@@ -40,7 +40,7 @@ object QTreeMicroBenchmark {
       val r = if (q.offset % 2 == 0) null else q
 
       val parent =
-        new QTree[A](nextOffset, nextLevel, q.count, monoid.zero, l, r)
+        new QTree[A](monoid.zero, nextOffset, nextLevel, q.count, l, r)
 
       extendToLevelDoubleBranch(parent, n)
     }
@@ -56,9 +56,9 @@ object QTreeMicroBenchmark {
 
       val parent =
         if (q.offset % 2 == 0)
-          new QTree[A](nextOffset, nextLevel, q.count, monoid.zero, q, null)
+          new QTree[A](monoid.zero, nextOffset, nextLevel, q.count, q, null)
         else
-          new QTree[A](nextOffset, nextLevel, q.count, monoid.zero, null, q)
+          new QTree[A](monoid.zero, nextOffset, nextLevel, q.count, null, q)
 
       extendToLevelSingleBranch(parent, n)
     }
