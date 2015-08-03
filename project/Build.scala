@@ -9,10 +9,21 @@ import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
 
 object AlgebirdBuild extends Build {
+
+  val paradiseVersion = "2.0.1"
+  val quasiquotesVersion = "2.0.1"
+
+  def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
+    case version if version startsWith "2.10" => "2.10"
+    case version if version startsWith "2.11" => "2.11"
+    case _ => sys.error("unknown error")
+  }
+  def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.10"
+
   val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     organization := "com.twitter",
     scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.10.5", "2.11.5"),
+    crossScalaVersions := Seq("2.10.5", "2.11.7"),
     ScalariformKeys.preferences := formattingPreferences,
 
     resolvers ++= Seq(
@@ -98,7 +109,7 @@ object AlgebirdBuild extends Build {
   def youngestForwardCompatible(subProj: String) =
     Some(subProj)
       .filterNot(unreleasedModules.contains(_))
-      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.10.2" }
+      .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.11.0" }
 
   lazy val algebird = Project(
     id = "algebird",
@@ -112,7 +123,8 @@ object AlgebirdBuild extends Build {
     algebirdTest,
     algebirdCore,
     algebirdUtil,
-    algebirdBijection
+    algebirdBijection,
+    algebirdSpark
   )
 
   def module(name: String) = {
@@ -128,17 +140,30 @@ object AlgebirdBuild extends Build {
     initialCommands := """
                        import com.twitter.algebird._
                        """.stripMargin('|'),
-    libraryDependencies += "com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    libraryDependencies <++= (scalaVersion) { scalaVersion =>
+      Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+          "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
+        if (isScala210x(scalaVersion))
+          Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
+        else
+          Seq()
+      }
+    },
     sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
       GenTupleAggregators.gen(outDir)
-    }
+    }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   )
 
   lazy val algebirdTest = module("test").settings(
-    libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.11.5",
-      "org.scalatest" %% "scalatest" % "2.2.2"
-    )
+    libraryDependencies <++= (scalaVersion) { scalaVersion =>
+      Seq("org.scalacheck" %% "scalacheck" % "1.11.5",
+          "org.scalatest" %% "scalatest" % "2.2.2") ++ {
+        if (isScala210x(scalaVersion))
+          Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
+        else
+          Seq()
+      }
+    }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   ).dependsOn(algebirdCore)
 
   /** Uses https://github.com/softprops/cappi#readme
@@ -159,6 +184,10 @@ object AlgebirdBuild extends Build {
 
   lazy val algebirdBijection = module("bijection").settings(
     libraryDependencies += "com.twitter" %% "bijection-core" % "0.8.0"
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
+
+  lazy val algebirdSpark = module("spark").settings(
+    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided"
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 }
 

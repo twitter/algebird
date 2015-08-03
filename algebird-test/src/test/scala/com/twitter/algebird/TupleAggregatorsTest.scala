@@ -340,18 +340,27 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
 
     val MinLongAgg = Aggregator.min[Int].andThenPresent{ _.toLong }
 
+    "Create an aggregator from 1 (key, aggregator) pair" in {
+      val agg: MapMonoidAggregator[Int, Long, String, Long] = MapAggregator(
+        ("key1", SizeAgg))
+      val expectedMap = Map("key1" -> 6)
+      assert(agg(data) == expectedMap)
+      assert(agg.keys == expectedMap.keys)
+    }
+
     "Create an aggregator from 2 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int, Tuple2[Int, Long], Map[String, Long]] = MapAggregator(
+      val agg: MapAggregator[Int, Tuple2[Int, Long], String, Long] = MapAggregator(
         ("key1", MinLongAgg),
         ("key2", SizeAgg))
       val expectedMap = Map(
         "key1" -> 0,
         "key2" -> 6)
       assert(agg(data) == expectedMap)
+      assert(agg.keys == expectedMap.keys)
     }
 
     "Create an aggregator from 3 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int, Tuple3[Int, Long, Int], Map[String, Long]] = MapAggregator(
+      val agg: MapAggregator[Int, Tuple3[Int, Long, Int], String, Long] = MapAggregator(
         ("key1", MinLongAgg),
         ("key2", SizeAgg),
         ("key3", MinLongAgg))
@@ -360,10 +369,11 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key2" -> 6,
         "key3" -> 0)
       assert(agg(data) == expectedMap)
+      assert(agg.keys == expectedMap.keys)
     }
 
     "Create an aggregator from 4 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int, Tuple4[Int, Long, Int, Long], Map[String, Long]] = MapAggregator(
+      val agg: MapAggregator[Int, Tuple4[Int, Long, Int, Long], String, Long] = MapAggregator(
         ("key1", MinLongAgg),
         ("key2", SizeAgg),
         ("key3", MinLongAgg),
@@ -374,6 +384,7 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key3" -> 0,
         "key4" -> 6)
       assert(agg(data) == expectedMap)
+      assert(agg.keys == expectedMap.keys)
     }
 
     "Create an aggregator from 5 (key, aggregator) pairs" in {
