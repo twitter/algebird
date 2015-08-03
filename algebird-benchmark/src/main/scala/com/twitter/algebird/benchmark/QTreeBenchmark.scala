@@ -80,17 +80,17 @@ class QTreeBenchmark {
 
   @Benchmark
   def timePlusUnit(state: QTreeState): QTree[Unit] = {
-    state.inputDataUnit.tail.foldLeft(state.inputDataUnit.head)(state.qtreeUnit.plus)
+    state.inputDataUnit.tail.reduce(state.qtreeUnit.plus)
   }
 
   @Benchmark
   def timePlusLong(state: QTreeState): QTree[Long] = {
-    state.inputDataLong.tail.foldLeft(state.inputDataLong.head)(state.qtreeLong.plus)
+    state.inputDataLong.tail.reduce(state.qtreeLong.plus)
   }
 
   @Benchmark
   def timePlusDouble(state: QTreeState): QTree[Double] = {
-    state.inputDataDouble.tail.foldLeft(state.inputDataDouble.head)(state.qtreeDouble.plus)
+    state.inputDataDouble.tail.reduce(state.qtreeDouble.plus)
   }
 
 }
