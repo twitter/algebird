@@ -1,49 +1,42 @@
 package com.twitter.algebird
 
-import org.scalacheck.Gen
+import org.scalacheck.{ Gen, Prop }
 
 trait ApproximateProperty {
-  type Params
   type Exact
   type Approx
   type Input
-  type ExactResult
-  type ApproximateResult
+  type Result
 
   def exactGenerator: Gen[Exact]
   def inputGenerator(e: Exact): Gen[Input]
 
-  def makeApproximate(p: Params, e: Exact): Approx
+  def makeApproximate(e: Exact): Approx
 
-  def exactResult(e: Exact, i: Input): ExactResult
-  def approximateResult(a: Approx, i: Input): ApproximateResult
-
-  def claimWithProbability(p: Params, e: ExactResult, a: ApproximateResult): (Boolean, Double)
+  def exactResult(e: Exact, i: Input): Result
+  def approximateResult(a: Approx, i: Input): Approximate[Result]
 }
 
-class CmsProperty[K: CMSHasher] extends ApproximateProperty {
-  // eps, delta, seed
-  case class CmsParams(eps: Double, delta: Double, seed: Int)
-  type Params = CmsParams
+object ApproximateProperty {
 
-  type Exact = List[K]
-  type Approx = CMS[K]
+  /**
+   *  Generates a stream of exactly n Ts.
+   *  Useful because `gen.apply` gives us Option[T], while we often want
+   *  List[T].
+   */
+  def genListOf[T](gen: Gen[T], n: Int): Stream[T] =
+    Stream.continually(()).map { _ => gen.apply(Gen.Parameters.default) }.flatten.take(n)
 
-  type Input = K
-  type ExactResult = Long
-  type ApproximateResult = Approximate[Long]
-
-  def exactGenerator: Gen[List[K]] = ???
-  def inputGenerator(e: List[K]): Gen[K] = ???
-
-  def makeApproximate(p: CmsParams, exact: List[K]) = {
-    val cmsMonoid = CMS.monoid(p.eps, p.delta, p.seed)
-    cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
+  def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
+    val successesAndProbabilities: Stream[(Int, Double)] = genListOf(a.exactGenerator, objectReps)
+      .flatMap { exact =>
+        val approx = a.makeApproximate(exact)
+        genListOf(a.inputGenerator(exact), inputReps).map { input =>
+          val approxResult = a.approximateResult(approx, input)
+          val exactResult = a.exactResult(exact, input)
+          val success = if (approxResult.boundsContain(exactResult)) 1 else 0
+          (success, approxResult.probWithinBounds)
+        }
+      }
   }
-
-  def exactResult(list: List[K], key: K) = list.filter(_ == key).length
-  def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
-
-  def claimWithProbability(p: CmsParams, e: Long, a: Approximate[Long]) =
-    (a.boundsContain(e), a.probWithinBounds)
 }
