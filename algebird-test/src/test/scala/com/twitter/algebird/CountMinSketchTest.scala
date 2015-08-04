@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Gen, Arbitrary, Properties }
 
 import CMSHasherImplicits._
 import CmsTestImplicits._
@@ -228,7 +228,7 @@ class CMSBigIntTest extends CMSTest[BigInt]
 class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
-class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
+abstract class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
   val delta = 1E-10
   val eps = 0.001
   val seed = 1
@@ -236,19 +236,35 @@ class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
   type Exact = List[K]
   type Approx = CMS[K]
 
-  type Input = K
-  type Result = Long
-
   def exactGenerator: Gen[List[K]] = Gen.listOf[K](implicitly[Gen[K]])
-  def inputGenerator(e: List[K]): Gen[K] = Gen.oneOf(e)
 
   def makeApproximate(exact: List[K]) = {
     val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
     cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
   }
+}
+
+class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
+  type Input = K
+  type Result = Long
+
+  def inputGenerator(e: List[K]): Gen[K] = Gen.oneOf(e)
 
   def exactResult(list: List[K], key: K) = list.filter(_ == key).length
   def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
+}
+
+class CmsProperties extends Properties("CountMinSketch") {
+  import ApproximateProperty.toProp
+
+  implicit val intGen = Gen.choose(1, 1000000)
+
+  property("yay") = true
+
+  property("CMS is good") = {
+    println("Hi")
+    toProp(new CmsFrequencyProperty[Int](), 10, 10, 0.01)
+  }
 }
 
 abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {

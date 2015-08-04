@@ -27,9 +27,8 @@ object ApproximateProperty {
   def genListOf[T](gen: Gen[T], n: Int): Stream[T] =
     Stream.continually(()).map { _ => gen.apply(Gen.Parameters.default) }.flatten.take(n)
 
-  def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
-    require(0 <= falsePositiveRate && falsePositiveRate <= 1)
-    val successesAndProbabilities: Stream[(Int, Double)] = genListOf(a.exactGenerator, objectReps)
+  private def successesAndProbabilities(a: ApproximateProperty, objectReps: Int, inputReps: Int): (Int, Double) = {
+    val stream: Stream[(Int, Double)] = genListOf(a.exactGenerator, objectReps)
       .flatMap { exact =>
         val approx = a.makeApproximate(exact)
         genListOf(a.inputGenerator(exact), inputReps).map { input =>
@@ -40,8 +39,29 @@ object ApproximateProperty {
         }
       }
     val monoid = implicitly[Monoid[(Int, Double)]]
-    val (successes, sumOfProbabilities) = monoid.sum(successesAndProbabilities)
-    val n = successesAndProbabilities.length
+    monoid.sum(stream)
+  }
+
+  def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
+    require(0 <= falsePositiveRate && falsePositiveRate <= 1)
+
+    val (successes, sumOfProbabilities) = successesAndProbabilities(a, objectReps, inputReps)
+    val n = objectReps * inputReps
+    (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
+  }
+
+  def toProp(a: Iterable[ApproximateProperty], objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
+    require(0 <= falsePositiveRate && falsePositiveRate <= 1)
+
+    val monoid = implicitly[Monoid[(Int, Double)]]
+    val (successes, sumOfProbabilities) = monoid.sum(a.map { approximateProp =>
+      successesAndProbabilities(approximateProp, objectReps, inputReps)
+    })
+    val n = objectReps * inputReps
+
+    println("Foo")
+    println(sumOfProbabilities - successes)
+
     (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
   }
 }
