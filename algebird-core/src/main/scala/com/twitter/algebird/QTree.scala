@@ -268,49 +268,32 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   def quantileBounds(p: Double): (Double, Double) = {
     require(p >= 0.0 && p <= 1.0, "The given percentile must be of the form 0 <= p <= 1.0")
 
-    val rank = math.floor(_count * p).toLong
-    // get is safe below, because findRankLowerBound only returns
-    // None if rank > count, but due to construction rank <= count
-    (findRankLowerBound(rank), findRankUpperBound(rank))
+    // rank is 0-indexed and 0 <= rank < count
+    val rank = math.floor(count * p).toLong.min(count - 1)
+
+    findRankBounds(rank)
   }
 
-  private def findRankLowerBound(rank: Long): java.lang.Double =
-    if (rank > _count)
-      null
-    else {
-      val childCounts = mapChildrenWithDefault(0L)(_.count)
-      val parentCount = _count - childCounts._1 - childCounts._2
-      val r2 = if (lowerChildNullable != null) lowerChildNullable.findRankLowerBound(rank - parentCount) else null
+  /**
+   * Precondition: 0 <= rank < count
+   */
+  private def findRankBounds(rank: Long): (Double, Double) = {
+    require(0 <= rank && rank < count)
 
-      if (r2 == null) {
-        val newRank = rank - childCounts._1 - parentCount
-        if (newRank <= 0)
-          lowerBound
-        else if (upperChildNullable != null)
-          upperChildNullable.findRankLowerBound(newRank)
-        else
-          null
-      } else r2
-    }
+    val (leftCount, rightCount) = mapChildrenWithDefault(0L)(_.count)
+    val parentCount = count - leftCount - rightCount
 
-  private def findRankUpperBound(rank: Long): java.lang.Double = {
-    if (rank > _count)
-      null
-    else {
-      val r = if (lowerChildNullable != null) {
-        lowerChildNullable.findRankUpperBound(rank)
-      } else null
-      if (r == null) {
-        val lowerCount = if (lowerChildNullable == null) 0L else lowerChildNullable.count
-
-        val r2: java.lang.Double = if (upperChildNullable != null) {
-          upperChildNullable.findRankUpperBound(rank - lowerCount)
-        } else null
-
-        if (r2 == null) {
-          upperBound
-        } else r2
-      } else r
+    if (rank < leftCount) {
+      // Note that 0 <= rank < leftCount because of the require above.
+      // So leftCount > 0, so lowerChild is not None.
+      lowerChild.get.findRankBounds(rank)
+    } else if (rank < leftCount + parentCount) {
+      // leftCount <= rank < leftCount + parentCount
+      (lowerBound, upperBound)
+    } else {
+      // Note that leftCount + parentCount <= rank < count.
+      // So rightCount > 0, so upperChild is not None.
+      upperChild.get.findRankBounds(rank - leftCount - parentCount)
     }
   }
 
