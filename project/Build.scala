@@ -4,9 +4,9 @@ import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
-import cappi.Plugin._
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform._
+import pl.project13.scala.sbt.JmhPlugin
 
 object AlgebirdBuild extends Build {
 
@@ -35,7 +35,7 @@ object AlgebirdBuild extends Build {
 
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-language:implicitConversions", "-language:higherKinds", "-language:existentials"),
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimize", "-Xlint", "-language:implicitConversions", "-language:higherKinds", "-language:existentials"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
         if (sv startsWith "2.10")
@@ -124,6 +124,7 @@ object AlgebirdBuild extends Build {
     algebirdCore,
     algebirdUtil,
     algebirdBijection,
+    algebirdBenchmark,
     algebirdSpark
   )
 
@@ -166,17 +167,9 @@ object AlgebirdBuild extends Build {
     }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
   ).dependsOn(algebirdCore)
 
-  /** Uses https://github.com/softprops/cappi#readme
-   * Note, a bug in cappi mis-reports the benchmark
-   * names.
-   *
-   * use cappi::benchmarkOnly com.twitter.algebird.caliper.HllBenchmark
-   */
-  lazy val algebirdCaliper = module("caliper").settings(
-     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.8.0"),
-      javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) },
-      fork in run := true
-    ).settings(cappiSettings : _*).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
+  lazy val algebirdBenchmark = module("benchmark").settings(JmhPlugin.projectSettings:_*).settings(
+     libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % "0.8.0")
+  ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile").enablePlugins(JmhPlugin)
 
   lazy val algebirdUtil = module("util").settings(
     libraryDependencies += "com.twitter" %% "util-core" % "6.20.0"
