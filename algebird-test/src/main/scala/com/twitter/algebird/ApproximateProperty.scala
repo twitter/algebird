@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import org.scalacheck.{ Gen, Prop }
+import org.scalacheck.util.Pretty
 
 trait ApproximateProperty {
   type Exact
@@ -20,18 +21,22 @@ trait ApproximateProperty {
 object ApproximateProperty {
 
   /**
-   *  Generates a stream of exactly n Ts.
-   *  Useful because `gen.apply` gives us Option[T], while we often want
-   *  List[T].
+   *  Generates a list of exactly n Ts.
+   *  Useful because `Gen.listOfN(n, gen).sample` gives us Option[List[T]],
+   *  while we often want List[T].
    */
-  def genListOf[T](gen: Gen[T], n: Int): Stream[T] =
-    Stream.continually(()).map { _ => gen.apply(Gen.Parameters.default) }.flatten.take(n)
+  private def genListOf[T](n: Int, gen: Gen[T]): List[T] = {
+    Gen.listOfN(n, gen).sample match {
+      case Some(xs) => xs
+      case _ => genListOf(n, gen)
+    }
+  }
 
   private def successesAndProbabilities(a: ApproximateProperty, objectReps: Int, inputReps: Int): (Int, Double) = {
-    val stream: Stream[(Int, Double)] = genListOf(a.exactGenerator, objectReps)
+    val list = genListOf(objectReps, a.exactGenerator)
       .flatMap { exact =>
         val approx = a.makeApproximate(exact)
-        genListOf(a.inputGenerator(exact), inputReps).map { input =>
+        genListOf(inputReps, a.inputGenerator(exact)).map { input =>
           val approxResult = a.approximateResult(approx, input)
           val exactResult = a.exactResult(exact, input)
           val success = if (approxResult.boundsContain(exactResult)) 1 else 0
@@ -39,16 +44,34 @@ object ApproximateProperty {
         }
       }
     val monoid = implicitly[Monoid[(Int, Double)]]
-    monoid.sum(stream)
+    monoid.sum(list)
   }
 
-  def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
-    require(0 <= falsePositiveRate && falsePositiveRate <= 1)
+  def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop =
+    new Prop {
+      def apply(params: Gen.Parameters) = {
+        require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
-    val (successes, sumOfProbabilities) = successesAndProbabilities(a, objectReps, inputReps)
-    val n = objectReps * inputReps
-    (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
-  }
+        val (successes, sumOfProbabilities) = successesAndProbabilities(a, objectReps, inputReps)
+        val n = objectReps * inputReps
+
+        // Computed from Hoeffding's inequality, might be inaccurate
+        // TODO Make sure this is correct
+        val diff = scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
+
+        val args = List(("Successes", successes),
+          ("Expected successes", sumOfProbabilities),
+          ("Requires successes", sumOfProbabilities - diff))
+          .map {
+            case (name, value) =>
+              Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
+          }
+
+        val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
+
+        Prop.Result(success, args = args)
+      }
+    }
 
   def toProp(a: Iterable[ApproximateProperty], objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
     require(0 <= falsePositiveRate && falsePositiveRate <= 1)

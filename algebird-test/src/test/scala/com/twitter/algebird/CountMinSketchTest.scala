@@ -236,17 +236,29 @@ abstract class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
   type Exact = List[K]
   type Approx = CMS[K]
 
-  def exactGenerator: Gen[List[K]] = Gen.listOf[K](implicitly[Gen[K]])
-
   def makeApproximate(exact: List[K]) = {
     val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
     cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
   }
 }
 
-class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
+class CmsSmallFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   type Input = K
   type Result = Long
+
+  def exactGenerator: Gen[List[K]] = Gen.listOf[K](implicitly[Gen[K]])
+
+  def inputGenerator(e: List[K]): Gen[K] = Gen.oneOf(e)
+
+  def exactResult(list: List[K], key: K) = list.filter(_ == key).length
+  def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
+}
+
+class CmsLargeFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
+  type Input = K
+  type Result = Long
+
+  def exactGenerator: Gen[List[K]] = Gen.listOfN[K](10000, implicitly[Gen[K]])
 
   def inputGenerator(e: List[K]): Gen[K] = Gen.oneOf(e)
 
@@ -257,14 +269,13 @@ class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
 class CmsProperties extends Properties("CountMinSketch") {
   import ApproximateProperty.toProp
 
-  implicit val intGen = Gen.choose(1, 1000000)
+  implicit val intGen = Gen.choose(1, 100)
 
   property("yay") = true
 
-  property("CMS is good") = {
-    println("Hi")
-    toProp(new CmsFrequencyProperty[Int](), 10, 10, 0.01)
-  }
+  property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
+
+  property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
 }
 
 abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
