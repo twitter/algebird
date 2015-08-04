@@ -93,4 +93,13 @@ class QTreeBenchmark {
     state.inputDataDouble.tail.reduce(state.qtreeDouble.plus)
   }
 
+  @Benchmark
+  def timeQuantileBounds(state: QTreeState) = {
+    state.inputDataUnit.map(_.quantileBounds(0))
+    state.inputDataUnit.map(_.quantileBounds(0.25))
+    state.inputDataUnit.map(_.quantileBounds(0.5))
+    state.inputDataUnit.map(_.quantileBounds(0.75))
+    state.inputDataUnit.map(_.quantileBounds(1))
+  }
+
 }
