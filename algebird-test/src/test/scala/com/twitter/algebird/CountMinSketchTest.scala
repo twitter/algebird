@@ -229,9 +229,9 @@ class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
 class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
-  val eps = 0.05
-  val delta = 0.05
-  val seed = 123
+  val delta = 1E-10
+  val eps = 0.001
+  val seed = 1
 
   type Exact = List[K]
   type Approx = CMS[K]
@@ -243,7 +243,7 @@ class CmsProperty[K: CMSHasher: Gen] extends ApproximateProperty {
   def inputGenerator(e: List[K]): Gen[K] = Gen.oneOf(e)
 
   def makeApproximate(exact: List[K]) = {
-    val cmsMonoid = CMS.monoid(eps, delta, seed)
+    val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
     cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
   }
 

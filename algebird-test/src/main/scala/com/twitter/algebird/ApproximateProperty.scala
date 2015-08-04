@@ -28,6 +28,7 @@ object ApproximateProperty {
     Stream.continually(()).map { _ => gen.apply(Gen.Parameters.default) }.flatten.take(n)
 
   def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
+    require(0 <= falsePositiveRate && falsePositiveRate <= 1)
     val successesAndProbabilities: Stream[(Int, Double)] = genListOf(a.exactGenerator, objectReps)
       .flatMap { exact =>
         val approx = a.makeApproximate(exact)
@@ -38,5 +39,9 @@ object ApproximateProperty {
           (success, approxResult.probWithinBounds)
         }
       }
+    val monoid = implicitly[Monoid[(Int, Double)]]
+    val (successes, sumOfProbabilities) = monoid.sum(successesAndProbabilities)
+    val n = successesAndProbabilities.length
+    (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
   }
 }
