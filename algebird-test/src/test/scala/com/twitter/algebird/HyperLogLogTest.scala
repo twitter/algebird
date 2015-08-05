@@ -148,7 +148,7 @@ class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) ex
 
   def approximateResult(hlls: Seq[HLL], i: Unit) = monoid.intersectionSize(hlls)
 
-  def exactResult(it: Seq[Seq[T]], i: Unit) = it.flatten.toSet.size
+  def exactResult(it: Seq[Seq[T]], i: Unit) = it.reduce(_ intersect _).size
 }
 
 class HLLProperties extends Properties("HyperLogLog") {
@@ -177,11 +177,11 @@ class HLLProperties extends Properties("HyperLogLog") {
     toProp(new HLLCountProperty[Int](10), 10, 10, 0.01)
 
   property("Intersect 2 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 2), 10, 10, 0.01)
+    toProp(new HLLIntersectionProperty[Int](10, 2), 100, 1, 0.01)
   property("Intersect 3 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 3), 10, 10, 0.01)
+    toProp(new HLLIntersectionProperty[Int](10, 3), 100, 1, 0.01)
   property("Intersect 4 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 4), 10, 10, 0.01)
+    toProp(new HLLIntersectionProperty[Int](10, 4), 100, 1, 0.01)
 
   property("Downsize sparse HLLs from 10 bits to 7 bits") =
     toProp(new HLLDownsizeCountProperty[Long](10, 10, 7), 10, 10, 0.01)
