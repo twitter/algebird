@@ -89,7 +89,7 @@ package com.twitter.algebird
  *        (an interval that depends on `eps`) around the truth.
  * @param seed  A seed to initialize the random number generator used to create the pairwise independent
  *        hash functions.
- * @param
+ * @param maxExactCountOpt An Option parameter about how many exact counts a sparse CMS wants to keep.
  * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
  *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
  *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
@@ -152,6 +152,7 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
  * @param delta A bound on the probability that a query estimate does not lie within some small interval
  *              (an interval that depends on `eps`) around the truth.
+ * @param maxExactCountOpt An Option parameter about how many exact counts a sparse CMS wants to keep.
  * @tparam K The type used to identify the elements to be counted.
  */
 case class CMSParams[K](hashes: Seq[CMSHash[K]], eps: Double, delta: Double, maxExactCountOpt: Option[Int] = None) {
@@ -501,7 +502,7 @@ case class SparseCMS[K](exactCountTable: Map[K, Long],
       case other: CMSItem[K] => this + (other.item, other.totalCount)
       case other: SparseCMS[K] =>
         // This SparseCMS's maxExactCount is used, so ++ is not communitive
-        val newTable = exactCountTable ++ other.exactCountTable
+        val newTable = Semigroup.plus(exactCountTable, other.exactCountTable)
         if (newTable.size < maxExactCount) {
           // still sparse
           SparseCMS(newTable, totalCount = totalCount + other.totalCount, params = params)

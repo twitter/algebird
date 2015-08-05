@@ -116,6 +116,25 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
 
 }
 
+class SparseCMSTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import BaseProperties._
+
+  val DELTA = 1E-8
+  val EPS = 0.005
+  val SEED = 1
+
+  "correctly count SparseCMS numbers" in {
+    val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
+    val cmsZero = cmsMonoid.zero
+    val cms1 = cmsZero + (1, 100) + (1, 200)
+    cms1.frequency(1).estimate should be(300)
+    val cms2 = cmsZero + (1, 100) + (2, 100)
+    val cms3 = cms1 ++ cms2
+    cms3.frequency(1).estimate should be(400)
+  }
+}
+
 class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import BaseProperties._
