@@ -228,11 +228,7 @@ class CMSBigIntTest extends CMSTest[BigInt]
 class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
-abstract class CmsProperty[K] extends ApproximateProperty {
-  val delta = 1E-10
-  val eps = 0.001
-  val seed = 1
-}
+abstract class CmsProperty[K] extends ApproximateProperty
 
 object CmsProperty {
   val delta = 1E-10
@@ -301,10 +297,7 @@ class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(exact: Vector[K]): CMS[K] = {
-    val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
-    cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
-  }
+  def makeApproximate(exact: Vector[K]) = CmsProperty.makeApproximate(exact)
 
   def exactGenerator: Gen[Vector[K]] = Gen.containerOfN[Vector, K](10000, implicitly[Gen[K]])
 
@@ -321,11 +314,8 @@ class CmsProperties extends Properties("CountMinSketch") {
   implicit val intGen = Gen.choose(1, 100)
 
   property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
-
   property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
-
   property("CMS inner product works") = toProp(new CmsInnerProductProperty[Int](), 10, 10, 0.01)
-
   property("CMS counts total count") = toProp(new CmsTotalCountProperty[Int](), 10, 10, 0.01)
 }
 

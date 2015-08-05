@@ -64,7 +64,7 @@ class HyperLogLogLaws extends CheckProperties {
   property("bitsForError and error match") {
     Prop.forAll(Gen.choose(0.0001, 0.999)) { err =>
       val bits = HyperLogLog.bitsForError(err)
-      (HyperLogLog.error(bits) <= err) && (HyperLogLog.error(bits - 1) > err)
+      HyperLogLog.error(bits) <= err && err < HyperLogLog.error(bits - 1)
     }
   }
 
@@ -93,6 +93,26 @@ class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
       assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
     }
   }
+}
+
+abstract class HyperLogLogProperty extends ApproximateProperty
+
+class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProperty {
+  type Exact = Iterable[T]
+  type Approx = HLL
+
+  type Input = Unit
+  type Result = Long
+
+  val monoid = new HyperLogLogMonoid(bits)
+
+  def makeApproximate(it: Iterable[T]) = monoid.sum(it.map { monoid.create(_) })
+
+  def exactGenerator = Gen.containerOf[Vector, T](implicitly[Gen[T]])
+
+  def inputGenerator(it: Exact) = Gen.const(())
+  def approximateResult(a: HLL, i: Unit) = monoid.sizeOf(a)
+  def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
 }
 
 class HyperLogLogTest extends WordSpec with Matchers {
