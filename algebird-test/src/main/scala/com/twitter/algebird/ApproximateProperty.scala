@@ -65,6 +65,7 @@ object ApproximateProperty {
 
         val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
 
+        // Args that get printed when Scalacheck runs the test
         val argsList = List(("Successes", successes),
           ("Expected successes", "%.2f".format(sumOfProbabilities)),
           ("Required successes", "%.2f".format(sumOfProbabilities - diff))) ++
@@ -79,6 +80,12 @@ object ApproximateProperty {
       }
     }
 
+  /**
+   * Converts a list of ApproximateProperties to a scalacheck Prop that
+   * fails if too many of the ApproximateProperties fail.
+   * TODO use `new Prop` like the above `toProp` method so that we can
+   * have useful error messages.
+   */
   def toProp(a: Iterable[ApproximateProperty], objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
     require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
@@ -87,9 +94,6 @@ object ApproximateProperty {
       successesAndProbabilities(approximateProp, objectReps, inputReps)
     })
     val n = objectReps * inputReps
-
-    println("Foo")
-    println(sumOfProbabilities - successes)
 
     (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
   }
