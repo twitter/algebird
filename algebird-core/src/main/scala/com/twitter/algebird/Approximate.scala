@@ -107,10 +107,10 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
       this
     } else {
       val n = numeric
-      val ends = for (
-        leftv <- List(min, max);
+      val ends = for {
+        leftv <- List(min, max)
         rightv <- List(right.min, right.max)
-      ) yield n.times(leftv, rightv)
+      } yield n.times(leftv, rightv)
 
       val newProb = probWithinBounds * right.probWithinBounds
 
@@ -153,7 +153,7 @@ object Approximate {
   // Not a group/ring:
   // negate fails: x - x != 0, because with some probability the bound is bad.
   // distributive fails because a*b + a*c ignores that a is either in or out
-  // of the bound, and counts it idependently.
+  // of the bound, and counts it independently.
   implicit def monoid[N](implicit n: Numeric[N]): Monoid[Approximate[N]] = {
     // avoid capturing the Numeric:
     val z = Approximate.zero[N]

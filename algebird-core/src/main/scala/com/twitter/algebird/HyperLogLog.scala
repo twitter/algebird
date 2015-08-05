@@ -57,7 +57,7 @@ object HyperLogLog {
     buf
   }
 
-  implicit def int2Bytes(i: Int) = {
+  implicit def int2Bytes(i: Int): Array[Byte] = {
     val buf = new Array[Byte](4)
     ByteBuffer
       .wrap(buf)
@@ -65,7 +65,7 @@ object HyperLogLog {
     buf
   }
 
-  implicit def long2Bytes(i: Long) = {
+  implicit def long2Bytes(i: Long): Array[Byte] = {
     val buf = new Array[Byte](8)
     ByteBuffer
       .wrap(buf)

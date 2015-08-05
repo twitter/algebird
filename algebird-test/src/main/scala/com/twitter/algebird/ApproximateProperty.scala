@@ -60,8 +60,8 @@ object ApproximateProperty {
         val diff = scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
 
         val args = List(("Successes", successes),
-          ("Expected successes", sumOfProbabilities),
-          ("Required successes", sumOfProbabilities - diff))
+          ("Expected successes", "%.2f".format(sumOfProbabilities)),
+          ("Required successes", "%.2f".format(sumOfProbabilities - diff)))
           .map {
             case (name, value) =>
               Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))

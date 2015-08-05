@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary, Prop }
+import org.scalacheck.{ Gen, Arbitrary, Prop, Properties }
 
 import scala.collection.BitSet
 
@@ -104,6 +104,8 @@ class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProp
   type Input = Unit
   type Result = Long
 
+  def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
+
   val monoid = new HyperLogLogMonoid(bits)
 
   def makeApproximate(it: Iterable[T]) = monoid.sum(it.map { monoid.create(_) })
@@ -113,6 +115,81 @@ class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProp
   def inputGenerator(it: Exact) = Gen.const(())
   def approximateResult(a: HLL, i: Unit) = monoid.sizeOf(a)
   def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
+}
+
+class HLLDownsizeCountProperty[T <% Array[Byte]: Gen](numItems: Int, oldBits: Int, newBits: Int) extends HLLCountProperty[T](oldBits) {
+
+  override def exactGenerator = Gen.containerOfN[Vector, T](numItems, implicitly[Gen[T]])
+
+  override def approximateResult(a: HLL, i: Unit) = monoid.sizeOf(a.downsize(newBits))
+}
+
+class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty {
+  type Exact = Seq[T]
+  type Approx = Seq[HLL]
+
+  type Input = Unit
+  type Result = Long
+
+  val monoid = new HyperLogLogMonoid(bits)
+
+  def makeApproximate(it: Seq[T]) = it.map { monoid.create(_) }
+
+  def exactGenerator = Gen.containerOfN[Vector, T](numHlls, implicitly[Gen[T]])
+
+  def inputGenerator(it: Exact) = Gen.const(())
+
+  def approximateResult(hlls: Seq[HLL], i: Unit) = monoid.intersectionSize(hlls)
+
+  def exactResult(it: Seq[T], i: Unit) = it.toSet.size
+}
+
+class HLLProperties extends Properties("HyperLogLog") {
+  import ApproximateProperty.toProp
+  import HyperLogLog.{ int2Bytes, long2Bytes }
+
+  implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
+  implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
+
+  property("Count ints with 5 bits") =
+    toProp(new HLLCountProperty[Int](5), 10, 10, 0.01)
+  property("Count ints with 6 bits") =
+    toProp(new HLLCountProperty[Int](6), 10, 10, 0.01)
+  property("Count ints with 7 bits") =
+    toProp(new HLLCountProperty[Int](7), 10, 10, 0.01)
+  property("Count ints with 10 bits") =
+    toProp(new HLLCountProperty[Int](10), 10, 10, 0.01)
+
+  property("Count longs with 5 bits") =
+    toProp(new HLLCountProperty[Int](5), 10, 10, 0.01)
+  property("Count longs with 6 bits") =
+    toProp(new HLLCountProperty[Int](6), 10, 10, 0.01)
+  property("Count longs with 7 bits") =
+    toProp(new HLLCountProperty[Int](7), 10, 10, 0.01)
+  property("Count longs with 10 bits") =
+    toProp(new HLLCountProperty[Int](10), 10, 10, 0.01)
+
+  property("Intersect 2 HLLs with 10 bits") =
+    toProp(new HLLIntersectionProperty[Int](10, 2), 10, 10, 0.01)
+  property("Intersect 3 HLLs with 10 bits") =
+    toProp(new HLLIntersectionProperty[Int](10, 3), 10, 10, 0.01)
+  property("Intersect 3 HLLs with 10 bits") =
+    toProp(new HLLIntersectionProperty[Int](10, 4), 10, 10, 0.01)
+
+  property("Downsize sparse HLLs from 10 bits to 7 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10, 10, 7), 10, 10, 0.01)
+  property("Downsize sparse HLLs from 14 bits to 4 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10, 14, 4), 10, 10, 0.01)
+  property("Downsize sparse HLLs from 12 bits to 12 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10, 12, 12), 10, 10, 0.01)
+
+  property("Downsize dense HLLs from 10 bits to 7 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10000, 10, 7), 10, 10, 0.01)
+  property("Downsize dense HLLs from 14 bits to 4 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10000, 14, 4), 10, 10, 0.01)
+  property("Downsize dense HLLs from 12 bits to 12 bits") =
+    toProp(new HLLDownsizeCountProperty[Long](10000, 12, 12), 10, 10, 0.01)
+
 }
 
 class HyperLogLogTest extends WordSpec with Matchers {
@@ -129,35 +206,6 @@ class HyperLogLogTest extends WordSpec with Matchers {
 
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
 
-  def exactIntersect[T](it: Seq[Iterable[T]]): Int = {
-    it.foldLeft(Set[T]()) { (old, newS) => old ++ (newS.toSet) }.size
-  }
-  def approxIntersect[T <% Array[Byte]](bits: Int, it: Seq[Iterable[T]]): Double = {
-    val hll = new HyperLogLogMonoid(bits)
-    //Map each iterable to a HLL instance:
-    val seqHlls = it.map { iter => hll.sum(iter.view.map { hll.create(_) }) }
-    hll.intersectionSize(seqHlls).estimate.toDouble
-  }
-
-  def test(bits: Int) {
-    val data = (0 to 10000).map { i => r.nextInt(1000) }
-    val exact = exactCount(data).toDouble
-    assert(scala.math.abs(exact - approxCount(bits, data)) / exact < 3.5 * aveErrorOf(bits))
-  }
-  def testLong(bits: Int) {
-    val data = (0 to 10000).map { i => r.nextLong }
-    val exact = exactCount(data).toDouble
-    assert(scala.math.abs(exact - approxCount(bits, data)) / exact < 3.5 * aveErrorOf(bits))
-  }
-  def testLongIntersection(bits: Int, sets: Int) {
-    val data: Seq[Iterable[Int]] = (0 until sets).map { idx =>
-      (0 to 1000).map { i => r.nextInt(100) }
-    }.toSeq
-    val exact = exactIntersect(data)
-    val errorMult = scala.math.pow(2.0, sets) - 1.0
-    assert(scala.math.abs(exact - approxIntersect(bits, data)) / exact < errorMult *
-      aveErrorOf(bits))
-  }
   def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
     val data = (0 until dataSize).map { i => r.nextLong }
     val exact = exactCount(data).toDouble
@@ -168,26 +216,6 @@ class HyperLogLogTest extends WordSpec with Matchers {
   }
 
   "HyperLogLog" should {
-    "count with 5-bits" in {
-      test(5)
-      testLong(5)
-    }
-    "count with 6-bits" in {
-      test(6)
-      testLong(6)
-    }
-    "count with 7-bits" in {
-      test(7)
-      testLong(7)
-    }
-    "count with 10-bits" in {
-      test(10)
-      testLong(10)
-    }
-    "count intersections of 2" in { testLongIntersection(10, 2) }
-    "count intersections of 3" in { testLongIntersection(10, 3) }
-    "count intersections of 4" in { testLongIntersection(10, 4) }
-
     "throw error for differently sized HLL instances" in {
       val bigMon = new HyperLogLogMonoid(5)
       val smallMon = new HyperLogLogMonoid(4)
@@ -271,10 +299,6 @@ class HyperLogLogTest extends WordSpec with Matchers {
     }
 
     "correctly downsize sparse HLL" in {
-      testDownsize(10)(10, 7)
-      testDownsize(10)(14, 4)
-      testDownsize(10)(12, 12)
-
       intercept[IllegalArgumentException] {
         testDownsize(10)(9, 13)
       }
@@ -284,10 +308,6 @@ class HyperLogLogTest extends WordSpec with Matchers {
     }
 
     "correctly downsize dense HLL" in {
-      testDownsize(10000)(10, 7)
-      testDownsize(10000)(14, 4)
-      testDownsize(10000)(12, 12)
-
       intercept[IllegalArgumentException] {
         testDownsize(10000)(9, 13)
       }
