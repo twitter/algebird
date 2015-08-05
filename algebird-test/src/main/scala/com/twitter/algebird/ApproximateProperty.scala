@@ -61,7 +61,7 @@ object ApproximateProperty {
 
         val args = List(("Successes", successes),
           ("Expected successes", sumOfProbabilities),
-          ("Requires successes", sumOfProbabilities - diff))
+          ("Required successes", sumOfProbabilities - diff))
           .map {
             case (name, value) =>
               Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
