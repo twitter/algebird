@@ -159,23 +159,25 @@ class HLLProperties extends Properties("HyperLogLog") {
   implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
   property("Count ints with 5 bits") =
-    toProp(new HLLCountProperty[Int](5), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](5), 100, 1, 0.01)
   property("Count ints with 6 bits") =
-    toProp(new HLLCountProperty[Int](6), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](6), 100, 1, 0.01)
   property("Count ints with 7 bits") =
-    toProp(new HLLCountProperty[Int](7), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](7), 100, 1, 0.01)
   property("Count ints with 10 bits") =
-    toProp(new HLLCountProperty[Int](10), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](10), 100, 1, 0.01)
 
   property("Count longs with 5 bits") =
-    toProp(new HLLCountProperty[Int](5), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](5), 100, 1, 0.01)
   property("Count longs with 6 bits") =
-    toProp(new HLLCountProperty[Int](6), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](6), 100, 1, 0.01)
   property("Count longs with 7 bits") =
-    toProp(new HLLCountProperty[Int](7), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](7), 100, 1, 0.01)
   property("Count longs with 10 bits") =
-    toProp(new HLLCountProperty[Int](10), 10, 10, 0.01)
+    toProp(new HLLCountProperty[Int](10), 100, 1, 0.01)
 
+  property("Intersect 1 HLLs with 10 bits") =
+    toProp(new HLLIntersectionProperty[Int](10, 1), 100, 1, 0.01)
   property("Intersect 2 HLLs with 10 bits") =
     toProp(new HLLIntersectionProperty[Int](10, 2), 100, 1, 0.01)
   property("Intersect 3 HLLs with 10 bits") =
@@ -196,6 +198,15 @@ class HLLProperties extends Properties("HyperLogLog") {
     toProp(new HLLDownsizeCountProperty[Long](10000, 14, 4), 10, 10, 0.01)
   property("Downsize dense HLLs from 12 bits to 12 bits") =
     toProp(new HLLDownsizeCountProperty[Long](10000, 12, 12), 10, 10, 0.01)
+
+  property("Intersection of a list containing one HLL is the same as that HLL's size") = {
+    val monoid = new HyperLogLogMonoid(10)
+
+    val exact = Gen.containerOfN[Vector, Long](1000, longGen).sample.get
+    val approx = monoid.sum(exact.map { monoid.create(_) })
+
+    monoid.sizeOf(approx) == monoid.intersectionSize(List(approx))
+  }
 
 }
 
