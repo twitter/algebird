@@ -125,7 +125,7 @@ class HLLDownsizeCountProperty[T <% Array[Byte]: Gen](numItems: Int, oldBits: In
 }
 
 class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty {
-  type Exact = Seq[T]
+  type Exact = Seq[Seq[T]]
   type Approx = Seq[HLL]
 
   type Input = Unit
@@ -133,15 +133,22 @@ class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) ex
 
   val monoid = new HyperLogLogMonoid(bits)
 
-  def makeApproximate(it: Seq[T]) = it.map { monoid.create(_) }
+  def makeApproximate(it: Seq[Seq[T]]) =
+    it.map { xs =>
+      monoid.sum(xs.map { monoid.create(_) })
+    }
 
-  def exactGenerator = Gen.containerOfN[Vector, T](numHlls, implicitly[Gen[T]])
+  def exactGenerator: Gen[Seq[Seq[T]]] = {
+    val vectorGenerator: Gen[Seq[T]] =
+      Gen.containerOfN[Vector, T](1000, implicitly[Gen[T]])
+    Gen.containerOfN[Vector, Seq[T]](numHlls, vectorGenerator)
+  }
 
   def inputGenerator(it: Exact) = Gen.const(())
 
   def approximateResult(hlls: Seq[HLL], i: Unit) = monoid.intersectionSize(hlls)
 
-  def exactResult(it: Seq[T], i: Unit) = it.toSet.size
+  def exactResult(it: Seq[Seq[T]], i: Unit) = it.flatten.toSet.size
 }
 
 class HLLProperties extends Properties("HyperLogLog") {
@@ -173,7 +180,7 @@ class HLLProperties extends Properties("HyperLogLog") {
     toProp(new HLLIntersectionProperty[Int](10, 2), 10, 10, 0.01)
   property("Intersect 3 HLLs with 10 bits") =
     toProp(new HLLIntersectionProperty[Int](10, 3), 10, 10, 0.01)
-  property("Intersect 3 HLLs with 10 bits") =
+  property("Intersect 4 HLLs with 10 bits") =
     toProp(new HLLIntersectionProperty[Int](10, 4), 10, 10, 0.01)
 
   property("Downsize sparse HLLs from 10 bits to 7 bits") =
