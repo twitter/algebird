@@ -61,7 +61,7 @@ object ApproximateProperty {
 
         // Computed from Hoeffding's inequality, might be inaccurate
         // TODO Make sure this is correct
-        val diff = scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
+        val diff = scala.math.sqrt(-n * scala.math.log(falsePositiveRate) / 2.0)
 
         val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
 

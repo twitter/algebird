@@ -148,7 +148,7 @@ class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) ex
 
   def approximateResult(hlls: Seq[HLL], i: Unit) = monoid.intersectionSize(hlls)
 
-  def exactResult(it: Seq[Seq[T]], i: Unit) = it.reduce(_ intersect _).size
+  def exactResult(it: Seq[Seq[T]], i: Unit) = it.map(_.toSet).reduce(_ intersect _).size
 }
 
 class HLLProperties extends Properties("HyperLogLog") {
@@ -198,15 +198,6 @@ class HLLProperties extends Properties("HyperLogLog") {
     toProp(new HLLDownsizeCountProperty[Long](10000, 14, 4), 10, 10, 0.01)
   property("Downsize dense HLLs from 12 bits to 12 bits") =
     toProp(new HLLDownsizeCountProperty[Long](10000, 12, 12), 10, 10, 0.01)
-
-  property("Intersection of a list containing one HLL is the same as that HLL's size") = {
-    val monoid = new HyperLogLogMonoid(10)
-
-    val exact = Gen.containerOfN[Vector, Long](1000, longGen).sample.get
-    val approx = monoid.sum(exact.map { monoid.create(_) })
-
-    monoid.sizeOf(approx) == monoid.intersectionSize(List(approx))
-  }
 
 }
 
