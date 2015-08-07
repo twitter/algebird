@@ -369,14 +369,19 @@ trait CMSHeavyHitters[K] {
 
 object CMS {
 
-  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed, maxExactCountOpt)
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] = monoid(eps, delta, seed, None)
+  def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int]): CMSMonoid[K] = new CMSMonoid[K](eps, delta, seed, maxExactCountOpt)
 
+  def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] = monoid(depth, width, seed, None)
   def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int, maxExactCountOpt: Option[Int]): CMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, maxExactCountOpt)
 
-  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] = aggregator(eps, delta, seed, None)
+  def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int]): CMSAggregator[K] =
     new CMSAggregator[K](monoid(eps, delta, seed, maxExactCountOpt))
 
+  def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
+    aggregator(depth, width, seed, None)
   def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int, maxExactCountOpt: Option[Int]): CMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, maxExactCountOpt)
 
