@@ -95,25 +95,26 @@ class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
   }
 }
 
-abstract class HyperLogLogProperty extends ApproximateProperty
+abstract class HyperLogLogProperty(bits: Int) extends ApproximateProperty {
+  val monoid = new HyperLogLogMonoid(bits)
 
-class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProperty {
+  def iterableToHLL[T <% Array[Byte]](it: Iterable[T]): HLL =
+    monoid.sum(it.map(monoid.create(_)))
+}
+
+class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProperty(bits) {
   type Exact = Iterable[T]
   type Approx = HLL
 
   type Input = Unit
   type Result = Long
 
-  def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
-
-  val monoid = new HyperLogLogMonoid(bits)
-
-  def makeApproximate(it: Iterable[T]) = monoid.sum(it.map { monoid.create(_) })
+  def makeApproximate(it: Iterable[T]) = iterableToHLL(it)
 
   def exactGenerator = Gen.containerOf[Vector, T](implicitly[Gen[T]])
 
   def inputGenerator(it: Exact) = Gen.const(())
-  def approximateResult(a: HLL, i: Unit) = monoid.sizeOf(a)
+  def approximateResult(a: HLL, i: Unit) = a.approximateSize
   def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
 }
 
@@ -121,22 +122,18 @@ class HLLDownsizeCountProperty[T <% Array[Byte]: Gen](numItems: Int, oldBits: In
 
   override def exactGenerator = Gen.containerOfN[Vector, T](numItems, implicitly[Gen[T]])
 
-  override def approximateResult(a: HLL, i: Unit) = monoid.sizeOf(a.downsize(newBits))
+  override def approximateResult(a: HLL, i: Unit) =
+    a.downsize(newBits).approximateSize
 }
 
-class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty {
+class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty(bits) {
   type Exact = Seq[Seq[T]]
   type Approx = Seq[HLL]
 
   type Input = Unit
   type Result = Long
 
-  val monoid = new HyperLogLogMonoid(bits)
-
-  def makeApproximate(it: Seq[Seq[T]]) =
-    it.map { xs =>
-      monoid.sum(xs.map { monoid.create(_) })
-    }
+  def makeApproximate(it: Seq[Seq[T]]) = it.map { iterableToHLL(_) }
 
   def exactGenerator: Gen[Seq[Seq[T]]] = {
     val vectorGenerator: Gen[Seq[T]] =
@@ -151,6 +148,51 @@ class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) ex
   def exactResult(it: Seq[Seq[T]], i: Unit) = it.map(_.toSet).reduce(_ intersect _).size
 }
 
+/**
+ * SetSizeAggregator should work as an aggregator and return
+ * approximate size when > maxSetSize
+ */
+abstract class SetSizeAggregatorProperty[T <% Array[Byte]](bits: Int) extends ApproximateProperty {
+  type Exact = Set[T]
+  type Approx = Long
+
+  type Input = Unit
+  type Result = Double
+
+  val maxSetSize = 10000
+
+  def makeApproximate(s: Set[T]): Long =
+    SetSizeAggregator[T](bits, maxSetSize).apply(s)
+
+  def inputGenerator(it: Exact) = Gen.const(())
+
+  def exactResult(set: Set[T], i: Unit) = set.size
+}
+
+class SmallSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+  def exactGenerator: Gen[Set[T]] =
+    for {
+      size <- Gen.choose(maxSetSize + 1, maxSetSize * 2)
+      set <- Gen.containerOfN[Set, T](size, implicitly[Gen[T]])
+    } yield set
+
+  def approximateResult(aggResult: Long, i: Unit) =
+    Approximate.exact(aggResult.toDouble)
+}
+
+class LargeSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+  def exactGenerator: Gen[Set[T]] =
+    for {
+      size <- Gen.choose(1, maxSetSize)
+      set <- Gen.containerOfN[Set, T](size, implicitly[Gen[T]])
+    } yield set
+
+  def approximateResult(aggResult: Long, i: Unit) = {
+    val error = 1.04 / scala.math.sqrt(1 << bits)
+    Approximate[Double](aggResult - error, aggResult, aggResult + error, 0.9972)
+  }
+}
+
 class HLLProperties extends Properties("HyperLogLog") {
   import ApproximateProperty.toProp
   import HyperLogLog.{ int2Bytes, long2Bytes }
@@ -158,47 +200,47 @@ class HLLProperties extends Properties("HyperLogLog") {
   implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
   implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
-  property("Count ints with 5 bits") =
-    toProp(new HLLCountProperty[Int](5), 100, 1, 0.01)
-  property("Count ints with 6 bits") =
-    toProp(new HLLCountProperty[Int](6), 100, 1, 0.01)
-  property("Count ints with 7 bits") =
-    toProp(new HLLCountProperty[Int](7), 100, 1, 0.01)
-  property("Count ints with 10 bits") =
-    toProp(new HLLCountProperty[Int](10), 100, 1, 0.01)
+  for (bits <- List(5, 6, 7, 10)) {
+    property(s"Count ints with $bits bits") =
+      toProp(new HLLCountProperty[Int](bits), 100, 1, 0.01)
 
-  property("Count longs with 5 bits") =
-    toProp(new HLLCountProperty[Int](5), 100, 1, 0.01)
-  property("Count longs with 6 bits") =
-    toProp(new HLLCountProperty[Int](6), 100, 1, 0.01)
-  property("Count longs with 7 bits") =
-    toProp(new HLLCountProperty[Int](7), 100, 1, 0.01)
-  property("Count longs with 10 bits") =
-    toProp(new HLLCountProperty[Int](10), 100, 1, 0.01)
+    property(s"Count longs with $bits bits") =
+      toProp(new HLLCountProperty[Long](bits), 100, 1, 0.01)
+  }
 
-  property("Intersect 1 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 1), 100, 1, 0.01)
-  property("Intersect 2 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 2), 100, 1, 0.01)
-  property("Intersect 3 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 3), 100, 1, 0.01)
-  property("Intersect 4 HLLs with 10 bits") =
-    toProp(new HLLIntersectionProperty[Int](10, 4), 100, 1, 0.01)
+  for (numHLLs <- List(1, 2, 3, 4)) {
+    property(s"Intersect $numHLLs HLLs with 10 bits") =
+      toProp(new HLLIntersectionProperty[Int](10, numHLLs), 100, 1, 0.01)
+  }
 
-  property("Downsize sparse HLLs from 10 bits to 7 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10, 10, 7), 10, 10, 0.01)
-  property("Downsize sparse HLLs from 14 bits to 4 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10, 14, 4), 10, 10, 0.01)
-  property("Downsize sparse HLLs from 12 bits to 12 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10, 12, 12), 10, 10, 0.01)
+  for {
+    sparse <- List(true, false)
+    (oldBits, newBits) <- List((10, 7), (14, 4), (12, 12))
+  } {
+    val sparseOrDense = if (sparse) "sparse" else "dense"
+    val numElements = if (sparse) 10 else 10000
+    property(s"Downsize $sparseOrDense HLLs from $oldBits bits to $newBits bits") =
+      toProp(new HLLDownsizeCountProperty[Long](numElements, oldBits, newBits), 10, 10, 0.01)
+  }
 
-  property("Downsize dense HLLs from 10 bits to 7 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10000, 10, 7), 10, 10, 0.01)
-  property("Downsize dense HLLs from 14 bits to 4 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10000, 14, 4), 10, 10, 0.01)
-  property("Downsize dense HLLs from 12 bits to 12 bits") =
-    toProp(new HLLDownsizeCountProperty[Long](10000, 12, 12), 10, 10, 0.01)
+}
 
+class SetSizeAggregatorProperties extends Properties("SetSizeAggregator") {
+  import ApproximateProperty.toProp
+  import HyperLogLog.{ int2Bytes, long2Bytes }
+
+  implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
+  implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
+
+  for (bits <- List(5, 7, 10)) {
+    property(s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits") =
+      toProp(new SmallSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+  }
+
+  for (bits <- List(5, 7, 10)) {
+    property(s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits") =
+      toProp(new LargeSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+  }
 }
 
 class HyperLogLogTest extends WordSpec with Matchers {
@@ -328,36 +370,6 @@ class HyperLogLogTest extends WordSpec with Matchers {
     def verifySerialization(h: HLL) {
       assert(fromBytes(toBytes(h)) == h)
       fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
-    }
-  }
-
-  "SetSizeAggregator" should {
-    "work as an Aggregator and return exact size when <= maxSetSize" in {
-      List(5, 7, 10).foreach(i => {
-        val maxSetSize = 10000
-        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
-
-        val maxUniqueDataSize = maxSetSize / 2
-        val data = (0 to maxUniqueDataSize).map { _ => r.nextInt(1000) }
-        val exact = exactCount(data).toDouble
-        val result = aggregator(data)
-        assert(result == exact)
-      })
-    }
-
-    "work as an Aggregator and return approximate size when > maxSetSize" in {
-      List(5, 7, 10).foreach(i => {
-        val maxSetSize = 10000
-        val aggregator = SetSizeAggregator[Int](i, maxSetSize)
-
-        val maxUniqueDataSize = maxSetSize + i
-        val data = 0 to maxUniqueDataSize
-        val exact = exactCount(data).toDouble
-
-        val estimate = aggregator(data)
-        assert(estimate != exact)
-        assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(i))
-      })
     }
   }
 }
