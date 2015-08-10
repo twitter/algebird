@@ -152,7 +152,7 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
  * SetSizeAggregator should work as an aggregator and return
  * approximate size when > maxSetSize
  */
-abstract class SetSizeAggregatorProperty[T <% Array[Byte]](bits: Int) extends ApproximateProperty {
+abstract class SetSizeAggregatorProperty[T](bits: Int) extends ApproximateProperty {
   type Exact = Set[T]
   type Approx = Long
 
@@ -161,15 +161,12 @@ abstract class SetSizeAggregatorProperty[T <% Array[Byte]](bits: Int) extends Ap
 
   val maxSetSize = 10000
 
-  def makeApproximate(s: Set[T]): Long =
-    SetSizeAggregator[T](bits, maxSetSize).apply(s)
-
   def inputGenerator(it: Exact) = Gen.const(())
 
   def exactResult(set: Set[T], i: Unit) = set.size
 }
 
-class SmallSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+abstract class SmallSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
   def exactGenerator: Gen[Set[T]] =
     for {
       size <- Gen.choose(maxSetSize + 1, maxSetSize * 2)
@@ -180,7 +177,7 @@ class SmallSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends S
     Approximate.exact(aggResult.toDouble)
 }
 
-class LargeSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
   def exactGenerator: Gen[Set[T]] =
     for {
       size <- Gen.choose(1, maxSetSize)
@@ -191,6 +188,26 @@ class LargeSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends S
     val error = 1.04 / scala.math.sqrt(1 << bits)
     Approximate[Double](aggResult - error, aggResult, aggResult + error, 0.9972)
   }
+}
+
+class SmallBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends SmallSetSizeAggregatorProperty[T](bits) {
+  def makeApproximate(s: Set[T]): Long =
+    SetSizeAggregator[T](bits, maxSetSize).apply(s)
+}
+
+class LargeBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int) extends LargeSetSizeAggregatorProperty[T](bits) {
+  def makeApproximate(s: Set[T]): Long =
+    SetSizeAggregator[T](bits, maxSetSize).apply(s)
+}
+
+class SmallSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int) extends SmallSetSizeAggregatorProperty[T](bits) {
+  def makeApproximate(s: Set[T]): Long =
+    SetSizeHashAggregator[T](bits, maxSetSize).apply(s)
+}
+
+class LargeSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int) extends LargeSetSizeAggregatorProperty[T](bits) {
+  def makeApproximate(s: Set[T]): Long =
+    SetSizeHashAggregator[T](bits, maxSetSize).apply(s)
 }
 
 class HLLProperties extends Properties("HyperLogLog") {
@@ -233,13 +250,17 @@ class SetSizeAggregatorProperties extends Properties("SetSizeAggregator") {
   implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
   for (bits <- List(5, 7, 10)) {
-    property(s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits") =
-      toProp(new SmallSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+    property(s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using conversion to Array[Byte]") =
+      toProp(new SmallBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+    property(s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using Hash128") =
+      toProp(new SmallSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
   }
 
   for (bits <- List(5, 7, 10)) {
-    property(s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits") =
-      toProp(new LargeSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+    property(s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using conversion to Array[Byte]") =
+      toProp(new LargeBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+    property(s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using Hash128") =
+      toProp(new LargeSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
   }
 }
 
