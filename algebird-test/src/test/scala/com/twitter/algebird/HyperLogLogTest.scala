@@ -98,11 +98,11 @@ class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
 abstract class HyperLogLogProperty(bits: Int) extends ApproximateProperty {
   val monoid = new HyperLogLogMonoid(bits)
 
-  def iterableToHLL[T <% Array[Byte]](it: Iterable[T]): HLL =
-    monoid.sum(it.map(monoid.create(_)))
+  def iterableToHLL[T: Hash128](it: Iterable[T]): HLL =
+    monoid.sum(it.map(monoid.toHLL(_)))
 }
 
-class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProperty(bits) {
+class HLLCountProperty[T: Hash128: Gen](bits: Int) extends HyperLogLogProperty(bits) {
   type Exact = Iterable[T]
   type Approx = HLL
 
@@ -118,7 +118,7 @@ class HLLCountProperty[T <% Array[Byte]: Gen](bits: Int) extends HyperLogLogProp
   def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
 }
 
-class HLLDownsizeCountProperty[T <% Array[Byte]: Gen](numItems: Int, oldBits: Int, newBits: Int) extends HLLCountProperty[T](oldBits) {
+class HLLDownsizeCountProperty[T: Hash128: Gen](numItems: Int, oldBits: Int, newBits: Int) extends HLLCountProperty[T](oldBits) {
 
   override def exactGenerator = Gen.containerOfN[Vector, T](numItems, implicitly[Gen[T]])
 
@@ -126,7 +126,7 @@ class HLLDownsizeCountProperty[T <% Array[Byte]: Gen](numItems: Int, oldBits: In
     a.downsize(newBits).approximateSize
 }
 
-class HLLIntersectionProperty[T <% Array[Byte]: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty(bits) {
+class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends HyperLogLogProperty(bits) {
   type Exact = Seq[Seq[T]]
   type Approx = Seq[HLL]
 
