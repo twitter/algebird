@@ -15,10 +15,27 @@ trait ApproximateProperty {
   def makeApproximate(e: Exact): Approx
 
   def exactResult(e: Exact, i: Input): Result
-  def approximateResult(a: Approx, i: Input): Approximate[Result]
+  def approximateResult(a: Approx, i: Input): GeneralizedApproximate[Result]
+}
+
+trait GeneralizedApproximate[T] {
+  def withProb: Double
+  def contains(t: T): Boolean
 }
 
 object ApproximateProperty {
+
+  implicit def approximateBooleanToGeneralized(b: ApproximateBoolean): GeneralizedApproximate[Boolean] =
+    new GeneralizedApproximate[Boolean] {
+      def withProb = b.withProb
+      def contains(t: Boolean) = b.isTrue == t
+    }
+
+  implicit def approximateToGeneralized[T](a: Approximate[T]): GeneralizedApproximate[T] =
+    new GeneralizedApproximate[T] {
+      def withProb = a.probWithinBounds
+      def contains(t: T) = a.boundsContain(t)
+    }
 
   /**
    *  Generates a list of exactly n Ts.
@@ -40,11 +57,10 @@ object ApproximateProperty {
           val approxResult = a.approximateResult(approx, input)
           val exactResult = a.exactResult(exact, input)
 
-          val success = approxResult.boundsContain(exactResult)
+          val success = approxResult.contains(exactResult)
           val successInt = if (success) 1 else 0
-          // val messages = if (success) List() else List(s"Exact: $exact. Approx: $approx. Exact result: $exactResult. Approx result: $approxResult.")
           val messages = if (success) List() else List(s"Exact result: $exactResult. Approx result: $approxResult.")
-          (successInt, approxResult.probWithinBounds, messages)
+          (successInt, approxResult.withProb, messages)
         }
       }
     val monoid = implicitly[Monoid[(Int, Double, List[String])]]
