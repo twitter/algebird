@@ -2,9 +2,11 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Gen, Arbitrary, Properties }
 
-import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
+import HyperLogLog.{ int2Bytes, long2Bytes }
+
+import ApproximateProperty.approximateToGeneralized
 
 class HyperLogLogSeriesLaws extends CheckProperties {
   import BaseProperties._
@@ -22,42 +24,47 @@ class HyperLogLogSeriesLaws extends CheckProperties {
   }
 }
 
-class HyperLogLogSeriesTest extends WordSpec with Matchers {
-  def getHllCount[T <% Array[Byte]](it: Iterable[T], hll: HyperLogLogMonoid) = {
-    hll.sizeOf(hll.sum(it.map { hll(_) })).estimate.toDouble
+class HLLSeriesSinceProperty extends ApproximateProperty {
+
+  // List of (value, timestamp) pairs
+  type Exact = Seq[(Long, Long)]
+  type Approx = HLLSeries
+
+  type Input = Long
+  type Result = Long
+
+  val bits = 12
+  val hllSeriesMonoid = new HyperLogLogSeriesMonoid(bits)
+  val hll = new HyperLogLogMonoid(bits)
+
+  def makeApproximate(timestampedData: Seq[(Long, Long)]) = {
+    val hllSeries = timestampedData
+      .map { case (value, timestamp) => hllSeriesMonoid.create(value, timestamp) }
+    hllSeriesMonoid.sum(hllSeries)
   }
 
-  def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
+  def exactGenerator: Gen[Seq[(Long, Long)]] = for {
+    data <- Gen.listOfN(100, Gen.choose(Long.MinValue, Long.MaxValue))
+    timestamps = 1L to 100L
+  } yield data.zip(timestamps)
 
-  def testApproximatelyEqual(hllSeries: HLLSeries, hllCount: Double, bits: Int) = {
-    val seriesResult = hllSeries.toHLL.estimatedSize
-    assert(scala.math.abs(seriesResult - hllCount) / seriesResult < (3.5 * aveErrorOf(bits)))
-  }
+  // arbitrary timestamp
+  def inputGenerator(timestampedData: Exact): Gen[Long] =
+    Gen.oneOf(timestampedData).map { case (value, timestamp) => timestamp }
 
-  "HyperLogLogSeries" should {
-    "properly calculate .since" in {
-      val bits = 12
-      val hllSeriesMonoid = new HyperLogLogSeriesMonoid(bits)
-      val hll = new HyperLogLogMonoid(bits)
+  def approximateResult(series: HLLSeries, timestamp: Long) =
+    series.since(timestamp).toHLL.approximateSize
 
-      val timestamps = (1 to 100).map { _.toLong }
-      val r = new java.util.Random
-      val timestampedData = timestamps.map { t => (r.nextLong, t) }
+  def exactResult(timestampedData: Seq[(Long, Long)], timestamp: Long): Long =
+    timestampedData
+      .dropWhile { case (_, t) => t < timestamp }
+      .map { case (value, _) => value }
+      .length
+}
 
-      val series = timestampedData
-        .map{ case (value, timestamp) => hllSeriesMonoid.create(value, timestamp) }
-        .reduce{ hllSeriesMonoid.plus(_, _) }
+class HLLSeriesProperties extends Properties("HyperLogLogSeries") {
+  import ApproximateProperty.toProp
 
-      timestamps.foreach { timestamp =>
-        val seriesResult = series.since(timestamp)
-
-        val dataSinceTimestamp = timestampedData
-          .dropWhile { case (_, t) => t < timestamp }
-          .map { case (value, _) => value }
-        val expected = getHllCount(dataSinceTimestamp, hll)
-
-        testApproximatelyEqual(seriesResult, expected, bits)
-      }
-    }
-  }
+  property("properly calculates .since") =
+    toProp(new HLLSeriesSinceProperty, 1, 100, 0.01)
 }

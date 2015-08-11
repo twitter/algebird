@@ -29,12 +29,14 @@ object ApproximateProperty {
     new GeneralizedApproximate[Boolean] {
       def withProb = b.withProb
       def contains(t: Boolean) = b.isTrue == t
+      override def toString = b.toString
     }
 
   implicit def approximateToGeneralized[T](a: Approximate[T]): GeneralizedApproximate[T] =
     new GeneralizedApproximate[T] {
       def withProb = a.probWithinBounds
       def contains(t: T) = a.boundsContain(t)
+      override def toString = a.toString
     }
 
   /**
