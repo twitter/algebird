@@ -6,9 +6,6 @@ import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalatest.{ Matchers, WordSpec }
 import org.scalacheck.Prop._
 
-import ApproximateProperty.approximateBooleanToGeneralized
-import ApproximateProperty.approximateToGeneralized
-
 class BloomFilterLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 

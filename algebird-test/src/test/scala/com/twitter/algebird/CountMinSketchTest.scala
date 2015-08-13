@@ -9,8 +9,6 @@ import CmsTestImplicits._
 
 import scala.util.Random
 
-import ApproximateProperty.approximateToGeneralized
-
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
 
   import BaseProperties._

@@ -6,8 +6,6 @@ import org.scalacheck.{ Gen, Arbitrary, Properties }
 
 import HyperLogLog.{ int2Bytes, long2Bytes }
 
-import ApproximateProperty.approximateToGeneralized
-
 class HyperLogLogSeriesLaws extends CheckProperties {
   import BaseProperties._
 

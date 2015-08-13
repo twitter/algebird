@@ -10,8 +10,6 @@ import scala.collection.BitSet
 import java.lang.AssertionError
 import java.util.Arrays
 
-import ApproximateProperty.approximateToGeneralized
-
 object ReferenceHyperLogLog {
 
   /** Reference implementation of jRhoW to compare optimizations against */

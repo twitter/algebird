@@ -16,9 +16,13 @@ limitations under the License.
 
 package com.twitter.algebird
 
+private[algebird] trait ApproximateSet[T] {
+  def contains(t: T): ApproximateBoolean
+}
+
 // This gives an answer, and a LOWER BOUND on the probability that answer is
 // correct
-case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
+case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends ApproximateSet[Boolean] {
 
   def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
 
@@ -58,6 +62,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
       ApproximateBoolean(false, newP)
     }
   }
+
+  def contains(b: Boolean) = if (isTrue) this else not
 }
 
 object ApproximateBoolean {
@@ -67,7 +73,7 @@ object ApproximateBoolean {
 }
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
-case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) {
+case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) extends ApproximateSet[N] {
   // Is this value contained within the bounds:
   def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
   def contains(v: N): ApproximateBoolean =
