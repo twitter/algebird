@@ -22,7 +22,7 @@ import scala.reflect.runtime.universe._
  * > import com.twitter.algebird.macros.Cuber.cuber
  * > val people: List[People]
  * > val averageHeights: Map[(Option[String], Option[Int]), Double] =
- * >   people.flatMap { p => (cuber((p.gender, p.age)), p) }
+ * >   people.flatMap { p => cuber((p.gender, p.age)).map((_,p)) }
  * >     .groupBy(_._1)
  * >     .mapValues { xs => val heights = xs.map(_.height); heights.sum / heights.length }
  */
@@ -60,7 +60,7 @@ trait Cuber[I] {
  * > import com.twitter.algebird.macros.Roller.roller
  * > val data: List[Data]
  * > val averageTemps: Map[(Option[String], Option[String], Option[String]), Double] =
- * > data.flatMap { d => (cuber((d.continent, d.country, d.city)), d) }
+ * > data.flatMap { d => cuber((d.continent, d.country, d.city)).map((_, d)) }
  * >   .groupBy(_._1)
  * >   .mapValues { xs => val temps = xs.map(_.temperature); temps.sum / temps.length }
  */
