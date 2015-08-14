@@ -4,13 +4,66 @@ import scala.language.experimental.{ macros => sMacros }
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
-// import com.twitter.algebird._
-
+/**
+ * Object that "cubes" a case class or tuple, i.e. for a tuple of type
+ * (T1, T2, ... , TN) generates all 2^N possible combinations of type
+ * (Option[T1], Option[T2], ... , Option[TN]).
+ *
+ * This is useful for comparing some metric across all possible subsets.
+ * For example, suppose we have a set of people represented as
+ * case class Person(gender: String, age: Int, height: Double)
+ * and we want to know the average height of
+ *  - people, grouped by gender and age
+ *  - people, grouped by only gender
+ *  - people, grouped by only age
+ *  - all people
+ *
+ * Then we could do
+ * > import com.twitter.algebird.macros.Cuber.cuber
+ * > val people: List[People]
+ * > val averageHeights: Map[(Option[String], Option[Int]), Double] =
+ * >   people.flatMap { p => (cuber((p.gender, p.age)), p) }
+ * >     .groupBy(_._1)
+ * >     .mapValues { xs => val heights = xs.map(_.height); heights.sum / heights.length }
+ */
 trait Cuber[I] {
   type K
   def apply(in: I): TraversableOnce[K]
 }
 
+/**
+ * Object that hierarchically "rolls up" a case class or tuple,
+ * i.e. for a tuple (x1, x2, ... , xN) of type (T1, T2, ... , TN)
+ * generates a TraversableOnce[(Option[T1], Option[T2], ... , Option[TN]) that contains
+ *   (None, None, None, ..., None)
+ *   (Some(x1), None, None, ... , None)
+ *   (Some(x1), Some(x2), None, ... , None)
+ *   (Some(x1), Some(x2), Some(x3), ... , None)
+ *      ...
+ *   (Some(x1), Some(x2), Some(x3), ... , Some(xN))
+ *
+ * This is useful for comparing some metric across multiple layers of
+ * some hierarchy.
+ * For example, suppose we have some climate data represented as
+ * case class Data(continent: String, country: String, city: String, temperature: Double)
+ * and we want to know the average temperatures of
+ *   - each continent
+ *   - each (continent, country) pair
+ *   - each (continent, country, city) triple
+ *
+ * Here we desire the (continent, country) and (continent, country, city)
+ * pair because, for example, if we grouped by city instead of by
+ * (continent, country, city), we would accidentally combine the results for
+ * Paris, Texas and Paris, France.
+ *
+ * Then we could do
+ * > import com.twitter.algebird.macros.Roller.roller
+ * > val data: List[Data]
+ * > val averageTemps: Map[(Option[String], Option[String], Option[String]), Double] =
+ * > data.flatMap { d => (cuber((d.continent, d.country, d.city)), d) }
+ * >   .groupBy(_._1)
+ * >   .mapValues { xs => val temps = xs.map(_.temperature); temps.sum / temps.length }
+ */
 trait Roller[I] {
   type K
   def apply(in: I): TraversableOnce[K]
