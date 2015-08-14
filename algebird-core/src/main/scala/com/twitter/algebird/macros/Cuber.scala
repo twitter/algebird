@@ -27,6 +27,8 @@ object Cuber {
     val params = getParams(c)
     if (params.length > 22)
       c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has more than 22 parameters.")
+    if (params.length == 0)
+      c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has no parameters.")
 
     val tupleName = newTypeName(s"Tuple${params.length}")
     val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
@@ -57,10 +59,13 @@ object Roller {
     val params = getParams(c)
     if (params.length > 22)
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has more than 22 parameters.")
+    if (params.length == 0)
+      c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
     val tupleName = newTypeName(s"Tuple${params.length}")
     val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
+    // params.head is safe because the case class has at least one member
     val firstFor = fq"""${params.head.name.asInstanceOf[c.TermName]} <- _root_.scala.Seq(_root_.scala.Some(in.${params.head}), _root_.scala.None)"""
     val restOfFors = params.tail.zip(params).map {
       case (param, prevParam) =>
