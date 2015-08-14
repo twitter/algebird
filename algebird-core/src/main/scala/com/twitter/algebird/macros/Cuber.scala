@@ -60,7 +60,7 @@ trait Cuber[I] {
  * > import com.twitter.algebird.macros.Roller.roller
  * > val data: List[Data]
  * > val averageTemps: Map[(Option[String], Option[String], Option[String]), Double] =
- * > data.flatMap { d => cuber((d.continent, d.country, d.city)).map((_, d)) }
+ * > data.flatMap { d => roller((d.continent, d.country, d.city)).map((_, d)) }
  * >   .groupBy(_._1)
  * >   .mapValues { xs => val temps = xs.map(_.temperature); temps.sum / temps.length }
  */
