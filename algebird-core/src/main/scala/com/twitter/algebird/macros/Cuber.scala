@@ -64,7 +64,7 @@ trait Roller[I] {
 }
 
 object Cuber {
-  def cuber[T]: Cuber[T] = macro cuberImpl[T]
+  implicit def cuber[T]: Cuber[T] = macro cuberImpl[T]
 
   def cuberImpl[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Cuber[T]] = {
     import c.universe._
@@ -108,7 +108,7 @@ object Cuber {
 }
 
 object Roller {
-  def roller[T]: Roller[T] = macro rollerImpl[T]
+  implicit def roller[T]: Roller[T] = macro rollerImpl[T]
 
   def rollerImpl[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Roller[T]] = {
     import c.universe._
