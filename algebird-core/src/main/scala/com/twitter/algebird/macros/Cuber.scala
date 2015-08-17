@@ -5,7 +5,7 @@ import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
 /**
- * Object that "cubes" a case class or tuple, i.e. for a tuple of type
+ * "Cubes" a case class or tuple, i.e. for a tuple of type
  * (T1, T2, ... , TN) generates all 2^N possible combinations of type
  * (Option[T1], Option[T2], ... , Option[TN]).
  *
@@ -32,15 +32,9 @@ trait Cuber[I] {
 }
 
 /**
- * Object that hierarchically "rolls up" a case class or tuple,
- * i.e. for a tuple (x1, x2, ... , xN) of type (T1, T2, ... , TN)
- * generates a TraversableOnce[(Option[T1], Option[T2], ... , Option[TN]) that contains
- *   (None, None, None, ..., None)
- *   (Some(x1), None, None, ... , None)
- *   (Some(x1), Some(x2), None, ... , None)
- *   (Some(x1), Some(x2), Some(x3), ... , None)
- *      ...
- *   (Some(x1), Some(x2), Some(x3), ... , Some(xN))
+ * For a tuple N produces a result with (N + 1) elements each of arity N
+ * such that, for all k from 0 to N, there is an element with k Somes
+ * followed by (N - k) nones.
  *
  * This is useful for comparing some metric across multiple layers of
  * some hierarchy.

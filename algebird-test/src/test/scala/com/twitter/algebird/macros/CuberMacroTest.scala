@@ -19,49 +19,49 @@ object CuberRollerProperties extends Properties("Cuber and roller macro") {
   case class Baz(a: Int)
 
   property("Cuber works for Foo") = forAll { f: Foo =>
-    Cuber.cuber(f).toSet == Set(
-      (None, None, None),
-      (Some(f.a), None, None),
-      (None, Some(f.b), None),
-      (None, None, Some(f.c)),
+    Cuber.cuber(f) == List(
+      (Some(f.a), Some(f.b), Some(f.c)),
       (Some(f.a), Some(f.b), None),
       (Some(f.a), None, Some(f.c)),
+      (Some(f.a), None, None),
       (None, Some(f.b), Some(f.c)),
-      (Some(f.a), Some(f.b), Some(f.c)))
+      (None, Some(f.b), None),
+      (None, None, Some(f.c)),
+      (None, None, None))
   }
 
   property("Cuber works for Bar") = forAll { b: Bar =>
-    Cuber.cuber(b).toSet == Set(
-      (None, None),
+    Cuber.cuber(b) == List(
+      (Some(b.a), Some(b.foo)),
       (Some(b.a), None),
       (None, Some(b.foo)),
-      (Some(b.a), Some(b.foo)))
+      (None, None))
   }
 
   property("Cuber works for Baz") = forAll { b: Baz =>
-    Cuber.cuber(b).toSet == Set(
-      Tuple1(None),
-      Tuple1(Some(b.a)))
+    Cuber.cuber(b) == List(
+      Tuple1(Some(b.a)),
+      Tuple1(None))
   }
 
   property("Roller works for Foo") = forAll { f: Foo =>
-    Roller.roller(f).toSet == Set(
-      (None, None, None),
-      (Some(f.a), None, None),
+    Roller.roller(f) == List(
+      (Some(f.a), Some(f.b), Some(f.c)),
       (Some(f.a), Some(f.b), None),
-      (Some(f.a), Some(f.b), Some(f.c)))
+      (Some(f.a), None, None),
+      (None, None, None))
   }
 
   property("Roller works for Bar") = forAll { b: Bar =>
-    Roller.roller(b).toSet == Set(
-      (None, None),
+    Roller.roller(b) == List(
+      (Some(b.a), Some(b.foo)),
       (Some(b.a), None),
-      (Some(b.a), Some(b.foo)))
+      (None, None))
   }
 
   property("Roller works for Baz") = forAll { b: Baz =>
-    Roller.roller(b).toSet == Set(
-      Tuple1(None),
-      Tuple1(Some(b.a)))
+    Roller.roller(b) == List(
+      Tuple1(Some(b.a)),
+      Tuple1(None))
   }
 }
