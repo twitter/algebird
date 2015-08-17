@@ -32,9 +32,9 @@ trait Cuber[I] {
 }
 
 /**
- * For a tuple N produces a result with (N + 1) tuples each of arity N
+ * Given a TupleN, produces a sequence of (N + 1) tuples each of arity N
  * such that, for all k from 0 to N, there is a tuple with k Somes
- * followed by (N - k) nones.
+ * followed by (N - k) Nones.
  *
  * This is useful for comparing some metric across multiple layers of
  * some hierarchy.
