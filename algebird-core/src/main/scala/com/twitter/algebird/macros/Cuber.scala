@@ -89,7 +89,7 @@ object Cuber {
 
     val options = (1 to arity).map { index =>
       val some = newTermName(s"some$index")
-      q"if (((1 << ${index - 1}) & i) == 0) { _root_.scala.None } else { $some }"
+      q"if (((1 << ${index - 1}) & i) == 0) _root_.scala.None else $some"
     }
 
     val cuber = q"""
@@ -116,30 +116,38 @@ object Roller {
     ensureCaseClass(c)
 
     val params = getParams(c)
-    if (params.length > 22)
+    val arity = params.length
+    if (arity > 22)
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has more than 22 parameters.")
-    if (params.length == 0)
+    if (arity == 0)
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
-    val tupleName = newTypeName(s"Tuple${params.length}")
+    val tupleName = newTypeName(s"Tuple${arity}")
     val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
-    // params.head is safe because the case class has at least one member
-    val firstFor = fq"""${params.head.name.asInstanceOf[c.TermName]} <- _root_.scala.Seq(_root_.scala.Some(in.${params.head}), _root_.scala.None)"""
-    val restOfFors = params.tail.zip(params).map {
-      case (param, prevParam) =>
-        fq"""${param.name.asInstanceOf[c.TermName]} <- if (${prevParam.name.asInstanceOf[c.TermName]}.isDefined) _root_.scala.Seq(_root_.scala.Some(in.${param}), _root_.scala.None) else _root_.scala.Seq(_root_.scala.None)"""
+    val somes = params.zip(Stream.from(1)).map {
+      case (param, index) =>
+        val name = newTermName(s"some$index")
+        q"val $name = _root_.scala.Some(in.$param)"
     }
-    val fors = firstFor :: restOfFors
 
-    val names = params.map { param => param.name.asInstanceOf[c.TermName] }
+    val items = (0 to arity).map { i =>
+      val args = (1 to arity).map { index =>
+        val some = newTermName(s"some$index")
+        if (index <= i) q"$some" else q"_root_.scala.None"
+      }
+      q"new K(..$args)"
+    }
 
-    val cuber = q"""
+    val roller = q"""
     new _root_.com.twitter.algebird.macros.Roller[${T}] {
       type K = $tupleName[..$types]
-      def apply(in: ${T}): _root_.scala.Seq[K] = for (..$fors) yield new K(..$names)
+      def apply(in: ${T}): _root_.scala.Seq[K] = {
+        ..$somes
+        Seq(..$items)
+      }
     }
     """
-    c.Expr[Roller[T]](cuber)
+    c.Expr[Roller[T]](roller)
   }
 }
