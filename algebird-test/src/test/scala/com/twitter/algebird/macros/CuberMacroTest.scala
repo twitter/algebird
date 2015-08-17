@@ -20,28 +20,28 @@ object CuberRollerProperties extends Properties("Cuber and roller macro") {
 
   property("Cuber works for Foo") = forAll { f: Foo =>
     Cuber.cuber(f) == List(
-      (Some(f.a), Some(f.b), Some(f.c)),
-      (Some(f.a), Some(f.b), None),
-      (Some(f.a), None, Some(f.c)),
+      (None, None, None),
       (Some(f.a), None, None),
-      (None, Some(f.b), Some(f.c)),
       (None, Some(f.b), None),
+      (Some(f.a), Some(f.b), None),
       (None, None, Some(f.c)),
-      (None, None, None))
+      (Some(f.a), None, Some(f.c)),
+      (None, Some(f.b), Some(f.c)),
+      (Some(f.a), Some(f.b), Some(f.c)))
   }
 
   property("Cuber works for Bar") = forAll { b: Bar =>
     Cuber.cuber(b) == List(
-      (Some(b.a), Some(b.foo)),
+      (None, None),
       (Some(b.a), None),
       (None, Some(b.foo)),
-      (None, None))
+      (Some(b.a), Some(b.foo)))
   }
 
   property("Cuber works for Baz") = forAll { b: Baz =>
     Cuber.cuber(b) == List(
-      Tuple1(Some(b.a)),
-      Tuple1(None))
+      Tuple1(None),
+      Tuple1(Some(b.a)))
   }
 
   property("Roller works for Foo") = forAll { f: Foo =>
