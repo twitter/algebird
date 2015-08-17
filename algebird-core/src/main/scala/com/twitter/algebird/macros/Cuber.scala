@@ -32,8 +32,8 @@ trait Cuber[I] {
 }
 
 /**
- * For a tuple N produces a result with (N + 1) elements each of arity N
- * such that, for all k from 0 to N, there is an element with k Somes
+ * For a tuple N produces a result with (N + 1) tuples each of arity N
+ * such that, for all k from 0 to N, there is a tuple with k Somes
  * followed by (N - k) nones.
  *
  * This is useful for comparing some metric across multiple layers of
@@ -78,7 +78,10 @@ object Cuber {
     if (arity == 0)
       c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has no parameters.")
 
-    val tupleName = newTypeName(s"Tuple${arity}")
+    val tupleName = {
+      val tupleType = newTypeName(s"Tuple${arity}")
+      tq"_root_.scala.$tupleType"
+    }
     val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
     val somes = params.zip(Stream.from(1)).map {
@@ -122,7 +125,10 @@ object Roller {
     if (arity == 0)
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
-    val tupleName = newTypeName(s"Tuple${arity}")
+    val tupleName = {
+      val tupleType = newTypeName(s"Tuple${arity}")
+      tq"_root_.scala.$tupleType"
+    }
     val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
     val somes = params.zip(Stream.from(1)).map {
