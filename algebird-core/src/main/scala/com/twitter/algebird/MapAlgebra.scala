@@ -18,6 +18,8 @@ package com.twitter.algebird
 import scala.collection.{ Map => ScMap }
 import scala.collection.mutable.{ Map => MMap }
 
+import com.twitter.algebird.macros.{ Cuber, Roller }
+
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
   def remove(oldMap: M, k: K): M
@@ -222,4 +224,31 @@ object MapAlgebra {
 
   def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: Monoid[V]): V =
     Monoid.sum(mring.times(left, right).values)
+
+  def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, TraversableOnce[V]] = {
+    val sg = new Semigroup[Iterable[V]] {
+      def plus(x: Iterable[V], y: Iterable[V]) = x ++ y
+    }
+    cubeSum(it.map { case (k, v) => (k, Iterable(v)) })(c, sg)
+  }
+
+  def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
+
+  def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit c: Cuber[K]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup).mapValues(agg.present)
+
+  def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, TraversableOnce[V]] = {
+    val sg = new Semigroup[Iterable[V]] {
+      def plus(x: Iterable[V], y: Iterable[V]) = x ++ y
+    }
+    rollupSum(it.map { case (k, v) => (k, Iterable(v)) })(r, sg)
+  }
+
+  def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
+
+  def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit r: Roller[K]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { t => r(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup).mapValues(agg.present)
+
 }
