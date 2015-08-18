@@ -28,4 +28,23 @@ package object macros {
     import c.universe._
     weakTypeOf[T].typeSymbol.companionSymbol
   }
+
+  private[macros] def getParamTypes[T](c: Context)(implicit T: c.WeakTypeTag[T]): List[c.universe.Type] = {
+    import c.universe._
+
+    @annotation.tailrec
+    def normalized(tpe: c.universe.Type): c.universe.Type = {
+      val norm = tpe.normalize
+      if (!(norm =:= tpe))
+        normalized(norm)
+      else
+        tpe
+    }
+
+    val tpe = weakTypeOf[T]
+    tpe.declarations.collect {
+      case m: MethodSymbol if m.isCaseAccessor => normalized(m.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
+    }.toList
+  }
+
 }
