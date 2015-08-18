@@ -225,7 +225,7 @@ object MapAlgebra {
   def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: Monoid[V]): V =
     Monoid.sum(mring.times(left, right).values)
 
-  def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, TraversableOnce[V]] = {
+  def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
     val map: collection.mutable.Map[c.K, List[V]] = collection.mutable.Map[c.K, List[V]]()
     it.toIterator.foreach {
       case (k, v) =>
@@ -247,7 +247,7 @@ object MapAlgebra {
     sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
       .map { case (k, v) => (k, agg.present(v)) }
 
-  def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, TraversableOnce[V]] = {
+  def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
     val map: collection.mutable.Map[r.K, List[V]] = collection.mutable.Map[r.K, List[V]]()
     it.toIterator.foreach {
       case (k, v) =>
