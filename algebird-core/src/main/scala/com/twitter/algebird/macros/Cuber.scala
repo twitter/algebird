@@ -79,7 +79,7 @@ object Cuber {
       c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has no parameters.")
 
     val tupleName = {
-      val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+      val types = getParamTypes(c)
       val optionTypes = types.map { t => tq"_root_.scala.Option[$t]" }
       val tupleType = newTypeName(s"Tuple${arity}")
       tq"_root_.scala.$tupleType[..$optionTypes]"
@@ -127,7 +127,7 @@ object Roller {
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
     val tupleName = {
-      val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+      val types = getParamTypes(c)
       val optionTypes = types.map { t => tq"_root_.scala.Option[$t]" }
       val tupleType = newTypeName(s"Tuple${arity}")
       tq"_root_.scala.$tupleType[..$optionTypes]"

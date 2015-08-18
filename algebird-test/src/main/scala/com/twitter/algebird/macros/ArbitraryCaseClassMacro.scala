@@ -18,11 +18,8 @@ object ArbitraryCaseClassMacro {
     if (!isCaseClass)
       c.abort(c.enclosingPosition, s"$T is not a clase class")
 
-    val params = tpe.declarations.collect {
-      case m: MethodSymbol if m.isCaseAccessor => m
-    }.toList
-
-    val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+    val params = getParams(c)
+    val types = getParamTypes(c)
 
     val getsList = params.zip(types).map {
       case (param, t) =>

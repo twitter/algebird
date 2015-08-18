@@ -29,7 +29,7 @@ package object macros {
     weakTypeOf[T].typeSymbol.companionSymbol
   }
 
-  private[macros] def getFieldType(c: Context)(method: c.universe.MethodSymbol, tpe: c.universe.Type): c.universe.Type = {
+  private[macros] def getParamTypes[T](c: Context)(implicit T: c.WeakTypeTag[T]): List[c.universe.Type] = {
     import c.universe._
 
     @annotation.tailrec
@@ -40,6 +40,11 @@ package object macros {
       else
         tpe
     }
-    normalized(method.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
+
+    val tpe = weakTypeOf[T]
+    tpe.declarations.collect {
+      case m: MethodSymbol if m.isCaseAccessor => normalized(m.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
+    }.toList
   }
+
 }
