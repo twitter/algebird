@@ -79,9 +79,10 @@ object Cuber {
       c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has no parameters.")
 
     val tupleName = {
-      val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
+      val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+      val optionTypes = types.map { t => tq"_root_.scala.Option[$t]" }
       val tupleType = newTypeName(s"Tuple${arity}")
-      tq"_root_.scala.$tupleType[..$types]"
+      tq"_root_.scala.$tupleType[..$optionTypes]"
     }
 
     val somes = params.zip(Stream.from(1)).map {
@@ -126,9 +127,10 @@ object Roller {
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
     val tupleName = {
-      val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
+      val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+      val optionTypes = types.map { t => tq"_root_.scala.Option[$t]" }
       val tupleType = newTypeName(s"Tuple${arity}")
-      tq"_root_.scala.$tupleType[..$types]"
+      tq"_root_.scala.$tupleType[..$optionTypes]"
     }
 
     val somes = params.zip(Stream.from(1)).map {

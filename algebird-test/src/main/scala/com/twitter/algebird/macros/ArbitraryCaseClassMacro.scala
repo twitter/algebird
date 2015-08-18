@@ -22,9 +22,11 @@ object ArbitraryCaseClassMacro {
       case m: MethodSymbol if m.isCaseAccessor => m
     }.toList
 
-    val getsList = params.map {
-      case param =>
-        fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[${param.returnType}]"
+    val types = params.map { t => getFieldType(c)(t, weakTypeOf[T]) }
+
+    val getsList = params.zip(types).map {
+      case (param, t) =>
+        fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[$t]"
     }
 
     val paramsList = params.map(param => q"${param.name.asInstanceOf[TermName]}")

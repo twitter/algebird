@@ -226,29 +226,47 @@ object MapAlgebra {
     Monoid.sum(mring.times(left, right).values)
 
   def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, TraversableOnce[V]] = {
-    val sg = new Semigroup[Iterable[V]] {
-      def plus(x: Iterable[V], y: Iterable[V]) = x ++ y
+    val map: collection.mutable.Map[c.K, List[V]] = collection.mutable.Map[c.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        c(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
     }
-    cubeSum(it.map { case (k, v) => (k, Iterable(v)) })(c, sg)
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
   }
 
   def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
     sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
 
   def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit c: Cuber[K]): Map[c.K, V] =
-    sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup).mapValues(agg.present)
+    sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
 
   def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, TraversableOnce[V]] = {
-    val sg = new Semigroup[Iterable[V]] {
-      def plus(x: Iterable[V], y: Iterable[V]) = x ++ y
+    val map: collection.mutable.Map[r.K, List[V]] = collection.mutable.Map[r.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        r(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
     }
-    rollupSum(it.map { case (k, v) => (k, Iterable(v)) })(r, sg)
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
   }
 
   def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
     sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
 
   def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit r: Roller[K]): Map[r.K, V] =
-    sumByKey(it.toIterator.flatMap { t => r(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup).mapValues(agg.present)
+    sumByKey(it.toIterator.flatMap { t => r(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
 
 }

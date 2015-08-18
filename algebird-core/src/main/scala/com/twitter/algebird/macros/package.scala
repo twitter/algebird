@@ -28,4 +28,18 @@ package object macros {
     import c.universe._
     weakTypeOf[T].typeSymbol.companionSymbol
   }
+
+  private[macros] def getFieldType(c: Context)(method: c.universe.MethodSymbol, tpe: c.universe.Type): c.universe.Type = {
+    import c.universe._
+
+    @annotation.tailrec
+    def normalized(tpe: c.universe.Type): c.universe.Type = {
+      val norm = tpe.normalize
+      if (!(norm =:= tpe))
+        normalized(norm)
+      else
+        tpe
+    }
+    normalized(method.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
+  }
 }
