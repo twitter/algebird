@@ -79,10 +79,10 @@ object Cuber {
       c.abort(c.enclosingPosition, s"Cannot create Cuber for $T because it has no parameters.")
 
     val tupleName = {
+      val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
       val tupleType = newTypeName(s"Tuple${arity}")
-      tq"_root_.scala.$tupleType"
+      tq"_root_.scala.$tupleType[..$types]"
     }
-    val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
     val somes = params.zip(Stream.from(1)).map {
       case (param, index) =>
@@ -97,7 +97,7 @@ object Cuber {
 
     val cuber = q"""
     new _root_.com.twitter.algebird.macros.Cuber[${T}] {
-      type K = $tupleName[..$types]
+      type K = $tupleName
       def apply(in: ${T}): _root_.scala.Seq[K] = {
         ..$somes
         (0 until (1 << $arity)).map { i =>
@@ -126,10 +126,10 @@ object Roller {
       c.abort(c.enclosingPosition, s"Cannot create Roller for $T because it has no parameters.")
 
     val tupleName = {
+      val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
       val tupleType = newTypeName(s"Tuple${arity}")
-      tq"_root_.scala.$tupleType"
+      tq"_root_.scala.$tupleType[..$types]"
     }
-    val types = params.map { param => tq"_root_.scala.Option[${param.returnType}]" }
 
     val somes = params.zip(Stream.from(1)).map {
       case (param, index) =>
@@ -147,7 +147,7 @@ object Roller {
 
     val roller = q"""
     new _root_.com.twitter.algebird.macros.Roller[${T}] {
-      type K = $tupleName[..$types]
+      type K = $tupleName
       def apply(in: ${T}): _root_.scala.Seq[K] = {
         ..$somes
         Seq(..$items)
