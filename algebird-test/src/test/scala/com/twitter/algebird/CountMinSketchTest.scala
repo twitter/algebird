@@ -251,7 +251,7 @@ abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty {
   def makeApproximate(e: Exact) = CmsProperty.makeApproximate(e)
   def inputGenerator(e: Vector[K]): Gen[K] = Gen.oneOf(e)
 
-  def exactResult(list: Vector[K], key: K) = list.filter(_ == key).length
+  def exactResult(vec: Vector[K], key: K) = vec.count(_ == key)
   def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
 }
 
