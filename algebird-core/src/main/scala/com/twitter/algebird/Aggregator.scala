@@ -103,6 +103,16 @@ object Aggregator extends java.io.Serializable {
   def sortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
   /**
+   * Immutable version of sortedTake, for frameworks that check immutability of reduce functions.
+   */
+  def immutableSortedTake[T: Ordering](count: Int): MonoidAggregator[T, TopK[T], Seq[T]] =
+    new TopKToListAggregator[T](count)
+  /**
+   * Immutable version of sortedReverseTake, for frameworks that check immutability of reduce functions.
+   */
+  def immutableSortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, TopK[T], Seq[T]] =
+    new TopKToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
+  /**
    * Put everything in a List. Note, this could fill the memory if the List is very large.
    */
   def toList[T]: MonoidAggregator[T, List[T], List[T]] =
