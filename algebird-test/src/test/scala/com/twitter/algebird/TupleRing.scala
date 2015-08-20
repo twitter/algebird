@@ -4,7 +4,7 @@ import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
-class TupleRingSpecification extends PropSpec with PropertyChecks with Matchers {
+class TupleRingSpecification extends CheckProperties {
   import BaseProperties._
 
   property("(Int,Int) is a Ring") {
