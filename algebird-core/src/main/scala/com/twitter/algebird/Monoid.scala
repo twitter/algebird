@@ -71,7 +71,7 @@ class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
   }
   override def sumOption(items: TraversableOnce[Option[T]]): Option[Option[T]] =
     if (items.isEmpty) None
-    else Some(semi.sumOption(items.filter(_.isDefined).map { _.get }))
+    else Some(semi.sumOption(items.flatten))
 }
 
 class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R]) extends EitherSemigroup[L, R]()(semigroupl, monoidr) with Monoid[Either[L, R]] {
