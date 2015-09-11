@@ -43,7 +43,8 @@ object HyperLogLog {
   /* Size of the hash in bits */
   val hashSize = 128
 
-  val powersOfNegativeTwo: Array[Double] = 0.until(hashSize).map{ i => math.pow(2.0, -i) }.toArray
+  private[algebird] val negativePowersOfTwo: Array[Double] =
+    0.to(hashSize).map{ i => math.pow(2.0, -i) }.toArray
 
   def hash(input: Array[Byte]): Array[Byte] = {
     val (l0, l1) = Hash128.arrayByteHash.hash(input)
@@ -360,7 +361,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 
   lazy val zeroCnt = size - maxRhow.size
 
-  lazy val z = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj => HyperLogLog.powersOfNegativeTwo(mj.get) }.sum)
+  lazy val z = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj => HyperLogLog.negativePowersOfTwo(mj.get) }.sum)
 
   def +(other: HLL) = {
 
@@ -449,7 +450,7 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
         count += 1
         res += 1.0
       } else {
-        res += HyperLogLog.powersOfNegativeTwo(mj)
+        res += HyperLogLog.negativePowersOfTwo(mj)
       }
       idx += 1
     }
