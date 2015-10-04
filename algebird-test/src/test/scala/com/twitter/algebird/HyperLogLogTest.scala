@@ -210,7 +210,7 @@ class LargeSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int) extends Lar
     SetSizeHashAggregator[T](bits, maxSetSize).apply(s)
 }
 
-class HLLProperties extends Properties("HyperLogLog") {
+class HLLProperties extends ApproximateProperties("HyperLogLog") {
   import ApproximateProperty.toProp
   import HyperLogLog.{ int2Bytes, long2Bytes }
 
@@ -242,7 +242,7 @@ class HLLProperties extends Properties("HyperLogLog") {
 
 }
 
-class SetSizeAggregatorProperties extends Properties("SetSizeAggregator") {
+class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregator") {
   import ApproximateProperty.toProp
   import HyperLogLog.{ int2Bytes, long2Bytes }
 

@@ -308,7 +308,7 @@ class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   def approximateResult(cms: CMS[K], input: Unit) = Approximate.exact(cms.totalCount)
 }
 
-class CmsProperties extends Properties("CountMinSketch") {
+class CmsProperties extends ApproximateProperties("CountMinSketch") {
   import ApproximateProperty.toProp
 
   implicit val intGen = Gen.choose(1, 100)

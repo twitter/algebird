@@ -159,7 +159,7 @@ class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
   def approximateResult(bf: BF, u: Unit) = bf.size
 }
 
-class BloomFilterProperties extends Properties("BloomFilter") {
+class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
   import ApproximateProperty.toProp
 
   for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {

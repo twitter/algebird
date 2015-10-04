@@ -63,7 +63,7 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
     }
   }
 
-  def contains(b: Boolean) = if (isTrue) this else not
+  def contains(b: Boolean): ApproximateBoolean = if (isTrue) this else not
 }
 
 object ApproximateBoolean {

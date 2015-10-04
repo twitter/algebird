@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalacheck.{ Gen, Prop }
+import org.scalacheck.{ Gen, Prop, Properties, Test }
 import org.scalacheck.util.Pretty
 
 trait ApproximateProperty {
@@ -115,4 +115,13 @@ object ApproximateProperty {
 
     (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
   }
+}
+
+/**
+ * All tests that use ApproximateProperty should extend from this class so that
+ * the scalacheck property is run exactly once.
+ */
+abstract class ApproximateProperties(name: String) extends Properties(name) {
+  def overrideParameters(p: Test.Parameters): Test.Parameters =
+    p.withMinSuccessfulTests(1)
 }

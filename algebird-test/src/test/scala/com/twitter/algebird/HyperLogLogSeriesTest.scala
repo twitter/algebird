@@ -60,7 +60,7 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
       .length
 }
 
-class HLLSeriesProperties extends Properties("HyperLogLogSeries") {
+class HLLSeriesProperties extends ApproximateProperties("HyperLogLogSeries") {
   import ApproximateProperty.toProp
 
   property("properly calculates .since") =
