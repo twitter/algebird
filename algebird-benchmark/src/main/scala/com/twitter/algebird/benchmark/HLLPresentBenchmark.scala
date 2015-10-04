@@ -1,6 +1,6 @@
 package com.twitter.algebird.benchmark
 
-import com.twitter.algebird.{ HyperLogLogMonoid, HLL }
+import com.twitter.algebird.{ HyperLogLogMonoid, HLL, SparseHLL, DenseHLL }
 import com.twitter.bijection._
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
@@ -38,10 +38,18 @@ object HLLPresentBenchmark {
 class HLLPresentBenchmark {
   import HLLPresentBenchmark._
 
+  //don't cache the lazy values
+  def clone(hll: HLL): HLL = {
+    hll match {
+      case SparseHLL(bits, maxRhow) => SparseHLL(bits, maxRhow)
+      case DenseHLL(bits, v) => DenseHLL(bits, v)
+    }
+  }
+
   @Benchmark
   def timeBatchCreate(state: HLLPresentState, bh: Blackhole) = {
     state.data.foreach { hll =>
-      bh.consume(hll.approximateSize)
+      bh.consume(clone(hll).approximateSize)
     }
   }
 }
