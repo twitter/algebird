@@ -17,9 +17,12 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.roaringbitmap._
+import org.roaringbitmap.FastAggregation
+
+import scala.collection.JavaConversions.asJavaIterator
 
 object ExactCountDistinct {
-  implicit val monoid = new RoaringBitampMonoid()
+  implicit val monoid = new RoaringBitMapMonoid()
 
   /**
    * Accurate Count-Distinct for integer values (<= 2,147,483,646)
@@ -32,10 +35,22 @@ object ExactCountDistinct {
   }
 }
 
-class RoaringBitampSemigroup extends Semigroup[RoaringBitmap] {
+class RoaringBitMapSemigroup extends Semigroup[RoaringBitmap] {
   def plus(l: RoaringBitmap, r: RoaringBitmap): RoaringBitmap = RoaringBitmap.or(l, r)
+
+  override def sumOption(iter: TraversableOnce[RoaringBitmap]): Option[RoaringBitmap] = {
+    if (!iter.isEmpty){
+      Some(FastAggregation.or(iter.toIterator))
+    } else {
+      None
+    }
+  }
 }
 
-class RoaringBitampMonoid extends RoaringBitampSemigroup with Monoid[RoaringBitmap] {
+class RoaringBitMapMonoid extends RoaringBitMapSemigroup with Monoid[RoaringBitmap] {
   def zero = new RoaringBitmap()
+
+  override def sum(vs: TraversableOnce[RoaringBitmap]): RoaringBitmap = {
+    FastAggregation.or(vs.toIterator)
+  }
 }

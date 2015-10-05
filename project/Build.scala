@@ -143,7 +143,7 @@ object AlgebirdBuild extends Build {
                        """.stripMargin('|'),
     libraryDependencies <++= (scalaVersion) { scalaVersion =>
       Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
-          "org.roaringbitmap" % "RoaringBitmap" % "0.4.9",
+          "org.roaringbitmap" % "RoaringBitmap" % "0.5.4",
           "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
         if (isScala210x(scalaVersion))
           Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
