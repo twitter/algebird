@@ -3,7 +3,6 @@ package com.twitter.algebird
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalacheck.Prop
 
 /**
  * Tests abstract algebra against scala's Numeric trait
@@ -11,10 +10,10 @@ import org.scalacheck.Prop
  * below to test all the numeric traits.
  */
 class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
-  def plusNumericProp[T: Monoid: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
+  def plusNumericProp[T: Monoid: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
-    num.plus(a, b) == mon.plus(a, b)
+    assert(num.plus(a, b) == mon.plus(a, b))
   }
   property("Int plus") {
     plusNumericProp[Int]
@@ -32,42 +31,46 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     plusNumericProp[Float]
   }
 
-  def zeroNumericProp[T: Monoid: Group: Numeric: Arbitrary] = Prop.forAll { (a: T) =>
+  def zeroNumericProp[T: Monoid: Group: Numeric: Arbitrary] = forAll { (a: T) =>
     val mon = implicitly[Monoid[T]]
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
-    (a == mon.plus(mon.zero, a)) &&
+    assert((a == mon.plus(mon.zero, a)) &&
       (a == mon.plus(a, mon.zero)) &&
       (a == grp.minus(a, grp.zero)) &&
-      (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero })
+      (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero }))
   }
 
   def zeroProps[T: Monoid: Numeric] = {
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
-    (num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon.nonZeroOption(mon.zero) == None)
+    assert((num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon.nonZeroOption(mon.zero) == None))
   }
 
   property("Int zero") {
-    zeroNumericProp[Int] && zeroProps[Int]
+    zeroNumericProp[Int]
+    zeroProps[Int]
   }
 
   property("Long zero") {
-    zeroNumericProp[Long] && zeroProps[Long]
+    zeroNumericProp[Long]
+    zeroProps[Long]
   }
 
   property("Double zero") {
-    zeroNumericProp[Double] && zeroProps[Double]
+    zeroNumericProp[Double]
+    zeroProps[Double]
   }
 
   property("Float zero") {
-    zeroNumericProp[Float] && zeroProps[Float]
+    zeroNumericProp[Float]
+    zeroProps[Float]
   }
 
-  def minusNumericProp[T: Group: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
+  def minusNumericProp[T: Group: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
-    num.minus(a, b) == grp.minus(a, b)
+    assert(num.minus(a, b) == grp.minus(a, b))
   }
 
   property("Int minus") {
@@ -86,10 +89,10 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     minusNumericProp[Float]
   }
 
-  def oneNumericProp[T: Ring: Numeric: Arbitrary] = Prop.forAll { (a: T) =>
+  def oneNumericProp[T: Ring: Numeric: Arbitrary] = forAll { (a: T) =>
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
-    (num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring.times(ring.one, a))
+    assert((num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring.times(ring.one, a)))
   }
   property("Int one") {
     oneNumericProp[Int]
@@ -107,10 +110,10 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     oneNumericProp[Float]
   }
 
-  def timesNumericProp[T: Ring: Numeric: Arbitrary] = Prop.forAll { (a: T, b: T) =>
+  def timesNumericProp[T: Ring: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
-    num.times(a, b) == ring.times(a, b)
+    assert(num.times(a, b) == ring.times(a, b))
   }
 
   property("Int times") {

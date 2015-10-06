@@ -845,6 +845,64 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
 
   }
 
+  "A Scoped Top-N Count-Min sketch implementing CMSHeavyHitters" should {
+
+    "create correct sketches out of a single item" in {
+      forAll{ (x: Int, y: Int) =>
+        val data = (x, y).toK[K]
+        val cmsMonoid = {
+          val heavyHittersN = 2
+          ScopedTopNCMS.monoid[K, K](EPS, DELTA, SEED, heavyHittersN)
+        }
+        val topCms = cmsMonoid.create(data)
+        topCms.totalCount should be(1)
+        topCms.cms.totalCount should be(1)
+        topCms.frequency((x, y).toK[K]).estimate should be(1)
+        // Poor man's way to come up with an item that is not x and that is very unlikely to hash to the same slot.
+        val otherItem = (x + 1, y)
+        topCms.frequency(otherItem.toK[K]).estimate should be(0)
+        // The following assert indirectly verifies whether the counting table is not all-zero (cf. GH-393).
+        topCms.innerProduct(topCms).estimate should be(1)
+      }
+    }
+
+    "(when adding CMS instances) keep all heavy hitters keys" in {
+      val heavyHittersN = 1
+      val monoid = ScopedTopNCMS.monoid[K, K](EPS, DELTA, SEED, heavyHittersN)
+      val cms1 = monoid.create(Seq((1, 1), (2, 3), (2, 3)).toK[K])
+      cms1.heavyHitters should be(Set((1, 1), (2, 3)).toK[K])
+      val cms2 = cms1 ++ monoid.create(Seq((3, 8), (3, 8), (3, 8)).toK[K])
+      cms2.heavyHitters should be(Set((1, 1), (2, 3), (3, 8)).toK[K])
+      val cms3 = cms2 ++ monoid.create(Seq((1, 1), (1, 1), (1, 1)).toK[K])
+      cms3.heavyHitters should be(Set((1, 1), (2, 3), (3, 8)).toK[K])
+      val cms4 = cms3 ++ monoid.create(Seq((6, 2), (6, 2), (6, 2), (6, 2), (6, 2), (6, 2)).toK[K])
+      cms4.heavyHitters should be(Set((1, 1), (2, 3), (3, 8), (6, 2)).toK[K])
+    }
+
+    "(when adding CMS instances) drop old heavy hitters for the same key when new heavy hitters replace them" in {
+      val heavyHittersN = 2
+      val monoid = ScopedTopNCMS.monoid[K, K](EPS, DELTA, SEED, heavyHittersN)
+      val cms1 = monoid.create(Seq((4, 1), (4, 2), (4, 2)).toK[K])
+      cms1.heavyHitters should be(Set((4, 1), (4, 2)).toK[K])
+      val cms2 = cms1 ++ monoid.create(Seq((4, 3), (4, 3), (4, 3)).toK[K])
+      cms2.heavyHitters should be(Set((4, 2), (4, 3)).toK[K])
+      val cms3 = cms2 ++ monoid.create(Seq((4, 1), (4, 1), (4, 1)).toK[K])
+      cms3.heavyHitters should be(Set((4, 3), (4, 1)).toK[K])
+      val cms4 = cms3 ++ monoid.create(Seq((4, 6), (4, 6), (4, 6), (4, 6), (4, 6), (4, 6)).toK[K])
+      cms4.heavyHitters should be(Set((4, 1), (4, 6)).toK[K])
+    }
+
+    "trim multiple keys at once" in {
+      val heavyHittersN = 2
+      val data =
+        Seq(1, 2, 2, 3, 3, 3, 6, 6, 6, 6, 6, 6).flatMap { i => Seq((4, i), (7, i + 2)) }.toK[K]
+      val monoid = ScopedTopNCMS.monoid[K, K](EPS, DELTA, SEED, heavyHittersN)
+      val cms = monoid.create(data)
+      cms.heavyHitters should be(Set((4, 3), (4, 6), (7, 5), (7, 8)).toK[K])
+    }
+
+  }
+
 }
 
 class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
@@ -940,11 +998,26 @@ class CMSHasherBytesSpec extends CMSHasherSpec[Bytes]
 
 abstract class CMSHasherSpec[K: CMSHasher: FromIntLike] extends PropSpec with PropertyChecks with Matchers {
 
-  property("returns positive hashes (i.e. slots) only") {
+  property("returns hashes (i.e. slots) in the range [0, width)") {
     forAll { (a: Int, b: Int, width: Int, x: Int) =>
       whenever (width > 0) {
         val hash = CMSHash[K](a, b, width)
-        hash(x.toK[K]) should be >= 0
+        val hashValue = hash(x.toK[K])
+
+        hashValue should be >= 0
+        hashValue should be < width
+      }
+    }
+  }
+
+  property("returns scoped hashes in the range [0, width)") {
+    forAll { (a: Int, b: Int, width: Int, x: Int, y: Int) =>
+      whenever (width > 0) {
+        val hasher = ScopedTopNCMS.scopedHasher[K, K]
+        val hashValue = hasher.hash(a, b, width)((x, y).toK[K])
+
+        hashValue should be >= 0
+        hashValue should be < width
       }
     }
   }
@@ -1000,12 +1073,24 @@ object CmsTestImplicits {
     def toK[T: FromIntLike]: T = implicitly[FromIntLike[T]].fromInt(x)
   }
 
+  implicit class PairCast(x: (Int, Int)) {
+    def toK[T: FromIntLike]: (T, T) = (x._1.toK[T], x._2.toK[T])
+  }
+
   implicit class SeqCast(xs: Seq[Int]) {
     def toK[T: FromIntLike]: Seq[T] = xs map { _.toK[T] }
   }
 
+  implicit class PairSeqCast(xs: Seq[(Int, Int)]) {
+    def toK[T: FromIntLike]: Seq[(T, T)] = xs map { _.toK[T] }
+  }
+
   implicit class SetCast(xs: Set[Int]) {
     def toK[T: FromIntLike]: Set[T] = xs map { _.toK[T] }
+  }
+
+  implicit class PairSetCast(xs: Set[(Int, Int)]) {
+    def toK[T: FromIntLike]: Set[(T, T)] = xs map { _.toK[T] }
   }
 
 }

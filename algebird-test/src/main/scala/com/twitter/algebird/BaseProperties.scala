@@ -55,7 +55,7 @@ object BaseProperties {
 
   def semigroupSumWorks[T: Semigroup: Arbitrary: Equiv] = 'semigroupSumWorks |: forAll { (in: List[T]) =>
     in.isEmpty || {
-      Equiv[T].equiv(Semigroup.sumOption(in).get, in.reduceLeft(Semigroup.plus(_, _)))
+      Equiv[T].equiv(Semigroup.sumOption(in.iterator).get, in.reduceLeft(Semigroup.plus(_, _)))
     }
   }
 
