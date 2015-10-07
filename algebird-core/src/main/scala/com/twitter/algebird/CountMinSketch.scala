@@ -201,7 +201,7 @@ object CMSFunctions {
    * Compute maxExactCount from parameters or `depth` and `width`
    */
   def maxExactCount(maxExactCountOpt: Option[Int], depth: Int, width: Int): Int =
-    maxExactCountOpt.getOrElse(math.max(width * depth / 100, 100))
+    maxExactCountOpt.getOrElse(math.max(width * depth / 100, 50))
 
   // Eliminates precision errors such as the following:
   //
