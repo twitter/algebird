@@ -106,6 +106,8 @@ case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Mono
 sealed abstract class BF extends java.io.Serializable {
   val numHashes: Int
 
+  val hashes: BFHash
+
   val width: Int
 
   def ++(other: BF): BF
