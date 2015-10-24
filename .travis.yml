@@ -1,9 +1,8 @@
 language: scala
 sudo: false
-matrix:
-  include:
-    - scala: 2.10.5
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
-
-    - scala: 2.11.7
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
+scala:
+  - 2.10.5
+  - 2.11.7
+script:
+  - ./sbt ++$TRAVIS_SCALA_VERSION clean compile
+  - ./sbt ++$TRAVIS_SCALA_VERSION test
