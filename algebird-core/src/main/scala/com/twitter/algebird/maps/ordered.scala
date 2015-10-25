@@ -23,7 +23,7 @@ import com.twitter.algebird.maps.redblack.tree._
 object tree {
   /** Trees that back a map-like object have a value as well as a key */
   trait DataMap[K, V] extends Data[K] {
-    val value: V
+    def value: V
 
     override def hashCode = key.hashCode + value.hashCode
     override def equals(that: Any) = that match {
@@ -42,7 +42,7 @@ object tree {
   trait LNodeMap[K, V] extends NodeMap[K, V] with LNode[K]
 
   trait INodeMap[K, V] extends NodeMap[K, V] with INode[K] {
-    val data: DataMap[K, V]
+    def data: DataMap[K, V]
   }
 }
 

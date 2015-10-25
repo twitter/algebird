@@ -32,7 +32,7 @@ object tree {
   /** Base trait of R/B tree nodes supporting nearest-key query */
   trait NodeNear[K] extends Node[K] {
     /** Ordering that also supports linear distance |x-y| */
-    val keyOrdering: Numeric[K] // <: Ordering[K]
+    def keyOrdering: Numeric[K] // <: Ordering[K]
 
     /** Obtain the nearest nodes to a given key */
     private[nearest] def near(k: K): Seq[INodeNear[K]]
@@ -52,11 +52,11 @@ object tree {
 
   /** Internal R/B tree nodes supporting nearest-key query */
   trait INodeNear[K] extends NodeNear[K] with INode[K] {
-    val lsub: NodeNear[K]
-    val rsub: NodeNear[K]
+    def lsub: NodeNear[K]
+    def rsub: NodeNear[K]
 
-    val kmin: K
-    val kmax: K
+    def kmin: K
+    def kmax: K
 
     final def covL(k: K) = {
       if (keyOrdering.lteq(k, data.key)) {

@@ -30,7 +30,7 @@ object tree {
   /** Base trait of R/B tree nodes supporting increment */
   trait NodeInc[K, V] extends NodeMap[K, V] {
     /** The monoid that defines what it means to increment a value */
-    val valueMonoid: Monoid[V]
+    def valueMonoid: Monoid[V]
 
     /** Increment the value at a key, by another value */
     private[increment] final def incr(di: DataMap[K, V]) = blacken(inc(di))
@@ -51,8 +51,8 @@ object tree {
 
   /** Internal R/B node supporting increment */
   trait INodeInc[K, V] extends NodeInc[K, V] with INodeMap[K, V] {
-    val lsub: NodeInc[K, V]
-    val rsub: NodeInc[K, V]
+    def lsub: NodeInc[K, V]
+    def rsub: NodeInc[K, V]
 
     final def inc(di: DataMap[K, V]) =
       if (color == R) {

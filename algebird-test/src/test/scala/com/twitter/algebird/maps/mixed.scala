@@ -40,8 +40,8 @@ object mixed {
 
     trait INodeMix[K, V, P] extends NodeMix[K, V, P]
       with INodePS[K, V, P] with INodeInc[K, V] with INodeNearMap[K, V] {
-      val lsub: NodeMix[K, V, P]
-      val rsub: NodeMix[K, V, P]
+      def lsub: NodeMix[K, V, P]
+      def rsub: NodeMix[K, V, P]
     }
   }
 

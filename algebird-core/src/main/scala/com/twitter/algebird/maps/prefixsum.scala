@@ -29,7 +29,7 @@ object tree {
   /** Base trait for R/B nodes supporting prefix-sum query */
   trait NodePS[K, V, P] extends NodeMap[K, V] {
     /** Monoid with increment-by-element that defines semantics of prefix sum */
-    val prefixMonoid: IncrementingMonoid[P, V]
+    def prefixMonoid: IncrementingMonoid[P, V]
 
     /**
      * Obtain the prefix (cumulative) sum of values <= a given key 'k'.
@@ -52,10 +52,10 @@ object tree {
 
   /** Internal node for R/B nodes supporting prefix-sum query */
   trait INodePS[K, V, P] extends NodePS[K, V, P] with INodeMap[K, V] {
-    val lsub: NodePS[K, V, P]
-    val rsub: NodePS[K, V, P]
+    def lsub: NodePS[K, V, P]
+    def rsub: NodePS[K, V, P]
 
-    val prefix: P
+    def prefix: P
 
     final def pfSum(k: K, sum: P, open: Boolean) =
       if (keyOrdering.lt(k, data.key))

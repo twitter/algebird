@@ -27,7 +27,7 @@ object tree {
   /** Defines the data payload of a tree node */
   trait Data[K] extends Serializable {
     /** The axiomatic unit of data for R/B trees is a key */
-    val key: K
+    def key: K
 
     override def hashCode = key.hashCode
     override def equals(that: Any) = that match {
@@ -43,7 +43,7 @@ object tree {
   trait Node[K] extends Serializable {
 
     /** The ordering that is applied to key values */
-    val keyOrdering: Ordering[K]
+    def keyOrdering: Ordering[K]
 
     /** Instantiate an internal node. */
     protected def iNode(color: Color, d: Data[K], lsub: Node[K], rsub: Node[K]): INode[K]
@@ -167,13 +167,13 @@ object tree {
   /** Represents an internal node (Red or Black) in the Red Black tree system */
   trait INode[K] extends Node[K] {
     /** The Red/Black color of this node */
-    val color: Color
+    def color: Color
     /** Including, but not limited to, the key */
-    val data: Data[K]
+    def data: Data[K]
     /** The left sub-tree */
-    val lsub: Node[K]
+    def lsub: Node[K]
     /** The right sub-tree */
-    val rsub: Node[K]
+    def rsub: Node[K]
 
     final def node(k: K) =
       if (keyOrdering.lt(k, data.key)) lsub.node(k)
