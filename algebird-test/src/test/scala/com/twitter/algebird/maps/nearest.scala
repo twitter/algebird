@@ -24,9 +24,9 @@ object NearestSetProperties extends FlatSpec with Matchers {
   import tree._
   import infra._
 
-  def testNearest[IN <: INodeNear[Double], M <: NearestSetLike[Double, IN, M]](
+  def testNearest[IN <: INodeNear[Double], M <: NearestSetLike[Double, IN, M] with Set[Double]](
     data: Seq[Double],
-    map: NearestSetLike[Double, IN, M]) {
+    map: NearestSetLike[Double, IN, M] with Set[Double]) {
     val n = data.length
     // I'm writing this test assuming Double keys (0.0, 1.0, 2.0, ... (n-1))
     data should beEqSeq(Vector.tabulate(n)(j => j.toDouble))
@@ -49,9 +49,9 @@ object NearestMapProperties extends FlatSpec with Matchers {
   import tree._
   import infra._
 
-  def testNearest[V, IN <: INodeNearMap[Double, V], M <: NearestMapLike[Double, V, IN, M]](
+  def testNearest[V, IN <: INodeNearMap[Double, V], M <: NearestMapLike[Double, V, IN, M] with Map[Double, V]](
     data: Seq[(Double, V)],
-    map: NearestMapLike[Double, V, IN, M]) {
+    map: NearestMapLike[Double, V, IN, M] with Map[Double, V]) {
     val n = data.length
     // I'm writing this test assuming Double keys (0.0, 1.0, 2.0, ... (n-1))
     data.map(_._1) should beEqSeq(Vector.tabulate(n)(j => j.toDouble))

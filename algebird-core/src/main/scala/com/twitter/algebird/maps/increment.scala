@@ -104,7 +104,7 @@ import infra._
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait IncrementMapLike[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M]]
+trait IncrementMapLike[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M] with Map[K, V]]
   extends NodeInc[K, V] with OrderedMapLike[K, V, IN, M] {
 
   /**
@@ -118,7 +118,22 @@ trait IncrementMapLike[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, I
     }).asInstanceOf[M]
 }
 
-sealed trait IncrementMap[K, V] extends IncrementMapLike[K, V, INodeInc[K, V], IncrementMap[K, V]] {
+sealed trait IncrementMap[K, V] extends Map[K, V] with IncrementMapLike[K, V, INodeInc[K, V], IncrementMap[K, V]] {
+
+  type IN2[V2] = INodeInc[K, V2]
+  type M2[V2] = IncrementMap[K, V2]
+
+  override def empty = IncrementMap.key(keyOrdering).value(valueMonoid)
+
+  def +[V2 >: V](kv2: (K, V2)) = kv2 match {
+    case kv: (K, V) => this.insert(
+      new DataMap[K, V] {
+        val key = kv._1
+        val value = kv._2
+      }).asInstanceOf[IncrementMap[K, V2]]
+    case _ => throw new Exception("insertion may not widen type of IncrementMap")
+  }
+
   override def toString =
     "IncrementMap(" +
       nodesIterator.map(n => s"${n.data.key} -> ${n.data.value}").mkString(", ") +

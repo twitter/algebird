@@ -26,9 +26,9 @@ object IncrementMapProperties extends FlatSpec with Matchers {
   import tree._
   import infra._
 
-  def testIncrement[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M]](
+  def testIncrement[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M] with Map[K, V]](
     data: Seq[(K, V)],
-    map: IncrementMapLike[K, V, IN, M]) {
+    map: IncrementMapLike[K, V, IN, M] with Map[K, V]) {
     val mon = map.valueMonoid
 
     // add values to themselves w.r.t. monoid

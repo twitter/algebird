@@ -98,18 +98,18 @@ object OrderedSetProperties extends FlatSpec with Matchers {
   import RBProperties._
 
   // Assumes 'data' is in key order
-  def testK[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]](
+  def testK[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
     data: Seq[K],
-    omap: OrderedSetLike[K, IN, M]) {
+    omap: OrderedSetLike[K, IN, M] with Set[K]) {
 
     // verify the map elements are ordered by key
     omap.keys should beEqSeq(data)
   }
 
   // Assumes 'data' is in key order
-  def testDel[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]](
+  def testDel[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
     data: Seq[K],
-    omap: OrderedSetLike[K, IN, M]) {
+    omap: OrderedSetLike[K, IN, M] with Set[K]) {
 
     data.foreach { key =>
       val delMap = omap - key
@@ -119,12 +119,14 @@ object OrderedSetProperties extends FlatSpec with Matchers {
     }
   }
 
-  def testEq[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]](
+  def testEq[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
     data: Seq[K],
-    empty: OrderedSetLike[K, IN, M]) {
+    map: OrderedSetLike[K, IN, M] with Set[K]) {
 
-    val map1 = scala.util.Random.shuffle(data).foldLeft(empty)((m, e) => m + e)
-    val map2 = scala.util.Random.shuffle(data).foldLeft(empty)((m, e) => m + e)
+    val map1 = scala.util.Random.shuffle(data)
+      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
+    val map2 = scala.util.Random.shuffle(data)
+      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
 
     (map1 == map2) should be (true)
 
@@ -145,9 +147,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
   import RBProperties._
 
   // Assumes 'data' is in key order
-  def testKV[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M]](
+  def testKV[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
     data: Seq[(K, V)],
-    omap: OrderedMapLike[K, V, IN, M]) {
+    omap: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
 
     // verify the map elements are ordered by key
     omap.keys should beEqSeq(data.map(_._1))
@@ -158,9 +160,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
   }
 
   // Assumes 'data' is in key order
-  def testDel[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M]](
+  def testDel[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
     data: Seq[(K, V)],
-    omap: OrderedMapLike[K, V, IN, M]) {
+    omap: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
 
     data.iterator.map(_._1).foreach { key =>
       val delMap = omap - key
@@ -170,12 +172,14 @@ object OrderedMapProperties extends FlatSpec with Matchers {
     }
   }
 
-  def testEq[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M]](
+  def testEq[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
     data: Seq[(K, V)],
-    empty: OrderedMapLike[K, V, IN, M]) {
+    map: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
 
-    val map1 = scala.util.Random.shuffle(data).foldLeft(empty)((m, e) => m + e)
-    val map2 = scala.util.Random.shuffle(data).foldLeft(empty)((m, e) => m + e)
+    val map1 = scala.util.Random.shuffle(data)
+      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
+    val map2 = scala.util.Random.shuffle(data)
+      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
 
     (map1 == map2) should be (true)
 

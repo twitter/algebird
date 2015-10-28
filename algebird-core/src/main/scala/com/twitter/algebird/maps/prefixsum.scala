@@ -22,6 +22,7 @@ import com.twitter.algebird.{ Monoid, MonoidAggregator }
 
 import com.twitter.algebird.maps.redblack.tree._
 import com.twitter.algebird.maps.ordered._
+import com.twitter.algebird.maps.ordered.tree.DataMap
 
 object tree {
   import com.twitter.algebird.maps.ordered.tree._
@@ -102,7 +103,7 @@ import infra._
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M]]
+trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M] with Map[K, V]]
   extends NodePS[K, V, P] with OrderedMapLike[K, V, IN, M] {
 
   /**
@@ -127,8 +128,22 @@ trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K,
   }
 }
 
-sealed trait PrefixSumMap[K, V, P]
-  extends PrefixSumMapLike[K, V, P, INodePS[K, V, P], PrefixSumMap[K, V, P]] {
+sealed trait PrefixSumMap[K, V, P] extends Map[K, V]
+  with PrefixSumMapLike[K, V, P, INodePS[K, V, P], PrefixSumMap[K, V, P]] {
+
+  type IN2[V2] = INodePS[K, V2, P]
+  type M2[V2] = PrefixSumMap[K, V2, P]
+
+  override def empty = PrefixSumMap.key(keyOrdering).value[V].prefix(prefixMonoid)
+
+  def +[V2 >: V](kv2: (K, V2)) = kv2 match {
+    case kv: (K, V) => this.insert(
+      new DataMap[K, V] {
+        val key = kv._1
+        val value = kv._2
+      }).asInstanceOf[PrefixSumMap[K, V2, P]]
+    case _ => throw new Exception("insertion may not widen type of PrefixSumMap")
+  }
 
   override def toString =
     "PrefixSumMap(" +

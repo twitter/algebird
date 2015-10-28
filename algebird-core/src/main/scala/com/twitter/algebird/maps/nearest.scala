@@ -22,7 +22,7 @@ import com.twitter.algebird.maps.redblack.tree._
 import com.twitter.algebird.maps.ordered._
 import com.twitter.algebird.maps.ordered.tree.DataMap
 
-case class Cover[T](l: Option[T], r: Option[T]) {
+case class Cover[+T](l: Option[T], r: Option[T]) {
   def map[U](f: T => U) = Cover(l.map(f), r.map(f))
 }
 
@@ -131,9 +131,9 @@ object tree {
     }
   }
 
-  trait NodeNearMap[K, V] extends NodeNear[K] with NodeMap[K, V]
-  trait LNodeNearMap[K, V] extends NodeNearMap[K, V] with LNodeNear[K] with LNodeMap[K, V]
-  trait INodeNearMap[K, V] extends NodeNearMap[K, V] with INodeNear[K] with INodeMap[K, V]
+  trait NodeNearMap[K, +V] extends NodeNear[K] with NodeMap[K, V]
+  trait LNodeNearMap[K, +V] extends NodeNearMap[K, V] with LNodeNear[K] with LNodeMap[K, V]
+  trait INodeNearMap[K, +V] extends NodeNearMap[K, V] with INodeNear[K] with INodeMap[K, V]
 }
 
 import tree._
@@ -188,7 +188,7 @@ import infra._
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The self-type of the concrete container
  */
-trait NearestLike[K, IN <: INodeNear[K], M <: NearestLike[K, IN, M]]
+trait NearestLike[K, +IN <: INodeNear[K], +M <: NearestLike[K, IN, M]]
   extends NodeNear[K] with OrderedLike[K, IN, M] {
 
   /** Obtain the nodes nearest to a key */
@@ -216,7 +216,7 @@ trait NearestLike[K, IN <: INodeNear[K], M <: NearestLike[K, IN, M]]
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The self-type of the concrete container
  */
-trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M]]
+trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M] with Set[K]]
   extends NearestLike[K, IN, M] with OrderedSetLike[K, IN, M] {
 
   /**
@@ -238,7 +238,7 @@ trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M]]
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The self-type of the concrete container
  */
-trait NearestMapLike[K, V, IN <: INodeNearMap[K, V], M <: NearestMapLike[K, V, IN, M]]
+trait NearestMapLike[K, +V, +IN <: INodeNearMap[K, V], +M <: NearestMapLike[K, V, IN, M] with Map[K, V]]
   extends NodeNearMap[K, V] with NearestLike[K, IN, M] with OrderedMapLike[K, V, IN, M] {
 
   /**
@@ -262,14 +262,30 @@ trait NearestMapLike[K, V, IN <: INodeNearMap[K, V], M <: NearestMapLike[K, V, I
   }
 }
 
-sealed trait NearestSet[K] extends NearestSetLike[K, INodeNear[K], NearestSet[K]] {
+sealed trait NearestSet[K] extends Set[K] with NearestSetLike[K, INodeNear[K], NearestSet[K]] {
+
+  override def empty = NearestSet.key(keyOrdering)
+
   override def toString =
     "NearestSet(" +
       nodesIterator.map(n => s"${n.data.key}").mkString(", ") +
       ")"
 }
 
-sealed trait NearestMap[K, V] extends NearestMapLike[K, V, INodeNearMap[K, V], NearestMap[K, V]] {
+sealed trait NearestMap[K, +V] extends Map[K, V]
+  with NearestMapLike[K, V, INodeNearMap[K, V], NearestMap[K, V]] {
+
+  type IN2[V2] = INodeNearMap[K, V2]
+  type M2[V2] = NearestMap[K, V2]
+
+  override def empty = NearestMap.key(keyOrdering).value[V]
+
+  def +[V2 >: V](kv: (K, V2)) = this.asInstanceOf[NearestMap[K, V2]].insert(
+    new DataMap[K, V2] {
+      val key = kv._1
+      val value = kv._2
+    }).asInstanceOf[NearestMap[K, V2]]
+
   override def toString =
     "NearestMap(" +
       nodesIterator.map(n => s"${n.data.key} -> ${n.data.value}").mkString(", ") +

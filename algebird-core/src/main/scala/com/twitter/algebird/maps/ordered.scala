@@ -18,11 +18,14 @@ package com.twitter.algebird.maps.ordered
 
 import math.Ordering
 
+import scala.collection.immutable.MapLike
+import scala.collection.SetLike
+
 import com.twitter.algebird.maps.redblack.tree._
 
 object tree {
   /** Trees that back a map-like object have a value as well as a key */
-  trait DataMap[K, V] extends Data[K] {
+  trait DataMap[K, +V] extends Data[K] {
     def value: V
 
     override def hashCode = key.hashCode + value.hashCode
@@ -37,11 +40,11 @@ object tree {
    * @tparam K The key type
    * @tparam V The value type
    */
-  trait NodeMap[K, V] extends Node[K]
+  trait NodeMap[K, +V] extends Node[K]
 
-  trait LNodeMap[K, V] extends NodeMap[K, V] with LNode[K]
+  trait LNodeMap[K, +V] extends NodeMap[K, V] with LNode[K]
 
-  trait INodeMap[K, V] extends NodeMap[K, V] with INode[K] {
+  trait INodeMap[K, +V] extends NodeMap[K, V] with INode[K] {
     def data: DataMap[K, V]
   }
 }
@@ -131,28 +134,16 @@ import infra._
  * @tparam IN The internal node type of the underlying R/B tree subclass
  * @tparam M The container self-type of the concrete map subclass
  */
-trait OrderedLike[K, IN <: INode[K], M <: OrderedLike[K, IN, M]] extends Node[K] {
-
-  /** Obtain a new container with key removed */
-  def -(k: K) = this.delete(k).asInstanceOf[M]
+trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[K] {
 
   /** Get the internal node stored at at key, or None if key is not present */
   def getNode(k: K) = this.node(k).map(_.asInstanceOf[IN])
-
-  /** Returns true if key is present in the container, false otherwise */
-  def contains(k: K) = this.node(k).isDefined
 
   /** A container of underlying nodes, in key order */
   def nodes = nodesIterator.toIterable
 
   /** Iterator over nodes, in key order */
   def nodesIterator: Iterator[IN] = INodeIterator.apply[K, IN](this)
-
-  /** A container of keys, in key order */
-  def keys = keysIterator.toIterable
-
-  /** Iterator over keys, in key order */
-  def keysIterator = nodesIterator.map(_.data.key)
 }
 
 /**
@@ -162,8 +153,22 @@ trait OrderedLike[K, IN <: INode[K], M <: OrderedLike[K, IN, M]] extends Node[K]
  * @tparam IN The internal node type of the underlying R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]]
-  extends OrderedLike[K, IN, M] with Iterable[K] {
+trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]]
+  extends OrderedLike[K, IN, M] with SetLike[K, M] {
+
+  def empty: M
+
+  /** Obtain a new container with key removed */
+  def -(k: K) = this.delete(k).asInstanceOf[M]
+
+  /** Returns true if key is present in the container, false otherwise */
+  override def contains(k: K) = this.node(k).isDefined
+
+  /** A container of keys, in key order */
+  def keys = keysIterator.toIterable
+
+  /** Iterator over keys, in key order */
+  def keysIterator = nodesIterator.map(_.data.key)
 
   /** Obtain a new container with key inserted */
   def +(k: K) = this.insert(
@@ -176,7 +181,8 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]]
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
-    case coll: OrderedSetLike[K, IN, M] => coll.sameElements(this)
+    case coll: OrderedSetLike[K, IN, M] =>
+      coll.nodesIterator.map(_.data).toSeq.sameElements(this.nodesIterator.map(_.data).toSeq)
     case _ => false
   }
 }
@@ -189,15 +195,27 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M]]
  * @tparam IN The internal node type of the underlying R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait OrderedMapLike[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M]]
-  extends NodeMap[K, V] with OrderedLike[K, IN, M] with Iterable[(K, V)] {
+trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN, M] with Map[K, V]]
+  extends NodeMap[K, V] with OrderedLike[K, IN, M] with MapLike[K, V, M] {
 
-  /** Obtain a new map with a (key, val) pair inserted */
-  def +(kv: (K, V)) = this.insert(
-    new DataMap[K, V] {
-      val key = kv._1
-      val value = kv._2
-    }).asInstanceOf[M]
+  type IN2[V2] <: INodeMap[K, V2]
+  type M2[V2] <: OrderedMapLike[K, V2, IN2[V2], M2[V2]] with Map[K, V2]
+
+  def empty: M
+
+  def +[V2 >: V](kv2: (K, V2)): M2[V2]
+
+  /** Obtain a new container with key removed */
+  def -(k: K) = this.delete(k).asInstanceOf[M]
+
+  /** Returns true if key is present in the container, false otherwise */
+  override def contains(k: K) = this.node(k).isDefined
+
+  /** A container of keys, in key order */
+  override def keys = keysIterator.toIterable
+
+  /** Iterator over keys, in key order */
+  override def keysIterator = nodesIterator.map(_.data.key)
 
   /** Get the value stored at a key, or None if key is not present */
   def get(k: K) = this.getNode(k).map(_.data.value)
@@ -206,25 +224,43 @@ trait OrderedMapLike[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M
   def iterator: Iterator[(K, V)] = nodesIterator.map(n => ((n.data.key, n.data.value)))
 
   /** Container of values, in key order */
-  def values = valuesIterator.toIterable
+  override def values = valuesIterator.toIterable
 
   /** Iterator over values, in key order */
-  def valuesIterator = nodesIterator.map(_.data.value)
+  override def valuesIterator = nodesIterator.map(_.data.value)
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
-    case coll: OrderedMapLike[K, V, IN, M] => coll.sameElements(this)
+    case coll: OrderedMapLike[K, V, IN, M] =>
+      coll.nodesIterator.map(_.data).toSeq.sameElements(this.nodesIterator.map(_.data).toSeq)
     case _ => false
   }
 }
 
-sealed trait OrderedSet[K] extends OrderedSetLike[K, INode[K], OrderedSet[K]] {
+sealed trait OrderedSet[K] extends Set[K] with OrderedSetLike[K, INode[K], OrderedSet[K]] {
+
+  override def empty = OrderedSet.key(keyOrdering)
+
   override def toString =
     "OrderedSet(" +
       nodesIterator.map(n => s"${n.data.key}").mkString(", ") +
       ")"
 }
-sealed trait OrderedMap[K, V] extends OrderedMapLike[K, V, INodeMap[K, V], OrderedMap[K, V]] {
+
+sealed trait OrderedMap[K, +V]
+  extends Map[K, V] with OrderedMapLike[K, V, INodeMap[K, V], OrderedMap[K, V]] {
+
+  type IN2[V2] = INodeMap[K, V2]
+  type M2[V2] = OrderedMap[K, V2]
+
+  override def empty = OrderedMap.key(keyOrdering).value[V]
+
+  def +[V2 >: V](kv: (K, V2)) = this.asInstanceOf[OrderedMap[K, V2]].insert(
+    new DataMap[K, V2] {
+      val key = kv._1
+      val value = kv._2
+    }).asInstanceOf[OrderedMap[K, V2]]
+
   override def toString =
     "OrderedMap(" +
       nodesIterator.map(n => s"${n.data.key} -> ${n.data.value}").mkString(", ") +
