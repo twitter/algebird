@@ -156,6 +156,11 @@ trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[
 
   /** Iterator over nodes, in key order, having key >= k */
   def nodesIteratorFrom(k: K): Iterator[IN] = INodeIterator.fromKey[K, IN](k, this)
+
+  def nodesIteratorRange(from: Option[K], until: Option[K]): Iterator[IN] = {
+    val fromItr = from.fold(nodesIterator)(k => nodesIteratorFrom(k))
+    until.fold(fromItr)(k => fromItr.takeWhile(n => keyOrdering.lt(n.data.key, k)))
+  }
 }
 
 /**
@@ -192,6 +197,9 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K
   def iterator: Iterator[K] = nodesIterator.map(_.data.key)
 
   def keysIteratorFrom(k: K): Iterator[K] = nodesIteratorFrom(k).map(_.data.key)
+
+  def rangeImpl(from: Option[K], until: Option[K]) =
+    nodesIteratorRange(from, until).map(_.data.key).foldLeft(empty)((m, e) => m + e)
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
@@ -249,6 +257,10 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
   def keysIteratorFrom(k: K): Iterator[K] = nodesIteratorFrom(k).map(_.data.key)
 
   def valuesIteratorFrom(k: K): Iterator[V] = nodesIteratorFrom(k).map(_.data.value)
+
+  def rangeImpl(from: Option[K], until: Option[K]) =
+    nodesIteratorRange(from, until).map(n => (n.data.key, n.data.value))
+      .foldLeft(empty)((m, e) => (m + e).asInstanceOf[M])
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {

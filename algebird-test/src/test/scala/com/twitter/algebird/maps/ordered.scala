@@ -23,6 +23,11 @@ import com.twitter.algebird.matchers.seq._
 object RBProperties extends FlatSpec with Matchers {
   import com.twitter.algebird.maps.redblack.tree._
 
+  def filter[T, K](data: Seq[T])(f: T => K)(from: Option[K], until: Option[K])(implicit ord: Ordering[K]) = {
+    val dataFrom = from.fold(data)(k => data.dropWhile(e => ord.lt(f(e), k)))
+    until.fold(dataFrom)(k => dataFrom.takeWhile(e => ord.lt(f(e), k)))
+  }
+
   def color[K](node: Node[K]): Color = node match {
     case n: INode[K] => n.color
     case _ => B
@@ -287,6 +292,18 @@ class OrderedSetSpec extends FlatSpec with Matchers {
       testFrom(data, map)
     }
   }
+
+  it should "support rangeImpl" in {
+    val data = Vector('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
+    (1 to 100).foreach { u =>
+      val shuffled = scala.util.Random.shuffle(data)
+      val map = shuffled.foldLeft(OrderedSet.key[Char])((m, e) => m + e)
+      map.rangeImpl(Some('2'), Some('8')) should beEqSeq(filter(data)(x => x)(Some('2'), Some('8')))
+      map.rangeImpl(None, Some('8')) should beEqSeq(filter(data)(x => x)(None, Some('8')))
+      map.rangeImpl(Some('2'), None) should beEqSeq(filter(data)(x => x)(Some('2'), None))
+      map.rangeImpl(None, None) should beEqSeq(filter(data)(x => x)(None, None))
+    }
+  }
 }
 
 class OrderedMapSpec extends FlatSpec with Matchers {
@@ -343,6 +360,18 @@ class OrderedMapSpec extends FlatSpec with Matchers {
       val shuffled = scala.util.Random.shuffle(data)
       val map = shuffled.foldLeft(OrderedMap.key[Double].value[Int])((m, e) => m + e)
       testFrom(data, map)
+    }
+  }
+
+  it should "support rangeImpl" in {
+    val data = Vector(('0', 0), ('1', 1), ('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6), ('7', 7), ('8', 8), ('9', 9))
+    (1 to 100).foreach { u =>
+      val shuffled = scala.util.Random.shuffle(data)
+      val map = shuffled.foldLeft(OrderedMap.key[Char].value[Int])((m, e) => m + e)
+      map.rangeImpl(Some('2'), Some('8')) should beEqSeq(filter(data)(_._1)(Some('2'), Some('8')))
+      map.rangeImpl(None, Some('8')) should beEqSeq(filter(data)(_._1)(None, Some('8')))
+      map.rangeImpl(Some('2'), None) should beEqSeq(filter(data)(_._1)(Some('2'), None))
+      map.rangeImpl(None, None) should beEqSeq(filter(data)(_._1)(None, None))
     }
   }
 }
