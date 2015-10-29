@@ -139,6 +139,18 @@ object OrderedSetProperties extends FlatSpec with Matchers {
       (map1 == (map2d + key)) should be (true)
     }
   }
+
+  // assumes data is of form 0.0, 1.0, 2.0 ...
+  def testFrom[IN <: INode[Double], M <: OrderedSetLike[Double, IN, M] with Set[Double]](
+    data: Seq[Double],
+    map: OrderedSetLike[Double, IN, M] with Set[Double]) {
+
+    data.foreach { k =>
+      map.keysIteratorFrom(k).toSeq should beEqSeq(data.filter(_ >= k))
+      map.keysIteratorFrom(k - 0.5).toSeq should beEqSeq(data.filter(_ >= k))
+      map.keysIteratorFrom(k + 0.5).toSeq should beEqSeq(data.filter(_ >= (k + 1.0)))
+    }
+  }
 }
 
 object OrderedMapProperties extends FlatSpec with Matchers {
@@ -198,6 +210,25 @@ object OrderedMapProperties extends FlatSpec with Matchers {
       }
     }
   }
+
+  // assumes data is of form (0.0, 0), (1.0, 1), (2.0, 2) ...
+  def testFrom[IN <: INodeMap[Double, Int], M <: OrderedMapLike[Double, Int, IN, M] with Map[Double, Int]](
+    data: Seq[(Double, Int)],
+    map: OrderedMapLike[Double, Int, IN, M] with Map[Double, Int]) {
+
+    data.foreach { p =>
+      val (k, v) = p
+      map.iteratorFrom(k).toSeq should beEqSeq(data.filter(_._1 >= k))
+      map.iteratorFrom(k - 0.5).toSeq should beEqSeq(data.filter(_._1 >= k))
+      map.iteratorFrom(k + 0.5).toSeq should beEqSeq(data.filter(_._1 >= (k + 1.0)))
+      map.keysIteratorFrom(k).toSeq should beEqSeq(data.filter(_._1 >= k).map(_._1))
+      map.keysIteratorFrom(k - 0.5).toSeq should beEqSeq(data.filter(_._1 >= k).map(_._1))
+      map.keysIteratorFrom(k + 0.5).toSeq should beEqSeq(data.filter(_._1 >= (k + 1.0)).map(_._1))
+      map.valuesIteratorFrom(k).toSeq should beEqSeq(data.filter(_._1 >= k).map(_._2))
+      map.valuesIteratorFrom(k - 0.5).toSeq should beEqSeq(data.filter(_._1 >= k).map(_._2))
+      map.valuesIteratorFrom(k + 0.5).toSeq should beEqSeq(data.filter(_._1 >= (k + 1.0)).map(_._2))
+    }
+  }
 }
 
 class OrderedSetSpec extends FlatSpec with Matchers {
@@ -247,6 +278,15 @@ class OrderedSetSpec extends FlatSpec with Matchers {
     testK(data, imap)
     testDel(data, imap)
   }
+
+  it should "support keysIteratorFrom()" in {
+    val data = Vector.tabulate(50)(_.toDouble)
+    (1 to 1000).foreach { u =>
+      val shuffled = scala.util.Random.shuffle(data)
+      val map = shuffled.foldLeft(OrderedSet.key[Double])((m, e) => m + e)
+      testFrom(data, map)
+    }
+  }
 }
 
 class OrderedMapSpec extends FlatSpec with Matchers {
@@ -295,5 +335,14 @@ class OrderedMapSpec extends FlatSpec with Matchers {
     testRB(imap)
     testKV(data, imap)
     testDel(data, imap)
+  }
+
+  it should "support the iteratorFrom() family" in {
+    val data = Vector.tabulate(50)(j => (j.toDouble, j))
+    (1 to 1000).foreach { u =>
+      val shuffled = scala.util.Random.shuffle(data)
+      val map = shuffled.foldLeft(OrderedMap.key[Double].value[Int])((m, e) => m + e)
+      testFrom(data, map)
+    }
   }
 }

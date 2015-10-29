@@ -53,7 +53,7 @@ import tree._
 
 object infra {
   class INodeIterator[IN <: INode[_]] extends Iterator[IN] {
-    val stack = scala.collection.mutable.Stack.empty[INode[_]]
+    private[infra] val stack = scala.collection.mutable.Stack.empty[INode[_]]
 
     def hasNext = !stack.isEmpty
     def next = {
@@ -73,10 +73,37 @@ object infra {
   }
 
   object INodeIterator {
+
+    /** An empty node iterator, with a specified type */
     def empty[IN <: INode[_]] = new INodeIterator[IN]
+
+    /** Construct a node iterator from a given tree node */
     def from[IN <: INode[_]](node: Node[_]) = {
-      val itr = new INodeIterator[IN]
+      val itr = empty[IN]
       itr.pushLeft(node)
+      itr
+    }
+
+    /** Construct a node iterator that will start at key */
+    def fromKey[K, IN <: INode[_]](key: K, node: Node[K]) = {
+      val itr = empty[IN]
+      def fill(node: Node[K]) {
+        val ord = node.keyOrdering
+        node match {
+          case n: INode[K] => {
+            if (ord.lt(key, n.data.key)) {
+              itr.stack.push(n)
+              fill(n.lsub)
+            } else if (ord.gt(key, n.data.key)) {
+              fill(n.rsub)
+            } else {
+              itr.stack.push(n)
+            }
+          }
+          case _ => ()
+        }
+      }
+      fill(node)
       itr
     }
   }
@@ -123,6 +150,12 @@ trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[
 
   /** Iterator over nodes, in key order */
   def nodesIterator: Iterator[IN] = INodeIterator.from[IN](this)
+
+  /** A container of nodes, in key order, having key >= k */
+  def nodesFrom(k: K) = nodesIteratorFrom(k).toIterable
+
+  /** Iterator over nodes, in key order, having key >= k */
+  def nodesIteratorFrom(k: K): Iterator[IN] = INodeIterator.fromKey[K, IN](k, this)
 }
 
 /**
@@ -157,6 +190,8 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K
 
   /** Iterator over keys, in key order */
   def iterator: Iterator[K] = nodesIterator.map(_.data.key)
+
+  def keysIteratorFrom(k: K): Iterator[K] = nodesIteratorFrom(k).map(_.data.key)
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
@@ -207,6 +242,13 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
 
   /** Iterator over values, in key order */
   override def valuesIterator = nodesIterator.map(_.data.value)
+
+  def iteratorFrom(k: K): Iterator[(K, V)] =
+    nodesIteratorFrom(k).map(n => (n.data.key, n.data.value))
+
+  def keysIteratorFrom(k: K): Iterator[K] = nodesIteratorFrom(k).map(_.data.key)
+
+  def valuesIteratorFrom(k: K): Iterator[V] = nodesIteratorFrom(k).map(_.data.value)
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
