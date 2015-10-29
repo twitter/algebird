@@ -52,53 +52,32 @@ object tree {
 import tree._
 
 object infra {
-  /** Iterator over internal nodes in a Red Black tree, performing in-order traversal */
-  class INodeIterator[K, IN <: INode[K]](node: IN) extends Iterator[IN] {
-    // At any point in time, only one iterator is stored, which is important because
-    // otherwise we'd instantiate all sub-iterators over the entire tree.  This way iterators
-    // get GC'd once they are spent, and only a linear stack is instantiated at any one time.
-    private var state = INodeIterator.stateL
-    private var itr = itrNext
+  class INodeIterator[IN <: INode[_]] extends Iterator[IN] {
+    val stack = scala.collection.mutable.Stack.empty[INode[_]]
 
-    def hasNext = itr.hasNext
-
+    def hasNext = !stack.isEmpty
     def next = {
-      val v = itr.next
-      if (!itr.hasNext) itr = itrNext
-      v
+      val r = stack.pop()
+      pushLeft(r.rsub)
+      r.asInstanceOf[IN]
     }
 
-    // Get the next non-empty iterator if it exists, or an empty iterator otherwise
-    // Adhere to in-order state transition: left-subtree -> current -> right-subtree 
-    private def itrNext = {
-      var n = itrState
-      while (!n.hasNext && state < INodeIterator.stateR) n = itrState
-      n
-    }
-
-    // Get the iterator corresponding to next iteration state
-    private def itrState = {
-      val i = state match {
-        case INodeIterator.stateL => INodeIterator.apply[K, IN](node.lsub) // left subtree
-        case INodeIterator.stateC => Iterator.single(node) // current node
-        case INodeIterator.stateR => INodeIterator.apply[K, IN](node.rsub) // right subtree
-        case _ => Iterator.empty
+    private[infra] def pushLeft(n: Node[_]) {
+      var t = n
+      while (t.isInstanceOf[INode[_]]) {
+        val ti = t.asInstanceOf[INode[_]]
+        stack.push(ti)
+        t = ti.lsub
       }
-      state += 1
-      i
     }
   }
 
-  /** Factory and constants for INodeIterator */
   object INodeIterator {
-    // Iteration states corresponding to in-order tree traversal 
-    private[infra] val stateL = 1 // iterating over left subtree
-    private[infra] val stateC = 2 // current node
-    private[infra] val stateR = 3 // iterating over right subtree
-
-    def apply[K, IN <: INode[K]](node: Node[K]) = node match {
-      case n: LNode[K] => Iterator.empty
-      case _ => new INodeIterator[K, IN](node.asInstanceOf[IN])
+    def empty[IN <: INode[_]] = new INodeIterator[IN]
+    def from[IN <: INode[_]](node: Node[_]) = {
+      val itr = new INodeIterator[IN]
+      itr.pushLeft(node)
+      itr
     }
   }
 
@@ -143,7 +122,7 @@ trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[
   def nodes = nodesIterator.toIterable
 
   /** Iterator over nodes, in key order */
-  def nodesIterator: Iterator[IN] = INodeIterator.apply[K, IN](this)
+  def nodesIterator: Iterator[IN] = INodeIterator.from[IN](this)
 }
 
 /**
