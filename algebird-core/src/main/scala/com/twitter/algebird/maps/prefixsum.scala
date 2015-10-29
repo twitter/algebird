@@ -18,6 +18,8 @@ package com.twitter.algebird.maps.prefixsum
 
 import math.Ordering
 
+import scala.collection.SortedMap
+
 import com.twitter.algebird.{ Monoid, MonoidAggregator }
 
 import com.twitter.algebird.maps.redblack.tree._
@@ -103,7 +105,7 @@ import infra._
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M] with Map[K, V]]
+trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M] with SortedMap[K, V]]
   extends NodePS[K, V, P] with OrderedMapLike[K, V, IN, M] {
 
   /**
@@ -128,7 +130,7 @@ trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K,
   }
 }
 
-sealed trait PrefixSumMap[K, V, P] extends Map[K, V]
+sealed trait PrefixSumMap[K, V, P] extends SortedMap[K, V]
   with PrefixSumMapLike[K, V, P, INodePS[K, V, P], PrefixSumMap[K, V, P]] {
 
   type IN2[V2] = INodePS[K, V2, P]

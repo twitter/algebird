@@ -24,6 +24,8 @@ import com.twitter.algebird.matchers.seq._
 
 object mixed {
   import math.Numeric
+  import scala.collection.SortedMap
+
   import com.twitter.algebird.maps.increment._
   import com.twitter.algebird.maps.prefixsum._
   import com.twitter.algebird.maps.nearest._
@@ -82,7 +84,7 @@ object mixed {
 
   import infra._
 
-  sealed trait MixedMap[K, V, P] extends Map[K, V]
+  sealed trait MixedMap[K, V, P] extends SortedMap[K, V]
     with IncrementMapLike[K, V, INodeMix[K, V, P], MixedMap[K, V, P]]
     with PrefixSumMapLike[K, V, P, INodeMix[K, V, P], MixedMap[K, V, P]]
     with NearestMapLike[K, V, INodeMix[K, V, P], MixedMap[K, V, P]] {

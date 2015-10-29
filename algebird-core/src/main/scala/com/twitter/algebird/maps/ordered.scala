@@ -17,9 +17,11 @@ limitations under the License.
 package com.twitter.algebird.maps.ordered
 
 import math.Ordering
+import scala.collection.{ SortedSet, SortedMap }
 
 import scala.collection.immutable.MapLike
-import scala.collection.SetLike
+import scala.collection.mutable.Builder
+import scala.collection.{ SortedSet, SortedMap, SetLike, SortedSetLike, SortedMapLike }
 
 import com.twitter.algebird.maps.redblack.tree._
 
@@ -170,8 +172,8 @@ trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[
  * @tparam IN The internal node type of the underlying R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]]
-  extends OrderedLike[K, IN, M] with SetLike[K, M] {
+trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with SortedSet[K]]
+  extends OrderedLike[K, IN, M] with SetLike[K, M] with SortedSetLike[K, M] {
 
   def empty: M
 
@@ -201,6 +203,9 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K
   def rangeImpl(from: Option[K], until: Option[K]) =
     nodesIteratorRange(from, until).map(_.data.key).foldLeft(empty)((m, e) => m + e)
 
+  override def seq = this.asInstanceOf[M]
+  def ordering = keyOrdering
+
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
     case coll: OrderedSetLike[K, IN, M] =>
@@ -217,11 +222,11 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K
  * @tparam IN The internal node type of the underlying R/B tree subclass
  * @tparam M The map self-type of the concrete map subclass
  */
-trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN, M] with Map[K, V]]
-  extends NodeMap[K, V] with OrderedLike[K, IN, M] with MapLike[K, V, M] {
+trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]]
+  extends NodeMap[K, V] with OrderedLike[K, IN, M] with SortedMapLike[K, V, M] {
 
   type IN2[V2] <: INodeMap[K, V2]
-  type M2[V2] <: OrderedMapLike[K, V2, IN2[V2], M2[V2]] with Map[K, V2]
+  type M2[V2] <: OrderedMapLike[K, V2, IN2[V2], M2[V2]] with SortedMap[K, V2]
 
   def empty: M
 
@@ -262,6 +267,19 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
     nodesIteratorRange(from, until).map(n => (n.data.key, n.data.value))
       .foldLeft(empty)((m, e) => (m + e).asInstanceOf[M])
 
+  override def seq = this.asInstanceOf[M]
+  def ordering = keyOrdering
+
+  override protected[this] def newBuilder = new Builder[(K, V), M] {
+    var res = empty
+    def +=(e: (K, V)) = {
+      res = (res + e).asInstanceOf[M]
+      this
+    }
+    def clear() { res = empty }
+    def result = res
+  }
+
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
     case coll: OrderedMapLike[K, V, IN, M] =>
@@ -270,7 +288,7 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
   }
 }
 
-sealed trait OrderedSet[K] extends Set[K] with OrderedSetLike[K, INode[K], OrderedSet[K]] {
+sealed trait OrderedSet[K] extends SortedSet[K] with OrderedSetLike[K, INode[K], OrderedSet[K]] {
 
   override def empty = OrderedSet.key(keyOrdering)
 
@@ -281,7 +299,8 @@ sealed trait OrderedSet[K] extends Set[K] with OrderedSetLike[K, INode[K], Order
 }
 
 sealed trait OrderedMap[K, +V]
-  extends Map[K, V] with OrderedMapLike[K, V, INodeMap[K, V], OrderedMap[K, V]] {
+  extends SortedMap[K, V]
+  with OrderedMapLike[K, V, INodeMap[K, V], OrderedMap[K, V]] {
 
   type IN2[V2] = INodeMap[K, V2]
   type M2[V2] = OrderedMap[K, V2]

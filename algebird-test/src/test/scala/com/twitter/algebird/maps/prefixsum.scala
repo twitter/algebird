@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird.maps.prefixsum
 
+import scala.collection.SortedMap
+
 import org.scalatest._
 
 import com.twitter.algebird.Monoid
@@ -27,9 +29,9 @@ object PrefixSumMapProperties extends FlatSpec with Matchers {
   import infra._
 
   // Assumes 'data' is in key order
-  def testPrefix[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M] with Map[K, V]](
+  def testPrefix[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K, V, P, IN, M] with SortedMap[K, V]](
     data: Seq[(K, V)],
-    psmap: PrefixSumMapLike[K, V, P, IN, M] with Map[K, V]) {
+    psmap: PrefixSumMapLike[K, V, P, IN, M] with SortedMap[K, V]) {
 
     val mon = psmap.prefixMonoid
     val psTruth = data.map(_._2).scanLeft(mon.zero)((v, e) => mon.inc(v, e))

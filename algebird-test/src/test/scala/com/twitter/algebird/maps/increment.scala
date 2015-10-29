@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird.maps.increment
 
+import scala.collection.SortedMap
+
 import org.scalatest._
 
 import com.twitter.algebird.Monoid
@@ -26,9 +28,9 @@ object IncrementMapProperties extends FlatSpec with Matchers {
   import tree._
   import infra._
 
-  def testIncrement[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M] with Map[K, V]](
+  def testIncrement[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, IN, M] with SortedMap[K, V]](
     data: Seq[(K, V)],
-    map: IncrementMapLike[K, V, IN, M] with Map[K, V]) {
+    map: IncrementMapLike[K, V, IN, M] with SortedMap[K, V]) {
     val mon = map.valueMonoid
 
     // add values to themselves w.r.t. monoid

@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird.maps.ordered
 
+import scala.collection.{ SortedSet, SortedMap }
+
 import org.scalatest._
 
 import com.twitter.algebird.matchers.seq._
@@ -103,18 +105,18 @@ object OrderedSetProperties extends FlatSpec with Matchers {
   import RBProperties._
 
   // Assumes 'data' is in key order
-  def testK[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
+  def testK[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with SortedSet[K]](
     data: Seq[K],
-    omap: OrderedSetLike[K, IN, M] with Set[K]) {
+    omap: OrderedSetLike[K, IN, M] with SortedSet[K]) {
 
     // verify the map elements are ordered by key
     omap.keys should beEqSeq(data)
   }
 
   // Assumes 'data' is in key order
-  def testDel[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
+  def testDel[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with SortedSet[K]](
     data: Seq[K],
-    omap: OrderedSetLike[K, IN, M] with Set[K]) {
+    omap: OrderedSetLike[K, IN, M] with SortedSet[K]) {
 
     data.foreach { key =>
       val delMap = omap - key
@@ -124,9 +126,9 @@ object OrderedSetProperties extends FlatSpec with Matchers {
     }
   }
 
-  def testEq[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Set[K]](
+  def testEq[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with SortedSet[K]](
     data: Seq[K],
-    map: OrderedSetLike[K, IN, M] with Set[K]) {
+    map: OrderedSetLike[K, IN, M] with SortedSet[K]) {
 
     val map1 = scala.util.Random.shuffle(data)
       .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
@@ -146,9 +148,9 @@ object OrderedSetProperties extends FlatSpec with Matchers {
   }
 
   // assumes data is of form 0.0, 1.0, 2.0 ...
-  def testFrom[IN <: INode[Double], M <: OrderedSetLike[Double, IN, M] with Set[Double]](
+  def testFrom[IN <: INode[Double], M <: OrderedSetLike[Double, IN, M] with SortedSet[Double]](
     data: Seq[Double],
-    map: OrderedSetLike[Double, IN, M] with Set[Double]) {
+    map: OrderedSetLike[Double, IN, M] with SortedSet[Double]) {
 
     data.foreach { k =>
       map.keysIteratorFrom(k).toSeq should beEqSeq(data.filter(_ >= k))
@@ -164,9 +166,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
   import RBProperties._
 
   // Assumes 'data' is in key order
-  def testKV[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
+  def testKV[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]](
     data: Seq[(K, V)],
-    omap: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
+    omap: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]) {
 
     // verify the map elements are ordered by key
     omap.keys should beEqSeq(data.map(_._1))
@@ -177,9 +179,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
   }
 
   // Assumes 'data' is in key order
-  def testDel[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
+  def testDel[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]](
     data: Seq[(K, V)],
-    omap: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
+    omap: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]) {
 
     data.iterator.map(_._1).foreach { key =>
       val delMap = omap - key
@@ -189,9 +191,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
     }
   }
 
-  def testEq[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with Map[K, V]](
+  def testEq[K, V, IN <: INodeMap[K, V], M <: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]](
     data: Seq[(K, V)],
-    map: OrderedMapLike[K, V, IN, M] with Map[K, V]) {
+    map: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]) {
 
     val map1 = scala.util.Random.shuffle(data)
       .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
@@ -217,9 +219,9 @@ object OrderedMapProperties extends FlatSpec with Matchers {
   }
 
   // assumes data is of form (0.0, 0), (1.0, 1), (2.0, 2) ...
-  def testFrom[IN <: INodeMap[Double, Int], M <: OrderedMapLike[Double, Int, IN, M] with Map[Double, Int]](
+  def testFrom[IN <: INodeMap[Double, Int], M <: OrderedMapLike[Double, Int, IN, M] with SortedMap[Double, Int]](
     data: Seq[(Double, Int)],
-    map: OrderedMapLike[Double, Int, IN, M] with Map[Double, Int]) {
+    map: OrderedMapLike[Double, Int, IN, M] with SortedMap[Double, Int]) {
 
     data.foreach { p =>
       val (k, v) = p

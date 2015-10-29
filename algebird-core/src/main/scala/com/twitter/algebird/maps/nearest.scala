@@ -18,6 +18,8 @@ package com.twitter.algebird.maps.nearest
 
 import math.Numeric
 
+import scala.collection.{ SortedSet, SortedMap }
+
 import com.twitter.algebird.maps.redblack.tree._
 import com.twitter.algebird.maps.ordered._
 import com.twitter.algebird.maps.ordered.tree.DataMap
@@ -216,7 +218,7 @@ trait NearestLike[K, +IN <: INodeNear[K], +M <: NearestLike[K, IN, M]]
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The self-type of the concrete container
  */
-trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M] with Set[K]]
+trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M] with SortedSet[K]]
   extends NearestLike[K, IN, M] with OrderedSetLike[K, IN, M] {
 
   /**
@@ -238,7 +240,7 @@ trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M] with S
  * @tparam IN The node type of the concrete internal R/B tree subclass
  * @tparam M The self-type of the concrete container
  */
-trait NearestMapLike[K, +V, +IN <: INodeNearMap[K, V], +M <: NearestMapLike[K, V, IN, M] with Map[K, V]]
+trait NearestMapLike[K, +V, +IN <: INodeNearMap[K, V], +M <: NearestMapLike[K, V, IN, M] with SortedMap[K, V]]
   extends NodeNearMap[K, V] with NearestLike[K, IN, M] with OrderedMapLike[K, V, IN, M] {
 
   /**
@@ -262,7 +264,8 @@ trait NearestMapLike[K, +V, +IN <: INodeNearMap[K, V], +M <: NearestMapLike[K, V
   }
 }
 
-sealed trait NearestSet[K] extends Set[K] with NearestSetLike[K, INodeNear[K], NearestSet[K]] {
+sealed trait NearestSet[K] extends SortedSet[K]
+  with NearestSetLike[K, INodeNear[K], NearestSet[K]] {
 
   override def empty = NearestSet.key(keyOrdering)
 
@@ -272,7 +275,7 @@ sealed trait NearestSet[K] extends Set[K] with NearestSetLike[K, INodeNear[K], N
       ")"
 }
 
-sealed trait NearestMap[K, +V] extends Map[K, V]
+sealed trait NearestMap[K, +V] extends SortedMap[K, V]
   with NearestMapLike[K, V, INodeNearMap[K, V], NearestMap[K, V]] {
 
   type IN2[V2] = INodeNearMap[K, V2]
