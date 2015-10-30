@@ -18,6 +18,8 @@ package com.twitter.algebird.tdmap
 
 import math.Numeric
 
+import scala.collection.SortedMap
+
 import com.twitter.algebird.Monoid
 
 import com.twitter.algebird.maps.increment._
@@ -122,10 +124,12 @@ import infra._
  * The tree-backed map object a TDigest uses to store and update its clusters.  TDigestMap
  * inherits functionality for value increment, prefix-sum and nearest-neighbor queries.
  */
-sealed trait TDigestMap extends NodeTD
+sealed trait TDigestMap extends SortedMap[Double, Double] with NodeTD
   with IncrementMapLike[Double, Double, INodeTD, TDigestMap]
   with PrefixSumMapLike[Double, Double, Double, INodeTD, TDigestMap]
   with NearestMapLike[Double, Double, INodeTD, TDigestMap] {
+
+  override def empty = TDigestMap.empty
 
   private def m1m2(c1: Double, tm1: Double, c2: Double, tm2: Double) = {
     val s = this.prefixSum(c1, open = true)
