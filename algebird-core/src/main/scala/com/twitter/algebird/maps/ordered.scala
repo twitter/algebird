@@ -225,12 +225,34 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Sorte
 trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]]
   extends NodeMap[K, V] with OrderedLike[K, IN, M] with SortedMapLike[K, V, M] {
 
-  type IN2[V2] <: INodeMap[K, V2]
-  type M2[V2] <: OrderedMapLike[K, V2, IN2[V2], M2[V2]] with SortedMap[K, V2]
-
   def empty: M
 
-  def +[V2 >: V](kv2: (K, V2)): M2[V2]
+  def +[V2 >: V](kv2: (K, V2)): M = kv2 match {
+    case kv: (K, V) => this.insert(
+      new DataMap[K, V] {
+        val key = kv._1
+        val value = kv._2
+      }).asInstanceOf[M]
+
+    // Type-widening insertion causes a couple problems with this tree/map hierarchy
+    // (1) Some of the tree variations require Monoid(s) as part of their functionality, and
+    // there is no way to widen a Monoid without actually specifying it, so it can't be done
+    // via insertion.  In those cases I have to forbid widening.
+    // (2) I can push the definition of '+' down into specific subclasses, but it requires me
+    // to define type members that encode the correct widened type:
+    //   type IN2[V2] <: INodeMap[K, V2]
+    //   type M2[V2] <: OrderedMapLike[K, V2, IN2[V2], M2[V2]] with SortedMap[K, V2]
+    // In this case, I run into problems when defining an object like TDigestMap, which has no
+    // K or V type parameters, because Scala considers a parameter-less variation to be
+    // incompatible with the super-class variations.
+    // Given (1) and (2), I contend that the least-insane solution is to expose the
+    // type-widening signature that SortedMapLike requires, but throw an exception if
+    // anybody actually tries to widen the type.  This probably still makes unicorns cry,
+    // but I believe it achieves a global minimum of evil.
+    // This has a side-benefit of avoiding some annoying type mismatch complaints from Scala
+    // caused by its inability to know that M2[V2] is not the same as M.
+    case _ => throw new Exception("insertion may not widen OrderedMapLike objects")
+  }
 
   /** Obtain a new container with key removed */
   def -(k: K) = this.delete(k).asInstanceOf[M]
@@ -265,7 +287,7 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
 
   def rangeImpl(from: Option[K], until: Option[K]) =
     nodesIteratorRange(from, until).map(n => (n.data.key, n.data.value))
-      .foldLeft(empty)((m, e) => (m + e).asInstanceOf[M])
+      .foldLeft(empty)((m, e) => m + e)
 
   override def seq = this.asInstanceOf[M]
   def ordering = keyOrdering
@@ -273,7 +295,7 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
   override protected[this] def newBuilder = new Builder[(K, V), M] {
     var res = empty
     def +=(e: (K, V)) = {
-      res = (res + e).asInstanceOf[M]
+      res = res + e
       this
     }
     def clear() { res = empty }
@@ -302,16 +324,7 @@ sealed trait OrderedMap[K, +V]
   extends SortedMap[K, V]
   with OrderedMapLike[K, V, INodeMap[K, V], OrderedMap[K, V]] {
 
-  type IN2[V2] = INodeMap[K, V2]
-  type M2[V2] = OrderedMap[K, V2]
-
   override def empty = OrderedMap.key(keyOrdering).value[V]
-
-  def +[V2 >: V](kv: (K, V2)) = this.asInstanceOf[OrderedMap[K, V2]].insert(
-    new DataMap[K, V2] {
-      val key = kv._1
-      val value = kv._2
-    }).asInstanceOf[OrderedMap[K, V2]]
 
   override def toString =
     "OrderedMap(" +

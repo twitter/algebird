@@ -89,19 +89,7 @@ object mixed {
     with PrefixSumMapLike[K, V, P, INodeMix[K, V, P], MixedMap[K, V, P]]
     with NearestMapLike[K, V, INodeMix[K, V, P], MixedMap[K, V, P]] {
 
-    type IN2[V2] = INodeMix[K, V2, P]
-    type M2[V2] = MixedMap[K, V2, P]
-
     override def empty = MixedMap.key(keyOrdering).value(valueMonoid).prefix(prefixMonoid)
-
-    def +[V2 >: V](kv2: (K, V2)) = kv2 match {
-      case kv: (K, V) => this.insert(
-        new com.twitter.algebird.maps.ordered.tree.DataMap[K, V] {
-          val key = kv._1
-          val value = kv._2
-        }).asInstanceOf[MixedMap[K, V2, P]]
-      case _ => throw new Exception("cannot widen type of MixedMap")
-    }
 
     override def toString =
       "MixedMap(" +

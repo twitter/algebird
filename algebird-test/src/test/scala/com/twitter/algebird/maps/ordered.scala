@@ -130,10 +130,8 @@ object OrderedSetProperties extends FlatSpec with Matchers {
     data: Seq[K],
     map: OrderedSetLike[K, IN, M] with SortedSet[K]) {
 
-    val map1 = scala.util.Random.shuffle(data)
-      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
-    val map2 = scala.util.Random.shuffle(data)
-      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
+    val map1 = scala.util.Random.shuffle(data).foldLeft(map.empty)((m, e) => m + e)
+    val map2 = scala.util.Random.shuffle(data).foldLeft(map.empty)((m, e) => m + e)
 
     (map1 == map2) should be (true)
 
@@ -195,10 +193,8 @@ object OrderedMapProperties extends FlatSpec with Matchers {
     data: Seq[(K, V)],
     map: OrderedMapLike[K, V, IN, M] with SortedMap[K, V]) {
 
-    val map1 = scala.util.Random.shuffle(data)
-      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
-    val map2 = scala.util.Random.shuffle(data)
-      .foldLeft(map.empty)((m, e) => (m + e).asInstanceOf[M])
+    val map1 = scala.util.Random.shuffle(data).foldLeft(map.empty)((m, e) => m + e)
+    val map2 = scala.util.Random.shuffle(data).foldLeft(map.empty)((m, e) => m + e)
 
     (map1 == map2) should be (true)
 

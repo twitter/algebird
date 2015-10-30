@@ -278,16 +278,7 @@ sealed trait NearestSet[K] extends SortedSet[K]
 sealed trait NearestMap[K, +V] extends SortedMap[K, V]
   with NearestMapLike[K, V, INodeNearMap[K, V], NearestMap[K, V]] {
 
-  type IN2[V2] = INodeNearMap[K, V2]
-  type M2[V2] = NearestMap[K, V2]
-
   override def empty = NearestMap.key(keyOrdering).value[V]
-
-  def +[V2 >: V](kv: (K, V2)) = this.asInstanceOf[NearestMap[K, V2]].insert(
-    new DataMap[K, V2] {
-      val key = kv._1
-      val value = kv._2
-    }).asInstanceOf[NearestMap[K, V2]]
 
   override def toString =
     "NearestMap(" +

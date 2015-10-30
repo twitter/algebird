@@ -123,19 +123,7 @@ trait IncrementMapLike[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, I
 sealed trait IncrementMap[K, V] extends SortedMap[K, V]
   with IncrementMapLike[K, V, INodeInc[K, V], IncrementMap[K, V]] {
 
-  type IN2[V2] = INodeInc[K, V2]
-  type M2[V2] = IncrementMap[K, V2]
-
   override def empty = IncrementMap.key(keyOrdering).value(valueMonoid)
-
-  def +[V2 >: V](kv2: (K, V2)) = kv2 match {
-    case kv: (K, V) => this.insert(
-      new DataMap[K, V] {
-        val key = kv._1
-        val value = kv._2
-      }).asInstanceOf[IncrementMap[K, V2]]
-    case _ => throw new Exception("insertion may not widen type of IncrementMap")
-  }
 
   override def toString =
     "IncrementMap(" +
