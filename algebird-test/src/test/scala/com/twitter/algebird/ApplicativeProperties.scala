@@ -19,6 +19,7 @@ package com.twitter.algebird
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
+import org.scalacheck.Prop.forAll
 
 class ApplicativeProperties extends CheckProperties {
   import ApplicativeLaws._
@@ -45,6 +46,14 @@ class ApplicativeProperties extends CheckProperties {
   }
   property("seq") {
     applicativeLaws[Seq, Int, String, Long]()
+  }
+  property("sequenceGen") {
+    // This follows from the laws, so we are just testing
+    // the implementation of sequenceGen against sequence here
+    forAll { ls: List[Option[Int]] =>
+      val res: Option[Vector[Int]] = Applicative.sequenceGen(ls)
+      Applicative.sequence(ls).map(_.toVector) == res
+    }
   }
   // Applicative algebras:
   import BaseProperties._
