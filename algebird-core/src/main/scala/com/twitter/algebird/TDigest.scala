@@ -56,7 +56,7 @@ case class TDigest(
     if (s.nclusters <= R) s
     else {
       // too many clusters: attempt to compress it by re-clustering
-      val ds = scala.util.Random.shuffle(s.clusters.toVector)
+      val ds = TDigest.shuffle(s.clusters.toVector)
       ds.foldLeft(TDigest.empty(delta))((d, e) => d.update(e))
     }
   }
@@ -100,7 +100,7 @@ case class TDigest(
 
       // assign new mass (wn) among the clusters
       var cmNew = Vector.empty[(Double, Double)]
-      scala.util.Random.shuffle(s).foreach { clust =>
+      TDigest.shuffle(s).foreach { clust =>
         if (wn <= 0.0) {
           // if we have already distributed all the mass, remaining clusters unchanged
           cmNew = cmNew :+ ((clust.centroid, clust.mass))
@@ -153,6 +153,9 @@ case class TDigest(
 
 /** Factory functions for TDigest */
 object TDigest {
+  import scala.collection.SeqLike
+  import scala.collection.generic.CanBuildFrom
+
   /**
    * Default value for a t-digest delta parameter.  The number of clusters varies, roughly, as
    * about (50/delta), when data are presented in random order
@@ -194,8 +197,7 @@ object TDigest {
     delta: Double = deltaDefault)(implicit num: Numeric[N]): TDigest = {
     require(delta > 0.0, s"delta was not > 0")
     val td = data.foldLeft(empty(delta))((c, e) => c + ((e, 1)))
-    val ds = scala.util.Random.shuffle(td.clusters.toVector)
-    ds.foldLeft(empty(delta))((c, e) => c + e)
+    TDigest.shuffle(td.clusters.toVector).foldLeft(empty(delta))((c, e) => c + e)
   }
 
   /**
@@ -217,6 +219,16 @@ object TDigest {
   /** Try to add a bit of efficiency to wasteful construction of t-digest objects for each input */
   private[algebird] def prepare[N](x: N, delta: Double = deltaDefault)(implicit num: Numeric[N]) =
     TDigest(delta, 1, TDigestMap.empty + ((num.toDouble(x), 1.0)))
+
+  // Shuffle a sequence in a referentially-transparent way: pseudo-randomly, but with a random
+  // seed that is a function of the sequence argument.
+  private[algebird] def shuffle[E, S[X] <: SeqLike[X, S[X]]](
+    seq: S[E])(implicit cbf: CanBuildFrom[S[E], E, S[E]]) =
+    if (seq.length <= 1) seq
+    else {
+      val seed = scala.util.hashing.MurmurHash3.productHash((seq(0), seq(1), seq.length))
+      (new scala.util.Random(seed)).shuffle(seq)
+    }
 }
 
 /** The Semigroup type class for TDigest objects */
@@ -243,8 +255,8 @@ object TDigestSemigroup {
       val d = rtd.clusters.asInstanceOf[tdmap.tree.INodeTD].data
       ltd + ((d.key, d.value))
     } else {
-      val ds = scala.util.Random.shuffle(ltd.clusters.toVector ++ rtd.clusters.toVector)
-      ds.foldLeft(TDigest.empty(delta))((d, e) => d + e)
+      TDigest.shuffle(ltd.clusters.toVector ++ rtd.clusters.toVector)
+        .foldLeft(TDigest.empty(delta))((d, e) => d + e)
     }
   }
 }
