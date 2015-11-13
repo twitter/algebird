@@ -18,7 +18,7 @@ package com.twitter.algebird.maps.redblack
 
 import math.Ordering
 
-object tree {
+package tree {
   /** The color (red or black) of a node in a Red/Black tree */
   sealed trait Color extends Serializable
   case object R extends Color

@@ -25,7 +25,7 @@ import scala.collection.{ SortedSet, SortedMap, SetLike, SortedSetLike, SortedMa
 
 import com.twitter.algebird.maps.redblack.tree._
 
-object tree {
+package tree {
   /** Trees that back a map-like object have a value as well as a key */
   trait DataMap[K, +V] extends Data[K] {
     def value: V
@@ -53,7 +53,7 @@ object tree {
 
 import tree._
 
-object infra {
+package infra {
   class INodeIterator[IN <: INode[_]] extends Iterator[IN] {
     private[infra] val stack = scala.collection.mutable.Stack.empty[INode[_]]
 

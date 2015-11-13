@@ -26,7 +26,7 @@ import com.twitter.algebird.maps.redblack.tree._
 import com.twitter.algebird.maps.ordered._
 import com.twitter.algebird.maps.ordered.tree.DataMap
 
-object tree {
+package tree {
   import com.twitter.algebird.maps.ordered.tree._
 
   /** Base trait of R/B tree nodes supporting increment */
@@ -83,7 +83,7 @@ object tree {
 
 import tree._
 
-object infra {
+package infra {
   class Inject[K, V](val keyOrdering: Ordering[K], val valueMonoid: Monoid[V])
     extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =

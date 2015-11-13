@@ -26,7 +26,7 @@ import com.twitter.algebird.maps.redblack.tree._
 import com.twitter.algebird.maps.ordered._
 import com.twitter.algebird.maps.ordered.tree.DataMap
 
-object tree {
+package tree {
   import com.twitter.algebird.maps.ordered.tree._
 
   /** Base trait for R/B nodes supporting prefix-sum query */
@@ -76,7 +76,7 @@ object tree {
 
 import tree._
 
-object infra {
+package infra {
   import com.twitter.algebird.maps.ordered.tree.DataMap
 
   class Inject[K, V, P](val keyOrdering: Ordering[K], val prefixMonoid: IncrementingMonoid[P, V])

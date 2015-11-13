@@ -28,7 +28,7 @@ case class Cover[+T](l: Option[T], r: Option[T]) {
   def map[U](f: T => U) = Cover(l.map(f), r.map(f))
 }
 
-object tree {
+package tree {
   import com.twitter.algebird.maps.ordered.tree._
 
   /** Base trait of R/B tree nodes supporting nearest-key query */
@@ -140,7 +140,7 @@ object tree {
 
 import tree._
 
-object infra {
+package infra {
   class InjectSet[K](val keyOrdering: Numeric[K]) extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
       new InjectSet[K](keyOrdering) with INodeNear[K] with NearestSet[K] {
