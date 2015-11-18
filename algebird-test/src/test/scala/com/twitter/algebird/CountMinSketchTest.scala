@@ -156,6 +156,10 @@ class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropert
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
  */
 class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+  /**
+   * These tests are super expensive, so don't run too many
+   */
+  implicit override val generatorDrivenConfig = PropertyCheckConfig(minSuccessful = 10)
 
   "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
     // Given a "source" CMSHasher[K]
@@ -265,6 +269,11 @@ class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
 abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  /**
+   * These tests are super expensive, so don't run too many
+   */
+  implicit override val generatorDrivenConfig = PropertyCheckConfig(minSuccessful = 10)
 
   val DELTA = 1E-10
   val EPS = 0.001
@@ -906,6 +915,10 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
 }
 
 class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
+  /**
+   * These tests are super expensive, so don't run too many
+   */
+  implicit override val generatorDrivenConfig = PropertyCheckConfig(minSuccessful = 10)
 
   property("roundtrips width->eps->width") {
     forAll { (i: Int) =>
@@ -951,6 +964,10 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 }
 
 class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
+  /**
+   * These tests are super expensive, so don't run too many
+   */
+  implicit override val generatorDrivenConfig = PropertyCheckConfig(minSuccessful = 10)
 
   val AnyEps = 0.001
   val AnyDelta = 1E-5
@@ -997,6 +1014,10 @@ class CMSHasherStringSpec extends CMSHasherSpec[String]
 class CMSHasherBytesSpec extends CMSHasherSpec[Bytes]
 
 abstract class CMSHasherSpec[K: CMSHasher: FromIntLike] extends PropSpec with PropertyChecks with Matchers {
+  /**
+   * These tests are super expensive, so don't run too many
+   */
+  implicit override val generatorDrivenConfig = PropertyCheckConfig(minSuccessful = 10)
 
   property("returns hashes (i.e. slots) in the range [0, width)") {
     forAll { (a: Int, b: Int, width: Int, x: Int) =>
