@@ -17,10 +17,8 @@ package com.twitter.algebird.util
 
 import com.twitter.algebird._
 import com.twitter.util.{ Await, Future }
+
 import scala.util.Random
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Arbitrary
 
 object TunnelMonoidProperties {
   def testTunnelMonoid[I, V](makeRandomInput: Int => I,
@@ -59,9 +57,9 @@ object TunnelMonoidProperties {
   }
 }
 
-class TunnelMonoidProperties extends PropSpec with PropertyChecks with Matchers {
-  import TunnelMonoidProperties._
+class TunnelMonoidPropertiesextends extends CheckProperties {
 
+  import TunnelMonoidProperties._
   implicit val monoid = new Monoid[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer

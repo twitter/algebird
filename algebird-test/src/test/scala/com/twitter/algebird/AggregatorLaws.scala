@@ -17,11 +17,9 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalacheck.Prop._
 
-class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class AggregatorLaws extends CheckProperties {
 
   implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
@@ -37,21 +35,21 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   property("composing before Aggregator is correct") {
     forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
       val composed = ag.composePrepare(compose)
-      assert(in.isEmpty || composed(in) == ag(in.map(compose)))
+      in.isEmpty || composed(in) == ag(in.map(compose))
     }
   }
 
   property("andThen after Aggregator is correct") {
     forAll { (in: List[Int], andt: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
       val ag1 = ag.andThenPresent(andt)
-      assert(in.isEmpty || ag1(in) == andt(ag(in)))
+      in.isEmpty || ag1(in) == andt(ag(in))
     }
   }
 
   property("composing two Aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
       val c = GeneratedTupleAggregator.from2(ag1, ag2)
-      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+      in.isEmpty || c(in) == (ag1(in), ag2(in))
     }
   }
 
@@ -59,7 +57,7 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
     forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
       type AggInt[T] = Aggregator[Int, _, T]
       val c = Applicative.join[AggInt, Int, String](ag1, ag2)
-      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+      in.isEmpty || c(in) == (ag1(in), ag2(in))
     }
   }
 
@@ -67,14 +65,14 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
     forAll { (in: List[(Int, String)], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[String, Set[String], Double]) =>
       val c = ag1.zip(ag2)
       val (as, bs) = in.unzip
-      assert(in.isEmpty || c(in) == (ag1(as), ag2(bs)))
+      in.isEmpty || c(in) == (ag1(as), ag2(bs))
     }
   }
 
   property("Aggregator.lift works for empty sequences") {
     forAll { (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
       val liftedAg = ag.lift
-      assert(in.isEmpty && liftedAg(in) == None || liftedAg(in) == Some(ag(in)))
+      in.isEmpty && liftedAg(in) == None || liftedAg(in) == Some(ag(in))
     }
   }
 
@@ -92,18 +90,30 @@ class AggregatorLaws extends PropSpec with PropertyChecks with Matchers {
   property("MonoidAggregator.sumBefore is correct") {
     forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
       val liftedAg = ag.sumBefore
-      assert(liftedAg(in) == ag(in.flatten))
+      liftedAg(in) == ag(in.flatten)
     }
   }
 
   property("Aggregator.applyCumulatively is correct") {
     forAll{ (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
       val cumulative: List[Int] = ag.applyCumulatively(in)
-      assert(cumulative.size == in.size)
-      assert(cumulative.zipWithIndex.forall{
-        case (sum, i) =>
-          sum == ag.apply(in.take(i + 1))
-      })
+      cumulative.size == in.size &&
+        cumulative.zipWithIndex.forall{
+          case (sum, i) =>
+            sum == ag.apply(in.take(i + 1))
+        }
+    }
+  }
+  property("MonoidAggregator.either is correct") {
+    forAll { (in: List[(Int, Int)], agl: MonoidAggregator[Int, Int, Int], agr: MonoidAggregator[Int, Int, Int]) =>
+      agl.zip(agr).apply(in) ==
+        agl.either(agr).apply(in.flatMap { case (l, r) => List(Left(l), Right(r)) })
+    }
+  }
+
+  property("MonoidAggregator.filter is correct") {
+    forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Boolean) =>
+      ag.filterBefore(fn).apply(in) == ag.apply(in.filter(fn))
     }
   }
 }

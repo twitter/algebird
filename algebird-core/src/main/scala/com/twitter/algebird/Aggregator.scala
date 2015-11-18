@@ -103,6 +103,16 @@ object Aggregator extends java.io.Serializable {
   def sortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
   /**
+   * Immutable version of sortedTake, for frameworks that check immutability of reduce functions.
+   */
+  def immutableSortedTake[T: Ordering](count: Int): MonoidAggregator[T, TopK[T], Seq[T]] =
+    new TopKToListAggregator[T](count)
+  /**
+   * Immutable version of sortedReverseTake, for frameworks that check immutability of reduce functions.
+   */
+  def immutableSortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, TopK[T], Seq[T]] =
+    new TopKToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
+  /**
    * Put everything in a List. Note, this could fill the memory if the List is very large.
    */
   def toList[T]: MonoidAggregator[T, List[T], List[T]] =
@@ -116,10 +126,34 @@ object Aggregator extends java.io.Serializable {
   /**
    * This builds an in-memory Set, and then finally gets the size of that set.
    * This may not be scalable if the Uniques are very large. You might check the
-   * HyperLogLog Aggregator to get an approximate version of this that is scalable.
+   * approximateUniqueCount or HyperLogLog Aggregator to get an approximate version
+   * of this that is scalable.
    */
   def uniqueCount[T]: MonoidAggregator[T, Set[T], Int] =
     toSet[T].andThenPresent(_.size)
+
+  /**
+   * Using a constant amount of memory, give an approximate unique count (~ 1% error).
+   * This uses an exact set for up to 100 items,
+   * then HyperLogLog (HLL) with an 1.2% standard error which uses at most 8192 bytes
+   * for each HLL. For more control, see HyperLogLogAggregator.
+   */
+  def approximateUniqueCount[T: Hash128]: MonoidAggregator[T, Either[HLL, Set[T]], Long] =
+    SetSizeHashAggregator[T](hllBits = 13, maxSetSize = 100)
+
+  /**
+   * Returns the lower bound of a given percentile where the percentile is between (0,1]
+   * The items that are iterated over cannot be negative.
+   */
+  def approximatePercentile[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregatorLowerBound[T] =
+    QTreeAggregatorLowerBound[T](percentile, k)
+
+  /**
+   * Returns the intersection of a bounded percentile where the percentile is between (0,1]
+   * The items that are iterated over cannot be negative.
+   */
+  def approximatePercentileBounds[T](percentile: Double, k: Int)(implicit num: Numeric[T]): QTreeAggregator[T] =
+    QTreeAggregator[T](percentile, k)
 }
 
 /**
@@ -316,12 +350,55 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     }
   }
 
+  /**
+   * Build a MonoidAggregator that either takes left or right input
+   * and outputs the pair from both
+   */
+  def either[A2, B2, C2](that: MonoidAggregator[A2, B2, C2]): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
+    new MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] {
+      def prepare(e: Either[A, A2]) = e match {
+        case Left(a) => (self.prepare(a), that.monoid.zero)
+        case Right(a2) => (self.monoid.zero, that.prepare(a2))
+      }
+      val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
+      def present(bs: (B, B2)) = (self.present(bs._1), that.present(bs._2))
+    }
+
+  /**
+   * Only aggregate items that match a predicate
+   */
+  def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
+    new MonoidAggregator[A1, B, C] {
+      def prepare(a: A1) = if (pred(a)) self.prepare(a) else self.monoid.zero
+      def monoid = self.monoid
+      def present(b: B) = self.present(b)
+    }
+  /**
+   * This maps the inputs to Bs, then sums them, effectively flattening
+   * the inputs to the MonoidAggregator
+   */
   def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
     new MonoidAggregator[TraversableOnce[A], B, C] {
       def monoid: Monoid[B] = self.monoid
       def prepare(input: TraversableOnce[A]): B = monoid.sum(input.map(self.prepare))
       def present(reduction: B): C = self.present(reduction)
     }
+
+  /**
+   * This allows you to join two aggregators into one that takes a tuple input,
+   * which in turn allows you to chain .composePrepare onto the result if you have
+   * an initial input that has to be prepared differently for each of the joined aggregators.
+   *
+   * The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+   */
+  def zip[A2, B2, C2](ag2: MonoidAggregator[A2, B2, C2]): MonoidAggregator[(A, A2), (B, B2), (C, C2)] = {
+    val ag1 = self
+    new MonoidAggregator[(A, A2), (B, B2), (C, C2)] {
+      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
+      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+    }
+  }
 }
 
 trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {

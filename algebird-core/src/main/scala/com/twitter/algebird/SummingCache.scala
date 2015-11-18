@@ -58,7 +58,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
   }
   override def flush: Option[Map[K, V]] = {
     // Get a copy of the cache, since it is mutable
-    val res = optNonEmpty(Map(cache.toSeq: _*))
+    val res = optNonEmpty(cache.iterator.toMap)
     cache.clear
     res
   }
@@ -83,7 +83,7 @@ object SummingWithHitsCache {
 /**
  * A SummingCache that also tracks the number of key hits
  */
-class SummingWithHitsCache[K, V] (capacity: Int)(implicit sgv: Semigroup[V])
+class SummingWithHitsCache[K, V](capacity: Int)(implicit sgv: Semigroup[V])
   extends SummingCache[K, V](capacity)(sgv) {
 
   def putWithHits(m: Map[K, V]): (Int, Option[Map[K, V]]) = {

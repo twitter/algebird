@@ -16,12 +16,10 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Prop._
+import org.scalacheck.{ Gen, Arbitrary }
 
-class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers {
-  import BaseVectorSpaceProperties._
+class VectorSpaceProperties extends CheckProperties {
+  import com.twitter.algebird.BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait
   def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) = {
@@ -34,6 +32,8 @@ class VectorSpaceProperties extends PropSpec with PropertyChecks with Matchers {
       }
     }
   }
+
+  implicit val genDouble = Arbitrary{ Gen.choose(-1.0E50, 1.0E50) }
 
   property("map int double scaling") {
     vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))

@@ -1,15 +1,10 @@
 package com.twitter.algebird
 
-import org.scalatest._
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.{ Matchers, _ }
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
-
-import java.util.Arrays
-
-class MinHasherTest extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class MinHasherTest extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit val mhMonoid = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary {

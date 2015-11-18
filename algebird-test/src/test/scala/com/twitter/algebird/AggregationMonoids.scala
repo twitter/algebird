@@ -4,7 +4,7 @@ import org.scalacheck.{ Gen, Arbitrary }
 import org.scalatest.{ PropSpec, Matchers }
 import org.scalatest.prop.PropertyChecks
 
-class AggregationMonoidSpecification extends PropSpec with PropertyChecks with Matchers {
+class AggregationMonoidSpecification extends CheckProperties {
   import BaseProperties._
   import Gen.choose
 

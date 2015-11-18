@@ -29,14 +29,23 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
   def mean = m1
 
   // Population variance, not sample variance.
-  def variance = m2 / count
+  def variance = if (count > 1)
+    m2 / count
+  else /* don't return junk when the moment is not defined */
+    Double.NaN
 
   // Population standard deviation, not sample standard deviation.
   def stddev = math.sqrt(variance)
 
-  def skewness = math.sqrt(count) * m3 / math.pow(m2, 1.5)
+  def skewness = if (count > 2)
+    math.sqrt(count) * m3 / math.pow(m2, 1.5)
+  else /* don't return junk when the moment is not defined */
+    Double.NaN
 
-  def kurtosis = count * m4 / math.pow(m2, 2) - 3
+  def kurtosis = if (count > 3)
+    count * m4 / math.pow(m2, 2) - 3
+  else /* don't return junk when the moment is not defined */
+    Double.NaN
 }
 
 object Moments {

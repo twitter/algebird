@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
-class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyRingLaws extends CheckProperties {
   import BaseProperties._
 
   val eventuallyRing = new EventuallyRing[Long, Int](_.asInstanceOf[Long])(_ > 10000)
@@ -18,7 +18,7 @@ class EventuallyRingLaws extends PropSpec with PropertyChecks with Matchers {
 }
 
 // A lossy one:
-class EventuallyMonoidLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyMonoidLaws extends CheckProperties {
   import BaseProperties._
 
   val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
@@ -93,6 +93,51 @@ class EventuallyTest extends WordSpec with Matchers {
       assert(eventuallyMonoid.sum(listOfLefts :+ Right(short) :+ Left(short.length)) == Left(1012 * short.length))
     }
 
+  }
+
+}
+
+class EventuallyAggregatorLaws extends PropSpec with PropertyChecks with Matchers {
+  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B],
+    sg: Semigroup[B],
+    present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+    for {
+      pp <- prepare.arbitrary
+      ps <- present.arbitrary
+    } yield new Aggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def semigroup = sg
+      def present(b: B) = ps(b)
+    }
+  }
+
+  def eventuallyAggregator(rightAg: Aggregator[Int, Int, Int])(pred: (Int => Boolean)): EventuallyAggregator[Int, Double, Int, String] = {
+    new EventuallyAggregator[Int, Double, Int, String] {
+      def presentLeft(e: Double) = "Left"
+
+      def convert(o: Int) = o.toDouble
+      def mustConvert(o: Int) = pred(o)
+
+      val leftSemigroup = Semigroup.doubleSemigroup
+      def rightAggregator = rightAg.andThenPresent{ _ => "Right" }
+    }
+  }
+
+  def isConvertedCorrectly(s: String, semi: EventuallySemigroup[Double, Int], in: List[Right[Double, Int]]) = {
+    val isFromLeft = s == "Left"
+    val shouldBeFromLeft = semi.sumOption(in).get.isLeft
+
+    if (shouldBeFromLeft) isFromLeft else !isFromLeft
+  }
+
+  property("EventuallyAggregator converts correctly") {
+    forAll{ (in: List[Int], pred: (Int => Boolean), rightAg: Aggregator[Int, Int, Int]) =>
+      val eventuallyAg = eventuallyAggregator(rightAg)(pred)
+      val semi = eventuallyAg.semigroup
+      val rightIn = in.map { Right(_) }
+
+      assert(in.isEmpty || isConvertedCorrectly(eventuallyAg(in), semi, rightIn))
+    }
   }
 
 }

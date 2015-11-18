@@ -75,6 +75,12 @@ class MomentsGroupTest extends WordSpec with Matchers {
     testApproxEq(m2.variance, 0.64)
     testApproxEq(m2.skewness, 0.84375)
     testApproxEq(m2.kurtosis, -0.921875)
+  }
 
+  "Moments should not return higher-order moments for small data sets" in {
+    val m1 = MomentsAggregator(List(1, 2))
+    testApproxEq(m1.count, 2)
+    assert(m1.skewness.isNaN)
+    assert(m1.kurtosis.isNaN)
   }
 }

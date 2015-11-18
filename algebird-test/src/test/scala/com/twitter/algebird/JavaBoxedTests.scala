@@ -1,16 +1,14 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
-
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
+import java.lang.{ Boolean => JBool, Double => JDouble, Float => JFloat, Integer => JInt, Long => JLong, Short => JShort }
 import java.util.{ List => JList, Map => JMap }
+
+import org.scalacheck.{ Arbitrary, Gen }
 
 import scala.collection.JavaConverters._
 
-class JavaBoxedTests extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class JavaBoxedTests extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   implicit val jboolArg = Arbitrary { for (v <- Gen.oneOf(JBool.TRUE, JBool.FALSE)) yield v }
   implicit val jintArg = Arbitrary {

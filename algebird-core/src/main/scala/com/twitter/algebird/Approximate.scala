@@ -22,6 +22,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
 
   def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
 
+  def unary_! : ApproximateBoolean = not
+
   def ^(that: ApproximateBoolean): ApproximateBoolean = {
     // This is true with probability > withProb * that.withProb
     // The answer is also correct if both are wrong, which is
@@ -66,20 +68,26 @@ object ApproximateBoolean {
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
 case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) {
-  // Is this value contained within the bounds:
+  require(numeric.lteq(min, estimate) && numeric.lteq(estimate, max))
+
+  /**
+   * Is this value contained within the bounds?
+   * Contract is:
+   * Prob(boundsContain(estimate)) >= probWithinBounds
+   */
   def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
+
   def contains(v: N): ApproximateBoolean =
     ApproximateBoolean(boundsContain(v), probWithinBounds)
-  /*
-    * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
-    * and then x ~ 1.05 returns true
-    */
+
+  /**
+   * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
+   * and then x ~ 1.05 returns true
+   */
   def ~(v: N): Boolean = boundsContain(v)
-  /*
-    * Contract is:
-    * Prob(boundsContain(estimate)) >= probWithinBounds
-    */
+
   def isExact: Boolean = (probWithinBounds == 1.0) && numeric.equiv(min, max)
+
   def +(right: Approximate[N]): Approximate[N] = {
     val n = numeric
     Approximate(n.plus(min, right.min),

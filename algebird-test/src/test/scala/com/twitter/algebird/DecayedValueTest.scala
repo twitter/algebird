@@ -1,12 +1,10 @@
 package com.twitter.algebird
 
-import org.scalacheck.{ Gen, Arbitrary }
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.Prop._
 
-class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
-  import Gen.choose
+class DecayedValueLaws extends CheckProperties {
+  import org.scalacheck.Gen.choose
 
   def approxEq(f1: Double, f2: Double) = {
     (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 0.1
@@ -20,7 +18,7 @@ class DecayedValueLaws extends PropSpec with PropertyChecks with Matchers {
         DecayedValue.build(params.mean + (params.mean * noise), t, params.halfLife)
       }
       val result = decayedMonoid.sum(data)
-      assert(approxEq(fn(result, params), params.mean))
+      approxEq(fn(result, params), params.mean)
     }
   }
 

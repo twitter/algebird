@@ -17,11 +17,9 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
+import org.scalacheck.Prop._
 
-class PreparerLaws extends PropSpec with PropertyChecks with Matchers {
-  import BaseProperties._
+class PreparerLaws extends CheckProperties {
 
   implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B], sg: Semigroup[B], present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
@@ -37,14 +35,14 @@ class PreparerLaws extends PropSpec with PropertyChecks with Matchers {
   property("mapping before aggregate is correct") {
     forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
       val composed = Preparer[Int].map(compose).aggregate(ag)
-      assert(in.isEmpty || composed(in) == ag(in.map(compose)))
+      in.isEmpty || composed(in) == ag(in.map(compose))
     }
   }
 
   property("split with two aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
       val c = Preparer[Int].split{ p => (p.aggregate(ag1), p.aggregate(ag2)) }
-      assert(in.isEmpty || c(in) == (ag1(in), ag2(in)))
+      in.isEmpty || c(in) == (ag1(in), ag2(in))
     }
   }
 
@@ -62,7 +60,7 @@ class PreparerLaws extends PropSpec with PropertyChecks with Matchers {
   property("flatten before aggregate is correct") {
     forAll{ (in: List[List[Int]], ag: MonoidAggregator[Int, Int, Int]) =>
       val flattenedAg = Preparer[List[Int]].flatten.aggregate(ag)
-      assert(flattenedAg(in) == ag(in.flatten))
+      flattenedAg(in) == ag(in.flatten)
     }
   }
 
@@ -75,7 +73,7 @@ class PreparerLaws extends PropSpec with PropertyChecks with Matchers {
           .split{ a => (a.aggregate(ag1), a.aggregate(ag2)) }
 
       val preSplit = in.map(mapFn).flatMap(flatMapFn)
-      assert(in.isEmpty || ag(in) == (ag1(preSplit), ag2(preSplit)))
+      in.isEmpty || ag(in) == (ag1(preSplit), ag2(preSplit))
     }
   }
 }

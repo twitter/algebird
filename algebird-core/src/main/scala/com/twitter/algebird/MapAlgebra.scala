@@ -18,6 +18,8 @@ package com.twitter.algebird
 import scala.collection.{ Map => ScMap }
 import scala.collection.mutable.{ Map => MMap }
 
+import com.twitter.algebird.macros.{ Cuber, Roller }
+
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
   def remove(oldMap: M, k: K): M
@@ -104,7 +106,7 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
   override def fromMutable(mut: MMap[K, V]): ScMap[K, V] = new MutableBackedMap(mut)
 }
 
-private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V]) extends Map[K, V] {
+private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V]) extends Map[K, V] with java.io.Serializable {
   def get(key: K) = backingMap.get(key)
 
   def iterator = backingMap.iterator
@@ -222,4 +224,49 @@ object MapAlgebra {
 
   def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: Monoid[V]): V =
     Monoid.sum(mring.times(left, right).values)
+
+  def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
+    val map: collection.mutable.Map[c.K, List[V]] = collection.mutable.Map[c.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        c(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
+    }
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
+  }
+
+  def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
+
+  def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit c: Cuber[K]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
+
+  def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
+    val map: collection.mutable.Map[r.K, List[V]] = collection.mutable.Map[r.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        r(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
+    }
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
+  }
+
+  def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
+
+  def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit r: Roller[K]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { t => r(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
+
 }

@@ -1,5 +1,50 @@
 # Algebird #
 
+### Version 0.11.0 ###
+* Move CMSHasherByteArray from scalding: https://github.com/twitter/algebird/pull/467
+* Upgrade sbt launcher script (sbt-extras): https://github.com/twitter/algebird/pull/469
+* Create case class macros for algebraic structures: https://github.com/twitter/algebird/pull/466
+* Refactor MapAggregator: https://github.com/twitter/algebird/pull/462
+* Algebird support for spark: https://github.com/twitter/algebird/pull/397
+* Add MapAggregator from 1 (key, aggregator) pair: https://github.com/twitter/algebird/pull/452
+* Remove unnecessary use of scala.math: https://github.com/twitter/algebird/pull/455
+* Don&#39;t call deprecated HyperLogLog methods in tests: https://github.com/twitter/algebird/pull/456
+* Update product_generators.rb: https://github.com/twitter/algebird/pull/457
+* Pzheng/gaussian euclidean: https://github.com/twitter/algebird/pull/448
+
+### Version 0.10.2 ###
+* QTree quantileBounds assert percentile <= 1.0 #447
+
+### Version 0.10.1 ###
+* Make HLL easier to use, add Hash128 typeclass #440
+* add ! to ApproximateBoolean #442
+* add QTreeAggregator and add approximatePercentileBounds to Aggregator #443
+* Make level configurable in QTreeAggregators #444
+
+### Version 0.10.0 ###
+* HyperLogLogSeries #295
+* CMS: add contramap to convert CMS[K] to CMS[L], add support for String and Bytes, remove Ordering context bound for K #399
+* EventuallyAggregator and variants #407
+* Add MultiAggregator.apply #408
+* Return a MonoidAggregator from MultiAggregator when possible #409
+* Add SummingWithHitsCache class to also track key hits. #410
+* Add MapAggregator to compose tuples of (key, agg) pairs #411
+* fix README.md. 2.9.3 no longer published #412
+* Add Coveralls Badge to the README #413
+* Add some combinators on MonoidAggregator #417
+* Added function to safely downsize a HyperLogLog sketch #418
+* AdaptiveCache #419
+* fix property tests #421
+* Make Preparer extend Serializable #422
+* Make MutableBackedMap Serializable. #424
+* A couple of performance optimizations: HyperLogLog and BloomFilter #426
+* Adds a presenting benchmark and optimizes it #427
+* Fixed broken links in README #428
+* Speed up QTree #433
+* Moments returns NaN when count is too low for higher order statistics #434
+* Add HLL method to do error-based Aggregator #438
+* Bump bijection to 0.8.0 #441
+
 ### Version 0.9.0 ###
 * Replace mapValues with one single map to avoid serialization in frameworks like Spark. #344
 * Add Fold trait for composable incremental processing (for develop) #350
