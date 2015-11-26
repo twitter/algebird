@@ -48,6 +48,47 @@ object Aggregator extends java.io.Serializable {
   }
 
   /**
+   * Obtain a [[MonoidAggregator]] that uses an efficient append operation for faster aggregation
+   * @tparam F Data input type
+   * @tparam T Aggregating [[Monoid]] type
+   * @param appnd Function that appends the [[Monoid]].  Defines the [[append]] method for this aggregator.
+   * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
+   * @param m The [[Monoid]] type class
+   */
+  def appendMonoid[F, T](appnd: (T, F) => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] =
+    appendMonoid(appnd, identity[T]_)(m)
+
+  /**
+   * Obtain a [[MonoidAggregator]] that uses an efficient append operation for faster aggregation
+   * @tparam F Data input type
+   * @tparam T Aggregating [[Monoid]] type
+   * @tparam P Presentation (output) type
+   * @param appnd Function that appends the [[Monoid]].  Defines the [[append]] method for this aggregator.
+   * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
+   * @param pres The presentation function
+   * @param m The [[Monoid]] type class
+   */
+  def appendMonoid[F, T, P](appnd: (T, F) => T, pres: T => P)(implicit m: Monoid[T]): MonoidAggregator[F, T, P] =
+    new MonoidAggregator[F, T, P] {
+      def monoid: Monoid[T] = m
+      def prepare(input: F): T = appnd(m.zero, input)
+      def present(reduction: T): P = pres(reduction)
+
+      override def apply(inputs: TraversableOnce[F]): P = present(agg(inputs))
+
+      override def applyOption(inputs: TraversableOnce[F]): Option[P] =
+        if (inputs.isEmpty) None else Some(apply(inputs))
+
+      override def append(l: T, r: F): T = appnd(l, r)
+
+      override def appendAll(old: T, items: TraversableOnce[F]): T = reduce(old, agg(items))
+
+      override def appendAll(items: TraversableOnce[F]): T = agg(items)
+
+      private def agg(inputs: TraversableOnce[F]): T = inputs.aggregate(m.zero)(appnd, m.plus)
+    }
+
+  /**
    * How many items satisfy a predicate
    */
   def count[T](pred: T => Boolean): MonoidAggregator[T, Long, Long] =
