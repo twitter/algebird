@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import java.io.{ ByteArrayOutputStream, ObjectOutputStream }
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalatest.{ Matchers, WordSpec }
 import org.scalacheck.Prop._
 
@@ -95,6 +95,86 @@ class BFHashIndices extends CheckProperties {
   }
 }
 
+class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends ApproximateProperty {
+  type Exact = Set[T]
+  type Approx = BF
+
+  type Input = T
+  type Result = Boolean
+
+  val maxNumEntries = 1000
+
+  val seed = 1
+
+  def exactGenerator = for {
+    numEntries <- Gen.choose(1, maxNumEntries)
+    set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
+  } yield set
+
+  def makeApproximate(set: Set[T]) = {
+    val bfMonoid = BloomFilter(set.size, falsePositiveRate, seed)
+
+    val strings = set.map(_.toString).toSeq
+    bfMonoid.create(strings: _*)
+  }
+
+  def inputGenerator(set: Set[T]) =
+    for {
+      randomValues <- Gen.listOfN[T](set.size, implicitly[Gen[T]])
+      x <- Gen.oneOf((set ++ randomValues).toSeq)
+    } yield x
+
+  def exactResult(s: Set[T], t: T) = s.contains(t)
+
+  def approximateResult(bf: BF, t: T) = bf.contains(t.toString)
+}
+
+class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
+  type Exact = Set[T]
+  type Approx = BF
+
+  type Input = Unit
+  type Result = Long
+
+  val maxNumEntries = 10000
+  val falsePositiveRate = 0.01
+
+  val seed = 1
+
+  def exactGenerator = for {
+    numEntries <- Gen.choose(1, maxNumEntries)
+    set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
+  } yield set
+
+  def makeApproximate(set: Set[T]) = {
+    val bfMonoid = BloomFilter(set.size, falsePositiveRate, seed)
+
+    val strings = set.map(_.toString).toSeq
+    bfMonoid.create(strings: _*)
+  }
+
+  def inputGenerator(set: Set[T]) = Gen.const(())
+
+  def exactResult(s: Set[T], u: Unit) = s.size
+  def approximateResult(bf: BF, u: Unit) = bf.size
+}
+
+class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
+  import ApproximateProperty.toProp
+
+  for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {
+    property(s"has small false positive rate with false positive rate = $falsePositiveRate") = {
+      implicit val intGen = Gen.choose(1, 1000)
+      toProp(new BloomFilterFalsePositives[Int](falsePositiveRate), 50, 50, 0.01)
+    }
+  }
+
+  property("approximate cardinality") = {
+    implicit val intGen = Gen.choose(1, 1000)
+    toProp(new BloomFilterCardinality[Int], 50, 1, 0.01)
+  }
+}
+
 class BloomFilterTest extends WordSpec with Matchers {
 
   val SEED = 1
@@ -115,45 +195,6 @@ class BloomFilterTest extends WordSpec with Matchers {
               assert(bf.contains(i.toString).isTrue)
             }
           }
-      }
-    }
-
-    "have small false positive rate" in {
-      val iter = 10000
-
-      Seq(0.1, 0.01, 0.001).foreach { fpProb =>
-        {
-          val fps = (0 until iter).par.map{
-            _ =>
-              {
-                val numEntries = RAND.nextInt(10) + 1
-
-                val bfMonoid = BloomFilter(numEntries, fpProb, SEED)
-
-                val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
-                val bf = bfMonoid.create(entries.drop(1): _*)
-
-                if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
-              }
-          }
-
-          val observedFpProb = fps.sum / fps.size
-
-          assert(observedFpProb <= 2 * fpProb)
-        }
-      }
-    }
-
-    "approximate cardinality" in {
-      val bfMonoid = BloomFilterMonoid(10, 100000, SEED)
-      Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
-        val items = (1 until exactCardinality).map { _.toString }
-        val bf = bfMonoid.create(items: _*)
-        val size = bf.size
-
-        assert(size ~ exactCardinality)
-        assert(size.min <= size.estimate)
-        assert(size.max >= size.estimate)
       }
     }
 

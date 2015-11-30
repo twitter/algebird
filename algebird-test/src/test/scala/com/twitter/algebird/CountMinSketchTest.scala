@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{ Gen, Arbitrary, Properties }
 
 import CMSHasherImplicits._
 import CmsTestImplicits._
@@ -264,6 +264,97 @@ class CMSBigIntTest extends CMSTest[BigInt]
 class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
+abstract class CmsProperty[K] extends ApproximateProperty
+
+object CmsProperty {
+  val delta = 1E-10
+  val eps = 0.001
+  val seed = 1
+
+  def makeApproximate[K: CMSHasher](exact: Vector[K]) = {
+    val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
+    cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
+  }
+}
+
+abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty {
+  type Exact = Vector[K]
+  type Approx = CMS[K]
+
+  type Input = K
+  type Result = Long
+
+  def makeApproximate(e: Exact) = CmsProperty.makeApproximate(e)
+  def inputGenerator(e: Vector[K]): Gen[K] = Gen.oneOf(e)
+
+  def exactResult(vec: Vector[K], key: K) = vec.count(_ == key)
+  def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
+}
+
+class CmsSmallFrequencyProperty[K: CMSHasher: Gen] extends CmsFrequencyProperty[K] {
+  def exactGenerator: Gen[Vector[K]] = Gen.containerOf[Vector, K](implicitly[Gen[K]])
+}
+
+class CmsLargeFrequencyProperty[K: CMSHasher: Gen] extends CmsFrequencyProperty[K] {
+  def exactGenerator: Gen[Vector[K]] = Gen.containerOfN[Vector, K](100000, implicitly[Gen[K]])
+}
+
+class CmsInnerProductProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
+  type Exact = (Vector[K], Vector[K])
+  type Approx = (CMS[K], CMS[K])
+
+  type Input = Unit
+  type Result = Long
+
+  def makeApproximate(exacts: (Vector[K], Vector[K])) =
+    (CmsProperty.makeApproximate(exacts._1), CmsProperty.makeApproximate(exacts._2))
+
+  def exactGenerator: Gen[(Vector[K], Vector[K])] =
+    for {
+      list1 <- Gen.containerOfN[Vector, K](10000, implicitly[Gen[K]])
+      list2 <- Gen.containerOfN[Vector, K](10000, implicitly[Gen[K]])
+    } yield (list1, list2)
+
+  def inputGenerator(e: (Vector[K], Vector[K])): Gen[Unit] = Gen.const(())
+
+  def exactResult(lists: (Vector[K], Vector[K]), input: Unit) = {
+    val counts1 = lists._1.groupBy(identity).mapValues(_.size)
+    val counts2 = lists._2.groupBy(identity).mapValues(_.size)
+    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
+  }
+
+  def approximateResult(cmses: (CMS[K], CMS[K]), input: Unit) = cmses._1.innerProduct(cmses._2)
+}
+
+class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
+  type Exact = Vector[K]
+  type Approx = CMS[K]
+
+  type Input = Unit
+  type Result = Long
+
+  def makeApproximate(exact: Vector[K]) = CmsProperty.makeApproximate(exact)
+
+  def exactGenerator: Gen[Vector[K]] = Gen.containerOfN[Vector, K](10000, implicitly[Gen[K]])
+
+  def inputGenerator(e: Vector[K]): Gen[Unit] = Gen.const(())
+
+  def exactResult(list: Vector[K], input: Unit) = list.length
+
+  def approximateResult(cms: CMS[K], input: Unit) = Approximate.exact(cms.totalCount)
+}
+
+class CmsProperties extends ApproximateProperties("CountMinSketch") {
+  import ApproximateProperty.toProp
+
+  implicit val intGen = Gen.choose(1, 100)
+
+  property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
+  property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
+  property("CMS inner product works") = toProp(new CmsInnerProductProperty[Int](), 10, 10, 0.01)
+  property("CMS counts total count") = toProp(new CmsTotalCountProperty[Int](), 10, 10, 0.01)
+}
+
 abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   val DELTA = 1E-10
@@ -279,21 +370,6 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
   }
 
   val RAND = new scala.util.Random
-
-  /**
-   * Returns the exact frequency of {x} in {data}.
-   */
-  def exactFrequency(data: Seq[K], x: K): Long = data.count(_ == x)
-
-  /**
-   * Returns the exact inner product between two data streams, when the streams
-   * are viewed as count vectors.
-   */
-  def exactInnerProduct(data1: Seq[K], data2: Seq[K]): Long = {
-    val counts1 = data1.groupBy(identity).mapValues(_.size)
-    val counts2 = data2.groupBy(identity).mapValues(_.size)
-    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k => counts1(k) * counts2(k) }.sum
-  }
 
   /**
    * Returns the elements in {data} that appear at least heavyHittersPct * data.size times.
@@ -317,106 +393,6 @@ abstract class CMSTest[K: CMSHasher: FromIntLike] extends WordSpec with Matchers
   }
 
   "A Count-Min sketch implementing CMSCounting" should {
-
-    "count total number of elements in a stream" in {
-      val totalCount = 1243
-      val range = 234
-      val data = createRandomStream(totalCount, range)
-      val cms = COUNTING_CMS_MONOID.create(data)
-
-      cms.totalCount should be(totalCount)
-    }
-
-    "estimate frequencies" in {
-      val totalCount = 5678
-      val range = 897
-      val data = createRandomStream(totalCount, range)
-      val cms = COUNTING_CMS_MONOID.create(data)
-
-      (0 to 100).foreach { _ =>
-        // Instead of drawing randomly from the full `range`, we could also pick a random element from `data` instead.
-        // Think: `val x = data(RAND.nextInt(data.length))`.  However, the current test will also pick elements that
-        // are not in `data`, and for those elements the CMS invariants should still hold.
-        val x = RAND.nextInt(range).toK[K]
-        val exact = exactFrequency(data, x)
-        val approx = cms.frequency(x).estimate
-        val estimationError = approx - exact
-        val maxError = approx - cms.frequency(x).min
-        val beWithinTolerance = be >= 0L and be <= maxError
-
-        approx should be >= exact
-        estimationError should beWithinTolerance
-      }
-    }
-
-    "exactly compute frequencies in a small stream" in {
-      val one = COUNTING_CMS_MONOID.create(1.toK[K])
-      one.frequency(1.toK[K]).estimate should be(1)
-      one.frequency(2.toK[K]).estimate should be(0)
-      val two = COUNTING_CMS_MONOID.create(2.toK[K])
-      two.frequency(1.toK[K]).estimate should be(0)
-      two.frequency(2.toK[K]).estimate should be(1)
-      val cms = COUNTING_CMS_MONOID.plus(COUNTING_CMS_MONOID.plus(one, two), two)
-
-      cms.frequency(0.toK[K]).estimate should be(0)
-      cms.frequency(1.toK[K]).estimate should be(1)
-      cms.frequency(2.toK[K]).estimate should be(2)
-
-      val three = COUNTING_CMS_MONOID.create(Seq(1, 1, 1).toK[K])
-      three.frequency(1.toK[K]).estimate should be(3)
-      val four = COUNTING_CMS_MONOID.create(Seq(1, 1, 1, 1).toK[K])
-      four.frequency(1.toK[K]).estimate should be(4)
-      val cms2 = COUNTING_CMS_MONOID.plus(four, three)
-      cms2.frequency(1.toK[K]).estimate should be(7)
-    }
-
-    "estimate inner products" in {
-      val totalCounts = Gen.choose(1, 10000)
-      val ranges = Gen.choose(100, 2000)
-
-      forAll((totalCounts, "totalCount"), (ranges, "range"), minSuccessful(10)) { (totalCount: Int, range: Int) =>
-        val data1 = createRandomStream(totalCount, range)
-        val data2 = createRandomStream(totalCount, range)
-        val cms1 = COUNTING_CMS_MONOID.create(data1)
-        val cms2 = COUNTING_CMS_MONOID.create(data2)
-
-        val approxA = cms1.innerProduct(cms2)
-        val approx = approxA.estimate
-        val exact = exactInnerProduct(data1, data2)
-        val estimationError = approx - exact
-        val maxError = approx - approxA.min
-        val beWithinTolerance = be >= 0L and be <= maxError
-
-        // We do not support negative counts, hence the lower limit of a frequency is 0 but never negative.
-        approxA.min should be >= 0L
-
-        approx should be(cms2.innerProduct(cms1).estimate)
-        approx should be >= exact
-        estimationError should beWithinTolerance
-      }
-    }
-
-    "exactly compute inner product of small streams" in {
-      // Nothing in common.
-      val a1 = List(1, 2, 3).toK[K]
-      val a2 = List(4, 5, 6).toK[K]
-      COUNTING_CMS_MONOID.create(a1).innerProduct(COUNTING_CMS_MONOID.create(a2)).estimate should be(0)
-
-      // One element in common.
-      val b1 = List(1, 2, 3).toK[K]
-      val b2 = List(3, 5, 6).toK[K]
-      COUNTING_CMS_MONOID.create(b1).innerProduct(COUNTING_CMS_MONOID.create(b2)).estimate should be(1)
-
-      // Multiple, non-repeating elements in common.
-      val c1 = List(1, 2, 3).toK[K]
-      val c2 = List(3, 2, 6).toK[K]
-      COUNTING_CMS_MONOID.create(c1).innerProduct(COUNTING_CMS_MONOID.create(c2)).estimate should be(2)
-
-      // Multiple, repeating elements in common.
-      val d1 = List(1, 2, 2, 3, 3).toK[K]
-      val d2 = List(2, 3, 3, 6).toK[K]
-      COUNTING_CMS_MONOID.create(d1).innerProduct(COUNTING_CMS_MONOID.create(d2)).estimate should be(6)
-    }
 
     "work as an Aggregator when created from a single, small stream" in {
       val data1 = Seq(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5).toK[K]

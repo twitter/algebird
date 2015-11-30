@@ -156,8 +156,9 @@ object AlgebirdBuild extends Build {
   )
 
   lazy val algebirdTest = module("test").settings(
+    testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
     libraryDependencies <++= (scalaVersion) { scalaVersion =>
-      Seq("org.scalacheck" %% "scalacheck" % "1.12.4",
+      Seq("org.scalacheck" %% "scalacheck" % "1.12.5",
           "org.scalatest" %% "scalatest" % "2.2.4") ++ {
         if (isScala210x(scalaVersion))
           Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)

@@ -16,9 +16,13 @@ limitations under the License.
 
 package com.twitter.algebird
 
+private[algebird] trait ApproximateSet[T] {
+  def contains(t: T): ApproximateBoolean
+}
+
 // This gives an answer, and a LOWER BOUND on the probability that answer is
 // correct
-case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
+case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends ApproximateSet[Boolean] {
 
   def not: ApproximateBoolean = ApproximateBoolean(!isTrue, withProb)
 
@@ -58,6 +62,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) {
       ApproximateBoolean(false, newP)
     }
   }
+
+  def contains(b: Boolean): ApproximateBoolean = if (isTrue) this else not
 }
 
 object ApproximateBoolean {
@@ -67,7 +73,7 @@ object ApproximateBoolean {
 }
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
-case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) {
+case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) extends ApproximateSet[N] {
   require(numeric.lteq(min, estimate) && numeric.lteq(estimate, max))
 
   /**
@@ -113,10 +119,10 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
       this
     } else {
       val n = numeric
-      val ends = for (
-        leftv <- List(min, max);
+      val ends = for {
+        leftv <- List(min, max)
         rightv <- List(right.min, right.max)
-      ) yield n.times(leftv, rightv)
+      } yield n.times(leftv, rightv)
 
       val newProb = probWithinBounds * right.probWithinBounds
 
@@ -159,7 +165,7 @@ object Approximate {
   // Not a group/ring:
   // negate fails: x - x != 0, because with some probability the bound is bad.
   // distributive fails because a*b + a*c ignores that a is either in or out
-  // of the bound, and counts it idependently.
+  // of the bound, and counts it independently.
   implicit def monoid[N](implicit n: Numeric[N]): Monoid[Approximate[N]] = {
     // avoid capturing the Numeric:
     val z = Approximate.zero[N]
