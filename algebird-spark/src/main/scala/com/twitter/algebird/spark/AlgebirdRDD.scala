@@ -21,8 +21,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
   def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] = {
     val pr = rdd.mapPartitions({ data =>
       if (data.isEmpty) Iterator.empty else {
-        val sg = agg.prepare(data.next)
-        Iterator(agg.appendAll(sg, data))
+        val b = agg.prepare(data.next)
+        Iterator(agg.appendAll(b, data))
       }
     }, preservesPartitioning = true)
     pr.coalesce(1, shuffle = true)
