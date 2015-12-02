@@ -35,6 +35,11 @@ object Aggregator extends java.io.Serializable {
   def fromMonoid[F, T](implicit mon: Monoid[T], prep: F => T): MonoidAggregator[F, T, T] =
     prepareMonoid(prep)(mon)
 
+  def prepareSemigroup[F, T](prep: F => T)(implicit sg: Semigroup[T]): Aggregator[F, T, T] = new Aggregator[F, T, T] {
+    def prepare(input: F) = prep(input)
+    def semigroup = sg
+    def present(reduction: T) = reduction
+  }
   def prepareMonoid[F, T](prep: F => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] = new MonoidAggregator[F, T, T] {
     def prepare(input: F) = prep(input)
     def monoid = m
@@ -48,12 +53,50 @@ object Aggregator extends java.io.Serializable {
   }
 
   /**
-   * Obtain a [[MonoidAggregator]] that uses an efficient append operation for faster aggregation
+   * Obtain an [[Aggregator]] that uses an efficient append operation for faster aggregation.
+   * Equivalent to {{{ appendSemigroup(prep, appnd, identity[T]_)(sg) }}}
+   */
+  def appendSemigroup[F, T](prep: F => T, appnd: (T, F) => T)(implicit sg: Semigroup[T]): Aggregator[F, T, T] =
+    appendSemigroup(prep, appnd, identity[T]_)(sg)
+
+  /**
+   * Obtain an [[Aggregator]] that uses an efficient append operation for faster aggregation
    * @tparam F Data input type
-   * @tparam T Aggregating [[Monoid]] type
-   * @param appnd Function that appends the [[Monoid]].  Defines the [[append]] method for this aggregator.
+   * @tparam T Aggregating [[Semigroup]] type
+   * @tparam P Presentation (output) type
+   * @param prep The preparation function.  Expected to construct an instance of type T from a single data element.
+   * @param appnd Function that appends the [[Semigroup]].  Defines the [[append]] method for this aggregator.
    * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
-   * @param m The [[Monoid]] type class
+   * @param pres The presentation function
+   * @param sg The [[Semigroup]] type class
+   * @note The functions 'appnd' and 'prep' are expected to obey the law: {{{ appnd(t, f) == sg.plus(t, prep(f)) }}}
+   */
+  def appendSemigroup[F, T, P](prep: F => T, appnd: (T, F) => T, pres: T => P)(implicit sg: Semigroup[T]): Aggregator[F, T, P] =
+    new Aggregator[F, T, P] {
+      def semigroup: Semigroup[T] = sg
+      def prepare(input: F): T = prep(input)
+      def present(reduction: T): P = pres(reduction)
+
+      override def apply(inputs: TraversableOnce[F]): P = applyOption(inputs).get
+
+      override def applyOption(inputs: TraversableOnce[F]): Option[P] = agg(inputs).map(pres)
+
+      override def append(l: T, r: F): T = appnd(l, r)
+
+      override def appendAll(old: T, items: TraversableOnce[F]): T =
+        if (items.isEmpty) old else reduce(old, agg(items).get)
+
+      private def agg(inputs: TraversableOnce[F]): Option[T] =
+        if (inputs.isEmpty) None else {
+          val itr = inputs.toIterator
+          val t = prepare(itr.next)
+          Some(itr.foldLeft(t)(appnd))
+        }
+    }
+
+  /**
+   * Obtain a [[MonoidAggregator]] that uses an efficient append operation for faster aggregation.
+   * Equivalent to {{{ appendMonoid(appnd, identity[T]_)(m) }}}
    */
   def appendMonoid[F, T](appnd: (T, F) => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] =
     appendMonoid(appnd, identity[T]_)(m)
@@ -67,6 +110,7 @@ object Aggregator extends java.io.Serializable {
    * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
    * @param pres The presentation function
    * @param m The [[Monoid]] type class
+   * @note The function 'appnd' is expected to obey the law: {{{ appnd(t, f) == m.plus(t, appnd(m.zero, f)) }}}
    */
   def appendMonoid[F, T, P](appnd: (T, F) => T, pres: T => P)(implicit m: Monoid[T]): MonoidAggregator[F, T, P] =
     new MonoidAggregator[F, T, P] {
