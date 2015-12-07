@@ -3,7 +3,20 @@ sudo: false
 matrix:
   include:
     - scala: 2.10.5
+      before_script:
+        # default $SBT_OPTS is irrelevant to sbt lancher
+        - unset SBT_OPTS
+        # sometimes downloads are flakey, retry to get dependencies
+        - travis_retry ./sbt ++$TRAVIS_SCALA_VERSION update
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - scala: 2.11.7
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
+      before_script:
+        # default $SBT_OPTS is irrelevant to sbt lancher
+        - unset SBT_OPTS
+        # sometimes downloads are flakey, retry to get dependencies
+        - travis_retry ./sbt ++$TRAVIS_SCALA_VERSION update
+      script:
+        - travis_wait ./sbt ++$TRAVIS_SCALA_VERSION coverage test
+        - ./sbt ++$TRAVIS_SCALA_VERSION coverageAggregate
+      after_success: "./sbt ++$TRAVIS_SCALA_VERSION coveralls"
