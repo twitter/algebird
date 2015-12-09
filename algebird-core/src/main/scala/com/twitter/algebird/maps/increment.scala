@@ -113,7 +113,7 @@ trait IncrementMapLike[K, V, IN <: INodeInc[K, V], M <: IncrementMapLike[K, V, I
    * Add (w.r.t. valueMonoid) a given value to the value currently stored at key.
    * @note If key is not present, equivalent to insert(k, valueMonoid.plus(valueMonoid.zero, iv)
    */
-  def increment(k: K, iv: V) = this.incr(
+  def increment(k: K, iv: V): M = this.incr(
     new DataMap[K, V] {
       val key = k
       val value = iv
@@ -147,7 +147,7 @@ object IncrementMap {
    * val map2 = IncrementMap.key[String].value(mon)
    * }}}
    */
-  def key[K](implicit ord: Ordering[K]) = infra.GetValue(ord)
+  def key[K](implicit ord: Ordering[K]): infra.GetValue[K] = infra.GetValue(ord)
 
   object infra {
     /** Mediating class between key method and value method */

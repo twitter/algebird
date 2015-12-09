@@ -25,7 +25,7 @@ import com.twitter.algebird.maps.ordered._
 import com.twitter.algebird.maps.ordered.tree.DataMap
 
 case class Cover[+T](l: Option[T], r: Option[T]) {
-  def map[U](f: T => U) = Cover(l.map(f), r.map(f))
+  def map[U](f: T => U): Cover[U] = Cover(l.map(f), r.map(f))
 }
 
 package tree {
@@ -194,10 +194,10 @@ trait NearestLike[K, +IN <: INodeNear[K], +M <: NearestLike[K, IN, M]]
   extends NodeNear[K] with OrderedLike[K, IN, M] {
 
   /** Obtain the nodes nearest to a key */
-  def nearestNodes(k: K) = this.near(k).map(_.asInstanceOf[IN])
+  def nearestNodes(k: K): Seq[IN] = this.near(k).map(_.asInstanceOf[IN])
 
-  def coverLNodes(k: K) = this.covL(k)
-  def coverRNodes(k: K) = this.covR(k)
+  def coverLNodes(k: K): Cover[IN] = this.covL(k).map(_.asInstanceOf[IN])
+  def coverRNodes(k: K): Cover[IN] = this.covR(k).map(_.asInstanceOf[IN])
 
   /** Minimum key stored in this collection */
   def keyMin: Option[K] = this match {
@@ -227,10 +227,10 @@ trait NearestSetLike[K, IN <: INodeNear[K], M <: NearestSetLike[K, IN, M] with S
    * nearest will be returned (in key order).  If container is empty, an empty sequence
    * will be returned.
    */
-  def nearest(k: K) = this.near(k).map(_.data.key)
+  def nearest(k: K): Seq[K] = this.near(k).map(_.data.key)
 
-  def coverL(k: K) = this.covL(k).map(_.data.key)
-  def coverR(k: K) = this.covR(k).map(_.data.key)
+  def coverL(k: K): Cover[K] = this.covL(k).map(_.data.key)
+  def coverR(k: K): Cover[K] = this.covR(k).map(_.data.key)
 }
 
 /**
@@ -249,16 +249,16 @@ trait NearestMapLike[K, +V, +IN <: INodeNearMap[K, V], +M <: NearestMapLike[K, V
    * nearest will be returned (in key order).  If container is empty, an empty sequence
    * will be returned.
    */
-  def nearest(k: K) = this.near(k).map { n =>
+  def nearest(k: K): Seq[(K, V)] = this.near(k).map { n =>
     val dm = n.data.asInstanceOf[DataMap[K, V]]
     (dm.key, dm.value)
   }
 
-  def coverL(k: K) = this.covL(k).map { n =>
+  def coverL(k: K): Cover[(K, V)] = this.covL(k).map { n =>
     val dm = n.data.asInstanceOf[DataMap[K, V]]
     (dm.key, dm.value)
   }
-  def coverR(k: K) = this.covR(k).map { n =>
+  def coverR(k: K): Cover[(K, V)] = this.covR(k).map { n =>
     val dm = n.data.asInstanceOf[DataMap[K, V]]
     (dm.key, dm.value)
   }
@@ -316,7 +316,7 @@ object NearestMap {
    * val map2 = NearestMap.key(num).value[String]
    * }}}
    */
-  def key[K](implicit num: Numeric[K]) = infra.GetValue(num)
+  def key[K](implicit num: Numeric[K]): infra.GetValue[K] = infra.GetValue(num)
 
   object infra {
     /** Mediating class between key method and value method */

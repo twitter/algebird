@@ -39,7 +39,7 @@ package tree {
      * If 'open' is true, sums the open interval for keys strictly < k.
      * If 'k' is not present in the map, then the sum for keys < k is returned.
      */
-    final def prefixSum(k: K, open: Boolean = false) = pfSum(k, prefixMonoid.zero, open)
+    final def prefixSum(k: K, open: Boolean = false): P = pfSum(k, prefixMonoid.zero, open)
 
     private[tree] def pfSum(k: K, sum: P, open: Boolean): P
 
@@ -112,19 +112,19 @@ trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K,
    * A container of all prefix sums over the stored values.  If 'open' is true,
    * the sums will be for strictly < each key.
    */
-  def prefixSums(open: Boolean = false) = prefixSumsIterator(open).toIterable
+  def prefixSums(open: Boolean = false): Iterable[P] = prefixSumsIterator(open).toIterable
 
   /**
    * Iterate over prefix sums for stored values.  If 'open' is true,
    * the sums will be for strictly < each key.
    */
-  def prefixSumsIterator(open: Boolean = false) = {
+  def prefixSumsIterator(open: Boolean = false): Iterator[P] = {
     val itr = valuesIterator.scanLeft(prefixMonoid.zero)((p, e) => prefixMonoid.inc(p, e))
     if (open) itr.takeWhile(_ => itr.hasNext) else itr.drop(1)
   }
 
   /** equivalent to prefixSum of the right-most key */
-  def sum = this match {
+  def sum: P = this match {
     case n: INodePS[K, V, P] => n.prefix
     case _ => prefixMonoid.zero
   }
@@ -155,12 +155,12 @@ object PrefixSumMap {
    * val map2 = PrefixSumMap.key(ord).value[Int].prefix(IncrementingMonoid.fromMonoid[Int])
    * }}}
    */
-  def key[K](implicit ord: Ordering[K]) = infra.GetValue(ord)
+  def key[K](implicit ord: Ordering[K]): infra.GetValue[K] = infra.GetValue(ord)
 
   object infra {
     /** Mediating class between key method and value method */
     case class GetValue[K](ord: Ordering[K]) {
-      def value[V] = GetPrefix[K, V](ord)
+      def value[V]: GetPrefix[K, V] = GetPrefix[K, V](ord)
     }
 
     /** Mediating class between value method and prefix method */

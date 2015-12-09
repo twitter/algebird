@@ -49,10 +49,10 @@ package tree {
     protected def iNode(color: Color, d: Data[K], lsub: Node[K], rsub: Node[K]): INode[K]
 
     /** Insert a node into the tree */
-    private[maps] final def insert(d: Data[K]) = blacken(ins(d))
+    private[maps] final def insert(d: Data[K]): Node[K] = blacken(ins(d))
 
     /** Delete the key from the tree */
-    private[maps] final def delete(k: K) = if (node(k).isDefined) blacken(del(k)) else this
+    private[maps] final def delete(k: K): Node[K] = if (node(k).isDefined) blacken(del(k)) else this
 
     /** Obtain the node stored at a given key if it exists, None otherwise */
     def node(k: K): Option[INode[K]]
@@ -65,16 +65,16 @@ package tree {
     private[tree] def del(k: K): Node[K]
 
     /** create a new Red node from a key, value, left subtree and right subtree */
-    final protected def rNode(d: Data[K], lsub: Node[K], rsub: Node[K]) = iNode(R, d, lsub, rsub)
+    final protected def rNode(d: Data[K], lsub: Node[K], rsub: Node[K]): INode[K] = iNode(R, d, lsub, rsub)
 
     /** create a new Black node from a key, value, left subtree and right subtree */
-    final protected def bNode(d: Data[K], lsub: Node[K], rsub: Node[K]) = iNode(B, d, lsub, rsub)
+    final protected def bNode(d: Data[K], lsub: Node[K], rsub: Node[K]): INode[K] = iNode(B, d, lsub, rsub)
 
-    final protected def blacken(node: Node[K]) = node match {
+    final protected def blacken(node: Node[K]): Node[K] = node match {
       case n: INode[K] if (n.color == R) => bNode(n.data, n.lsub, n.rsub)
       case n => n
     }
-    final protected def redden(node: Node[K]) = node match {
+    final protected def redden(node: Node[K]): Node[K] = node match {
       case n: INode[K] => if (n.color == R) n else rNode(n.data, n.lsub, n.rsub)
       case _ => throw new Exception("illegal attempt to make a leaf node red")
     }

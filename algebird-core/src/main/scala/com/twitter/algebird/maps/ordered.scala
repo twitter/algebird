@@ -77,17 +77,17 @@ package infra {
   object INodeIterator {
 
     /** An empty node iterator, with a specified type */
-    def empty[IN <: INode[_]] = new INodeIterator[IN]
+    def empty[IN <: INode[_]]: INodeIterator[IN] = new INodeIterator[IN]
 
     /** Construct a node iterator from a given tree node */
-    def from[IN <: INode[_]](node: Node[_]) = {
+    def from[IN <: INode[_]](node: Node[_]): INodeIterator[IN] = {
       val itr = empty[IN]
       itr.pushLeft(node)
       itr
     }
 
     /** Construct a node iterator that will start at key */
-    def fromKey[K, IN <: INode[_]](key: K, node: Node[K]) = {
+    def fromKey[K, IN <: INode[_]](key: K, node: Node[K]): INodeIterator[IN] = {
       val itr = empty[IN]
       def fill(node: Node[K]) {
         val ord = node.keyOrdering
@@ -145,16 +145,16 @@ import infra._
 trait OrderedLike[K, +IN <: INode[K], +M <: OrderedLike[K, IN, M]] extends Node[K] {
 
   /** Get the internal node stored at at key, or None if key is not present */
-  def getNode(k: K) = this.node(k).map(_.asInstanceOf[IN])
+  def getNode(k: K): Option[IN] = this.node(k).map(_.asInstanceOf[IN])
 
   /** A container of underlying nodes, in key order */
-  def nodes = nodesIterator.toIterable
+  def nodes: Iterable[IN] = nodesIterator.toIterable
 
   /** Iterator over nodes, in key order */
   def nodesIterator: Iterator[IN] = INodeIterator.from[IN](this)
 
   /** A container of nodes, in key order, having key >= k */
-  def nodesFrom(k: K) = nodesIteratorFrom(k).toIterable
+  def nodesFrom(k: K): Iterable[IN] = nodesIteratorFrom(k).toIterable
 
   /** Iterator over nodes, in key order, having key >= k */
   def nodesIteratorFrom(k: K): Iterator[IN] = INodeIterator.fromKey[K, IN](k, this)
@@ -178,19 +178,19 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Sorte
   def empty: M
 
   /** Obtain a new container with key removed */
-  def -(k: K) = this.delete(k).asInstanceOf[M]
+  def -(k: K): M = this.delete(k).asInstanceOf[M]
 
   /** Returns true if key is present in the container, false otherwise */
-  override def contains(k: K) = this.node(k).isDefined
+  override def contains(k: K): Boolean = this.node(k).isDefined
 
   /** A container of keys, in key order */
-  def keys = keysIterator.toIterable
+  def keys: Iterable[K] = keysIterator.toIterable
 
   /** Iterator over keys, in key order */
-  def keysIterator = nodesIterator.map(_.data.key)
+  def keysIterator: Iterator[K] = nodesIterator.map(_.data.key)
 
   /** Obtain a new container with key inserted */
-  def +(k: K) = this.insert(
+  def +(k: K): M = this.insert(
     new Data[K] {
       val key = k
     }).asInstanceOf[M]
@@ -200,11 +200,11 @@ trait OrderedSetLike[K, IN <: INode[K], M <: OrderedSetLike[K, IN, M] with Sorte
 
   def keysIteratorFrom(k: K): Iterator[K] = nodesIteratorFrom(k).map(_.data.key)
 
-  def rangeImpl(from: Option[K], until: Option[K]) =
+  def rangeImpl(from: Option[K], until: Option[K]): M =
     nodesIteratorRange(from, until).map(_.data.key).foldLeft(empty)((m, e) => m + e)
 
-  override def seq = this.asInstanceOf[M]
-  def ordering = keyOrdering
+  override def seq: M = this.asInstanceOf[M]
+  def ordering: Ordering[K] = keyOrdering
 
   override def hashCode = scala.util.hashing.MurmurHash3.orderedHash(nodesIterator.map(_.data))
   override def equals(that: Any) = that match {
@@ -255,28 +255,28 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
   }
 
   /** Obtain a new container with key removed */
-  def -(k: K) = this.delete(k).asInstanceOf[M]
+  def -(k: K): M = this.delete(k).asInstanceOf[M]
 
   /** Returns true if key is present in the container, false otherwise */
-  override def contains(k: K) = this.node(k).isDefined
+  override def contains(k: K): Boolean = this.node(k).isDefined
 
   /** A container of keys, in key order */
-  override def keys = keysIterator.toIterable
+  override def keys: Iterable[K] = keysIterator.toIterable
 
   /** Iterator over keys, in key order */
-  override def keysIterator = nodesIterator.map(_.data.key)
+  override def keysIterator: Iterator[K] = nodesIterator.map(_.data.key)
 
   /** Get the value stored at a key, or None if key is not present */
-  def get(k: K) = this.getNode(k).map(_.data.value)
+  def get(k: K): Option[V] = this.getNode(k).map(_.data.value)
 
   /** Iterator over (key,val) pairs, in key order */
   def iterator: Iterator[(K, V)] = nodesIterator.map(n => ((n.data.key, n.data.value)))
 
   /** Container of values, in key order */
-  override def values = valuesIterator.toIterable
+  override def values: Iterable[V] = valuesIterator.toIterable
 
   /** Iterator over values, in key order */
-  override def valuesIterator = nodesIterator.map(_.data.value)
+  override def valuesIterator: Iterator[V] = nodesIterator.map(_.data.value)
 
   def iteratorFrom(k: K): Iterator[(K, V)] =
     nodesIteratorFrom(k).map(n => (n.data.key, n.data.value))
@@ -285,7 +285,7 @@ trait OrderedMapLike[K, +V, +IN <: INodeMap[K, V], +M <: OrderedMapLike[K, V, IN
 
   def valuesIteratorFrom(k: K): Iterator[V] = nodesIteratorFrom(k).map(_.data.value)
 
-  def rangeImpl(from: Option[K], until: Option[K]) =
+  def rangeImpl(from: Option[K], until: Option[K]): M =
     nodesIteratorRange(from, until).map(n => (n.data.key, n.data.value))
       .foldLeft(empty)((m, e) => m + e)
 
@@ -362,7 +362,7 @@ object OrderedMap {
    * val map2 = OrderedMap.key(ord).value[Int]
    * }}}
    */
-  def key[K](implicit ord: Ordering[K]) = infra.GetValue(ord)
+  def key[K](implicit ord: Ordering[K]): infra.GetValue[K] = infra.GetValue(ord)
 
   object infra {
     /** Mediating class between key method and value method */
