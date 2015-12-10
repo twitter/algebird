@@ -20,7 +20,7 @@ import scala.collection.SortedMap
 
 import org.scalatest._
 
-import com.twitter.algebird.Monoid
+import com.twitter.algebird.{ Monoid, Aggregator, MonoidAggregator }
 
 import com.twitter.algebird.matchers.seq._
 
@@ -33,8 +33,8 @@ object PrefixSumMapProperties extends FlatSpec with Matchers {
     data: Seq[(K, V)],
     psmap: PrefixSumMapLike[K, V, P, IN, M] with SortedMap[K, V]) {
 
-    val mon = psmap.prefixMonoid
-    val psTruth = data.map(_._2).scanLeft(mon.zero)((v, e) => mon.inc(v, e))
+    val agg = psmap.prefixAggregator
+    val psTruth = data.map(_._2).scanLeft(agg.monoid.zero)((v, e) => agg.append(v, e))
     psmap.prefixSums() should beEqSeq(psTruth.tail)
     psmap.prefixSums(open = true) should beEqSeq(psTruth.dropRight(1))
     psmap.prefixSums() should beEqSeq(psmap.keys.map(k => psmap.prefixSum(k)))
@@ -50,7 +50,7 @@ class PrefixSumMapSpec extends FlatSpec with Matchers {
 
   def mapType1 =
     PrefixSumMap.key[Int].value[Int]
-      .prefix(IncrementingMonoid.fromMonoid(implicitly[Monoid[Int]]))
+      .prefix(Aggregator.appendMonoid((ps: Int, v: Int) => ps + v))
 
   it should "pass randomized tree patterns" in {
     val data = Vector.tabulate(50)(j => (j, j))

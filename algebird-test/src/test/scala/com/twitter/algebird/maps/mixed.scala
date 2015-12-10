@@ -18,7 +18,7 @@ package com.twitter.algebird.maps
 
 import org.scalatest._
 
-import com.twitter.algebird.Monoid
+import com.twitter.algebird.{ Monoid, Aggregator, MonoidAggregator }
 
 import com.twitter.algebird.matchers.seq._
 
@@ -56,10 +56,10 @@ object mixed {
     class Inject[K, V, P](
       val keyOrdering: Numeric[K],
       val valueMonoid: Monoid[V],
-      val prefixMonoid: IncrementingMonoid[P, V]) extends Serializable {
+      val prefixAggregator: MonoidAggregator[V, P, P]) extends Serializable {
 
       def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
-        new Inject[K, V, P](keyOrdering, valueMonoid, prefixMonoid) with INodeMix[K, V, P] with MixedMap[K, V, P] {
+        new Inject[K, V, P](keyOrdering, valueMonoid, prefixAggregator) with INodeMix[K, V, P] with MixedMap[K, V, P] {
 
           // INode[K]
           val color = clr
@@ -67,7 +67,7 @@ object mixed {
           val rsub = rs.asInstanceOf[NodeMix[K, V, P]]
           val data = dat.asInstanceOf[DataMap[K, V]]
           // INodePS[K, V, P]
-          val prefix = prefixMonoid.inc(prefixMonoid.plus(lsub.pfs, rsub.pfs), data.value)
+          val prefix = prefixAggregator.append(prefixAggregator.reduce(lsub.pfs, rsub.pfs), data.value)
           // INodeNear[K, V]
           val kmin = lsub match {
             case n: INodeMix[K, V, P] => n.kmin
@@ -89,7 +89,7 @@ object mixed {
     with PrefixSumMapLike[K, V, P, INodeMix[K, V, P], MixedMap[K, V, P]]
     with NearestMapLike[K, V, INodeMix[K, V, P], MixedMap[K, V, P]] {
 
-    override def empty = MixedMap.key(keyOrdering).value(valueMonoid).prefix(prefixMonoid)
+    override def empty = MixedMap.key(keyOrdering).value(valueMonoid).prefix(prefixAggregator)
 
     override def toString =
       "MixedMap(" +
@@ -107,15 +107,14 @@ object mixed {
       }
 
       case class GetPrefix[K, V](num: Numeric[K], vm: Monoid[V]) {
-        def prefix[P](implicit im: IncrementingMonoid[P, V]): MixedMap[K, V, P] =
-          new Inject[K, V, P](num, vm, im) with LNodeMix[K, V, P] with MixedMap[K, V, P]
+        def prefix[P](implicit agg: MonoidAggregator[V, P, P]): MixedMap[K, V, P] =
+          new Inject[K, V, P](num, vm, agg) with LNodeMix[K, V, P] with MixedMap[K, V, P]
       }
     }
   }
 }
 
 class MixedMapSpec extends FlatSpec with Matchers {
-  import com.twitter.algebird.maps.prefixsum.IncrementingMonoid
 
   import com.twitter.algebird.maps.ordered.RBProperties._
   import com.twitter.algebird.maps.ordered.OrderedMapProperties._
@@ -127,7 +126,7 @@ class MixedMapSpec extends FlatSpec with Matchers {
 
   def mapType1 =
     MixedMap.key[Double].value[Int]
-      .prefix(IncrementingMonoid.fromMonoid(implicitly[Monoid[Int]]))
+      .prefix(Aggregator.appendMonoid((ps: Int, v: Int) => ps + v))
 
   it should "pass randomized tree patterns" in {
     val data = Vector.tabulate(50)(j => (j.toDouble, j))

@@ -31,15 +31,15 @@ package tree {
 
   /** Base trait for R/B nodes supporting prefix-sum query */
   trait NodePS[K, V, P] extends NodeMap[K, V] {
-    /** Monoid with increment-by-element that defines semantics of prefix sum */
-    def prefixMonoid: IncrementingMonoid[P, V]
+    /** Aggregator that defines semantics of prefix sum */
+    def prefixAggregator: MonoidAggregator[V, P, P]
 
     /**
      * Obtain the prefix (cumulative) sum of values <= a given key 'k'.
      * If 'open' is true, sums the open interval for keys strictly < k.
      * If 'k' is not present in the map, then the sum for keys < k is returned.
      */
-    final def prefixSum(k: K, open: Boolean = false): P = pfSum(k, prefixMonoid.zero, open)
+    final def prefixSum(k: K, open: Boolean = false): P = pfSum(k, prefixAggregator.monoid.zero, open)
 
     private[tree] def pfSum(k: K, sum: P, open: Boolean): P
 
@@ -50,7 +50,7 @@ package tree {
   /** Leaf node for R/B nodes supporting prefix-sum query */
   trait LNodePS[K, V, P] extends NodePS[K, V, P] with LNodeMap[K, V] {
     final def pfSum(k: K, sum: P, open: Boolean) = sum
-    final def pfs = prefixMonoid.zero
+    final def pfs = prefixAggregator.monoid.zero
   }
 
   /** Internal node for R/B nodes supporting prefix-sum query */
@@ -64,11 +64,11 @@ package tree {
       if (keyOrdering.lt(k, data.key))
         lsub.pfSum(k, sum, open)
       else if (keyOrdering.gt(k, data.key))
-        rsub.pfSum(k, prefixMonoid.inc(prefixMonoid.plus(sum, lsub.pfs), data.value), open)
+        rsub.pfSum(k, prefixAggregator.append(prefixAggregator.reduce(sum, lsub.pfs), data.value), open)
       else if (open)
-        prefixMonoid.plus(sum, lsub.pfs)
+        prefixAggregator.reduce(sum, lsub.pfs)
       else
-        prefixMonoid.inc(prefixMonoid.plus(sum, lsub.pfs), data.value)
+        prefixAggregator.append(prefixAggregator.reduce(sum, lsub.pfs), data.value)
 
     final def pfs = prefix
   }
@@ -79,17 +79,17 @@ import tree._
 package infra {
   import com.twitter.algebird.maps.ordered.tree.DataMap
 
-  class Inject[K, V, P](val keyOrdering: Ordering[K], val prefixMonoid: IncrementingMonoid[P, V])
+  class Inject[K, V, P](val keyOrdering: Ordering[K], val prefixAggregator: MonoidAggregator[V, P, P])
     extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
-      new Inject[K, V, P](keyOrdering, prefixMonoid) with INodePS[K, V, P] with PrefixSumMap[K, V, P] {
+      new Inject[K, V, P](keyOrdering, prefixAggregator) with INodePS[K, V, P] with PrefixSumMap[K, V, P] {
         // INode[K]
         val color = clr
         val lsub = ls.asInstanceOf[NodePS[K, V, P]]
         val rsub = rs.asInstanceOf[NodePS[K, V, P]]
         val data = dat.asInstanceOf[DataMap[K, V]]
         // INodePS[K, V, P]
-        val prefix = prefixMonoid.inc(prefixMonoid.plus(lsub.pfs, rsub.pfs), data.value)
+        val prefix = prefixAggregator.append(prefixAggregator.reduce(lsub.pfs, rsub.pfs), data.value)
       }
   }
 
@@ -119,21 +119,21 @@ trait PrefixSumMapLike[K, V, P, IN <: INodePS[K, V, P], M <: PrefixSumMapLike[K,
    * the sums will be for strictly < each key.
    */
   def prefixSumsIterator(open: Boolean = false): Iterator[P] = {
-    val itr = valuesIterator.scanLeft(prefixMonoid.zero)((p, e) => prefixMonoid.inc(p, e))
+    val itr = valuesIterator.scanLeft(prefixAggregator.monoid.zero)((p, e) => prefixAggregator.append(p, e))
     if (open) itr.takeWhile(_ => itr.hasNext) else itr.drop(1)
   }
 
   /** equivalent to prefixSum of the right-most key */
   def sum: P = this match {
     case n: INodePS[K, V, P] => n.prefix
-    case _ => prefixMonoid.zero
+    case _ => prefixAggregator.monoid.zero
   }
 }
 
 sealed trait PrefixSumMap[K, V, P] extends SortedMap[K, V]
   with PrefixSumMapLike[K, V, P, INodePS[K, V, P], PrefixSumMap[K, V, P]] {
 
-  override def empty = PrefixSumMap.key(keyOrdering).value[V].prefix(prefixMonoid)
+  override def empty = PrefixSumMap.key(keyOrdering).value[V].prefix(prefixAggregator)
 
   override def toString =
     "PrefixSumMap(" +
@@ -149,10 +149,10 @@ object PrefixSumMap {
    * import com.twitter.algebird.maps.prefixsum._
    *
    * // map strings to integers, using default ordering and standard integer monoid
-   * val map1 = PrefixSumMap.key[String].value[Int].prefix(IncrementingMonoid.fromMonoid[Int])
+   * val map1 = PrefixSumMap.key[String].value[Int].prefix(Aggregator.appendMonoid((ps: Int, v: Int) => ps + v))
    * // Use a custom ordering
    * val ord: Ordering[String] = ...
-   * val map2 = PrefixSumMap.key(ord).value[Int].prefix(IncrementingMonoid.fromMonoid[Int])
+   * val map2 = PrefixSumMap.key(ord).value[Int].prefix(Aggregator.appendMonoid((ps: Int, v: Int) => ps + v))
    * }}}
    */
   def key[K](implicit ord: Ordering[K]): infra.GetValue[K] = infra.GetValue(ord)
@@ -165,60 +165,8 @@ object PrefixSumMap {
 
     /** Mediating class between value method and prefix method */
     case class GetPrefix[K, V](ord: Ordering[K]) {
-      def prefix[P](implicit mon: IncrementingMonoid[P, V]): PrefixSumMap[K, V, P] =
-        new Inject[K, V, P](ord, mon) with LNodePS[K, V, P] with PrefixSumMap[K, V, P]
-    }
-  }
-}
-
-/**
- * A monoid that also supports an 'increment' operation.  This class is intended to encode
- * semantics similar to Scala's seq.aggregate(z)(seqop,combop), where the standard
- * Monoid 'plus' corresponds to 'combop' and the 'inc' method corresponds to 'seqop'.
- */
-trait IncrementingMonoid[T, E] extends Monoid[T] {
-  /** increment a monoid 't' by an element value 'e', and return the result */
-  def inc(t: T, e: E): T
-}
-
-/** Factory methods for instantiating incrementing monoids */
-object IncrementingMonoid {
-  /**
-   * Create an incrementing monoid from a MonoidAggregator object.
-   * 'zero' and 'plus' are inherited from agg.monoid.
-   * 'inc' is defined by: agg.monoid.plus(t,agg.prepare(e))
-   */
-  def fromMonoidAggregator[T, E](agg: MonoidAggregator[E, T, T]) = new IncrementingMonoid[T, E] {
-    def zero = agg.monoid.zero
-    def plus(l: T, r: T) = agg.monoid.plus(l, r)
-    def inc(t: T, e: E) = agg.monoid.plus(t, agg.prepare(e))
-  }
-
-  /**
-   * Create an incrementing monoid from a Monoid object.
-   * 'zero' and 'plus' are inherited from monoid.
-   * 'inc' is equivalent to 'plus'
-   */
-  def fromMonoid[T](implicit monoid: Monoid[T]) = new IncrementingMonoid[T, T] {
-    def zero = monoid.zero
-    def plus(l: T, r: T) = monoid.plus(l, r)
-    def inc(t: T, e: T) = monoid.plus(t, e)
-  }
-
-  /**
-   * Create an incrementing monoid from zero, plus and inc
-   * {{{
-   * IncrementingMonoid.zero(0).plus(_ + _).inc(_ + _)
-   * IncrementingMonoid.zero(Set.empty[Int].plus(_ ++ _).inc[Int](_ + _)
-   * }}}
-   */
-  def zero[T](z: T) = new AnyRef {
-    def plus(p: (T, T) => T) = new AnyRef {
-      def inc[E](i: (T, E) => T) = new IncrementingMonoid[T, E] {
-        def zero = z
-        def plus(l: T, r: T) = p(l, r)
-        def inc(t: T, e: E) = i(t, e)
-      }
+      def prefix[P](implicit agg: MonoidAggregator[V, P, P]): PrefixSumMap[K, V, P] =
+        new Inject[K, V, P](ord, agg) with LNodePS[K, V, P] with PrefixSumMap[K, V, P]
     }
   }
 }
