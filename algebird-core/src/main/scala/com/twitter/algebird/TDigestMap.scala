@@ -20,7 +20,7 @@ import math.Numeric
 
 import scala.collection.SortedMap
 
-import com.twitter.algebird.Monoid
+import com.twitter.algebird.{ Monoid, Aggregator }
 
 import com.twitter.algebird.maps.increment._
 import com.twitter.algebird.maps.prefixsum._
@@ -93,7 +93,7 @@ object infra {
     // Typeclasses corresponding to "regular real numbers":
     val keyOrdering = implicitly[Numeric[Double]]
     val valueMonoid = implicitly[Monoid[Double]]
-    val prefixMonoid = IncrementingMonoid.fromMonoid[Double]
+    val prefixAggregator = Aggregator.appendMonoid((ps: Double, v: Double) => ps + v)
 
     def iNode(clr: Color, dat: Data[Double], ls: Node[Double], rs: Node[Double]) =
       new Inject with INodeTD with TDigestMap {
@@ -103,7 +103,7 @@ object infra {
         val rsub = rs.asInstanceOf[NodeTD]
         val data = dat.asInstanceOf[DataMap[Double, Double]]
         // INodePS
-        val prefix = prefixMonoid.inc(prefixMonoid.plus(lsub.pfs, rsub.pfs), data.value)
+        val prefix = prefixAggregator.append(prefixAggregator.reduce(lsub.pfs, rsub.pfs), data.value)
         // INodeNear
         val kmin = lsub match {
           case n: INodeTD => n.kmin
