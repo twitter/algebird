@@ -84,6 +84,7 @@ package tree {
 import tree._
 
 package infra {
+  /** Dependency injection for [[IncrementMap]].  Supplies implementations of all abstract methods */
   class Inject[K, V](val keyOrdering: Ordering[K], val valueMonoid: Monoid[V])
     extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =

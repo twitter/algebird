@@ -141,6 +141,7 @@ package tree {
 import tree._
 
 package infra {
+  /** Dependency injection for [[NearestSet]].  Supplies implementations of all abstract methods */
   class InjectSet[K](val keyOrdering: Numeric[K]) extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
       new InjectSet[K](keyOrdering) with INodeNear[K] with NearestSet[K] {
@@ -161,6 +162,7 @@ package infra {
       }
   }
 
+  /** Dependency injection for [[NearestMap]].  Supplies implementations of all abstract methods */
   class InjectMap[K, V](val keyOrdering: Numeric[K]) extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
       new InjectMap[K, V](keyOrdering) with INodeNearMap[K, V] with NearestMap[K, V] {

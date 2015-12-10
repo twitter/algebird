@@ -110,6 +110,7 @@ package infra {
     }
   }
 
+  /** Dependency injection for [[OrderedSet]].  Supplies implementations of all abstract methods */
   class InjectSet[K](val keyOrdering: Ordering[K]) extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
       new InjectSet[K](keyOrdering) with INode[K] with OrderedSet[K] {
@@ -121,6 +122,7 @@ package infra {
       }
   }
 
+  /** Dependency injection for [[OrderedMap]].  Supplies implementations of all abstract methods */
   class InjectMap[K, V](val keyOrdering: Ordering[K]) extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
       new InjectMap[K, V](keyOrdering) with INodeMap[K, V] with OrderedMap[K, V] {

@@ -79,6 +79,7 @@ import tree._
 package infra {
   import com.twitter.algebird.maps.ordered.tree.DataMap
 
+  /** Dependency injection for [[PrefixSumMap]].  Supplies implementations of all abstract methods */
   class Inject[K, V, P](val keyOrdering: Ordering[K], val prefixAggregator: MonoidAggregator[V, P, P])
     extends Serializable {
     def iNode(clr: Color, dat: Data[K], ls: Node[K], rs: Node[K]) =
