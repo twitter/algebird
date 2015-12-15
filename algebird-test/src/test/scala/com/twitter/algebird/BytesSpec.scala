@@ -115,11 +115,9 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
       suffixed should be > bytes1
 
       // 4. a Bytes instances and a "shorter" Bytes instance.
-      if (bytes1.array.length > 1) {
-        val shortened = Bytes(bytes1.array.tail)
-        bytes1 should be > shortened
-        shortened should be < bytes1
-      }
+      val shortened = Bytes(bytes1.array.dropRight(1))
+      bytes1 should be > shortened
+      shortened should be < bytes1
     }
   }
 
