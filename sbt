@@ -4,7 +4,7 @@
 # Author: Paul Phillips <paulp@improving.org>
 
 # todo - make this dynamic
-declare -r sbt_release_version="0.13.8"
+declare -r sbt_release_version="0.13.9"
 declare -r sbt_unreleased_version="0.13.9-M1"
 declare -r buildProps="project/build.properties"
 
