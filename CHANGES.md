@@ -1,5 +1,27 @@
 # Algebird #
 
+### Version 0.12.0 ###
+
+* Implement an appendMonoid Aggregator factory which yields aggregators…: https://github.com/twitter/algebird/pull/501
+* Dealing with probabilistic tests: https://github.com/twitter/algebird/pull/478
+* Add Applicative.sequenceGen: https://github.com/twitter/algebird/pull/498
+* Create a sparse Count-Min-Sketch.: https://github.com/twitter/algebird/pull/464
+* fix name and visibility of negativePowersOfTwo: https://github.com/twitter/algebird/pull/492
+* Speed up HLL presentation by 100x: https://github.com/twitter/algebird/pull/491
+* Test Semigroup#sumOption using Iterator instead of List: https://github.com/twitter/algebird/pull/490
+* Fix tests that were not actually running: https://github.com/twitter/algebird/pull/485
+* add immutable version of sorted(Reverse)Take: https://github.com/twitter/algebird/pull/484
+* Cuber/roller macros: https://github.com/twitter/algebird/pull/483
+* Add sanity requirement for Approximate: https://github.com/twitter/algebird/pull/481
+* Ioconnell/make develop version have snapshot suffix: https://github.com/twitter/algebird/pull/482
+* Upgrade scalacheck and scalatest: https://github.com/twitter/algebird/pull/480
+* Adding scoped top-N CMS monoid: https://github.com/twitter/algebird/pull/471
+* Fix Qtree quantileBounds off-by-one error: https://github.com/twitter/algebird/pull/472
+* Move benchmarks to JMH: https://github.com/twitter/algebird/pull/473
+* Ianoc/q tree benchmark more coverage: https://github.com/twitter/algebird/pull/474
+* Optimize QTree a bunch: https://github.com/twitter/algebird/pull/475
+* Disable coveralls, shows up as builds pending that are long finished: https://github.com/twitter/algebird/pull/476
+
 ### Version 0.11.0 ###
 * Move CMSHasherByteArray from scalding: https://github.com/twitter/algebird/pull/467
 * Upgrade sbt launcher script (sbt-extras): https://github.com/twitter/algebird/pull/469
