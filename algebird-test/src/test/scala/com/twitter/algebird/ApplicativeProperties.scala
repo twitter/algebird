@@ -37,6 +37,7 @@ class ApplicativeProperties extends CheckProperties {
   property("indexedseq") {
     applicativeLaws[IndexedSeq, Int, String, Long]()
   }
+
   property("vector") {
     applicativeLaws[Vector, Int, String, Long]()
   }
@@ -44,9 +45,15 @@ class ApplicativeProperties extends CheckProperties {
   property("set") {
     applicativeLaws[Set, Int, String, Long]()
   }
+
   property("seq") {
     applicativeLaws[Seq, Int, String, Long]()
   }
+
+  property("identity") {
+    applicativeLaws[Identity, Int, String, Long]()
+  }
+
   property("sequenceGen") {
     // This follows from the laws, so we are just testing
     // the implementation of sequenceGen against sequence here

@@ -65,4 +65,7 @@ object MonadLaws {
 
   implicit def someA[T](implicit arbl: Arbitrary[T]): Arbitrary[Some[T]] =
     Arbitrary { arbl.arbitrary.map { l => Some(l) } }
+
+  implicit def identityA[T](implicit arbl: Arbitrary[T]): Arbitrary[Identity[T]] =
+    Arbitrary { arbl.arbitrary.map { l => Identity(l) } }
 }

@@ -18,7 +18,8 @@ package com.twitter.algebird
 
 class FunctorProperties extends CheckProperties {
   import com.twitter.algebird.FunctorLaws._
-  import com.twitter.algebird.Monad._ // for Arbitrary instances
+  import com.twitter.algebird.Monad._ // for Functor instances
+  import com.twitter.algebird.MonadLaws._ // for Arbitrary instances
 
   property("list") {
     functorLaws[List, Int, String, Long]()
@@ -44,4 +45,7 @@ class FunctorProperties extends CheckProperties {
     functorLaws[Seq, Int, String, Long]()
   }
 
+  property("identity") {
+    functorLaws[Identity, Int, String, Long]()
+  }
 }
