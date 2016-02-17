@@ -48,4 +48,8 @@ class MonadProperties extends CheckProperties {
   property("seq") {
     monadLaws[Seq, Int, String, Long]()
   }
+
+  property("identity") {
+    monadLaws[Identity, Int, String, Long]()
+  }
 }
