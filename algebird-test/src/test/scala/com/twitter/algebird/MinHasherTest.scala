@@ -55,7 +55,7 @@ class MinHasherSpec extends WordSpec with Matchers {
     "measure 0.5 similarity in 1024 bytes with < 0.1 error" in {
       test(new MinHasher32(0.5, 1024), 0.5, 0.1)
     }
-    "measure 0.8 similarity in 1024 bytes with < 0.05 error" in {
+    "measure 0.8 similarity in 1024 bytes with < 0.1 error" in {
       test(new MinHasher32(0.8, 1024), 0.8, 0.1)
     }
     "measure 1.0 similarity in 1024 bytes with < 0.01 error" in {
