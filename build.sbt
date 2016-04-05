@@ -8,7 +8,7 @@ import scalariform.formatter.preferences._
 
 val paradiseVersion = "2.0.1"
 val quasiquotesVersion = "2.0.1"
-val bijectionVersion = "0.9.0"
+val bijectionVersion = "0.9.2"
 val utilVersion = "6.20.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
