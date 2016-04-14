@@ -20,7 +20,7 @@ object Operators {
   implicit def toMinus[T: Group](t: T) = new MinusOp(t)
   implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
   implicit def toDiv[T: Field](t: T) = new DivOp(t)
-  implicit def toRichTraversable[T](t: Traversable[T]) = new RichTraversable(t)
+  implicit def toRichTraversable[T](t: TraversableOnce[T]) = new RichTraversable(t)
 }
 
 class PlusOp[T: Semigroup](t: T) {
