@@ -22,7 +22,7 @@ def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
 
 val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
   organization := "com.twitter",
-  scalaVersion := "2.10.5",
+  scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7"),
   ScalariformKeys.preferences := formattingPreferences,
 
