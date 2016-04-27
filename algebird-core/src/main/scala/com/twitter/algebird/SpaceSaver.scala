@@ -9,6 +9,12 @@ object SpaceSaver {
    */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
+  /**
+   * Construct SpaceSaver with given capacity containing a single item with provided exact count.
+   * This is the public api to create a new SpaceSaver.
+   */
+  def apply[T](capacity: Int, item: T, count: Long): SpaceSaver[T] = SSMany(capacity, Map(item -> (count, 0L)))
+
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
@@ -84,7 +90,7 @@ sealed abstract class SpaceSaver[T] {
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
-case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
+case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
   def min: Long = 0L
@@ -101,14 +107,14 @@ object SSMany {
   private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] =
     SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
 
-  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
+  private[algebird] def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
     SSMany(capacity, counters, bucketsFromCounters(counters))
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
     SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
+case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
   private val exact: Boolean = counters.size < capacity
 
   val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
@@ -178,6 +184,5 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
 }
 
 class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
-
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
 }

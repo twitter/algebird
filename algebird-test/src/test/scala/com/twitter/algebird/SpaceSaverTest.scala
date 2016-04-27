@@ -51,5 +51,9 @@ class SpaceSaverTest extends WordSpec with Matchers {
             assert(approx ~ exactCounts(item))
         }
     }
+
+    "be consistent in its constructors" in {
+      assert(SpaceSaver(10, "ha") ++ SpaceSaver(10, "ha") ++ SpaceSaver(10, "ha") === SpaceSaver(10, "ha", 3))
+    }
   }
 }
