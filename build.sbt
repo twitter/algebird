@@ -10,6 +10,8 @@ val paradiseVersion = "2.0.1"
 val quasiquotesVersion = "2.0.1"
 val bijectionVersion = "0.9.0"
 val utilVersion = "6.20.0"
+val algebraVersion = "0.4.0"
+val javaEwahVersion = "0.6.6"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version startsWith "2.10" => "2.10"
@@ -158,7 +160,8 @@ lazy val algebirdCore = module("core").settings(
                      import com.twitter.algebird._
                      """.stripMargin('|'),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
-    Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
+    Seq("com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
+        "org.spire-math" %% "algebra" % algebraVersion,
         "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)

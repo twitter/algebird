@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Group => AGroup }
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -82,7 +83,29 @@ class ArrayGroup[T: ClassTag](implicit grp: Group[T])
   }.toArray
 }
 
-object Group extends GeneratedGroupImplicits with ProductGroups {
+/**
+ * Group can't extend AGroup because Field extends Group and it already has
+ * a method named inverse
+ */
+class FromAlgebraGroup[T](m: AGroup[T]) extends FromAlgebraMonoid(m) with Group[T] {
+  override def negate(t: T): T = m.inverse(t)
+  override def minus(r: T, l: T): T = m.remove(r, l)
+}
+
+class ToAlgebraGroup[T](g: Group[T]) extends AGroup[T] {
+  override def empty: T = g.zero
+  override def combine(l: T, r: T): T = g.plus(l, r)
+  override def combineAll(ts: TraversableOnce[T]): T = g.sum(ts)
+  override def combineAllOption(ts: TraversableOnce[T]): Option[T] = g.sumOption(ts)
+  override def remove(l: T, r: T): T = g.minus(l, r)
+  override def inverse(v: T): T = g.negate(v)
+}
+
+trait FromAlgebraGroupImplicit {
+  implicit def fromAlgebraGroup[T](m: AGroup[T]): Group[T] = new FromAlgebraGroup(m)
+}
+
+object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebraGroupImplicit {
   // This pattern is really useful for typeclasses
   def negate[T](x: T)(implicit grp: Group[T]) = grp.negate(x)
   def minus[T](l: T, r: T)(implicit grp: Group[T]) = grp.minus(l, r)

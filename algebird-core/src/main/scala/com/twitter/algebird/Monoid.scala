@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Monoid => AMonoid }
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 import scala.reflect.ClassTag
@@ -31,7 +32,7 @@ import scala.collection.{ Map => ScMap }
  */
 
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
-trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
+trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] with AMonoid[T] {
   def zero: T //additive identity
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v: T) {
@@ -49,6 +50,9 @@ trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
   }
   // Override this if there is a more efficient means to implement this
   def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
+
+  final override def empty: T = zero
+  final override def combineAll(t: TraversableOnce[T]): T = sum(t)
 }
 
 // For Java interop so they get the default methods
@@ -222,7 +226,16 @@ object AndValMonoid extends Monoid[AndVal] {
     else Some(AndVal(its.forall(_.get)))
 }
 
-object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
+class FromAlgebraMonoid[T](m: AMonoid[T]) extends FromAlgebraSemigroup(m) with Monoid[T] {
+  override def sum(ts: TraversableOnce[T]): T = m.combineAll(ts)
+  override def zero: T = m.empty
+}
+
+trait FromAlgebraMonoidImplicit {
+  implicit def fromAlgebraMonoid[T](m: AMonoid[T]): Monoid[T] = new FromAlgebraMonoid(m)
+}
+
+object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlgebraMonoidImplicit {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon: Monoid[T]) = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples

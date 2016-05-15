@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Semigroup => ASemigroup }
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -29,13 +30,16 @@ import macros.caseclass._
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
-trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serializable {
+trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] {
   def plus(l: T, r: T): T
   /**
    * override this if there is a faster way to do this sum than reduceLeftOption on plus
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
+
+  final override def combine(l: T, r: T): T = plus(l, r)
+  final override def combineAllOption(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
 }
 
 // For Java interop so they get the default sumOption
@@ -70,7 +74,20 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
   }
 }
 
-object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
+class FromAlgebraSemigroup[T](sg: ASemigroup[T]) extends Semigroup[T] {
+  override def plus(l: T, r: T): T = sg.combine(l, r)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] = sg.combineAllOption(ts)
+}
+
+/**
+ * An Algebra semigroup can be an Algebird semigroup
+ */
+trait FromAlgebraSemigroupImplicit {
+  implicit def fromAlgebraSemigroup[T](implicit sg: ASemigroup[T]): Semigroup[T] =
+    new FromAlgebraSemigroup(sg)
+}
+
+object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with FromAlgebraSemigroupImplicit {
   // This pattern is really useful for typeclasses
   def plus[T](l: T, r: T)(implicit semi: Semigroup[T]) = semi.plus(l, r)
   // Left sum: (((a + b) + c) + d)
