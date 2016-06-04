@@ -164,13 +164,4 @@ object BaseProperties {
       isNonZeroWorksRing[T]
 
   def ringLaws[T: Ring: Arbitrary] = validOne[T] && pseudoRingLaws[T]
-
-  def hasMultiplicativeInverse[T: Field: Arbitrary] = 'hasMultiplicativeInverse |: forAll { (a: T) =>
-    val fld = implicitly[Field[T]]
-    (!fld.isNonZero(a)) || {
-      val inva = fld.inverse(a)
-      (fld.times(inva, a) == fld.one) && (fld.times(a, inva) == fld.one)
-    }
-  }
-  def fieldLaws[T: Field: Arbitrary] = ringLaws[T] && hasMultiplicativeInverse[T]
 }

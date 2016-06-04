@@ -47,34 +47,31 @@ object JLongRing extends Ring[JLong] {
   override def times(x: JLong, y: JLong) = x * y
 }
 
-object JFloatField extends Field[JFloat] {
+object JFloatRing extends Ring[JFloat] {
   override val zero = JFloat.valueOf(0.0f)
   override val one = JFloat.valueOf(1.0f)
   override def plus(x: JFloat, y: JFloat) = x + y
   override def negate(x: JFloat): JFloat = -x
   override def minus(x: JFloat, y: JFloat) = x - y
   override def times(x: JFloat, y: JFloat) = x * y
-  override def div(x: JFloat, y: JFloat) = { assertNotZero(y); x / y }
 }
 
-object JDoubleField extends Field[JDouble] {
+object JDoubleRing extends Ring[JDouble] {
   override val zero = JDouble.valueOf(0.0)
   override val one = JDouble.valueOf(1.0)
   override def plus(x: JDouble, y: JDouble) = x + y
   override def negate(x: JDouble): JDouble = -x
   override def minus(x: JDouble, y: JDouble) = x - y
   override def times(x: JDouble, y: JDouble) = x * y
-  override def div(x: JDouble, y: JDouble) = { assertNotZero(y); x / y }
 }
 
-object JBoolField extends Field[JBool] {
+object JBoolRing extends Ring[JBool] {
   override val zero = JBool.FALSE
   override val one = JBool.TRUE
   override def plus(x: JBool, y: JBool) = JBool.valueOf(x.booleanValue ^ y.booleanValue)
   override def negate(x: JBool) = x
   override def minus(x: JBool, y: JBool) = plus(x, y)
   override def times(x: JBool, y: JBool) = JBool.valueOf(x.booleanValue & y.booleanValue)
-  override def div(x: JBool, y: JBool) = { assertNotZero(y); x }
 }
 
 /**

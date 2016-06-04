@@ -274,22 +274,22 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlge
     }
   }
 
-  implicit val nullMonoid: Monoid[Null] = NullGroup
-  implicit val unitMonoid: Monoid[Unit] = UnitGroup
-  implicit val boolMonoid: Monoid[Boolean] = BooleanField
-  implicit val jboolMonoid: Monoid[JBool] = JBoolField
-  implicit val intMonoid: Monoid[Int] = IntRing
-  implicit val jintMonoid: Monoid[JInt] = JIntRing
-  implicit val shortMonoid: Monoid[Short] = ShortRing
-  implicit val jshortMonoid: Monoid[JShort] = JShortRing
-  implicit val bigIntMonoid: Monoid[BigInt] = BigIntRing
-  implicit val longMonoid: Monoid[Long] = LongRing
-  implicit val jlongMonoid: Monoid[JLong] = JLongRing
-  implicit val floatMonoid: Monoid[Float] = FloatField
-  implicit val jfloatMonoid: Monoid[JFloat] = JFloatField
-  implicit val doubleMonoid: Monoid[Double] = DoubleField
-  implicit val jdoubleMonoid: Monoid[JDouble] = JDoubleField
-  implicit val stringMonoid: Monoid[String] = StringMonoid
+  implicit def nullMonoid: Monoid[Null] = NullGroup
+  implicit def unitMonoid: Monoid[Unit] = UnitGroup
+  implicit def boolMonoid: Monoid[Boolean] = BooleanRing
+  implicit def jboolMonoid: Monoid[JBool] = JBoolRing
+  implicit def intMonoid: Monoid[Int] = IntRing
+  implicit def jintMonoid: Monoid[JInt] = JIntRing
+  implicit def shortMonoid: Monoid[Short] = ShortRing
+  implicit def jshortMonoid: Monoid[JShort] = JShortRing
+  implicit def bigIntMonoid: Monoid[BigInt] = BigIntRing
+  implicit def longMonoid: Monoid[Long] = LongRing
+  implicit def jlongMonoid: Monoid[JLong] = JLongRing
+  implicit def floatMonoid: Monoid[Float] = FloatRing
+  implicit def jfloatMonoid: Monoid[JFloat] = JFloatRing
+  implicit def doubleMonoid: Monoid[Double] = DoubleRing
+  implicit def jdoubleMonoid: Monoid[JDouble] = JDoubleRing
+  implicit def stringMonoid: Monoid[String] = StringMonoid
   implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]

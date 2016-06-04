@@ -145,22 +145,22 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
     }
   }
 
-  implicit val nullSemigroup: Semigroup[Null] = NullGroup
-  implicit val unitSemigroup: Semigroup[Unit] = UnitGroup
-  implicit val boolSemigroup: Semigroup[Boolean] = BooleanField
-  implicit val jboolSemigroup: Semigroup[JBool] = JBoolField
-  implicit val intSemigroup: Semigroup[Int] = IntRing
-  implicit val jintSemigroup: Semigroup[JInt] = JIntRing
-  implicit val shortSemigroup: Semigroup[Short] = ShortRing
-  implicit val jshortSemigroup: Semigroup[JShort] = JShortRing
-  implicit val longSemigroup: Semigroup[Long] = LongRing
-  implicit val bigIntSemigroup: Semigroup[BigInt] = BigIntRing
-  implicit val jlongSemigroup: Semigroup[JLong] = JLongRing
-  implicit val floatSemigroup: Semigroup[Float] = FloatField
-  implicit val jfloatSemigroup: Semigroup[JFloat] = JFloatField
-  implicit val doubleSemigroup: Semigroup[Double] = DoubleField
-  implicit val jdoubleSemigroup: Semigroup[JDouble] = JDoubleField
-  implicit val stringSemigroup: Semigroup[String] = StringMonoid
+  implicit def nullSemigroup: Semigroup[Null] = NullGroup
+  implicit def unitSemigroup: Semigroup[Unit] = UnitGroup
+  implicit def boolSemigroup: Semigroup[Boolean] = BooleanRing
+  implicit def jboolSemigroup: Semigroup[JBool] = JBoolRing
+  implicit def intSemigroup: Semigroup[Int] = IntRing
+  implicit def jintSemigroup: Semigroup[JInt] = JIntRing
+  implicit def shortSemigroup: Semigroup[Short] = ShortRing
+  implicit def jshortSemigroup: Semigroup[JShort] = JShortRing
+  implicit def longSemigroup: Semigroup[Long] = LongRing
+  implicit def bigIntSemigroup: Semigroup[BigInt] = BigIntRing
+  implicit def jlongSemigroup: Semigroup[JLong] = JLongRing
+  implicit def floatSemigroup: Semigroup[Float] = FloatRing
+  implicit def jfloatSemigroup: Semigroup[JFloat] = JFloatRing
+  implicit def doubleSemigroup: Semigroup[Double] = DoubleRing
+  implicit def jdoubleSemigroup: Semigroup[JDouble] = JDoubleRing
+  implicit def stringSemigroup: Semigroup[String] = StringMonoid
   implicit def optionSemigroup[T: Semigroup]: Semigroup[Option[T]] = new OptionMonoid[T]
   implicit def listSemigroup[T]: Semigroup[List[T]] = new ListMonoid[T]
   implicit def seqSemigroup[T]: Semigroup[Seq[T]] = new SeqMonoid[T]

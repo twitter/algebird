@@ -43,10 +43,11 @@ import scala.annotation.implicitNotFound
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
 trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] {
-  def one: T // Multiplicative identity
-  def times(l: T, r: T): T
-  // Left product: (((a * b) * c) * d)
-  def product(iter: TraversableOnce[T]): T = Ring.product(iter)(this)
+  def one: T
+  def times(a: T, b: T): T
+  def product(iter: TraversableOnce[T]): T =
+    if (iter.isEmpty) one // avoid hitting one as some have abused Ring for Rng
+    else iter.reduce(times)
 }
 
 // For Java interop so they get the default methods
@@ -88,7 +89,38 @@ object LongRing extends Ring[Long] {
   override def times(l: Long, r: Long) = l * r
 }
 
+object FloatRing extends Ring[Float] {
+  override def one = 1.0f
+  override def zero = 0.0f
+  override def negate(v: Float) = -v
+  override def plus(l: Float, r: Float) = l + r
+  override def minus(l: Float, r: Float) = l - r
+  override def times(l: Float, r: Float) = l * r
+}
+
+object DoubleRing extends Ring[Double] {
+  override def one = 1.0
+  override def zero = 0.0
+  override def negate(v: Double) = -v
+  override def plus(l: Double, r: Double) = l + r
+  override def minus(l: Double, r: Double) = l - r
+  override def times(l: Double, r: Double) = l * r
+}
+
+object BooleanRing extends Ring[Boolean] {
+  override def one = true
+  override def zero = false
+  override def negate(v: Boolean) = v
+  override def plus(l: Boolean, r: Boolean) = l ^ r
+  override def minus(l: Boolean, r: Boolean) = l ^ r
+  override def times(l: Boolean, r: Boolean) = l && r
+}
+
 object BigIntRing extends NumericRing[BigInt]
+
+trait NumericRingProvider {
+  implicit def numericRing[T: Numeric]: Ring[T] = new NumericRing[T]
+}
 
 object Ring extends GeneratedRingImplicits with ProductRings {
   // This pattern is really useful for typeclasses
@@ -97,29 +129,27 @@ object Ring extends GeneratedRingImplicits with ProductRings {
   def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] =
     Monoid.from[T](ring.one)(ring.times _)
   // Left product: (((a * b) * c) * d)
-  def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) = {
-    // avoid touching one unless we need to (some items are pseudo-rings)
-    if (iter.isEmpty) ring.one
-    else iter.reduceLeft(ring.times _)
-  }
+  def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) =
+    ring.product(iter)
+
   // If the ring doesn't have a one, or you want to distinguish empty cases:
   def productOption[T](it: TraversableOnce[T])(implicit rng: Ring[T]): Option[T] =
-    it.reduceLeftOption(rng.times _)
+    if (it.isEmpty) None
+    else Some(rng.product(it))
 
-  implicit def numericRing[T: Numeric]: Ring[T] = new NumericRing[T]
-  implicit val boolRing: Ring[Boolean] = BooleanField
-  implicit val jboolRing: Ring[JBool] = JBoolField
-  implicit val intRing: Ring[Int] = IntRing
-  implicit val jintRing: Ring[JInt] = JIntRing
-  implicit val shortRing: Ring[Short] = ShortRing
-  implicit val jshortRing: Ring[JShort] = JShortRing
-  implicit val longRing: Ring[Long] = LongRing
-  implicit val bigIntRing: Ring[BigInt] = BigIntRing
-  implicit val jlongRing: Ring[JLong] = JLongRing
-  implicit val floatRing: Ring[Float] = FloatField
-  implicit val jfloatRing: Ring[JFloat] = JFloatField
-  implicit val doubleRing: Ring[Double] = DoubleField
-  implicit val jdoubleRing: Ring[JDouble] = JDoubleField
+  implicit def boolRing: Ring[Boolean] = BooleanRing
+  implicit def jboolRing: Ring[JBool] = JBoolRing
+  implicit def intRing: Ring[Int] = IntRing
+  implicit def jintRing: Ring[JInt] = JIntRing
+  implicit def shortRing: Ring[Short] = ShortRing
+  implicit def jshortRing: Ring[JShort] = JShortRing
+  implicit def longRing: Ring[Long] = LongRing
+  implicit def bigIntRing: Ring[BigInt] = BigIntRing
+  implicit def jlongRing: Ring[JLong] = JLongRing
+  implicit def floatRing: Ring[Float] = FloatRing
+  implicit def jfloatRing: Ring[JFloat] = JFloatRing
+  implicit def doubleRing: Ring[Double] = DoubleRing
+  implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
   implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
   implicit def mapRing[K, V](implicit ring: Ring[V]) = new MapRing[K, V]()(ring)
   implicit def scMapRing[K, V](implicit ring: Ring[V]) = new ScMapRing[K, V]()(ring)
