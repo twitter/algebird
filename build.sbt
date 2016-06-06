@@ -162,6 +162,7 @@ lazy val algebirdCore = module("core").settings(
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
     Seq("com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
         "org.spire-math" %% "algebra" % algebraVersion,
+        "org.spire-math" %% "algebra-ring" % algebraVersion,
         "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)

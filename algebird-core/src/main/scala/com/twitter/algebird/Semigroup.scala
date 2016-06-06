@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.{ Semigroup => ASemigroup }
+import algebra.ring.{ AdditiveSemigroup }
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -30,16 +31,21 @@ import macros.caseclass._
  *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
-trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] {
-  def plus(l: T, r: T): T
+trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] with AdditiveSemigroup[T] {
   /**
    * override this if there is a faster way to do this sum than reduceLeftOption on plus
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
 
-  final override def combine(l: T, r: T): T = plus(l, r)
-  final override def combineAllOption(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
+  /*
+   * These are methods from algebra
+   */
+  override def trySum(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
+
+  override def additive: ASemigroup[T] = this
+  override def combine(l: T, r: T): T = plus(l, r)
+  override def combineAllOption(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
 }
 
 // For Java interop so they get the default sumOption

@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
+import algebra.ring.{ Ring => ARing }
 
 import scala.annotation.implicitNotFound
 /**
@@ -42,10 +43,10 @@ import scala.annotation.implicitNotFound
  */
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
-trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] {
+trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with ARing[T] {
   def one: T
   def times(a: T, b: T): T
-  def product(iter: TraversableOnce[T]): T =
+  override def product(iter: TraversableOnce[T]): T =
     if (iter.isEmpty) one // avoid hitting one as some have abused Ring for Rng
     else iter.reduce(times)
 }

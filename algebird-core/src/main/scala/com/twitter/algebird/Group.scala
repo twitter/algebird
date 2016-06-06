@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.{ Group => AGroup }
+import algebra.ring.AdditiveGroup
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -29,11 +30,11 @@ import scala.math.Equiv
  */
 
 @implicitNotFound(msg = "Cannot find Group type class for ${T}")
-trait Group[@specialized(Int, Long, Float, Double) T] extends AGroup[T] with Monoid[T] {
-  // must override negate or minus (or both)
-  def negate(v: T): T = minus(zero, v)
-  def minus(l: T, r: T): T = plus(l, negate(r))
-
+trait Group[@specialized(Int, Long, Float, Double) T] extends AGroup[T] with Monoid[T] with AdditiveGroup[T] {
+  /*
+   * This are from algebra.Group
+   */
+  override def additive: AGroup[T] = this
   override def remove(l: T, r: T): T = minus(l, r)
   override def inverse(v: T): T = negate(v)
 }

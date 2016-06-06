@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.{ Monoid => AMonoid }
+import algebra.ring.{ AdditiveMonoid }
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 import scala.reflect.ClassTag
@@ -32,8 +33,7 @@ import scala.collection.{ Map => ScMap }
  */
 
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
-trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] with AMonoid[T] {
-  def zero: T //additive identity
+trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] with AMonoid[T] with AdditiveMonoid[T] {
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v: T) {
     if (!isNonZero(v)) {
@@ -48,11 +48,14 @@ trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] with
       None
     }
   }
-  // Override this if there is a more efficient means to implement this
-  def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
+  override def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
 
-  final override def empty: T = zero
-  final override def combineAll(t: TraversableOnce[T]): T = sum(t)
+  /**
+   * These are from algebra.Monoid
+   */
+  override def additive: AMonoid[T] = this
+  override def empty: T = zero
+  override def combineAll(t: TraversableOnce[T]): T = sum(t)
 }
 
 // For Java interop so they get the default methods
