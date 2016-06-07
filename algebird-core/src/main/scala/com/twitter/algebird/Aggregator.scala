@@ -183,10 +183,24 @@ object Aggregator extends java.io.Serializable {
   def sortedTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)
   /**
+   * Same as sortedTake, but using a function that returns a value that has an Ordering.
+   *
+   * This function is like writing list.sortBy(fn).take(count).
+   */
+  def sortByTake[T, U: Ordering](count: Int)(fn: T => U): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
+    Aggregator.sortedTake(count)(Ordering.by(fn))
+  /**
    * Take the largest `count` items using a heap
    */
   def sortedReverseTake[T: Ordering](count: Int): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
     new mutable.PriorityQueueToListAggregator[T](count)(implicitly[Ordering[T]].reverse)
+  /**
+   * Same as sortedReverseTake, but using a function that returns a value that has an Ordering.
+   *
+   * This function is like writing list.sortBy(fn).reverse.take(count).
+   */
+  def sortByReverseTake[T, U: Ordering](count: Int)(fn: T => U): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
+    Aggregator.sortedReverseTake(count)(Ordering.by(fn))
   /**
    * Immutable version of sortedTake, for frameworks that check immutability of reduce functions.
    */
