@@ -19,13 +19,13 @@ object CMS2Benchmark {
     val JavaCharSizeInBits = 2 * 8
 
     @Param(Array("0.1", "0.005"))
-    var eps: Double = 0.0
-
-    @Param(Array("0.0000001" /* 1E-8 */ ))
     var delta: Double = 0.0
 
+    @Param(Array("0.0000001" /* 1E-8 */ ))
+    var epsilon: Double = 0.0
+
     @Param(Array("1000"))
-    var ops: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
+    var ops: Int = 0 // Number of operations per benchmark repetition (cf. `rdelta`)
 
     @Param(Array("2048"))
     var maxBits: Int = 0
@@ -51,9 +51,9 @@ object CMS2Benchmark {
       // Required import of implicit values (e.g. for BigInt- or Long-backed CMS instances)
       import CMSHasherImplicits._
 
-      implicit val longContext: CMS2.Context[Long] = CMS2.Context(delta, eps, Seed)
-      implicit val bigIntContext: CMS2.Context[BigInt] = CMS2.Context(delta, eps, Seed)
-      implicit val stringContext: CMS2.Context[String] = CMS2.Context(delta, eps, Seed)
+      implicit val longContext: CMS2.Context[Long] = CMS2.Context(epsilon, delta, Seed)
+      implicit val bigIntContext: CMS2.Context[BigInt] = CMS2.Context(epsilon, delta, Seed)
+      implicit val stringContext: CMS2.Context[String] = CMS2.Context(epsilon, delta, Seed)
 
       cmsLongSemigroup = CMS2.cms2Monoid[Long]
       cmsBigIntSemigroup = CMS2.cms2Monoid[BigInt]

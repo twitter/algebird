@@ -27,24 +27,32 @@ sealed abstract class CMS2[K] {
     copy().append(that)
 
   def addAll(values: TraversableOnce[K])(implicit ctxt: Context[K]): CMS2[K] =
-    values.foldLeft(copy())((c, k) => c.add(k))
+    values.foldLeft(copy())((acc, k) => acc.add(k))
 
   def addAllCounts(values: TraversableOnce[(K, Long)])(implicit ctxt: Context[K]): CMS2[K] =
-    values.foldLeft(copy()) { case (c, (k, n)) => c.add(k, n) }
+    values.foldLeft(copy()) { case (acc, (k, n)) => acc.add(k, n) }
 
   def appendAll(those: TraversableOnce[CMS2[K]])(implicit ctxt: Context[K]): CMS2[K] =
     those.foldLeft(copy()) { (acc, c) => acc.append(c) }
+
+  private[algebird] def rowSumInvariant(implicit ctxt: Context[K]): Boolean
 }
 
 object CMS2 {
 
   def empty[K]: CMS2[K] =
-    Empty[K]
+    new Empty[K]
 
   def apply[K](k: K): CMS2[K] =
-    Single(k, 1L)
+    new Single(k, 1L)
 
-  case class Empty[K]() extends CMS2[K] {
+  def addAll[K: CMS2.Context](ks: TraversableOnce[K]): CMS2[K] =
+    new Empty[K].addAll(ks)
+
+  def addAllCounts[K: CMS2.Context](ks: TraversableOnce[(K, Long)]): CMS2[K] =
+    new Empty[K].addAllCounts(ks)
+
+  private case class Empty[K]() extends CMS2[K] {
     def totalCount: Long = 0L
 
     def frequency(value: K)(implicit ctxt: Context[K]): Approximate[Long] =
@@ -57,13 +65,15 @@ object CMS2 {
       Single(value, n)
 
     private[algebird] def append(that: CMS2[K])(implicit ctxt: Context[K]): CMS2[K] =
-      that
+      that.copy()
 
     private[algebird] def copy(): CMS2[K] =
       this
+
+    private[algebird] def rowSumInvariant(implicit ctxt: Context[K]): Boolean = true
   }
 
-  case class Single[K](k: K, totalCount: Long) extends CMS2[K] {
+  private case class Single[K](k: K, totalCount: Long) extends CMS2[K] {
     require(totalCount >= 0, s"count should be non-negative (got: $totalCount)")
 
     def frequency(value: K)(implicit ctxt: Context[K]): Approximate[Long] =
@@ -77,10 +87,20 @@ object CMS2 {
       else Dense.empty[K].add(k, totalCount).add(value, n)
 
     private[algebird] def append(that: CMS2[K])(implicit ctxt: Context[K]): CMS2[K] =
-      Dense.empty[K].add(k, totalCount).append(that)
+      that.copy().add(k, totalCount)
 
     private[algebird] def copy(): CMS2[K] =
       this
+
+    def equalsSingle(s: Single[K])(implicit ctxt: Context[K]): Boolean = (totalCount == s.totalCount) && {
+      val h = ctxt.hasher
+      val d = ctxt.depth
+      var row = 0
+      while ((row < d) && (h.hash(row, k) == h.hash(row, s.k))) { row += 1 }
+      row == d
+    }
+
+    private[algebird] def rowSumInvariant(implicit ctxt: Context[K]): Boolean = true
   }
 
   /**
@@ -95,8 +115,23 @@ object CMS2 {
    *   max depth
    *
    * index(column, row) = cells(row * width + column)
+   * also, by our update strategy, each row sums to totalCount (which
+   * implies, if all rows have a single column with totalCount, this
+   * is a singleton dense value).
    */
-  case class Dense[K](cells: Array[Long], var totalCount: Long) extends CMS2[K] {
+  private case class Dense[K](cells: Array[Long], var totalCount: Long) extends CMS2[K] {
+
+    override def hashCode: Int =
+      totalCount.toInt ^ java.util.Arrays.hashCode(cells)
+
+    override def equals(that: Any): Boolean =
+      (this eq (that.asInstanceOf[AnyRef])) || {
+        that match {
+          case Dense(thoseCells, thoseCounts) =>
+            totalCount == thoseCounts && java.util.Arrays.equals(cells, thoseCells)
+          case _ => false
+        }
+      }
 
     def frequency(value: K)(implicit ctxt: Context[K]): Approximate[Long] = {
       val h = ctxt.hasher
@@ -176,14 +211,44 @@ object CMS2 {
 
     private[algebird] def copy(): CMS2[K] =
       Dense(cells.clone, totalCount)
+
+    def equalsSingle(s: Single[K])(implicit ctxt: Context[K]): Boolean = (totalCount == s.totalCount) && {
+      /**
+       * The invariant on the row is that the sum == totalCount (because we put
+       * into each row one time), so if we equal the count of s in each of the
+       * hash locations, all other locations must be 0
+       */
+      val h = ctxt.hasher
+      val d = ctxt.depth
+      var row = 0
+      while ((row < d) && (totalCount == cells(h.hash(row, s.k)))) { row += 1 }
+      row == d
+    }
+
+    private[algebird] def rowSumInvariant(implicit ctxt: Context[K]): Boolean = {
+      val d = ctxt.depth
+      val w = ctxt.width
+      var row = 0
+      var sum = totalCount
+      while ((row < d) && (sum == totalCount)) {
+        var col = 0
+        sum = 0L
+        while (col < w) {
+          sum += cells(row * w + col)
+          col += 1
+        }
+        row += 1
+      }
+      (row == d)
+    }
   }
 
-  object Dense {
+  private object Dense {
     def empty[K](implicit ctxt: Context[K]): CMS2[K] =
       Dense(new Array[Long](ctxt.width * ctxt.depth), 0L)
   }
 
-  final case class Context[K](delta: Double, epsilon: Double, seed: Int)(implicit h: CMSHasher[K]) {
+  final case class Context[K](epsilon: Double, delta: Double, seed: Int)(implicit h: CMSHasher[K]) {
     require(0.0 < delta && delta < 1, s"delta should be in (0, 1), got $delta")
     require(0.0 < epsilon && epsilon < 1, s"epsilon should be in (0, 1), got $epsilon")
 
@@ -201,8 +266,8 @@ object CMS2 {
   }
 
   object Context {
-    def apply[K: CMSHasher](d: Double, e: Double): Context[K] =
-      Context(d, e, "fast as heck".hashCode)
+    def apply[K: CMSHasher](e: Double, d: Double): Context[K] =
+      Context(e, d, "fast as heck".hashCode)
   }
 
   case class Hasher[K](as: Array[Int], width: Int)(implicit h: CMSHasher[K]) {
@@ -216,9 +281,20 @@ object CMS2 {
     }
   }
 
+  implicit def cms2Equiv[K](implicit ctxt: Context[K]): Equiv[CMS2[K]] = new Equiv[CMS2[K]] {
+    def equiv(a: CMS2[K], b: CMS2[K]): Boolean = (a, b) match {
+      case (Empty(), that) => that.totalCount == 0L
+      case (that, Empty()) => that.totalCount == 0L
+      case (s1 @ Single(_, _), s2 @ Single(_, _)) => s1.equalsSingle(s2)
+      case (s @ Single(_, _), d @ Dense(_, _)) => d.equalsSingle(s)
+      case (d @ Dense(_, _), s @ Single(_, _)) => d.equalsSingle(s)
+      case (d1 @ Dense(_, _), d2 @ Dense(_, _)) => d1 == d2
+    }
+  }
+
   implicit def cms2Monoid[K](implicit ctxt: Context[K]): Monoid[CMS2[K]] =
     new Monoid[CMS2[K]] {
-      val zero: CMS2[K] = CMS2.Empty[K]
+      val zero: CMS2[K] = new CMS2.Empty[K]
 
       override def isNonZero(x: CMS2[K]): Boolean =
         x.totalCount > 0
