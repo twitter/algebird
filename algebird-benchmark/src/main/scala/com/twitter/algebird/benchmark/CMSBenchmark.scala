@@ -27,8 +27,8 @@ object CMSBenchmark {
     @Param(Array("0.2"))
     var heavyHittersPct: Double = 0.0
 
-    @Param(Array("100"))
-    var operations: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
+    @Param(Array("1000"))
+    var ops: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
 
     @Param(Array("2048"))
     var maxBits: Int = 0
@@ -37,8 +37,8 @@ object CMSBenchmark {
     var cmsLongMonoid: TopPctCMSMonoid[Long] = _
     var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
     var cmsStringMonoid: TopPctCMSMonoid[String] = _
-    var inputsBigInt: Seq[BigInt] = _
-    var inputsString: Seq[String] = _
+    var inputsBigInt: Vector[BigInt] = _
+    var inputsString: Vector[String] = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
@@ -51,9 +51,9 @@ object CMSBenchmark {
 
       random = new scala.util.Random
 
-      inputsString = (0 to operations).map { i => random.nextString(maxBits / JavaCharSizeInBits) }.toSeq
+      inputsString = (0 to ops).map { i => random.nextString(maxBits / JavaCharSizeInBits) }.toVector
       Console.out.println(s"Created ${inputsString.size} input records for String")
-      inputsBigInt = inputsString.map { s => BigInt(s.getBytes) }
+      inputsBigInt = inputsString.map { s => BigInt(s.getBytes) }.toVector
       Console.out.println(s"Created ${inputsBigInt.size} input records for BigInt")
     }
   }
@@ -63,26 +63,29 @@ class CMSBenchmark {
   import CMSBenchmark._
   // Case A (K=Long): We count the first hundred integers, i.e. [1, 100]
   @Benchmark
-  def timePlusOfFirstHundredIntegersWithLongCms(state: CMSState) = {
-    (1 to state.operations).view.foldLeft(state.cmsLongMonoid.zero)((l, r) => { l ++ state.cmsLongMonoid.create(r) })
+  def timePlusOfFirstHundredIntegersWithLongCms(st: CMSState) = {
+    val m = st.cmsLongMonoid
+    m.sumOption((1 to st.ops).iterator.map(n => m.create(n)))
   }
 
   // Case B.1 (K=BigInt): We count the first hundred integers, i.e. [1, 100]
   @Benchmark
-  def timePlusOfFirstHundredIntegersWithBigIntCms(state: CMSState) = {
-    (1 to state.operations).view.foldLeft(state.cmsBigIntMonoid.zero)((l, r) => { l ++ state.cmsBigIntMonoid.create(r) })
+  def timePlusOfFirstHundredIntegersWithBigIntCms(st: CMSState) = {
+    val m = st.cmsBigIntMonoid
+    m.sumOption((1 to st.ops).iterator.map(n => m.create(BigInt(n))))
   }
 
   // Case B.2 (K=BigInt): We count numbers drawn randomly from a 2^maxBits address space
   @Benchmark
-  def timePlusOfRandom2048BitNumbersWithBigIntCms(state: CMSState) = {
-    state.inputsBigInt.view.foldLeft(state.cmsBigIntMonoid.zero)((l, r) => l ++ state.cmsBigIntMonoid.create(r))
+  def timePlusOfRandom2048BitNumbersWithBigIntCms(st: CMSState) = {
+    val m = st.cmsBigIntMonoid
+    m.sumOption(st.inputsBigInt.iterator.map(m.create(_)))
   }
 
   // Case C (K=String): We count strings drawn randomly from a 2^maxBits address space
   @Benchmark
-  def timePlusOfRandom2048BitNumbersWithStringCms(state: CMSState) = {
-    state.inputsString.view.foldLeft(state.cmsStringMonoid.zero)((l, r) => l ++ state.cmsStringMonoid.create(r))
+  def timePlusOfRandom2048BitNumbersWithStringCms(st: CMSState) = {
+    val m = st.cmsStringMonoid
+    m.sumOption(st.inputsString.iterator.map(m.create(_)))
   }
-
 }

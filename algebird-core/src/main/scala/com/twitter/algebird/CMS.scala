@@ -41,6 +41,9 @@ object CMS2 {
   def empty[K]: CMS2[K] =
     Empty[K]
 
+  def apply[K](k: K): CMS2[K] =
+    Single(k, 1L)
+
   case class Empty[K]() extends CMS2[K] {
     def totalCount: Long = 0L
 

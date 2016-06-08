@@ -42,9 +42,9 @@ object Batched {
   }
 
   private[algebird] class ItemsIterator[A](root: Batched[A]) extends Iterator[A] {
-    var ready: A = descend(root)
-    var running: Boolean = true
     var stack: List[Batched[A]] = Nil
+    var running: Boolean = true
+    var ready: A = descend(root)
 
     def ascend(): Unit =
       stack match {
