@@ -84,8 +84,7 @@ object CMS2 {
   }
 
   /**
-   * Currently `cells` are stored in column-major form. We should test
-   * both row- and column-major forms to see which has better performance.
+   * Currently `cells` are stored in row-major form.
    *
    *   colums
    * r+-----------+m w
@@ -94,29 +93,24 @@ object CMS2 {
    * s|           |  t
    *  +-----------+  h
    *   max depth
+   *
+   * index(column, row) = cells(row * width + column)
    */
   case class Dense[K](cells: Array[Long], var totalCount: Long) extends CMS2[K] {
-
-    @inline final def index(row: Int, col: Int, depth: Int): Int =
-      col * depth + row
 
     def frequency(value: K)(implicit ctxt: Context[K]): Approximate[Long] = {
       val h = ctxt.hasher
       val d = ctxt.depth
       val w = ctxt.width
       val col0 = h.hash(0, value)
-      var est = cells(index(0, col0, d))
+      var est = cells(col0) // indexing
       var row = 1
       while (row < d) {
         val col = h.hash(row, value)
-        est = min(cells(index(row, col, d)), est)
+        est = min(cells(row * w + col), est) // indexing
         row += 1
       }
-      if (est == 0L) Approximate.exact(0L)
-      else {
-        val lower = max(0L, est - (ctxt.epsilon * totalCount).toLong)
-        Approximate(lower, est, est, 1 - ctxt.delta)
-      }
+      ctxt.approximate(est, totalCount)
     }
 
     def innerProduct(that: CMS2[K])(implicit ctxt: Context[K]): Approximate[Long] =
@@ -130,7 +124,7 @@ object CMS2 {
             var col = 0
             var sum = 0L
             while (col < w) {
-              val i = index(row, col, d)
+              val i = row * w + col //indexing
               sum += cells(i) * otherCells(i)
               col += 1
             }
@@ -144,8 +138,7 @@ object CMS2 {
             row += 1
           }
 
-          val minimum = max(est - (ctxt.epsilon * totalCount * otherTotal).toLong, 0)
-          Approximate(minimum, est, est, 1 - ctxt.delta)
+          ctxt.approximate(est, totalCount * otherTotal)
         case otherwise =>
           otherwise.innerProduct(this)
       }
@@ -157,7 +150,7 @@ object CMS2 {
       var row = 0
       while (row < d) {
         val col = h.hash(row, value)
-        cells(index(row, col, d)) += n
+        cells(row * w + col) += n // indexing
         row += 1
       }
       totalCount += n
@@ -198,11 +191,18 @@ object CMS2 {
     final val depth: Int = ceil(log(1.0 / delta)).toInt
 
     final val hasher: Hasher[K] = Hasher.generate(depth, width, seed)(h)
+
+    def lowerBound(est: Long, total: Long): Long =
+      max(0L, est - (epsilon * total).toLong) // zero floor
+
+    def approximate(est: Long, total: Long): Approximate[Long] =
+      if (est == 0L) Approximate.exact(0L)
+      else Approximate(lowerBound(est, total), est, est, 1.0 - delta)
   }
 
   object Context {
     def apply[K: CMSHasher](d: Double, e: Double): Context[K] =
-      Context(d, e, "count-min sketch".hashCode)
+      Context(d, e, "fast as heck".hashCode)
   }
 
   case class Hasher[K](as: Array[Int], width: Int)(implicit h: CMSHasher[K]) {

@@ -81,31 +81,31 @@ class CMS2Benchmark {
   @Benchmark
   def timePlusOfFirstHundredIntegersWithLongCms2(st: CMSState) =
     st.cmsLongSemigroup.sumOption((1 to st.ops).iterator.map(n => CMS2(n.toLong)))
-    // st.batchedLongSemigroup.sumOption((1 to st.ops).iterator.map(n => Batched(CMS2(n.toLong))))
-    //   .map(_.sum(st.cmsLongSemigroup))
-    //(1 to st.ops).iterator.map(n => CMS2(n.toLong)).reduceLeft(st.cmsLongSemigroup.plus)
+  // st.batchedLongSemigroup.sumOption((1 to st.ops).iterator.map(n => Batched(CMS2(n.toLong))))
+  //   .map(_.sum(st.cmsLongSemigroup))
+  //(1 to st.ops).iterator.map(n => CMS2(n.toLong)).reduceLeft(st.cmsLongSemigroup.plus)
 
   // Case B.1 (K=BigInt): We count the integers [1, N].
   @Benchmark
   def timePlusOfFirstHundredIntegersWithBigIntCms2(st: CMSState) =
     st.cmsBigIntSemigroup.sumOption((1 to st.ops).iterator.map(n => CMS2(BigInt(n))))
-    // st.batchedBigIntSemigroup.sumOption((1 to st.ops).iterator.map(n => Batched(CMS2(BigInt(n)))))
-    //   .map(_.sum(st.cmsBigIntSemigroup))
-    //(1 to st.ops).iterator.map(n => CMS2(BigInt(n))).reduceLeft(st.cmsBigIntSemigroup.plus)
+  // st.batchedBigIntSemigroup.sumOption((1 to st.ops).iterator.map(n => Batched(CMS2(BigInt(n)))))
+  //   .map(_.sum(st.cmsBigIntSemigroup))
+  //(1 to st.ops).iterator.map(n => CMS2(BigInt(n))).reduceLeft(st.cmsBigIntSemigroup.plus)
 
   // Case B.2 (K=BigInt): We count numbers drawn randomly from a 2^maxBits address space
   @Benchmark
   def timePlusOfRandom2048BitNumbersWithBigIntCms2(st: CMSState) =
     st.cmsBigIntSemigroup.sumOption(st.inputsBigInt.iterator.map(n => CMS2(n)))
-    // st.batchedBigIntSemigroup.sumOption(st.inputsBigInt.iterator.map(n => Batched(CMS2(n))))
-    //   .map(_.sum(st.cmsBigIntSemigroup))
-    //st.inputsBigInt.iterator.map(n => CMS2(n)).reduceLeft(st.cmsBigIntSemigroup.plus)
+  // st.batchedBigIntSemigroup.sumOption(st.inputsBigInt.iterator.map(n => Batched(CMS2(n))))
+  //   .map(_.sum(st.cmsBigIntSemigroup))
+  //st.inputsBigInt.iterator.map(n => CMS2(n)).reduceLeft(st.cmsBigIntSemigroup.plus)
 
   // Case C (K=String): We count strings drawn randomly from a 2^maxBits address space
   @Benchmark
   def timePlusOfRandom2048BitNumbersWithStringCms2(st: CMSState) =
     st.cmsStringSemigroup.sumOption(st.inputsString.iterator.map(s => CMS2(s)))
-    // st.batchedStringSemigroup.sumOption(st.inputsString.iterator.map(s => Batched(CMS2(s))))
-    //   .map(_.sum(st.cmsStringSemigroup))
-    //st.inputsString.iterator.map(s => CMS2(s)).reduceLeft(st.cmsStringSemigroup.plus)
+  // st.batchedStringSemigroup.sumOption(st.inputsString.iterator.map(s => Batched(CMS2(s))))
+  //   .map(_.sum(st.cmsStringSemigroup))
+  //st.inputsString.iterator.map(s => CMS2(s)).reduceLeft(st.cmsStringSemigroup.plus)
 }
