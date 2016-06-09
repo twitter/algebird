@@ -42,3 +42,42 @@ class Cms2Laws extends PropSpec {
   }
 }
 
+class Cms2ApproximateProps[K: CMS2.Context: Arbitrary] extends ApproximateProperty {
+  type Exact = Vector[K]
+  type Approx = CMS2[K]
+
+  type Input = K
+  type Result = Long
+
+  def exactGenerator: Gen[Vector[K]] = Gen.containerOf[Vector, K](arbitrary[K])
+  def makeApproximate(e: Exact) = CMS2.addAll(e)
+  def inputGenerator(e: Vector[K]): Gen[K] = Gen.oneOf(e)
+
+  def exactResult(vec: Vector[K], key: K) = vec.count(_ == key)
+  def approximateResult(cms: CMS2[K], key: K) = cms.frequency(key)
+}
+
+class Cms2Props extends ApproximateProperties("CMS2") {
+  import ApproximateProperty.toProp
+  implicit def ctxt[K: CMSHasher]: CMS2.Context[K] = CMS2.Context(0.01, 0.01)
+
+  implicit def arbCms2Long: Arbitrary[Long] =
+    Arbitrary(Gen.choose(Long.MinValue + 1, Long.MaxValue))
+
+  implicit def arbCms2Int: Arbitrary[Int] =
+    Arbitrary(Gen.choose(Int.MinValue + 1, Int.MaxValue))
+
+  property("CMS2[Long] works") =
+    toProp(new Cms2ApproximateProps[Long], 10, 10, 0.01)
+
+  property("CMS2[String] works") =
+    toProp(new Cms2ApproximateProps[String], 10, 10, 0.01)
+
+  property("CMS2[Int] works") =
+    toProp(new Cms2ApproximateProps[Int], 10, 10, 0.01)
+
+  implicit def arbBytes: Arbitrary[Bytes] = Arbitrary(arbitrary[Array[Byte]].map(Bytes(_)))
+
+  property("CMS2[Bytes] works") =
+    toProp(new Cms2ApproximateProps[Bytes], 10, 10, 0.01)
+}

@@ -4,7 +4,6 @@ import org.scalatest.{ PropSpec, Matchers, WordSpec }
 import org.scalatest.prop.{ GeneratorDrivenPropertyChecks, PropertyChecks }
 import org.scalacheck.{ Gen, Arbitrary, Properties }
 
-import CMSHasherImplicits._
 import CmsTestImplicits._
 
 import scala.util.Random
@@ -159,7 +158,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 
   "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
     // Given a "source" CMSHasher[K]
-    val sourceHasher: CMSHasher[String] = CMSHasherImplicits.CMSHasherString
+    val sourceHasher: CMSHasher[String] = CMSHasher.CMSHasherString
     // and a translation function from an unsupported type L (here: Seq[Byte]) to K
     def f(bytes: Seq[Byte]): String = new String(bytes.toArray[Byte], "UTF-8")
 
@@ -178,7 +177,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 
   "supports, via contramap, creating CMS monoids for such types K that are not supported out of the box" in {
     // Given a "source" CMSHasher[K] which is supported out of the box
-    val sourceHasher: CMSHasher[String] = CMSHasherImplicits.CMSHasherString
+    val sourceHasher: CMSHasher[String] = CMSHasher.CMSHasherString
     // and a translation function from an unsupported type L (here: Seq[Byte]) to K
     def f(bytes: Seq[Byte]): String = new String(bytes.toArray[Byte], "UTF-8")
 
@@ -217,7 +216,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
 
   "supports, via contramap, creating TopPctCMS monoids for such types K that are not supported out of the box" in {
     // Given a "source" CMSHasher[K] which is supported out of the box
-    val sourceHasher: CMSHasher[String] = CMSHasherImplicits.CMSHasherString
+    val sourceHasher: CMSHasher[String] = CMSHasher.CMSHasherString
     // and a translation function from an unsupported type L (here: Seq[Byte]) to K
     def f(bytes: Seq[Byte]): String = new String(bytes.toArray[Byte], "UTF-8")
 
@@ -347,7 +346,7 @@ class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
 class CmsProperties extends ApproximateProperties("CountMinSketch") {
   import ApproximateProperty.toProp
 
-  implicit val intGen = Gen.choose(1, 100)
+  implicit val intGen = Gen.choose(Int.MinValue, Int.MaxValue)
 
   property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
   property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)

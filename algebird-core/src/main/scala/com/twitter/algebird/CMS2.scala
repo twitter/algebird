@@ -52,6 +52,26 @@ object CMS2 {
   def addAllCounts[K: CMS2.Context](ks: TraversableOnce[(K, Long)]): CMS2[K] =
     new Empty[K].addAllCounts(ks)
 
+  /**
+   * This uses internal mutable state to very efficiently
+   * create CMS2. This composes better than Semigroup.sumOption
+   */
+  def cms2Fold[K](implicit ctxt: Context[K]): Fold[K, CMS2[K]] =
+    Fold.foldMutable[CMS2[K], K, CMS2[K]](
+      { (cms, k) => cms.add(k) },
+      u => empty[K],
+      x => x)
+
+  /**
+   * This uses internal mutable state to very efficiently
+   * create CMS2. This composes better than Semigroup.sumOption
+   */
+  def cms2FoldCount[K](implicit ctxt: Context[K]): Fold[(K, Long), CMS2[K]] =
+    Fold.foldMutable[CMS2[K], (K, Long), CMS2[K]](
+      { case (cms, (k, c)) => cms.add(k, c) },
+      u => empty[K],
+      x => x)
+
   private case class Empty[K]() extends CMS2[K] {
     def totalCount: Long = 0L
 
@@ -270,14 +290,21 @@ object CMS2 {
       Context(e, d, "fast as heck".hashCode)
   }
 
-  case class Hasher[K](as: Array[Int], width: Int)(implicit h: CMSHasher[K]) {
+  case class Hasher[K](as: Array[Int], bs: Array[Int], width: Int)(implicit h: CMSHasher[K]) {
+    //def hash(row: Int, value: K): Int = h.hash(as(row), bs(row), width)(value)
     def hash(row: Int, value: K): Int = h.hash(as(row), 0, width)(value)
   }
 
   object Hasher {
     def generate[K](depth: Int, width: Int, seed: Int)(implicit h: CMSHasher[K]): Hasher[K] = {
       val r = new Random(seed)
-      Hasher(Array.fill(depth)(r.nextInt()), width)(h)
+      val bigWidth = BigInt(width)
+      val one = BigInt(1)
+      // Get coprime a values so that (a*x mod width) is uniform on [0, width)
+      val coprimes = Iterator.continually(r.nextInt())
+        .filter { a => BigInt(a).gcd(bigWidth) == one }
+        .take(depth)
+      Hasher(coprimes.toArray, Array.fill(depth)(r.nextInt()), width)(h)
     }
   }
 
