@@ -126,7 +126,7 @@ object Batched {
    * produce different lists (for instance, if one of the batches has
    * more zeros in it than another one).
    */
-  def equiv[A](implicit s: Semigroup[A]): Equiv[Batched[A]] =
+  implicit def equiv[A](implicit s: Semigroup[A]): Equiv[Batched[A]] =
     new Equiv[Batched[A]] {
       def equiv(x: Batched[A], y: Batched[A]): Boolean = x.sum(s) == y.sum(s)
     }
@@ -285,7 +285,7 @@ object Batched {
    */
   private[algebird] class ReverseItemsIterator[A](root: Batched[A]) extends ItemsIterator[A](root) {
     def descend(v: Batched[A]): A = {
-      @tailrec def descend0(v: Batched[A]): A =
+      @inline @tailrec def descend0(v: Batched[A]): A =
         v match {
           case Items(lhs, rhs) =>
             stack = lhs :: stack
