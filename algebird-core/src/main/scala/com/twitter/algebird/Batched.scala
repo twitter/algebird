@@ -126,9 +126,10 @@ object Batched {
    * produce different lists (for instance, if one of the batches has
    * more zeros in it than another one).
    */
-  implicit def equiv[A](implicit s: Semigroup[A]): Equiv[Batched[A]] =
+  implicit def equiv[A](implicit e: Equiv[A], s: Semigroup[A]): Equiv[Batched[A]] =
     new Equiv[Batched[A]] {
-      def equiv(x: Batched[A], y: Batched[A]): Boolean = x.sum(s) == y.sum(s)
+      def equiv(x: Batched[A], y: Batched[A]): Boolean =
+        e.equiv(x.sum(s), y.sum(s))
     }
 
   /**
@@ -305,7 +306,7 @@ object Batched {
  * than `batchSize` values in it. When more values are added, the
  * tree is compacted using `s`.
  */
-class BatchedSemigroup[T](batchSize: Int)(implicit sg: Semigroup[T]) extends Semigroup[Batched[T]] {
+class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T]] {
 
   require(batchSize > 0, s"Batch size must be > 0, found: $batchSize")
 
@@ -320,12 +321,11 @@ class BatchedSemigroup[T](batchSize: Int)(implicit sg: Semigroup[T]) extends Sem
  * than `batchSize` values in it. When more values are added, the
  * tree is compacted using `m`.
  */
-class BatchedMonoid[T](batchSize: Int)(implicit monoid: Monoid[T])
-  extends BatchedSemigroup(batchSize)(monoid) with Monoid[Batched[T]] {
-  val zero: Batched[T] = Batched(monoid.zero)
+class BatchedMonoid[T: Monoid](batchSize: Int) extends BatchedSemigroup[T](batchSize) with Monoid[Batched[T]] {
+  val zero: Batched[T] = Batched(Monoid.zero)
 
   // if we knew that (a+b=0) only for (a=0, b=0), we could instead do:
   //   new Batched.ItemsIterator(b).exists(monoid.isNonZero)
   override def isNonZero(b: Batched[T]): Boolean =
-    monoid.isNonZero(b.sum(monoid))
+    Monoid.isNonZero(b.sum)
 }
