@@ -6,7 +6,6 @@ import org.openjdk.jmh.annotations._
 import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSMonoid }
 import scala.util.Random.nextString
 
-import CMSHasherImplicits._
 import CMSFunctions.generateHashes
 
 /**
