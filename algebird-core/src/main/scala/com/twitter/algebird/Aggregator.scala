@@ -218,7 +218,7 @@ object Aggregator extends java.io.Serializable {
    * selected. This assumes that all sampled records can fit in memory, so use this only when the
    * expected number of sampled values is small.
    */
-  def randomSample[T](prob: Double, seed: Int = DefaultSeed): MonoidAggregator[T, List[T], List[T]] = {
+  def randomSample[T](prob: Double, seed: Int = DefaultSeed): MonoidAggregator[T, Option[Batched[T]], List[T]] = {
     assert(prob >= 0 && prob <= 1, "randomSample.prob must lie in [0, 1]")
     val rng = new java.util.Random(seed)
     Preparer[T]
@@ -240,8 +240,13 @@ object Aggregator extends java.io.Serializable {
   /**
    * Put everything in a List. Note, this could fill the memory if the List is very large.
    */
-  def toList[T]: MonoidAggregator[T, List[T], List[T]] =
-    prepareMonoid { t: T => List(t) }
+  def toList[T]: MonoidAggregator[T, Option[Batched[T]], List[T]] =
+    new MonoidAggregator[T, Option[Batched[T]], List[T]] {
+      def prepare(t: T): Option[Batched[T]] = Some(Batched(t))
+      def monoid: Monoid[Option[Batched[T]]] = Monoid.optionMonoid(Batched.semigroup)
+      def present(o: Option[Batched[T]]): List[T] = o.map(_.toList).getOrElse(Nil)
+    }
+
   /**
    * Put everything in a Set. Note, this could fill the memory if the Set is very large.
    */
