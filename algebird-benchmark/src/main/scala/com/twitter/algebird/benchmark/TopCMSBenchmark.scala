@@ -1,8 +1,9 @@
-package com.twitter.algebird.benchmark
+package com.twitter.algebird
+package benchmark
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import com.twitter.algebird.{ TopPctCMS, CMSHasherImplicits, TopPctCMSMonoid }
+import scala.util.Random.nextString
 
 /**
  * Benchmarks the Count-Min sketch implementation in Algebird.
@@ -15,77 +16,65 @@ object TopCMSBenchmark {
   @State(Scope.Benchmark)
   class CMSState {
 
-    val Seed = 1
-    val JavaCharSizeInBits = 2 * 8
+    val Seed: Int = 1
+    val MaxBits: Int = 2048
 
     @Param(Array("0.1", "0.005"))
     var eps: Double = 0.0
 
-    @Param(Array("0.0000001" /* 1E-8 */ ))
+    @Param(Array("0.0000001")) // 1e-8
     var delta: Double = 0.0
 
     @Param(Array("0.2"))
-    var heavyHittersPct: Double = 0.0
+    var pct: Double = 0.0
 
     @Param(Array("1000"))
-    var ops: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
+    var size: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
 
-    @Param(Array("2048"))
-    var maxBits: Int = 0
+    // need to initialize later because we don't have `size` yet.
+    var smallLongs: Vector[Long] = _
+    var smallBigInts: Vector[BigInt] = _
+    var largeBigInts: Vector[BigInt] = _
+    var largeStrings: Vector[String] = _
 
-    var random: scala.util.Random = _
     var cmsLongMonoid: TopPctCMSMonoid[Long] = _
     var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
     var cmsStringMonoid: TopPctCMSMonoid[String] = _
-    var inputsBigInt: Vector[BigInt] = _
-    var inputsString: Vector[String] = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
-      // Required import of implicit values (e.g. for BigInt- or Long-backed CMS instances)
-      import CMSHasherImplicits._
+      cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, pct)
+      cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, pct)
+      cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, pct)
 
-      cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, heavyHittersPct)
-      cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, heavyHittersPct)
-      cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, heavyHittersPct)
-
-      random = new scala.util.Random
-
-      inputsString = (0 to ops).map { i => random.nextString(maxBits / JavaCharSizeInBits) }.toVector
-      Console.out.println(s"Created ${inputsString.size} input records for String")
-      inputsBigInt = inputsString.map { s => BigInt(s.getBytes) }.toVector
-      Console.out.println(s"Created ${inputsBigInt.size} input records for BigInt")
+      val bitsPerChar = 16
+      largeStrings = (1 to size).map(i => nextString(MaxBits / bitsPerChar)).toVector
+      largeBigInts = largeStrings.map(s => BigInt(s.getBytes)).toVector
+      smallLongs = (1 to size).map(_.toLong).toVector
+      smallBigInts = (1 to size).map(BigInt(_)).toVector
     }
   }
+
+  def sumTopCmsVector[A](as: Vector[A], m: TopPctCMSMonoid[A]): TopCMS[A] =
+    m.sum(as.iterator.map(m.create))
 }
 
 class TopCMSBenchmark {
   import TopCMSBenchmark._
-  // Case A (K=Long): We count the first hundred integers, i.e. [1, 100]
-  @Benchmark
-  def timePlusOfFirstHundredIntegersWithLongCms(st: CMSState) = {
-    val m = st.cmsLongMonoid
-    m.sumOption((1 to st.ops).iterator.map(n => m.create(n)))
-  }
 
-  // Case B.1 (K=BigInt): We count the first hundred integers, i.e. [1, 100]
   @Benchmark
-  def timePlusOfFirstHundredIntegersWithBigIntCms(st: CMSState) = {
-    val m = st.cmsBigIntMonoid
-    m.sumOption((1 to st.ops).iterator.map(n => m.create(BigInt(n))))
-  }
+  def sumSmallLongTopCms(st: CMSState) =
+    sumTopCmsVector(st.smallLongs, st.cmsLongMonoid)
 
-  // Case B.2 (K=BigInt): We count numbers drawn randomly from a 2^maxBits address space
   @Benchmark
-  def timePlusOfRandom2048BitNumbersWithBigIntCms(st: CMSState) = {
-    val m = st.cmsBigIntMonoid
-    m.sumOption(st.inputsBigInt.iterator.map(m.create(_)))
-  }
+  def sumSmallBigIntTopCms(st: CMSState) =
+    sumTopCmsVector(st.smallBigInts, st.cmsBigIntMonoid)
 
-  // Case C (K=String): We count strings drawn randomly from a 2^maxBits address space
   @Benchmark
-  def timePlusOfRandom2048BitNumbersWithStringCms(st: CMSState) = {
-    val m = st.cmsStringMonoid
-    m.sumOption(st.inputsString.iterator.map(m.create(_)))
-  }
+  def sumLargeBigIntTopCms(st: CMSState) =
+    sumTopCmsVector(st.largeBigInts, st.cmsBigIntMonoid)
+
+  @Benchmark
+  def sumLargeStringTopCms(st: CMSState) =
+    sumTopCmsVector(st.largeStrings, st.cmsStringMonoid)
 }
