@@ -230,14 +230,23 @@ class CollectionSpecification extends CheckProperties {
     }
   }
 
-  property("sumByKey works") {
+  property("MapAlgebra.sumByKey works") {
     forAll { (keys: List[Int], values: List[Int]) =>
       import com.twitter.algebird.Operators._
       val tupList = keys.zip(values)
-      (tupList.sumByKey.filter { _._2 != 0 } ==
-        tupList.groupBy { _._1 }
+      val expected = tupList.groupBy { _._1 }
         .mapValues { v => v.map { _._2 }.sum }
-        .filter { _._2 != 0 })
+        .filter { _._2 != 0 }
+      MapAlgebra.sumByKey(tupList) == expected && tupList.sumByKey == expected
+    }
+  }
+
+  property("MapAlgebra.group works") {
+    forAll { (keys: List[Int], values: List[Int]) =>
+      import com.twitter.algebird.Operators._
+      val tupList = keys.zip(values)
+      val expected = tupList.groupBy(_._1).mapValues(_.map(_._2).toList)
+      MapAlgebra.group(tupList) == expected && tupList.group == expected
     }
   }
 

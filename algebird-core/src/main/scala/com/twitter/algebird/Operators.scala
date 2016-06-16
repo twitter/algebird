@@ -41,7 +41,10 @@ class DivOp[T: Field](t: T) {
 
 class RichTraversable[T](t: TraversableOnce[T]) {
   def sumByKey[K, V](implicit ev: <:<[T, (K, V)], sg: Semigroup[V]): Map[K, V] =
-    MapAlgebra.sumByKey(t.map { _.asInstanceOf[(K, V)] })
+    MapAlgebra.sumByKey(t.asInstanceOf[TraversableOnce[(K, V)]])
+
+  def group[K, V](implicit ev: <:<[T, (K, V)]): Map[K, List[V]] =
+    MapAlgebra.group(t.asInstanceOf[TraversableOnce[(K, V)]])
 
   def monoidSum(implicit monoid: Monoid[T]) = Monoid.sum(t)
   def ringProduct(implicit ring: Ring[T]) = Ring.product(t)
