@@ -468,7 +468,7 @@ object CMS {
       val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
       CMSParams(hashes, eps, delta, maxExactCountOpt)
     }
-    CMSInstance[K](params)
+    CMSZero[K](params)
   }
 
 }
