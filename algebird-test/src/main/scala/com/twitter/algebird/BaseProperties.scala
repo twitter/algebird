@@ -44,7 +44,7 @@ object BaseProperties {
   def isAssociativeEq[T: Semigroup, U <: T: Arbitrary](eqfn: (T, T) => Boolean) = {
     'isAssociativeEq |: forAll { (a: U, b: U, c: U) =>
       val semi = implicitly[Semigroup[T]]
-      eqfn(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c)) //&& false
+      eqfn(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c))
     }
   }
 

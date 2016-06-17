@@ -180,7 +180,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
     val a = 4
     val b = 0
     val width = 1234
-    val x = Array(113.toByte).toSeq // same as Seq(1.toByte)
+    val x = Array(113.toByte).toSeq // same as Seq(133.toByte)
     val result = targetHasher.hash(a, b, width)(x)
     val expected = sourceHasher.hash(a, b, width)("q")
     result should be(expected)
@@ -358,7 +358,7 @@ class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
 class CmsProperties extends ApproximateProperties("CountMinSketch") {
   import ApproximateProperty.toProp
 
-  implicit val intGen = Gen.choose(Int.MinValue, Int.MaxValue)
+  implicit val intGen = Gen.choose(1, 100)
 
   property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
   property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
