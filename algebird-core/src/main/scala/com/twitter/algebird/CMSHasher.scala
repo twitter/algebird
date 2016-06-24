@@ -121,13 +121,9 @@ object CMSHasher {
     positiveHash % width
   }
 
-  // This CMSHasher[BigInt] is newer, and faster, than the old version
-  // found in CMSHasherImplicits. Unless you have serialized data that
-  // requires the old implementation for correctness, you should be
-  // using this instance.
   implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
     override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int =
-      ((a * x.hashCode + b) & Int.MaxValue) % width
+      CMSHasher.hashBytes(a, b, width)(x.toByteArray)
   }
 
   // This CMSHasher[String] is newer, and faster, than the old version
