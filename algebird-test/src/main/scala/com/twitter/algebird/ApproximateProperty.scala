@@ -25,10 +25,10 @@ object ApproximateProperty {
    *  Useful because `Gen.listOfN(n, gen).sample` gives us Option[List[T]],
    *  while we often want List[T].
    */
-  private def genListOf[T](n: Int, gen: Gen[T]): List[T] = {
+  @annotation.tailrec private def genListOf[T](n: Int, gen: Gen[T], trial: Int = 100): List[T] = {
     Gen.listOfN(n, gen).sample match {
       case Some(xs) => xs
-      case _ => genListOf(n, gen)
+      case _ => if (trial <= 0) Nil else genListOf(n, gen, trial - 1)
     }
   }
 

@@ -11,16 +11,13 @@ import com.twitter.algebird.TopPctCMS
  * Only use this object when transitioning legacy code.  Newer code should use [[TopPctCMS.monoid()]]:
  *
  * {{{
- * import com.twitter.algebird.CMSHasherImplicits._
  * val cmsMonoid = TopPctCMS.monoid[Long](...)
  * }}}
  */
 object CountMinSketchMonoid {
 
-  import com.twitter.algebird.CMSHasherImplicits._
-
   @deprecated(
-    "You should use TopPctCMS.monoid[Long]() instead of legacy.CountMinSketchMonoid, and import CMSHasherImplicits._",
+    "You should use TopPctCMS.monoid[Long]() instead of legacy.CountMinSketchMonoid",
     since = "0.8.1")
   def apply(eps: Double, delta: Double, seed: Int, heavyHittersPct: Double = 0.01): CountMinSketchMonoid =
     TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
