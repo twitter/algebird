@@ -284,6 +284,20 @@ object Aggregator extends java.io.Serializable {
    */
   def approximatePercentileBounds[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit num: Numeric[T]): QTreeAggregator[T] =
     QTreeAggregator[T](percentile, k)
+
+  /**
+   * An aggregator that sums Numeric values into Doubles.
+   *
+   * Note that if you instead wanted to aggregate Numeric values of a type T into the same type T
+   * (e.g. if you want MonoidAggregator[T, T, T] for some Numeric type T), you can directly use
+   * Aggregator.fromMonoid[T] after importing the numericRing implicit:
+   *
+   *   > import com.twitter.algebird.Ring.numericRing
+   *   > def numericAggregator[T: Numeric]: MonoidAggregator[T, T, T] = Aggregator.fromMonoid[T]
+   */
+  def numericSum[T](implicit num: Numeric[T]): MonoidAggregator[T, Double, Double] =
+    Preparer[T].map(num.toDouble).monoidAggregate(Aggregator.fromMonoid)
+
 }
 
 /**
