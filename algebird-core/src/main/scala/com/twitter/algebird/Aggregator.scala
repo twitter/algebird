@@ -284,6 +284,11 @@ object Aggregator extends java.io.Serializable {
    */
   def approximatePercentileBounds[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit num: Numeric[T]): QTreeAggregator[T] =
     QTreeAggregator[T](percentile, k)
+
+  /**
+   * An aggregator that sums the values using Numeric addition.
+   */
+  def numericSum[T: Numeric]: MonoidAggregator[T, T, T] = Aggregator.fromMonoid(new NumericRing[T])
 }
 
 /**
