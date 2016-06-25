@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-object Operators extends {
+object Operators {
   implicit def toPlus[T: Semigroup](t: T) = new PlusOp(t)
   implicit def toMinus[T: Group](t: T) = new MinusOp(t)
   implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
