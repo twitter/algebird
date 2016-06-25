@@ -12,6 +12,7 @@ import scala.util.Random.nextString
  */
 
 object TopCMSBenchmark {
+  import CMSHasherImplicits.CMSHasherBigInt
 
   @State(Scope.Benchmark)
   class CMSState {

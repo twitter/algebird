@@ -1312,10 +1312,15 @@ case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) extends java.io.Ser
  */
 object CMSHasherImplicits {
 
-  implicit val CMSHasherBigInt: CMSHasher[BigInt] = CMSHasher.CMSHasherBigInt
+  implicit object CMSHasherBigInt extends CMSHasher[BigInt] {
+    override def hash(a: Int, b: Int, width: Int)(x: BigInt): Int =
+      CMSHasher.hashBytes(a, b, width)(x.toByteArray)
+  }
 
   implicit object CMSHasherString extends CMSHasher[String] {
     override def hash(a: Int, b: Int, width: Int)(x: String): Int =
       CMSHasher.hashBytes(a, b, width)(x.getBytes("UTF-8"))
   }
+
+  def cmsHasherShort: CMSHasher[Short] = CMSHasher.cmsHasherShort
 }
