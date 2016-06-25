@@ -120,12 +120,12 @@ lazy val formattingPreferences = {
   * This returns the youngest jar we released that is compatible with
   * the current.
   */
-val unreleasedModules = Set[String]()
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper")
 
 def youngestForwardCompatible(subProj: String) =
   Some(subProj)
-    .filterNot(unreleasedModules.contains(_))
-    .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.11.0" }
+    .filterNot(noBinaryCompatCheck.contains(_))
+    .map { s => "com.twitter" % ("algebird-" + s + "_2.11") % "0.12.0" }
 
 lazy val algebird = Project(
   id = "algebird",

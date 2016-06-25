@@ -14,6 +14,8 @@ import CMSFunctions.generateHashes
  */
 object CMSBenchmark {
 
+  import CMSHasherImplicits.CMSHasherBigInt
+
   @State(Scope.Benchmark)
   class CMSState {
 
