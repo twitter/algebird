@@ -29,7 +29,12 @@ class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
     sc = new SparkContext(conf)
   }
 
-  after { if (sc != null) { sc.stop() } }
+  after {
+    try sc.stop()
+    catch {
+      case t: Throwable => ()
+    }
+  }
 
   // Why does scala.math.Equiv suck so much.
   implicit def optEq[V](implicit eq: Equiv[V]): Equiv[Option[V]] = Equiv.fromFunction[Option[V]] { (o1, o2) =>
