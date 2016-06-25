@@ -15,17 +15,14 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-trait LowPriorityOperators {
-  implicit def toRichTraversable[T](t: Traversable[T]): RichTraversable[T] =
-    new RichTraversable(t)
-}
-
-object Operators extends LowPriorityOperators {
+object Operators extends {
   implicit def toPlus[T: Semigroup](t: T) = new PlusOp(t)
   implicit def toMinus[T: Group](t: T) = new MinusOp(t)
   implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
   implicit def toDiv[T: Field](t: T) = new DivOp(t)
-  implicit def toRichTraversable[T](t: TraversableOnce[T]): RichTraversable[T] =
+  implicit def toRichTraversableFromIterator[T](t: Iterator[T]): RichTraversable[T] =
+    new RichTraversable(t)
+  implicit def toRichTraversable[T](t: Traversable[T]): RichTraversable[T] =
     new RichTraversable(t)
 }
 

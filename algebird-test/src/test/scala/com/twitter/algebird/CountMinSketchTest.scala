@@ -8,6 +8,7 @@ import org.scalacheck.{ Gen, Arbitrary, Properties }
 import CmsTestImplicits._
 
 import scala.util.Random
+import CMSHasherImplicits.CMSHasherBigInt
 
 class CmsLaws extends PropSpec with PropertyChecks with Matchers {
 
