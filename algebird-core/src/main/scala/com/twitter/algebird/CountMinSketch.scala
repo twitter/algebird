@@ -163,6 +163,7 @@ class CMSSummation[K](params: CMSParams[K]) {
       offset += width
       row += 1
     }
+    totalCount += count
   }
 
   def updateAll(sketches: TraversableOnce[CMS[K]]): Unit =
@@ -174,13 +175,11 @@ class CMSSummation[K](params: CMSParams[K]) {
         ()
       case CMSItem(item, count, _) =>
         insert(item, count)
-        totalCount += count
       case SparseCMS(table, count, _) =>
         table.foreach {
           case (item, c) =>
             insert(item, c)
         }
-        totalCount += count
       case CMSInstance(CMSInstance.CountsTable(matrix), count, _) =>
         var offset = 0
         val rit = matrix.iterator
