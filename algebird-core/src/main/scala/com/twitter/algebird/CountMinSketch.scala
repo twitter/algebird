@@ -126,9 +126,7 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
    */
   def create(data: Seq[K]): CMS[K] = {
     val summation = new CMSSummation(params)
-    data.iterator.foreach { k =>
-      summation.insert(k, 1L)
-    }
+    data.foreach { k => summation.insert(k, 1L) }
     summation.result
   }
 
