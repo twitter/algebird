@@ -68,6 +68,14 @@ object IntRing extends Ring[Int] {
   override def plus(l: Int, r: Int) = l + r
   override def minus(l: Int, r: Int) = l - r
   override def times(l: Int, r: Int) = l * r
+  override def sum(t: TraversableOnce[Int]): Int = {
+    var sum = 0
+    t.foreach(sum += _)
+    sum
+  }
+  override def sumOption(t: TraversableOnce[Int]): Option[Int] =
+    if (t.isEmpty) None
+    else Some(sum(t))
 }
 
 object ShortRing extends Ring[Short] {
@@ -77,6 +85,14 @@ object ShortRing extends Ring[Short] {
   override def plus(l: Short, r: Short) = (l + r).toShort
   override def minus(l: Short, r: Short) = (l - r).toShort
   override def times(l: Short, r: Short) = (l * r).toShort
+  override def sum(t: TraversableOnce[Short]): Short = {
+    var sum = 0
+    t.foreach(sum += _)
+    sum.toShort
+  }
+  override def sumOption(t: TraversableOnce[Short]): Option[Short] =
+    if (t.isEmpty) None
+    else Some(sum(t))
 }
 
 object LongRing extends Ring[Long] {
@@ -86,6 +102,14 @@ object LongRing extends Ring[Long] {
   override def plus(l: Long, r: Long) = l + r
   override def minus(l: Long, r: Long) = l - r
   override def times(l: Long, r: Long) = l * r
+  override def sum(t: TraversableOnce[Long]): Long = {
+    var sum = 0L
+    t.foreach(sum += _)
+    sum
+  }
+  override def sumOption(t: TraversableOnce[Long]): Option[Long] =
+    if (t.isEmpty) None
+    else Some(sum(t))
 }
 
 object BigIntRing extends NumericRing[BigInt]
