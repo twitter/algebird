@@ -54,6 +54,14 @@ object FloatField extends Field[Float] {
     assertNotZero(r)
     l / r
   }
+  override def sum(t: TraversableOnce[Float]): Float = {
+    var sum = 0.0f
+    t.foreach(sum += _)
+    sum
+  }
+  override def sumOption(t: TraversableOnce[Float]): Option[Float] =
+    if (t.isEmpty) None
+    else Some(sum(t))
 }
 
 object DoubleField extends Field[Double] {
@@ -67,6 +75,14 @@ object DoubleField extends Field[Double] {
     assertNotZero(r)
     l / r
   }
+  override def sum(t: TraversableOnce[Double]): Double = {
+    var sum = 0.0
+    t.foreach(sum += _)
+    sum
+  }
+  override def sumOption(t: TraversableOnce[Double]): Option[Double] =
+    if (t.isEmpty) None
+    else Some(sum(t))
 }
 
 object BooleanField extends Field[Boolean] {
