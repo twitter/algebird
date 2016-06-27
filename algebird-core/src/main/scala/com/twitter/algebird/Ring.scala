@@ -86,9 +86,9 @@ object ShortRing extends Ring[Short] {
   override def minus(l: Short, r: Short) = (l - r).toShort
   override def times(l: Short, r: Short) = (l * r).toShort
   override def sum(t: TraversableOnce[Short]): Short = {
-    var sum: Short = 0
-    t.foreach { s => sum = (sum + s).toShort }
-    sum
+    var sum = 0
+    t.foreach(sum += _)
+    sum.toShort
   }
   override def sumOption(t: TraversableOnce[Short]): Option[Short] =
     if (t.isEmpty) None
