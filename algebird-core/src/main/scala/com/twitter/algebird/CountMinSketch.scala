@@ -124,7 +124,11 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
   /**
    * Creates a sketch out of multiple items.
    */
-  def create(data: Seq[K]): CMS[K] = data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
+  def create(data: Seq[K]): CMS[K] = {
+    val summation = new CMSSummation(params)
+    data.foreach { k => summation.insert(k, 1L) }
+    summation.result
+  }
 
   override def sumOption(sketches: TraversableOnce[CMS[K]]): Option[CMS[K]] =
     if (sketches.isEmpty) None else Some(sum(sketches))
@@ -136,6 +140,13 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
   }
 }
 
+/**
+ * This mutable builder can be used when speed is essential
+ * and you can be sure the scope of the mutability cannot escape
+ * in an unsafe way. The intended use is to allocate and call
+ * result in one method without letting a reference to the instance
+ * escape into a closure.
+ */
 class CMSSummation[K](params: CMSParams[K]) {
   private[this] val hashes = params.hashes.toArray
   private[this] val height = CMSFunctions.depth(params.delta)
@@ -152,6 +163,7 @@ class CMSSummation[K](params: CMSParams[K]) {
       offset += width
       row += 1
     }
+    totalCount += count
   }
 
   def updateAll(sketches: TraversableOnce[CMS[K]]): Unit =
@@ -163,13 +175,11 @@ class CMSSummation[K](params: CMSParams[K]) {
         ()
       case CMSItem(item, count, _) =>
         insert(item, count)
-        totalCount += count
       case SparseCMS(table, count, _) =>
         table.foreach {
           case (item, c) =>
             insert(item, c)
         }
-        totalCount += count
       case CMSInstance(CMSInstance.CountsTable(matrix), count, _) =>
         var offset = 0
         val rit = matrix.iterator
@@ -185,7 +195,7 @@ class CMSSummation[K](params: CMSParams[K]) {
         totalCount += count
     }
 
-  def result: CMS[K] = {
+  def result: CMS[K] = if (totalCount == 0L) CMSZero(params) else {
     def vectorize(row: Int): Vector[Long] = {
       val offset = row * width
       val b = Vector.newBuilder[Long]
