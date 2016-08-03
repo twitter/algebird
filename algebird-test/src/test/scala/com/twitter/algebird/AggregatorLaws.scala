@@ -76,6 +76,16 @@ class AggregatorLaws extends CheckProperties {
     }
   }
 
+  def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]) =
+    forAll { in: List[T] =>
+      val aggregator = Aggregator.numericSum[T]
+      aggregator(in) == in.map(num.toDouble).sum
+    }
+  property("Aggregator.numericSum is correct for Ints") { checkNumericSum[Int] }
+  property("Aggregator.numericSum is correct for Longs") { checkNumericSum[Long] }
+  property("Aggregator.numericSum is correct for Doubles") { checkNumericSum[Double] }
+  property("Aggregator.numericSum is correct for Floats") { checkNumericSum[Float] }
+
   implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
