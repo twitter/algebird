@@ -288,6 +288,10 @@ object Aggregator extends java.io.Serializable {
   /**
    * An aggregator that sums Numeric values into Doubles.
    *
+   * This is really no more than converting to Double and then summing. The conversion to double 
+   * means we don't have the overflow semantics of integer types on the jvm 
+   * (e.g. Int.MaxValue + 1 == Int.MinValue).
+   *
    * Note that if you instead wanted to aggregate Numeric values of a type T into the same type T
    * (e.g. if you want MonoidAggregator[T, T, T] for some Numeric type T), you can directly use
    * Aggregator.fromMonoid[T] after importing the numericRing implicit:
