@@ -35,7 +35,14 @@ val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
 
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimize", "-Xlint", "-language:implicitConversions", "-language:higherKinds", "-language:existentials"),
+  scalacOptions ++= Seq(
+    "-unchecked",
+    "-deprecation",
+    "-optimize",
+    "-Xlint",
+    "-language:implicitConversions",
+    "-language:higherKinds",
+    "-language:existentials"),
 
   scalacOptions <++= (scalaVersion) map { sv =>
       if (sv startsWith "2.10")

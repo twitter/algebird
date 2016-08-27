@@ -71,6 +71,16 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
 }
 
 object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
+  def maybePlus[T](opt: Option[T], t: T)(implicit sg: Semigroup[T]): T =
+    opt match {
+      case None => t
+      case Some(s) => sg.plus(s, t)
+    }
+  def maybePlus[T](t: T, opt: Option[T])(implicit sg: Semigroup[T]): T =
+    opt match {
+      case None => t
+      case Some(u) => sg.plus(t, u)
+    }
   // This pattern is really useful for typeclasses
   def plus[T](l: T, r: T)(implicit semi: Semigroup[T]) = semi.plus(l, r)
   // Left sum: (((a + b) + c) + d)
