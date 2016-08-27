@@ -1,5 +1,5 @@
 ## Algebird [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
-[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)]()
+[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)](https://codecov.io/github/twitter/algebird)
 
 
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Apache Storm](http://storm.apache.org/)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
