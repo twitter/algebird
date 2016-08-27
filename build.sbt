@@ -39,7 +39,7 @@ val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
     "-unchecked",
     "-deprecation",
     "-optimize",
-    "-Xlint:-adapted-args",
+    "-Xlint",
     "-language:implicitConversions",
     "-language:higherKinds",
     "-language:existentials"),
