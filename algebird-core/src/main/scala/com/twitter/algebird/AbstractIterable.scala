@@ -1,5 +1,5 @@
 /*
- Copyright 2014 Twitter, Inc.
+ Copyright 2016 Twitter, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,14 +14,7 @@
  limitations under the License.
  */
 
-package com.twitter
+package com.twitter.algebird
 
-package object algebird {
-  /**
-   * TODO remove these in scala 2.11 and use the standard there.
-   * these are here to avoid massive bloat around these classes
-   * https://github.com/twitter/algebird/issues/263
-   */
-  private[algebird] abstract class AbstractIterable[T] extends Iterable[T]
-  private[algebird] abstract class AbstractIterator[T] extends Iterator[T]
-}
+private[algebird] abstract class AbstractIterable[T] extends Iterable[T]
+private[algebird] abstract class AbstractIterator[T] extends Iterator[T]
