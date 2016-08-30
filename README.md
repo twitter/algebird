@@ -36,15 +36,25 @@ For example, average, moving average, max/min, set
   you might numbers, and add them up in hadoop or online to produce powerful statistics and
   analytics.
 
-## Community and Documentation
-
-This, and all [github.com/twitter](https://github.com/twitter) projects, are under the [Twitter Open Source Code of Conduct](https://engineering.twitter.com/opensource/code-of-conduct). Additionally, see the [Typelevel Code of Conduct](http://typelevel.org/conduct) for specific examples of harassing behavior that are not tolerated.
+## Documentation
 
 To learn more and find links to tutorials and information around the web, check out the [Algebird Wiki](https://github.com/twitter/algebird/wiki).
 
 The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
 
-Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
+## Get Involved + Code of Conduct
+Pull requests and bug reports are always welcome!
+
+Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). 
+Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
+
+We use a lightweight form of project governence inspired by the one used by Apache projects.
+Please see [Contributing and Committership](https://github.com/twitter/analytics-infra-governance#contributing-and-committership) for our code of conduct and our pull request review process.
+The TL;DR is send us a pull request, iterate on the feedback + discussion, and get a +1 from a [Committer](COMMITTERS.md) in order to get your PR accepted.
+
+The current list of active committers (who can +1 a pull request) can be found here: [Committers](COMMITTERS.md)
+
+A list of contributors to the project can be found here: [Contributors](https://github.com/twitter/algebird/graphs/contributors)
 
 ## Maven
 
