@@ -94,7 +94,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   @inline
   private[this] final def updateHH(item: Int) {
     @inline
-    def pruneHH {
+    def pruneHH(): Unit = {
       val iter = hh.values.iterator
       while (iter.hasNext) {
         val n = iter.next
@@ -108,7 +108,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
       val v = hh.get(item)
       val newItemCount = +1L
       if (newItemCount < hhMinReq) {
-        pruneHH
+        pruneHH()
       } else {
         hh.put(item, newItemCount)
       }
@@ -117,13 +117,13 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
       if (newItemCount >= hhMinReq) {
         hh.put(item, totalCount)
       }
-      pruneHH
+      pruneHH()
     }
   }
 
   // We include the ability to reset the CMS so we can age our counters
   // over time
-  private[this] def resetCMS {
+  private[this] def resetCMS(): Unit = {
     hh.clear
     totalCount = 0L
     hhMinReq = 0L
@@ -144,7 +144,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
     if (newCounter > rollOverFrequency) {
       hh.synchronized {
         updateStep.set(1L)
-        resetCMS
+        resetCMS()
       }
     }
     if (newCounter < 1000L || newCounter % updateFrequency == 0L) {

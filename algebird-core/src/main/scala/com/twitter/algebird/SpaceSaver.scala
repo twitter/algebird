@@ -13,7 +13,7 @@ object SpaceSaver {
    * Construct SpaceSaver with given capacity containing a single item with provided exact count.
    * This is the public api to create a new SpaceSaver.
    */
-  def apply[T](capacity: Int, item: T, count: Long): SpaceSaver[T] = SSMany(capacity, Map(item -> (count, 0L)))
+  def apply[T](capacity: Int, item: T, count: Long): SpaceSaver[T] = SSMany(capacity, Map(item -> ((count, 0L))))
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
@@ -95,7 +95,7 @@ case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSave
 
   def min: Long = 0L
 
-  def counters: Map[T, (Long, Long)] = Map(item -> (1L, 1L))
+  def counters: Map[T, (Long, Long)] = Map(item -> ((1L, 1L)))
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSOne[_] => SSMany(this).add(other)
@@ -111,7 +111,7 @@ object SSMany {
     SSMany(capacity, counters, bucketsFromCounters(counters))
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
-    SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
+    SSMany(one.capacity, Map(one.item -> ((1L, 0L))), SortedMap(1L -> Set(one.item)))
 }
 
 case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
@@ -122,7 +122,7 @@ case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buc
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
     val (count, err) = counters(item)
-    val counters1 = counters + (item -> (count + 1L, err)) // increment by one
+    val counters1 = counters + (item -> ((count + 1L, err))) // increment by one
     val currBucket = buckets(count) // current bucket
     val buckets1 = {
       if (currBucket.size == 1) // delete current bucket since it will be empty
@@ -147,7 +147,7 @@ case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buc
 
   // introduce new item
   private def introduce(item: T, count: Long, err: Long) = {
-    val counters1 = counters + (item -> (count, err))
+    val counters1 = counters + (item -> ((count, err)))
     val buckets1 = buckets + (count -> (buckets.getOrElse(count, Set()) + item))
     SSMany(capacity, counters1, buckets1)
   }
@@ -170,7 +170,7 @@ case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buc
       .map { key =>
         val (count1, err1) = counters.getOrElse(key, (min, min))
         val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
-        (key -> (count1 + count2, err1 + err2))
+        (key -> ((count1 + count2, err1 + err2)))
       }
       .sorted(SpaceSaver.ordering)
       .take(capacity)

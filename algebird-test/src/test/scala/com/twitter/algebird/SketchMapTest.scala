@@ -58,7 +58,7 @@ class SketchMapTest extends WordSpec with Matchers {
 
       val three = MONOID.create((1, 3L))
       assert(MONOID.frequency(three, 1) == 3L)
-      val four = MONOID.create(1, 4L)
+      val four = MONOID.create((1, 4L))
       assert(MONOID.frequency(four, 1) == 4L)
       val sm2 = MONOID.plus(four, three)
       assert(MONOID.frequency(sm2, 1) == 7L)

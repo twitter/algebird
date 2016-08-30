@@ -62,7 +62,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
     else {
       val buffer = scala.collection.mutable.Buffer[SketchMap[K, V]]()
       val maxBuffer = 1000
-      def sumBuffer: Unit = {
+      def sumBuffer(): Unit = {
         val newValuesTable = Monoid.sum(buffer.iterator.map(_.valuesTable))
         val heavyHittersSet = Monoid.sum(buffer.iterator.map(_.heavyHitterKeys.toSet))
         val newtotalValue = Monoid.sum(buffer.iterator.map(_.totalValue))
@@ -74,10 +74,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
       }
 
       items.foreach { sm =>
-        if (buffer.size > maxBuffer) sumBuffer
+        if (buffer.size > maxBuffer) sumBuffer()
         buffer += sm
       }
-      if (buffer.size > 1) sumBuffer //don't bother to sum if there is only one item.
+      if (buffer.size > 1) sumBuffer() //don't bother to sum if there is only one item.
       Some(buffer(0))
     }
 
@@ -150,7 +150,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     hashes
       .iterator
       .zipWithIndex
-      .map { case (hash, row) => table.getValue(row, hash(key)) }
+      .map { case (hash, row) => table.getValue((row, hash(key))) }
       .min
 
   /**
