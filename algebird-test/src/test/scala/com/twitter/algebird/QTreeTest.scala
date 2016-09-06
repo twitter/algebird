@@ -18,25 +18,19 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Properties
-import org.scalatest.{ PropSpec, Matchers }
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
+import org.scalacheck.Properties
+import org.scalatest.prop.PropertyChecks
+import org.scalatest.{ PropSpec, Matchers }
 
 import java.util.Arrays
 
 class QTreeLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val qtSemigroup = new QTreeSemigroup[Long](6)
+  implicit val qtSemigroup = new QTreeSemigroup[Long](4)
   implicit val qtGen = Arbitrary {
     for (
       v <- choose(0L, 10000L)
@@ -46,7 +40,6 @@ class QTreeLaws extends CheckProperties {
   property("QTree is associative") {
     isAssociative[QTree[Long]]
   }
-
 }
 
 class QTreeTest extends WordSpec with Matchers {
@@ -56,7 +49,7 @@ class QTreeTest extends WordSpec with Matchers {
 
   def buildQTree(k: Int, list: Seq[Double]) = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
-    list.map{ QTree(_) }.reduce{ qtSemigroup.plus(_, _) }
+    qtSemigroup.sumOption(list.map{ QTree(_) }).get
   }
 
   def trueQuantile[T: Ordering](list: Seq[T], q: Double): T = {
@@ -72,7 +65,7 @@ class QTreeTest extends WordSpec with Matchers {
     s"QTree with elements (1 to $k)" should {
       val trueMedian = (1 + k) / 2
       s"have median $trueMedian" in {
-        implicit val sg = new QTreeSemigroup[Unit](k)
+        implicit val sg = new QTreeSemigroup[Unit](6)
 
         val list = (1 to k).map(_.toDouble)
         val qtree = sg.sumOption(list.map(QTree.value(_))).get
@@ -113,7 +106,7 @@ class QTreeTest extends WordSpec with Matchers {
         assert(truth <= upper)
       }
       "have size bounded by 2^(k+2)" in {
-        val list = randomList(100000)
+        val list = randomList(10000)
         val qt = buildQTree(k, list)
         assert(qt.size <= (1 << (k + 2)))
       }

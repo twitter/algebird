@@ -6,8 +6,8 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 import scalariform.formatter.preferences._
 
-val paradiseVersion = "2.0.1"
-val quasiquotesVersion = "2.0.1"
+val paradiseVersion = "2.1.0"
+val quasiquotesVersion = "2.1.0"
 val bijectionVersion = "0.9.0"
 val utilVersion = "6.20.0"
 
@@ -22,8 +22,8 @@ def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
 
 val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
   organization := "com.twitter",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7"),
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8"),
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
