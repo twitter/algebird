@@ -6,11 +6,11 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 import scalariform.formatter.preferences._
 
-val paradiseVersion = "2.0.1"
-val quasiquotesVersion = "2.0.1"
+val paradiseVersion = "2.1.0"
+val quasiquotesVersion = "2.1.0"
 val bijectionVersion = "0.9.0"
 val utilVersion = "6.20.0"
-val algebraVersion = "0.4.0"
+val algebraVersion = "0.5.1"
 val javaEwahVersion = "0.6.6"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
@@ -24,8 +24,8 @@ def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
 
 val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
   organization := "com.twitter",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7"),
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8"),
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
@@ -37,7 +37,14 @@ val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
 
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimize", "-Xlint", "-language:implicitConversions", "-language:higherKinds", "-language:existentials"),
+  scalacOptions ++= Seq(
+    "-unchecked",
+    "-deprecation",
+    "-optimize",
+    "-Xlint",
+    "-language:implicitConversions",
+    "-language:higherKinds",
+    "-language:existentials"),
 
   scalacOptions <++= (scalaVersion) map { sv =>
       if (sv startsWith "2.10")
@@ -122,12 +129,12 @@ lazy val formattingPreferences = {
   * This returns the youngest jar we released that is compatible with
   * the current.
   */
-val unreleasedModules = Set[String]()
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper")
 
 def youngestForwardCompatible(subProj: String) =
   Some(subProj)
-    .filterNot(unreleasedModules.contains(_))
-    .map { s => "com.twitter" % ("algebird-" + s + "_2.10") % "0.11.0" }
+    .filterNot(noBinaryCompatCheck.contains(_))
+    .map { s => "com.twitter" %% ("algebird-" + s) % "0.12.0" }
 
 lazy val algebird = Project(
   id = "algebird",
@@ -161,8 +168,7 @@ lazy val algebirdCore = module("core").settings(
                      """.stripMargin('|'),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
     Seq("com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
-        "org.spire-math" %% "algebra" % algebraVersion,
-        "org.spire-math" %% "algebra-ring" % algebraVersion,
+        "org.typelevel" %% "algebra" % algebraVersion,
         "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)

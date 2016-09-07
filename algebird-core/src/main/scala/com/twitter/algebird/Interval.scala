@@ -219,7 +219,7 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     case ub @ ExclusiveUpper(_) => lower && (ub && upper)
     case Intersection(thatL, thatU) => (lower && thatL) && (upper && thatU)
   }
-  def mapNonDecreasing[U: Ordering](fn: T => U): Interval[U] =
+  def mapNonDecreasing[T1: Ordering](fn: T => T1): Interval[T1] =
     lower.mapNonDecreasing(fn) && upper.mapNonDecreasing(fn)
 
   /**

@@ -78,7 +78,7 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
       // Beyond the standard contract of `hashCode` (which is covered above), we also want small changes to an instance
       // to result in a different hash code.  The verifications below (combined with the generator-driven test setup)
       // are a naive smoke test.
-      val appended = Bytes(bytes1.array :+ bytes1.array.head)
+      val appended = Bytes(bytes1.array :+ random.nextInt.toByte)
       bytes1.hashCode shouldNot be(appended.hashCode)
 
       if (bytes1.array.length > 1) {

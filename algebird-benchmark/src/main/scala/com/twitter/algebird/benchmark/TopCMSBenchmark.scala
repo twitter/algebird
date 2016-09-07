@@ -5,15 +5,13 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 
-import CMSFunctions.generateHashes
-
 /**
- * Benchmarks the Count-Min sketch (CMS) implementation in Algebird.
+ * Benchmarks the Count-Min sketch implementation in Algebird.
  *
  * We benchmark different `K` types as well as different input data streams.
  */
-object CMSBenchmark {
 
+object TopCMSBenchmark {
   import CMSHasherImplicits.CMSHasherBigInt
 
   @State(Scope.Benchmark)
@@ -28,9 +26,11 @@ object CMSBenchmark {
     @Param(Array("0.0000001")) // 1e-8
     var delta: Double = 0.0
 
-    // number of data values to combine into a CMS
+    @Param(Array("0.2"))
+    var pct: Double = 0.0
+
     @Param(Array("1000"))
-    var size: Int = 0
+    var size: Int = 0 // Number of operations per benchmark repetition (cf. `reps`)
 
     // need to initialize later because we don't have `size` yet.
     var smallLongs: Vector[Long] = _
@@ -38,16 +38,15 @@ object CMSBenchmark {
     var largeBigInts: Vector[BigInt] = _
     var largeStrings: Vector[String] = _
 
-    // need to initialize later because we don't have `eps` and `delta` yet.
-    var longMonoid: CMSMonoid[Long] = _
-    var bigIntMonoid: CMSMonoid[BigInt] = _
-    var stringMonoid: CMSMonoid[String] = _
+    var cmsLongMonoid: TopPctCMSMonoid[Long] = _
+    var cmsBigIntMonoid: TopPctCMSMonoid[BigInt] = _
+    var cmsStringMonoid: TopPctCMSMonoid[String] = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
-      longMonoid = CMS.monoid[Long](eps, delta, Seed)
-      bigIntMonoid = CMS.monoid[BigInt](eps, delta, Seed)
-      stringMonoid = CMS.monoid[String](eps, delta, Seed)
+      cmsLongMonoid = TopPctCMS.monoid[Long](eps, delta, Seed, pct)
+      cmsBigIntMonoid = TopPctCMS.monoid[BigInt](eps, delta, Seed, pct)
+      cmsStringMonoid = TopPctCMS.monoid[String](eps, delta, Seed, pct)
 
       val bitsPerChar = 16
       largeStrings = (1 to size).map(i => nextString(MaxBits / bitsPerChar)).toVector
@@ -55,29 +54,28 @@ object CMSBenchmark {
       smallLongs = (1 to size).map(_.toLong).toVector
       smallBigInts = (1 to size).map(BigInt(_)).toVector
     }
-
   }
 
-  def sumCmsVector[A](as: Vector[A], m: CMSMonoid[A]): CMS[A] =
-    m.sum(as.iterator.map(CMSItem(_, 1L, m.params)))
+  def sumTopCmsVector[A](as: Vector[A], m: TopPctCMSMonoid[A]): TopCMS[A] =
+    m.sum(as.iterator.map(m.create))
 }
 
-class CMSBenchmark {
-  import CMSBenchmark._
+class TopCMSBenchmark {
+  import TopCMSBenchmark._
 
   @Benchmark
-  def sumSmallLongCms(st: CMSState): CMS[Long] =
-    sumCmsVector(st.smallLongs, st.longMonoid)
+  def sumSmallLongTopCms(st: CMSState) =
+    sumTopCmsVector(st.smallLongs, st.cmsLongMonoid)
 
   @Benchmark
-  def sumSmallBigIntCms(st: CMSState): CMS[BigInt] =
-    sumCmsVector(st.smallBigInts, st.bigIntMonoid)
+  def sumSmallBigIntTopCms(st: CMSState) =
+    sumTopCmsVector(st.smallBigInts, st.cmsBigIntMonoid)
 
   @Benchmark
-  def sumLargeBigIntCms(st: CMSState): CMS[BigInt] =
-    sumCmsVector(st.largeBigInts, st.bigIntMonoid)
+  def sumLargeBigIntTopCms(st: CMSState) =
+    sumTopCmsVector(st.largeBigInts, st.cmsBigIntMonoid)
 
   @Benchmark
-  def sumLargeStringCms(st: CMSState): CMS[String] =
-    sumCmsVector(st.largeStrings, st.stringMonoid)
+  def sumLargeStringTopCms(st: CMSState) =
+    sumTopCmsVector(st.largeStrings, st.cmsStringMonoid)
 }

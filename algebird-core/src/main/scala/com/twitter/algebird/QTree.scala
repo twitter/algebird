@@ -101,13 +101,13 @@ object QTree {
    * If you are sure you only care about the approximate histogram
    * features of QTree, you can save some space by using QTree[Unit]
    */
-  def value(v: Long): QTree[Unit] = apply(v -> ())
+  def value(v: Long): QTree[Unit] = apply(v -> (()))
   /**
    * If you are sure you only care about the approximate histogram
    * features of QTree, you can save some space by using QTree[Unit]
    * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
    */
-  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] = apply(v -> (), level)
+  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] = apply(v -> (()), level)
 
   private[algebird] def mergePeers[@specialized(Int, Long, Float, Double) A](left: QTree[A], right: QTree[A])(implicit monoid: Monoid[A]): QTree[A] = {
     assert(right.lowerBound == left.lowerBound, "lowerBound " + right.lowerBound + " != " + left.lowerBound)

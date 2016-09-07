@@ -27,7 +27,7 @@ private object Counter {
 }
 
 private sealed trait Counter {
-  def increment: Unit
+  def increment(): Unit
   def add(v: Long): Unit
   def get: Long
   def toDouble = get.toDouble
@@ -37,7 +37,7 @@ private sealed trait Counter {
 /** thread safe */
 private case class AtomicCounter() extends Counter {
   private[this] final val counter = new AtomicLong(0)
-  override def increment = counter.incrementAndGet
+  override def increment() = counter.incrementAndGet
   override def add(v: Long) = counter.addAndGet(v)
   override def get = counter.get
 }
@@ -45,7 +45,7 @@ private case class AtomicCounter() extends Counter {
 /** not thread safe */
 private case class PlainCounter() extends Counter {
   private[this] final var counter: Long = 0
-  override def increment = counter += 1
+  override def increment() = counter += 1
   override def add(v: Long) = counter += v
   override def get = counter
 }
