@@ -156,6 +156,7 @@ class FromAlgebraRing[T](r: ARing[T]) extends Ring[T] {
   override def sum(ts: TraversableOnce[T]): T = r.sum(ts)
   override def sumOption(ts: TraversableOnce[T]): Option[T] = r.trySum(ts)
   override def times(a: T, b: T): T = r.times(a, b)
+  override def product(ts: TraversableOnce[T]): T = r.product(ts)
 }
 
 private[algebird] trait RingImplicits0 extends NumericRingProvider {
