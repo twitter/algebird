@@ -92,11 +92,15 @@ class FromAlgebraGroup[T](m: AGroup[T]) extends FromAlgebraMonoid(m) with Group[
   override def minus(r: T, l: T): T = m.remove(r, l)
 }
 
-trait FromAlgebraGroupImplicit {
-  implicit def fromAlgebraGroup[T](m: AGroup[T]): Group[T] = new FromAlgebraGroup(m)
+private[algebird] trait FromAlgebraGroupImplicit1 {
+  implicit def fromAlgebraAdditiveGroup[T](implicit m: AdditiveGroup[T]): Group[T] =
+    new FromAlgebraGroup(m.additive)
+}
+private[algebird] trait FromAlgebraGroupImplicit0 extends FromAlgebraGroupImplicit1 {
+  implicit def fromAlgebraGroup[T](implicit m: AGroup[T]): Group[T] = new FromAlgebraGroup(m)
 }
 
-object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebraGroupImplicit {
+object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebraGroupImplicit0 {
   // This pattern is really useful for typeclasses
   def negate[T](x: T)(implicit grp: Group[T]) = grp.negate(x)
   def minus[T](l: T, r: T)(implicit grp: Group[T]) = grp.minus(l, r)

@@ -147,7 +147,23 @@ trait NumericRingProvider {
   implicit def numericRing[T: Numeric]: Ring[T] = new NumericRing[T]
 }
 
-object Ring extends GeneratedRingImplicits with ProductRings {
+class FromAlgebraRing[T](r: ARing[T]) extends Ring[T] {
+  override def zero: T = r.zero
+  override def one: T = r.one
+  override def plus(a: T, b: T): T = r.plus(a, b)
+  override def negate(t: T): T = r.negate(t)
+  override def minus(a: T, b: T): T = r.minus(a, b)
+  override def sum(ts: TraversableOnce[T]): T = r.sum(ts)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] = r.trySum(ts)
+  override def times(a: T, b: T): T = r.times(a, b)
+}
+
+private[algebird] trait RingImplicits0 extends NumericRingProvider {
+  implicit def fromAlgebraRing[T](implicit r: ARing[T]): Ring[T] =
+    new FromAlgebraRing(r)
+}
+
+object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0 {
   // This pattern is really useful for typeclasses
   def one[T](implicit rng: Ring[T]) = rng.one
   def times[T](l: T, r: T)(implicit rng: Ring[T]) = rng.times(l, r)

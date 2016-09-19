@@ -88,12 +88,17 @@ class FromAlgebraSemigroup[T](sg: ASemigroup[T]) extends Semigroup[T] {
 /**
  * An Algebra semigroup can be an Algebird semigroup
  */
-trait FromAlgebraSemigroupImplicit {
+private[algebird] trait FromAlgebraSemigroupImplicit1 {
+  implicit def fromAlgebraAdditiveSemigroup[T](implicit sg: AdditiveSemigroup[T]): Semigroup[T] =
+    new FromAlgebraSemigroup(sg.additive)
+}
+
+private[algebird] trait FromAlgebraSemigroupImplicit0 extends FromAlgebraSemigroupImplicit1 {
   implicit def fromAlgebraSemigroup[T](implicit sg: ASemigroup[T]): Semigroup[T] =
     new FromAlgebraSemigroup(sg)
 }
 
-object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with FromAlgebraSemigroupImplicit {
+object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with FromAlgebraSemigroupImplicit0 {
   def maybePlus[T](opt: Option[T], t: T)(implicit sg: Semigroup[T]): T =
     opt match {
       case None => t
@@ -110,7 +115,8 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]): Option[T] =
     sg.sumOption(iter)
 
-  def from[T](associativeFn: (T, T) => T): Semigroup[T] = new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
+  def from[T](associativeFn: (T, T) => T): Semigroup[T] =
+    new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
 
   /**
    * Same as v + v + v .. + v (i times in total)

@@ -6,12 +6,13 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 import scalariform.formatter.preferences._
 
+val algebraVersion = "0.5.1"
+val bijectionVersion = "0.9.0"
+val javaEwahVersion = "0.6.6"
 val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
-val bijectionVersion = "0.9.0"
+val scalaTestVersion = "2.2.4"
 val utilVersion = "6.20.0"
-val algebraVersion = "0.5.1"
-val javaEwahVersion = "0.6.6"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version startsWith "2.10" => "2.10"
@@ -162,14 +163,14 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
-  test := { }, // All tests reside in algebirdTest
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
     Seq("com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
         "org.typelevel" %% "algebra" % algebraVersion,
-        "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
+        "org.scala-lang" % "scala-reflect" % scalaVersion,
+        "org.scalatest" %% "scalatest" % scalaTestVersion % "test") ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
       else
@@ -185,7 +186,7 @@ lazy val algebirdTest = module("test").settings(
   testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
     Seq("org.scalacheck" %% "scalacheck" % "1.12.5",
-        "org.scalatest" %% "scalatest" % "2.2.4") ++ {
+      "org.scalatest" %% "scalatest" % scalaTestVersion) ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
       else

@@ -234,11 +234,16 @@ class FromAlgebraMonoid[T](m: AMonoid[T]) extends FromAlgebraSemigroup(m) with M
   override def zero: T = m.empty
 }
 
-trait FromAlgebraMonoidImplicit {
-  implicit def fromAlgebraMonoid[T](m: AMonoid[T]): Monoid[T] = new FromAlgebraMonoid(m)
+private[algebird] trait FromAlgebraMonoidImplicit1 {
+  implicit def fromAlgebraAdditiveMonoid[T](implicit m: AdditiveMonoid[T]): Monoid[T] =
+    new FromAlgebraMonoid(m.additive)
 }
 
-object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlgebraMonoidImplicit {
+private[algebird] trait FromAlgebraMonoidImplicit0 extends FromAlgebraMonoidImplicit1 {
+  implicit def fromAlgebraMonoid[T](implicit m: AMonoid[T]): Monoid[T] = new FromAlgebraMonoid(m)
+}
+
+object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlgebraMonoidImplicit0 {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon: Monoid[T]) = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples
