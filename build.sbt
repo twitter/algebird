@@ -132,7 +132,7 @@ val noBinaryCompatCheck = Set[String]("benchmark", "caliper")
 def youngestForwardCompatible(subProj: String) =
   Some(subProj)
     .filterNot(noBinaryCompatCheck.contains(_))
-    .map { s => "com.twitter" %% ("algebird-" + s) % "0.12.0" }
+    .map { s => "com.twitter" %% ("algebird-" + s) % "0.12.2" }
 
 lazy val algebird = Project(
   id = "algebird",
