@@ -138,4 +138,20 @@ object CMSHasher {
     override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = hashBytes(a, b, width)(x)
   }
 
+  // Note: CMSHasher[BigInt] not provided here but in CMSHasherImplicits for legacy support reasons. New hashers
+  // should come here.
+
+  implicit object CMSHasherBigDecimal extends CMSHasher[BigDecimal] {
+    override def hash(a: Int, b: Int, width: Int)(x: BigDecimal): Int = {
+
+      val uh = scala.util.hashing.MurmurHash3.arrayHash(x.underlying.unscaledValue.toByteArray, a)
+      val hash = scala.util.hashing.MurmurHash3.productHash((uh, x.scale), a)
+
+      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+      val positiveHash = hash & Int.MaxValue
+      positiveHash % width
+    }
+  }
+
 }

@@ -270,6 +270,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
   implicit val shortMonoid: Monoid[Short] = ShortRing
   implicit val jshortMonoid: Monoid[JShort] = JShortRing
   implicit val bigIntMonoid: Monoid[BigInt] = BigIntRing
+  implicit val bigDecimalMonoid: Monoid[BigDecimal] = BigDecimalRing
   implicit val longMonoid: Monoid[Long] = LongRing
   implicit val jlongMonoid: Monoid[JLong] = JLongRing
   implicit val floatMonoid: Monoid[Float] = FloatField
