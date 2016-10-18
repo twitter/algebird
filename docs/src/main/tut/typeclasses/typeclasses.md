@@ -12,10 +12,11 @@ trait Show[A] {
   def show(f: A): String
 }
 ```
+
 This class says that a value of type `Show[A]` has a way to turn `A`s
 into `String`s. Now we can write a function which is polymorphic on
-some `A`, as long as we have some value of `Show[A]`, so that our function
-can have a way of producing a `String`:
+some `A`, as long as we have some value of `Show[A]`, so that our
+function can have a way of producing a `String`:
 
 ```tut:silent
 def log[A](a: A)(implicit s: Show[A]) = println(s.show(a))
