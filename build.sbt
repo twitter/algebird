@@ -123,6 +123,13 @@ lazy val formattingPreferences = {
     setPreference(PreserveSpaceBeforeArguments, true)
 }
 
+lazy val noPublishSettings = Seq(
+    publish := (),
+    publishLocal := (),
+    test := (),
+    publishArtifact := false
+  )
+
 /**
   * This returns the youngest jar we released that is compatible with
   * the current.
@@ -137,12 +144,9 @@ def youngestForwardCompatible(subProj: String) =
 lazy val algebird = Project(
   id = "algebird",
   base = file("."),
-  settings = sharedSettings ++ DocGen.publishSettings
-  ).settings(
-  test := { },
-  publish := { }, // skip publishing for this root project.
-  publishLocal := { }
-).aggregate(
+  settings = sharedSettings)
+  .settings(noPublishSettings)
+  .aggregate(
   algebirdTest,
   algebirdCore,
   algebirdUtil,
@@ -207,3 +211,53 @@ lazy val algebirdSpark = module("spark").settings(
   libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided"
 ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
+lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
+
+lazy val docSettings = Seq(
+  micrositeName := "Cats",
+  micrositeDescription := "Lightweight, modular, and extensible library for functional programming",
+  micrositeAuthor := "Typelevel contributors",
+  micrositeHighlightTheme := "atom-one-light",
+  micrositeHomepage := "http://typelevel.org/cats",
+  micrositeBaseUrl := "cats",
+  micrositeDocumentationUrl := "api",
+  micrositeGithubOwner := "typelevel",
+  micrositeExtraMdFiles := Map(file("CONTRIBUTING.md") -> "contributing.md"),
+  micrositeGithubRepo := "cats",
+  micrositePalette := Map(
+    "brand-primary" -> "#5B5988",
+    "brand-secondary" -> "#292E53",
+    "brand-tertiary" -> "#222749",
+    "gray-dark" -> "#49494B",
+    "gray" -> "#7B7B7E",
+    "gray-light" -> "#E5E5E6",
+    "gray-lighter" -> "#F4F3F4",
+    "white-color" -> "#FFFFFF"),
+  autoAPIMappings := true,
+  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+    inProjects(docsSourcesAndProjects(scalaVersion.value)._2:_*),
+  docsMappingsAPIDir := "api",
+  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+  ghpagesNoJekyll := false,
+  fork in tut := true,
+  fork in (ScalaUnidoc, unidoc) := true,
+  scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
+    "-Xfatal-warnings",
+    "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
+    "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
+    "-diagrams"
+  ),
+  git.remoteRepo := "git@github.com:typelevel/cats.git",
+  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
+)
+
+lazy val docs = project
+  .enablePlugins(MicrositesPlugin)
+  .settings(moduleName := "algebird-docs")
+  .settings(catsSettings)
+  .settings(noPublishSettings)
+  .settings(unidocSettings)
+  .settings(ghpages.settings)
+  .settings(docSettings)
+  .settings(tutScalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
+  .dependsOn(algebirdCore)

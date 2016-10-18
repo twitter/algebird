@@ -5,7 +5,6 @@ import Keys._
 
 import com.typesafe.sbt.git.GitRunner
 import com.typesafe.sbt.SbtGit.GitKeys
-import com.typesafe.sbt.SbtSite.{ site, SiteKeys }
 import com.typesafe.sbt.SbtGhPages.{ ghpages, GhPagesKeys => ghkeys }
 import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
 
@@ -39,5 +38,5 @@ object DocGen {
       ghkeys.synchLocal <<= syncLocal
     )
 
-  lazy val publishSettings = site.settings ++ Unidoc.settings ++ ghpages.settings ++ unidocSettings
+  lazy val publishSettings = Unidoc.settings ++ ghpages.settings ++ unidocSettings
 }
