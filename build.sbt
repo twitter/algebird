@@ -1,9 +1,11 @@
 import ReleaseTransformations._
 import algebird._
 import com.typesafe.sbt.SbtScalariform._
+import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
+import sbtunidoc.Plugin.UnidocKeys._
 import scalariform.formatter.preferences._
 
 val paradiseVersion = "2.1.0"
@@ -19,6 +21,24 @@ def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
 }
 
 def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.10"
+
+/**
+  * Remove 2.10 projects from doc generation, as the macros used in the projects
+  * cause problems generating the documentation on scala 2.10. As the APIs for 2.10
+  * and 2.11 are the same this has no effect on the resultant documentation, though
+  * it does mean that the scaladocs cannot be generated when the build is in 2.10 mode.
+  */
+def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
+  CrossVersion.partialVersion(sv) match {
+    case Some((2, 10)) => (false, Nil)
+    case _ => (true, Seq(
+      algebirdTest,
+      algebirdCore,
+      algebirdUtil,
+      algebirdBijection,
+      algebirdBenchmark,
+      algebirdSpark))
+  }
 
 val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
   organization := "com.twitter",
@@ -214,16 +234,16 @@ lazy val algebirdSpark = module("spark").settings(
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
 lazy val docSettings = Seq(
-  micrositeName := "Cats",
-  micrositeDescription := "Lightweight, modular, and extensible library for functional programming",
-  micrositeAuthor := "Typelevel contributors",
+  micrositeName := "Algebird",
+  micrositeDescription := "Abstract Algebra for Scala.",
+  micrositeAuthor := "Algebird's contributors",
   micrositeHighlightTheme := "atom-one-light",
-  micrositeHomepage := "http://typelevel.org/cats",
-  micrositeBaseUrl := "cats",
+  micrositeHomepage := "http://twitter.github.io/algebird",
+  micrositeBaseUrl := "algebird",
   micrositeDocumentationUrl := "api",
-  micrositeGithubOwner := "typelevel",
+  micrositeGithubOwner := "twitter",
   micrositeExtraMdFiles := Map(file("CONTRIBUTING.md") -> "contributing.md"),
-  micrositeGithubRepo := "cats",
+  micrositeGithubRepo := "algebird",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
     "brand-secondary" -> "#292E53",
@@ -242,19 +262,20 @@ lazy val docSettings = Seq(
   fork in tut := true,
   fork in (ScalaUnidoc, unidoc) := true,
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
-    "-Xfatal-warnings",
-    "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
+    "-doc-source-url", "https://github.com/twitter/algebird/tree/master€{FILE_PATH}.scala",
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
     "-diagrams"
   ),
-  git.remoteRepo := "git@github.com:typelevel/cats.git",
+  git.remoteRepo := "git@github.com:twitter/algebird.git",
   includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
 )
 
+// Documentation is generated for projects defined in
+// `docsSourcesAndProjects`.
 lazy val docs = project
   .enablePlugins(MicrositesPlugin)
   .settings(moduleName := "algebird-docs")
-  .settings(catsSettings)
+  .settings(sharedSettings)
   .settings(noPublishSettings)
   .settings(unidocSettings)
   .settings(ghpages.settings)

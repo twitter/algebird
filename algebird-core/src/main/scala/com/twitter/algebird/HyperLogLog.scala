@@ -21,10 +21,9 @@ import java.nio.ByteBuffer
 /** A super lightweight (hopefully) version of BitSet */
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
-    /**
-     * Pretend 'in' is little endian so that the bitstring b0b1b2b3 is such that if b0 == 1, then
-     *  0 is in the bitset, if b1 == 1, then 1 is in the bitset.
-     */
+    // Pretend 'in' is little endian so that the bitstring b0b1b2b3 is
+    // such that if b0 == 1, then 0 is in the bitset, if b1 == 1, then
+    // 1 is in the bitset.
     val arrayIdx = x / 8
     val remainder = x % 8
     ((in(arrayIdx) >> (7 - remainder)) & 1) == 1
@@ -33,7 +32,8 @@ case class BitSetLite(in: Array[Byte]) {
 
 /**
  * Implementation of the HyperLogLog approximate counting as a Monoid
- * @link http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
+ *
+ * @see [[http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf]]
  *
  * HyperLogLog: the analysis of a near-optimal cardinality estimation algorithm
  * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
