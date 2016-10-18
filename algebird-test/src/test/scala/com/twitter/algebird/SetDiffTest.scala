@@ -7,88 +7,88 @@ import org.scalatest.prop.Checkers
 
 import Arbitrary.arbitrary
 
-object DiffTest {
-  implicit def arbDiff[T: Arbitrary]: Arbitrary[Diff[T]] =
-    Arbitrary(arbitrary[(Set[T], Set[T])].map { case (a, b) => Diff.of(a, b) })
+object SetDiffTest {
+  implicit def arbSetDiff[T: Arbitrary]: Arbitrary[SetDiff[T]] =
+    Arbitrary(arbitrary[(Set[T], Set[T])].map { case (a, b) => SetDiff.of(a, b) })
 }
 
-class DiffTest extends WordSpec with Matchers with Checkers {
-  import DiffTest._
+class SetDiffTest extends WordSpec with Matchers with Checkers {
+  import SetDiffTest._
 
-  "Diff" should {
+  "SetDiff" should {
     "be a monoid" in {
-      check(BaseProperties.monoidLaws[Diff[Int]])
+      check(BaseProperties.monoidLaws[SetDiff[Int]])
     }
     "be idempotent" in {
-      check { (d: Diff[Int]) =>
+      check { (d: SetDiff[Int]) =>
         d.merge(d) == d
       }
     }
 
     /**
      * This is the core law, along with associativity that allows
-     * us to reason about set Diffs.
+     * us to reason about set SetDiffs.
      */
-    "Diffs are the same as updating the set" in {
+    "SetDiffs are the same as updating the set" in {
       check { (init: Set[Int], items: List[Either[Int, Int]]) =>
         val updated = items.foldLeft(init) {
           case (s, Left(i)) => s - i
           case (s, Right(i)) => s + i
         }
         val diff = Monoid.sum(items.map {
-          case Left(i) => Diff.remove(i)
-          case Right(i) => Diff.add(i)
+          case Left(i) => SetDiff.remove(i)
+          case Right(i) => SetDiff.add(i)
         })
         updated == diff(init)
       }
     }
-    "+ is the same as Diff.add" in {
-      check { (d: Diff[Int], inc: Int) =>
-        d + inc == (d merge (Diff.add(inc)))
+    "+ is the same as SetDiff.add" in {
+      check { (d: SetDiff[Int], inc: Int) =>
+        d + inc == (d merge (SetDiff.add(inc)))
       }
     }
-    "- is the same as Diff.remove" in {
-      check { (d: Diff[Int], dec: Int) =>
-        d - dec == (d merge (Diff.remove(dec)))
+    "- is the same as SetDiff.remove" in {
+      check { (d: SetDiff[Int], dec: Int) =>
+        d - dec == (d merge (SetDiff.remove(dec)))
       }
     }
-    "++ is the same as Diff.addAll" in {
-      check { (d: Diff[Int], inc: Set[Int]) =>
-        d ++ inc == (d merge (Diff.addAll(inc)))
+    "++ is the same as SetDiff.addAll" in {
+      check { (d: SetDiff[Int], inc: Set[Int]) =>
+        d ++ inc == (d merge (SetDiff.addAll(inc)))
       }
     }
-    "-- is the same as Diff.removeAll" in {
-      check { (d: Diff[Int], dec: Set[Int]) =>
-        d -- dec == (d merge (Diff.removeAll(dec)))
+    "-- is the same as SetDiff.removeAll" in {
+      check { (d: SetDiff[Int], dec: Set[Int]) =>
+        d -- dec == (d merge (SetDiff.removeAll(dec)))
       }
     }
     "+ then - is the same as -" in {
       check { (i: Int) =>
-        (Diff.add(i) merge Diff.remove(i)) == Diff.remove(i)
+        (SetDiff.add(i) merge SetDiff.remove(i)) == SetDiff.remove(i)
       }
     }
     "- then + is the same as +" in {
       check { (i: Int) =>
-        (Diff.remove(i) merge Diff.add(i)) == Diff.add(i)
+        (SetDiff.remove(i) merge SetDiff.add(i)) == SetDiff.add(i)
       }
     }
 
     "apply diffs between sets" in {
       check { (oldSet: Set[String], newSet: Set[String]) =>
-        Diff.of(oldSet, newSet)(oldSet) == newSet
+        SetDiff.of(oldSet, newSet)(oldSet) == newSet
       }
     }
 
     "create proper diffs" in {
       check { (oldSet: Set[String], newSet: Set[String]) =>
-        val diff = Diff.of(oldSet, newSet)
+        val diff = SetDiff.of(oldSet, newSet)
         (diff.add &~ newSet).isEmpty && (diff.remove & newSet).isEmpty
       }
     }
 
     "never intersect the add and remove sets by construction" in {
       check { (ops: List[Either[Int, Int]]) =>
-        val built = ops.foldLeft(Diff.empty[Int]) {
+        val built = ops.foldLeft(SetDiff.empty[Int]) {
           case (diff, Left(remove)) => diff - remove
           case (diff, Right(add)) => diff + add
         }
@@ -97,13 +97,13 @@ class DiffTest extends WordSpec with Matchers with Checkers {
     }
 
     "apply distributes over merge" in {
-      check { (init: Set[Int], a: Diff[Int], b: Diff[Int]) =>
+      check { (init: Set[Int], a: SetDiff[Int], b: SetDiff[Int]) =>
         (a merge b)(init) == b(a(init))
       }
     }
 
     "strict application fails if the diff tries to remove extra items" in {
-      check { (set: Set[Int], a: Diff[Int]) =>
+      check { (set: Set[Int], a: SetDiff[Int]) =>
         a.strictApply(set) match {
           case None =>
             ((a.remove diff set).nonEmpty || (a.add & set).nonEmpty) &&
@@ -119,14 +119,14 @@ class DiffTest extends WordSpec with Matchers with Checkers {
       }
     }
     "if diff.invert(diff(a)) == a implies diff.strictApply(a).isDefined" in {
-      check { (a: Set[Int], diff: Diff[Int]) =>
+      check { (a: Set[Int], diff: SetDiff[Int]) =>
         (diff.invert(diff(a)) != a) || diff.strictApply(a).isDefined
       }
     }
 
     "Valid diffs are invertible" in {
       check { (a: Set[Int], b: Set[Int]) =>
-        val diff = Diff.of(a, b)
+        val diff = SetDiff.of(a, b)
         // we know that diff(a) == b from a law above
         a == diff.invert(b)
       }
