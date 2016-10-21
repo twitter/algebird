@@ -148,6 +148,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   implicit val jshortSemigroup: Semigroup[JShort] = JShortRing
   implicit val longSemigroup: Semigroup[Long] = LongRing
   implicit val bigIntSemigroup: Semigroup[BigInt] = BigIntRing
+  implicit val bigDecimalSemigroup: Semigroup[BigDecimal] = BigDecimalRing
   implicit val jlongSemigroup: Semigroup[JLong] = JLongRing
   implicit val floatSemigroup: Semigroup[Float] = FloatField
   implicit val jfloatSemigroup: Semigroup[JFloat] = JFloatField
