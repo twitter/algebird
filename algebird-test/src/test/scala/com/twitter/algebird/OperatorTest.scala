@@ -1,25 +1,24 @@
 package com.twitter.algebird
 
-import org.specs._
+import org.scalatest._
 
 import Operators._
 
-class OperatorTest extends Specification {
-  noDetailedDiffs()
+class OperatorTest extends WordSpec with Matchers {
 
   "Operators" should {
-     "allow plus" in {
-       List(1,2) + List(3,4) must be_==(List(1,2,3,4))
-     }
-     "allow -" in {
-       (1,3) - (2,4) must be_==((-1,-1))
-     }
-     "allow *" in {
-       Map(1 -> 3) * Map(2 -> 4) must be_==(Map[Int,Int]())
-       Map(1 -> 3) * Map(1 -> 4) must be_==(Map(1 -> 12))
-     }
-     "allow /" in {
-       true / true must be_==(true)
-     }
+    "allow plus" in {
+      assert(List(1, 2) + List(3, 4) == List(1, 2, 3, 4))
+    }
+    "allow -" in {
+      assert((1, 3) - (2, 4) == (-1, -1))
+    }
+    "allow *" in {
+      assert(Map(1 -> 3) * Map(2 -> 4) == Map[Int, Int]())
+      assert(Map(1 -> 3) * Map(1 -> 4) == Map(1 -> 12))
+    }
+    "allow /" in {
+      assert(true / true == true)
+    }
   }
 }

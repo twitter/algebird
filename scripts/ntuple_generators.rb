@@ -108,6 +108,26 @@ def get_operation(n, algebraic_structure, operation)
   "override def #{operation}(#{method_params}) = #{values_commaed}"
 end
 
+def get_sumoption(n, bufferSize)
+  # Example: "(T, U)"
+  individual_element_type = "(#{TYPE_SYMBOLS.first(n).join(", ")})"
+  # Example: "items : TraversableOnce[(T, U)]"
+  method_params = "to : TraversableOnce[#{individual_element_type}]"
+  # Example: "tsemigroup.sumOption(items.iterator.map(_._1), "
+  values_commaed = TYPE_SYMBOLS.first(n).each_with_index.map do |t, i|
+    "#{t.downcase}semigroup.sumOption(items.iterator.map(_._#{i+1})).get"
+  end.join(", ")
+
+  "override def sumOption(#{method_params}) = {
+    val buf = new ArrayBufferedOperation[#{individual_element_type}, #{individual_element_type}](#{bufferSize}) with BufferedReduce[#{individual_element_type}] {
+      def operate(items: Seq[#{individual_element_type}]) =
+        (#{values_commaed})
+    }
+    to.foreach(buf.put(_))
+    buf.flush
+  }"
+end
+
 # Example return:
 #   "implicit def pairMonoid[T,U](implicit tg : Monoid[T], ug : Monoid[U]) : Monoid[(T,U)] = {
 #    new Tuple2Monoid[T,U]()(tg,ug)
@@ -134,6 +154,7 @@ def print_class_definitions
 #{get_comment(tuple_size, "semigroup")}
 #{get_class_definition(tuple_size, "semigroup")} {
   #{get_operation(tuple_size, "semigroup", "plus")}
+  #{get_sumoption(tuple_size, 1000)}
 }
 
 #{get_comment(tuple_size, "monoid")}

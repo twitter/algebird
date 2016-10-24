@@ -1,15 +1,13 @@
 package com.twitter.algebird
 
-import org.specs._
+import java.io.{ ByteArrayOutputStream, ObjectOutputStream }
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Properties
-import org.scalacheck.Gen.choose
-import java.io.{ObjectOutputStream, ByteArrayOutputStream}
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.{ Matchers, WordSpec }
+import org.scalacheck.Prop._
 
-object BloomFilterLaws extends Properties("BloomFilter") {
-  import BaseProperties._
+class BloomFilterLaws extends CheckProperties {
+  import com.twitter.algebird.BaseProperties._
 
   val NUM_HASHES = 6
   val WIDTH = 32
@@ -17,15 +15,84 @@ object BloomFilterLaws extends Properties("BloomFilter") {
   implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH)
   implicit val bfGen =
     Arbitrary {
-      for (v <- choose(0, 10000)) yield (bfMonoid.create(v.toString))
+      for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
     }
 
-  property("BloomFilter is a Monoid") = monoidLaws[BF]
+  property("BloomFilter is a Monoid") {
+    monoidLaws[BF]
+  }
 }
 
+class BFHashIndices extends CheckProperties {
+  val NUM_HASHES = 10
+  val WIDTH = 4752800
 
-class BloomFilterTest extends Specification {
-  noDetailedDiffs()
+  implicit val bfHash: Arbitrary[BFHash] =
+    Arbitrary {
+      for {
+        hashes <- Gen.choose(1, 10)
+        width <- Gen.choose(100, 5000000)
+      } yield BFHash(hashes, width)
+    }
+
+  property("Indices are non negative") {
+    forAll { (hash: BFHash, v: Long) =>
+      hash.apply(v.toString).forall { e =>
+        e >= 0
+      }
+    }
+  }
+
+  /**
+   *   This is the version of the BFHash as of before the "negative values fix"
+   */
+  case class NegativeBFHash(numHashes: Int, width: Int) {
+    val size = numHashes
+
+    def apply(s: String) = nextHash(s.getBytes, numHashes)
+
+    private def splitLong(x: Long) = {
+      val upper = math.abs(x >> 32).toInt
+      val lower = math.abs((x << 32) >> 32).toInt
+      (upper, lower)
+    }
+
+    private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
+      if (k == 0)
+        Stream.empty
+      else {
+        val d = if (digested.isEmpty) {
+          val (a, b) = MurmurHash128(k)(bytes)
+          val (x1, x2) = splitLong(a)
+          val (x3, x4) = splitLong(b)
+          Seq(x1, x2, x3, x4)
+        } else
+          digested
+
+        Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
+      }
+    }
+  }
+
+  implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
+    Arbitrary {
+      for {
+        hashes <- Gen.choose(1, 10)
+        width <- Gen.choose(100, 5000000)
+      } yield (BFHash(hashes, width), NegativeBFHash(hashes, width))
+    }
+
+  property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") {
+    forAll { (pair: (BFHash, NegativeBFHash), v: Long) =>
+      val s = v.toString
+      val (hash, negativeHash) = pair
+      val indices = negativeHash.apply(s)
+      indices == hash.apply(s) || indices.exists(_ < 0)
+    }
+  }
+}
+
+class BloomFilterTest extends WordSpec with Matchers {
 
   val RAND = new scala.util.Random
 
@@ -33,40 +100,42 @@ class BloomFilterTest extends Specification {
 
     "identify all true positives" in {
       (0 to 100).foreach{
-        _ => {
-          val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5)+1, RAND.nextInt(64)+32)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = bfMonoid.create(entries: _*)
+        _ =>
+          {
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = bfMonoid.create(entries: _*)
 
-          entries.foreach{
-            i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach{ i =>
+              assert(bf.contains(i.toString).isTrue)
+            }
           }
-        }
       }
     }
 
     "have small false positive rate" in {
       val iter = 10000
 
-      Seq(0.1, 0.01, 0.001).foreach{
-        fpProb => {
+      Seq(0.1, 0.01, 0.001).foreach { fpProb =>
+        {
           val fps = (0 until iter).par.map{
-            _ => {
-              val numEntries = RAND.nextInt(10) + 1
+            _ =>
+              {
+                val numEntries = RAND.nextInt(10) + 1
 
-              val bfMonoid = BloomFilter(numEntries, fpProb)
+                val bfMonoid = BloomFilter(numEntries, fpProb)
 
-              val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
-              val bf = bfMonoid.create(entries.drop(1): _*)
+                val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
+                val bf = bfMonoid.create(entries.drop(1): _*)
 
-              if(bf.contains(entries(0)).isTrue) 1.0 else 0.0
-            }
+                if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
+              }
           }
 
           val observedFpProb = fps.sum / fps.size
 
-          observedFpProb must be_<=(2 * fpProb)
+          assert(observedFpProb <= 2 * fpProb)
         }
       }
     }
@@ -78,24 +147,25 @@ class BloomFilterTest extends Specification {
         val bf = bfMonoid.create(items: _*)
         val size = bf.size
 
-        (size ~ exactCardinality) must be_==(true)
-        size.min must be_<=(size.estimate)
-        size.max must be_>=(size.estimate)
+        assert(size ~ exactCardinality)
+        assert(size.min <= size.estimate)
+        assert(size.max >= size.estimate)
       }
     }
 
     "work as an Aggregator" in {
       (0 to 10).foreach{
-        _ => {
-          val aggregator = BloomFilterAggregator(RAND.nextInt(5)+1, RAND.nextInt(64)+32)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = aggregator(entries)
+        _ =>
+          {
+            val aggregator = BloomFilterAggregator(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = aggregator(entries)
 
-          entries.foreach{
-            i => bf.contains(i.toString).isTrue must be_==(true)
+            entries.foreach { i =>
+              assert(bf.contains(i.toString).isTrue)
+            }
           }
-        }
       }
     }
 
@@ -113,9 +183,52 @@ class BloomFilterTest extends Specification {
       val bf = BloomFilter(10, 0.1).create(items: _*)
       val bytesBeforeSizeCalled = new String(serialize(bf))
       bf.size
-      bf.contains("1").isTrue must be_==(true)
+
+      assert(bf.contains("1").isTrue)
+
       val bytesAfterSizeCalled = new String(serialize(bf))
-      bytesBeforeSizeCalled mustEqual bytesAfterSizeCalled
+      assert(bytesBeforeSizeCalled == bytesAfterSizeCalled)
+    }
+
+    /**
+     * this test failed before the fix for https://github.com/twitter/algebird/issues/229
+     */
+    "not have negative hash values" in {
+      val NUM_HASHES = 2
+      val WIDTH = 4752800
+      val bfHash = BFHash(NUM_HASHES, WIDTH)
+      val s = "7024497610539761509"
+      val index = bfHash.apply(s).head
+
+      assert(index >= 0)
     }
   }
+
+  "BloomFilter method `checkAndAdd`" should {
+
+    "be identical to method `+`" in {
+      (0 to 100).foreach {
+        _ =>
+          {
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val numEntries = 5
+            val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+            val bf = bfMonoid.create(entries: _*)
+            val bfWithCheckAndAdd = entries
+              .map { entry => (entry, bfMonoid.create(entry)) }
+              .foldLeft((bfMonoid.zero, bfMonoid.zero)) {
+                case ((left, leftAlt), (entry, right)) =>
+                  val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
+                  left.contains(entry) shouldBe contained
+                  (left + entry, newLeftAlt)
+              }
+
+            entries.foreach { i =>
+              assert(bf.contains(i.toString).isTrue)
+            }
+          }
+      }
+    }
+  }
+
 }

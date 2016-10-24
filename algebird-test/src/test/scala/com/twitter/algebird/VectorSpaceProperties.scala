@@ -16,11 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck._
-import org.scalacheck.Prop._
-
-object VectorSpaceProperties extends Properties("ScalingOperator") {
-  import BaseVectorSpaceProperties._
+class VectorSpaceProperties extends CheckProperties {
+  import com.twitter.algebird.BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait
   def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) = {
@@ -34,5 +31,7 @@ object VectorSpaceProperties extends Properties("ScalingOperator") {
     }
   }
 
-  property("map int double scaling") = vectorSpaceLaws[Double,({type x[a]=Map[Int, a]})#x](mapEqFn(_, _))
+  property("map int double scaling") {
+    vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
+  }
 }

@@ -25,17 +25,14 @@ package com.twitter.algebird
  * Law 2: isFlushed == flush.isEmpty
  * @author Oscar Boykin
  */
-trait StatefulSummer[V] extends java.io.Serializable {
+trait StatefulSummer[V] extends Buffered[V, V] {
   def semigroup: Semigroup[V]
-  // possibly emit a partially summed value
-  def put(item: V): Option[V]
-  // All state is reset at this point and return the rest of the sum
-  def flush: Option[V]
-  def isFlushed: Boolean
 }
 
-/** Sum the entire iterator one item at a time. Only emits on flush
-*/
+/**
+ * Sum the entire iterator one item at a time. Only emits on flush
+ * you should probably prefer BufferedSumAll
+ */
 class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
   var summed: Option[V] = None
   def put(item: V) = {
@@ -48,4 +45,12 @@ class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulS
     res
   }
   def isFlushed = summed.isEmpty
+}
+
+class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V])
+  extends ArrayBufferedOperation[V, V](size)
+  with StatefulSummer[V]
+  with BufferedReduce[V] {
+
+  def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
 }

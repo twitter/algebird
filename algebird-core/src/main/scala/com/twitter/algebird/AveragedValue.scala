@@ -18,14 +18,16 @@ package com.twitter.algebird
 
 object AveragedValue {
   implicit val group = AveragedGroup
-  implicit val aggregator: Aggregator[Double,AveragedValue,Double] = Averager
+  def aggregator: Aggregator[Double, AveragedValue, Double] = Averager
+  def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
+    Aggregator.prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
+      .andThenPresent(_.value)
 
-  def apply[V <% Double](v : V) = new AveragedValue(1L, v)
-  def apply[V <% Double](c : Long, v : V) = new AveragedValue(c, v)
+  def apply[V <% Double](v: V) = new AveragedValue(1L, v)
+  def apply[V <% Double](c: Long, v: V) = new AveragedValue(c, v)
 }
 
-
-case class AveragedValue(count : Long, value : Double)
+case class AveragedValue(count: Long, value: Double)
 
 object AveragedGroup extends Group[AveragedValue] {
   // When combining averages, if the counts sizes are too close we should use a different
@@ -33,38 +35,36 @@ object AveragedGroup extends Group[AveragedValue] {
   // can be:
   private val STABILITY_CONSTANT = 0.1
   /**
-   * uses a more stable online algorithm which should
+   * Uses a more stable online algorithm which should
    * be suitable for large numbers of records
    * similar to:
    * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
    */
   val zero = AveragedValue(0L, 0.0)
 
-  override def isNonZero(av : AveragedValue) = (av.count != 0L)
+  override def isNonZero(av: AveragedValue) = (av.count != 0L)
 
-  override def negate(av : AveragedValue) = AveragedValue(-av.count, av.value)
+  override def negate(av: AveragedValue) = AveragedValue(-av.count, av.value)
 
-  def plus(cntAve1 : AveragedValue, cntAve2 : AveragedValue) : AveragedValue = {
+  def plus(cntAve1: AveragedValue, cntAve2: AveragedValue): AveragedValue = {
     val (big, small) = if (cntAve1.count >= cntAve2.count)
-        (cntAve1, cntAve2)
-      else
-        (cntAve2, cntAve1)
+      (cntAve1, cntAve2)
+    else
+      (cntAve2, cntAve1)
     val n = big.count
     val k = small.count
     val newCnt = n + k
     if (newCnt == n) {
       // Handle zero without allocation
       big
-    }
-    else if (newCnt == 0L) {
+    } else if (newCnt == 0L) {
       zero
-    }
-    else {
+    } else {
       val an = big.value
       val ak = small.value
-      val scaling = k.toDouble/newCnt
+      val scaling = k.toDouble / newCnt
       // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-      val newAve = if (scaling < STABILITY_CONSTANT) (an + (ak - an)*scaling) else (n*an + k*ak)/newCnt
+      val newAve = if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling) else (n * an + k * ak) / newCnt
       new AveragedValue(newCnt, newAve)
     }
   }
@@ -72,6 +72,6 @@ object AveragedGroup extends Group[AveragedValue] {
 
 object Averager extends MonoidAggregator[Double, AveragedValue, Double] {
   val monoid = AveragedGroup
-  def prepare(value : Double) = AveragedValue(value)
-  def present(average : AveragedValue) = average.value
+  def prepare(value: Double) = AveragedValue(value)
+  def present(average: AveragedValue) = average.value
 }

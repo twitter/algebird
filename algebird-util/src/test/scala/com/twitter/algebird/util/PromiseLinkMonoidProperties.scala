@@ -16,13 +16,10 @@ limitations under the License.
 package com.twitter.algebird.util
 
 import com.twitter.algebird._
-import com.twitter.util.{ Await, Future }
-import scala.util.Random
-import org.scalacheck.{ Arbitrary, Properties }
-import scala.annotation.tailrec
+import org.scalacheck.Prop._
 
-object PromiseLinkMonoidProperties extends Properties("PromiseLinkMonoids") {
-	property("associative") = {
+class PromiseLinkMonoidProperties extends CheckProperties {
+  property("associative") {
     def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
     def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
       finalTunnel.completeWithStartingValue(toFeed)

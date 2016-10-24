@@ -38,27 +38,27 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 object SummingQueue {
-  def apply[V:Semigroup](cap: Int): SummingQueue[V] = new SummingQueue(cap)
+  def apply[V: Semigroup](cap: Int): SummingQueue[V] = new SummingQueue(cap)
 }
 
 class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: Semigroup[V])
-  extends (V => Option[V]) with StatefulSummer[V] {
+  extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
 
-  /** puts an item to the queue, optionally sums up the queue and returns value
+  /**
+   * puts an item to the queue, optionally sums up the queue and returns value
    * This never blocks interally. It uses offer. If the queue is full, we drain,
    * sum the queue.
    */
   final def put(item: V): Option[V] =
     if (queueOption.isDefined) {
       queueOption.flatMap { queue =>
-        if(!queue.offer(item)) {
+        if (!queue.offer(item)) {
           // Queue is full, do the work:
           Monoid.plus(flush, Some(item))
-        }
-        else {
+        } else {
           // We are in the queue
           None
         }
@@ -67,7 +67,8 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
 
   def apply(v: V): Option[V] = put(v)
 
-  /** drain the queue and return the sum. If empty, return None
+  /**
+   * drain the queue and return the sum. If empty, return None
    */
   def flush: Option[V] = {
     queueOption.flatMap { queue =>

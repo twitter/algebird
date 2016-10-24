@@ -16,12 +16,13 @@ limitations under the License.
 
 package com.twitter.algebird
 
-/** Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
+/**
+ * Note that this works similar to Semigroup[Map[Int,T]] not like Semigroup[List[T]]
  * This does element-wise operations, like standard vector math, not concatenation,
  * like Semigroup[String] or Semigroup[List[T]]
  *
  * If l.size != r.size, then only sums the elements up to the index min(l.size, r.size); appends
- * the remaineder to the result.
+ * the remainder to the result.
  */
 class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
 
@@ -29,12 +30,12 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
     // We need summands to be the same length
     val (leftSummand, rightSummand, remainder) = if (left.size > right.size) {
       (left.view(0, right.size),
-       right,
-       left.view(right.size, left.size))
+        right,
+        left.view(right.size, left.size))
     } else {
       (left,
-      right.view(0, left.size),
-      right.view(left.size, right.size))
+        right.view(0, left.size),
+        right.view(left.size, right.size))
     }
 
     val sum = leftSummand
@@ -45,8 +46,7 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
   }
 }
 
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with
-  Monoid[IndexedSeq[T]] {
+class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) =
     v.exists { t => mont.isNonZero(t) }

@@ -15,8 +15,7 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import java.lang.{Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool}
-import java.util.{List => JList, Map => JMap}
+import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 
 import scala.annotation.implicitNotFound
 /**
@@ -25,14 +24,29 @@ import scala.annotation.implicitNotFound
  *  - additive identity aka zero
  *  - addition
  *  - multiplication
+ *
+ *
+ *  Note, if you have distributive property, additive inverses, and multiplicative identity you
+ *  can prove you have a commutative group under the ring:
+ *
+ *  1. (a + 1)*(b + 1) = a(b + 1) + (b + 1)
+ *  2.                 = ab + a + b + 1
+ *  3. or:
+ *  4.
+ *  5.                 = (a + 1)b + (a + 1)
+ *  6.                 = ab + b + a + 1
+ *  7.
+ *  8. So: ab + a + b + 1 == ab + b + a + 1
+ *  9.   using the fact that -(ab) and -1 exist, we get:
+ * 10. a + b == b + a
  */
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
-trait Ring[@specialized(Int,Long,Float,Double) T] extends Group[T] {
-  def one : T // Multiplicative identity
-  def times(l : T, r : T) : T
+trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] {
+  def one: T // Multiplicative identity
+  def times(l: T, r: T): T
   // Left product: (((a * b) * c) * d)
-  def product(iter : TraversableOnce[T]): T = Ring.product(iter)(this)
+  def product(iter: TraversableOnce[T]): T = Ring.product(iter)(this)
 }
 
 // For Java interop so they get the default methods
@@ -50,42 +64,42 @@ class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
 object IntRing extends Ring[Int] {
   override def zero = 0
   override def one = 1
-  override def negate(v : Int) = -v
-  override def plus(l : Int, r : Int) = l + r
-  override def minus(l : Int, r : Int) = l - r
-  override def times(l : Int, r : Int) = l * r
+  override def negate(v: Int) = -v
+  override def plus(l: Int, r: Int) = l + r
+  override def minus(l: Int, r: Int) = l - r
+  override def times(l: Int, r: Int) = l * r
 }
 
 object ShortRing extends Ring[Short] {
   override def zero = 0.toShort
   override def one = 1.toShort
-  override def negate(v : Short) = (-v).toShort
-  override def plus(l : Short, r : Short) = (l + r).toShort
-  override def minus(l : Short, r : Short) = (l - r).toShort
-  override def times(l : Short, r : Short) = (l * r).toShort
+  override def negate(v: Short) = (-v).toShort
+  override def plus(l: Short, r: Short) = (l + r).toShort
+  override def minus(l: Short, r: Short) = (l - r).toShort
+  override def times(l: Short, r: Short) = (l * r).toShort
 }
 
 object LongRing extends Ring[Long] {
   override def zero = 0L
   override def one = 1L
-  override def negate(v : Long) = -v
-  override def plus(l : Long, r : Long) = l + r
-  override def minus(l : Long, r : Long) = l - r
-  override def times(l : Long, r : Long) = l * r
+  override def negate(v: Long) = -v
+  override def plus(l: Long, r: Long) = l + r
+  override def minus(l: Long, r: Long) = l - r
+  override def times(l: Long, r: Long) = l * r
 }
 
 object BigIntRing extends NumericRing[BigInt]
 
 object Ring extends GeneratedRingImplicits with ProductRings {
   // This pattern is really useful for typeclasses
-  def one[T](implicit rng : Ring[T]) = rng.one
-  def times[T](l : T, r : T)(implicit rng : Ring[T]) = rng.times(l,r)
+  def one[T](implicit rng: Ring[T]) = rng.one
+  def times[T](l: T, r: T)(implicit rng: Ring[T]) = rng.times(l, r)
   def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] =
     Monoid.from[T](ring.one)(ring.times _)
   // Left product: (((a * b) * c) * d)
-  def product[T](iter : TraversableOnce[T])(implicit ring : Ring[T]) = {
+  def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) = {
     // avoid touching one unless we need to (some items are pseudo-rings)
-    if(iter.isEmpty) ring.one
+    if (iter.isEmpty) ring.one
     else iter.reduceLeft(ring.times _)
   }
   // If the ring doesn't have a one, or you want to distinguish empty cases:
@@ -93,20 +107,20 @@ object Ring extends GeneratedRingImplicits with ProductRings {
     it.reduceLeftOption(rng.times _)
 
   implicit def numericRing[T: Numeric]: Ring[T] = new NumericRing[T]
-  implicit val boolRing : Ring[Boolean] = BooleanField
-  implicit val jboolRing : Ring[JBool] = JBoolField
-  implicit val intRing : Ring[Int] = IntRing
-  implicit val jintRing : Ring[JInt] = JIntRing
-  implicit val shortRing : Ring[Short] = ShortRing
-  implicit val jshortRing : Ring[JShort] = JShortRing
-  implicit val longRing : Ring[Long] = LongRing
-  implicit val bigIntRing : Ring[BigInt] = BigIntRing
-  implicit val jlongRing : Ring[JLong] = JLongRing
-  implicit val floatRing : Ring[Float] = FloatField
-  implicit val jfloatRing : Ring[JFloat] = JFloatField
-  implicit val doubleRing : Ring[Double] = DoubleField
-  implicit val jdoubleRing : Ring[JDouble] = JDoubleField
-  implicit def indexedSeqRing[T:Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
-  implicit def mapRing[K,V](implicit ring : Ring[V]) = new MapRing[K,V]()(ring)
-  implicit def scMapRing[K,V](implicit ring : Ring[V]) = new ScMapRing[K,V]()(ring)
+  implicit val boolRing: Ring[Boolean] = BooleanField
+  implicit val jboolRing: Ring[JBool] = JBoolField
+  implicit val intRing: Ring[Int] = IntRing
+  implicit val jintRing: Ring[JInt] = JIntRing
+  implicit val shortRing: Ring[Short] = ShortRing
+  implicit val jshortRing: Ring[JShort] = JShortRing
+  implicit val longRing: Ring[Long] = LongRing
+  implicit val bigIntRing: Ring[BigInt] = BigIntRing
+  implicit val jlongRing: Ring[JLong] = JLongRing
+  implicit val floatRing: Ring[Float] = FloatField
+  implicit val jfloatRing: Ring[JFloat] = JFloatField
+  implicit val doubleRing: Ring[Double] = DoubleField
+  implicit val jdoubleRing: Ring[JDouble] = JDoubleField
+  implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
+  implicit def mapRing[K, V](implicit ring: Ring[V]) = new MapRing[K, V]()(ring)
+  implicit def scMapRing[K, V](implicit ring: Ring[V]) = new ScMapRing[K, V]()(ring)
 }

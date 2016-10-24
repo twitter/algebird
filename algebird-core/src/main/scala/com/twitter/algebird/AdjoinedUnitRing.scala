@@ -46,7 +46,7 @@ class AdjoinedUnitRing[T](implicit ring: Ring[T]) extends Ring[AdjoinedUnit[T]] 
     AdjoinedUnit(left.ones - right.ones, ring.minus(left.get, right.get))
 
   def times(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) = {
-    // (n1, g1) * (n1, g2) = (n1*n2, (n2*g1) + (n2*g1) + g1*g2))
+    // (n1, g1) * (n2, g2) = (n1*n2, (n1*g1) + (n2*g1) + (g1*g2))
     import Group.intTimes
 
     val ones = left.ones * right.ones
