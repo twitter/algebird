@@ -52,49 +52,47 @@ object ApproximateProperty {
       }
 
   def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop =
-    new Prop {
-      def apply(params: Gen.Parameters) = {
-        require(0 <= falsePositiveRate && falsePositiveRate <= 1)
+    Prop { params: Gen.Parameters =>
+      require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
-        val list = successesAndProbabilities(a, objectReps, inputReps)
-        val n = list.length
+      val list = successesAndProbabilities(a, objectReps, inputReps)
+      val n = list.length
 
-        val monoid = implicitly[Monoid[(Int, Double, List[String])]]
-        val (successes, sumOfProbabilities, exacts) = monoid.sum(list)
+      val monoid = implicitly[Monoid[(Int, Double, List[String])]]
+      val (successes, sumOfProbabilities, exacts) = monoid.sum(list)
 
-        // Computed from Hoeffding's inequality, might be inaccurate
-        // TODO Make sure this is correct
-        val diff = scala.math.sqrt(-n * scala.math.log(falsePositiveRate) / 2.0)
+      // Computed from Hoeffding's inequality, might be inaccurate
+      // TODO Make sure this is correct
+      val diff = scala.math.sqrt(-n * scala.math.log(falsePositiveRate) / 2.0)
 
-        val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
+      val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
 
-        // Args that get printed when Scalacheck runs the test
-        val argsList: List[(String, String)] = {
-          val results = List(("Successes", s"$successes (out of $n)"),
-            ("Expected successes", "%.2f".format(sumOfProbabilities)),
-            ("Required successes", "%.2f".format(sumOfProbabilities - diff)))
+      // Args that get printed when Scalacheck runs the test
+      val argsList: List[(String, String)] = {
+        val results = List(("Successes", s"$successes (out of $n)"),
+          ("Expected successes", "%.2f".format(sumOfProbabilities)),
+          ("Required successes", "%.2f".format(sumOfProbabilities - diff)))
 
-          val exampleFailures =
-            if (success == Prop.False)
-              List(("Example failures:\n  >", exacts.take(5).mkString("\n  >")))
-            else List()
+        val exampleFailures =
+          if (success == Prop.False)
+            List(("Example failures:\n  >", exacts.take(5).mkString("\n  >")))
+          else List()
 
-          val zeroProbTests = objectReps * inputReps - n
-          val testsReturnedZeroProb =
-            if (zeroProbTests > 0) {
-              List(("Omitted results", s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."))
-            } else List()
+        val zeroProbTests = objectReps * inputReps - n
+        val testsReturnedZeroProb =
+          if (zeroProbTests > 0) {
+            List(("Omitted results", s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."))
+          } else List()
 
-          results ++ exampleFailures ++ testsReturnedZeroProb
-        }
-
-        val args = argsList.map {
-          case (name, value) =>
-            Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
-        }
-
-        Prop.Result(success, args = args)
+        results ++ exampleFailures ++ testsReturnedZeroProb
       }
+
+      val args = argsList.map {
+        case (name, value) =>
+          Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
+      }
+
+      Prop.Result(success, args = args)
     }
 
   /**
@@ -122,6 +120,6 @@ object ApproximateProperty {
  * the scalacheck property is run exactly once.
  */
 abstract class ApproximateProperties(name: String) extends Properties(name) {
-  def overrideParameters(p: Test.Parameters): Test.Parameters =
+  override def overrideParameters(p: Test.Parameters): Test.Parameters =
     p.withMinSuccessfulTests(1)
 }
