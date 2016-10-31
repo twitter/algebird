@@ -64,7 +64,7 @@ case class ExpHist(conf: ExpHist.Config, timestamps: Vector[Long], sizes: Vector
       copy(
         time = newTime,
         timestamps = filtered,
-        sizes = Canonical.dropBiggest(bucketsDropped, sizes))
+        sizes = Canonical.dropBiggest(bucketsDropped, sizes.reverse).reverse)
     }
 
   // Efficient implementation of add. To make this solid we'll want to
@@ -225,13 +225,13 @@ object Canonical {
    * representation.)
    */
   @tailrec def dropBiggest(bucketsToDrop: Int, canonical: Vector[Int]): Vector[Int] =
-    (canonical, bucketsToDrop) match {
-      case (l, 0) => l
-      case (l @ (init :+ last), toDrop) =>
-        (toDrop - last) match {
-          case 0 => init
-          case x if x < 0 => init :+ -x
-          case x if x > 0 => dropBiggest(x, init)
+    (bucketsToDrop, canonical) match {
+      case (0, l) => l
+      case (toDrop, count +: tail) =>
+        (toDrop - count) match {
+          case 0 => tail
+          case x if x < 0 => -x +: tail
+          case x if x > 0 => dropBiggest(x, tail)
         }
       case _ => Vector.empty[Int]
     }
@@ -243,12 +243,15 @@ object Canonical {
    *         an element wasn't fully consumed, the remainder will be
    *         stuck back onto the head.
    */
-  @tailrec def drop[T](x: Long, input: Vector[(Long, T)]): Vector[(Long, T)] = {
-    val (count, t) +: tail = input
-    (x - count) match {
-      case 0 => tail
-      case x if x < 0 => (-x, t) +: tail
-      case x if x > 0 => drop(x, tail)
+  @tailrec def drop[T](x: Long, input: Vector[(Long, T)]): Vector[(Long, T)] =
+    (x, input) match {
+      case (0, input) => input
+      case (toDrop, (count, t) +: tail) =>
+        (toDrop - count) match {
+          case 0 => tail
+          case x if x < 0 => (-x, t) +: tail
+          case x if x > 0 => drop(x, tail)
+        }
+      case _ => Vector.empty[(Long, T)]
     }
-  }
 }
