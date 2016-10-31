@@ -1,19 +1,163 @@
 package com.twitter.algebird
 
+import java.lang.{ Long => JLong }
+import scala.annotation.tailrec
+
 /**
  * Exponential Histogram algorithm from
  * http://ilpubs.stanford.edu:8090/504/1/2001-34.pdf.
- *
- *
- * Next step - code up the l-canonical representation of numbers,
- * then do some of the fancier business in the paper!
  */
-
 object ExpHist {
-  private[this] def log2(i: Float): Double = math.log(i) / math.log(2)
+  import Canonical.Exp2
 
-  def minBuckets(k: Int) = math.ceil(k / 2.0).toInt
-  def maxBuckets(k: Int) = minBuckets(k) + 1
+  // Same as math.ceil(x / 2.0).toInt
+  def div2Ceil(x: Int): Int = (x >> 1) + (if ((x & 1) == 0) 0 else 1)
+
+  case class Config(epsilon: Double, windowSize: Long) {
+    val l: Int = div2Ceil(math.ceil(1 / epsilon).toInt)
+
+    // Returns the last timestamp before the window. any ts <= [the
+    // returned timestamp] is outside the window.
+    def expiration(currTime: Long): Long = currTime - windowSize
+  }
+
+  def empty(conf: Config): ExpHist = ExpHist(conf, Vector.empty, Vector.empty, 0L)
+
+  def from(i: Long, ts: Long, conf: Config): ExpHist = {
+    val sizes = Canonical.fromLong(i, conf.l)
+    ExpHist(conf, Vector.fill(sizes.sum)(ts), sizes, ts)
+  }
+
+  /**
+   * Takes a vector of timestamps sorted in descending order (newest
+   * first) and a cutoff and returns a vector containing only
+   * timestamps AFTER the cutoff.
+   */
+  def dropExpired(timestamps: Vector[Long], cutoff: Long): Vector[Long] =
+    timestamps.reverse.dropWhile(_ <= cutoff).reverse
+
+  /**
+   * @param x total count to remove from the head of `input`.
+   * @param input pairs of (count, T).
+   * @return Vector with x total items removed from the head; if
+   *         an element wasn't fully consumed, the remainder will be
+   *         stuck back onto the head.
+   */
+  @tailrec private[this] def take[T](x: Long, input: Vector[(Long, T)]): Vector[(Long, T)] = {
+    val (count, t) +: tail = input
+    (x - count) match {
+      case 0 => tail
+      case x if x < 0 => (-x, t) +: tail
+      case x if x > 0 => take(x, tail)
+    }
+  }
+
+  @tailrec def take2[T](x: Long, input: Vector[T])(from: T => Long)(to: (Long, T) => T): Vector[T] = {
+    val head +: tail = input
+    val count = from(head)
+    (x - count) match {
+      case 0 => tail
+      case x if x < 0 => to(-x, head) +: tail
+      case x if x > 0 => take2(x, tail)(from)(to)
+    }
+  }
+
+  /**
+   * Rebuckets the vector of inputs into buckets of the supplied
+   * sequence of sizes. Returns only the associated `T` information
+   * (timestamp, for example).
+   */
+  def rebucket[T](v: Vector[(Long, T)], buckets: Vector[Exp2]): Vector[T] = {
+    if (buckets.isEmpty) Vector.empty
+    else {
+      val exp2 +: tail = buckets
+      val remaining = take(exp2.value, v) // (_._1) { (l, pair) => (l + pair._1, pair._2) }
+      v.head._2 +: rebucket(remaining, tail)
+    }
+  }
+}
+
+// TODO: Interesting that relative error only depends on sizes, not on
+// timestamps. You could totally get a relative error off of some
+// number without ever going through this business, then use that to
+// decide when to evict stuff from the bucket.
+case class ExpHist(conf: ExpHist.Config, timestamps: Vector[Long], sizes: Vector[Int], time: Long) {
+  def step(newTime: Long): ExpHist =
+    if (newTime <= time) this
+    else {
+      val filtered = ExpHist.dropExpired(timestamps, conf.expiration(newTime))
+      val bucketsDropped = timestamps.size - filtered.size
+      copy(
+        time = newTime,
+        timestamps = filtered,
+        sizes = Canonical.dropBiggest(sizes, bucketsDropped))
+    }
+
+  // Efficient implementation of add. To make this solid we'll want to
+  // keep a buffer of new items and only add when the buffer expires.
+  def add(i: Long, timestamp: Long): ExpHist = {
+    val self = step(timestamp)
+    if (i == 0) self
+    else {
+      val newSizes = Canonical.fromLong(self.total + i, conf.l)
+      val bucketSizes = Canonical.toBuckets(self.sizes).map(_.value)
+      val inputs = (i, timestamp) +: (bucketSizes zip self.timestamps)
+      self.copy(
+        timestamps = ExpHist.rebucket(inputs, Canonical.toBuckets(newSizes)),
+        sizes = newSizes)
+    }
+  }
+
+  def inc(timestamp: Long): ExpHist = add(1L, timestamp)
+
+  def last: Long = 1 << (sizes.size - 1)
+
+  def total: Long = Canonical.expand(sizes)
+
+  def lowerBoundSum: Long = total - last
+
+  def upperBoundSum: Long = total
+
+  def guess: Double = total - (last - 1) / 2.0
+
+  def relativeError: Double =
+    if (total == 0) 0.0
+    else {
+      val minInsideWindow = total + 1 - last
+      val absoluteError = (last - 1) / 2.0
+      absoluteError / minInsideWindow
+    }
+
+  /**
+   * Returns the same ExpHist with a new window. If the new window is
+   * smaller than the current window, evicts older items.
+   */
+  def withWindow(newWindow: Long): ExpHist =
+    copy(conf = conf.copy(windowSize = newWindow)).step(time)
+
+  // Returns the vector of bucket sizes from largest to smallest.
+  def windows: Vector[Long] =
+    for {
+      (numBuckets, idx) <- sizes.zipWithIndex.reverse
+      bucket <- List.fill(numBuckets)(1L << idx)
+    } yield bucket
+}
+
+object Canonical {
+  case class Exp2(exp: Int) extends AnyVal { l =>
+    def double: Exp2 = Exp2(exp + 1)
+    def value: Long = 1 << exp
+  }
+
+  @inline private[this] def prevPowerOfTwo(x: Long): Int =
+    JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
+
+  @inline private[this] def modPow2(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
+  @inline private[this] def quotient(i: Int, exp2: Int): Int = i >> exp2
+  @inline private[this] def bit(i: Int, idx: Int): Int = (i >> idx) & 1
+
+  private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
+    (0 until bits).map { idx => offset + bit(i, idx) }.toVector
 
   /**
    * returns a vector of the total number of buckets of size `s^i`,
@@ -23,233 +167,55 @@ object ExpHist {
    * `s` is the "sum of the sizes of all of the buckets tracked by
    * the ExpHist instance.
    *
-   * `k` is `math.ceil(epsilon / 2)`, where epsilon is the relative
-   * error of `s`.
+   * `l` is... well, gotta explain that based on the paper.
    */
-  def lNormalize(s: Long, k: Int): Vector[Int] = {
-    val l = minBuckets(k)
-    val j = log2(s / l + 1).toInt
-    // returns the little-endian bit rep of the supplied number.
-    def binarize(sh: Long): Vector[Int] =
-      ((0 until j).map { i => l + ((sh.toInt >> i) % 2) }).toVector
-
-    val twoJ = 1 << j
-    val sPrime = s - (twoJ - 1) * l
-
-    if (sPrime >= twoJ) {
-      val m = (sPrime >> j)
-      val sHat = (sPrime - m * twoJ)
-      binarize(sHat) :+ m.toInt
-    } else binarize(sPrime)
+  def fromLong(s: Long, l: Int): Vector[Int] = {
+    val num = s + l
+    val denom = l + 1
+    val j = prevPowerOfTwo(num / denom)
+    val offset = (num - (denom << j)).toInt
+    binarize(modPow2(offset, j), j, l) :+ (quotient(offset, j) + 1)
   }
 
   /**
-   * Expand out a number's l-normalized form into the original
-   * number.
+   * Total number of buckets required to represent this number.
    */
-  def expand(form: Vector[Int]): Long =
-    form.zipWithIndex
-      .map { case (i, exp) => i.toLong << exp }
-      .reduce(_ + _)
+  def bucketsRequired(s: Long, l: Short): Int = fromLong(s, l).sum
 
-  def relativeError(e: ExpHist): Double =
-    if (e.total == 0) 0.0
+  /**
+   * Expand out a number's l-canonical form into the original number.
+   */
+  def expand(rep: Vector[Int]): Long =
+    if (rep.isEmpty) 0L
     else {
-      val maxOutsideWindow = e.last - 1
-      val minInsideWindow = 1 + e.total - e.last
-      val absoluteError = maxOutsideWindow / 2.0
-      absoluteError / minInsideWindow
+      rep.iterator.zipWithIndex
+        .map { case (i, exp) => i.toLong << exp }
+        .reduce(_ + _)
     }
 
-  case class Config(k: Int, windowSize: Long) {
-    // Maximum number of buckets of size 2^i allowed in the repr of
-    // this exponential histogram.
-    def maxBuckets: Int = ExpHist.maxBuckets(k)
-
-    // Returns the last timestamp before the window. any ts <= [the
-    // returned timestamp] is outside the window.
-    def expiration(currTime: Long): Long = currTime - windowSize
-  }
-
-  def empty(conf: Config): ExpHist = ExpHist(conf, Vector.empty, 0L, 0L, 0L)
-  def empty(k: Int, windowSize: Long): ExpHist = empty(Config(k, windowSize))
-}
-
-/**
- * @param total counter for the total size of all buckets.
- * @param last the size of the oldest bucket.
- */
-case class ExpHist(conf: ExpHist.Config, buckets: Vector[BucketSeq], time: Long, last: Long, total: Long) {
-  /**
-   * Returns the same ExpHist with a new window. If the new window is
-   * smaller than the current window, evicts older items.
-   */
-  def withWindow(newWindow: Long): ExpHist = copy(conf = conf.copy(windowSize = newWindow)).step(time)
+  // Expands out the compressed form to a list of the bucket sizes (sized with exponent only)
+  //
+  // TODO: law - toBuckets(rep).size == rep.sum
+  def toBuckets(rep: Vector[Int]): Vector[Exp2] =
+    rep.zipWithIndex.flatMap { case (i, exp) => List.fill(i)(Exp2(exp)) }
 
   /**
-   * Step forward to `newTime`, evicting any wrapped buckets that
-   * fall outside of the window.
+   * Given a canonical representation, takes a number of buckets to
+   * drop (starting with the largest buckets!) and removes that
+   * number of buckets from the end.
+   *
+   * (The sum of `canonical` is the total number of buckets in the
+   * representation.)
    */
-  def step(newTime: Long): ExpHist =
-    if (newTime <= time) this
-    else {
-      val t = conf.expiration(newTime)
-
-      // TODO this is junk, but now the madness is contained.
-      val newBuckets = buckets.flatMap(_.expire(t))
-      val newLast = newBuckets.headOption.map(_.bucketSize).getOrElse(0L)
-      val newTotal = newBuckets.map(_.count).reduceLeftOption(_ + _).getOrElse(0L)
-
-      copy(
-        buckets = buckets.flatMap(_.expire(t)),
-        time = newTime, total = newTotal, last = newLast
-      )
+  @tailrec def dropBiggest(canonical: Vector[Int], bucketsToDrop: Int): Vector[Int] =
+    (canonical, bucketsToDrop) match {
+      case (l, 0) => l
+      case (l @ (init :+ last), toDrop) =>
+        (toDrop - last) match {
+          case 0 => init
+          case x if x < 0 => init :+ -x
+          case x if x > 0 => dropBiggest(init, x)
+        }
+      case _ => Vector.empty[Int]
     }
-
-  /**
-   * "inc" algorithm:
-   *
-   *  * Step forward to the new timestamp
-   *  * create a new bucket with size 1 and timestamp
-   *  * Traverse the list of buckets in order of increasing sizes.
-   *
-   * If there are (k / 2 + 2) or more buckets of the same size, merge
-   * the oldest two of these buckets into a single bucket of double
-   * the size. Repeat until the bucket size is less than the limit.
-   */
-  def inc(timestamp: Long): ExpHist = {
-    val stepped = step(timestamp)
-    val newBuckets =
-      stepped.buckets.lastOption match {
-        case None => Vector(BucketSeq.one(timestamp))
-        case Some(bucketSeq) => stepped.buckets.init :+ (bucketSeq + timestamp)
-      }
-    stepped.copy(
-      total = total + 1,
-      buckets = BucketSeq.normalize(conf.maxBuckets, newBuckets))
-  }
-
-  // Stupid implementation of `add` - just inc a bunch of times with
-  // the same timestamp.
-  def add(i: Long, timestamp: Long): ExpHist =
-    (0L until i).foldLeft(step(timestamp)) {
-      case (acc, _) => acc.inc(timestamp)
-    }
-
-  def lowerBoundSum: Long = total - last
-  def upperBoundSum: Long = total
-
-  // For testing. Returns the vector of bucket sizes from largest to
-  // smallest.
-  def windows: Vector[Long] =
-    for {
-      b <- buckets
-      t <- b.timestamps
-    } yield b.bucketSize
-}
-
-/**
- * "compressed" representation of `timestamps.length` buckets of size
- * `exp`.
- *
- * Bucket timestamps are sorted in time-increasing order (so the
- * oldest bucket is at the head).
- */
-case class BucketSeq(exp: BucketSeq.Pow2, timestamps: Vector[Long]) { l =>
-  require(timestamps.sorted == timestamps)
-  require(timestamps.nonEmpty)
-
-  // bucketSize, as defined in the paper.
-  def bucketSize: Long = exp.value
-
-  // Total number of ticks recorded in this BucketSeq.
-  def count: Long = bucketSize * length
-
-  // Total number of buckets tracked by the BucketSeq.
-  def length: Int = timestamps.length
-
-  // Add a new timestamp. TODO: NOT sure if it's legit to not require
-  // that the new timestamp be > all existing timestamps.
-  def +(ts: Long): BucketSeq = copy(timestamps = (timestamps :+ ts).sorted)
-
-  def ++(r: BucketSeq): BucketSeq = {
-    require(l.exp == r.exp)
-    copy(timestamps = (l.timestamps ++ r.timestamps).sorted)
-  }
-
-  /**
-   * Remove all timestamps <= the cutoff. Returns:
-   *
-   *  - None if the resulting [[BucketSeq]] is empty,
-   *  - Some(the filtered [[BucketSeq]]) otherwise.
-   */
-  def expire(cutoff: Long): Option[BucketSeq] =
-    Some(timestamps.filter(_ > cutoff))
-      .filter(_.nonEmpty)
-      .map { v => copy(timestamps = v) }
-
-  /**
-   * Returns the number of pairs to drop to get this BucketSeq's final
-   * length <= the supplied limit.
-   */
-  private[this] def pairsToDrop(limit: Int): Int =
-    0 max math.ceil((length - limit) / 2.0).toInt
-
-  /**
-   * if this.length <= limit, returns (this, None).
-   *
-   * else, splits this BucketSeq into two by combining pairs of
-   * timestamps into new buckets until enough timestamps have been
-   * removed that this.length <= limit.
-   *
-   * The new pairs form a new [[BucketSeq]] instance with a doubled
-   * bucketSize.
-   *
-   * The return value in this case is a pair of the new, slimmed-down
-   * current BucketSeq and Some(the new, doubled BucketSeq).
-   */
-  def evolve(limit: Int): (BucketSeq, Option[BucketSeq]) =
-    pairsToDrop(limit) match {
-      case 0 => (this, None)
-      case pairs =>
-        val childTs = (0 until pairs).map(i => timestamps(i * 2 + 1))
-        val child = Some(BucketSeq(exp.double, childTs.toVector))
-        (copy(timestamps = timestamps.drop(pairs * 2)), child)
-    }
-
-  /**
-   * Expands this BucketSeq out into a vector of BucketSeq instances
-   * that all have lengths <= the supplied limit. (Used on the oldest
-   * bucket after normalizing a sequence of BucketSeqs.)
-   */
-  def expand(limit: Int): Vector[BucketSeq] =
-    evolve(limit) match {
-      case (bs, None) => Vector(bs)
-      case (bs, Some(remaining)) => remaining.expand(limit) :+ bs
-    }
-}
-
-object BucketSeq {
-  case class Pow2(exp: Int) extends AnyVal { l =>
-    def double: Pow2 = Pow2(exp + 1)
-    def value: Long = 1 << exp
-    def *(r: Pow2) = Pow2(l.exp + r.exp)
-  }
-
-  // Returns a singleton bucketseq.
-  def one(timestamp: Long): BucketSeq = BucketSeq(Pow2(0), Vector(timestamp))
-
-  // evolves all BucketSeq instances in `seqs` from newest -> oldest
-  // until every [[BucketSeq]] length is <= the supplied limit.
-  def normalize(limit: Int, seqs: Vector[BucketSeq]): Vector[BucketSeq] = {
-    val empty = (Vector.empty[BucketSeq], None: Option[BucketSeq])
-
-    val (ret, extra) = seqs.foldRight(empty) {
-      case (bs, (acc, optCarry)) =>
-        val withCarry = optCarry.map(_ ++ bs).getOrElse(bs)
-        val (evolved, carry) = withCarry.evolve(limit)
-        (evolved +: acc, carry)
-    }
-    extra.map(_.expand(limit) ++ ret).getOrElse(ret)
-  }
 }

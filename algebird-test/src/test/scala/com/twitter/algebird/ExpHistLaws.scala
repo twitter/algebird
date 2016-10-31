@@ -44,7 +44,7 @@ class ExpHistLaws extends PropSpec with PropertyChecks with Matchers {
     Arbitrary(for {
       k <- Gen.posNum[Short]
       windowSize <- Gen.posNum[Long]
-    } yield ExpHist.Config(k, windowSize))
+    } yield ExpHist.Config(1 / k.toDouble, windowSize))
 
   def addAll(e: ExpHist, ticks: List[Tick]): ExpHist =
     ticks.foldLeft(e) {
@@ -62,7 +62,7 @@ class ExpHistLaws extends PropSpec with PropertyChecks with Matchers {
   // algorithm. He says to assume that k/2 == 2, but then he promotes
   // as if k/2 == 1, ie k == 2.
   property("example from paper") {
-    val e = ExpHist.empty(2, 100)
+    val e = ExpHist.empty(ExpHist.Config(0.5, 100))
     val plus76 = e.add(76, 0)
 
     val inc = plus76.inc(0)
@@ -78,6 +78,14 @@ class ExpHistLaws extends PropSpec with PropertyChecks with Matchers {
       assert(ExpHist.empty(conf)
         .add(tick.count, tick.timestamp)
         .upperBoundSum == tick.count)
+    }
+  }
+
+  property("empty.add and from are identical") {
+    forAll { (conf: ExpHist.Config, tick: Tick) =>
+      val byAdd = ExpHist.empty(conf).add(tick.count, tick.timestamp)
+      val byFrom = ExpHist.from(tick.count, tick.timestamp, conf)
+      assert(byAdd == byFrom)
     }
   }
 
@@ -125,7 +133,15 @@ class ExpHistLaws extends PropSpec with PropertyChecks with Matchers {
       val minInsideWindow = 1 + full.total - full.last
       val absoluteError = maxOutsideWindow / 2.0
       val relativeError = absoluteError / minInsideWindow
-      assert(ExpHist.relativeError(full) <= 1.0 / conf.k)
+
+      // local relative error calc:
+      assert(relativeError <= conf.epsilon)
+
+      // Instance's relative error calc:
+      assert(full.relativeError <= conf.epsilon)
+
+      // Error can never be above 0.5.
+      assert(full.relativeError <= 0.5)
     }
   }
 
@@ -147,18 +163,24 @@ class ExpHistLaws extends PropSpec with PropertyChecks with Matchers {
 
   property("l-canonical representation round-trips") {
     forAll { (i: PosNum[Long], k: PosNum[Short]) =>
-      assert(ExpHist.expand(ExpHist.lNormalize(i.value, k.value)) == i.value)
+      assert(Canonical.expand(Canonical.fromLong(i.value, k.value)) == i.value)
     }
   }
 
   property("all i except last have either k/2, k/2 + 1 buckets") {
     forAll { (i: PosNum[Long], k: PosNum[Short]) =>
-      val lower = ExpHist.minBuckets(k.value)
-      val upper = ExpHist.maxBuckets(k.value)
+      val lower = k.value
+      val upper = lower + 1
       assert(
-        ExpHist.lNormalize(i.value, k.value).init.forall { numBuckets =>
+        Canonical.fromLong(i.value, k.value).init.forall { numBuckets =>
           lower <= numBuckets && numBuckets <= upper
         })
+    }
+  }
+
+  property("impl of `div2Ceil` matches the simpler impl") {
+    forAll { i: Int =>
+      assert(ExpHist.div2Ceil(i) == math.ceil(i / 2.0).toInt)
     }
   }
 }
