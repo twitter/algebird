@@ -37,32 +37,6 @@ object ExpHist {
     timestamps.reverse.dropWhile(_ <= cutoff).reverse
 
   /**
-   * @param x total count to remove from the head of `input`.
-   * @param input pairs of (count, T).
-   * @return Vector with x total items removed from the head; if
-   *         an element wasn't fully consumed, the remainder will be
-   *         stuck back onto the head.
-   */
-  @tailrec private[this] def take[T](x: Long, input: Vector[(Long, T)]): Vector[(Long, T)] = {
-    val (count, t) +: tail = input
-    (x - count) match {
-      case 0 => tail
-      case x if x < 0 => (-x, t) +: tail
-      case x if x > 0 => take(x, tail)
-    }
-  }
-
-  @tailrec def take2[T](x: Long, input: Vector[T])(from: T => Long)(to: (Long, T) => T): Vector[T] = {
-    val head +: tail = input
-    val count = from(head)
-    (x - count) match {
-      case 0 => tail
-      case x if x < 0 => to(-x, head) +: tail
-      case x if x > 0 => take2(x, tail)(from)(to)
-    }
-  }
-
-  /**
    * Rebuckets the vector of inputs into buckets of the supplied
    * sequence of sizes. Returns only the associated `T` information
    * (timestamp, for example).
@@ -71,7 +45,7 @@ object ExpHist {
     if (buckets.isEmpty) Vector.empty
     else {
       val exp2 +: tail = buckets
-      val remaining = take(exp2.value, v) // (_._1) { (l, pair) => (l + pair._1, pair._2) }
+      val remaining = Canonical.drop(exp2.value, v)
       v.head._2 +: rebucket(remaining, tail)
     }
   }
@@ -90,7 +64,7 @@ case class ExpHist(conf: ExpHist.Config, timestamps: Vector[Long], sizes: Vector
       copy(
         time = newTime,
         timestamps = filtered,
-        sizes = Canonical.dropBiggest(sizes, bucketsDropped))
+        sizes = Canonical.dropBiggest(bucketsDropped, sizes))
     }
 
   // Efficient implementation of add. To make this solid we'll want to
@@ -99,8 +73,15 @@ case class ExpHist(conf: ExpHist.Config, timestamps: Vector[Long], sizes: Vector
     val self = step(timestamp)
     if (i == 0) self
     else {
+      // calculate canonical representation of the NEW total.
       val newSizes = Canonical.fromLong(self.total + i, conf.l)
+
+      // Vector[TotalSizeOfEachBucket]
+      // Vector(3,3,2) expands out to
+      // Vector((1, ts),(1, ts),.... 1,2,2,2,4,4) == bucketSizes
       val bucketSizes = Canonical.toBuckets(self.sizes).map(_.value)
+
+      // this is how we'd implement addAll:
       val inputs = (i, timestamp) +: (bucketSizes zip self.timestamps)
       self.copy(
         timestamps = ExpHist.rebucket(inputs, Canonical.toBuckets(newSizes)),
@@ -110,7 +91,7 @@ case class ExpHist(conf: ExpHist.Config, timestamps: Vector[Long], sizes: Vector
 
   def inc(timestamp: Long): ExpHist = add(1L, timestamp)
 
-  def last: Long = 1 << (sizes.size - 1)
+  def last: Long = if (sizes.isEmpty) 0L else (1 << (sizes.size - 1))
 
   def total: Long = Canonical.expand(sizes)
 
@@ -149,7 +130,7 @@ object Canonical {
     def value: Long = 1 << exp
   }
 
-  @inline private[this] def prevPowerOfTwo(x: Long): Int =
+  @inline private[this] def floorPowerOfTwo(x: Long): Int =
     JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
 
   @inline private[this] def modPow2(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
@@ -168,13 +149,49 @@ object Canonical {
    * the ExpHist instance.
    *
    * `l` is... well, gotta explain that based on the paper.
+   *
+   * 1
+   * 11
+   * 111
+   * 112
+   * 1112
+   * 1122
+   *
+   * 1
+   * 2
+   * 3
+   * 2 1
+   * 3 1
+   * 2 2
+   * 3 2
+   * 2 3
+   * 3 3
+   * 2 2 1
+   * 3 2 1
+   * 2 3 1
+   * 3 3 1
+   * 2 2 2
+   * 3 2 2
+   * 2 3 2
+   * 3 3 2
    */
   def fromLong(s: Long, l: Int): Vector[Int] = {
+    if (s <= 0) Vector.empty
+    else {
+      val num = s + l
+      val denom = l + 1
+      val j = floorPowerOfTwo(num / denom)
+      val offset = (num - (denom << j)).toInt
+      binarize(modPow2(offset, j), j, l) :+ (quotient(offset, j) + 1)
+    }
+  }
+
+  def lastBucketSize(s: Long, l: Int): Int = {
     val num = s + l
     val denom = l + 1
-    val j = prevPowerOfTwo(num / denom)
+    val j = floorPowerOfTwo(num / denom)
     val offset = (num - (denom << j)).toInt
-    binarize(modPow2(offset, j), j, l) :+ (quotient(offset, j) + 1)
+    (quotient(offset, j) + 1)
   }
 
   /**
@@ -207,15 +224,31 @@ object Canonical {
    * (The sum of `canonical` is the total number of buckets in the
    * representation.)
    */
-  @tailrec def dropBiggest(canonical: Vector[Int], bucketsToDrop: Int): Vector[Int] =
+  @tailrec def dropBiggest(bucketsToDrop: Int, canonical: Vector[Int]): Vector[Int] =
     (canonical, bucketsToDrop) match {
       case (l, 0) => l
       case (l @ (init :+ last), toDrop) =>
         (toDrop - last) match {
           case 0 => init
           case x if x < 0 => init :+ -x
-          case x if x > 0 => dropBiggest(init, x)
+          case x if x > 0 => dropBiggest(x, init)
         }
       case _ => Vector.empty[Int]
     }
+
+  /**
+   * @param x total count to remove from the head of `input`.
+   * @param input pairs of (count, T).
+   * @return Vector with x total items removed from the head; if
+   *         an element wasn't fully consumed, the remainder will be
+   *         stuck back onto the head.
+   */
+  @tailrec def drop[T](x: Long, input: Vector[(Long, T)]): Vector[(Long, T)] = {
+    val (count, t) +: tail = input
+    (x - count) match {
+      case 0 => tail
+      case x if x < 0 => (-x, t) +: tail
+      case x if x > 0 => drop(x, tail)
+    }
+  }
 }
