@@ -11,7 +11,8 @@ object ExpHist {
   import Canonical.Exp2
 
   // Same as math.ceil(x / 2.0).toInt
-  def div2Ceil(x: Int): Int = (x >> 1) + (if ((x & 1) == 0) 0 else 1)
+  @inline def div2Ceil(x: Int): Int =
+    (x >>> 1) + (if ((x & 1) == 0) 0 else case)
 
   case class Config(epsilon: Double, windowSize: Long) {
     val l: Int = div2Ceil(math.ceil(1 / epsilon).toInt)
@@ -134,8 +135,8 @@ object Canonical {
     JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
 
   @inline private[this] def modPow2(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
-  @inline private[this] def quotient(i: Int, exp2: Int): Int = i >> exp2
-  @inline private[this] def bit(i: Int, idx: Int): Int = (i >> idx) & 1
+  @inline private[this] def quotient(i: Int, exp2: Int): Int = i >>> exp2
+  @inline private[this] def bit(i: Int, idx: Int): Int = (i >>> idx) & 1
 
   private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
     (0 until bits).map { idx => offset + bit(i, idx) }.toVector
