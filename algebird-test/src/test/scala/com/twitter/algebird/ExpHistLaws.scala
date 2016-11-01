@@ -97,9 +97,32 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
     }
   }
 
-  property("bucket sizes are all powers of two") {
+  // The next two properties are invariants from the paper.
+  property("Invariant 1: relative error bound applies as old buckets expire") {
+    forAll { hist: ExpHist =>
+      val numBuckets = hist.buckets.size
+
+      // sequence of histograms, each with one more oldest bucket
+      // dropped off of its tail.
+      val histograms = (0 until numBuckets).scanLeft(hist) {
+        case (e, _) =>
+          e.copy(
+            buckets = e.buckets.init,
+            total = e.total - e.oldestBucketSize)
+      }
+
+      // every histogram's relative error stays within bounds.
+      histograms.foreach { e => assert(e.relativeError <= e.conf.epsilon) }
+    }
+  }
+
+  property("Invariant 2: bucket sizes are nondecreasing powers of two") {
     forAll { e: ExpHist =>
       assert(e.buckets.forall { b => isPowerOfTwo(b.size) })
+
+      // sizes are nondecreasing:
+      val sizes = e.buckets.map(_.size)
+      assert(sizes.sorted == sizes)
     }
   }
 
