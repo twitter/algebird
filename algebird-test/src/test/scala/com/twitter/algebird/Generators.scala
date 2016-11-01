@@ -19,6 +19,25 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen._
+import Arbitrary.arbitrary
+
+case class PosNum[T: Numeric](value: T)
+
+object PosNum {
+  implicit def arb[T: Numeric: Gen.Choose]: Arbitrary[PosNum[T]] =
+    Arbitrary(for { p <- Gen.posNum[T] } yield PosNum(p))
+}
+
+case class NonEmptyVector[T](items: Vector[T]) {
+  def sorted(implicit ev: Ordering[T]): Vector[T] = items.sorted
+}
+
+object NonEmptyVector {
+  implicit def arb[T: Ordering: Arbitrary]: Arbitrary[NonEmptyVector[T]] =
+    Arbitrary(for {
+      l <- Gen.nonEmptyListOf(arbitrary[T])
+    } yield NonEmptyVector[T](l.toVector))
+}
 
 /**
  * Generators useful in testing Interval
@@ -55,27 +74,27 @@ object Generators {
 
   def genInclusiveLower[T: Arbitrary: Ordering] =
     for {
-      l <- Arbitrary.arbitrary[T]
+      l <- arbitrary[T]
     } yield InclusiveLower(l)
 
   def genExclusiveLower[T: Arbitrary: Ordering] =
     for {
-      l <- Arbitrary.arbitrary[T]
+      l <- arbitrary[T]
     } yield ExclusiveLower(l)
 
   def genInclusiveUpper[T: Arbitrary: Ordering] =
     for {
-      u <- Arbitrary.arbitrary[T]
+      u <- arbitrary[T]
     } yield InclusiveUpper(u)
 
   def genExclusiveUpper[T: Arbitrary: Ordering] =
     for {
-      u <- Arbitrary.arbitrary[T]
+      u <- arbitrary[T]
     } yield ExclusiveUpper(u)
 
   def genIntersection[T: Arbitrary: Ordering] =
     for {
-      l <- Arbitrary.arbitrary[Lower[T]]
-      u <- Arbitrary.arbitrary[Upper[T]] if l.intersects(u)
+      l <- arbitrary[Lower[T]]
+      u <- arbitrary[Upper[T]] if l.intersects(u)
     } yield Intersection(l, u)
 }
