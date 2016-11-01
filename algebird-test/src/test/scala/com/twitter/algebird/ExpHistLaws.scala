@@ -8,7 +8,7 @@ import Arbitrary.arbitrary
 
 class ExpHistLaws extends PropSpec with PropertyChecks {
   import ExpHistGenerators._
-  import ExpHist.{ Bucket, Config }
+  import ExpHist.{ Bucket, Canonical, Config }
 
   property("Increment example from DGIM paper") {
     // Returns a vector of bucket sizes from largest to smallest.
@@ -92,7 +92,7 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
 
   property("verify isPowerOfTwo") {
     forAll { i: PosNum[Int] =>
-      val power = math.pow(2, i.value % 64).toLong
+      val power = math.pow(2, i.value % 32).toLong
       assert(isPowerOfTwo(power))
     }
   }
@@ -233,11 +233,11 @@ object ExpHistGenerators {
 }
 
 class CanonicalLaws extends PropSpec with PropertyChecks {
-  import Canonical._
+  import ExpHist.Canonical._
 
   property("l-canonical representation is all l or l+1s except for last") {
     forAll { (i: PosNum[Long], l: PosNum[Short]) =>
-      val rep = fromLong(i.value, l.value)
+      val rep = fromLong(i.value, l.value).rep
 
       // all values but the last are l or l + 1
       assert(rep.init.forall(v => v == l.value || v == l.value + 1))
@@ -248,14 +248,14 @@ class CanonicalLaws extends PropSpec with PropertyChecks {
 
   property("canonical representation round-trips") {
     forAll { (i: PosNum[Long], l: PosNum[Short]) =>
-      assert(toLong(fromLong(i.value, l.value)) == i.value)
+      assert(fromLong(i.value, l.value).toLong == i.value)
     }
   }
 
   property("fromLong(i, k).sum == # of buckets required to encode i") {
     forAll { (i: PosNum[Long], k: PosNum[Short]) =>
       val rep = fromLong(i.value, k.value)
-      val numBuckets = toBuckets(rep).size
+      val numBuckets = rep.toBuckets.size
 
       assert(rep.sum == numBuckets)
     }
@@ -264,7 +264,7 @@ class CanonicalLaws extends PropSpec with PropertyChecks {
   property("bucketsFromLong(i, k).sum generates buckets directly") {
     forAll { (i: PosNum[Long], k: PosNum[Short]) =>
       val rep = fromLong(i.value, k.value)
-      assert(bucketsFromLong(i.value, k.value) == toBuckets(rep))
+      assert(bucketsFromLong(i.value, k.value) == rep.toBuckets)
     }
   }
 
@@ -273,7 +273,7 @@ class CanonicalLaws extends PropSpec with PropertyChecks {
       val lower = k.value
       val upper = lower + 1
       assert(
-        fromLong(i.value, k.value).init.forall { numBuckets =>
+        fromLong(i.value, k.value).rep.init.forall { numBuckets =>
           lower <= numBuckets && numBuckets <= upper
         })
     }
