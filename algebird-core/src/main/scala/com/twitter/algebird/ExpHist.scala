@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 
 /**
  * Exponential Histogram algorithm from
- * http://ilpubs.stanford.edu:8090/504/1/2001-34.pdf
+ * http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf
  *
  * An Exponential Histogram is a sliding window counter that can
  * guarantee a bounded relative error. You configure the data structure with
@@ -21,7 +21,6 @@ import scala.annotation.tailrec
  * relative error of the true count seen across the supplied
  * `windowSize`.
  *
- *
  * Next steps:
  *
  * - combine Canonical.fromLong and Canonical.bucketsFromLong
@@ -29,7 +28,6 @@ import scala.annotation.tailrec
  * - Query EH with a shorter window than the configured window
  * - Discussion of epsilon vs memory tradeoffs
  * - Discussion of how Canonical.fromLong works
- *
  *
  *
  * @param conf the config values for this isntance.
