@@ -8,14 +8,15 @@ import scala.annotation.tailrec
  * http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf
  *
  * An Exponential Histogram is a sliding window counter that can
- * guarantee a bounded relative error. You configure the data structure with
+ * guarantee a bounded relative error. You configure the data
+ * structure with
  *
  * - epsilon, the relative error you're willing to tolerate
  * - windowSize, the number of time ticks that you want to track
  *
  * You interact with the data structure by adding (number, timestamp)
- * pairs into the exponential histogram, and querying it for
- * approximate counts.
+ * pairs into the exponential histogram. querying it for an
+ * approximate counts with `guess`.
  *
  * The approximate count is guaranteed to be within conf.epsilon
  * relative error of the true count seen across the supplied
@@ -23,21 +24,18 @@ import scala.annotation.tailrec
  *
  * Next steps:
  *
- * - combine Canonical.fromLong and Canonical.bucketsFromLong
- * - efficient serialization using Canonical
+ * - efficient serialization
  * - Query EH with a shorter window than the configured window
  * - Discussion of epsilon vs memory tradeoffs
- * - Discussion of how Canonical.fromLong works
  *
  *
- * @param conf the config values for this isntance.
+ * @param conf the config values for this instance.
  * @param buckets Vector of timestamps of each (powers of 2)
- *                ticks. This is the core of the exponential
- *                histogram representation. See [[Canonical]] for
- *                more info.
- * @param total total ticks tracked, == buckets.map(_.size).sum
+ *                ticks. This is the key to the exponential histogram
+ *                representation. See [[ExpHist.Canonical]] for more
+ *                info.
+ * @param total total ticks tracked. `total == buckets.map(_.size).sum`
  * @param time current timestamp of this instance.
- *             Used with conf.windowSize to expire buckets.
  */
 case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total: Long, time: Long) {
   import ExpHist.{ Bucket, Canonical }
@@ -74,9 +72,9 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
   /**
    * Efficiently add many buckets at once.
    *
-   * @param unsorted [bucket]. All timestamps must be >= this.time.
+   * @param unsorted vector of buckets. All timestamps must be >= this.time.
    * @return ExpHist instance with all buckets added, stepped
-   *         forward to the most timestamp in `unsorted`.
+   *         forward to the max timestamp in `unsorted`.
    */
   def addAll(unsorted: Vector[Bucket]): ExpHist =
     if (unsorted.isEmpty) this
@@ -139,6 +137,10 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
 }
 
 object ExpHist {
+  /**
+   * @param size number of items tracked by this bucket.
+   * @param timestamp timestamp of the most recent item tracked by this bucket.
+   */
   case class Bucket(size: Long, timestamp: Long)
 
   object Bucket {
@@ -149,6 +151,8 @@ object ExpHist {
    * ExpHist guarantees that the returned guess will be within
    * `epsilon` relative error of the true count across a sliding
    * window of size `windowSize`.
+   * @param epsilon relative error, from [0, 0.5]
+   * @param windowSize number of time ticks to track
    */
   case class Config(epsilon: Double, windowSize: Long) {
     val k: Int = math.ceil(1 / epsilon).toInt
@@ -165,13 +169,14 @@ object ExpHist {
   }
 
   /**
-   * Create an empty instance with the supplied Config.
+   * Returns an empty instance with the supplied Config.
    */
   def empty(conf: Config): ExpHist = ExpHist(conf, Vector.empty, 0L, 0L)
 
   /**
-   *  Generate an instance directly from a number. All buckets in the
-   *  returned ExpHist will have the same timestamp, equal to `ts`.
+   *  Returns an instance directly from a number `i`. All buckets in
+   *  the returned ExpHist will have the same timestamp, equal to
+   *  `ts`.
    */
   def from(i: Long, ts: Long, conf: Config): ExpHist = {
     val buckets = Canonical.bucketsFromLong(i, conf.l).map(Bucket(_, ts))
@@ -198,7 +203,7 @@ object ExpHist {
    *
    * (rebucket only works if desired.sum == buckets.map(_.size).sum)
    *
-   * @param buckets [buckets] sorted in DESCENDING order (recent first)
+   * @param buckets vector of buckets sorted in DESCENDING order (recent first)
    * @param desired bucket sizes to rebucket `buckets` into.
    */
   private[algebird] def rebucket(buckets: Vector[Bucket], desired: Vector[Long]): Vector[Bucket] =
@@ -229,23 +234,23 @@ object ExpHist {
 
   /**
    * The paper that introduces the exponential histogram proves that,
-   * given a positive number `l`, every integer can be uniquely
+   * given a positive number `l`, every integer s can be uniquely
    * represented as the sum of
    *
    * (l or (l + 1)) * 2^i + (# from 1 to (l + 1)) 2^j
    *
    * for i = (0 to j - 1), given some j.
    *
-   * The paper calls this the "l-canonical" representation of the
-   * number.
+   * The paper calls this the "l-canonical" representation of s.
    *
    * It turns out that if you follow the exponential histogram
    * bucket-merging algorithm, you end up with the invariant that the
    * number of buckets with size 2^i exactly matches that power of 2's
-   * coefficient in its l-canonical representation.
+   * coefficient in s's l-canonical representation.
    *
    * Put another way - only sequences of buckets with sizes matching
-   * the l-canonical representation are valid exponential histograms.
+   * the l-canonical representation of some number s are valid
+   * exponential histograms.
    *
    * (We use this idea in `ExpHist.rebucket` to take a sequence of
    * buckets of any size and rebucket them into a sequence where the
@@ -253,20 +258,19 @@ object ExpHist {
    *
    * This is huge. This means that you can implement `addAll(newBuckets)` by
    *
-   * - calculating newTotal = total + delta contributed by newBuckets
-   * - generating the l-canonical sequence of bucket sizes for newTotal
+   * - calculating newS = s + delta contributed by newBuckets
+   * - generating the l-canonical sequence of bucket sizes for newS
    * - rebucketing newBuckets ++ oldBuckets into those bucket sizes
    *
    * The resulting sequence of buckets is a valid exponential
    * histogram.
    */
-
   object Canonical {
     @inline private[this] def floorPowerOfTwo(x: Long): Int =
       JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
 
-    @inline private[this] def modPow2(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
-    @inline private[this] def quotient(i: Int, exp2: Int): Int = i >>> exp2
+    @inline private[this] def modPow2Minus1(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
+    @inline private[this] def quotientPow2(i: Int, exp2: Int): Int = i >>> exp2
     @inline private[this] def bit(i: Int, idx: Int): Int = (i >>> idx) & 1
 
     private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
@@ -278,15 +282,6 @@ object ExpHist {
      * @return vector of the coefficients of 2^i in the
      *         l-canonical representation of s.
      *
-     * the "l" in l-canonical means that
-     *
-     *  - all return vector entries but the last one == `l` or `l + 1`
-     *  - 1 <= `returnVector.last` <= l + 1
-     *
-     * The return vector's size is the largest k such that
-     *
-     * 2^k <= (s + l) / (l + 1)
-     *
      * For example:
      *
      * {{{
@@ -294,6 +289,147 @@ object ExpHist {
      * res0: Vector[Int] = Vector(3, 2, 2)
      * }}}
      * 15 = (3 * 2^0) + (2 * 2^1) + (2 * 2^2)
+     *
+     *
+     * the "l" in l-canonical means that
+     *
+     *  - all return vector entries but the last one == `l` or `l + 1`
+     *  - 1 <= `returnVector.last` <= l + 1
+     *
+     * ## L-Canonical Representation Generation:
+     *
+     * - Find the largest j s.t. 2^j <= (s + l) / (1 + l)
+     * - let s' = 2^j(1 + l) - l
+     *
+     * - let diff = (s - s') is the position of s within that group.
+     * - let b = the little-endian binary rep of diff % (2^j - 1)
+     * - let ret = return vector of length j:
+     *
+     * {{{
+     * (0 until j).map { i => ret(i) = b(i) + l }
+     * ret(j) = math.floor(diff / 2^j)
+     * }}}
+     *
+     *
+     * ## Implementation Discussion
+     *
+     * The exponential histogram algorithm tracks buckets of size
+     * 2^i. Every new increment to the histogram adds a bucket of
+     * size 1.
+     *
+     * Because only l or l+1 buckets of size 2^i are allowed for each
+     * i, this increment might trigger an incremental merge of
+     * smaller buckets into larger buckets.
+     *
+     * Let's look at 10 steps of the algorithm with l == 2:
+     *
+     * 1:  1 (1 added)
+     * 2:  1 1 (1 added)
+     * 3:  1 1 1 (1 added)
+     * 4:  1 1 2 (1 added, triggering a 1 + 1 = 2 merge)
+     * 5:  1 1 1 2 (1 added)
+     * 6:  1 1 2 2 (1 added, triggering a 1 + 1 = 2 merge)
+     * 7:  1 1 1 2 2 (1 added)
+     * 8:  1 1 2 2 2 (1 added, triggering a 1 + 1 = 2 merge AND a 2 + 2 = 4 merge)
+     * 9:  1 1 1 2 2 2 (1 added)
+     * 10: 1 1 2 2 4 (1 added, triggering a 1 + 1 = 2 merge AND a 2 + 2 = 4 merge)
+     *
+     * Notice that the bucket sizes always sum to the algorithm step,
+     * ie (10 == 1 + 1 + 1 + 2 + 2 + 4).
+     *
+     * Now let's write out a list of the number of buckets of each size, ie
+     * [bucketsOfSize(1), bucketsOfSize(2), bucketsOfSize(4), ....]
+     *
+     * Here's the above sequence in the new representation, plus a
+     * few more steps:
+     *
+     * 1:  1     <-- (l + 1)2^0 - l = 3 * 2^0 - 2 = 1
+     * 2:  2
+     * 3:  3
+     * 4:  2 1   <-- (l + 1)2^1 - l = 3 * 2^0 - 2 = 4
+     * 5:  3 1
+     * 6:  2 2
+     * 7:  3 2
+     * 8:  2 3
+     * 9:  3 3
+     * 10: 2 2 1 <-- (l + 1)2^2 - l = 3 * 2^0 - 2 = 10
+     * 11: 3 2 1
+     * 12: 2 3 1
+     * 13: 3 3 1
+     * 14: 2 2 2
+     * 15: 3 2 2
+     * 16: 2 3 2
+     * 16: 3 3 2
+     * 17: 2 2 3
+     *
+     * This sequence is called the "l-canonical representation" of s.
+     *
+     * A pattern emerges! Every bucket size except the largest looks
+     * like a binary counter... if you added `l + 1` to the bit, and
+     * made the counter little-endian, so the least-significant bits
+     * came first. Let's call this the "binary" prefix, or "bin(_)".
+     *
+     * Here's the above sequence with the prefix decoded from
+     * "binary":
+     *
+     * 1:  1        <-- (l + 1)2^0 - l = 3 * 2^0 - 2 = 1
+     * 2:  2
+     * 3:  3
+     *
+     * 4:  bin(0) 1 <-- (l + 1)2^1 - l = 3 * 2^0 - 2 = 4
+     * 5:  bin(1) 1
+     * 6:  bin(0) 2
+     * 7:  bin(1) 2
+     * 8:  bin(0) 3
+     * 9:  bin(1) 3
+     *
+     * 10: bin(0) 1 <-- (l + 1)2^2 - l = 3 * 2^0 - 2 = 10
+     * 11: bin(1) 1
+     * 12: bin(2) 1
+     * 13: bin(3) 1
+     * 14: bin(0) 2
+     * 15: bin(1) 2
+     * 16: bin(2) 2
+     * 16: bin(3) 2
+     * 17: bin(0) 3
+     *
+     * Some observations about the pattern:
+     *
+     * The l-canonical representation groups the natural numbers into
+     * groups of size (l + 1)2^i for i >= 0.
+     *
+     * Each group starts at (l + 1)2^i - l (see 1, 4, 10... above)
+     *
+     * Within each group, the "binary" prefix of the l-canonical rep
+     * cycles from 0 to (2^i - 1), l + 1 total times. (This makes
+     * sense; each cycle increments the final entry by one until it
+     * hits l + 1; after that an increment triggers a merge and a new
+     * "group" begins.)
+     *
+     * The final l-canonical entry ==
+     *
+     * floor((position within the group) / 2^i), or the "quotient" of
+     * that position and 2^i.
+     *
+     * That's all we need to know to write a procedure to generate
+     * the l-canonical representation! Here it is again:
+     *
+     *
+     * ## L-Canonical Representation Procedure:
+     *
+     * - Find the largest j s.t. 2^j <= (s + l) / (1 + l)
+     * - let s' = 2^j(1 + l) - l
+     *
+     * (s' is the position if the start of a group, ie 1, 4, 10...)
+     *
+     * - let diff = (s - s') is the position of s within that group.
+     * - let b = the little-endian binary rep of diff % (2^j - 1)
+     * - let ret = return vector of length j:
+     *
+     * {{{
+     * (0 until j).map { i => ret(i) = b(i) + l }
+     * ret(j) = math.floor(diff / 2^j)
+     * }}}
      */
     def fromLong(s: Long, l: Int): CanonicalVector =
       if (s <= 0) CanonicalVector(Vector.empty)
@@ -303,7 +439,7 @@ object ExpHist {
         val j = floorPowerOfTwo(num / denom)
         val offset = (num - (denom << j)).toInt
         CanonicalVector(
-          binarize(modPow2(offset, j), j, l) :+ (quotient(offset, j) + 1))
+          binarize(modPow2Minus1(offset, j), j, l) :+ (quotientPow2(offset, j) + 1))
       }
 
     /**
@@ -329,11 +465,11 @@ object ExpHist {
         val denom = l + 1
         val j = floorPowerOfTwo(num / denom)
         val offset = (num - (denom << j)).toInt
-        val prefixRep = modPow2(offset, j)
+        val prefixRep = modPow2Minus1(offset, j)
 
         (0 until j).toVector.flatMap {
           idx => Vector.fill(l + bit(prefixRep, idx))(1L << idx)
-        } ++ List.fill(quotient(offset, j) + 1)(1L << j)
+        } ++ List.fill(quotientPow2(offset, j) + 1)(1L << j)
       }
   }
 

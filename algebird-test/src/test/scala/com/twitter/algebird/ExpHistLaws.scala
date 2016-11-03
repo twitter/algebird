@@ -236,23 +236,26 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
 object ExpHistGenerators {
   import ExpHist.{ Bucket, Config }
 
-  implicit val arb: Arbitrary[Bucket] =
-    Arbitrary(for {
-      count <- Gen.posNum[Long]
-      timestamp <- Gen.posNum[Long]
-    } yield Bucket(count - 1L, timestamp))
+  implicit val genBucket: Gen[Bucket] = for {
+    count <- Gen.posNum[Long]
+    timestamp <- Gen.posNum[Long]
+  } yield Bucket(count - 1L, timestamp)
 
-  implicit val conf: Arbitrary[Config] =
-    Arbitrary(for {
-      k <- Gen.posNum[Short]
-      windowSize <- Gen.posNum[Long]
-    } yield Config(1 / k.toDouble, windowSize))
+  implicit val genConfig: Gen[Config] = for {
+    k <- Gen.posNum[Short]
+    windowSize <- Gen.posNum[Long]
+  } yield Config(1 / k.toDouble, windowSize)
 
-  implicit val expHist: Arbitrary[ExpHist] =
-    Arbitrary(for {
-      buckets <- arbitrary[Vector[Bucket]]
-      conf <- arbitrary[Config]
-    } yield ExpHist.empty(conf).addAll(buckets))
+  implicit val genExpHist: Gen[ExpHist] =
+    for {
+      buckets <- Gen.containerOf[Vector, Bucket](genBucket)
+      conf <- genConfig
+    } yield ExpHist.empty(conf).addAll(buckets)
+
+  implicit val arbBucket: Arbitrary[Bucket] = Arbitrary(genBucket)
+  implicit val arbConfig: Arbitrary[Config] = Arbitrary(genConfig)
+  implicit val arbExpHist: Arbitrary[ExpHist] = Arbitrary(genExpHist)
+
 }
 
 class CanonicalLaws extends PropSpec with PropertyChecks {
