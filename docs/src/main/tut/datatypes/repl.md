@@ -37,40 +37,25 @@ scala> import com.twitter.algebird._
 
 Example from http://www.michael-noll.com/blog/2013/12/02/twitter-algebird-monoid-monad-for-large-scala-data-analytics/
 
-```scala
-scala> import com.twitter.algebird.Operators._
+```tut
 import com.twitter.algebird.Operators._
+Max(10) + Max(30) + Max(20)
 
-scala> Max(10) + Max(30) + Max(20)
-res22: com.twitter.algebird.Max[Int] = Max(30)
+case class TwitterUser(val name: String, val numFollowers: Int) extends Ordered[TwitterUser] {
+  def compare(that: TwitterUser): Int = {
+    val c = this.numFollowers - that.numFollowers
+    if (c == 0) this.name.compareTo(that.name) else c
+  }
+}
 
-scala> case class TwitterUser(val name: String, val numFollowers: Int) extends Ordered[TwitterUser] {
-         def compare(that: TwitterUser): Int = {
-           val c = this.numFollowers - that.numFollowers
-           if (c == 0) this.name.compareTo(that.name) else c
-           }
-       }
-res23: defined class TwitterUser
+// Let's have a popularity contest on Twitter.  The user with the most followers wins!
 
-scala> // Let's have a popularity contest on Twitter.  The user with the most followers wins!
-
-scala> val barackobama = TwitterUser("BarackObama", 40267391)
-res24: barackobama: TwitterUser = TwitterUser(BarackObama,40267391)
-
-scala> val katyperry = TwitterUser("katyperry", 48013573)
-res25: katyperry: TwitterUser = TwitterUser(katyperry,48013573)
-
-scala> val ladygaga = TwitterUser("ladygaga", 40756470)
-res26: ladygaga: TwitterUser = TwitterUser(ladygaga,40756470)
-
-scala> val miguno = TwitterUser("miguno", 731) // I participate, too.  Olympic spirit!
-res27: miguno: TwitterUser = TwitterUser(miguno,731)
-
-scala> val taylorswift = TwitterUser("taylorswift13", 37125055)
-res28: taylorswift: TwitterUser = TwitterUser(taylorswift13,37125055)
-
-scala> val winner: Max[TwitterUser] = Max(barackobama) + Max(katyperry) + Max(ladygaga) + Max(miguno) + Max(taylorswift)
-res29: winner: com.twitter.algebird.Max[TwitterUser] = Max(TwitterUser(katyperry,48013573))
+val barackobama = TwitterUser("BarackObama", 40267391)
+val katyperry = TwitterUser("katyperry", 48013573)
+val ladygaga = TwitterUser("ladygaga", 40756470)
+val miguno = TwitterUser("miguno", 731) // I participate, too.  Olympic spirit!
+val taylorswift = TwitterUser("taylorswift13", 37125055)
+val winner: Max[TwitterUser] = Max(barackobama) + Max(katyperry) + Max(ladygaga) + Max(miguno) + Max(taylorswift)
 ```
 
 ## Hyperloglog
