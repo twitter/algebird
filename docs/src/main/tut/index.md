@@ -37,9 +37,9 @@ We use a lightweight form of project governance inspired by the one used by Apac
 
 Please see [Contributing and Committership](https://github.com/twitter/analytics-infra-governance#contributing-and-committership) for our code of conduct and our pull request review process.
 
-The TL;DR is send us a pull request, iterate on the feedback + discussion, and get a +1 from a [Committer](https://github.com/twitter/algebird/COMMITTERS.md) in order to get your PR accepted.
+The TL;DR is send us a pull request, iterate on the feedback + discussion, and get a +1 from a [Committer](https://github.com/twitter/algebird/blob/develop/COMMITTERS.md) in order to get your PR accepted.
 
-The current list of active committers (who can +1 a pull request) can be found here: [Committers](https://github.com/twitter/algebird/COMMITTERS.md)
+The current list of active committers (who can +1 a pull request) can be found here: [Committers](https://github.com/twitter/algebird/blob/develop/COMMITTERS.md)
 
 A list of contributors to the project can be found here: [Contributors](https://github.com/twitter/algebird/graphs/contributors)
 
