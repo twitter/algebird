@@ -7,7 +7,7 @@ package com.twitter.algebird
  * `h(x) = [a * x + b (mod p)] (mod m)`
  *
  * As a requirement for using CMS you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to
- * count.  Algebird ships with several such implicits for commonly used types `K` such as [[Long]] and [[BigInt]].
+ * count.  Algebird ships with several such implicits for commonly used types `K` such as `Long` and [[scala.BigInt]].
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
  * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
