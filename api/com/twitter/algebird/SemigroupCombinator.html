@@ -56,7 +56,7 @@ Also, if B is List[T], and (l:A,r:List[T]) = r.sortBy(fn(l))
 this works as well (due to the associativity on A, and the fact that the list never loses data).</p><p>For approximate lists (like top-K applications) this might work (or be close enough to associative
 that for approximation algorithms it is fine), and in fact, that is the main motivation of this code:
 Produce some ordering in A, and use it to do sorted-topK on the list in B.</p><p>Seems like an open topic here.... you are obliged to think on your own about this.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Combinator.scala" target="_blank">Combinator.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/sritchie/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Combinator.scala" target="_blank">Combinator.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[(<span class="extype" name="com.twitter.algebird.SemigroupCombinator.A">A</span>, <span class="extype" name="com.twitter.algebird.SemigroupCombinator.B">B</span>)], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
