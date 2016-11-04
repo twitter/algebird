@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop
+import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalacheck.Prop.forAll
+
 import scala.math.Equiv
 
 /**
@@ -26,6 +26,14 @@ import scala.math.Equiv
  */
 
 object BaseProperties {
+  val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
+    for {
+      scale <- Gen.choose(-128, +128)
+      base <- implicitly[Arbitrary[BigInt]].arbitrary
+    } yield {
+      (BigDecimal(base) * BigDecimal(10).pow(scale))
+    })
+
   def defaultEq[T](t0: T, t1: T) = t0 == t1
 
   trait HigherEq[M[_]] {
