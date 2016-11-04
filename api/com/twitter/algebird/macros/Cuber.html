@@ -63,7 +63,7 @@ and we want to know the average height of</p><ul><li>people, grouped by gender a
 &gt;   people.flatMap { p =&gt; cuber((p.gender, p.age)).map((_,p)) }
 &gt;     .groupBy(_._1)
 &gt;     .mapValues { xs =&gt; val heights = xs.map(_.height); heights.sum / heights.length }
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/sritchie/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/macros/Cuber.scala" target="_blank">Cuber.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/macros/Cuber.scala" target="_blank">Cuber.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
