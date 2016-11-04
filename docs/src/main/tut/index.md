@@ -24,7 +24,7 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 
 ## Documentation
 
-The latest API docs are hosted at Algebird's [ScalaDoc index](api/#index).
+The latest API docs are hosted at Algebird's [ScalaDoc index](api/).
 
 ## Get Involved + Code of Conduct
 

@@ -39,7 +39,7 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 
 To learn more and find links to tutorials and information around the web, check out the [website](https://twitter.github.io/algebird).
 
-The latest API docs are hosted on Algebird's [ScalaDoc index](http://twitter.github.io/algebird/api/#index).
+The latest API docs are hosted on Algebird's [ScalaDoc index](http://twitter.github.io/algebird/api/).
 
 ## Get Involved + Code of Conduct
 
