@@ -4,7 +4,8 @@ title:  "Data Types"
 section: "data"
 position: 2
 ---
-# Data Types
+
+{% include_relative datatypes/datatypes.md %}
 
 {% for x in site.pages %}
   {% if x.section == 'data' %}

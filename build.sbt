@@ -262,7 +262,7 @@ lazy val docSettings = Seq(
   fork in tut := true,
   fork in (ScalaUnidoc, unidoc) := true,
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
-    "-doc-source-url", "https://github.com/twitter/algebird/tree/master€{FILE_PATH}.scala",
+    "-doc-source-url", "https://github.com/twitter/algebird/tree/develop€{FILE_PATH}.scala",
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
     "-diagrams"
   ),
