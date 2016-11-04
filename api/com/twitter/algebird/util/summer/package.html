@@ -1,0 +1,464 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>summer - com.twitter.algebird.util.summer</title>
+          <meta name="description" content="summer - com.twitter.algebird.util.summer" />
+          <meta name="keywords" content="summer com.twitter.algebird.util.summer" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../index.html';
+            var hash = 'com.twitter.algebird.util.summer.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../package.html" class="extype" name="com">com</a>.<a href="../../../package.html" class="extype" name="com.twitter">twitter</a>.<a href="../../package.html" class="extype" name="com.twitter.algebird">algebird</a>.<a href="../package.html" class="extype" name="com.twitter.algebird.util">util</a></p>
+        <h1>summer</h1><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">summer</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block diagram-container" id="content-diagram-container">
+                <span class="toggle diagram-link">Content Hierarchy</span>
+                <div class="diagram" id="content-diagram"><svg class="package-diagram" id="graph1" viewBox="0.00 0.00 978.50 155.00" height="155pt" width="979pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 151)" class="graph" id="graph0"><polygon points="-4,4 -4,-151 974.5,-151 974.5,4 -4,4" stroke="none" fill="white"></polygon><!-- node0 --><g class="node trait" id="graph1_0"><g id="a_trait|graph1_0"><a xlink:title="com.twitter.algebird.util.summer.WithFlushConditions" xlink:href="WithFlushConditions.html#inheritance-diagram"><polygon points="529.5,-86 370.5,-86 370.5,-61 529.5,-61 529.5,-86" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../lib/trait_diagram.png" y="-80.5" x="381" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="401.537" text-anchor="start">WithFlushConditions[T, M]</text></a></g></g><!-- node1 --><g class="node class" id="graph1_1"><g id="a_class|graph1_1"><a xlink:title="com.twitter.algebird.util.summer.SyncSummingQueue" xlink:href="SyncSummingQueue.html#inheritance-diagram"><polygon points="190,-25 0,-25 0,-0 190,-0 190,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-19.5" x="10" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="30.6465" text-anchor="start">SyncSummingQueue[Key, Value]</text></a></g></g><!-- node0&#45;&gt;node1 --><g class="edge inheritance" id="graph1_0_1"><g id="a_inheritance|graph1_0_1"><a xlink:title="SyncSummingQueue[Key, Value] is a subtype of WithFlushConditions[T, M]"><path d="M375.523,-60.1222C313.285,-49.7783 225.2,-35.1388 164.418,-25.0371" stroke="#d4d4d4" fill="none"></path><polygon points="375.49,-61.8906 380.71,-60.9841 376.064,-58.438 375.49,-61.8906" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node3 --><g class="node class" id="graph1_3"><g id="a_class|graph1_3"><a xlink:title="com.twitter.algebird.util.summer.HeavyHittersCachingSummer" xlink:href="HeavyHittersCachingSummer.html#inheritance-diagram"><polygon points="407.5,-25 208.5,-25 208.5,-0 407.5,-0 407.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-19.5" x="219" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="239.53" text-anchor="start">HeavyHittersCachingSummer[K, V]</text></a></g></g><!-- node0&#45;&gt;node3 --><g class="edge inheritance" id="graph1_0_3"><g id="a_inheritance|graph1_0_3"><a xlink:title="HeavyHittersCachingSummer[K, V] is a subtype of WithFlushConditions[T, M]"><path d="M417.494,-58.9941C392.93,-48.788 359.556,-34.921 336.132,-25.1884" stroke="#d4d4d4" fill="none"></path><polygon points="416.995,-60.6817 422.284,-60.9841 418.338,-57.4496 416.995,-60.6817" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node6 --><g class="node class" id="graph1_6"><g id="a_class|graph1_6"><a xlink:title="com.twitter.algebird.util.summer.AsyncMapSum" xlink:href="AsyncMapSum.html#inheritance-diagram"><polygon points="588.5,-25 425.5,-25 425.5,-0 588.5,-0 588.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-19.5" x="436" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="456.77" text-anchor="start">AsyncMapSum[Key, Value]</text></a></g></g><!-- node0&#45;&gt;node6 --><g class="edge inheritance" id="graph1_0_6"><g id="a_inheritance|graph1_0_6"><a xlink:title="AsyncMapSum[Key, Value] is a subtype of WithFlushConditions[T, M]"><path d="M464.946,-57.0291C474.596,-47.0415 486.946,-34.2572 495.762,-25.1323" stroke="#d4d4d4" fill="none"></path><polygon points="463.477,-56.0316 461.261,-60.8435 465.994,-58.4634 463.477,-56.0316" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node7 --><g class="node class" id="graph1_7"><g id="a_class|graph1_7"><a xlink:title="com.twitter.algebird.util.summer.AsyncListSum" xlink:href="AsyncListSum.html#inheritance-diagram"><polygon points="765.5,-25 606.5,-25 606.5,-0 765.5,-0 765.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-19.5" x="617" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="637.715" text-anchor="start">AsyncListSum[Key, Value]</text></a></g></g><!-- node0&#45;&gt;node7 --><g class="edge inheritance" id="graph1_0_7"><g id="a_inheritance|graph1_0_7"><a xlink:title="AsyncListSum[Key, Value] is a subtype of WithFlushConditions[T, M]"><path d="M501.006,-59.7485C542.218,-49.4454 599.735,-35.0662 639.65,-25.0875" stroke="#d4d4d4" fill="none"></path><polygon points="500.49,-58.0736 496.063,-60.9841 501.339,-61.4691 500.49,-58.0736" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node8 --><g class="node class" id="graph1_8"><g id="a_class|graph1_8"><a xlink:title="com.twitter.algebird.util.summer.AsyncListMMapSum" xlink:href="AsyncListMMapSum.html#inheritance-diagram"><polygon points="970.5,-25 783.5,-25 783.5,-0 970.5,-0 970.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-19.5" x="794" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="814.824" text-anchor="start">AsyncListMMapSum[Key, Value]</text></a></g></g><!-- node0&#45;&gt;node8 --><g class="edge inheritance" id="graph1_0_8"><g id="a_inheritance|graph1_0_8"><a xlink:title="AsyncListMMapSum[Key, Value] is a subtype of WithFlushConditions[T, M]"><path d="M535.161,-60.733C610.246,-50.3583 719.004,-35.3308 793.567,-25.0283" stroke="#d4d4d4" fill="none"></path><polygon points="534.528,-59.0538 529.815,-61.4718 535.007,-62.5208 534.528,-59.0538" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node2 --><g class="node class" id="graph1_2"><g id="a_class|graph1_2"><a xlink:title="com.twitter.algebird.util.summer.NullSummer" xlink:href="NullSummer.html#inheritance-diagram"><polygon points="352.5,-86 201.5,-86 201.5,-61 352.5,-61 352.5,-86" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../lib/class_diagram.png" y="-80.5" x="212" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="232.888" text-anchor="start">NullSummer[Key, Value]</text></a></g></g><!-- node4 --><g class="node trait" id="graph1_4"><g id="a_trait|graph1_4"><a xlink:title="com.twitter.algebird.util.summer.AsyncSummerProxy" xlink:href="AsyncSummerProxy.html#inheritance-diagram"><polygon points="706,-86 548,-86 548,-61 706,-61 706,-86" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../lib/trait_diagram.png" y="-80.5" x="558" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="578.601" text-anchor="start">AsyncSummerProxy[T, M]</text></a></g></g><!-- node5 --><g class="node trait" id="graph1_5"><g id="a_trait|graph1_5"><a xlink:title="com.twitter.algebird.util.summer.AsyncSummer" xlink:href="AsyncSummer.html#inheritance-diagram"><polygon points="604.5,-147 471.5,-147 471.5,-122 604.5,-122 604.5,-147" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../lib/trait_diagram.png" y="-141.5" x="482" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-131.75" x="502.882" text-anchor="start">AsyncSummer[T, M]</text></a></g></g><!-- node5&#45;&gt;node0 --><g class="edge inheritance" id="graph1_5_0"><g id="a_inheritance|graph1_5_0"><a xlink:title="WithFlushConditions[T, M] is a subtype of AsyncSummer[T, M]"><path d="M516.102,-118.819C501.044,-108.723 481.321,-95.4995 467.35,-86.1323" stroke="#d4d4d4" fill="none"></path><polygon points="515.486,-120.513 520.614,-121.843 517.436,-117.606 515.486,-120.513" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node1 --><g class="edge inheritance" id="graph1_5_1"><g id="a_inheritance|graph1_5_1"><a xlink:title="SyncSummingQueue[Key, Value] is a subtype of AsyncSummer[T, M]"><path d="M466.033,-128.631C377.102,-121.8 231.471,-107.719 182,-86 149.595,-71.7734 119.748,-41.7101 104.882,-25.1138" stroke="#d4d4d4" fill="none"></path><polygon points="466.16,-130.396 471.279,-129.031 466.426,-126.906 466.16,-130.396" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node2 --><g class="edge inheritance" id="graph1_5_2"><g id="a_inheritance|graph1_5_2"><a xlink:title="NullSummer[Key, Value] is a subtype of AsyncSummer[T, M]"><path d="M482.146,-120.874C436.53,-110.562 372.583,-96.1068 328.26,-86.0875" stroke="#d4d4d4" fill="none"></path><polygon points="481.794,-122.589 487.057,-121.984 482.566,-119.175 481.794,-122.589" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node3 --><g class="edge inheritance" id="graph1_5_3"><g id="a_inheritance|graph1_5_3"><a xlink:title="HeavyHittersCachingSummer[K, V] is a subtype of AsyncSummer[T, M]"><path d="M466.386,-134.251C375.655,-133.495 226.859,-125.971 192,-86 167.494,-57.8994 216.675,-36.9977 258.379,-25.034" stroke="#d4d4d4" fill="none"></path><polygon points="466.457,-136.002 471.469,-134.287 466.482,-132.502 466.457,-136.002" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node4 --><g class="edge inheritance" id="graph1_5_4"><g id="a_inheritance|graph1_5_4"><a xlink:title="AsyncSummerProxy[T, M] is a subtype of AsyncSummer[T, M]"><path d="M559.754,-119.079C575.031,-108.951 595.201,-95.5802 609.453,-86.1323" stroke="#d4d4d4" fill="none"></path><polygon points="558.784,-117.622 555.584,-121.843 560.718,-120.539 558.784,-117.622" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node6 --><g class="edge inheritance" id="graph1_5_6"><g id="a_inheritance|graph1_5_6"><a xlink:title="AsyncMapSum[Key, Value] is a subtype of AsyncSummer[T, M]"><path d="M609.983,-127.84C672.336,-120.093 747.772,-102.1 715,-61 706.167,-49.9224 633.596,-35.1194 576.629,-25.0007" stroke="#d4d4d4" fill="none"></path><polygon points="609.513,-126.134 604.758,-128.469 609.931,-129.609 609.513,-126.134" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node7 --><g class="edge inheritance" id="graph1_5_7"><g id="a_inheritance|graph1_5_7"><a xlink:title="AsyncListSum[Key, Value] is a subtype of AsyncSummer[T, M]"><path d="M609.604,-125.333C658.696,-118.089 717.625,-105.569 733,-86 748.939,-65.712 722.244,-39.9583 703.008,-25.2418" stroke="#d4d4d4" fill="none"></path><polygon points="609.28,-123.612 604.583,-126.061 609.782,-127.075 609.28,-123.612" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5&#45;&gt;node8 --><g class="edge inheritance" id="graph1_5_8"><g id="a_inheritance|graph1_5_8"><a xlink:title="AsyncListMMapSum[Key, Value] is a subtype of AsyncSummer[T, M]"><path d="M609.957,-122.879C651.744,-115.367 704.88,-103.478 750,-86 792.14,-69.6763 837.078,-41.0019 860.551,-25.0439" stroke="#d4d4d4" fill="none"></path><polygon points="609.535,-121.177 604.918,-123.774 610.147,-124.623 609.535,-121.177" stroke="#d4d4d4" fill="none"></polygon></a></g></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.twitter.algebird.util.summer.ApproxHHTracker" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ApproxHHTrackerextendsAnyRef"></a>
+      <a id="ApproxHHTracker:ApproxHHTracker"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ApproxHHTracker.html"><span class="name">ApproxHHTracker</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@ApproxHHTrackerextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.AsyncListMMapSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AsyncListMMapSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]"></a>
+      <a id="AsyncListMMapSum[Key,Value]:AsyncListMMapSum[Key,Value]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AsyncListMMapSum.html"><span class="name">AsyncListMMapSum</span></a><span class="tparams">[<span name="Key">Key</span>, <span name="Value">Value</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Value">Value</span>]] with <a href="WithFlushConditions.html" class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions">WithFlushConditions</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListMMapSum.Value">Value</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@AsyncListMMapSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.AsyncListSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AsyncListSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]"></a>
+      <a id="AsyncListSum[Key,Value]:AsyncListSum[Key,Value]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AsyncListSum.html"><span class="name">AsyncListSum</span></a><span class="tparams">[<span name="Key">Key</span>, <span name="Value">Value</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Value">Value</span>]] with <a href="WithFlushConditions.html" class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions">WithFlushConditions</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncListSum.Value">Value</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@AsyncListSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.AsyncMapSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AsyncMapSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]"></a>
+      <a id="AsyncMapSum[Key,Value]:AsyncMapSum[Key,Value]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AsyncMapSum.html"><span class="name">AsyncMapSum</span></a><span class="tparams">[<span name="Key">Key</span>, <span name="Value">Value</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Value">Value</span>]] with <a href="WithFlushConditions.html" class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions">WithFlushConditions</a>[(<span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncMapSum.Value">Value</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@AsyncMapSum[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.AsyncSummer" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AsyncSummer[T,+M&lt;:Iterable[T]]extendsAnyRef"></a>
+      <a id="AsyncSummer[T,+M&lt;:Iterable[T]]:AsyncSummer[T,M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="AsyncSummer.html"><span class="name">AsyncSummer</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">+M &lt;: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncSummer.T">T</span>]</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@AsyncSummer[T,+M&lt;:Iterable[T]]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.AsyncSummerProxy" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AsyncSummerProxy[T,+M&lt;:Iterable[T]]extendsAsyncSummer[T,M]"></a>
+      <a id="AsyncSummerProxy[T,+M&lt;:Iterable[T]]:AsyncSummerProxy[T,M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="AsyncSummerProxy.html"><span class="name">AsyncSummerProxy</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">+M &lt;: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncSummerProxy.T">T</span>]</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[<span class="extype" name="com.twitter.algebird.util.summer.AsyncSummerProxy.T">T</span>, <span class="extype" name="com.twitter.algebird.util.summer.AsyncSummerProxy.M">M</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@AsyncSummerProxy[T,+M&lt;:Iterable[T]]extendsAsyncSummer[T,M]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.BufferSize" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BufferSizeextendsProductwithSerializable"></a>
+      <a id="BufferSize:BufferSize"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BufferSize.html"><span class="name">BufferSize</span></a><span class="params">(<span name="v">v: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@BufferSizeextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.Compact" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CompactextendsAnyValwithProductwithSerializable"></a>
+      <a id="Compact:Compact"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Compact.html"><span class="name">Compact</span></a><span class="params">(<span name="flag">flag: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@CompactextendsAnyValwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.CompactionSize" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CompactionSizeextendsAnyValwithProductwithSerializable"></a>
+      <a id="CompactionSize:CompactionSize"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CompactionSize.html"><span class="name">CompactionSize</span></a><span class="params">(<span name="toInt">toInt: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@CompactionSizeextendsAnyValwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.CustomSummingQueue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CustomSummingQueue[V]extendsStatefulSummer[V]"></a>
+      <a id="CustomSummingQueue[V]:CustomSummingQueue[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CustomSummingQueue.html"><span class="name">CustomSummingQueue</span></a><span class="tparams">[<span name="V">V</span>]</span><span class="result"> extends <a href="../../StatefulSummer.html" class="extype" name="com.twitter.algebird.StatefulSummer">StatefulSummer</a>[<span class="extype" name="com.twitter.algebird.util.summer.CustomSummingQueue.V">V</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@CustomSummingQueue[V]extendsStatefulSummer[V]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.FlushFrequency" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlushFrequencyextendsProductwithSerializable"></a>
+      <a id="FlushFrequency:FlushFrequency"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlushFrequency.html"><span class="name">FlushFrequency</span></a><span class="params">(<span name="v">v: <span class="extype" name="com.twitter.util.Duration">Duration</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@FlushFrequencyextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HeavyHittersCachingSummer[K,V]extendsAsyncSummer[(K,V),Iterable[(K,V)]]withWithFlushConditions[(K,V),Iterable[(K,V)]]"></a>
+      <a id="HeavyHittersCachingSummer[K,V]:HeavyHittersCachingSummer[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHittersCachingSummer.html"><span class="name">HeavyHittersCachingSummer</span></a><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.K">K</span>, <span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.V">V</span>), <span class="extype" name="scala.Iterable">Iterable</span>[(<span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.K">K</span>, <span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.V">V</span>)]] with <a href="WithFlushConditions.html" class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions">WithFlushConditions</a>[(<span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.K">K</span>, <span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.V">V</span>), <span class="extype" name="scala.Iterable">Iterable</span>[(<span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.K">K</span>, <span class="extype" name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer.V">V</span>)]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@HeavyHittersCachingSummer[K,V]extendsAsyncSummer[(K,V),Iterable[(K,V)]]withWithFlushConditions[(K,V),Iterable[(K,V)]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.HeavyHittersPercent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HeavyHittersPercentextendsProductwithSerializable"></a>
+      <a id="HeavyHittersPercent:HeavyHittersPercent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHittersPercent.html"><span class="name">HeavyHittersPercent</span></a><span class="params">(<span name="toFloat">toFloat: <span class="extype" name="scala.Float">Float</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@HeavyHittersPercentextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.Incrementor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IncrementorextendsAnyRef"></a>
+      <a id="Incrementor:Incrementor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Incrementor.html"><span class="name">Incrementor</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@IncrementorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.MemoryFlushPercent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MemoryFlushPercentextendsProductwithSerializable"></a>
+      <a id="MemoryFlushPercent:MemoryFlushPercent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MemoryFlushPercent.html"><span class="name">MemoryFlushPercent</span></a><span class="params">(<span name="v">v: <span class="extype" name="scala.Float">Float</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@MemoryFlushPercentextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.NullSummer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NullSummer[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]"></a>
+      <a id="NullSummer[Key,Value]:NullSummer[Key,Value]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NullSummer.html"><span class="name">NullSummer</span></a><span class="tparams">[<span name="Key">Key</span>, <span name="Value">Value</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.NullSummer.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.NullSummer.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.NullSummer.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.NullSummer.Value">Value</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@NullSummer[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.RollOverFrequency" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RollOverFrequencyextendsProductwithSerializable"></a>
+      <a id="RollOverFrequency:RollOverFrequency"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RollOverFrequency.html"><span class="name">RollOverFrequency</span></a><span class="params">(<span name="toLong">toLong: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@RollOverFrequencyextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.util.summer.SyncSummingQueue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SyncSummingQueue[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]withProductwithSerializable"></a>
+      <a id="SyncSummingQueue[Key,Value]:SyncSummingQueue[Key,Value]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SyncSummingQueue.html"><span class="name">SyncSummingQueue</span></a><span class="tparams">[<span name="Key">Key</span>, <span name="Value">Value</span>]</span><span class="params">(<span name="bufferSize">bufferSize: <a href="BufferSize.html" class="extype" name="com.twitter.algebird.util.summer.BufferSize">BufferSize</a></span>, <span name="flushFrequency">flushFrequency: <a href="FlushFrequency.html" class="extype" name="com.twitter.algebird.util.summer.FlushFrequency">FlushFrequency</a></span>, <span name="softMemoryFlush">softMemoryFlush: <a href="MemoryFlushPercent.html" class="extype" name="com.twitter.algebird.util.summer.MemoryFlushPercent">MemoryFlushPercent</a></span>, <span name="memoryIncr">memoryIncr: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>, <span name="timeoutIncr">timeoutIncr: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>, <span name="sizeIncr">sizeIncr: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>, <span name="insertOps">insertOps: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>, <span name="tuplesIn">tuplesIn: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>, <span name="tuplesOut">tuplesOut: <a href="Incrementor.html" class="extype" name="com.twitter.algebird.util.summer.Incrementor">Incrementor</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="semigroup">semigroup: <a href="../../Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Value">Value</span>]</span>)</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[(<span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Value">Value</span>]] with <a href="WithFlushConditions.html" class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions">WithFlushConditions</a>[(<span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Value">Value</span>), <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Key">Key</span>, <span class="extype" name="com.twitter.algebird.util.summer.SyncSummingQueue.Value">Value</span>]] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@SyncSummingQueue[Key,Value]extendsAsyncSummer[(Key,Value),Map[Key,Value]]withWithFlushConditions[(Key,Value),Map[Key,Value]]withProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.UpdateFrequency" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UpdateFrequencyextendsProductwithSerializable"></a>
+      <a id="UpdateFrequency:UpdateFrequency"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="UpdateFrequency.html"><span class="name">UpdateFrequency</span></a><span class="params">(<span name="toInt">toInt: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@UpdateFrequencyextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p>
+    </li><li name="com.twitter.algebird.util.summer.WithFlushConditions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="WithFlushConditions[T,M&lt;:Iterable[T]]extendsAsyncSummer[T,M]"></a>
+      <a id="WithFlushConditions[T,M&lt;:Iterable[T]]:WithFlushConditions[T,M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="WithFlushConditions.html"><span class="name">WithFlushConditions</span></a><span class="tparams">[<span name="T">T</span>, <span name="M">M &lt;: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions.T">T</span>]</span>]</span><span class="result"> extends <a href="AsyncSummer.html" class="extype" name="com.twitter.algebird.util.summer.AsyncSummer">AsyncSummer</a>[<span class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions.T">T</span>, <span class="extype" name="com.twitter.algebird.util.summer.WithFlushConditions.M">M</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@WithFlushConditions[T,M&lt;:Iterable[T]]extendsAsyncSummer[T,M]" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.twitter.algebird.util.summer.HeavyHittersCachingSummer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HeavyHittersCachingSummer"></a>
+      <a id="HeavyHittersCachingSummer:HeavyHittersCachingSummer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HeavyHittersCachingSummer$.html"><span class="name">HeavyHittersCachingSummer</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.twitter.algebird.util.summer.package@HeavyHittersCachingSummer" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

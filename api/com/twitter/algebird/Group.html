@@ -1,0 +1,662 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Group - com.twitter.algebird.Group</title>
+          <meta name="description" content="Group - com.twitter.algebird.Group" />
+          <meta name="keywords" content="Group com.twitter.algebird.Group" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'com.twitter.algebird.Group';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="Group$.html" title="See companion object"><img alt="Trait/Object" src="../../../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.twitter">twitter</a>.<a href="package.html" class="extype" name="com.twitter.algebird">algebird</a></p>
+        <h1><a href="Group$.html" title="See companion object">Group</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="Group$.html" title="See companion object">object Group</a>
+            | <a href="package.html" class="extype" name="com.twitter.algebird">package algebird</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Group</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Group: this is a monoid that also has subtraction (and negation):
+  So, you can do (a-b), or -a (which is equal to 0 - a).
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Cannot find Group type class for ${T}&quot;">...</span>
+    </span>)</span>
+              
+        </dd><dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Group.scala" target="_blank">Group.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>], <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="AbstractField.html" class="extype" name="com.twitter.algebird.AbstractField">AbstractField</a>, <a href="AbstractGroup.html" class="extype" name="com.twitter.algebird.AbstractGroup">AbstractGroup</a>, <a href="AbstractRing.html" class="extype" name="com.twitter.algebird.AbstractRing">AbstractRing</a>, <a href="AdjoinedUnitRing.html" class="extype" name="com.twitter.algebird.AdjoinedUnitRing">AdjoinedUnitRing</a>, <a href="ApplicativeField.html" class="extype" name="com.twitter.algebird.ApplicativeField">ApplicativeField</a>, <a href="ApplicativeGroup.html" class="extype" name="com.twitter.algebird.ApplicativeGroup">ApplicativeGroup</a>, <a href="ApplicativeRing.html" class="extype" name="com.twitter.algebird.ApplicativeRing">ApplicativeRing</a>, <a href="ArrayGroup.html" class="extype" name="com.twitter.algebird.ArrayGroup">ArrayGroup</a>, <a href="AveragedGroup$.html" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a>, <a href="BigDecimalRing$.html" class="extype" name="com.twitter.algebird.BigDecimalRing">BigDecimalRing</a>, <a href="BigIntRing$.html" class="extype" name="com.twitter.algebird.BigIntRing">BigIntRing</a>, <a href="bijection/BijectedField.html" class="extype" name="com.twitter.algebird.bijection.BijectedField">BijectedField</a>, <a href="bijection/BijectedGroup.html" class="extype" name="com.twitter.algebird.bijection.BijectedGroup">BijectedGroup</a>, <a href="bijection/BijectedRing.html" class="extype" name="com.twitter.algebird.bijection.BijectedRing">BijectedRing</a>, <a href="BooleanField$.html" class="extype" name="com.twitter.algebird.BooleanField">BooleanField</a>, <a href="ConstantGroup.html" class="extype" name="com.twitter.algebird.ConstantGroup">ConstantGroup</a>, <a href="DoubleField$.html" class="extype" name="com.twitter.algebird.DoubleField">DoubleField</a>, <a href="EventuallyGroup.html" class="extype" name="com.twitter.algebird.EventuallyGroup">EventuallyGroup</a>, <a href="EventuallyRing.html" class="extype" name="com.twitter.algebird.EventuallyRing">EventuallyRing</a>, <a href="Field.html" class="extype" name="com.twitter.algebird.Field">Field</a>, <a href="FloatField$.html" class="extype" name="com.twitter.algebird.FloatField">FloatField</a>, <a href="GenericMapRing.html" class="extype" name="com.twitter.algebird.GenericMapRing">GenericMapRing</a>, <a href="IndexedSeqGroup.html" class="extype" name="com.twitter.algebird.IndexedSeqGroup">IndexedSeqGroup</a>, <a href="IndexedSeqRing.html" class="extype" name="com.twitter.algebird.IndexedSeqRing">IndexedSeqRing</a>, <a href="IntRing$.html" class="extype" name="com.twitter.algebird.IntRing">IntRing</a>, <a href="JBoolField$.html" class="extype" name="com.twitter.algebird.JBoolField">JBoolField</a>, <a href="JDoubleField$.html" class="extype" name="com.twitter.algebird.JDoubleField">JDoubleField</a>, <a href="JFloatField$.html" class="extype" name="com.twitter.algebird.JFloatField">JFloatField</a>, <a href="JIntRing$.html" class="extype" name="com.twitter.algebird.JIntRing">JIntRing</a>, <a href="JLongRing$.html" class="extype" name="com.twitter.algebird.JLongRing">JLongRing</a>, <a href="JShortRing$.html" class="extype" name="com.twitter.algebird.JShortRing">JShortRing</a>, <a href="LongRing$.html" class="extype" name="com.twitter.algebird.LongRing">LongRing</a>, <a href="MapGroup.html" class="extype" name="com.twitter.algebird.MapGroup">MapGroup</a>, <a href="MapRing.html" class="extype" name="com.twitter.algebird.MapRing">MapRing</a>, <a href="MinPlusSemiring.html" class="extype" name="com.twitter.algebird.MinPlusSemiring">MinPlusSemiring</a>, <a href="MomentsGroup$.html" class="extype" name="com.twitter.algebird.MomentsGroup">MomentsGroup</a>, <a href="NullGroup$.html" class="extype" name="com.twitter.algebird.NullGroup">NullGroup</a>, <a href="NumericRing.html" class="extype" name="com.twitter.algebird.NumericRing">NumericRing</a>, <a href="OptionGroup.html" class="extype" name="com.twitter.algebird.OptionGroup">OptionGroup</a>, <a href="Product10Group.html" class="extype" name="com.twitter.algebird.Product10Group">Product10Group</a>, <a href="Product10Ring.html" class="extype" name="com.twitter.algebird.Product10Ring">Product10Ring</a>, <a href="Product11Group.html" class="extype" name="com.twitter.algebird.Product11Group">Product11Group</a>, <a href="Product11Ring.html" class="extype" name="com.twitter.algebird.Product11Ring">Product11Ring</a>, <a href="Product12Group.html" class="extype" name="com.twitter.algebird.Product12Group">Product12Group</a>, <a href="Product12Ring.html" class="extype" name="com.twitter.algebird.Product12Ring">Product12Ring</a>, <a href="Product13Group.html" class="extype" name="com.twitter.algebird.Product13Group">Product13Group</a>, <a href="Product13Ring.html" class="extype" name="com.twitter.algebird.Product13Ring">Product13Ring</a>, <a href="Product14Group.html" class="extype" name="com.twitter.algebird.Product14Group">Product14Group</a>, <a href="Product14Ring.html" class="extype" name="com.twitter.algebird.Product14Ring">Product14Ring</a>, <a href="Product15Group.html" class="extype" name="com.twitter.algebird.Product15Group">Product15Group</a>, <a href="Product15Ring.html" class="extype" name="com.twitter.algebird.Product15Ring">Product15Ring</a>, <a href="Product16Group.html" class="extype" name="com.twitter.algebird.Product16Group">Product16Group</a>, <a href="Product16Ring.html" class="extype" name="com.twitter.algebird.Product16Ring">Product16Ring</a>, <a href="Product17Group.html" class="extype" name="com.twitter.algebird.Product17Group">Product17Group</a>, <a href="Product17Ring.html" class="extype" name="com.twitter.algebird.Product17Ring">Product17Ring</a>, <a href="Product18Group.html" class="extype" name="com.twitter.algebird.Product18Group">Product18Group</a>, <a href="Product18Ring.html" class="extype" name="com.twitter.algebird.Product18Ring">Product18Ring</a>, <a href="Product19Group.html" class="extype" name="com.twitter.algebird.Product19Group">Product19Group</a>, <a href="Product19Ring.html" class="extype" name="com.twitter.algebird.Product19Ring">Product19Ring</a>, <a href="Product20Group.html" class="extype" name="com.twitter.algebird.Product20Group">Product20Group</a>, <a href="Product20Ring.html" class="extype" name="com.twitter.algebird.Product20Ring">Product20Ring</a>, <a href="Product21Group.html" class="extype" name="com.twitter.algebird.Product21Group">Product21Group</a>, <a href="Product21Ring.html" class="extype" name="com.twitter.algebird.Product21Ring">Product21Ring</a>, <a href="Product22Group.html" class="extype" name="com.twitter.algebird.Product22Group">Product22Group</a>, <a href="Product22Ring.html" class="extype" name="com.twitter.algebird.Product22Ring">Product22Ring</a>, <a href="Product2Group.html" class="extype" name="com.twitter.algebird.Product2Group">Product2Group</a>, <a href="Product2Ring.html" class="extype" name="com.twitter.algebird.Product2Ring">Product2Ring</a>, <a href="Product3Group.html" class="extype" name="com.twitter.algebird.Product3Group">Product3Group</a>, <a href="Product3Ring.html" class="extype" name="com.twitter.algebird.Product3Ring">Product3Ring</a>, <a href="Product4Group.html" class="extype" name="com.twitter.algebird.Product4Group">Product4Group</a>, <a href="Product4Ring.html" class="extype" name="com.twitter.algebird.Product4Ring">Product4Ring</a>, <a href="Product5Group.html" class="extype" name="com.twitter.algebird.Product5Group">Product5Group</a>, <a href="Product5Ring.html" class="extype" name="com.twitter.algebird.Product5Ring">Product5Ring</a>, <a href="Product6Group.html" class="extype" name="com.twitter.algebird.Product6Group">Product6Group</a>, <a href="Product6Ring.html" class="extype" name="com.twitter.algebird.Product6Ring">Product6Ring</a>, <a href="Product7Group.html" class="extype" name="com.twitter.algebird.Product7Group">Product7Group</a>, <a href="Product7Ring.html" class="extype" name="com.twitter.algebird.Product7Ring">Product7Ring</a>, <a href="Product8Group.html" class="extype" name="com.twitter.algebird.Product8Group">Product8Group</a>, <a href="Product8Ring.html" class="extype" name="com.twitter.algebird.Product8Ring">Product8Ring</a>, <a href="Product9Group.html" class="extype" name="com.twitter.algebird.Product9Group">Product9Group</a>, <a href="Product9Ring.html" class="extype" name="com.twitter.algebird.Product9Ring">Product9Ring</a>, <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>, <a href="ScMapGroup.html" class="extype" name="com.twitter.algebird.ScMapGroup">ScMapGroup</a>, <a href="ScMapRing.html" class="extype" name="com.twitter.algebird.ScMapRing">ScMapRing</a>, <a href="ShortRing$.html" class="extype" name="com.twitter.algebird.ShortRing">ShortRing</a>, <a href="statistics/StatisticsGroup.html" class="extype" name="com.twitter.algebird.statistics.StatisticsGroup">StatisticsGroup</a>, <a href="statistics/StatisticsRing.html" class="extype" name="com.twitter.algebird.statistics.StatisticsRing">StatisticsRing</a>, <a href="Tuple10Group.html" class="extype" name="com.twitter.algebird.Tuple10Group">Tuple10Group</a>, <a href="Tuple10Ring.html" class="extype" name="com.twitter.algebird.Tuple10Ring">Tuple10Ring</a>, <a href="Tuple11Group.html" class="extype" name="com.twitter.algebird.Tuple11Group">Tuple11Group</a>, <a href="Tuple11Ring.html" class="extype" name="com.twitter.algebird.Tuple11Ring">Tuple11Ring</a>, <a href="Tuple12Group.html" class="extype" name="com.twitter.algebird.Tuple12Group">Tuple12Group</a>, <a href="Tuple12Ring.html" class="extype" name="com.twitter.algebird.Tuple12Ring">Tuple12Ring</a>, <a href="Tuple13Group.html" class="extype" name="com.twitter.algebird.Tuple13Group">Tuple13Group</a>, <a href="Tuple13Ring.html" class="extype" name="com.twitter.algebird.Tuple13Ring">Tuple13Ring</a>, <a href="Tuple14Group.html" class="extype" name="com.twitter.algebird.Tuple14Group">Tuple14Group</a>, <a href="Tuple14Ring.html" class="extype" name="com.twitter.algebird.Tuple14Ring">Tuple14Ring</a>, <a href="Tuple15Group.html" class="extype" name="com.twitter.algebird.Tuple15Group">Tuple15Group</a>, <a href="Tuple15Ring.html" class="extype" name="com.twitter.algebird.Tuple15Ring">Tuple15Ring</a>, <a href="Tuple16Group.html" class="extype" name="com.twitter.algebird.Tuple16Group">Tuple16Group</a>, <a href="Tuple16Ring.html" class="extype" name="com.twitter.algebird.Tuple16Ring">Tuple16Ring</a>, <a href="Tuple17Group.html" class="extype" name="com.twitter.algebird.Tuple17Group">Tuple17Group</a>, <a href="Tuple17Ring.html" class="extype" name="com.twitter.algebird.Tuple17Ring">Tuple17Ring</a>, <a href="Tuple18Group.html" class="extype" name="com.twitter.algebird.Tuple18Group">Tuple18Group</a>, <a href="Tuple18Ring.html" class="extype" name="com.twitter.algebird.Tuple18Ring">Tuple18Ring</a>, <a href="Tuple19Group.html" class="extype" name="com.twitter.algebird.Tuple19Group">Tuple19Group</a>, <a href="Tuple19Ring.html" class="extype" name="com.twitter.algebird.Tuple19Ring">Tuple19Ring</a>, <a href="Tuple20Group.html" class="extype" name="com.twitter.algebird.Tuple20Group">Tuple20Group</a>, <a href="Tuple20Ring.html" class="extype" name="com.twitter.algebird.Tuple20Ring">Tuple20Ring</a>, <a href="Tuple21Group.html" class="extype" name="com.twitter.algebird.Tuple21Group">Tuple21Group</a>, <a href="Tuple21Ring.html" class="extype" name="com.twitter.algebird.Tuple21Ring">Tuple21Ring</a>, <a href="Tuple22Group.html" class="extype" name="com.twitter.algebird.Tuple22Group">Tuple22Group</a>, <a href="Tuple22Ring.html" class="extype" name="com.twitter.algebird.Tuple22Ring">Tuple22Ring</a>, <a href="Tuple2Group.html" class="extype" name="com.twitter.algebird.Tuple2Group">Tuple2Group</a>, <a href="Tuple2Ring.html" class="extype" name="com.twitter.algebird.Tuple2Ring">Tuple2Ring</a>, <a href="Tuple3Group.html" class="extype" name="com.twitter.algebird.Tuple3Group">Tuple3Group</a>, <a href="Tuple3Ring.html" class="extype" name="com.twitter.algebird.Tuple3Ring">Tuple3Ring</a>, <a href="Tuple4Group.html" class="extype" name="com.twitter.algebird.Tuple4Group">Tuple4Group</a>, <a href="Tuple4Ring.html" class="extype" name="com.twitter.algebird.Tuple4Ring">Tuple4Ring</a>, <a href="Tuple5Group.html" class="extype" name="com.twitter.algebird.Tuple5Group">Tuple5Group</a>, <a href="Tuple5Ring.html" class="extype" name="com.twitter.algebird.Tuple5Ring">Tuple5Ring</a>, <a href="Tuple6Group.html" class="extype" name="com.twitter.algebird.Tuple6Group">Tuple6Group</a>, <a href="Tuple6Ring.html" class="extype" name="com.twitter.algebird.Tuple6Ring">Tuple6Ring</a>, <a href="Tuple7Group.html" class="extype" name="com.twitter.algebird.Tuple7Group">Tuple7Group</a>, <a href="Tuple7Ring.html" class="extype" name="com.twitter.algebird.Tuple7Ring">Tuple7Ring</a>, <a href="Tuple8Group.html" class="extype" name="com.twitter.algebird.Tuple8Group">Tuple8Group</a>, <a href="Tuple8Ring.html" class="extype" name="com.twitter.algebird.Tuple8Ring">Tuple8Ring</a>, <a href="Tuple9Group.html" class="extype" name="com.twitter.algebird.Tuple9Group">Tuple9Group</a>, <a href="Tuple9Ring.html" class="extype" name="com.twitter.algebird.Tuple9Ring">Tuple9Ring</a>, <a href="UnitGroup$.html" class="extype" name="com.twitter.algebird.UnitGroup">UnitGroup</a></div>
+          </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph1" viewBox="0.00 0.00 140.00 155.00" height="155pt" width="140pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 151)" class="graph" id="graph0"><polygon points="-4,4 -4,-151 136,-151 136,4 -4,4" stroke="none" fill="white"></polygon><g class="cluster" id="clust1"></g><g class="cluster" id="clust2"></g><!-- node0 --><g class="node this trait" id="graph1_0"><g id="a_this trait|graph1_0"><a xlink:title="com.twitter.algebird.Group (this trait)" xlink:href="#inheritance-diagram"><polygon points="107.5,-86 24.5,-86 24.5,-61 107.5,-61 107.5,-86" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-80.5" x="35" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="55.8818" text-anchor="start">Group[T]</text></a></g></g><!-- node1 --><g class="node default" id="graph1_1"><g id="a_default|graph1_1"><a xlink:title="AbstractGroup[T], ApplicativeGroup[T, M], ArrayGroup[T], AveragedGroup, BijectedGroup[T, U], ConstantGroup[T], EventuallyGroup[E, O], IndexedSeqGroup[T], MapGroup[K, V], MomentsGroup, OptionGroup[T], Product10Group[X, A, B, C, D, E, F, G, H, I, J], Product11Group[X, A, B, C, D, E, F, G, H, I, J, K], Product12Group[X, A, B, C, D, E, F, G, H, I, J, K, L], Product13Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M], Product14Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N], Product15Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O], Product16Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P], Product17Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q], Product18Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R], Product19Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S], Product20Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T], Product21Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U], Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V], Product2Group[X, A, B], Product3Group[X, A, B, C], Product4Group[X, A, B, C, D], Product5Group[X, A, B, C, D, E], Product6Group[X, A, B, C, D, E, F], Product7Group[X, A, B, C, D, E, F, G], Product8Group[X, A, B, C, D, E, F, G, H], Product9Group[X, A, B, C, D, E, F, G, H, I], Ring[T], ScMapGroup[K, V], StatisticsGroup[T], Tuple10Group[A, B, C, D, E, F, G, H, I, J], Tuple11Group[A, B, C, D, E, F, G, H, I, J, K], Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L], Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M], Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N], Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O], Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P], Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q], Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R], Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S], Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T], Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U], Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V], Tuple2Group[A, B], Tuple3Group[A, B, C], Tuple4Group[A, B, C, D], Tuple5Group[A, B, C, D, E], Tuple6Group[A, B, C, D, E, F], Tuple7Group[A, B, C, D, E, F, G], Tuple8Group[A, B, C, D, E, F, G, H], Tuple9Group[A, B, C, D, E, F, G, H, I]"><polygon points="112.5,-25 19.5,-25 19.5,-0 112.5,-0 112.5,-25" stroke="#ababab" fill="#e1e1e1"></polygon><text fill="#7d7d7d" font-size="10.00" font-family="Arial" y="-9.5" x="30.6528" text-anchor="start">56 classes/traits</text></a></g></g><!-- node0&#45;&gt;node1 --><g class="edge inheritance" id="graph1_0_1"><g id="a_inheritance|graph1_0_1"><a xlink:title="56 classes/traits are subtypes of Group[T]"><path d="M66,-55.6874C66,-45.9173 66,-33.8534 66,-25.1323" stroke="#d4d4d4" fill="none"></path><polygon points="64.2501,-55.8435 66,-60.8435 67.7501,-55.8435 64.2501,-55.8435" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node2 --><g class="node trait" id="graph1_2"><g id="a_trait|graph1_2"><a xlink:title="com.twitter.algebird.Monoid" xlink:href="Monoid.html#inheritance-diagram"><polygon points="110,-147 22,-147 22,-122 110,-122 110,-147" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-141.5" x="32" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-131.75" x="52.8794" text-anchor="start">Monoid[T]</text></a></g></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph1_2_0"><g id="a_inheritance|graph1_2_0"><a xlink:title="Group[T] is a subtype of Monoid[T]"><path d="M66,-116.687C66,-106.917 66,-94.8534 66,-86.1323" stroke="#d4d4d4" fill="none"></path><polygon points="64.2501,-116.843 66,-121.843 67.7501,-116.844 64.2501,-116.843" stroke="#d4d4d4" fill="none"></polygon></a></g></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.twitter.algebird.Group"><span>Group</span></li><li class="in" name="com.twitter.algebird.Monoid"><span>Monoid</span></li><li class="in" name="com.twitter.algebird.Semigroup"><span>Semigroup</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="com.twitter.algebird.Semigroup#plus" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="plus(l:T,r:T):T"></a>
+      <a id="plus(T,T):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">plus</span><span class="params">(<span name="l">l: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>, <span name="r">r: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@plus(l:T,r:T):T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Monoid#zero" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="zero:T"></a>
+      <a id="zero:T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zero</span><span class="result">: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@zero:T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.Monoid#assertNotZero" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="assertNotZero(v:T):Unit"></a>
+      <a id="assertNotZero(T):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">assertNotZero</span><span class="params">(<span name="v">v: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@assertNotZero(v:T):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.Monoid#isNonZero" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isNonZero(v:T):Boolean"></a>
+      <a id="isNonZero(T):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isNonZero</span><span class="params">(<span name="v">v: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@isNonZero(v:T):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Group#minus" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="minus(l:T,r:T):T"></a>
+      <a id="minus(T,T):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">minus</span><span class="params">(<span name="l">l: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>, <span name="r">r: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@minus(l:T,r:T):T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.Group#negate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="negate(v:T):T"></a>
+      <a id="negate(T):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">negate</span><span class="params">(<span name="v">v: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@negate(v:T):T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.Monoid#nonZeroOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nonZeroOption(v:T):Option[T]"></a>
+      <a id="nonZeroOption(T):Option[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nonZeroOption</span><span class="params">(<span name="v">v: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@nonZeroOption(v:T):Option[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.Monoid#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sum(vs:TraversableOnce[T]):T"></a>
+      <a id="sum(TraversableOnce[T]):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="vs">vs: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.Group.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@sum(vs:TraversableOnce[T]):T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sumOption(iter:TraversableOnce[T]):Option[T]"></a>
+      <a id="sumOption(TraversableOnce[T]):Option[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sumOption</span><span class="params">(<span name="iter">iter: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@sumOption(iter:TraversableOnce[T]):Option[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Group@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="com.twitter.algebird.Monoid">
+              <h3>Inherited from <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</h3>
+            </div><div class="parent" name="com.twitter.algebird.Semigroup">
+              <h3>Inherited from <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.Group.T">T</span>]</h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

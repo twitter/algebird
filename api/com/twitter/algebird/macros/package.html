@@ -1,0 +1,330 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>macros - com.twitter.algebird.macros</title>
+          <meta name="description" content="macros - com.twitter.algebird.macros" />
+          <meta name="keywords" content="macros com.twitter.algebird.macros" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../index.html';
+            var hash = 'com.twitter.algebird.macros.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../package.html" class="extype" name="com">com</a>.<a href="../../package.html" class="extype" name="com.twitter">twitter</a>.<a href="../package.html" class="extype" name="com.twitter.algebird">algebird</a></p>
+        <h1>macros</h1><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">macros</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/macros/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.twitter.algebird.macros"><span>macros</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.twitter.algebird.macros.Cuber" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="Cuber[I]extendsAnyRef"></a>
+      <a id="Cuber[I]:Cuber[I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Cuber.html"><span class="name">Cuber</span></a><span class="tparams">[<span name="I">I</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@Cuber[I]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">&quot;Cubes&quot; a case class or tuple, i.e.</p><div class="fullcomment"><div class="comment cmt"><p>&quot;Cubes&quot; a case class or tuple, i.e. for a tuple of type
+(T1, T2, ... , TN) generates all 2^N possible combinations of type
+(Option[T1], Option[T2], ... , Option[TN]).</p><p>This is useful for comparing some metric across all possible subsets.
+For example, suppose we have a set of people represented as
+case class Person(gender: String, age: Int, height: Double)
+and we want to know the average height of</p><ul><li>people, grouped by gender and age</li><li>people, grouped by only gender</li><li>people, grouped by only age</li><li>all people</li></ul><p>Then we could do
+&gt; import com.twitter.algebird.macros.Cuber.cuber
+&gt; val people: List[People]
+&gt; val averageHeights: Map[(Option[String], Option[Int]), Double] =
+&gt;   people.flatMap { p =&gt; cuber((p.gender, p.age)).map((_,p)) }
+&gt;     .groupBy(_._1)
+&gt;     .mapValues { xs =&gt; val heights = xs.map(_.height); heights.sum / heights.length }
+</p></div></div>
+    </li><li name="com.twitter.algebird.macros.Roller" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="Roller[I]extendsAnyRef"></a>
+      <a id="Roller[I]:Roller[I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Roller.html"><span class="name">Roller</span></a><span class="tparams">[<span name="I">I</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@Roller[I]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Given a TupleN, produces a sequence of (N + 1) tuples each of arity N
+such that, for all k from 0 to N, there is a tuple with k Somes
+followed by (N - k) Nones.</p><div class="fullcomment"><div class="comment cmt"><p>Given a TupleN, produces a sequence of (N + 1) tuples each of arity N
+such that, for all k from 0 to N, there is a tuple with k Somes
+followed by (N - k) Nones.</p><p>This is useful for comparing some metric across multiple layers of
+some hierarchy.
+For example, suppose we have some climate data represented as
+case class Data(continent: String, country: String, city: String, temperature: Double)
+and we want to know the average temperatures of</p><ul><li>each continent</li><li>each (continent, country) pair</li><li>each (continent, country, city) triple</li></ul><p>Here we desire the (continent, country) and (continent, country, city)
+pair because, for example, if we grouped by city instead of by
+(continent, country, city), we would accidentally combine the results for
+Paris, Texas and Paris, France.</p><p>Then we could do
+&gt; import com.twitter.algebird.macros.Roller.roller
+&gt; val data: List[Data]
+&gt; val averageTemps: Map[(Option[String], Option[String], Option[String]), Double] =
+&gt; data.flatMap { d =&gt; roller((d.continent, d.country, d.city)).map((_, d)) }
+&gt;   .groupBy(_._1)
+&gt;   .mapValues { xs =&gt; val temps = xs.map(_.temperature); temps.sum / temps.length }
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.twitter.algebird.macros.ArbitraryCaseClassMacro" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ArbitraryCaseClassMacro"></a>
+      <a id="ArbitraryCaseClassMacro:ArbitraryCaseClassMacro"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ArbitraryCaseClassMacro$.html"><span class="name">ArbitraryCaseClassMacro</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@ArbitraryCaseClassMacro" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.Cuber" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Cuber"></a>
+      <a id="Cuber:Cuber"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Cuber$.html"><span class="name">Cuber</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@Cuber" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.GroupMacro" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GroupMacro"></a>
+      <a id="GroupMacro:GroupMacro"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GroupMacro$.html"><span class="name">GroupMacro</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@GroupMacro" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.MonoidMacro" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MonoidMacro"></a>
+      <a id="MonoidMacro:MonoidMacro"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MonoidMacro$.html"><span class="name">MonoidMacro</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@MonoidMacro" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.RingMacro" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RingMacro"></a>
+      <a id="RingMacro:RingMacro"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RingMacro$.html"><span class="name">RingMacro</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@RingMacro" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.Roller" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Roller"></a>
+      <a id="Roller:Roller"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Roller$.html"><span class="name">Roller</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@Roller" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.SemigroupMacro" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SemigroupMacro"></a>
+      <a id="SemigroupMacro:SemigroupMacro"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SemigroupMacro$.html"><span class="name">SemigroupMacro</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@SemigroupMacro" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.macros.caseclass" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="caseclass"></a>
+      <a id="caseclass:caseclass"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="caseclass$.html"><span class="name">caseclass</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.twitter.algebird.macros.package@caseclass" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

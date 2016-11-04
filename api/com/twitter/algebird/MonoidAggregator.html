@@ -1,0 +1,942 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>MonoidAggregator - com.twitter.algebird.MonoidAggregator</title>
+          <meta name="description" content="MonoidAggregator - com.twitter.algebird.MonoidAggregator" />
+          <meta name="keywords" content="MonoidAggregator com.twitter.algebird.MonoidAggregator" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'com.twitter.algebird.MonoidAggregator';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Trait" src="../../../lib/trait_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.twitter">twitter</a>.<a href="package.html" class="extype" name="com.twitter.algebird">algebird</a></p>
+        <h1>MonoidAggregator</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="com.twitter.algebird">package algebird</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MonoidAggregator</span><span class="tparams">[<span name="A">-A</span>, <span name="B">B</span>, <span name="C">+C</span>]</span><span class="result"> extends <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</dd><dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Aggregator.scala" target="_blank">Aggregator.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="Averager$.html" class="extype" name="com.twitter.algebird.Averager">Averager</a>, <a href="BloomFilterAggregator.html" class="extype" name="com.twitter.algebird.BloomFilterAggregator">BloomFilterAggregator</a>, <a href="CMSAggregator.html" class="extype" name="com.twitter.algebird.CMSAggregator">CMSAggregator</a>, <a href="EventuallyMonoidAggregator.html" class="extype" name="com.twitter.algebird.EventuallyMonoidAggregator">EventuallyMonoidAggregator</a>, <a href="GenHLLAggregator.html" class="extype" name="com.twitter.algebird.GenHLLAggregator">GenHLLAggregator</a>, <a href="HyperLogLogAggregator.html" class="extype" name="com.twitter.algebird.HyperLogLogAggregator">HyperLogLogAggregator</a>, <a href="MapMonoidAggregator.html" class="extype" name="com.twitter.algebird.MapMonoidAggregator">MapMonoidAggregator</a>, <a href="MomentsAggregator$.html" class="extype" name="com.twitter.algebird.MomentsAggregator">MomentsAggregator</a>, <a href="mutable/PriorityQueueAggregator.html" class="extype" name="com.twitter.algebird.mutable.PriorityQueueAggregator">PriorityQueueAggregator</a>, <a href="mutable/PriorityQueueToListAggregator.html" class="extype" name="com.twitter.algebird.mutable.PriorityQueueToListAggregator">PriorityQueueToListAggregator</a>, <a href="RingAggregator.html" class="extype" name="com.twitter.algebird.RingAggregator">RingAggregator</a>, <a href="SetSizeAggregator.html" class="extype" name="com.twitter.algebird.SetSizeAggregator">SetSizeAggregator</a>, <a href="SetSizeAggregatorBase.html" class="extype" name="com.twitter.algebird.SetSizeAggregatorBase">SetSizeAggregatorBase</a>, <a href="SetSizeHashAggregator.html" class="extype" name="com.twitter.algebird.SetSizeHashAggregator">SetSizeHashAggregator</a>, <a href="SketchMapAggregator.html" class="extype" name="com.twitter.algebird.SketchMapAggregator">SketchMapAggregator</a>, <a href="TopCMSAggregator.html" class="extype" name="com.twitter.algebird.TopCMSAggregator">TopCMSAggregator</a>, <a href="TopKToListAggregator.html" class="extype" name="com.twitter.algebird.TopKToListAggregator">TopKToListAggregator</a>, <a href="TopNCMSAggregator.html" class="extype" name="com.twitter.algebird.TopNCMSAggregator">TopNCMSAggregator</a>, <a href="TopPctCMSAggregator.html" class="extype" name="com.twitter.algebird.TopPctCMSAggregator">TopPctCMSAggregator</a></div>
+          </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph1" viewBox="0.00 0.00 2220.00 155.00" height="155pt" width="2220pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 151)" class="graph" id="graph0"><polygon points="-4,4 -4,-151 2216,-151 2216,4 -4,4" stroke="none" fill="white"></polygon><g class="cluster" id="clust1"></g><g class="cluster" id="clust2"></g><!-- node0 --><g class="node this trait" id="graph1_0"><g id="a_this trait|graph1_0"><a xlink:title="com.twitter.algebird.MonoidAggregator (this trait)" xlink:href="#inheritance-diagram"><polygon points="1159.5,-86 996.5,-86 996.5,-61 1159.5,-61 1159.5,-86" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-80.5" x="1007" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="1027.86" text-anchor="start">MonoidAggregator[A, B, C]</text></a></g></g><!-- node1 --><g class="node object" id="graph1_1"><g id="a_object|graph1_1"><a xlink:title="com.twitter.algebird.Averager" xlink:href="Averager$.html#inheritance-diagram"><polygon points="84,-25 0,-25 0,-0 84,-0 84,-25" stroke="#102966" fill="#3556a7"></polygon><image xlink:href="../../../lib/object_diagram.png" y="-19.5" x="10" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="30.9131" text-anchor="start">Averager</text></a></g></g><!-- node0&#45;&gt;node1 --><g class="edge inheritance" id="graph1_0_1"><g id="a_inheritance|graph1_0_1"><a xlink:title="Averager is a subtype of MonoidAggregator[A, B, C]"><path d="M991.46,-73.3533C819.444,-73.943 422.683,-69.7741 93,-25 90.1219,-24.6091 87.1665,-24.1363 84.1981,-23.6081" stroke="#d4d4d4" fill="none"></path><polygon points="991.49,-75.1033 996.484,-73.3345 991.477,-71.6034 991.49,-75.1033" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node2 --><g class="node class" id="graph1_2"><g id="a_class|graph1_2"><a xlink:title="com.twitter.algebird.BloomFilterAggregator" xlink:href="BloomFilterAggregator.html#inheritance-diagram"><polygon points="245.5,-25 102.5,-25 102.5,-0 245.5,-0 245.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="113" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="133.589" text-anchor="start">BloomFilterAggregator</text></a></g></g><!-- node0&#45;&gt;node2 --><g class="edge inheritance" id="graph1_0_2"><g id="a_inheritance|graph1_0_2"><a xlink:title="BloomFilterAggregator is a subtype of MonoidAggregator[A, B, C]"><path d="M990.959,-69.9206C840.436,-64.9156 521.893,-51.9269 254,-25 251.347,-24.7334 248.648,-24.443 245.923,-24.1338" stroke="#d4d4d4" fill="none"></path><polygon points="991.187,-71.6791 996.242,-70.0953 991.303,-68.181 991.187,-71.6791" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node3 --><g class="node class" id="graph1_3"><g id="a_class|graph1_3"><a xlink:title="com.twitter.algebird.CMSAggregator" xlink:href="CMSAggregator.html#inheritance-diagram"><polygon points="390.5,-25 263.5,-25 263.5,-0 390.5,-0 390.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="274" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="294.648" text-anchor="start">CMSAggregator[K]</text></a></g></g><!-- node0&#45;&gt;node3 --><g class="edge inheritance" id="graph1_0_3"><g id="a_inheritance|graph1_0_3"><a xlink:title="CMSAggregator[K] is a subtype of MonoidAggregator[A, B, C]"><path d="M991.085,-68.8143C861.877,-62.7915 611.621,-49.0364 400,-25 396.94,-24.6525 393.813,-24.2691 390.657,-23.8595" stroke="#d4d4d4" fill="none"></path><polygon points="991.312,-70.5766 996.388,-69.0603 991.474,-67.0804 991.312,-70.5766" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node4 --><g class="node trait" id="graph1_4"><g id="a_trait|graph1_4"><a xlink:title="com.twitter.algebird.EventuallyMonoidAggregator" xlink:href="EventuallyMonoidAggregator.html#inheritance-diagram"><polygon points="631,-25 409,-25 409,-0 631,-0 631,-25" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-19.5" x="419" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="439.621" text-anchor="start">EventuallyMonoidAggregator[A, E, O, C]</text></a></g></g><!-- node0&#45;&gt;node4 --><g class="edge inheritance" id="graph1_0_4"><g id="a_inheritance|graph1_0_4"><a xlink:title="EventuallyMonoidAggregator[A, E, O, C] is a subtype of MonoidAggregator[A, B, C]"><path d="M991.08,-63.3096C893.396,-52.9809 734.666,-36.1977 628.818,-25.0059" stroke="#d4d4d4" fill="none"></path><polygon points="991.108,-65.0722 996.264,-63.8577 991.476,-61.5916 991.108,-65.0722" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node5 --><g class="node class" id="graph1_5"><g id="a_class|graph1_5"><a xlink:title="com.twitter.algebird.GenHLLAggregator" xlink:href="GenHLLAggregator.html#inheritance-diagram"><polygon points="791,-25 649,-25 649,-0 791,-0 791,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="659" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="679.636" text-anchor="start">GenHLLAggregator[K]</text></a></g></g><!-- node0&#45;&gt;node5 --><g class="edge inheritance" id="graph1_0_5"><g id="a_inheritance|graph1_0_5"><a xlink:title="GenHLLAggregator[K] is a subtype of MonoidAggregator[A, B, C]"><path d="M1002.89,-60.1222C940.129,-49.7783 851.3,-35.1388 790.005,-25.0371" stroke="#d4d4d4" fill="none"></path><polygon points="1002.91,-61.8977 1008.12,-60.9841 1003.48,-58.4443 1002.91,-61.8977" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node6 --><g class="node class" id="graph1_6"><g id="a_class|graph1_6"><a xlink:title="com.twitter.algebird.HyperLogLogAggregator" xlink:href="HyperLogLogAggregator.html#inheritance-diagram"><polygon points="962.5,-25 809.5,-25 809.5,-0 962.5,-0 962.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="820" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="840.85" text-anchor="start">HyperLogLogAggregator</text></a></g></g><!-- node0&#45;&gt;node6 --><g class="edge inheritance" id="graph1_0_6"><g id="a_inheritance|graph1_0_6"><a xlink:title="HyperLogLogAggregator is a subtype of MonoidAggregator[A, B, C]"><path d="M1035.68,-59.4964C1002.22,-49.2119 955.918,-34.9851 923.708,-25.0875" stroke="#d4d4d4" fill="none"></path><polygon points="1035.23,-61.1882 1040.52,-60.9841 1036.26,-57.8426 1035.23,-61.1882" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node7 --><g class="node trait" id="graph1_7"><g id="a_trait|graph1_7"><a xlink:title="com.twitter.algebird.MapMonoidAggregator" xlink:href="MapMonoidAggregator.html#inheritance-diagram"><polygon points="1175,-25 981,-25 981,-0 1175,-0 1175,-25" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-19.5" x="991" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1011.52" text-anchor="start">MapMonoidAggregator[A, B, K, C]</text></a></g></g><!-- node0&#45;&gt;node7 --><g class="edge inheritance" id="graph1_0_7"><g id="a_inheritance|graph1_0_7"><a xlink:title="MapMonoidAggregator[A, B, K, C] is a subtype of MonoidAggregator[A, B, C]"><path d="M1078,-55.6874C1078,-45.9173 1078,-33.8534 1078,-25.1323" stroke="#d4d4d4" fill="none"></path><polygon points="1076.25,-55.8435 1078,-60.8435 1079.75,-55.8435 1076.25,-55.8435" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node8 --><g class="node object" id="graph1_8"><g id="a_object|graph1_8"><a xlink:title="com.twitter.algebird.MomentsAggregator" xlink:href="MomentsAggregator$.html#inheritance-diagram"><polygon points="1327,-25 1193,-25 1193,-0 1327,-0 1327,-25" stroke="#102966" fill="#3556a7"></polygon><image xlink:href="../../../lib/object_diagram.png" y="-19.5" x="1203" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1223.81" text-anchor="start">MomentsAggregator</text></a></g></g><!-- node0&#45;&gt;node8 --><g class="edge inheritance" id="graph1_0_8"><g id="a_inheritance|graph1_0_8"><a xlink:title="MomentsAggregator is a subtype of MonoidAggregator[A, B, C]"><path d="M1118.5,-59.3697C1150.2,-49.0954 1193.85,-34.9445 1224.26,-25.0875" stroke="#d4d4d4" fill="none"></path><polygon points="1117.74,-57.7775 1113.52,-60.9841 1118.82,-61.1069 1117.74,-57.7775" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node9 --><g class="node class" id="graph1_9"><g id="a_class|graph1_9"><a xlink:title="com.twitter.algebird.mutable.PriorityQueueAggregator" xlink:href="mutable/PriorityQueueAggregator.html#inheritance-diagram"><polygon points="1524.5,-25 1345.5,-25 1345.5,-0 1524.5,-0 1524.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="1356" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1376.8" text-anchor="start">PriorityQueueAggregator[A, C]</text></a></g></g><!-- node0&#45;&gt;node9 --><g class="edge inheritance" id="graph1_0_9"><g id="a_inheritance|graph1_0_9"><a xlink:title="PriorityQueueAggregator[A, C] is a subtype of MonoidAggregator[A, B, C]"><path d="M1152.9,-60.1222C1215.49,-49.7783 1304.07,-35.1388 1365.19,-25.0371" stroke="#d4d4d4" fill="none"></path><polygon points="1152.33,-58.4422 1147.68,-60.9841 1152.9,-61.8954 1152.33,-58.4422" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node10 --><g class="node trait" id="graph1_10"><g id="a_trait|graph1_10"><a xlink:title="com.twitter.algebird.RingAggregator" xlink:href="RingAggregator.html#inheritance-diagram"><polygon points="1693.5,-25 1542.5,-25 1542.5,-0 1693.5,-0 1693.5,-25" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-19.5" x="1553" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1573.97" text-anchor="start">RingAggregator[A, B, C]</text></a></g></g><!-- node0&#45;&gt;node10 --><g class="edge inheritance" id="graph1_0_10"><g id="a_inheritance|graph1_0_10"><a xlink:title="RingAggregator[A, B, C] is a subtype of MonoidAggregator[A, B, C]"><path d="M1164.78,-64.3006C1256.59,-55.4295 1405.64,-40.4675 1534,-25 1536.78,-24.6654 1539.6,-24.3171 1542.46,-23.9591" stroke="#d4d4d4" fill="none"></path><polygon points="1164.45,-62.5748 1159.64,-64.7971 1164.78,-66.0586 1164.45,-62.5748" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node11 --><g class="node class" id="graph1_11"><g id="a_class|graph1_11"><a xlink:title="com.twitter.algebird.SketchMapAggregator" xlink:href="SketchMapAggregator.html#inheritance-diagram"><polygon points="1878.5,-25 1711.5,-25 1711.5,-0 1878.5,-0 1878.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="1722" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1742.63" text-anchor="start">SketchMapAggregator[K, V]</text></a></g></g><!-- node0&#45;&gt;node11 --><g class="edge inheritance" id="graph1_0_11"><g id="a_inheritance|graph1_0_11"><a xlink:title="SketchMapAggregator[K, V] is a subtype of MonoidAggregator[A, B, C]"><path d="M1164.83,-67.2359C1285.64,-59.6076 1511.23,-44.2618 1703,-25 1705.72,-24.7265 1708.49,-24.4387 1711.28,-24.1395" stroke="#d4d4d4" fill="none"></path><polygon points="1164.39,-65.51 1159.51,-67.571 1164.61,-69.003 1164.39,-65.51" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node12 --><g class="node class" id="graph1_12"><g id="a_class|graph1_12"><a xlink:title="com.twitter.algebird.TopCMSAggregator" xlink:href="TopCMSAggregator.html#inheritance-diagram"><polygon points="2039.5,-25 1896.5,-25 1896.5,-0 2039.5,-0 2039.5,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="1907" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="1927.59" text-anchor="start">TopCMSAggregator[K]</text></a></g></g><!-- node0&#45;&gt;node12 --><g class="edge inheritance" id="graph1_0_12"><g id="a_inheritance|graph1_0_12"><a xlink:title="TopCMSAggregator[K] is a subtype of MonoidAggregator[A, B, C]"><path d="M1164.73,-69.8111C1313.17,-64.6733 1625.35,-51.5317 1888,-25 1890.65,-24.7321 1893.35,-24.4405 1896.08,-24.1304" stroke="#d4d4d4" fill="none"></path><polygon points="1164.46,-68.0694 1159.52,-69.9905 1164.58,-71.5674 1164.46,-68.0694" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node13 --><g class="node class" id="graph1_13"><g id="a_class|graph1_13"><a xlink:title="com.twitter.algebird.TopKToListAggregator" xlink:href="TopKToListAggregator.html#inheritance-diagram"><polygon points="2212,-25 2058,-25 2058,-0 2212,-0 2212,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="2068" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="2088.8" text-anchor="start">TopKToListAggregator[A]</text></a></g></g><!-- node0&#45;&gt;node13 --><g class="edge inheritance" id="graph1_0_13"><g id="a_inheritance|graph1_0_13"><a xlink:title="TopKToListAggregator[A] is a subtype of MonoidAggregator[A, B, C]"><path d="M1164.9,-70.6977C1334.96,-66.629 1723.56,-54.6659 2049,-25 2051.85,-24.7402 2054.75,-24.4556 2057.68,-24.1513" stroke="#d4d4d4" fill="none"></path><polygon points="1164.64,-68.9532 1159.68,-70.8216 1164.72,-72.4523 1164.64,-68.9532" stroke="#d4d4d4" fill="none"></polygon></a></g></g><!-- node14 --><g class="node trait" id="graph1_14"><g id="a_trait|graph1_14"><a xlink:title="com.twitter.algebird.Aggregator" xlink:href="Aggregator.html#inheritance-diagram"><polygon points="1143,-147 1013,-147 1013,-122 1143,-122 1143,-147" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-141.5" x="1023" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-131.75" x="1043.76" text-anchor="start">Aggregator[A, B, C]</text></a></g></g><!-- node14&#45;&gt;node0 --><g class="edge inheritance" id="graph1_14_0"><g id="a_inheritance|graph1_14_0"><a xlink:title="MonoidAggregator[A, B, C] is a subtype of Aggregator[A, B, C]"><path d="M1078,-116.687C1078,-106.917 1078,-94.8534 1078,-86.1323" stroke="#d4d4d4" fill="none"></path><polygon points="1076.25,-116.843 1078,-121.843 1079.75,-116.844 1076.25,-116.843" stroke="#d4d4d4" fill="none"></polygon></a></g></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.twitter.algebird.MonoidAggregator"><span>MonoidAggregator</span></li><li class="in" name="com.twitter.algebird.Aggregator"><span>Aggregator</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="com.twitter.algebird.MonoidAggregator#monoid" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="monoid:com.twitter.algebird.Monoid[B]"></a>
+      <a id="monoid:Monoid[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">monoid</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@monoid:com.twitter.algebird.Monoid[B]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.Aggregator#prepare" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="prepare(input:A):B"></a>
+      <a id="prepare(A):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">prepare</span><span class="params">(<span name="input">input: <span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@prepare(input:A):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#present" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="present(reduction:B):C"></a>
+      <a id="present(B):C"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">present</span><span class="params">(<span name="reduction">reduction: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@present(reduction:B):C" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#andThenPresent" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="andThenPresent[D](present2:C=&gt;D):com.twitter.algebird.MonoidAggregator[A,B,D]"></a>
+      <a id="andThenPresent[D]((C)⇒D):MonoidAggregator[A,B,D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">andThenPresent</span><span class="tparams">[<span name="D">D</span>]</span><span class="params">(<span name="present2">present2: (<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>) ⇒ <span class="extype" name="com.twitter.algebird.MonoidAggregator.andThenPresent.D">D</span></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.andThenPresent.D">D</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@andThenPresent[D](present2:C=&gt;D):com.twitter.algebird.MonoidAggregator[A,B,D]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Like calling andThen on the present function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling andThen on the present function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a> → <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#append" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="append(l:B,r:A):B"></a>
+      <a id="append(B,A):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">append</span><span class="params">(<span name="l">l: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>, <span name="r">r: <span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@append(l:B,r:A):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#appendAll" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="appendAll(items:TraversableOnce[A]):B"></a>
+      <a id="appendAll(TraversableOnce[A]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">appendAll</span><span class="params">(<span name="items">items: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@appendAll(items:TraversableOnce[A]):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.Aggregator#appendAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="appendAll(old:B,items:TraversableOnce[A]):B"></a>
+      <a id="appendAll(B,TraversableOnce[A]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">appendAll</span><span class="params">(<span name="old">old: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>, <span name="items">items: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@appendAll(old:B,items:TraversableOnce[A]):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(inputs:TraversableOnce[A]):C"></a>
+      <a id="apply(TraversableOnce[A]):C"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="inputs">inputs: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@apply(inputs:TraversableOnce[A]):C" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This may error if inputs are empty (for Monoid Aggregators it never will, instead
+you see present(Monoid.zero[B])
+</p><div class="fullcomment"><div class="comment cmt"><p>This may error if inputs are empty (for Monoid Aggregators it never will, instead
+you see present(Monoid.zero[B])
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#applyCumulatively" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="applyCumulatively[In&lt;:TraversableOnce[A],Out](inputs:In)(implicitbf:scala.collection.generic.CanBuildFrom[In,C,Out]):Out"></a>
+      <a id="applyCumulatively[In&lt;:TraversableOnce[A],Out](In)(CanBuildFrom[In,C,Out]):Out"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">applyCumulatively</span><span class="tparams">[<span name="In">In &lt;: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>, <span name="Out">Out</span>]</span><span class="params">(<span name="inputs">inputs: <span class="extype" name="com.twitter.algebird.Aggregator.applyCumulatively.In">In</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="bf">bf: <span class="extype" name="scala.collection.generic.CanBuildFrom">CanBuildFrom</span>[<span class="extype" name="com.twitter.algebird.Aggregator.applyCumulatively.In">In</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>, <span class="extype" name="com.twitter.algebird.Aggregator.applyCumulatively.Out">Out</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.Aggregator.applyCumulatively.Out">Out</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@applyCumulatively[In&lt;:TraversableOnce[A],Out](inputs:In)(implicitbf:scala.collection.generic.CanBuildFrom[In,C,Out]):Out" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This returns the cumulative sum of its inputs, in the same order.</p><div class="fullcomment"><div class="comment cmt"><p>This returns the cumulative sum of its inputs, in the same order.
+If the inputs are empty, the result will be empty too.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#applyOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="applyOption(inputs:TraversableOnce[A]):Option[C]"></a>
+      <a id="applyOption(TraversableOnce[A]):Option[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">applyOption</span><span class="params">(<span name="inputs">inputs: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@applyOption(inputs:TraversableOnce[A]):Option[C]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This returns None if the inputs are empty
+</p><div class="fullcomment"><div class="comment cmt"><p>This returns None if the inputs are empty
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#composePrepare" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="composePrepare[A2](prepare2:A2=&gt;A):com.twitter.algebird.MonoidAggregator[A2,B,C]"></a>
+      <a id="composePrepare[A2]((A2)⇒A):MonoidAggregator[A2,B,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">composePrepare</span><span class="tparams">[<span name="A2">A2</span>]</span><span class="params">(<span name="prepare2">prepare2: (<span class="extype" name="com.twitter.algebird.MonoidAggregator.composePrepare.A2">A2</span>) ⇒ <span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.composePrepare.A2">A2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@composePrepare[A2](prepare2:A2=&gt;A):com.twitter.algebird.MonoidAggregator[A2,B,C]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Like calling compose on the prepare function</p><div class="fullcomment"><div class="comment cmt"><p>Like calling compose on the prepare function</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a> → <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#cumulativeIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cumulativeIterator(inputs:Iterator[A]):Iterator[C]"></a>
+      <a id="cumulativeIterator(Iterator[A]):Iterator[C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cumulativeIterator</span><span class="params">(<span name="inputs">inputs: <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@cumulativeIterator(inputs:Iterator[A]):Iterator[C]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This returns the cumulative sum of its inputs, in the same order.</p><div class="fullcomment"><div class="comment cmt"><p>This returns the cumulative sum of its inputs, in the same order.
+If the inputs are empty, the result will be empty too.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#either" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="either[A2,B2,C2](that:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[Either[A,A2],(B,B2),(C,C2)]"></a>
+      <a id="either[A2,B2,C2](MonoidAggregator[A2,B2,C2]):MonoidAggregator[Either[A,A2],(B,B2),(C,C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">either</span><span class="tparams">[<span name="A2">A2</span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.either.A2">A2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.B2">B2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.C2">C2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.Either">Either</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.A2">A2</span>], (<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.B2">B2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.either.C2">C2</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@either[A2,B2,C2](that:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[Either[A,A2],(B,B2),(C,C2)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Build a MonoidAggregator that either takes left or right input
+and outputs the pair from both
+</p>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#filterBefore" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="filterBefore[A1&lt;:A](pred:A1=&gt;Boolean):com.twitter.algebird.MonoidAggregator[A1,B,C]"></a>
+      <a id="filterBefore[A1&lt;:A]((A1)⇒Boolean):MonoidAggregator[A1,B,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filterBefore</span><span class="tparams">[<span name="A1">A1 &lt;: <span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span></span>]</span><span class="params">(<span name="pred">pred: (<span class="extype" name="com.twitter.algebird.MonoidAggregator.filterBefore.A1">A1</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.filterBefore.A1">A1</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@filterBefore[A1&lt;:A](pred:A1=&gt;Boolean):com.twitter.algebird.MonoidAggregator[A1,B,C]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Only aggregate items that match a predicate
+</p>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#join" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="join[A2&lt;:A,B2,C2](that:com.twitter.algebird.Aggregator[A2,B2,C2]):com.twitter.algebird.Aggregator[A2,(B,B2),(C,C2)]"></a>
+      <a id="join[A2&lt;:A,B2,C2](Aggregator[A2,B2,C2]):Aggregator[A2,(B,B2),(C,C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">join</span><span class="tparams">[<span name="A2">A2 &lt;: <span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span></span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="that">that: <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.Aggregator.join.A2">A2</span>, <span class="extype" name="com.twitter.algebird.Aggregator.join.B2">B2</span>, <span class="extype" name="com.twitter.algebird.Aggregator.join.C2">C2</span>]</span>)</span><span class="result">: <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.Aggregator.join.A2">A2</span>, (<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.Aggregator.join.B2">B2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>, <span class="extype" name="com.twitter.algebird.Aggregator.join.C2">C2</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@join[A2&lt;:A,B2,C2](that:com.twitter.algebird.Aggregator[A2,B2,C2]):com.twitter.algebird.Aggregator[A2,(B,B2),(C,C2)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This allows you to run two aggregators on the same data with a single pass
+</p><div class="fullcomment"><div class="comment cmt"><p>This allows you to run two aggregators on the same data with a single pass
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#lift" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lift:com.twitter.algebird.MonoidAggregator[A,Option[B],Option[C]]"></a>
+      <a id="lift:MonoidAggregator[A,Option[B],Option[C]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lift</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>], <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@lift:com.twitter.algebird.MonoidAggregator[A,Option[B],Option[C]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#reduce" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reduce(items:TraversableOnce[B]):B"></a>
+      <a id="reduce(TraversableOnce[B]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reduce</span><span class="params">(<span name="items">items: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@reduce(items:TraversableOnce[B]):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This may error if items is empty.</p><div class="fullcomment"><div class="comment cmt"><p>This may error if items is empty. To be safe you might use reduceOption
+if you don't know that items is non-empty
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a> → <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#reduce" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reduce(l:B,r:B):B"></a>
+      <a id="reduce(B,B):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reduce</span><span class="params">(<span name="l">l: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>, <span name="r">r: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@reduce(l:B,r:B):B" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">combine two inner values
+</p><div class="fullcomment"><div class="comment cmt"><p>combine two inner values
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#reduceOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reduceOption(items:TraversableOnce[B]):Option[B]"></a>
+      <a id="reduceOption(TraversableOnce[B]):Option[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reduceOption</span><span class="params">(<span name="items">items: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@reduceOption(items:TraversableOnce[B]):Option[B]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This is the safe version of the above.</p><div class="fullcomment"><div class="comment cmt"><p>This is the safe version of the above. If the input in empty, return None,
+else reduce the items
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#semigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroup:com.twitter.algebird.Monoid[B]"></a>
+      <a id="semigroup:Monoid[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">semigroup</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@semigroup:com.twitter.algebird.Monoid[B]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a> → <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#sumBefore" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="sumBefore:com.twitter.algebird.MonoidAggregator[TraversableOnce[A],B,C]"></a>
+      <a id="sumBefore:MonoidAggregator[TraversableOnce[A],B,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sumBefore</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>], <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@sumBefore:com.twitter.algebird.MonoidAggregator[TraversableOnce[A],B,C]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This maps the inputs to Bs, then sums them, effectively flattening
+the inputs to the MonoidAggregator
+</p>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.Aggregator#toFold" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toFold:com.twitter.algebird.Fold[A,Option[C]]"></a>
+      <a id="toFold:Fold[A,Option[C]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toFold</span><span class="result">: <a href="Fold.html" class="extype" name="com.twitter.algebird.Fold">Fold</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@toFold:com.twitter.algebird.Fold[A,Option[C]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Aggregator can be converted to a Fold, but not vice-versa
+Note, a Fold is more constrained so only do this if you require
+joining a Fold with an Aggregator to produce a Fold
+</p><div class="fullcomment"><div class="comment cmt"><p>An Aggregator can be converted to a Fold, but not vice-versa
+Note, a Fold is more constrained so only do this if you require
+joining a Fold with an Aggregator to produce a Fold
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.twitter.algebird.MonoidAggregator#zip" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="zip[A2,B2,C2](ag2:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[(A,A2),(B,B2),(C,C2)]"></a>
+      <a id="zip[A2,B2,C2](MonoidAggregator[A2,B2,C2]):MonoidAggregator[(A,A2),(B,B2),(C,C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zip</span><span class="tparams">[<span name="A2">A2</span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="ag2">ag2: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.A2">A2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.B2">B2</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.C2">C2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.MonoidAggregator">MonoidAggregator</a>[(<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.A2">A2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.B2">B2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.zip.C2">C2</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@zip[A2,B2,C2](ag2:com.twitter.algebird.MonoidAggregator[A2,B2,C2]):com.twitter.algebird.MonoidAggregator[(A,A2),(B,B2),(C,C2)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .composePrepare onto the result if you have
+an initial input that has to be prepared differently for each of the joined aggregators.</p><div class="fullcomment"><div class="comment cmt"><p>This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .composePrepare onto the result if you have
+an initial input that has to be prepared differently for each of the joined aggregators.</p><p>The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+</p></div></div>
+    </li><li name="com.twitter.algebird.Aggregator#zip" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="zip[A2,B2,C2](ag2:com.twitter.algebird.Aggregator[A2,B2,C2]):com.twitter.algebird.Aggregator[(A,A2),(B,B2),(C,C2)]"></a>
+      <a id="zip[A2,B2,C2](Aggregator[A2,B2,C2]):Aggregator[(A,A2),(B,B2),(C,C2)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zip</span><span class="tparams">[<span name="A2">A2</span>, <span name="B2">B2</span>, <span name="C2">C2</span>]</span><span class="params">(<span name="ag2">ag2: <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.Aggregator.zip.A2">A2</span>, <span class="extype" name="com.twitter.algebird.Aggregator.zip.B2">B2</span>, <span class="extype" name="com.twitter.algebird.Aggregator.zip.C2">C2</span>]</span>)</span><span class="result">: <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[(<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.Aggregator.zip.A2">A2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.Aggregator.zip.B2">B2</span>), (<span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>, <span class="extype" name="com.twitter.algebird.Aggregator.zip.C2">C2</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.MonoidAggregator@zip[A2,B2,C2](ag2:com.twitter.algebird.Aggregator[A2,B2,C2]):com.twitter.algebird.Aggregator[(A,A2),(B,B2),(C,C2)]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .composePrepare onto the result if you have
+an initial input that has to be prepared differently for each of the joined aggregators.</p><div class="fullcomment"><div class="comment cmt"><p>This allows you to join two aggregators into one that takes a tuple input,
+which in turn allows you to chain .composePrepare onto the result if you have
+an initial input that has to be prepared differently for each of the joined aggregators.</p><p>The law here is: ag1.zip(ag2).apply(as.zip(bs)) == (ag1(as), ag2(bs))
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="com.twitter.algebird.Aggregator">
+              <h3>Inherited from <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a>[<span class="extype" name="com.twitter.algebird.MonoidAggregator.A">A</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.B">B</span>, <span class="extype" name="com.twitter.algebird.MonoidAggregator.C">C</span>]</h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
