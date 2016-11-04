@@ -3,6 +3,7 @@
 [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
 [![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)](https://codecov.io/github/twitter/algebird)
 [![Latest version](https://index.scala-lang.org/twitter/algebird/algebird-core/latest.svg?color=orange)](https://index.scala-lang.org/twitter/algebird/algebird-core)
+[![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Overview
 
