@@ -6,7 +6,7 @@ section: "home"
 
 Algebird is a library which provides abstractions for abstract algebra in the [Scala programming language](https://scala-lang.org).
 
-This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Apache Storm](http://storm.apache.org/)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
+This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding), [Apache Storm](http://storm.apache.org/) or [Summingbird](https://github.com/twitter/summingbird)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
 ### What can you do with this code?
 
@@ -24,7 +24,7 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 
 ## Documentation
 
-The latest API docs are hosted at Algebird's [ScalaDoc index](docs/#index).
+The latest API docs are hosted at Algebird's [ScalaDoc index](api/#index).
 
 ## Get Involved + Code of Conduct
 

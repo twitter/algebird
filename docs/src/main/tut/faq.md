@@ -5,7 +5,7 @@ section: "faq"
 position: 4
 ---
 
-## Questions
+## Frequently Asked Questions
 
 * [Why not use spire?](#spire)
 * [Why not use Scalaz's Monoid trait?](#scalaz)

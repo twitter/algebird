@@ -4,10 +4,10 @@ Before getting into the details of Algebird, let's go through a few simple abstr
 
 ## Semigroup
 
-Given a set S and an operation `*`, we say that `(S, *)` is a *semigroup* if it satisfies the following properties for any x, y, z &isin; S:
+Given a set S and an operation `+`, we say that `(S, +)` is a *semigroup* if it satisfies the following properties for any x, y, z &isin; S:
 
-- *Closure*: `x * y` &isin; S
-- *Associativity*: `(x * y) * z = x * (y * z)`
+- *Closure*: `x + y` &isin; S
+- *Associativity*: `(x + y) + z = x + (y + z)`
 
 We also say that *S forms a semigroup under **.
 
@@ -17,13 +17,13 @@ We also say that *S forms a semigroup under **.
 
 ## Monoids
 
-A monoid is a semigroup with an identity element.  More formally, given a set M and an operation `*`, we say that `(M, *)` is a *monoid* if it satisfies the following properties for any x, y, z &isin; M:
+A monoid is a semigroup with an identity element.  More formally, given a set M and an operation `+`, we say that `(M, +)` is a *monoid* if it satisfies the following properties for any x, y, z &isin; M:
 
-- *Closure*: `x * y` &isin; M
-- *Associativity*: `(x * y) * z = x * (y * z)`
-- *Identity*: There exists an e &isin; M such that `e * x = x * e = x`
+- *Closure*: `x + y` &isin; M
+- *Associativity*: `(x + y) + z = x + (y + z)`
+- *Identity*: There exists an e &isin; M such that `e + x = x + e = x`
 
-We also say that *M is a monoid under *.*
+We also say that *M is a monoid under +.*
 
 #### Examples of Monoids
 
@@ -73,13 +73,3 @@ A few other types of rings:
 
 - `(Z, +, *)`
 - The set of square square matrices of a given size are a ring.
-
-## Fields
-
-A field is a commutative ring in which every non-zero element contains a multiplicative inverse.  Equivalently, `(F, +, *)` is a field if `(F', *)` is an abelian group where `F'` is the set of non-zero elements in `F`.
-
-#### Examples of fields
-
-- Rational numbers
-- Real numbers
-- Complex numbers
