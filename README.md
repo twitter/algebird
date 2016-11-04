@@ -1,12 +1,16 @@
-## Algebird [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
-[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)](https://codecov.io/github/twitter/algebird)
+## Algebird
 
+[![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
+[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)](https://codecov.io/github/twitter/algebird)
+[![Latest version](https://index.scala-lang.org/twitter/algebird/algebird-core/latest.svg?color=orange)](https://index.scala-lang.org/twitter/algebird/algebird-core)
+
+### Overview
 
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Apache Storm](http://storm.apache.org/)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
 See the [current API documentation](http://twitter.github.com/algebird) for more information.
 
-## What can you do with this code?
+### What can you do with this code?
 
 ```scala
 > ./sbt algebird-core/console
@@ -24,33 +28,30 @@ import com.twitter.algebird.Operators._
 scala> Map(1 -> Max(2)) + Map(1 -> Max(3)) + Map(2 -> Max(4))
 res0: scala.collection.immutable.Map[Int,com.twitter.algebird.Max[Int]] = Map(2 -> Max(4), 1 -> Max(3))
 ```
-In the above, the class Max[T] signifies that the + operator should actually be max (this is
-accomplished by providing an implicit instance of a typeclass for Max that handles +).
 
-* Model a wide class of "reductions" as a sum on some iterator of a particular value type.
-For example, average, moving average, max/min, set
-  union, approximate set size (in much less memory with HyperLogLog), approximate item counting
-  (using CountMinSketch).
-* All of these combine naturally in tuples, vectors, maps, options and more standard scala classes.
-* Implementations of Monoids for interesting approximation algorithms, such as Bloom filter,
-  HyperLogLog and CountMinSketch. These allow you to think of these sophisticated operations like
-  you might numbers, and add them up in hadoop or online to produce powerful statistics and
-  analytics.
+In the above, the class `Max[T]` signifies that the `+` operator should actually be `max` (this is accomplished by providing an implicit instance of a typeclass for `Max` that handles `+`).
+
+- Model a wide class of "reductions" as a sum on some iterator of a particular value type. For example, average, moving average, max/min, set union, approximate set size (in much less memory with HyperLogLog), approximate item counting (using CountMinSketch).
+- All of these combine naturally in tuples, vectors, maps, options and more standard scala classes.
+- Implementations of Monoids for interesting approximation algorithms, such as Bloom filter, HyperLogLog and CountMinSketch. These allow you to think of these sophisticated operations like you might numbers, and add them up in hadoop or online to produce powerful statistics and analytics.
 
 ## Documentation
 
-To learn more and find links to tutorials and information around the web, check out the [Algebird Wiki](https://github.com/twitter/algebird/wiki).
+To learn more and find links to tutorials and information around the web, check out the [website](https://twitter.github.io/algebird).
 
-The latest ScalaDocs are hosted on Algebird's [Github Project Page](http://twitter.github.io/algebird).
+The latest API docs are hosted on Algebird's [ScalaDoc index](http://twitter.github.io/algebird/api/#index).
 
 ## Get Involved + Code of Conduct
+
 Pull requests and bug reports are always welcome!
 
-Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird). 
+Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
-We use a lightweight form of project governence inspired by the one used by Apache projects.
+We use a lightweight form of project governance inspired by the one used by Apache projects.
+
 Please see [Contributing and Committership](https://github.com/twitter/analytics-infra-governance#contributing-and-committership) for our code of conduct and our pull request review process.
+
 The TL;DR is send us a pull request, iterate on the feedback + discussion, and get a +1 from a [Committer](COMMITTERS.md) in order to get your PR accepted.
 
 The current list of active committers (who can +1 a pull request) can be found here: [Committers](COMMITTERS.md)
@@ -74,19 +75,14 @@ Current published artifacts are
 
 The suffix denotes the scala version.
 
-## Questions
-> Why not use spire?
+## Projects using Algebird
 
-We didn't know about it when we started this code, but it seems like we're more focused on
-large scale analytics.
-
-> Why not use Scalaz's [Monoid](http://docs.typelevel.org/api/scalaz/stable/7.0.4/doc/#scalaz.Monoid) trait?
-
-The answer is a mix of the following:
-* The trait itself is tiny, we just need zero and plus, it is the implementations for all the types that are important. We wrote a code generator to derive instances for all the tuples, and by hand wrote monoids for List, Set, Option, Map, and several other objects used for counting (DecayedValue for exponential decay, AveragedValue for averaging, HyperLogLog for approximate cardinality counting). It's the instances that are useful in scalding and elsewhere.
-* We needed this to work in scala 2.8, and it appeared that Scalaz 7 didn't support 2.8. We've since moved to 2.9, though.
-* We also needed Ring and Field, and those are not (as of the writing of the code) in Scalaz.
-* If you want to interop, it is trivial to define implicit conversions to and from Scalaz Monoid.
+- [Scalding](http://github.com/twitter/scalding)
+- [Spark](https://github.com/mesos/spark/pull/480)
+- [Simmer](https://github.com/avibryant/simmer)
+- [Summingbird](https://github.com/twitter/summingbird)
+- [Packetloop](https://www.packetloop.com) (see [this tweet](https://twitter.com/cloudjunky/status/355073917720858626)
+- Ebay uses Algebird for machine learning: [ScalaDays talk](http://www.slideshare.net/VitalyGordon/scalable-and-flexible-machine-learning-with-scala-linkedin)
 
 ## Authors
 
@@ -102,6 +98,7 @@ The answer is a mix of the following:
 * Argyris Zymnis <http://twitter.com/argyris>
 
 ## License
-Copyright 2015 Twitter, Inc.
 
-Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+Copyright 2016 Twitter, Inc.
+
+Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
