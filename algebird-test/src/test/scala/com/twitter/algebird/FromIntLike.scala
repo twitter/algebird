@@ -36,6 +36,10 @@ object FromIntLike {
     override def fromInt(x: Int): BigInt = BigInt(x)
   }
 
+  implicit object FromIntBigDecimal extends FromIntLike[BigDecimal] {
+    override def fromInt(x: Int): BigDecimal = BigDecimal(x)
+  }
+
   implicit object FromIntString extends FromIntLike[String] {
     override def fromInt(x: Int): String = x.toString
   }

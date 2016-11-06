@@ -133,6 +133,8 @@ object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebra
   implicit def jdoubleGroup: Group[JDouble] = JDoubleRing
   implicit def optionGroup[T: Group] = new OptionGroup[T]
   implicit def indexedSeqGroup[T: Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
-  implicit def mapGroup[K, V](implicit group: Group[V]) = new MapGroup[K, V]()(group)
-  implicit def scMapGroup[K, V](implicit group: Group[V]) = new ScMapGroup[K, V]()(group)
+  implicit def mapGroup[K, V](implicit group: Group[V]): Group[Map[K, V]] =
+    new MapGroup[K, V]()(group)
+  implicit def scMapGroup[K, V](implicit group: Group[V]): Group[scala.collection.Map[K, V]] =
+    new ScMapGroup[K, V]()(group)
 }

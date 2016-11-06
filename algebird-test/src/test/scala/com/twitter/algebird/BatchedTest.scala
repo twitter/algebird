@@ -27,6 +27,7 @@ import Helpers.arbitraryBatched
 class BatchedLaws extends CheckProperties with Matchers with PropertyChecks {
 
   import BaseProperties._
+  implicit val arbitraryBigDecimalsHere = BaseProperties.arbReasonableBigDecimals
 
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {
     implicit val m: Monoid[Batched[A]] = Batched.compactingMonoid[A](size)
@@ -43,6 +44,10 @@ class BatchedLaws extends CheckProperties with Matchers with PropertyChecks {
   testBatchedMonoid[BigInt]("BigInt", 10)
   testBatchedMonoid[BigInt]("BigInt", 100)
   testBatchedMonoid[BigInt]("BigInt", 1000000)
+  testBatchedMonoid[BigDecimal]("BigDecimal", 1)
+  testBatchedMonoid[BigDecimal]("BigDecimal", 10)
+  testBatchedMonoid[BigDecimal]("BigDecimal", 100)
+  testBatchedMonoid[BigDecimal]("BigDecimal", 1000000)
   testBatchedMonoid[String]("String", 1)
   testBatchedMonoid[String]("String", 10)
   testBatchedMonoid[String]("String", 100)

@@ -25,7 +25,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
         Iterator(agg.appendAll(b, data))
       }
     }, preservesPartitioning = true)
-    pr.coalesce(1, shuffle = true)
+    pr.repartition(1)
       .mapPartitions(pr => Iterator(agg.semigroup.sumOption(pr)))
       .collect.head.map(agg.present)
   }
@@ -112,7 +112,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
 
     // my reading of the docs is that we do want a shuffle at this stage to
     // to make sure the upstream work is done in parallel.
-    val results = partialReduce.coalesce(1, shuffle = true).mapPartitions({ it =>
+    val results = partialReduce.repartition(1).mapPartitions({ it =>
       Iterator(sg.sumOption(it))
     }, preservesPartitioning = true)
       .collect

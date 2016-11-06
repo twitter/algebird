@@ -67,7 +67,7 @@ object Aggregator extends java.io.Serializable {
    * @tparam T Aggregating [[Semigroup]] type
    * @tparam P Presentation (output) type
    * @param prep The preparation function.  Expected to construct an instance of type T from a single data element.
-   * @param appnd Function that appends the [[Semigroup]].  Defines the [[append]] method for this aggregator.
+   * @param appnd Function that appends the [[Semigroup]].  Defines the [[Aggregator.append]] method for this aggregator.
    * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
    * @param pres The presentation function
    * @param sg The [[Semigroup]] type class
@@ -108,7 +108,7 @@ object Aggregator extends java.io.Serializable {
    * @tparam F Data input type
    * @tparam T Aggregating [[Monoid]] type
    * @tparam P Presentation (output) type
-   * @param appnd Function that appends the [[Monoid]].  Defines the [[append]] method for this aggregator.
+   * @param appnd Function that appends the [[Monoid]].  Defines the [[MonoidAggregator.append]] method for this aggregator.
    * Analogous to the 'seqop' function in Scala's sequence 'aggregate' method
    * @param pres The presentation function
    * @param m The [[Monoid]] type class
@@ -288,8 +288,8 @@ object Aggregator extends java.io.Serializable {
   /**
    * An aggregator that sums Numeric values into Doubles.
    *
-   * This is really no more than converting to Double and then summing. The conversion to double 
-   * means we don't have the overflow semantics of integer types on the jvm 
+   * This is really no more than converting to Double and then summing. The conversion to double
+   * means we don't have the overflow semantics of integer types on the jvm
    * (e.g. Int.MaxValue + 1 == Int.MinValue).
    *
    * Note that if you instead wanted to aggregate Numeric values of a type T into the same type T

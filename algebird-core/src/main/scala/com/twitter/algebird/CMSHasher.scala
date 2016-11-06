@@ -7,7 +7,7 @@ package com.twitter.algebird
  * `h(x) = [a * x + b (mod p)] (mod m)`
  *
  * As a requirement for using CMS you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to
- * count.  Algebird ships with several such implicits for commonly used types `K` such as [[Long]] and [[BigInt]].
+ * count.  Algebird ships with several such implicits for commonly used types `K` such as `Long` and [[scala.BigInt]].
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
  * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
@@ -136,6 +136,22 @@ object CMSHasher {
 
   implicit object CMSHasherByteArray extends CMSHasher[Array[Byte]] {
     override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = hashBytes(a, b, width)(x)
+  }
+
+  // Note: CMSHasher[BigInt] not provided here but in CMSHasherImplicits for legacy support reasons. New hashers
+  // should come here.
+
+  implicit object CMSHasherBigDecimal extends CMSHasher[BigDecimal] {
+    override def hash(a: Int, b: Int, width: Int)(x: BigDecimal): Int = {
+
+      val uh = scala.util.hashing.MurmurHash3.arrayHash(x.underlying.unscaledValue.toByteArray, a)
+      val hash = scala.util.hashing.MurmurHash3.productHash((uh, x.scale), a)
+
+      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
+      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
+      val positiveHash = hash & Int.MaxValue
+      positiveHash % width
+    }
   }
 
 }

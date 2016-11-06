@@ -142,6 +142,7 @@ object BooleanRing extends Ring[Boolean] {
 }
 
 object BigIntRing extends NumericRing[BigInt]
+object BigDecimalRing extends NumericRing[BigDecimal]
 
 trait NumericRingProvider {
   implicit def numericRing[T: Numeric]: Ring[T] = new NumericRing[T]
@@ -193,6 +194,8 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
   implicit def doubleRing: Ring[Double] = DoubleRing
   implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
   implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
-  implicit def mapRing[K, V](implicit ring: Ring[V]) = new MapRing[K, V]()(ring)
-  implicit def scMapRing[K, V](implicit ring: Ring[V]) = new ScMapRing[K, V]()(ring)
+  implicit def mapRing[K, V](implicit ring: Ring[V]): Ring[Map[K, V]] =
+    new MapRing[K, V]()(ring)
+  implicit def scMapRing[K, V](implicit ring: Ring[V]): Ring[scala.collection.Map[K, V]] =
+    new ScMapRing[K, V]()(ring)
 }
