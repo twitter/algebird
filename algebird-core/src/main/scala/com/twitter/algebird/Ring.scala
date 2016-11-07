@@ -17,6 +17,7 @@ package com.twitter.algebird
 
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import algebra.ring.{ Ring => ARing }
+import algebra.CommutativeGroup
 
 import scala.annotation.implicitNotFound
 /**
@@ -43,7 +44,7 @@ import scala.annotation.implicitNotFound
  */
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
-trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with ARing[T] {
+trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with CommutativeGroup[T] with ARing[T] {
   def one: T
   def times(a: T, b: T): T
   override def product(iter: TraversableOnce[T]): T =
@@ -169,8 +170,15 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
   // This pattern is really useful for typeclasses
   def one[T](implicit rng: Ring[T]) = rng.one
   def times[T](l: T, r: T)(implicit rng: Ring[T]) = rng.times(l, r)
-  def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] =
-    Monoid.from[T](ring.one)(ring.times _)
+  def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] = new Monoid[T] {
+    def zero = ring.one
+    def plus(a: T, b: T): T = ring.times(a, b)
+    override def sumOption(ts: TraversableOnce[T]): Option[T] =
+      if (ts.isEmpty) None
+      else Some(ring.product(ts))
+    override def sum(ts: TraversableOnce[T]): T =
+      ring.product(ts)
+  }
   // Left product: (((a * b) * c) * d)
   def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) =
     ring.product(iter)

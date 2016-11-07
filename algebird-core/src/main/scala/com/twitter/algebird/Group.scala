@@ -126,6 +126,7 @@ object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebra
   implicit def jshortGroup: Group[JShort] = JShortRing
   implicit def longGroup: Group[Long] = LongRing
   implicit def bigIntGroup: Group[BigInt] = BigIntRing
+  implicit def bigDecimalGroup: Group[BigDecimal] = implicitly[Ring[BigDecimal]]
   implicit def jlongGroup: Group[JLong] = JLongRing
   implicit def floatGroup: Group[Float] = FloatRing
   implicit def jfloatGroup: Group[JFloat] = JFloatRing

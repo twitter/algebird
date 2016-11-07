@@ -291,6 +291,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlge
   implicit def shortMonoid: Monoid[Short] = ShortRing
   implicit def jshortMonoid: Monoid[JShort] = JShortRing
   implicit def bigIntMonoid: Monoid[BigInt] = BigIntRing
+  implicit def bigDecimalMonoid: Monoid[BigDecimal] = implicitly[Ring[BigDecimal]]
   implicit def longMonoid: Monoid[Long] = LongRing
   implicit def jlongMonoid: Monoid[JLong] = JLongRing
   implicit def floatMonoid: Monoid[Float] = FloatRing
