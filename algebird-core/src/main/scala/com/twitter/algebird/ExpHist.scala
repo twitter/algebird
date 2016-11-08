@@ -90,11 +90,13 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
     }
 
   /**
-    * Returns a [[Fold]] instance that uses `add` to accumulate deltas
-    * into this exponential histogram instance.
-    */
-  def fold: Fold[ExpHist, (Long, Long)] =
-    Fold.foldLeft(this) { case (e, (delta, timestamp)) => e.add(delta, timestamp) }
+   * Returns a [[Fold]] instance that uses `add` to accumulate deltas
+   * into this exponential histogram instance.
+   */
+  def fold: Fold[Bucket, ExpHist] =
+    Fold.foldLeft(this) {
+      case (e, Bucket(delta, timestamp)) => e.add(delta, timestamp)
+    }
 
   // This internal method assumes that the instance is stepped forward
   // already, and does NOT try to step internally. It also assumes
@@ -132,10 +134,10 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
     else (total - (oldestBucketSize - 1) / 2.0)
 
   /**
-    * Returns an Approximate instance encoding the bounds and the
-    * closest long to the estimated count tracked by this instance.
-    */
-  def approx: Approximate[Long] =
+   * Returns an Approximate instance encoding the bounds and the
+   * closest long to the estimated sum tracked by this instance.
+   */
+  def approximateSum: Approximate[Long] =
     Approximate(lowerBoundSum, math.round(guess), upperBoundSum, 1.0)
 
   /**
@@ -159,7 +161,7 @@ object ExpHist {
 
   object Bucket {
     implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket => (b.timestamp, b.size) }
-  }
+ }
 
   /**
    * ExpHist guarantees that the returned guess will be within
@@ -186,8 +188,7 @@ object ExpHist {
      * into an empty exponential histogram instance configured with
      * this Config.
      */
-    def fold: Fold[ExpHist, (Long, Long)] =
-      Fold.foldLeft(ExpHist.empty(this)) { case (e, (delta, timestamp)) => e.add(delta, timestamp) }
+    def fold: Fold[Bucket, ExpHist] = ExpHist.empty(this).fold
   }
 
   /**

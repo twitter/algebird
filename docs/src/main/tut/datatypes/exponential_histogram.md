@@ -8,7 +8,7 @@ scaladoc: "#com.twitter.algebird.ExpHist"
 
 # Exponential Histogram
 
-Exponential Histogram algorithm from [Maintaining Stream Statistics over Sliding Windows](http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf), by Datar, Gionis, Indyk and Motwani.
+The `ExpHist` data structure implements the Exponential Histogram algorithm from [Maintaining Stream Statistics over Sliding Windows](http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf), by Datar, Gionis, Indyk and Motwani.
 
 An Exponential Histogram is a sliding window counter that can guarantee a bounded relative error. You configure the data structure with
 
@@ -18,6 +18,42 @@ An Exponential Histogram is a sliding window counter that can guarantee a bounde
 You interact with the data structure by adding (number, timestamp) pairs into the exponential histogram. querying it for an approximate counts with `guess`.
 
 The approximate count is guaranteed to be within `conf.epsilon` relative error of the true count seen across the supplied `windowSize`.
+
+## Example Usage
+
+Let's set up a bunch of buckets to add into our exponential histogram. Each bucket tracks a delta and a timestamp. This example uses the same number for both, for simplicity.
+
+```tut:book
+import com.twitter.algebird.ExpHist
+import ExpHist.{ Bucket, Config }
+
+val maxTimestamp = 200
+val inputs = (1 to maxTimestamp).map { i => ExpHist.Bucket(i, i) }.toVector
+
+val actualSum = inputs.map(_.size).sum
+```
+
+Now we'll configure an instance of `ExpHist` to track the count and add each of our buckets in.
+
+```tut:book
+val epsilon = 0.01
+val windowSize = maxTimestamp
+val eh = ExpHist.empty(Config(epsilon, windowSize))
+val full = inputs.foldLeft(eh) {
+  case (histogram, Bucket(delta, timestamp)) => histogram.add(delta, timestamp)
+}
+```
+
+Now we can query the full exponential histogram and compare the guess to the actual sum:
+
+```tut:book
+val approximateSum = full.guess
+full.relativeError
+val maxError = actualSum * full.relativeError
+
+assert(full.guess <= actualSum + maxError)
+assert(full.guess >= actualSum - maxError)
+```
 
 ## l-Canonical Representation
 
