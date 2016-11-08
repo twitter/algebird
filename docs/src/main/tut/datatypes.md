@@ -5,12 +5,10 @@ section: "data"
 position: 2
 ---
 
-{% include_relative datatypes/datatypes.md %}
+# Algebird's Data Types
 
-### Index
+Algebird is, first and foremost, a library of data structures for large-scale analytics.
 
-{% for x in site.pages %}
-  {% if x.section == 'data' %}
-- [{{x.title}}]({{site.baseurl}}{{x.url}})
-  {% endif %}
-{% endfor %}
+### Documentation Help
+
+We'd love your help fleshing out this documentation! You can edit this page in your browser by clicking [this link](https://github.com/twitter/algebird/edit/develop/docs/src/main/tut/datatypes.md).

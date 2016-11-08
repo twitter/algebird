@@ -10,7 +10,7 @@ This code is targeted at building aggregation systems (via [Scalding](https://gi
 
 ### What can you do with this code?
 
-```tut
+```tut:book
 import com.twitter.algebird._
 import com.twitter.algebird.Operators._
 Map(1 -> Max(2)) + Map(1 -> Max(3)) + Map(2 -> Max(4))

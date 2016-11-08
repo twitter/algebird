@@ -194,7 +194,7 @@ object ExpHist {
 
     // Drops all buckets with an expired timestamp, based on the
     // configured window and the supplied current time.
-    def dropExpired(buckets: Vector[Bucket], currTime: Timestamp): (Long, Vector[Bucket]) =
+    private[algebird] def dropExpired(buckets: Vector[Bucket], currTime: Timestamp): (Long, Vector[Bucket]) =
       ExpHist.dropExpired(buckets, expiration(currTime))
 
     /**
@@ -225,7 +225,7 @@ object ExpHist {
    * @param cutoff buckets with ts <= cutoff are expired
    * @return the sum of evicted bucket sizes and the unexpired buckets
    */
-  def dropExpired(buckets: Vector[Bucket], cutoff: Timestamp): (Long, Vector[Bucket]) = {
+  private[algebird] def dropExpired(buckets: Vector[Bucket], cutoff: Timestamp): (Long, Vector[Bucket]) = {
     val (dropped, remaining) = buckets.reverse.span(_.timestamp <= cutoff)
     (dropped.map(_.size).sum, remaining.reverse)
   }

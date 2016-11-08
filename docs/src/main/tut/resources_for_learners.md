@@ -7,6 +7,8 @@ position: 3
 ## Tutorials
 
 - [Of Algebirds, Monoids, Monads, and Other Bestiary for Large-Scale Data Analytics](http://www.michael-noll.com/blog/2013/12/02/twitter-algebird-monoid-monad-for-large-scala-data-analytics), by [Michael Noll](https://twitter.com/miguno)
+- [Algebird: a Tweet by Tweet Guide](https://twitter.com/i/moments/772269989587881984) by [Pardis Noorzad](https://twitter.com/djpardis)
+- [Top K Users, Using Algebird Bloomfilter in Spark](https://venukanaparthy.wordpress.com/2016/01/09/top-k-users-using-algebird-bloomfilter-in-spark/), by [Venu Kanaparthi](https://twitter.com/singhkorner/)
 
 ## Presentations
 
@@ -15,6 +17,7 @@ position: 3
 - [Add ALL the things: Abstract Algebra meets Analytics](https://www.infoq.com/presentations/abstract-algebra-analytics), by [Avi Bryant](https://twitter.com/avibryant)
 - [scala.collection.approximate](https://www.youtube.com/watch?v=yzitqjUI6ok), by [Avi Bryant](https://twitter.com/avibryant)
 - [Life after Monoids](https://www.youtube.com/watch?v=xO9AoZNSOH4), by [Tom Switzer](https://twitter.com/tixxit)
+- [Twitter Algebird Approximations](https://www.youtube.com/watch?v=0zqcACoD7kM) by [Martin Odersky](https://twitter.com/odersky)
 
 ## Slides
 
@@ -22,6 +25,7 @@ position: 3
 - [Data-cubing made simple with Spark, Algebird and HBase](https://speakerdeck.com/vidma/data-cubing-made-simple-with-spark-algebird-and-hbase) by Vidmantas Zemleris
 - [Algebra for Scalable Analytics](http://cdn.oreillystatic.com/en/assets/1/event/105/Algebra%20for%20Scalable%20Analytics%20Presentation.pdf), by [Oscar Boykin](https://twitter.com/posco)
 - [Counting with Algebird and Spark](http://esumitra.github.io/algebird-boston-spark), by [esumitra](https://github.com/esumitra)
+- [Aggregators: modeling data queries functionally](https://speakerdeck.com/johnynek/aggregators-modeling-data-queries-functionally), by [Oscar Boykin](https://twitter.com/posco)
 
 ## Papers
 
