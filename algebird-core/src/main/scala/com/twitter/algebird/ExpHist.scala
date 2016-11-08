@@ -89,6 +89,13 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
       }
     }
 
+  /**
+    * Returns a [[Fold]] instance that uses `add` to accumulate deltas
+    * into this exponential histogram instance.
+    */
+  def fold: Fold[ExpHist, (Long, Long)] =
+    Fold.foldLeft(this) { case (e, (delta, timestamp)) => e.add(delta, timestamp) }
+
   // This internal method assumes that the instance is stepped forward
   // already, and does NOT try to step internally. It also assumes
   // that `items` is sorted in ASCENDING order, with newer items on
@@ -123,6 +130,13 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
   def guess: Double =
     if (total == 0) 0.0
     else (total - (oldestBucketSize - 1) / 2.0)
+
+  /**
+    * Returns an Approximate instance encoding the bounds and the
+    * closest long to the estimated count tracked by this instance.
+    */
+  def approx: Approximate[Long] =
+    Approximate(lowerBoundSum, math.round(guess), upperBoundSum, 1.0)
 
   /**
    * relative error of guess, guaranteed to be <= conf.epsilon.
@@ -166,6 +180,14 @@ object ExpHist {
     // configured window and the supplied current time.
     def dropExpired(buckets: Vector[Bucket], currTime: Long): (Long, Vector[Bucket]) =
       ExpHist.dropExpired(buckets, expiration(currTime))
+
+    /**
+     * Returns a [[Fold]] instance that uses `add` to accumulate deltas
+     * into an empty exponential histogram instance configured with
+     * this Config.
+     */
+    def fold: Fold[ExpHist, (Long, Long)] =
+      Fold.foldLeft(ExpHist.empty(this)) { case (e, (delta, timestamp)) => e.add(delta, timestamp) }
   }
 
   /**

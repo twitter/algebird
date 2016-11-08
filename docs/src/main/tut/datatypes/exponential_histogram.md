@@ -12,20 +12,20 @@ Exponential Histogram algorithm from [Maintaining Stream Statistics over Sliding
 
 An Exponential Histogram is a sliding window counter that can guarantee a bounded relative error. You configure the data structure with
 
-- epsilon, the relative error you're willing to tolerate
-- windowSize, the number of time ticks that you want to track
+- `epsilon`, the relative error you're willing to tolerate
+- `windowSize`, the number of time ticks that you want to track
 
 You interact with the data structure by adding (number, timestamp) pairs into the exponential histogram. querying it for an approximate counts with `guess`.
 
-The approximate count is guaranteed to be within conf.epsilon relative error of the true count seen across the supplied `windowSize`.
+The approximate count is guaranteed to be within `conf.epsilon` relative error of the true count seen across the supplied `windowSize`.
 
 ## l-Canonical Representation
 
-The exponential histogram algorithm tracks buckets of size 2^i. Every new increment to the histogram adds a bucket of size 1.
+The exponential histogram algorithm tracks buckets of size `2^i`. Every new increment to the histogram adds a bucket of size 1.
 
-Because only l or l+1 buckets of size 2^i are allowed for each i, this increment might trigger an incremental merge of smaller buckets into larger buckets.
+Because only `l` or `l+1` buckets of size `2^i` are allowed for each `i`, this increment might trigger an incremental merge of smaller buckets into larger buckets.
 
-Let's look at 10 steps of the algorithm with l == 2:
+Let's look at 10 steps of the algorithm with `l == 2`:
 
 ```
 1:  1 (1 added)
@@ -40,11 +40,9 @@ Let's look at 10 steps of the algorithm with l == 2:
 10: 1 1 2 2 4 (1 added, triggering a 1 + 1 = 2 merge AND a 2 + 2 = 4 merge)
 ```
 
-Notice that the bucket sizes always sum to the algorithm step, ie (10 == 1 + 1 + 1 + 2 + 2 + 4).
+Notice that the bucket sizes always sum to the algorithm step, ie `10 == 1 + 1 + 1 + 2 + 2 + 4`.
 
-Now let's write out a list of the number of buckets of each size, ie [bucketsOfSize(1), bucketsOfSize(2), bucketsOfSize(4), ....]
-
-Here's the above sequence in the new representation, plus a few more steps:
+Now let's write out a list of the number of buckets of each size, ie `[bucketsOfSize(1), bucketsOfSize(2), bucketsOfSize(4), ....]`. Here's the above sequence in the new representation, plus a few more steps:
 
 ```
 1:  1     <-- (l + 1)2^0 - l = 3 * 2^0 - 2 = 1
@@ -67,9 +65,9 @@ Here's the above sequence in the new representation, plus a few more steps:
 17: 2 2 3
 ```
 
-This sequence is called the "l-canonical representation" of s.
+This sequence is called the "l-canonical representation" of `s`.
 
-A pattern emerges! Every bucket size except the largest looks like a binary counter... if you added `l + 1` to the bit, and made the counter little-endian, so the least-significant bits came first. Let's call this the "binary" prefix, or "bin(_)".
+A pattern emerges! Every bucket size except the largest looks like a binary counter (if you added `l + 1` to the bit, and made the counter little-endian). Let's call this the "binary" prefix, or `bin(_)`.
 
 Here's the above sequence with the prefix decoded from "binary":
 
@@ -98,28 +96,26 @@ Here's the above sequence with the prefix decoded from "binary":
 
 Some observations about the pattern:
 
-The l-canonical representation groups the natural numbers into groups of size (l + 1)2^i for i >= 0.
+The l-canonical representation groups the natural numbers into groups of size `(l + 1)2^i` for `i >= 0`.
 
-Each group starts at (l + 1)2^i - l (see 1, 4, 10... above)
+Each group starts at `(l + 1)2^i - l` (see 1, 4, 10... above)
 
-Within each group, the "binary" prefix of the l-canonical rep cycles from 0 to (2^i - 1), l + 1 total times. (This makes sense; each cycle increments the final entry by one until it hits l + 1; after that an increment triggers a merge and a new "group" begins.)
+Within each group, the "binary" prefix of the l-canonical rep cycles from `0` to `(2^i - 1)`, `l + 1` total times. (This makes sense; each cycle increments the final entry by one until it hits `l + 1`; after that an increment triggers a merge and a new "group" begins.)
 
-The final l-canonical entry ==
-
-floor((position within the group) / 2^i), or the "quotient" of that position and 2^i.
+The final l-canonical entry == `floor((position within the group) / 2^i)`, or the "quotient" of that position and `2^i`.
 
 That's all we need to know to write a procedure to generate the l-canonical representation! Here it is again:
 
 ## L-Canonical Representation Procedure:
 
-- Find the largest j s.t. 2^j <= (s + l) / (1 + l)
-- let s' = 2^j(1 + l) - l
+- Find the largest `j` s.t. `2^j <= (s + l) / (1 + l)`
+- let `s' := 2^j(1 + l) - l`
 
-(s' is the position if the start of a group, ie 1, 4, 10...)
+(`s'` is the position if the start of a group, ie 1, 4, 10...)
 
-- let diff = (s - s') is the position of s within that group.
-- let b = the little-endian binary rep of diff % (2^j - 1)
-- let ret = return vector of length j:
+- `diff := (s - s')` is the position of s within that group.
+- let `b :=` the little-endian binary rep of `diff % (2^j - 1)`
+- let `ret :=` return vector of length `j`:
 
 
 ```scala
