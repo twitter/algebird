@@ -25,10 +25,12 @@ Let's set up a bunch of buckets to add into our exponential histogram. Each buck
 
 ```tut:book
 import com.twitter.algebird.ExpHist
-import ExpHist.{ Bucket, Config }
+import ExpHist.{ Bucket, Config, Timestamp }
 
 val maxTimestamp = 200
-val inputs = (1 to maxTimestamp).map { i => ExpHist.Bucket(i, i) }.toVector
+val inputs = (1 to maxTimestamp).map {
+    i => ExpHist.Bucket(i, Timestamp(i))
+  }.toVector
 
 val actualSum = inputs.map(_.size).sum
 ```
