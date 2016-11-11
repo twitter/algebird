@@ -8,7 +8,7 @@ import Arbitrary.arbitrary
 
 class ExpHistLaws extends PropSpec with PropertyChecks {
   import ExpHistGenerators._
-  import ExpHist.{ Bucket, Canonical, Config }
+  import ExpHist.{ Bucket, Canonical, Config, Timestamp }
 
   property("Increment example from DGIM paper") {
     // Returns a vector of bucket sizes from largest to smallest.
@@ -17,9 +17,9 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
     // epsilon of 0.5 gives us window sizes of 1 or 2.
     val e = ExpHist.empty(Config(0.5, 100))
 
-    val plus76 = e.add(76, 0)
-    val inc = plus76.inc(0)
-    val twoMore = inc.add(2, 0)
+    val plus76 = e.add(76, Timestamp(0))
+    val inc = plus76.inc(Timestamp(0))
+    val twoMore = inc.add(2, Timestamp(0))
 
     assert(bSizes(plus76) == Vector(32, 16, 8, 8, 4, 4, 2, 1, 1))
     assert(bSizes(inc) == Vector(32, 16, 8, 8, 4, 4, 2, 2, 1))
@@ -53,7 +53,7 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
    * Returns the ACTUAL sum of the supplied vector of buckets,
    * filtering out any bucket with a timestamp <= exclusiveCutoff.
    */
-  def actualBucketSum(buckets: Vector[Bucket], exclusiveCutoff: Long): Long =
+  def actualBucketSum(buckets: Vector[Bucket], exclusiveCutoff: Timestamp): Long =
     buckets.collect {
       case Bucket(count, ts) if ts > exclusiveCutoff => count
     }.sum
@@ -70,6 +70,18 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
       val fullViaAddAll = ExpHist.empty(conf).addAll(buckets)
       val actualSum = actualBucketSum(buckets, cutoff)
       checkCoreProperties(fullViaAddAll, actualSum)
+    }
+  }
+
+  property("ExpHist.fold satisfies core properties") {
+    forAll { (v: NonEmptyVector[Bucket], conf: Config) =>
+      val buckets = v.items
+      val mostRecentTs = buckets.maxBy(_.timestamp).timestamp
+      val cutoff = conf.expiration(mostRecentTs)
+
+      val fullViaFold = ExpHist.empty(conf).fold.overTraversable(buckets)
+      val actualSum = actualBucketSum(buckets, cutoff)
+      checkCoreProperties(fullViaFold, actualSum)
     }
   }
 
@@ -173,8 +185,8 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
   }
 
   property("step(t) == add(0, t)") {
-    forAll { (expHist: ExpHist, ts: PosNum[Long]) =>
-      assert(expHist.step(ts.value) == expHist.add(0, ts.value))
+    forAll { (expHist: ExpHist, ts: Timestamp) =>
+      assert(expHist.step(ts) == expHist.add(0, ts))
     }
   }
 
@@ -202,9 +214,9 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
   }
 
   property("dropExpired works properly") {
-    forAll { (v: NonEmptyVector[Bucket], window: PosNum[Long]) =>
+    forAll { (v: NonEmptyVector[Bucket], conf: Config) =>
       val buckets = v.sorted.reverse
-      val cutoff = buckets.head.timestamp - window.value
+      val cutoff = conf.expiration(buckets.head.timestamp)
 
       val (droppedSum, remaining) = ExpHist.dropExpired(buckets, cutoff)
 
@@ -234,11 +246,14 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
 }
 
 object ExpHistGenerators {
-  import ExpHist.{ Bucket, Config }
+  import ExpHist.{ Bucket, Config, Timestamp }
+
+  implicit val genTimestamp: Gen[Timestamp] =
+    Gen.posNum[Long].map(Timestamp(_))
 
   implicit val genBucket: Gen[Bucket] = for {
     count <- Gen.posNum[Long]
-    timestamp <- Gen.posNum[Long]
+    timestamp <- genTimestamp
   } yield Bucket(count - 1L, timestamp)
 
   implicit val genConfig: Gen[Config] = for {
@@ -252,10 +267,10 @@ object ExpHistGenerators {
       conf <- genConfig
     } yield ExpHist.empty(conf).addAll(buckets)
 
+  implicit val arbTs: Arbitrary[Timestamp] = Arbitrary(genTimestamp)
   implicit val arbBucket: Arbitrary[Bucket] = Arbitrary(genBucket)
   implicit val arbConfig: Arbitrary[Config] = Arbitrary(genConfig)
   implicit val arbExpHist: Arbitrary[ExpHist] = Arbitrary(genExpHist)
-
 }
 
 class CanonicalLaws extends PropSpec with PropertyChecks {
