@@ -31,12 +31,59 @@ package com.twitter.algebird
  * @return  New HLLSeries
  */
 case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
+
+  def insert(data: Array[Byte], timestamp: Long): HLLSeries = {
+    import HyperLogLog._
+    val hashed = hash(data)
+    val j0 = j(hashed, bits)
+    val rhow = rhoW(hashed, bits) - 1
+
+    val newRows = if (rhow < rows.size) {
+      val row = rows(rhow)
+      val t = row.get(j0) match {
+        case Some(t0) => Math.max(t0, timestamp)
+        case None => timestamp
+      }
+      rows.updated(rhow, row.updated(j0, t))
+    } else {
+      val padded = (rows.size until rhow).foldLeft(rows)((rs, _) => rs :+ Map.empty)
+      padded :+ Map(j0 -> timestamp)
+    }
+    HLLSeries(bits, newRows)
+  }
+
+  def maxRhowStats(threshold: Long): (Int, Double) = {
+    val seen = scala.collection.mutable.Set.empty[Int]
+    var sum: Double = 0.0
+    var i = rows.size - 1
+    while (i >= 0) {
+      val it = rows(i).iterator
+      while (it.hasNext) {
+        val (k, t) = it.next
+        if (t >= threshold && !seen(k)) {
+          sum += HyperLogLog.negativePowersOfTwo(i + 1)
+          seen += k
+        }
+      }
+      i -= 1
+    }
+    (seen.size, sum)
+  }
+
+  def approximateSizeSince(threshold: Long): Approximate[Long] = {
+    val (maxRhowSize, maxRhowSum) = maxRhowStats(threshold)
+    val size = 1 << bits
+    val zeroCnt = size - maxRhowSize
+    val z = 1.0 / (zeroCnt + maxRhowSum)
+    HyperLogLog.approximateSize(bits, size, zeroCnt, z)
+  }
+
   /**
    * @param since Timestamp from which to reconstruct the HLL
    *
    * @return New HLLSeries only including RhoWs for values seen at or after the given timestamp
    */
-  def since(threshold: Long) =
+  def since(threshold: Long): HLLSeries =
     HLLSeries(
       bits,
       rows.map{ _.filter{ case (j, ts) => ts >= threshold } })
@@ -45,10 +92,10 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     if (rows.isEmpty)
       SparseHLL(bits, Map())
     else
-      rows.zipWithIndex.map{
+      rows.iterator.zipWithIndex.map {
         case (map, i) =>
           SparseHLL(bits, map.mapValues{ ts => Max((i + 1).toByte) }): HLL
-      }.reduce{ _ + _ }
+      }.reduce(_ + _)
 }
 
 /**
@@ -69,36 +116,44 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
 class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
   import HyperLogLog._
 
-  val zero = HLLSeries(bits, Vector())
+  val zero: HLLSeries = HLLSeries(bits, Vector.empty)
 
   def create(example: Array[Byte], timestamp: Long): HLLSeries = {
     val hashed = hash(example)
-    val (j, rhow) = jRhoW(hashed, bits)
-
-    val vector = Vector.fill(rhow - 1){ Map[Int, Long]() } ++ Vector(Map(j -> timestamp))
-    HLLSeries(bits, vector)
+    val rhow = rhoW(hashed, bits)
+    val e = Map.empty[Int, Long]
+    val bldr = Vector.newBuilder[Map[Int, Long]]
+    var i = 1
+    while (i < rhow) { bldr += e; i += 1 }
+    bldr += Map(j(hashed, bits) -> timestamp)
+    HLLSeries(bits, bldr.result())
   }
 
   def plus(left: HLLSeries, right: HLLSeries): HLLSeries = {
-    if (left.rows.size > right.rows.size)
+    val ln = left.rows.size
+    val rn = right.rows.size
+    if (ln > rn) {
       plus(right, left)
-    else {
-      val zipped = left.rows.zip(right.rows).map{
-        case (l, r) =>
-          combine(l, r)
-      }
-      HLLSeries(
-        bits,
-        zipped ++ right.rows.slice(left.rows.size, right.rows.size))
+    } else {
+      val bldr = Vector.newBuilder[Map[Int, Long]]
+      val lit = left.rows.iterator
+      val rit = right.rows.iterator
+      while (lit.hasNext && rit.hasNext) bldr += combine(lit.next, rit.next)
+      val zipped = bldr.result()
+      HLLSeries(bits, zipped ++ right.rows.slice(ln, rn))
     }
   }
 
-  private def combine(left: Map[Int, Long], right: Map[Int, Long]): Map[Int, Long] = {
-    if (left.size > right.size)
+  private def combine(left: Map[Int, Long], right: Map[Int, Long]): Map[Int, Long] =
+    if (left.size > right.size) {
       combine(right, left)
-    else {
-      right ++
-        left.map{ case (k, v) => k -> (right.getOrElse(k, 0L).max(v)) }
+    } else {
+      left.foldLeft(right) {
+        case (m, (k, lv)) =>
+          m.updated(k, m.get(k) match {
+            case None => lv
+            case Some(rv) => Math.max(lv, rv)
+          })
+      }
     }
-  }
 }

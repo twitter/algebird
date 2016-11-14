@@ -2,23 +2,66 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalacheck.{ Gen, Arbitrary, Properties }
+import org.scalacheck.{ Gen, Arbitrary, Properties, Prop }
+import Arbitrary.arbitrary
 
 import HyperLogLog.{ int2Bytes, long2Bytes }
 
 class HyperLogLogSeriesLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val hllSeriesMonoid = new HyperLogLogSeriesMonoid(5) //5 bits
+  implicit val monoid = new HyperLogLogSeriesMonoid(8)
 
-  implicit val hllSeriesGen = Arbitrary {
-    for (
-      v <- Gen.choose(0, 10000)
-    ) yield (hllSeriesMonoid.create(v, v))
+  case class Timestamp(value: Long)
+
+  object Timestamp {
+    implicit val arbitraryTimestamp: Arbitrary[Timestamp] =
+      Arbitrary(Gen.choose(0L, 1000000L).map(t => Timestamp(t)))
   }
+
+  def absorb(h0: HLLSeries, ts: List[Timestamp]): HLLSeries =
+    monoid.sum(h0 :: ts.map(t => monoid.create(long2Bytes(t.value), t.value)))
+
+  def directAbsorb(h0: HLLSeries, ts: List[Timestamp]): HLLSeries =
+    ts.foldLeft(h0)((h, t) => h.insert(long2Bytes(t.value), t.value))
+
+  implicit val hllSeriesGen: Arbitrary[HLLSeries] =
+    Arbitrary(arbitrary[List[Timestamp]].map(ts => absorb(monoid.zero, ts)))
 
   property("HyperLogLogSeries is a Monoid") {
     monoidLawsEq[HLLSeries]{ _.toHLL == _.toHLL }
+  }
+
+  property("HyperLogLogSeries is commutative") {
+    Prop.forAll { (h: HLLSeries, ts: List[Timestamp]) =>
+      absorb(h, ts) == absorb(h, ts.reverse)
+    }
+  }
+
+  property("series.approximateSizeSince(start) = h.since(t).toHLL.approximateSize") {
+    Prop.forAll { (h: HLLSeries, t: Timestamp) =>
+      h.approximateSizeSince(t.value) == h.since(t.value).toHLL.approximateSize
+    }
+  }
+
+  property("h.insert(bs, t) = m.plus(h, m.create(bs, t))") {
+    Prop.forAll { (h: HLLSeries, ts: List[Timestamp]) =>
+      absorb(h, ts) == directAbsorb(h, ts)
+    }
+  }
+
+  // this is a deterministic test to ensure that our rates are staying
+  // within the expected error bounds.
+  property("verify error rate") {
+    def verify(limit: Int): Boolean = {
+      val it = (0 until limit).iterator
+      val h = monoid.sum(it.map(i => monoid.create(int2Bytes(i), i)))
+      val n = h.since(0L).toHLL.approximateSize.estimate
+      val delta = (limit * 0.2).toInt
+      (limit - delta) <= n && n <= (limit + delta)
+    }
+
+    List(1024, 2048, 4096, 8192, 16384, 32768, 65536).forall(verify)
   }
 }
 
@@ -32,13 +75,13 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
   type Result = Long
 
   val bits = 12
-  val hllSeriesMonoid = new HyperLogLogSeriesMonoid(bits)
+  val monoid = new HyperLogLogSeriesMonoid(bits)
   val hll = new HyperLogLogMonoid(bits)
 
   def makeApproximate(timestampedData: Seq[(Long, Long)]) = {
     val hllSeries = timestampedData
-      .map { case (value, timestamp) => hllSeriesMonoid.create(value, timestamp) }
-    hllSeriesMonoid.sum(hllSeries)
+      .map { case (value, timestamp) => monoid.create(value, timestamp) }
+    monoid.sum(hllSeries)
   }
 
   def exactGenerator: Gen[Seq[(Long, Long)]] = for {
