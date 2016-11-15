@@ -120,6 +120,6 @@ object ApproximateProperty {
  * the scalacheck property is run exactly once.
  */
 abstract class ApproximateProperties(name: String) extends Properties(name) {
-  def overrideParameters(p: Test.Parameters): Test.Parameters =
+  override def overrideParameters(p: Test.Parameters): Test.Parameters =
     p.withMinSuccessfulTests(1)
 }
