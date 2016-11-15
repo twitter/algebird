@@ -87,14 +87,16 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
       bits,
       rows.map{ _.filter{ case (j, ts) => ts >= threshold } })
 
-  def toHLL: HLL =
-    if (rows.isEmpty)
-      SparseHLL(bits, Map())
-    else
-      rows.iterator.zipWithIndex.map {
+  def toHLL: HLL = {
+    val monoid = new HyperLogLogMonoid(bits)
+    if (rows.isEmpty) monoid.zero
+    else {
+      monoid.sum(rows.iterator.zipWithIndex.map {
         case (map, i) =>
-          SparseHLL(bits, map.mapValues{ ts => Max((i + 1).toByte) }): HLL
-      }.reduce(_ + _)
+          SparseHLL(bits, map.mapValues { ts => Max((i + 1).toByte) })
+      })
+    }
+  }
 }
 
 /**
