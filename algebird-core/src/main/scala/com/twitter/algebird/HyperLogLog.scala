@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.nio.ByteBuffer
+import java.lang.Math
 
 /** A super lightweight (hopefully) version of BitSet */
 @deprecated("This is no longer used.", since = "1.12.3")
@@ -78,7 +79,7 @@ object HyperLogLog {
   }
 
   @inline
-  def twopow(i: Int): Double = java.lang.Math.pow(2.0, i)
+  def twopow(i: Int): Double = Math.pow(2.0, i)
 
   @deprecated("This is no longer used. Use j(Array[Byte], Int) instead.", since = "1.12.3")
   def j(bsl: BitSetLite, bits: Int): Int =
@@ -93,7 +94,7 @@ object HyperLogLog {
     var need = bits
     while (i < bytes.length && need > 0) {
       val byte = bytes(i) & 0xff
-      val limit = java.lang.Math.min(8, need)
+      val limit = Math.min(8, need)
       var j = 0
       while (j < limit) {
         sum += ((byte >>> (7 - j)) & 1) << (i * 8 + j)
@@ -282,8 +283,8 @@ object HyperLogLog {
 
   def asApprox(bits: Int, v: Double): Approximate[Long] = {
     val stdev = 1.04 / scala.math.sqrt(twopow(bits))
-    val lowerBound = math.floor(math.max(v * (1.0 - 3 * stdev), 0.0)).toLong
-    val upperBound = math.ceil(v * (1.0 + 3 * stdev)).toLong
+    val lowerBound = Math.floor(math.max(v * (1.0 - 3 * stdev), 0.0)).toLong
+    val upperBound = Math.ceil(v * (1.0 + 3 * stdev)).toLong
     // Lower bound. see: http://en.wikipedia.org/wiki/68-95-99.7_rule
     val prob3StdDev = 0.9972
     Approximate(lowerBound, v.toLong, upperBound, prob3StdDev)
