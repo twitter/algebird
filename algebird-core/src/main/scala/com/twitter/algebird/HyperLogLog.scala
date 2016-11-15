@@ -93,7 +93,7 @@ object HyperLogLog {
     var need = bits
     while (i < bytes.length && need >= 0) {
       val byte = bytes(i) & 0xff
-      val limit = Integer.min(8, need)
+      val limit = java.lang.Math.min(8, need)
       var j = 0
       while (j < limit) {
         sum += ((byte >>> (7 - j)) & 1) << (i * 8 + j)
