@@ -60,9 +60,8 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
       val it = rows(i).iterator
       while (it.hasNext) {
         val (k, t) = it.next
-        if (t >= threshold && !seen(k)) {
+        if (t >= threshold && seen.add(k)) {
           sum += HyperLogLog.negativePowersOfTwo(i + 1)
-          seen += k
         }
       }
       i -= 1

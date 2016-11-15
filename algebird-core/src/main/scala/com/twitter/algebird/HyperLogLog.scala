@@ -19,7 +19,7 @@ package com.twitter.algebird
 import java.nio.ByteBuffer
 
 /** A super lightweight (hopefully) version of BitSet */
-@deprecated("this is no longer used", since = "1.12.3")
+@deprecated("This is no longer used.", since = "1.12.3")
 case class BitSetLite(in: Array[Byte]) {
   def contains(x: Int): Boolean = {
     // Pretend 'in' is little endian so that the bitstring b0b1b2b3 is
@@ -80,7 +80,7 @@ object HyperLogLog {
   @inline
   def twopow(i: Int): Double = java.lang.Math.pow(2.0, i)
 
-  @deprecated("this is no longer used", since = "1.12.3")
+  @deprecated("This is no longer used. Use j(Array[Byte], Int) instead.", since = "1.12.3")
   def j(bsl: BitSetLite, bits: Int): Int =
     j(bsl.in, bits)
 
@@ -91,7 +91,7 @@ object HyperLogLog {
     var i = 0
     var sum = 0
     var need = bits
-    while (i < bytes.length && need >= 0) {
+    while (i < bytes.length && need > 0) {
       val byte = bytes(i) & 0xff
       val limit = java.lang.Math.min(8, need)
       var j = 0
@@ -105,7 +105,7 @@ object HyperLogLog {
     sum
   }
 
-  @deprecated("this is no longer used", since = "1.12.3")
+  @deprecated("This is no longer used. Use rhoW(Array[Byte], Int) instead.", since = "1.12.3")
   def rhoW(bsl: BitSetLite, bits: Int): Byte =
     rhoW(bsl.in, bits)
 
@@ -126,7 +126,9 @@ object HyperLogLog {
     var zeros = 1 // start with a single zero
     while (i < bytes.length) {
       while (j >= 0) {
-        if (((bytes(i) >>> j) & 1) == 1) return zeros.toByte
+        if (((bytes(i) >>> j) & 1) == 1) {
+          return zeros.toByte
+        }
         zeros += 1
         j -= 1
       }
