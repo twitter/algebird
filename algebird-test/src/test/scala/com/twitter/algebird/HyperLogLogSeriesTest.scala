@@ -53,15 +53,23 @@ class HyperLogLogSeriesLaws extends CheckProperties {
   // this is a deterministic test to ensure that our rates are staying
   // within the expected error bounds.
   property("verify error rate") {
-    def verify(limit: Int): Boolean = {
-      val it = (0 until limit).iterator
+
+    // Ensure that building an HLLSeries containing the given
+    // cardinality of items have an acceptable error rate.
+    def verify(cardinality: Int, errorPct: Double): Boolean = {
+      val it = (0 until cardinality).iterator
       val h = monoid.sum(it.map(i => monoid.create(int2Bytes(i), i)))
       val n = h.since(0L).toHLL.approximateSize.estimate
-      val delta = (limit * 0.2).toInt
-      (limit - delta) <= n && n <= (limit + delta)
+      val delta = (cardinality * errorPct).toInt
+      (cardinality - delta) <= n && n <= (cardinality + delta)
     }
 
-    List(1024, 2048, 4096, 8192, 16384, 32768, 65536).forall(verify)
+    // We've verified that at 8-bits, the follow cardinalities all
+    // have <= 10% error. This is intended to protect us against
+    // possible future regressions (where the error rate gets worse
+    // than expected).
+    val cardinalities = List(1024, 2048, 4096, 8192, 16384, 32768, 65536)
+    cardinalities.forall { n => verify(n, 0.1) }
   }
 }
 
