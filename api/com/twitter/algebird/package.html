@@ -911,23 +911,6 @@ tree is compacted using <code>m</code>.
 than <code>batchSize</code> values in it. When more values are added, the
 tree is compacted using <code>s</code>.
 </p></div></div>
-    </li><li name="com.twitter.algebird.BitSetLite" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BitSetLiteextendsProductwithSerializable"></a>
-      <a id="BitSetLite:BitSetLite"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a href="BitSetLite.html"><span class="name">BitSetLite</span></a><span class="params">(<span name="in">in: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.package@BitSetLiteextendsProductwithSerializable" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">A super lightweight (hopefully) version of BitSet</p>
     </li><li name="com.twitter.algebird.BloomFilterAggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="BloomFilterAggregatorextendsMonoidAggregator[String,com.twitter.algebird.BF,com.twitter.algebird.BF]withProductwithSerializable"></a>
       <a id="BloomFilterAggregator:BloomFilterAggregator"></a>
@@ -1652,6 +1635,37 @@ with the contract that convert respect the appropriate structure.
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.ExpHist" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ExpHistextendsProductwithSerializable"></a>
+      <a id="ExpHist:ExpHist"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ExpHist.html"><span class="name">ExpHist</span></a><span class="params">(<span name="conf">conf: <a href="ExpHist$$Config.html" class="extype" name="com.twitter.algebird.ExpHist.Config">Config</a></span>, <span name="buckets">buckets: <span class="extype" name="scala.Vector">Vector</span>[<a href="ExpHist$$Bucket.html" class="extype" name="com.twitter.algebird.ExpHist.Bucket">Bucket</a>]</span>, <span name="total">total: <span class="extype" name="scala.Long">Long</span></span>, <span name="time">time: <a href="ExpHist$$Timestamp.html" class="extype" name="com.twitter.algebird.ExpHist.Timestamp">Timestamp</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.package@ExpHistextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Exponential Histogram algorithm from
+http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf</p><div class="fullcomment"><div class="comment cmt"><p>Exponential Histogram algorithm from
+http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf</p><p>An Exponential Histogram is a sliding window counter that can
+guarantee a bounded relative error. You configure the data
+structure with</p><p>- epsilon, the relative error you're willing to tolerate
+- windowSize, the number of time ticks that you want to track</p><p>You interact with the data structure by adding (number, timestamp)
+pairs into the exponential histogram. querying it for an
+approximate counts with <code>guess</code>.</p><p>The approximate count is guaranteed to be within conf.epsilon
+relative error of the true count seen across the supplied
+<code>windowSize</code>.</p><p>Next steps:</p><p>- efficient serialization
+- Query EH with a shorter window than the configured window
+- Discussion of epsilon vs memory tradeoffs</p></div><dl class="paramcmts block"><dt class="param">conf</dt><dd class="cmt"><p>the config values for this instance.</p></dd><dt class="param">buckets</dt><dd class="cmt"><p>Vector of timestamps of each (powers of 2)
+               ticks. This is the key to the exponential histogram
+               representation. See <a href="ExpHist$$Canonical$.html" class="extype" name="com.twitter.algebird.ExpHist.Canonical">ExpHist.Canonical</a> for more
+               info.</p></dd><dt class="param">total</dt><dd class="cmt"><p>total ticks tracked. <code>total == buckets.map(_.size).sum</code></p></dd><dt class="param">time</dt><dd class="cmt"><p>current timestamp of this instance.</p></dd></dl></div>
     </li><li name="com.twitter.algebird.Field" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="Field[T]extendsRing[T]"></a>
       <a id="Field[T]:Field[T]"></a>
@@ -7754,6 +7768,26 @@ This parameter can thus control the memory footprint required for tracking heavy
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.twitter.algebird.BitSetLite" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BitSetLiteextendsProductwithSerializable"></a>
+      <a id="BitSetLite:BitSetLite"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="BitSetLite.html"><span class="name deprecated" title="Deprecated: (Since version 0.12.3) This is no longer used.">BitSetLite</span></a><span class="params">(<span name="in">in: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.package@BitSetLiteextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A super lightweight (hopefully) version of BitSet</p><div class="fullcomment"><div class="comment cmt"><p>A super lightweight (hopefully) version of BitSet</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> This is no longer used.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -8315,6 +8349,23 @@ the newer one.
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.twitter.algebird.package@DoubleField" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.ExpHist" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ExpHist"></a>
+      <a id="ExpHist:ExpHist"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ExpHist$.html"><span class="name">ExpHist</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.package@ExpHist" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -9683,7 +9734,7 @@ params.</p><p>Use SketchMapMonoid to create instances of this class.
       </a>
     </span>
       <p class="shortcomment cmt">Creates an Iterator that emits partial sums of an input Iterator[V].</p><div class="fullcomment"><div class="comment cmt"><p>Creates an Iterator that emits partial sums of an input Iterator[V].
-Generally this is useful to change from processing individiual V's to
+Generally this is useful to change from processing individual Vs to
 possibly blocks of V @see SummingQueue or a cache of recent Keys in
 a V=Map[K,W] case: @see SummingCache
 </p></div></div>

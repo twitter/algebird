@@ -165,6 +165,40 @@ Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier</p>
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.HyperLogLog#approximateSize" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="approximateSize(bits:Int,size:Int,zeroCnt:Int,z:Double):com.twitter.algebird.Approximate[Long]"></a>
+      <a id="approximateSize(Int,Int,Int,Double):Approximate[Long]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">approximateSize</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="size">size: <span class="extype" name="scala.Int">Int</span></span>, <span name="zeroCnt">zeroCnt: <span class="extype" name="scala.Int">Int</span></span>, <span name="z">z: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="Approximate.html" class="extype" name="com.twitter.algebird.Approximate">Approximate</a>[<span class="extype" name="scala.Long">Long</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@approximateSize(bits:Int,size:Int,zeroCnt:Int,z:Double):com.twitter.algebird.Approximate[Long]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.HyperLogLog#asApprox" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="asApprox(bits:Int,v:Double):com.twitter.algebird.Approximate[Long]"></a>
+      <a id="asApprox(Int,Double):Approximate[Long]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asApprox</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="Approximate.html" class="extype" name="com.twitter.algebird.Approximate">Approximate</a>[<span class="extype" name="scala.Long">Long</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@asApprox(bits:Int,v:Double):com.twitter.algebird.Approximate[Long]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -421,6 +455,23 @@ let m = 2^bits. The size of the HLL is m bytes.</p><p>bits | size | error
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.HyperLogLog#initialEstimate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="initialEstimate(bits:Int,size:Int,zeroCnt:Int,z:Double):Double"></a>
+      <a id="initialEstimate(Int,Int,Int,Double):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialEstimate</span><span class="params">(<span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>, <span name="size">size: <span class="extype" name="scala.Int">Int</span></span>, <span name="zeroCnt">zeroCnt: <span class="extype" name="scala.Int">Int</span></span>, <span name="z">z: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@initialEstimate(bits:Int,size:Int,zeroCnt:Int,z:Double):Double" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="com.twitter.algebird.HyperLogLog#int2Bytes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="int2Bytes(i:Int):Array[Byte]"></a>
       <a id="int2Bytes(Int):Array[Byte]"></a>
@@ -455,25 +506,23 @@ let m = 2^bits. The size of the HLL is m bytes.</p><p>bits | size | error
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.HyperLogLog#j" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="j(bsl:com.twitter.algebird.BitSetLite,bits:Int):Int"></a>
-      <a id="j(BitSetLite,Int):Int"></a>
+    </li><li name="com.twitter.algebird.HyperLogLog#j" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="j(bytes:Array[Byte],bits:Int):Int"></a>
+      <a id="j(Array[Byte],Int):Int"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">j</span><span class="params">(<span name="bsl">bsl: <a href="BitSetLite.html" class="extype" name="com.twitter.algebird.BitSetLite">BitSetLite</a></span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">j</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@j(bsl:com.twitter.algebird.BitSetLite,bits:Int):Int" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@j(bytes:Array[Byte],bits:Int):Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">the value 'j' is equal to &lt;w_0, w_1 ...</p><div class="fullcomment"><div class="comment cmt"><p>the value 'j' is equal to &lt;w_0, w_1 ... w_(bits-1)&gt;
- TODO: We could read in a byte at a time.
-</p></div></div>
+      <p class="shortcomment cmt"></p>
     </li><li name="com.twitter.algebird.HyperLogLog#jRhoW" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="jRhoW(in:Array[Byte],bits:Int):(Int,Byte)"></a>
       <a id="jRhoW(Array[Byte],Int):(Int,Byte)"></a>
@@ -569,23 +618,27 @@ let m = 2^bits. The size of the HLL is m bytes.</p><p>bits | size | error
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.twitter.algebird.HyperLogLog#rhoW" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="rhoW(bsl:com.twitter.algebird.BitSetLite,bits:Int):Byte"></a>
-      <a id="rhoW(BitSetLite,Int):Byte"></a>
+      <a id="rhoW(bytes:Array[Byte],bits:Int):Byte"></a>
+      <a id="rhoW(Array[Byte],Int):Byte"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">rhoW</span><span class="params">(<span name="bsl">bsl: <a href="BitSetLite.html" class="extype" name="com.twitter.algebird.BitSetLite">BitSetLite</a></span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Byte">Byte</span></span>
+        <span class="name">rhoW</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Byte">Byte</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@rhoW(bsl:com.twitter.algebird.BitSetLite,bits:Int):Byte" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@rhoW(bytes:Array[Byte],bits:Int):Byte" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The value 'w' is equal to &lt;w_bits ...</p><div class="fullcomment"><div class="comment cmt"><p>The value 'w' is equal to &lt;w_bits ... w_n&gt;. The function rho counts the number of leading
- zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
+      <p class="shortcomment cmt">The value 'w' is represented as a bitset (encoding in
+<code>bytes</code>).</p><div class="fullcomment"><div class="comment cmt"><p>The value 'w' is represented as a bitset (encoding in
+<code>bytes</code>). This function counds the number of leading zeros in 'w'.</p><p>Each byte is treated as a set of bits (little-endian). That is,
+the one bit represents the first value, then the two bit, then
+four, and so on.</p><p>We treat the leading <code>bits</code> bits as if they were instead a single
+zero bit.
 </p></div></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
@@ -732,7 +785,50 @@ let m = 2^bits. The size of the HLL is m bytes.</p><p>bits | size | error
 
         
 
-        
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="com.twitter.algebird.HyperLogLog#j" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="j(bsl:com.twitter.algebird.BitSetLite,bits:Int):Int"></a>
+      <a id="j(BitSetLite,Int):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) This is no longer used. Use j(Array[Byte], Int) instead.">j</span><span class="params">(<span name="bsl">bsl: <a href="BitSetLite.html" class="extype" name="com.twitter.algebird.BitSetLite">BitSetLite</a></span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@j(bsl:com.twitter.algebird.BitSetLite,bits:Int):Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> This is no longer used. Use j(Array[Byte], Int) instead.</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.HyperLogLog#rhoW" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="rhoW(bsl:com.twitter.algebird.BitSetLite,bits:Int):Byte"></a>
+      <a id="rhoW(BitSetLite,Int):Byte"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) This is no longer used. Use rhoW(Array[Byte], Int) instead.">rhoW</span><span class="params">(<span name="bsl">bsl: <a href="BitSetLite.html" class="extype" name="com.twitter.algebird.BitSetLite">BitSetLite</a></span>, <span name="bits">bits: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Byte">Byte</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.HyperLogLog$@rhoW(bsl:com.twitter.algebird.BitSetLite,bits:Int):Byte" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> This is no longer used. Use rhoW(Array[Byte], Int) instead.</p></dd></dl></div>
+    </li></ol>
+            </div>
         </div>
 
         <div id="inheritedMembers">
