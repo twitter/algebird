@@ -30,7 +30,7 @@ The latest API docs are hosted at Algebird's [ScalaDoc index](api/).
 
 Pull requests and bug reports are always welcome!
 
-Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
+Discussion occurs primarily on the Gitter channel: [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 We use a lightweight form of project governance inspired by the one used by Apache projects.

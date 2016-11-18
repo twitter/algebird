@@ -10,8 +10,10 @@ scaladoc: "#com.twitter.algebird.Applicative"
 
 *(Note - don't use this, use [cats](https://github.com/typelevel/cats))*
 
-Simple implementation of an `Applicative` type-class. There are many choices for the canonical second operation (`join`, `sequence`, `joinWith`, `ap`),
-all equivalent. For a `Functor` modeling concurrent computations with failure, like `Future`, combining results with `join` can save a lot of time over combining with `flatMap`. (Given two operations, if the second fails before the first completes, one can fail the entire computation right then. With `flatMap`, one would have to wait for the first operation to complete before failing it.)
+Simple implementation of an `Applicative` type-class. There are many choices for the canonical second operation (`join`, `sequence`, `joinWith`, `ap`), all equivalent. For a `Functor` modeling concurrent computations with failure, like `Future`, combining results with `join` can save a lot of time over combining with `flatMap`.
+
+If your `Error` type is a singleton, given two operations, if the second fails before the first completes, one can fail the entire computation right then. With `flatMap`, one would have to wait for the first operation to complete before failing it. If your `Error` type isn't a singleton, if you want your `ap` / `zip` to agree with `flatMap`, you have to wait on the first operation to fail, even if the second fails, so that you can surface the error from the first. If the first fails, then you can bail out of the 2nd one early, but not vice versa.
+
 
 Laws `Applicative` instances must follow:
 
