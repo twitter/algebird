@@ -41,4 +41,4 @@ data.flatMap { d => roller((d.continent, d.country, d.city)).map((_, d)) }
 
 We'd love your help fleshing out this documentation! You can edit this page in your browser by clicking [this link](https://github.com/twitter/algebird/edit/develop/docs/src/main/tut/datatypes/combinator/roller.md). These links might be helpful:
 
-- [Roller.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/Roller.scala)
+- [Roller.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/macros/Roller.scala)
