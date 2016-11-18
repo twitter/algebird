@@ -20,7 +20,7 @@ Submit pull requests against the `develop` branch. Try not to pollute your pull 
 
 ## Contributing Documentation
 
-The documentation for Algebird's website is stored in the `docs/src/main/tut` directory of the [docs subproject](https://github.com/algebird/cats/tree/develop/docs).
+The documentation for Algebird's website is stored in the `docs/src/main/tut` directory of the [docs subproject](https://github.com/twitter/algebird/tree/develop/docs).
 
 Algebird's documentation is powered by [sbt-microsites](https://47deg.github.io/sbt-microsites/) and [tut](https://github.com/tpolecat/tut). `tut` compiles any code that appears in the documentation, ensuring that snippets and examples won't go out of date.
 
@@ -50,7 +50,7 @@ scaladoc: "#com.twitter.algebird.<YourDataType>"
     ```
 
 (Please replace `toot` with `tut`!) `tut` will evaluate your code as if you'd pasted it into a REPL and insert each line's results in the output. State persists across `tut` code blocks, so feel free to alternate code blocks with text discussion. See the [tut README](https://github.com/tpolecat/tut) for more information on the various options you can use to customize your code blocks.
-- Add your page to the appropriate section in [the menu](https://github.com/algebird/cats/tree/develop/docs/src/main/resources/microsite/data/menu.yml)
+- Add your page to the appropriate section in [the menu](https://github.com/twitter/algebird/tree/develop/docs/src/main/resources/microsite/data/menu.yml)
 
 ### Generating the Site
 
@@ -68,7 +68,7 @@ gem install jekyll
 
 2. In a shell, navigate to the generated site directory in `docs/target/site`
 3. Start jekyll with `jekyll serve --incremental`
-4. Navigate to http://127.0.0.1:4000/cats/ in your browser
+4. Navigate to http://127.0.0.1:4000/algebird/ in your browser
 5. Make changes to your site, and run `sbt docs/makeMicrosite` to regenerate the site. The changes should be reflected as soon as `sbt docs/makeMicrosite` completes.
 
 ## Post-release
