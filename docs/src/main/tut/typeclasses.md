@@ -1,10 +1,13 @@
 ---
 layout: docs
-title:  "Abstract Algebra"
+title:  "Type Classes"
 section: "typeclasses"
 position: 1
 ---
-{% include_relative typeclasses/abstract_algebra.md %}
+
+# Type Classes
+
+TODO: what's a type class? How do they help us reason about the algebraic properties of data structures?
 
 ## Index
 

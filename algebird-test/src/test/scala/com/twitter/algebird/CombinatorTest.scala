@@ -28,23 +28,17 @@ class CombinatorTest extends CheckProperties {
     Arbitrary.arbitrary[T].map { t => Max(t) }
   }
 
-  implicit val sg: Semigroup[(Max[Int], List[Int])] =
-    new SemigroupCombinator({ (m: Max[Int], l: List[Int]) =>
-      val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
-      l.sortWith { (l, r) =>
-        val (sl, sr) = (sortfn(l), sortfn(r))
-        if (sl == sr) l < r else sl < sr
-      }
-    })
+  private def fold(m: Max[Int], l: List[Int]): List[Int] = {
+    val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
+    l.sortWith { (l, r) =>
+      val (sl, sr) = (sortfn(l), sortfn(r))
+      if (sl == sr) l < r else sl < sr
+    }
+  }
 
-  implicit val mond: Monoid[(Max[Int], List[Int])] =
-    new MonoidCombinator({ (m: Max[Int], l: List[Int]) =>
-      val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
-      l.sortWith { (l, r) =>
-        val (sl, sr) = (sortfn(l), sortfn(r))
-        if (sl == sr) l < r else sl < sr
-      }
-    })
+  implicit val sg: Semigroup[(Max[Int], List[Int])] = new SemigroupCombinator(fold)
+  implicit val mond: Monoid[(Max[Int], List[Int])] = new MonoidCombinator(fold)
+
   // Make sure the lists start sorted:
   implicit def pairArb(implicit lista: Arbitrary[List[Int]]): Arbitrary[(Max[Int], List[Int])] =
     Arbitrary {
@@ -84,5 +78,4 @@ class CombinatorTest extends CheckProperties {
   property("MonoidCombinator with top-K forms a Monoid") {
     monoidLaws[(Map[Int, Int], Set[Int])]
   }
-
 }

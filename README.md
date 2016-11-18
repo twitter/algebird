@@ -9,7 +9,7 @@
 
 Abstract algebra for Scala. This code is targeted at building aggregation systems (via [Scalding](https://github.com/twitter/scalding) or [Apache Storm](http://storm.apache.org/)). It was originally developed as part of Scalding's Matrix API, where Matrices had values which are elements of Monoids, Groups, or Rings. Subsequently, it was clear that the code had broader application within Scalding and on other projects within Twitter.
 
-See the [current API documentation](http://twitter.github.com/algebird) for more information.
+See the [Algebird website](https://twitter.github.io/algebird) for more information.
 
 ### What can you do with this code?
 
@@ -61,7 +61,7 @@ A list of contributors to the project can be found here: [Contributors](https://
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.11.0`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.12.2`.
 
 Current published artifacts are
 

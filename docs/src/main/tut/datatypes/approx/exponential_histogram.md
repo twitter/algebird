@@ -3,7 +3,7 @@ layout: docs
 title:  "Exponential Histogram"
 section: "data"
 source: "algebird-core/src/main/scala/com/twitter/algebird/ExpHist.scala"
-scaladoc: "#com.twitter.algebird.ExpHist"
+scaladoc: "#com.twitter.algebird"
 ---
 
 # Exponential Histogram
@@ -144,7 +144,7 @@ The final l-canonical entry == `floor((position within the group) / 2^i)`, or th
 
 That's all we need to know to write a procedure to generate the l-canonical representation! Here it is again:
 
-## L-Canonical Representation Procedure:
+## L-Canonical Representation Procedure
 
 - Find the largest `j` s.t. `2^j <= (s + l) / (1 + l)`
 - let `s' := 2^j(1 + l) - l`
