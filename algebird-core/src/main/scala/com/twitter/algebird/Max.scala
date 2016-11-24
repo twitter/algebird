@@ -25,6 +25,8 @@ object Max extends MaxInstances {
 }
 
 private[algebird] sealed abstract class MaxInstances {
+  implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Max[T]] = Equiv.by(_.get)
+
   implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Max[T]] =
     Semigroup.from[Max[T]] { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
 

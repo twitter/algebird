@@ -19,7 +19,7 @@ package com.twitter.algebird
  * First tracks the "most recent" item by the order in which items
  * are seen.
  */
-final case class First[@specialized(Int, Long, Float, Double) +T](get: T)
+case class First[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object First extends FirstInstances {
   def aggregator[T]: FirstAggregator[T] = FirstAggregator()

@@ -16,13 +16,15 @@ limitations under the License.
 package com.twitter.algebird
 
 // To use the MinSemigroup wrap your item in a Min object
-final case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
+case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object Min extends MinInstances {
   def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
 }
 
 private[algebird] sealed abstract class MinInstances {
+  implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Min[T]] = Equiv.by(_.get)
+
   // Zero should have the property that it >= all T
   def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
     Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
