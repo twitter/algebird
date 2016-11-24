@@ -22,7 +22,12 @@ package com.twitter.algebird
 case class First[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object First {
-  implicit def semigroup[T]: Semigroup[First[T]] = Semigroup.from { (l, r) => l }
+  implicit def semigroup[T]: Semigroup[First[T]] = new Semigroup[First[T]] {
+     def plus(l: First[T], r: First[T]): First[T] = l
+
+    override def sumOption(iter: TraversableOnce[First[T]]): Option[First[T]] =
+      if (iter.isEmpty) None else Some(iter.toIterator.next)
+  }
 
   def aggregator[T]: FirstAggregator[T] = FirstAggregator()
 }
