@@ -8,7 +8,13 @@ scaladoc: "#com.twitter.algebird.OrderedSemigroup"
 
 # First and Last
 
+`First` and `Last`.
 
+## Algebraic Properties
+
+## Usage Examples
+
+## Related Data Structures
 
 ### Documentation Help
 

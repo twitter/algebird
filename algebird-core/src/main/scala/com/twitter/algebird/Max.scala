@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Twitter, Inc.
+Copyright 2016 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 
-// To use the MaxSemigroup wrap your item in a Max object
+// To use the MaxSemigroup wrap your item in Max
 case class Max[@specialized(Int, Long, Float, Double) +T](get: T)
 
 object Max {
   implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Max[T]] =
     Semigroup.from[Max[T]] { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
+
+  implicit def ordering[T](implicit ord: Ordering[T]): Ordering[Max[T]] =
+    Ordering.by(_.get)
 
   // Zero should have the property that it <= all T
   def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Max[T]] =
@@ -50,43 +53,6 @@ object Max {
       }
     }
   })
-}
-
-// To use the MinSemigroup wrap your item in a Min object
-case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
-
-object Min {
-  implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Min[T]] =
-    Semigroup.from[Min[T]] { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
-
-  // Zero should have the property that it >= all T
-  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
-    Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
-
-  def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
-
-  implicit def intMonoid: Monoid[Min[Int]] = monoid(Int.MaxValue)
-  implicit def longMonoid: Monoid[Min[Long]] = monoid(Long.MaxValue)
-  implicit def doubleMonoid: Monoid[Min[Double]] = monoid(Double.MaxValue)
-  implicit def floatMonoid: Monoid[Min[Float]] = monoid(Float.MaxValue)
-}
-
-// Not ordered by type, but ordered by order in which we see them:
-
-case class First[@specialized(Int, Long, Float, Double) +T](get: T)
-object First {
-  implicit def semigroup[T] = Semigroup.from[First[T]] { (l, r) => l }
-}
-
-case class Last[@specialized(Int, Long, Float, Double) +T](get: T)
-object Last {
-  implicit def semigroup[T] = Semigroup.from[Last[T]] { (l, r) => r }
-}
-
-case class MinAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
-  def prepare(v: T) = v
-  val semigroup = Semigroup.from { (l: T, r: T) => ord.min(l, r) }
-  def present(v: T) = v
 }
 
 case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {

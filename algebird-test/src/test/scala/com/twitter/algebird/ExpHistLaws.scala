@@ -1,8 +1,8 @@
 package com.twitter.algebird
 
+import com.twitter.algebird.scalacheck.{ PosNum, NonEmptyVector }
 import org.scalatest.PropSpec
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.prop.Checkers.check
 import org.scalacheck.{ Gen, Arbitrary }
 import Arbitrary.arbitrary
 
