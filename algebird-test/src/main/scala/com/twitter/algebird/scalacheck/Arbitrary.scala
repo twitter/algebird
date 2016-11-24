@@ -24,7 +24,7 @@ import Gen.oneOf
 /**
  * Arbitrary instances for Algebird data structures.
  */
-object arbitrary {
+object arbitrary extends ExpHistArb {
   import gen._
 
   implicit def firstArb[T: Arbitrary]: Arbitrary[First[T]] =

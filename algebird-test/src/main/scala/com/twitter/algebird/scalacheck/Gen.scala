@@ -24,7 +24,7 @@ import Gen._
 /**
  * Gen instances for Algebird data structures.
  */
-object gen {
+object gen extends ExpHistGen {
   def firstGen[T](g: Gen[T]): Gen[First[T]] = g.map(First(_))
 
   def lastGen[T](g: Gen[T]): Gen[Last[T]] = g.map(Last(_))

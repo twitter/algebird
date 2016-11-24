@@ -23,5 +23,5 @@ case class PosNum[T: Numeric](value: T)
 
 object PosNum {
   implicit def arb[T: Numeric: Gen.Choose]: Arbitrary[PosNum[T]] =
-    Arbitrary(for { p <- Gen.posNum[T] } yield PosNum(p))
+    Arbitrary(Gen.posNum[T].map(PosNum(_)))
 }
