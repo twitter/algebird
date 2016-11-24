@@ -16,20 +16,22 @@ limitations under the License.
 package com.twitter.algebird
 
 // To use the MinSemigroup wrap your item in a Min object
-case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
+final case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
 
-object Min {
+object Min extends MinInstances {
+  def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
+}
+
+private[algebird] sealed abstract class MinInstances {
+  // Zero should have the property that it >= all T
+  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
+    Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
+
   implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Min[T]] =
     Semigroup.from[Min[T]] { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
 
   implicit def ordering[T](implicit ord: Ordering[T]): Ordering[Min[T]] =
     Ordering.by(_.get)
-
-  // Zero should have the property that it >= all T
-  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
-    Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
-
-  def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
 
   implicit def intMonoid: Monoid[Min[Int]] = monoid(Int.MaxValue)
   implicit def longMonoid: Monoid[Min[Long]] = monoid(Long.MaxValue)

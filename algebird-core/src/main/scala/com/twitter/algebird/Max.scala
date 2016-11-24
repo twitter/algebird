@@ -20,7 +20,11 @@ import scala.annotation.tailrec
 // To use the MaxSemigroup wrap your item in Max
 case class Max[@specialized(Int, Long, Float, Double) +T](get: T)
 
-object Max {
+object Max extends MaxInstances {
+  def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)
+}
+
+private[algebird] sealed abstract class MaxInstances {
   implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Max[T]] =
     Semigroup.from[Max[T]] { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
 
@@ -30,8 +34,6 @@ object Max {
   // Zero should have the property that it <= all T
   def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Max[T]] =
     Monoid.from(Max(zero)) { (l, r) => if (ord.gteq(l.get, r.get)) l else r }
-
-  def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)
 
   implicit def intMonoid: Monoid[Max[Int]] = monoid(Int.MinValue)
   implicit def longMonoid: Monoid[Max[Long]] = monoid(Long.MinValue)

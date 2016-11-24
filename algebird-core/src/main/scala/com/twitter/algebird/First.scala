@@ -19,17 +19,19 @@ package com.twitter.algebird
  * First tracks the "most recent" item by the order in which items
  * are seen.
  */
-case class First[@specialized(Int, Long, Float, Double) +T](get: T)
+final case class First[@specialized(Int, Long, Float, Double) +T](get: T)
 
-object First {
+object First extends FirstInstances {
+  def aggregator[T]: FirstAggregator[T] = FirstAggregator()
+}
+
+private[algebird] sealed abstract class FirstInstances {
   implicit def semigroup[T]: Semigroup[First[T]] = new Semigroup[First[T]] {
-     def plus(l: First[T], r: First[T]): First[T] = l
+    def plus(l: First[T], r: First[T]): First[T] = l
 
     override def sumOption(iter: TraversableOnce[First[T]]): Option[First[T]] =
       if (iter.isEmpty) None else Some(iter.toIterator.next)
   }
-
-  def aggregator[T]: FirstAggregator[T] = FirstAggregator()
 }
 
 case class FirstAggregator[T]() extends Aggregator[T, T, T] {

@@ -21,10 +21,12 @@ package com.twitter.algebird
  */
 case class Last[@specialized(Int, Long, Float, Double) +T](get: T)
 
-object Last {
-  implicit def semigroup[T]: Semigroup[Last[T]] = Semigroup.from { (l, r) => r }
-
+object Last extends LastInstances {
   def aggregator[T]: LastAggregator[T] = LastAggregator()
+}
+
+private[algebird] sealed abstract class LastInstances {
+  implicit def semigroup[T]: Semigroup[Last[T]] = Semigroup.from { (l, r) => r }
 }
 
 case class LastAggregator[T]() extends Aggregator[T, T, T] {
