@@ -16,15 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
+import com.twitter.algebird.BaseProperties._
+import com.twitter.algebird.scalacheck.arbitrary._
+import org.scalacheck.Prop.forAll
 
-class AdjoinedRingSpecification extends CheckProperties {
-  import com.twitter.algebird.BaseProperties._
-
-  implicit def adjoined[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] = Arbitrary {
-    implicitly[Arbitrary[T]].arbitrary.map { t => AdjoinedUnit(t) }
-  }
+class AdjoinedUnitRingSpec extends CheckProperties {
   // AdjoinedUnit requires this method to be correct, so it is tested here:
   property("intTimes works correctly") {
     forAll { (bi0: BigInt, bi1: BigInt) =>
@@ -32,12 +28,6 @@ class AdjoinedRingSpecification extends CheckProperties {
     }
   }
 
-  property("AdjoinedUnit[Int] is a Ring") {
-    ringLaws[AdjoinedUnit[Int]]
-  }
-
-  property("AdjoinedUnit[Long] is a Ring") {
-    ringLaws[AdjoinedUnit[Long]]
-  }
-
+  property("AdjoinedUnit[Int] is a Ring") { ringLaws[AdjoinedUnit[Int]] }
+  property("AdjoinedUnit[Long] is a Ring") { ringLaws[AdjoinedUnit[Long]] }
 }

@@ -56,4 +56,28 @@ object gen extends ExpHistGen {
       l <- genLower[T]
       u <- genUpper[T] if l.intersects(u)
     } yield Intersection(l, u)
+
+  def genAdjoined[T](g: Gen[T]): Gen[AdjoinedUnit[T]] =
+    g.map(AdjoinedUnit(_))
+
+  def genDecayedValue: Gen[DecayedValue] =
+    for {
+      a <- choose(-1e100, 1e100) // Don't get too big and overflow
+      b <- choose(-1e100, 1e100) // Don't get too big and overflow
+    } yield DecayedValue(a, b)
+
+  def genAveragedValue: Gen[AveragedValue] =
+    for {
+      cnt <- choose(Int.MinValue.toLong, Int.MaxValue.toLong)
+      v <- choose(-1e100, 1e100) // Don't get too big and overflow
+    } yield AveragedValue(cnt, v)
+
+  def genMoments: Gen[Moments] =
+    for {
+      m0 <- choose(1L, Int.MaxValue.toLong)
+      m1 <- choose(-1e50, 1e50)
+      m2 <- choose(0, 1e50)
+      m3 <- choose(-1e10, 1e50)
+      m4 <- choose(0, 1e50)
+    } yield new Moments(m0, m1, m2, m3, m4)
 }

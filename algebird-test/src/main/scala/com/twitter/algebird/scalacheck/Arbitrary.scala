@@ -59,4 +59,15 @@ object arbitrary extends ExpHistArb {
 
   implicit def intersectionArb[T: Arbitrary: Ordering]: Arbitrary[Interval.GenIntersection[T]] =
     Arbitrary(genIntersection)
+
+  implicit def adjoinedArb[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] =
+    Arbitrary(genAdjoined(getArbitrary[T]))
+
+  implicit val decayedValueArb: Arbitrary[DecayedValue] =
+    Arbitrary(genDecayedValue)
+
+  implicit val averagedValueArb: Arbitrary[AveragedValue] =
+    Arbitrary(genAveragedValue)
+
+  implicit val momentsArb: Arbitrary[Moments] = Arbitrary(genMoments)
 }

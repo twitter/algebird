@@ -15,19 +15,10 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-class PredecessibleTests extends CheckProperties {
-  import com.twitter.algebird.PredecessibleLaws.{ predessibleLaws => laws }
+class PredecessibleSpec extends CheckProperties {
+  import com.twitter.algebird.PredecessibleLaws.{ predecessibleLaws => laws }
 
-  property("Int is Predecessible") {
-    laws[Int]
-  }
-
-  property("Long is Predecessible") {
-    laws[Long]
-  }
-
-  property("BigInt is Predecessible") {
-    laws[BigInt]
-  }
-
+  property("Int is Predecessible") { laws[Int] }
+  property("Long is Predecessible") { laws[Long] }
+  property("BigInt is Predecessible") { laws[BigInt] }
 }

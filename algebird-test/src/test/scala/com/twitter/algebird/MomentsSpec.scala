@@ -1,8 +1,33 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import com.twitter.algebird.BaseProperties._
+import com.twitter.algebird.scalacheck.arbitrary._
 
-class MomentsGroupTest extends WordSpec with Matchers {
+class MomentsSpec extends CheckProperties {
+  val EPS = 1e-10
+
+  property("Moments Group laws") {
+    groupLawsEq[Moments] { (ml, mr) =>
+      (ml.m0 == mr.m0) &&
+        approxEq(EPS)(ml.m1, mr.m1) &&
+        approxEq(EPS)(ml.m2, mr.m2) &&
+        approxEq(EPS)(ml.m3, mr.m3) &&
+        approxEq(EPS)(ml.m4, mr.m4)
+    }
+  }
+}
+
+object MomentsSpec {
+}
+
+class MomentsTest extends WordSpec with Matchers {
+  def testApproxEq(f1: Double, f2: Double) {
+    if (f2 == 0)
+      assert(f1 < 1e-10)
+    else
+      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
+  }
 
   /**
    * Given a list of doubles, create a Moments object to hold
@@ -10,13 +35,6 @@ class MomentsGroupTest extends WordSpec with Matchers {
    */
   def getMoments(xs: List[Double]): Moments =
     xs.foldLeft(MomentsGroup.zero) { (m, x) => MomentsGroup.plus(m, Moments(x)) }
-
-  def testApproxEq(f1: Double, f2: Double) {
-    if (f2 == 0)
-      assert(f1 < 1e-10)
-    else
-      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
-  }
 
   "Moments should count" in {
     val m1 = getMoments(List(1, 2, 3, 4, 5))
