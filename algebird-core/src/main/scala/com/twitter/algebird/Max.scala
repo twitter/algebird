@@ -48,19 +48,60 @@ private[algebird] sealed abstract class MaxInstances {
 
   // These have a lower bound, but not an upperbound, so the Max forms a monoid:
   implicit def stringMonoid: Monoid[Max[String]] = monoid("")
-  implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] = monoid[List[T]](Nil)(new Ordering[List[T]] {
-    @tailrec
-    final override def compare(left: List[T], right: List[T]): Int = {
-      (left, right) match {
-        case (Nil, Nil) => 0
-        case (Nil, _) => -1
-        case (_, Nil) => 1
-        case (lh :: lt, rh :: rt) =>
-          val c = Ordering[T].compare(lh, rh)
-          if (c == 0) compare(lt, rt) else c
+
+  implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] = monoid[List[T]](Nil)(
+    new Ordering[List[T]] {
+      @tailrec
+      final override def compare(left: List[T], right: List[T]): Int = {
+        (left, right) match {
+          case (Nil, Nil) => 0
+          case (Nil, _) => -1
+          case (_, Nil) => 1
+          case (lh :: lt, rh :: rt) =>
+            val c = Ordering[T].compare(lh, rh)
+            if (c == 0) compare(lt, rt) else c
+        }
+      }
+    })
+
+  // TODO: Replace with
+  // scala.collection.mutable.MutableMethods.iteratorCompare when we
+  // merge with cats.
+  def iteratorCompare[T](xs: Iterator[T], ys: Iterator[T])(implicit ord: Ordering[T]): Int = {
+    while (true) {
+      if (xs.hasNext) {
+        if (ys.hasNext) {
+          val x = xs.next
+          val y = ys.next
+          val cmp = ord.compare(x, y)
+          if (cmp != 0) return cmp
+        } else {
+          return 1
+        }
+      } else {
+        return if (ys.hasNext) -1 else 0
       }
     }
-  })
+    0
+  }
+
+  implicit def vectorMonoid[T: Ordering]: Monoid[Max[Vector[T]]] =
+    monoid[Vector[T]](Vector.empty[T])(
+      new Ordering[Vector[T]] {
+        def compare(l: Vector[T], r: Vector[T]): Int = {
+          if (l eq r) 0
+          else iteratorCompare(l.iterator, r.iterator)
+        }
+      })
+
+  implicit def streamMonoid[T: Ordering]: Monoid[Max[Stream[T]]] =
+    monoid[Stream[T]](Stream.empty[T])(
+      new Ordering[Stream[T]] {
+        def compare(l: Stream[T], r: Stream[T]): Int = {
+          if (l eq r) 0
+          else iteratorCompare(l.iterator, r.iterator)
+        }
+      })
 }
 
 case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {

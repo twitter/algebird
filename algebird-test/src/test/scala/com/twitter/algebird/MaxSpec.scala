@@ -45,4 +45,12 @@ class MaxSpec extends CheckProperties {
   property("Max[List[Int]] is a commutative monoid") {
     commutativeMonoidLaws[Max[List[Int]]]
   }
+
+  property("Max[Vector[Int]] is a commutative monoid") {
+    commutativeMonoidLaws[Max[Vector[Int]]]
+  }
+
+  property("Max[Stream[Int]] is a commutative monoid") {
+    commutativeMonoidLaws[Max[Stream[Int]]]
+  }
 }
