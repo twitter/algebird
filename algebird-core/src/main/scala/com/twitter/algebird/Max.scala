@@ -18,7 +18,11 @@ package com.twitter.algebird
 import scala.annotation.tailrec
 
 // To use the MaxSemigroup wrap your item in Max
-case class Max[@specialized(Int, Long, Float, Double) +T](get: T)
+case class Max[@specialized(Int, Long, Float, Double) +T](get: T) {
+  def max[U >: T](r: Max[U])(implicit ord: Ordering[U]): Max[U] =
+    Max.ordering.max(this, r)
+  def +[U >: T](r: Max[U])(implicit ord: Ordering[U]): Max[U] = max(r)
+}
 
 object Max extends MaxInstances {
   def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)

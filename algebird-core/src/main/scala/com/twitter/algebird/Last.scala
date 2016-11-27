@@ -19,7 +19,9 @@ package com.twitter.algebird
  * Last tracks the "most recent" item by the order in which items are
  * seen.
  */
-case class Last[@specialized(Int, Long, Float, Double) +T](get: T)
+case class Last[@specialized(Int, Long, Float, Double) +T](get: T) {
+  def +[U >: T](r: Last[U]): Last[U] = r
+}
 
 object Last extends LastInstances {
   def aggregator[T]: LastAggregator[T] = LastAggregator()

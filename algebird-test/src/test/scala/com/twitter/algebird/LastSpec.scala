@@ -6,14 +6,18 @@ import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Prop.forAll
 
 class LastSpec extends CheckProperties {
-  property("Last should work properly") {
+  property("Last should sum properly") {
     forAll { v: NonEmptyVector[Last[Int]] =>
       val last = Semigroup.sumOption[Last[Int]](v.items).get
       last == v.items.last
     }
   }
 
-  property("Last.aggregator returns the first item") {
+  property("Last.+ should work") {
+    forAll { (l: Last[Int], r: Last[Int]) => l + r == r }
+  }
+
+  property("Last.aggregator returns the last item") {
     forAll { v: NonEmptyVector[Int] =>
       v.items.last == Last.aggregator(v.items)
     }

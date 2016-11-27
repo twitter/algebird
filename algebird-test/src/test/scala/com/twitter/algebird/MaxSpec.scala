@@ -6,10 +6,17 @@ import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Prop.forAll
 
 class MaxSpec extends CheckProperties {
-  property("Max should work properly") {
+  property("Max should sum properly") {
     forAll { v: NonEmptyVector[Max[Int]] =>
       val max = Semigroup.sumOption[Max[Int]](v.items).get
       max == v.sorted.last
+    }
+  }
+
+  property("Max.{ +, max } should work") {
+    forAll { (l: Max[Int], r: Max[Int]) =>
+      val realMax = Max(l.get max r.get)
+      l + r == realMax && (l max r) == realMax
     }
   }
 

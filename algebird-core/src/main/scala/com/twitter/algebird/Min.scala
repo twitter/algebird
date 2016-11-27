@@ -16,7 +16,11 @@ limitations under the License.
 package com.twitter.algebird
 
 // To use the MinSemigroup wrap your item in a Min object
-case class Min[@specialized(Int, Long, Float, Double) +T](get: T)
+case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
+  def min[U >: T](r: Min[U])(implicit ord: Ordering[U]): Min[U] =
+    Min.ordering.min(this, r)
+  def +[U >: T](r: Min[U])(implicit ord: Ordering[U]): Min[U] = min(r)
+}
 
 object Min extends MinInstances {
   def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
