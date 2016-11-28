@@ -19,7 +19,7 @@ package scalacheck
 
 import org.scalacheck.{ Arbitrary, Gen }
 
-case class PosNum[T: Numeric](value: T)
+case class PosNum[T](value: T)
 
 object PosNum {
   implicit def arb[T: Numeric: Gen.Choose]: Arbitrary[PosNum[T]] =

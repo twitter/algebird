@@ -28,16 +28,20 @@ object First extends FirstInstances {
 }
 
 private[algebird] sealed abstract class FirstInstances {
-  implicit def semigroup[T]: Semigroup[First[T]] = new Semigroup[First[T]] {
-    def plus(l: First[T], r: First[T]): First[T] = l
+  def firstSemigroup[T] = new Semigroup[T] {
+    def plus(l: T, r: T): T = l
 
-    override def sumOption(iter: TraversableOnce[First[T]]): Option[First[T]] =
+    override def sumOption(iter: TraversableOnce[T]): Option[T] =
       if (iter.isEmpty) None else Some(iter.toIterator.next)
   }
+
+  implicit def semigroup[T]: Semigroup[First[T]] = firstSemigroup[First[T]]
 }
 
 case class FirstAggregator[T]() extends Aggregator[T, T, T] {
   def prepare(v: T) = v
-  val semigroup: Semigroup[T] = Semigroup.from { (l: T, r: T) => l }
+
+  val semigroup: Semigroup[T] = First.firstSemigroup[T]
+
   def present(v: T) = v
 }

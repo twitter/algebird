@@ -24,6 +24,8 @@ case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
 
 object Min extends MinInstances {
   def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
+  def minSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] =
+    Semigroup.from { (l: T, r: T) => ord.min(l, r) }
 }
 
 private[algebird] sealed abstract class MinInstances {
@@ -48,6 +50,6 @@ private[algebird] sealed abstract class MinInstances {
 
 case class MinAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
-  val semigroup = Semigroup.from { (l: T, r: T) => ord.min(l, r) }
+  val semigroup = Min.minSemigroup[T]
   def present(v: T) = v
 }

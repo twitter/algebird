@@ -18,9 +18,6 @@ class MomentsLaws extends CheckProperties {
   }
 }
 
-object MomentsSpec {
-}
-
 class MomentsTest extends WordSpec with Matchers {
   def testApproxEq(f1: Double, f2: Double) {
     if (f2 == 0)

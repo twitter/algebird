@@ -16,7 +16,7 @@ class DecayedValueLaws extends CheckProperties {
   }
 
   property("DecayedValue Monoid laws") {
-    monoidLawsEq[DecayedValue] { (dvl, dvr) =>
+    commutativeMonoidLawsEq[DecayedValue] { (dvl, dvr) =>
       approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
     }
   }

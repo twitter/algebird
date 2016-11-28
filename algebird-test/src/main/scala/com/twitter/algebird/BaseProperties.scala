@@ -34,6 +34,9 @@ object BaseProperties {
       (BigDecimal(base) * BigDecimal(10).pow(scale))
     })
 
+  @deprecated(
+    "Please use Equiv.universal, or the Equiv version of tests",
+    since = "0.12.3")
   def defaultEq[T](t0: T, t1: T): Boolean = t0 == t1
 
   def approxEq(eps: Double)(f1: Double, f2: Double): Boolean =
@@ -56,10 +59,8 @@ object BaseProperties {
   // Associative
   def isAssociative[T: Semigroup: Arbitrary]: Prop = isAssociativeDifferentTypes[T, T]
 
-  def isAssociativeDifferentTypes[T: Semigroup, U <: T: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+  def isAssociativeDifferentTypes[T: Semigroup, U <: T: Arbitrary]: Prop =
     isAssociativeEquiv[T, U]
-  }
 
   def isAssociativeEq[T: Semigroup, U <: T: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
@@ -74,7 +75,7 @@ object BaseProperties {
 
   // Commutative
   def isCommutative[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     isCommutativeEquiv[T]
   }
 
@@ -99,7 +100,7 @@ object BaseProperties {
     }
 
   def semigroupLaws[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     semigroupLawsEquiv[T]
   }
 
@@ -113,7 +114,7 @@ object BaseProperties {
 
   // Commutative Semigroup Laws
   def commutativeSemigroupLaws[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     commutativeSemigroupLawsEquiv[T]
   }
 
@@ -149,7 +150,7 @@ object BaseProperties {
   def weakZero[T: Monoid: Arbitrary]: Prop = weakZeroDifferentTypes[T, T]
 
   def validZero[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     validZeroEquiv[T]
   }
 
@@ -168,7 +169,7 @@ object BaseProperties {
     }
 
   def monoidLaws[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     monoidLawsEquiv[T]
   }
 
@@ -181,7 +182,7 @@ object BaseProperties {
     validZeroEquiv[T] && semigroupLawsEquiv[T] && isNonZeroWorksMonoid[T]
 
   def commutativeMonoidLaws[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     commutativeMonoidLawsEquiv[T]
   }
 
@@ -205,7 +206,7 @@ object BaseProperties {
     hasAdditiveInversesDifferentTypes[T, T]
 
   def groupLaws[T: Group: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.fromFunction(defaultEq)
+    implicit val eq: Equiv[T] = Equiv.universal
     groupLawsEquiv[T]
   }
 

@@ -26,6 +26,11 @@ case class Max[@specialized(Int, Long, Float, Double) +T](get: T) {
 
 object Max extends MaxInstances {
   def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] = MaxAggregator()(ord)
+
+  // TODO: Note that this is a semilattice, for when we merge
+  // typelevel/algebra.
+  def maxSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] =
+    Semigroup.from { (l: T, r: T) => ord.max(l, r) }
 }
 
 private[algebird] sealed abstract class MaxInstances {
@@ -69,7 +74,7 @@ private[algebird] sealed abstract class MaxInstances {
     })
 
   // TODO: Replace with
-  // scala.collection.mutable.MutableMethods.iteratorCompare when we
+  // cast.kernel.instances.StaticMethods.iteratorCompare when we
   // merge with cats.
   def iteratorCompare[T](xs: Iterator[T], ys: Iterator[T])(implicit ord: Ordering[T]): Int = {
     while (true) {
@@ -110,6 +115,6 @@ private[algebird] sealed abstract class MaxInstances {
 
 case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
-  val semigroup = Semigroup.from { (l: T, r: T) => ord.max(l, r) }
+  val semigroup = Max.maxSemigroup[T]
   def present(v: T) = v
 }

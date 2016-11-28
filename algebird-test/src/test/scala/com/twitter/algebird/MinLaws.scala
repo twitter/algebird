@@ -13,6 +13,9 @@ class MinLaws extends CheckProperties {
       l + r == realMin && (l min r) == realMin
     }
 
+  // Test equiv import.
+  val equiv = implicitly[Equiv[Min[Int]]]
+
   property("Min.{ +, min } works on ints") { minTest[Int] }
 
   property("Min should work on non-monoid types like String") { minTest[String] }

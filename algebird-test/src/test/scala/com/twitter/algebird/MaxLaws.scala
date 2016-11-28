@@ -13,6 +13,9 @@ class MaxLaws extends CheckProperties {
       l + r == realMax && (l max r) == realMax
     }
 
+  // Test equiv import.
+  val equiv = implicitly[Equiv[Max[Int]]]
+
   property("Max.{ +, max } works on ints") { maxTest[Int] }
 
   property("Max should work on non-monoid types like String") { maxTest[String] }
