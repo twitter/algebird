@@ -6,7 +6,7 @@ import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
-class MinSpec extends CheckProperties {
+class MinLaws extends CheckProperties {
   def minTest[T: Arbitrary: Ordering] =
     forAll { v: NonEmptyVector[Min[T]] =>
       val min = Semigroup.sumOption[Min[T]](v.items).get

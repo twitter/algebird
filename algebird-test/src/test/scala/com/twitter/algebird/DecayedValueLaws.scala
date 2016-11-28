@@ -6,7 +6,7 @@ import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop._
 
-class DecayedValueSpec extends CheckProperties {
+class DecayedValueLaws extends CheckProperties {
   case class Params(mean: Double, halfLife: Double, count: Int, maxNoise: Double)
 
   implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)

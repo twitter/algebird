@@ -6,7 +6,7 @@ import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
-class MaxSpec extends CheckProperties {
+class MaxLaws extends CheckProperties {
   def maxTest[T: Arbitrary: Ordering] =
     forAll { v: NonEmptyVector[Max[T]] =>
       val min = Semigroup.sumOption[Max[T]](v.items).get

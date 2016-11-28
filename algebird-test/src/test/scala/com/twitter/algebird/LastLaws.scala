@@ -5,7 +5,7 @@ import com.twitter.algebird.scalacheck.arbitrary._
 import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Prop.forAll
 
-class LastSpec extends CheckProperties {
+class LastLaws extends CheckProperties {
   property("Last should sum properly") {
     forAll { v: NonEmptyVector[Last[Int]] =>
       val last = Semigroup.sumOption[Last[Int]](v.items).get

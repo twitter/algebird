@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-class SuccessibleSpec extends CheckProperties {
+class SuccessibleProperties extends CheckProperties {
   import com.twitter.algebird.SuccessibleLaws.{ successibleLaws => laws }
 
   property("Int is Successible") { laws[Int] }

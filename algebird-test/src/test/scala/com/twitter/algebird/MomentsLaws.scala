@@ -4,7 +4,7 @@ import org.scalatest._
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 
-class MomentsSpec extends CheckProperties {
+class MomentsLaws extends CheckProperties {
   val EPS = 1e-10
 
   property("Moments Group laws") {
