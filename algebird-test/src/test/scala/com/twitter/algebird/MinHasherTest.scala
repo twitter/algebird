@@ -1,11 +1,10 @@
 package com.twitter.algebird
 
+import com.twitter.algebird.BaseProperties._
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalatest.{ Matchers, _ }
 
 class MinHasherTest extends CheckProperties {
-  import com.twitter.algebird.BaseProperties._
-
   implicit val mhMonoid = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary {
     for (
@@ -13,8 +12,8 @@ class MinHasherTest extends CheckProperties {
     ) yield (mhMonoid.init(v))
   }
 
-  property("MinHasher is a Monoid") {
-    monoidLawsEq[MinHashSignature]{ (a, b) => a.bytes.toList == b.bytes.toList }
+  property("MinHasher is a commutative monoid") {
+    commutativeMonoidLawsEquiv[MinHashSignature]
   }
 }
 

@@ -45,6 +45,7 @@ class DecayedVectorProperties extends CheckProperties {
   }
 
   property("DecayedVector[Map[Int, _]] is a monoid") {
-    monoidLawsEq[DecayedVector[({ type x[a] = Map[Int, a] })#x]](decayedMapEqFn)
+    implicit val equiv = Equiv.fromFunction(decayedMapEqFn)
+    monoidLawsEquiv[DecayedVector[({ type x[a] = Map[Int, a] })#x]]
   }
 }

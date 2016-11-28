@@ -32,7 +32,7 @@ class BatchedLaws extends CheckProperties with Matchers with PropertyChecks {
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {
     implicit val m: Monoid[Batched[A]] = Batched.compactingMonoid[A](size)
     property(s"CountMinSketch[$name] batched at $size is a Monoid") {
-      monoidLawsEq[Batched[A]](_.sum == _.sum)
+      monoidLawsEquiv[Batched[A]]
     }
   }
 
