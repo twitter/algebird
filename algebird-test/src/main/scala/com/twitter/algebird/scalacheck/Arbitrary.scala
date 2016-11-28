@@ -24,7 +24,7 @@ import Gen.oneOf
 /**
  * Arbitrary instances for Algebird data structures.
  */
-object arbitrary extends ExpHistArb {
+object arbitrary extends ExpHistArb with IntervalArb {
   import gen._
 
   implicit def firstArb[T: Arbitrary]: Arbitrary[First[T]] =
@@ -44,21 +44,6 @@ object arbitrary extends ExpHistArb {
 
   implicit def andValArb: Arbitrary[AndVal] =
     Arbitrary(getArbitrary[Boolean].map(AndVal(_)))
-
-  implicit def intervalArb[T](implicit arb: Arbitrary[T], ord: Ordering[T]): Arbitrary[Interval[T]] =
-    Arbitrary(
-      oneOf(
-        genUniverse[T], genEmpty[T],
-        genInclusiveLower[T], genExclusiveLower[T],
-        genInclusiveUpper[T], genExclusiveUpper[T],
-        genIntersection[T]))
-
-  implicit def lowerIntArb[T: Arbitrary: Ordering]: Arbitrary[Lower[T]] = Arbitrary(genLower)
-
-  implicit def upperIntArb[T: Arbitrary: Ordering]: Arbitrary[Upper[T]] = Arbitrary(genUpper)
-
-  implicit def intersectionArb[T: Arbitrary: Ordering]: Arbitrary[Interval.GenIntersection[T]] =
-    Arbitrary(genIntersection)
 
   implicit def adjoinedArb[T: Arbitrary]: Arbitrary[AdjoinedUnit[T]] =
     Arbitrary(genAdjoined(getArbitrary[T]))

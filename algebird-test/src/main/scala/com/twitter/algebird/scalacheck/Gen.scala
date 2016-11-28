@@ -24,38 +24,10 @@ import Gen._
 /**
  * Gen instances for Algebird data structures.
  */
-object gen extends ExpHistGen {
+object gen extends ExpHistGen with IntervalGen {
   def firstGen[T](g: Gen[T]): Gen[First[T]] = g.map(First(_))
 
   def lastGen[T](g: Gen[T]): Gen[Last[T]] = g.map(Last(_))
-
-  def genUniverse[T: Arbitrary: Ordering]: Gen[Universe[T]] = Universe[T]()
-
-  def genEmpty[T: Arbitrary: Ordering]: Gen[Empty[T]] = Empty[T]()
-
-  def genInclusiveLower[T: Arbitrary: Ordering]: Gen[InclusiveLower[T]] =
-    getArbitrary[T].map(InclusiveLower(_))
-
-  def genExclusiveLower[T: Arbitrary: Ordering]: Gen[ExclusiveLower[T]] =
-    getArbitrary[T].map(ExclusiveLower(_))
-
-  def genInclusiveUpper[T: Arbitrary: Ordering]: Gen[InclusiveUpper[T]] =
-    getArbitrary[T].map(InclusiveUpper(_))
-
-  def genExclusiveUpper[T: Arbitrary: Ordering]: Gen[ExclusiveUpper[T]] =
-    getArbitrary[T].map(ExclusiveUpper(_))
-
-  def genLower[T: Arbitrary: Ordering]: Gen[Lower[T]] =
-    oneOf(genInclusiveLower, genExclusiveLower)
-
-  def genUpper[T: Arbitrary: Ordering]: Gen[Upper[T]] =
-    oneOf(genInclusiveUpper, genExclusiveUpper)
-
-  def genIntersection[T: Arbitrary: Ordering]: Gen[Interval.GenIntersection[T]] =
-    for {
-      l <- genLower[T]
-      u <- genUpper[T] if l.intersects(u)
-    } yield Intersection(l, u)
 
   def genAdjoined[T](g: Gen[T]): Gen[AdjoinedUnit[T]] =
     g.map(AdjoinedUnit(_))
