@@ -23,6 +23,6 @@ class LastLaws extends CheckProperties {
     }
   }
 
-  property("Last[Int] is a Semigroup") { semigroupLaws[Last[Int]] }
-  property("Last[String] is a Semigroup") { semigroupLaws[Last[String]] }
+  property("Last[Int] is a Semigroup") { semigroupLawsEquiv[Last[Int]] }
+  property("Last[String] is a Semigroup") { semigroupLawsEquiv[Last[String]] }
 }

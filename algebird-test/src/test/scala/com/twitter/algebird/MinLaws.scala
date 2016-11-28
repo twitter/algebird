@@ -24,14 +24,14 @@ class MinLaws extends CheckProperties {
   }
 
   property("Min[String] is a commutative semigroup") {
-    commutativeSemigroupLaws[Min[String]]
+    commutativeSemigroupLawsEquiv[Min[String]]
   }
 
   property("Min[Long] is a commutative monoid") {
-    commutativeMonoidLaws[Min[Long]]
+    commutativeMonoidLawsEquiv[Min[Long]]
   }
 
   property("Min[Double] is a commutative monoid") {
-    commutativeMonoidLaws[Min[Double]]
+    commutativeMonoidLawsEquiv[Min[Double]]
   }
 }

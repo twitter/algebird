@@ -23,6 +23,6 @@ class FirstLaws extends CheckProperties {
     }
   }
 
-  property("First[Int] is a semigroup") { semigroupLaws[First[Int]] }
-  property("First[String] is a semigroup") { semigroupLaws[First[String]] }
+  property("First[Int] is a semigroup") { semigroupLawsEquiv[First[Int]] }
+  property("First[String] is a semigroup") { semigroupLawsEquiv[First[String]] }
 }
