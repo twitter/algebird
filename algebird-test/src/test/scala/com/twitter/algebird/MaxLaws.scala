@@ -8,19 +8,14 @@ import org.scalacheck.Prop.forAll
 
 class MaxLaws extends CheckProperties {
   def maxTest[T: Arbitrary: Ordering] =
-    forAll { v: NonEmptyVector[Max[T]] =>
-      val min = Semigroup.sumOption[Max[T]](v.items).get
-      min == v.sorted.last
-    } && forAll { (l: Max[T], r: Max[T]) =>
+    forAll { (l: Max[T], r: Max[T]) =>
       val realMax = Max(Ordering[T].max(l.get, r.get))
       l + r == realMax && (l max r) == realMax
     }
 
-  property("Max.{ +, max, sumOption } works on ints") { maxTest[Int] }
+  property("Max.{ +, max } works on ints") { maxTest[Int] }
 
-  property("Max should work on non-monoid types like String") {
-    maxTest[String]
-  }
+  property("Max should work on non-monoid types like String") { maxTest[String] }
 
   property("Max.aggregator returns the maximum item") {
     forAll { v: NonEmptyVector[Int] =>

@@ -31,24 +31,19 @@ object Max extends MaxInstances {
 private[algebird] sealed abstract class MaxInstances {
   implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Max[T]] = Equiv.by(_.get)
 
+  private[this] def plus[T](implicit ord: Ordering[T]) = {
+    (l: Max[T], r: Max[T]) => if (ord.gteq(l.get, r.get)) l else r
+  }
+
   // Zero should have the property that it <= all T
-  def monoid[T](z: => T)(implicit ord: Ordering[T]): Monoid[Max[T]] =
-    new Monoid[Max[T]] {
-      def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
-      override def zero: Max[T] = Max(z)
-      override def sumOption(iter: TraversableOnce[Max[T]]): Option[Max[T]] =
-        if (iter.isEmpty) None else Some(iter.max)
-    }
+  def monoid[T: Ordering](zero: => T): Monoid[Max[T]] = Monoid.from(Max(zero))(plus)
 
-  implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Max[T]] =
-    new Semigroup[Max[T]] {
-      def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
-      override def sumOption(iter: TraversableOnce[Max[T]]): Option[Max[T]] =
-        if (iter.isEmpty) None else Some(iter.max)
-    }
+  // There's no need to override `sumOption`, since the default
+  // implementation does no allocation other than the outer `Option`
+  // and `plus` doesn't do any allocation.
+  implicit def semigroup[T: Ordering]: Semigroup[Max[T]] = Semigroup.from(plus)
 
-  implicit def ordering[T](implicit ord: Ordering[T]): Ordering[Max[T]] =
-    Ordering.by(_.get)
+  implicit def ordering[T: Ordering]: Ordering[Max[T]] = Ordering.by(_.get)
 
   implicit def intMonoid: Monoid[Max[Int]] = monoid(Int.MinValue)
   implicit def longMonoid: Monoid[Max[Long]] = monoid(Long.MinValue)

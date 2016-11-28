@@ -8,19 +8,14 @@ import org.scalacheck.Prop.forAll
 
 class MinLaws extends CheckProperties {
   def minTest[T: Arbitrary: Ordering] =
-    forAll { v: NonEmptyVector[Min[T]] =>
-      val min = Semigroup.sumOption[Min[T]](v.items).get
-      min == v.sorted.head
-    } && forAll { (l: Min[T], r: Min[T]) =>
+    forAll { (l: Min[T], r: Min[T]) =>
       val realMin = Min(Ordering[T].min(l.get, r.get))
       l + r == realMin && (l min r) == realMin
     }
 
-  property("Min.{ +, min, sumOption } works on ints") { minTest[Int] }
+  property("Min.{ +, min } works on ints") { minTest[Int] }
 
-  property("Min should work on non-monoid types like String") {
-    minTest[String]
-  }
+  property("Min should work on non-monoid types like String") { minTest[String] }
 
   property("Min.aggregator returns the minimum item") {
     forAll { v: NonEmptyVector[Int] =>

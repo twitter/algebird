@@ -88,8 +88,10 @@ object BaseProperties {
     isAssociativeEq[T, T](Equiv[T].equiv _) && semigroupSumWorks[T]
 
   def commutativeSemigroupLawsEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean) =
-    isAssociativeEq[T, T](eqfn) && isCommutativeEq[T](eqfn)
-  def commutativeSemigroupLaws[T: Semigroup: Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
+    semigroupLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)
+
+  def commutativeSemigroupLaws[T: Semigroup: Arbitrary] =
+    commutativeSemigroupLawsEq[T](defaultEq _)
 
   def isNonZeroWorksMonoid[T: Monoid: Arbitrary: Equiv] = 'isNonZeroWorksMonoid |: forAll { (a: T, b: T) =>
     val aIsLikeZero = Monoid.zeroEquiv[T].equiv(Monoid.plus(a, b), b)
