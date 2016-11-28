@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 
 import UtilAlgebras._
 
-class UtilAlgebraSpec extends CheckProperties with UtilGenerators {
+class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
   def toOption[T](f: Future[T]): Option[T] =
     try {
       Some(Await.result(f))
