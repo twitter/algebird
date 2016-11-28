@@ -3,21 +3,23 @@ package com.twitter.algebird
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import com.twitter.algebird.scalacheck.NonEmptyVector
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 class MaxSpec extends CheckProperties {
-  property("Max should sum properly") {
-    forAll { v: NonEmptyVector[Max[Int]] =>
-      val max = Semigroup.sumOption[Max[Int]](v.items).get
-      max == v.sorted.last
-    }
-  }
-
-  property("Max.{ +, max } should work") {
-    forAll { (l: Max[Int], r: Max[Int]) =>
-      val realMax = Max(l.get max r.get)
+  def maxTest[T: Arbitrary: Ordering] =
+    forAll { v: NonEmptyVector[Max[T]] =>
+      val min = Semigroup.sumOption[Max[T]](v.items).get
+      min == v.sorted.last
+    } && forAll { (l: Max[T], r: Max[T]) =>
+      val realMax = Max(Ordering[T].max(l.get, r.get))
       l + r == realMax && (l max r) == realMax
     }
+
+  property("Max.{ +, max, sumOption } works on ints") { maxTest[Int] }
+
+  property("Max should work on non-monoid types like String") {
+    maxTest[String]
   }
 
   property("Max.aggregator returns the maximum item") {
@@ -26,8 +28,8 @@ class MaxSpec extends CheckProperties {
     }
   }
 
-  property("Max[Int] is a commutative semigroup") {
-    commutativeSemigroupLaws[Max[Int]]
+  property("Max[String] is a commutative semigroup") {
+    commutativeSemigroupLaws[Max[String]]
   }
 
   property("Max[Long] is a commutative monoid") {

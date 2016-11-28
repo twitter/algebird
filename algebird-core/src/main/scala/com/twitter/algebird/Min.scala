@@ -30,11 +30,20 @@ private[algebird] sealed abstract class MinInstances {
   implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Min[T]] = Equiv.by(_.get)
 
   // Zero should have the property that it >= all T
-  def monoid[T](zero: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
-    Monoid.from(Min(zero)) { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
+  def monoid[T](z: => T)(implicit ord: Ordering[T]): Monoid[Min[T]] =
+    new Monoid[Min[T]] {
+      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
+      override def zero: Min[T] = Min(z)
+      override def sumOption(iter: TraversableOnce[Min[T]]): Option[Min[T]] =
+        if (iter.isEmpty) None else Some(iter.min)
+    }
 
   implicit def semigroup[T](implicit ord: Ordering[T]): Semigroup[Min[T]] =
-    Semigroup.from[Min[T]] { (l, r) => if (ord.lteq(l.get, r.get)) l else r }
+    new Semigroup[Min[T]] {
+      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
+      override def sumOption(iter: TraversableOnce[Min[T]]): Option[Min[T]] =
+        if (iter.isEmpty) None else Some(iter.min)
+    }
 
   implicit def ordering[T](implicit ord: Ordering[T]): Ordering[Min[T]] =
     Ordering.by(_.get)
