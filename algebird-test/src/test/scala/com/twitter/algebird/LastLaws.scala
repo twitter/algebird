@@ -24,5 +24,4 @@ class LastLaws extends CheckProperties {
   }
 
   property("Last[Int] is a Semigroup") { semigroupLawsEquiv[Last[Int]] }
-  property("Last[String] is a Semigroup") { semigroupLawsEquiv[Last[String]] }
 }

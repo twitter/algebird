@@ -18,16 +18,10 @@ class MaxLaws extends CheckProperties {
 
   property("Max.{ +, max } works on ints") { maxTest[Int] }
 
-  property("Max should work on non-monoid types like String") { maxTest[String] }
-
   property("Max.aggregator returns the maximum item") {
     forAll { v: NonEmptyVector[Int] =>
       v.sorted.last == Max.aggregator[Int].apply(v.items)
     }
-  }
-
-  property("Max[String] is a commutative semigroup") {
-    commutativeSemigroupLawsEquiv[Max[String]]
   }
 
   property("Max[Long] is a commutative monoid") {
