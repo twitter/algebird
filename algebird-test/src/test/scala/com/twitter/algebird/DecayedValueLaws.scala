@@ -16,9 +16,11 @@ class DecayedValueLaws extends CheckProperties {
   }
 
   property("DecayedValue Monoid laws") {
-    commutativeMonoidLawsEq[DecayedValue] { (dvl, dvr) =>
-      approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
-    }
+    implicit val equiv: Equiv[DecayedValue] =
+      Equiv.fromFunction { (dvl, dvr) =>
+        approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
+      }
+    commutativeMonoidLawsEquiv[DecayedValue]
   }
 
   def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]) = {

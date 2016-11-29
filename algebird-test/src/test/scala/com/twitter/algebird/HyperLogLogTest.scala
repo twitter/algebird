@@ -57,7 +57,7 @@ class HyperLogLogLaws extends CheckProperties {
     Arbitrary(Gen.choose(0L, 1000000L).map(v => hllMonoid.create(long2Bytes(v))))
 
   property("HyperLogLog is a Monoid") {
-    monoidLawsEq[HLL]{ _.toDenseHLL == _.toDenseHLL }
+    commutativeMonoidLawsEquiv[HLL]
   }
 
   property("bitsForError and error match") {

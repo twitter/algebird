@@ -8,13 +8,15 @@ class MomentsLaws extends CheckProperties {
   val EPS = 1e-10
 
   property("Moments Group laws") {
-    groupLawsEq[Moments] { (ml, mr) =>
-      (ml.m0 == mr.m0) &&
-        approxEq(EPS)(ml.m1, mr.m1) &&
-        approxEq(EPS)(ml.m2, mr.m2) &&
-        approxEq(EPS)(ml.m3, mr.m3) &&
-        approxEq(EPS)(ml.m4, mr.m4)
-    }
+    implicit val equiv: Equiv[Moments] =
+      Equiv.fromFunction { (ml, mr) =>
+        (ml.m0 == mr.m0) &&
+          approxEq(EPS)(ml.m1, mr.m1) &&
+          approxEq(EPS)(ml.m2, mr.m2) &&
+          approxEq(EPS)(ml.m3, mr.m3) &&
+          approxEq(EPS)(ml.m4, mr.m4)
+      }
+    groupLawsEquiv[Moments]
   }
 }
 

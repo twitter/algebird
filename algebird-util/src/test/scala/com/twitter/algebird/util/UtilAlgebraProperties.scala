@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Twitter Inc.
+ * Copyright 2016 Twitter Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,38 +17,45 @@
 package com.twitter.algebird.util
 
 import com.twitter.algebird.CheckProperties
-import com.twitter.algebird.MonadLaws.monadLaws
-import com.twitter.util.{ Await, Future, Return, Try }
-import org.scalacheck.Arbitrary
+import com.twitter.algebird.BaseProperties._
+import com.twitter.algebird.MonadLaws.{ monadLawsEquiv, monadLaws }
+import com.twitter.util.{ Await, Future, Return, Throw, Try }
+import org.scalacheck.{ Arbitrary, Gen }
+import scala.util.control.NonFatal
 
-class UtilAlgebraProperties extends CheckProperties {
-  import com.twitter.algebird.util.UtilAlgebras._
+import UtilAlgebras._
 
+class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
   def toOption[T](f: Future[T]): Option[T] =
     try {
       Some(Await.result(f))
     } catch {
-      case _: Exception => None
+      case NonFatal(_) => None
     }
 
-  implicit def futureA[T: Arbitrary]: Arbitrary[Future[T]] =
-    Arbitrary {
-      Arbitrary.arbitrary[T].map { l => Future.value(l) }
-    }
+  implicit def futureEquiv[T: Equiv]: Equiv[Future[T]] = Equiv.by(toOption)
 
-  implicit def returnA[T: Arbitrary]: Arbitrary[Try[T]] =
-    Arbitrary {
-      Arbitrary.arbitrary[T].map { l => Return(l) }
-    }
+  property("Future is a monad") { monadLawsEquiv[Future, Int, String, Long] }
 
-  property("futureMonad") {
-    monadLaws[Future, Int, String, Long] { (f1, f2) =>
-      toOption(f1) == toOption(f2)
-    }
+  property("Future[Int] is a commutative monoid") {
+    commutativeMonoidLawsEquiv[Future[Int]]
   }
 
-  property("tryMonad") {
-    monadLaws[Try, Int, String, Long]()
-  }
+  property("Try is a monad") { monadLaws[Try, Int, String, Long]() }
 
+  property("Try[Int] is a monoid") { monoidLaws[Try[Int]] }
+}
+
+trait UtilGenerators {
+  def returnGen[T](g: Gen[T]): Gen[Return[T]] = g.map(Return(_))
+  def throwGen[T](g: Gen[Throwable]): Gen[Throw[T]] = g.map(Throw[T](_))
+  def tryGen[T](s: Gen[T], f: Gen[Throwable]): Gen[Try[T]] = Gen.oneOf(returnGen(s), throwGen(f))
+
+  def futureGen[T](s: Gen[T], f: Gen[Throwable]): Gen[Future[T]] = tryGen(s, f).map(Future.const[T](_))
+
+  implicit def tryArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Throwable]): Arbitrary[Try[T]] =
+    Arbitrary(tryGen(arb.arbitrary, err.arbitrary))
+
+  implicit def futureArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Throwable]): Arbitrary[Future[T]] =
+    Arbitrary(futureGen(arb.arbitrary, err.arbitrary))
 }
