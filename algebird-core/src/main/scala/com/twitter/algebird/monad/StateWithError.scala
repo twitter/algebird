@@ -76,12 +76,12 @@ final case class FlatMappedState[S, F, T, U](start: StateWithError[S, F, T], fn:
 }
 
 object StateWithError {
-  def getState[S]: StateWithError[S, Nothing, S] = StateFn({ (state: S) => Right(state, state) })
-  def putState[S](newState: S): StateWithError[S, Nothing, Unit] = StateFn({ (_: S) => Right(newState, ()) })
-  def swapState[S](newState: S): StateWithError[S, Nothing, S] = StateFn({ (old: S) => Right(newState, old) })
+  def getState[S]: StateWithError[S, Nothing, S] = StateFn({ (state: S) => Right((state, state)) })
+  def putState[S](newState: S): StateWithError[S, Nothing, Unit] = StateFn({ (_: S) => Right((newState, ())) })
+  def swapState[S](newState: S): StateWithError[S, Nothing, S] = StateFn({ (old: S) => Right((newState, old)) })
 
-  def const[S, T](t: T): StateWithError[S, Nothing, T] = StateFn({ (state: S) => Right(state, t) })
-  def lazyVal[S, T](t: => T): StateWithError[S, Nothing, T] = StateFn({ (state: S) => Right(state, t) })
+  def const[S, T](t: T): StateWithError[S, Nothing, T] = StateFn({ (state: S) => Right((state, t)) })
+  def lazyVal[S, T](t: => T): StateWithError[S, Nothing, T] = StateFn({ (state: S) => Right((state, t)) })
   def failure[S, F](f: F): StateWithError[S, F, Nothing] = StateFn({ (state: S) => Left(f) })
 
   /**

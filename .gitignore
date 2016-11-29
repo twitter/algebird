@@ -4,6 +4,8 @@
 *.jar
 *~
 
+sonatype.sbt
+
 #sbt
 /project/target/
 /project/project/target

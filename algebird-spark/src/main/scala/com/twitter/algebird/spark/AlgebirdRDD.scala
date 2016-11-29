@@ -18,10 +18,17 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] =
-    (new AlgebirdRDD(rdd.map(agg.prepare)))
-      .sumOption(agg.semigroup, implicitly)
-      .map(agg.present)
+  def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] = {
+    val pr = rdd.mapPartitions({ data =>
+      if (data.isEmpty) Iterator.empty else {
+        val b = agg.prepare(data.next)
+        Iterator(agg.appendAll(b, data))
+      }
+    }, preservesPartitioning = true)
+    pr.repartition(1)
+      .mapPartitions(pr => Iterator(agg.semigroup.sumOption(pr)))
+      .collect.head.map(agg.present)
+  }
 
   /**
    * This will throw if you use a non-MonoidAggregator with an empty RDD
@@ -105,7 +112,7 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
 
     // my reading of the docs is that we do want a shuffle at this stage to
     // to make sure the upstream work is done in parallel.
-    val results = partialReduce.coalesce(1, shuffle = true).mapPartitions({ it =>
+    val results = partialReduce.repartition(1).mapPartitions({ it =>
       Iterator(sg.sumOption(it))
     }, preservesPartitioning = true)
       .collect

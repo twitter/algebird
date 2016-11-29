@@ -53,10 +53,8 @@ object BaseProperties {
 
   def isAssociative[T: Semigroup: Arbitrary] = isAssociativeDifferentTypes[T, T]
 
-  def semigroupSumWorks[T: Semigroup: Arbitrary: Equiv] = 'semigroupSumWorks |: forAll { (in: List[T]) =>
-    in.isEmpty || {
-      Equiv[T].equiv(Semigroup.sumOption(in).get, in.reduceLeft(Semigroup.plus(_, _)))
-    }
+  def semigroupSumWorks[T: Semigroup: Arbitrary: Equiv] = 'semigroupSumWorks |: forAll { (head: T, tail: List[T]) =>
+    Equiv[T].equiv(Semigroup.sumOption(head :: tail).get, tail.foldLeft(head)(Semigroup.plus(_, _)))
   }
 
   def isCommutativeEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean) = 'isCommutativeEq |: forAll { (a: T, b: T) =>
@@ -113,6 +111,9 @@ object BaseProperties {
 
   def monoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop =
     validZeroEq[T](eqfn) && semigroupLawsEq[T](eqfn)
+
+  def monoidLawsEquiv[T: Monoid: Arbitrary: Equiv]: Prop =
+    monoidLawsEq[T](Equiv[T].equiv)
 
   def commutativeMonoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean) =
     monoidLawsEq[T](eqfn) && isCommutativeEq[T](eqfn)

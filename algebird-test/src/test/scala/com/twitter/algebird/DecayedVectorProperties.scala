@@ -30,7 +30,7 @@ class DecayedVectorProperties extends CheckProperties {
 
   // TODO: we won't need this when we have an Equatable trait
   def decayedMapEqFn(a: DecayedVector[({ type x[a] = Map[Int, a] })#x], b: DecayedVector[({ type x[a] = Map[Int, a] })#x]) = {
-    def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) =
+    def beCloseTo(a: Double, b: Double, eps: Double = 1e-6) =
       a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
       (a.vector.get(key), b.vector.get(key)) match {

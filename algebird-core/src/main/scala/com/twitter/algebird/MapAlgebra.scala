@@ -16,7 +16,9 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.{ Map => ScMap }
-import scala.collection.mutable.{ Map => MMap }
+import scala.collection.mutable.{ Builder, Map => MMap }
+
+import com.twitter.algebird.macros.{ Cuber, Roller }
 
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
@@ -185,9 +187,42 @@ object MapAlgebra {
   def removeZeros[K, V: Monoid](m: Map[K, V]): Map[K, V] =
     m filter { case (_, v) => Monoid.isNonZero(v) }
 
-  // groupBy ks, sum all the vs
+  /**
+   * For each key, sum all the values. Note that if V is a Monoid, the current
+   * implementation will drop from the output any key where the values are all
+   * Monoid.zero. If the Semigroup is a Monoid, This function is equivalent to:
+   *
+   *   pairs.filter(_._2 != Monoid.zero).groupBy(_._1).mapValues(_.map(_._2).sum)
+   *
+   * Otherwise, the function is equivalent to:
+   *
+   *   pairs.groupBy(_._1).mapValues(_.map(_._2).sum)
+   */
   def sumByKey[K, V: Semigroup](pairs: TraversableOnce[(K, V)]): Map[K, V] =
     Monoid.sum(pairs map { Map(_) })
+
+  /**
+   * For each key, creates a list of all values. This function is equivalent to:
+   *
+   *   pairs.groupBy(_._1).mapValues(_.map(_._2))
+   */
+  def group[K, V](pairs: TraversableOnce[(K, V)]): Map[K, List[V]] =
+    if (pairs.isEmpty) Map.empty
+    else {
+      val mutable = MMap[K, Builder[V, List[V]]]()
+      pairs.foreach {
+        case (k, v) =>
+          val oldVOpt = mutable.get(k)
+          // sorry for the micro optimization here: avoiding a closure
+          val bldr = if (oldVOpt.isEmpty) {
+            val b = List.newBuilder[V]
+            mutable.update(k, b)
+            b
+          } else oldVOpt.get
+          bldr += v
+      }
+      mutable.iterator.map { case (k, bldr) => (k, bldr.result) }.toMap
+    }
 
   // Consider this as edges from k -> v, produce a Map[K,Set[V]]
   def toGraph[K, V](pairs: TraversableOnce[(K, V)]): Map[K, Set[V]] =
@@ -222,4 +257,49 @@ object MapAlgebra {
 
   def dot[K, V](left: Map[K, V], right: Map[K, V])(implicit mring: Ring[Map[K, V]], mon: Monoid[V]): V =
     Monoid.sum(mring.times(left, right).values)
+
+  def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
+    val map: collection.mutable.Map[c.K, List[V]] = collection.mutable.Map[c.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        c(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
+    }
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
+  }
+
+  def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
+
+  def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit c: Cuber[K]): Map[c.K, V] =
+    sumByKey(it.toIterator.flatMap { t => c(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
+
+  def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
+    val map: collection.mutable.Map[r.K, List[V]] = collection.mutable.Map[r.K, List[V]]()
+    it.toIterator.foreach {
+      case (k, v) =>
+        r(k).foreach { ik =>
+          map.get(ik) match {
+            case Some(vs) => map += ik -> (v :: vs)
+            case None => map += ik -> List(v)
+          }
+        }
+    }
+    map.foreach { case (k, v) => map(k) = v.reverse }
+    new MutableBackedMap(map)
+  }
+
+  def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
+
+  def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(implicit r: Roller[K]): Map[r.K, V] =
+    sumByKey(it.toIterator.flatMap { t => r(fn(t)).map((_, agg.prepare(t))) })(agg.semigroup)
+      .map { case (k, v) => (k, agg.present(v)) }
+
 }

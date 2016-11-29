@@ -48,8 +48,8 @@ class AggregatorLaws extends CheckProperties {
 
   property("composing two Aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
-      val c = GeneratedTupleAggregator.from2(ag1, ag2)
-      in.isEmpty || c(in) == (ag1(in), ag2(in))
+      val c = GeneratedTupleAggregator.from2((ag1, ag2))
+      in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
 
@@ -57,7 +57,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
       type AggInt[T] = Aggregator[Int, _, T]
       val c = Applicative.join[AggInt, Int, String](ag1, ag2)
-      in.isEmpty || c(in) == (ag1(in), ag2(in))
+      in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
 
@@ -65,7 +65,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[(Int, String)], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[String, Set[String], Double]) =>
       val c = ag1.zip(ag2)
       val (as, bs) = in.unzip
-      in.isEmpty || c(in) == (ag1(as), ag2(bs))
+      in.isEmpty || c(in) == ((ag1(as), ag2(bs)))
     }
   }
 
@@ -75,6 +75,16 @@ class AggregatorLaws extends CheckProperties {
       in.isEmpty && liftedAg(in) == None || liftedAg(in) == Some(ag(in))
     }
   }
+
+  def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]) =
+    forAll { in: List[T] =>
+      val aggregator = Aggregator.numericSum[T]
+      aggregator(in) == in.map(num.toDouble).sum
+    }
+  property("Aggregator.numericSum is correct for Ints") { checkNumericSum[Int] }
+  property("Aggregator.numericSum is correct for Longs") { checkNumericSum[Long] }
+  property("Aggregator.numericSum is correct for Doubles") { checkNumericSum[Double] }
+  property("Aggregator.numericSum is correct for Floats") { checkNumericSum[Float] }
 
   implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
     for {

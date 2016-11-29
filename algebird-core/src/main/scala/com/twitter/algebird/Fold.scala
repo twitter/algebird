@@ -211,7 +211,7 @@ object Fold {
     new Fold[I, O] {
       type X = M
       override def build(): FoldState[X, I, O] =
-        new FoldState(add, start(), end)
+        new FoldState(add, start(()), end)
     }
 
   /**
