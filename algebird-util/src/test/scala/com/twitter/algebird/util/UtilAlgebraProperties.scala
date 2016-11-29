@@ -18,7 +18,7 @@ package com.twitter.algebird.util
 
 import com.twitter.algebird.CheckProperties
 import com.twitter.algebird.BaseProperties._
-import com.twitter.algebird.MonadLaws.monadLaws
+import com.twitter.algebird.MonadLaws.{ monadLawsEquiv, monadLaws }
 import com.twitter.util.{ Await, Future, Return, Throw, Try }
 import org.scalacheck.{ Arbitrary, Gen }
 import scala.util.control.NonFatal
@@ -33,13 +33,13 @@ class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
       case NonFatal(_) => None
     }
 
-  def futureEq[T] = { (f1: Future[T], f2: Future[T]) =>
-    toOption(f1) == toOption(f2)
+  implicit def futureEquiv[T: Equiv]: Equiv[Future[T]] = Equiv.by(toOption)
+
+  property("Future is a monad") { monadLawsEquiv[Future, Int, String, Long] }
+
+  property("Future[Int] is a commutative monoid") {
+    commutativeMonoidLawsEquiv[Future[Int]]
   }
-
-  property("Future is a monad") { monadLaws[Future, Int, String, Long](futureEq) }
-
-  property("Future[Int] is a monoid") { monoidLawsEq[Future[Int]](futureEq) }
 
   property("Try is a monad") { monadLaws[Try, Int, String, Long]() }
 
