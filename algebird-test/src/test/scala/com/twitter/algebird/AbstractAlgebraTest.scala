@@ -58,20 +58,6 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     }
   }
 
-  property("First/Last should work properly") {
-    val fsg = implicitly[Semigroup[First[Int]]]
-    val lsg = implicitly[Semigroup[Last[Int]]]
-    forAll { intList: List[Int] =>
-      !intList.isEmpty ==> {
-        val first = intList.map(First(_)).reduceLeft(fsg.plus _)
-        val last = intList.map(Last(_)).reduceLeft(lsg.plus _)
-
-        first == First(intList.head) &&
-          last == Last(intList.last)
-      }
-    }
-  }
-
   property("IndexedSeq should sum") {
     forAll { (lIndexedSeq: IndexedSeq[Int]) =>
       val rIndexedSeq = lIndexedSeq.map { _ => scala.util.Random.nextInt }

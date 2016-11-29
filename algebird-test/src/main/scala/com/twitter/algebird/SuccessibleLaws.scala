@@ -1,5 +1,5 @@
 /*
-Copyright 2014 Twitter, Inc.
+Copyright 2016 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,41 +38,13 @@ object SuccessibleLaws {
 
   /**
    * Use this to test your implementations:
-   * property("My succ") {
-   * successibleLaws[MyType]
-   * }
    *
+   * {{{
+   * property("blah is successible") { successibleLaws[MyType] }
+   * }}}
    */
-  def successibleLaws[T: Successible: Arbitrary]: Prop = forAll { (t: T, size: Short) =>
-    law(t) && iterateNextIncreases(t, size)
-  }
-}
-
-object PredecessibleLaws {
-  // Should always be true:
-  def law[T: Predecessible](t: T): Boolean =
-    Predecessible.prev(t) match {
-      case None => true // t is the max
-      case Some(p) =>
-        val pord = implicitly[Predecessible[T]].partialOrdering
-        pord.lt(p, t)
+  def successibleLaws[T: Successible: Arbitrary]: Prop =
+    forAll { (t: T, size: Short) =>
+      law(t) && iterateNextIncreases(t, size)
     }
-
-  def iteratePrevDecreases[T: Predecessible](t: T, size: Short): Boolean =
-    Predecessible.iteratePrev(t).take(size.toInt).sliding(2).forall {
-      case a :: b :: Nil => implicitly[Predecessible[T]].partialOrdering.lt(b, a)
-      case a :: Nil => true
-      case s => sys.error("should never happen: " + s)
-    }
-
-  /**
-   * Use this to test your implementations:
-   * property("My succ") {
-   * predessibleLaws[MyType]
-   * }
-   *
-   */
-  def predessibleLaws[T: Predecessible: Arbitrary]: Prop = forAll { (t: T, size: Short) =>
-    law(t) && iteratePrevDecreases(t, size)
-  }
 }

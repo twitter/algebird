@@ -1,5 +1,5 @@
 /*
-Copyright 2014 Twitter, Inc.
+Copyright 2016 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,22 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
+
 package com.twitter.algebird
+package scalacheck
 
-class PredecessibleTests extends CheckProperties {
-  import com.twitter.algebird.PredecessibleLaws.{ predessibleLaws => laws }
+import org.scalacheck.{ Arbitrary, Gen }
+import Arbitrary.{ arbitrary => getArbitrary }
 
-  property("Int is Predecessible") {
-    laws[Int]
-  }
+case class NonEmptyVector[T](items: Vector[T]) {
+  def sorted(implicit ev: Ordering[T]): Vector[T] = items.sorted
+}
 
-  property("Long is Predecessible") {
-    laws[Long]
-  }
-
-  property("BigInt is Predecessible") {
-    laws[BigInt]
-  }
-
+object NonEmptyVector {
+  implicit def arb[T: Arbitrary]: Arbitrary[NonEmptyVector[T]] =
+    Arbitrary(for {
+      l <- Gen.nonEmptyListOf(getArbitrary[T])
+    } yield NonEmptyVector[T](l.toVector))
 }

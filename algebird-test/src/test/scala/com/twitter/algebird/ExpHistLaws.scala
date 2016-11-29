@@ -1,13 +1,13 @@
 package com.twitter.algebird
 
+import com.twitter.algebird.scalacheck.{ PosNum, NonEmptyVector }
+import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.PropSpec
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.prop.Checkers.check
 import org.scalacheck.{ Gen, Arbitrary }
 import Arbitrary.arbitrary
 
 class ExpHistLaws extends PropSpec with PropertyChecks {
-  import ExpHistGenerators._
   import ExpHist.{ Bucket, Canonical, Config, Timestamp }
 
   property("Increment example from DGIM paper") {
@@ -243,34 +243,6 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
       assert(rebucketed.forall { b => isPowerOfTwo(b.size) })
     }
   }
-}
-
-object ExpHistGenerators {
-  import ExpHist.{ Bucket, Config, Timestamp }
-
-  implicit val genTimestamp: Gen[Timestamp] =
-    Gen.posNum[Long].map(Timestamp(_))
-
-  implicit val genBucket: Gen[Bucket] = for {
-    count <- Gen.posNum[Long]
-    timestamp <- genTimestamp
-  } yield Bucket(count - 1L, timestamp)
-
-  implicit val genConfig: Gen[Config] = for {
-    k <- Gen.posNum[Short]
-    windowSize <- Gen.posNum[Long]
-  } yield Config(1 / k.toDouble, windowSize)
-
-  implicit val genExpHist: Gen[ExpHist] =
-    for {
-      buckets <- Gen.containerOf[Vector, Bucket](genBucket)
-      conf <- genConfig
-    } yield ExpHist.empty(conf).addAll(buckets)
-
-  implicit val arbTs: Arbitrary[Timestamp] = Arbitrary(genTimestamp)
-  implicit val arbBucket: Arbitrary[Bucket] = Arbitrary(genBucket)
-  implicit val arbConfig: Arbitrary[Config] = Arbitrary(genConfig)
-  implicit val arbExpHist: Arbitrary[ExpHist] = Arbitrary(genExpHist)
 }
 
 class CanonicalLaws extends PropSpec with PropertyChecks {

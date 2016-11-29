@@ -16,17 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import com.twitter.algebird.BaseProperties._
+import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Arbitrary
 
 class CombinatorTest extends CheckProperties {
-  import com.twitter.algebird.BaseProperties._
-
-  implicit def minArb[T: Arbitrary]: Arbitrary[Min[T]] = Arbitrary {
-    Arbitrary.arbitrary[T].map { t => Min(t) }
-  }
-  implicit def maxArb[T: Arbitrary]: Arbitrary[Max[T]] = Arbitrary {
-    Arbitrary.arbitrary[T].map { t => Max(t) }
-  }
 
   private def fold(m: Max[Int], l: List[Int]): List[Int] = {
     val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
@@ -42,10 +36,10 @@ class CombinatorTest extends CheckProperties {
   // Make sure the lists start sorted:
   implicit def pairArb(implicit lista: Arbitrary[List[Int]]): Arbitrary[(Max[Int], List[Int])] =
     Arbitrary {
-      for (
-        m <- Arbitrary.arbitrary[Max[Int]];
+      for {
+        m <- Arbitrary.arbitrary[Max[Int]]
         l <- Arbitrary.arbitrary[List[Int]]
-      ) yield mond.plus(mond.zero, (m, l))
+      } yield mond.plus(mond.zero, (m, l))
     }
 
   property("SemigroupCombinator with mod sortfn forms a Semigroup") {
