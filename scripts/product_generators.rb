@@ -6,7 +6,7 @@
 #
 # Run it like this:
 #
-#   ruby scripts/product_generators.rb > src/main/scala/com/twitter/algebird/GeneratedProductAlgebra.scala
+#   ruby scripts/product_generators.rb > algebird-core/src/main/scala/com/twitter/algebird/GeneratedProductAlgebra.scala
 #
 # TODO: Remove in favour of script/product_generators.rb in the next breaking release
 
@@ -32,8 +32,8 @@ INDENT = "  "
 def get_comment(n, algebraic_structure)
   ret = <<EOS
 /**
-* Combine #{n} #{algebraic_structure}s into a product #{algebraic_structure}
-*/
+ * Combine #{n} #{algebraic_structure}s into a product #{algebraic_structure}
+ */
 EOS
   ret.strip
 end
@@ -43,7 +43,7 @@ end
 # algebraic_structure is "monoid", "group", "ring", etc.
 #
 # Example return:
-#   "class Product2Monoid[T,U](implicit tmonoid : Monoid[T], umonoid : Monoid[U]) extends Monoid[(T,U)]"
+#   "class Product2Monoid[T,U](implicit tmonoid: Monoid[T], umonoid: Monoid[U]) extends Monoid[(T,U)]"
 def get_class_definition(n, algebraic_structure)
   # Example: "T,U"
   type_values_commaed = TYPE_SYMBOLS.first(n).join(", ")
@@ -71,9 +71,9 @@ end
 # algebraic_structure is "monoid", "group", "ring", etc.
 #
 # Example return:
-#   "tmonoid : Monoid[T], umonoid : Monoid[U]"
+#   "tmonoid: Monoid[T], umonoid: Monoid[U]"
 def get_type_parameters(n, algebraic_structure)
-  params = TYPE_SYMBOLS.first(n).map{ |t| "#{t.downcase}#{algebraic_structure} : #{algebraic_structure.capitalize}[#{t.upcase}]"}
+  params = TYPE_SYMBOLS.first(n).map{ |t| "#{t.downcase}#{algebraic_structure}: #{algebraic_structure.capitalize}[#{t.upcase}]"}
   params.join(", ")
 end
 
@@ -96,7 +96,7 @@ end
 # algebraic_structure is "group", "ring", etc.
 #
 # Example return:
-#   "override def negate(v : (T,U)) = (tgroup.negate(v._1), ugroup.negate(v._2))"
+#   "override def negate(v: (T,U)) = (tgroup.negate(v._1), ugroup.negate(v._2))"
 def get_negate(n, algebraic_structure)
   negates_commaed = TYPE_SYMBOLS.first(n).each_with_index.map{ |t, i| "#{t.downcase}#{algebraic_structure}.negate(tuple._#{i+1})" }.join(", ")
   "override def negate(v: X) = { val tuple = unapply(v).get; apply(#{negates_commaed}) }"
@@ -109,13 +109,13 @@ end
 # operation is "plus", "minus", "times", etc.
 #
 # Example return:
-#   "override def plus(l : (T,U), r : (T,U)) = (tmonoid.plus(l._1,r._1), umonoid.plus(l._2, r._2))"
+#   "override def plus(l: (T,U), r: (T,U)) = (tmonoid.plus(l._1,r._1), umonoid.plus(l._2, r._2))"
 def get_operation(n, algebraic_structure, operation)
   # Example: "(T, U)"
   individual_element_type = "X"
 
-  # Example: "l : (T, U), r : (T, U)"
-  method_params = "l : #{individual_element_type}, r : #{individual_element_type}" # (1..n).to_a.map{ |i| "x#{i}" }.map{ |p| "#{p} : #{individual_element_type}" }.join(", ")
+  # Example: "l: (T, U), r: (T, U)"
+  method_params = "l: #{individual_element_type}, r: #{individual_element_type}" # (1..n).to_a.map{ |i| "x#{i}" }.map{ |p| "#{p}: #{individual_element_type}" }.join(", ")
 
   # Example: "(tmonoid.plus(l._1,r._1), umonoid.plus(l._2, r._2))"
   values_commaed = TYPE_SYMBOLS.first(n).each_with_index.map do |t, i|
@@ -126,8 +126,26 @@ def get_operation(n, algebraic_structure, operation)
   "override def #{operation}(#{method_params}) = { val lTuple = unapply(l).get; val rTuple = unapply(r).get; #{values_commaed} }"
 end
 
+def get_sumoption(n, bufferSize)
+  # Example: "tsemigroup.sumOption(items.iterator.map(_._1), "
+  values_commaed = TYPE_SYMBOLS.first(n).each_with_index.map do |t, i|
+    "#{t.downcase}semigroup.sumOption(iter.map(_._#{i+1})).get"
+  end.join(", ")
+
+  "override def sumOption(to: TraversableOnce[X]) = {
+    val buf = new ArrayBufferedOperation[X, X](#{bufferSize}) with BufferedReduce[X] {
+      def operate(items: Seq[X]) = {
+        val iter = items.iterator.map(unapply(_).get).toIterable
+        apply(#{values_commaed})
+      }
+    }
+    to.foreach(buf.put(_))
+    buf.flush
+  }"
+end
+
 # Example return:
-#   "implicit def pairMonoid[T,U](implicit tg : Monoid[T], ug : Monoid[U]) : Monoid[(T,U)] = {
+#   "implicit def pairMonoid[T,U](implicit tg: Monoid[T], ug: Monoid[U]): Monoid[(T,U)] = {
 #    new Product2Monoid[T,U]()(tg,ug)
 #   }"
 def get_implicit_definition(n, algebraic_structure)
@@ -139,7 +157,7 @@ def get_implicit_definition(n, algebraic_structure)
   # Example: "Monoid[(T,U)]"
   return_type = "#{algebraic_structure.capitalize}[(#{product_type_commaed})]"
 
-  ret = %Q|#{INDENT}implicit def #{algebraic_structure}#{n}[#{product_type_commaed}](implicit #{type_params_commaed}) : #{return_type} = {
+  ret = %Q|#{INDENT}implicit def #{algebraic_structure}#{n}[#{product_type_commaed}](implicit #{type_params_commaed}): #{return_type} = {
 #{INDENT}  new Product#{n}#{algebraic_structure.capitalize}[Tuple#{n}[#{product_type_commaed}], #{product_type_commaed}](Tuple#{n}.apply, Tuple#{n}.unapply)(#{TYPE_SYMBOLS.first(n).map{ |t| t.downcase + algebraic_structure.downcase }.join(", ")})
 #{INDENT}}|
   ret
@@ -165,6 +183,7 @@ def print_class_definitions
 #{get_comment(product_size, "semigroup")}
 #{get_class_definition(product_size, "semigroup")} {
   #{get_operation(product_size, "semigroup", "plus")}
+  #{get_sumoption(product_size, 1000)}
 }
 
 #{get_comment(product_size, "monoid")}
