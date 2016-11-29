@@ -17,11 +17,6 @@ object SpaceSaver {
 
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
-  implicit def equiv[T]: Equiv[SpaceSaver[T]] =
-    Equiv.fromFunction { (left, right) =>
-      (left consistentWith right) && (right consistentWith left)
-    }
-
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
 }
 

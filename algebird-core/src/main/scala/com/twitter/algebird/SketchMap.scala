@@ -209,14 +209,6 @@ object SketchMap {
 
   def aggregator[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
-
-  // TODO: SketchMap's heavy hitters are not strictly associative
-  // (approximately they are)
-  implicit def equiv[K, V]: Equiv[SketchMap[K, V]] =
-    Equiv.fromFunction { (left, right) =>
-      (left.valuesTable == right.valuesTable) &&
-        (left.totalValue == right.totalValue)
-    }
 }
 
 case class SketchMap[K, V](

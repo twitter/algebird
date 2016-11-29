@@ -22,6 +22,14 @@ class SketchMapLaws extends CheckProperties {
     for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
   }
 
+  // TODO: SketchMap's heavy hitters are not strictly associative
+  // (approximately they are)
+  implicit def equiv[K, V]: Equiv[SketchMap[K, V]] =
+    Equiv.fromFunction { (left, right) =>
+      (left.valuesTable == right.valuesTable) &&
+        (left.totalValue == right.totalValue)
+    }
+
   property("SketchMap is a commutative monoid") {
     commutativeMonoidLawsEquiv[SketchMap[Int, Long]]
   }

@@ -87,7 +87,8 @@ class TopPctCmsLaws extends CheckProperties {
 
   implicit def topCmsEquiv[K]: Equiv[TopCMS[K]] =
     new Equiv[TopCMS[K]] {
-      def equiv(x: TopCMS[K], y: TopCMS[K]): Boolean = (x ++ x) == (x ++ y)
+      def equiv(x: TopCMS[K], y: TopCMS[K]): Boolean =
+        (x ++ x) == (x ++ y)
     }
 
   private def createArbitrary[K: FromIntLike](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {

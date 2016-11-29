@@ -22,6 +22,10 @@ class SpaceSaverLaws extends CheckProperties {
             Gen.nonEmptyContainerOf[List, SSOne[Int]](Arbitrary.arbitrary[SSOne[Int]]).map(_.reduce(sg.plus)))
         }
 
+        implicit def equiv[T]: Equiv[SpaceSaver[T]] =
+          Equiv.fromFunction { (left, right) =>
+            (left consistentWith right) && (right consistentWith left)
+          }
         commutativeSemigroupLawsEquiv[SpaceSaver[Int]]
       }
     }

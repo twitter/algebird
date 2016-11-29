@@ -24,8 +24,7 @@ import scala.math.Equiv
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
-
-object BaseProperties {
+object BaseProperties extends MetricProperties {
   val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
     for {
       scale <- Gen.choose(-128, +128)

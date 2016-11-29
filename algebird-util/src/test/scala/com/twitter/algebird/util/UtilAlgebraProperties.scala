@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.twitter.algebird.util
+package com.twitter.algebird
+package util
 
-import com.twitter.algebird.CheckProperties
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.MonadLaws.{ monadLawsEquiv, monadLaws }
 import com.twitter.util.{ Await, Future, Return, Throw, Try }
 import org.scalacheck.{ Arbitrary, Gen }
 import scala.util.control.NonFatal
-
-import UtilAlgebras._
 
 class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
   def toOption[T](f: Future[T]): Option[T] =
@@ -35,27 +33,47 @@ class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
 
   implicit def futureEquiv[T: Equiv]: Equiv[Future[T]] = Equiv.by(toOption)
 
-  property("Future is a monad") { monadLawsEquiv[Future, Int, String, Long] }
+  property("Future is a monad") {
+    import UtilAlgebras.futureMonad
+    monadLawsEquiv[Future, Int, String, Long]
+  }
+
+  property("Future[Long] is a commutative semigroup") {
+    import UtilAlgebras.futureSemigroup
+    commutativeSemigroupLawsEquiv[Future[Long]]
+  }
 
   property("Future[Int] is a commutative monoid") {
+    import UtilAlgebras.futureMonoid
     commutativeMonoidLawsEquiv[Future[Int]]
   }
 
-  property("Try is a monad") { monadLaws[Try, Int, String, Long]() }
+  property("Try is a monad") {
+    import UtilAlgebras.tryMonad
+    monadLaws[Try, Int, String, Long]()
+  }
 
-  property("Try[Int] is a monoid") { monoidLaws[Try[Int]] }
+  property("Try[Long] is a commutative semigroup") {
+    import UtilAlgebras.trySemigroup
+    commutativeSemigroupLaws[Try[Long]]
+  }
+
+  property("Try[Int] is a commutative monoid") {
+    import UtilAlgebras.tryMonoid
+    commutativeMonoidLaws[Try[Int]]
+  }
 }
 
 trait UtilGenerators {
   def returnGen[T](g: Gen[T]): Gen[Return[T]] = g.map(Return(_))
-  def throwGen[T](g: Gen[Throwable]): Gen[Throw[T]] = g.map(Throw[T](_))
-  def tryGen[T](s: Gen[T], f: Gen[Throwable]): Gen[Try[T]] = Gen.oneOf(returnGen(s), throwGen(f))
+  def throwGen[T](g: Gen[Exception]): Gen[Throw[T]] = g.map(Throw[T](_))
+  def tryGen[T](s: Gen[T], f: Gen[Exception]): Gen[Try[T]] = Gen.oneOf(returnGen(s), throwGen(f))
 
-  def futureGen[T](s: Gen[T], f: Gen[Throwable]): Gen[Future[T]] = tryGen(s, f).map(Future.const[T](_))
+  def futureGen[T](s: Gen[T], f: Gen[Exception]): Gen[Future[T]] = tryGen(s, f).map(Future.const[T](_))
 
-  implicit def tryArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Throwable]): Arbitrary[Try[T]] =
+  implicit def tryArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Exception]): Arbitrary[Try[T]] =
     Arbitrary(tryGen(arb.arbitrary, err.arbitrary))
 
-  implicit def futureArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Throwable]): Arbitrary[Future[T]] =
+  implicit def futureArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Exception]): Arbitrary[Future[T]] =
     Arbitrary(futureGen(arb.arbitrary, err.arbitrary))
 }
