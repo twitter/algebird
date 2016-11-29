@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Twitter, Inc.
+Copyright 2016 Twitter, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,14 +12,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
+package scalacheck
 
-class SuccessibleProperties extends CheckProperties {
-  import com.twitter.algebird.SuccessibleLaws.{ successibleLaws => laws }
+import org.scalacheck.{ Arbitrary, Gen }
 
-  property("Int is Successible") { laws[Int] }
-  property("Long is Successible") { laws[Long] }
-  property("BigInt is Successible") { laws[BigInt] }
+case class PosNum[T](value: T)
+
+object PosNum {
+  implicit def arb[T: Numeric: Gen.Choose]: Arbitrary[PosNum[T]] =
+    Arbitrary(Gen.posNum[T].map(PosNum(_)))
 }

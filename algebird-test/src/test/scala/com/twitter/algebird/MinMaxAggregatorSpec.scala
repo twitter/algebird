@@ -2,9 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-class MinMaxAggregatorTest extends WordSpec with Matchers {
-  val data = List(1, 3, 5, 0, 7, 6)
-
+class MinMaxAggregatorSpec extends WordSpec with Matchers {
   sealed trait TestElementParent
   case object TestElementA extends TestElementParent
   case object TestElementB extends TestElementParent
@@ -19,25 +17,19 @@ class MinMaxAggregatorTest extends WordSpec with Matchers {
     case (TestElementC, _) => false
   })
 
-  val data2 = List(TestElementC, TestElementA, TestElementB)
+  val data = List(TestElementC, TestElementA, TestElementB)
 
   "MinAggregator" should {
     "produce the minimum value" in {
-      val agg = Min.aggregator[Int]
-      assert(agg(data) == 0)
-
-      val agg2 = Min.aggregator[TestElementParent]
-      assert(agg2(data2) == TestElementA)
+      val agg = Min.aggregator[TestElementParent]
+      assert(agg(data) == TestElementA)
     }
   }
 
   "MaxAggregator" should {
     "produce the maximum value" in {
-      val agg = Max.aggregator[Int]
-      assert(agg(data) == 7)
-
-      val agg2 = Max.aggregator[TestElementParent]
-      assert(agg2(data2) == TestElementC)
+      val agg = Max.aggregator[TestElementParent]
+      assert(agg(data) == TestElementC)
     }
   }
 }

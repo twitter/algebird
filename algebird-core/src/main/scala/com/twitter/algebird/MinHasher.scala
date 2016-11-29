@@ -9,8 +9,11 @@ import java.nio._
  */
 case class MinHashSignature(bytes: Array[Byte]) extends AnyVal
 
-object MinHasher {
+object MinHashSignature {
+  implicit def equiv: Equiv[MinHashSignature] = Equiv.by(_.bytes.toList)
+}
 
+object MinHasher {
   /** Numerically solve the inverse of estimatedThreshold, given numBands*numRows */
   def pickBands(threshold: Double, hashes: Int) = {
     val target = hashes * -1 * math.log(threshold)
