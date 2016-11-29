@@ -84,6 +84,28 @@ object BaseProperties {
   def semigroupLawsEquiv[T: Semigroup: Arbitrary: Equiv] =
     isAssociativeEq[T, T](Equiv[T].equiv _) && semigroupSumWorks[T]
 
+  def partialSemigroupLaws[T: Arbitrary: PartialSemigroup: Equiv] = forAll { (a: T, b: T, c: T) =>
+    val psg = implicitly[PartialSemigroup[T]]
+    (psg.tryPlus(a, b).flatMap(psg.tryPlus(_, c)), psg.tryPlus(b, c).flatMap(psg.tryPlus(a, _))) match {
+      case (None, _) => true
+      case (_, None) => true
+      case (Some(l), Some(r)) => Equiv[T].equiv(l, r)
+    }
+  }
+  /**
+   * see http://en.wikipedia.org/wiki/Band_(mathematics)
+   * A band in an idempotent semigroup
+   */
+  def bandLaws[T: Semigroup: Arbitrary: Equiv] =
+    semigroupLawsEquiv[T] && forAll { (t: T) => Equiv[T].equiv(Semigroup.plus(t, t), t) }
+  /**
+   * see http://en.wikipedia.org/wiki/Band_(mathematics)
+   * a semilattice is a commutative band
+   */
+  def commutativeBandLaws[T: Semigroup: Arbitrary: Equiv] =
+    commutativeSemigroupLawsEq[T](Equiv[T].equiv) &&
+      forAll { (t: T) => Equiv[T].equiv(Semigroup.plus(t, t), t) }
+
   def commutativeSemigroupLawsEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean) =
     isAssociativeEq[T, T](eqfn) && isCommutativeEq[T](eqfn)
   def commutativeSemigroupLaws[T: Semigroup: Arbitrary] = commutativeSemigroupLawsEq[T](defaultEq _)
