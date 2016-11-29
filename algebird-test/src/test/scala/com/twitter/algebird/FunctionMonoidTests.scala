@@ -9,10 +9,10 @@ class FunctionMonoidTests extends CheckProperties {
   // where a and b are arbitrary integers.
   // TODO: add more types of functions (e.g., polynomials of degree two).
   implicit def arbLinearFunc1: Arbitrary[Function1[Int, Int]] = Arbitrary[Function[Int, Int]] {
-    for (
-      a <- Arbitrary.arbInt.arbitrary;
+    for {
+      a <- Arbitrary.arbInt.arbitrary
       b <- Arbitrary.arbInt.arbitrary
-    ) yield ((x: Int) => a * x + b)
+    } yield ((x: Int) => a * x + b)
   }
 
   property("Linear functions over the integers form a monoid under function composition") {

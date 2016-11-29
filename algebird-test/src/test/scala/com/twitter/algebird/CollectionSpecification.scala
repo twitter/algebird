@@ -8,23 +8,7 @@ import org.scalacheck.Prop._
 
 class CollectionSpecification extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
-
-  implicit def arbMin[T: Arbitrary]: Arbitrary[Min[T]] =
-    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
-  implicit def arbMax[T: Arbitrary]: Arbitrary[Max[T]] =
-    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
-  implicit def arbOrVal: Arbitrary[OrVal] =
-    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => OrVal(b) } }
-  implicit def arbAndVal: Arbitrary[AndVal] =
-    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => AndVal(b) } }
-
-  property("MinSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Min[Int]]
-  }
-
-  property("MaxSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Max[Int]]
-  }
+  import com.twitter.algebird.scalacheck.arbitrary._
 
   property("OrValMonoid is a commutative monoid") {
     commutativeMonoidLaws[OrVal]
@@ -32,18 +16,6 @@ class CollectionSpecification extends CheckProperties {
 
   property("AndValMonoid is a commutative monoid") {
     commutativeMonoidLaws[AndVal]
-  }
-
-  property("Min[Int] is a monoid") {
-    monoidLaws[Min[Int]]
-  }
-
-  property("Max[String] is a monoid") {
-    monoidLaws[Max[String]]
-  }
-
-  property("Max[List[Int]] is a monoid") {
-    monoidLaws[Max[List[Int]]]
   }
 
   property("Either is a Semigroup") {
@@ -321,8 +293,11 @@ class CollectionSpecification extends CheckProperties {
       } yield AdaptiveVector.fromVector(Vector(l: _*), sparse),
       for {
         m <- Arbitrary.arbitrary[Map[Int, T]]
-      } yield AdaptiveVector.fromMap(m.filter{ case (k, _) => (k < 1000) && (k >= 0) },
-        sparse, 1000))
+      } yield AdaptiveVector.fromMap(m.filter { case (k, _) => (k < 1000) && (k >= 0) },
+        sparse, 1000),
+      for {
+        size <- Gen.posNum[Int]
+      } yield AdaptiveVector.fromMap(Map.empty, sparse, size))
 
   property("AdaptiveVector[Int] has a semigroup") {
     implicit val arb = Arbitrary(arbAV(2))
@@ -330,17 +305,21 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("AdaptiveVector[Int] has a monoid") {
+    // TODO: remove this equiv instance once #583 is resolved.
+    implicit val equiv = AdaptiveVector.denseEquiv[Int]
     implicit val arb = Arbitrary(arbAV(0))
-    monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+    monoidLawsEquiv[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a group") {
     implicit val arb = Arbitrary(arbAV(1))
-    groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+    groupLawsEquiv[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[String] has a monoid") {
+    // TODO: remove this equiv instance once #583 is resolved.
+    implicit val equiv = AdaptiveVector.denseEquiv[String]
     implicit val arb = Arbitrary(arbAV(""))
-    monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+    monoidLawsEquiv[AdaptiveVector[String]]
   }
 }

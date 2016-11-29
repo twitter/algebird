@@ -1077,5 +1077,4 @@ object CmsTestImplicits {
   implicit class PairSetCast(xs: Set[(Int, Int)]) {
     def toK[T: FromIntLike]: Set[(T, T)] = xs map { _.toK[T] }
   }
-
 }
