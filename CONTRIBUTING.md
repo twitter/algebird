@@ -18,6 +18,44 @@ This page lists recommendations and requirements for how to best contribute to A
 
 Submit pull requests against the `develop` branch. Try not to pollute your pull request with unintended changes. Keep it simple and small.
 
+## Contributing Tests
+
+All tests go into the test directory of the `algebird-test` subproject. This is because Algebird publishes a module of helpful functions and Scalacheck laws that anyone can use to test the algebraic properties of their own data structures.
+
+We don't have strong conventions around our tests, but here are a few guidelines that will help both for contributing, and when trying to find tests for existing data structures.
+
+### Scalacheck Properties
+
+If you're adding [scalacheck](https://scalacheck.org/) properties, make a new class that extends `com.twitter.algebird.CheckProperties`. Here's an example of a new file of tests:
+
+```scala
+package com.twitter.algebird
+
+import org.scalacheck.Prop
+
+class MaxLaws extends CheckProperties {
+  property("test description") {
+    // Any instance of Prop will work.
+    Prop.forAll { x: Int => x + 0 == x }
+  }
+
+  // Prop instances defined elsewhere work too:
+  property("Max[Long] is a commutative monoid") {
+    BaseProperties.commutativeMonoidLaws[Max[Long]]
+  }
+}
+```
+
+### Scalatest
+
+We use [scalatest](http://www.scalatest.org/) for all of our other tests. [OperatorTest.scala](https://github.com/twitter/algebird/blob/1520068ae296d65ce3c4af7a0dc40137349f76f0/algebird-test/src/test/scala/com/twitter/algebird/OperatorTest.scala#L7) provides a nice example of this style of testing.
+
+### What need testing the most?
+
+The best way to figure out where we need tests is to look at our [Codecov coverage report](https://codecov.io/github/twitter/algebird). Codecov has an incredible [browser extension](http://docs.codecov.io/docs/browser-extension) that will embed coverage information right into the GitHub file browsing UI.
+
+Once you've got the extension installed, navigate to the [algebird-core index](https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird) to see file-by-file coverage percentages. Inside each file, lines that aren't covered by tests will be highlighted red.
+
 ## Contributing Documentation
 
 The documentation for Algebird's website is stored in the `docs/src/main/tut` directory of the [docs subproject](https://github.com/twitter/algebird/tree/develop/docs).
