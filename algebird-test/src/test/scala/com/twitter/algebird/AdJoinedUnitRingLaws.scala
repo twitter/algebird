@@ -20,7 +20,7 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Prop.forAll
 
-class AdjoinedUnitRingSpec extends CheckProperties {
+class AdjoinedUnitRingLaws extends CheckProperties {
   // AdjoinedUnit requires this method to be correct, so it is tested here:
   property("intTimes works correctly") {
     forAll { (bi0: BigInt, bi1: BigInt) =>

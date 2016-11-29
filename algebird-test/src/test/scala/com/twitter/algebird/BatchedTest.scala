@@ -24,7 +24,7 @@ object Helpers {
 
 import Helpers.arbitraryBatched
 
-class BatchedLaws extends CheckProperties with Matchers with PropertyChecks {
+class BatchedLaws extends CheckProperties {
 
   import BaseProperties._
   implicit val arbitraryBigDecimalsHere = BaseProperties.arbReasonableBigDecimals
