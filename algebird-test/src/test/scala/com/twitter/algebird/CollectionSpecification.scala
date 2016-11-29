@@ -31,15 +31,16 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Option Group laws") {
-    groupLaws[Option[Int]] && groupLawsEq[Map[String, Option[Int]]]{
-      (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
-        val keys: Set[String] = a.keySet | b.keySet
-        keys.forall { key: String =>
-          val v1: Int = a.getOrElse(key, None).getOrElse(0)
-          val v2: Int = b.getOrElse(key, None).getOrElse(0)
-          v1 == v2
+    implicit val equiv: Equiv[Map[String, Option[Int]]] =
+        Equiv.fromFunction { (a, b) =>
+          val keys: Set[String] = a.keySet | b.keySet
+          keys.forall { key: String =>
+            val v1: Int = a.getOrElse(key, None).getOrElse(0)
+            val v2: Int = b.getOrElse(key, None).getOrElse(0)
+            v1 == v2
+          }
         }
-    }
+    groupLaws[Option[Int]] && groupLawsEquiv[Map[String, Option[Int]]]
   }
 
   property("List plus") {
@@ -68,9 +69,8 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Array Monoid laws") {
-    monoidLawsEq[Array[Int]]{
-      case (a, b) => a.deep == b.deep
-    }
+    implicit val equiv: Equiv[Array[Int]] = Equiv.by(_.deep)
+    monoidLawsEquiv[Array[Int]]
   }
 
   property("Set plus") {
@@ -181,9 +181,9 @@ class CollectionSpecification extends CheckProperties {
   }
 
   // TODO: this test fails sometimes due to the equiv not doing the right thing.
-  // Fix by defining and Equiv and having all the properties use an implicit Equiv
+  // Fix by defining an Equiv.
   property("IndexedSeq is a pseudoRing") {
-    pseudoRingLaws[IndexedSeq[Int]]
+    pseudoRingLawsEquiv[IndexedSeq[Int]]
   }
 
   property("Either is a Monoid") {
