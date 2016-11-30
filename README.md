@@ -48,6 +48,8 @@ Pull requests and bug reports are always welcome! Check out our [Contributing gu
 
 Discussion occurs primarily on the Algebird Gitter channel: [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+We also monitor the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
+
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 We use a lightweight form of project governance inspired by the one used by Apache projects.
