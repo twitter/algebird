@@ -28,7 +28,7 @@ The latest API docs are hosted at Algebird's [ScalaDoc index](api/).
 
 ## Get Involved + Code of Conduct
 
-Pull requests and bug reports are always welcome!
+Pull requests and bug reports are always welcome! Check out our [Contributing guide](contributing.html) for information on what we most need help with and how you can get started contributing.
 
 Discussion occurs primarily on the Gitter channel: [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).

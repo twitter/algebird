@@ -1,5 +1,42 @@
 # Algebird #
 
+### Version 0.12.3 (Not yet released) ###
+
+* Add `SetDiff` data structure to `algebird-core`: https://github.com/twitter/algebird/pull/555
+* Add `Ring[BigDecimal]`, modeled after `Ring[BigInt]`: https://github.com/twitter/algebird/pull/553
+* "Exponential Histogram" sliding window counter implementation added to `algebird-core` as `ExpHist`: https://github.com/twitter/algebird/pull/568
+* improve HLLSeries performance: https://github.com/twitter/algebird/pull/575
+* Add a microsite at <https://twitter.github.io/algebird> via the `sbt-microsites` plugin, along with docs for all typeclasses and data structures: https://github.com/twitter/algebird/pull/576
+* Adds lots of scalacheck `Arbitrary` and `Gen` instances to `algebird-test`, under `com.twitter.algebird.scalacheck.{ gen, arbitrary }`: https://github.com/twitter/algebird/pull/579
+* Add `Monoid[Max[Vector[T]]]`, `Monoid[Max[Stream[T]]]`: https://github.com/twitter/algebird/pull/579
+* Add `FirstAggregator` and `LastAggregator`, and docs and API / perf improvements for `First`, `Last`, `Min`, `Max`: https://github.com/twitter/algebird/pull/579
+* Add `LawsEquiv` versions of all laws: https://github.com/twitter/algebird/pull/584
+* Deprecates broken group/ring for `Future`/`Try`: https://github.com/twitter/algebird/pull/584
+* Add `metricsLaws[T]` to `BaseProperties` in `algebird-test`: https://github.com/twitter/algebird/pull/584
+* Modify generated `Tuple2Monoid`, etc to extend `TupleNSemigroup`, giving subclasses access to efficient `sumOption`: https://github.com/twitter/algebird/pull/585
+
+### Version 0.12.2 ###
+
+* optimize `CMS.create(Seq[K])`: https://github.com/twitter/algebird/pull/537
+* Update to sbt 0.13.11: https://github.com/twitter/algebird/pull/540
+* Add `Semigroup.maybePlus`: https://github.com/twitter/algebird/pull/544
+* Improve the build and test times and add Codecov.io: https://github.com/twitter/algebird/pull/541
+
+### Version 0.12.1 ###
+
+* Add `Identity` class and `Monad` instance: https://github.com/twitter/algebird/pull/511
+* Using `dropRight` instead of `tail` for shortening `BytesSpec` array: https://github.com/twitter/algebird/pull/510
+* Fix flaky `MinHasherSpec` test: https://github.com/twitter/algebird/pull/514
+* fix input type of `toRichTraversable`: https://github.com/twitter/algebird/pull/518
+* build in scala 2.11 by default: https://github.com/twitter/algebird/pull/520
+* make `SSOne`/`SSMany` constructors private and add apply method with count: https://github.com/twitter/algebird/pull/519
+* Fix `BytesSpec` to not reference head on an empty list  https://github.com/twitter/algebird/pull/525
+* Add an `Aggregator.randomSample` aggregator: https://github.com/twitter/algebird/pull/529
+* Add `sortedTakeBy` and `sortedReverseTakeBy` to `Aggregator.scala`: https://github.com/twitter/algebird/pull/527
+* Add `Batched[A]` type for efficient lazy addition: https://github.com/twitter/algebird/pull/530
+* Add a default `k` value for `Aggregator.approximatePercentile`: https://github.com/twitter/algebird/pull/531
+
+
 ### Version 0.12.0 ###
 
 * Implement an appendMonoid Aggregator factory which yields aggregators…: https://github.com/twitter/algebird/pull/501
