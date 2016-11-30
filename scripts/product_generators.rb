@@ -129,7 +129,7 @@ end
 def get_sumoption(n, bufferSize)
   # Example: "tsemigroup.sumOption(items.iterator.map(_._1), "
   values_commaed = TYPE_SYMBOLS.first(n).each_with_index.map do |t, i|
-    "#{t.downcase}semigroup.sumOption(iter.map(_._#{i+1})).get"
+    "#{t.downcase}semigroup.sumOption(iter.iterator.map(_._#{i+1})).get"
   end.join(", ")
 
   "override def sumOption(to: TraversableOnce[X]) = {
