@@ -1,7 +1,7 @@
 ## Algebird
 
 [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
-[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=2592000)](https://codecov.io/github/twitter/algebird)
+[![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=3600)](https://codecov.io/github/twitter/algebird)
 [![Latest version](https://index.scala-lang.org/twitter/algebird/algebird-core/latest.svg?color=orange)](https://index.scala-lang.org/twitter/algebird/algebird-core)
 [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -38,15 +38,18 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 
 ## Documentation
 
-To learn more and find links to tutorials and information around the web, check out the [website](https://twitter.github.io/algebird).
+To learn more and find links to tutorials and information around the web, check out the [Algebird website](https://twitter.github.io/algebird).
 
-The latest API docs are hosted on Algebird's [ScalaDoc index](http://twitter.github.io/algebird/api/).
+The latest API docs are hosted on Algebird's [ScalaDoc index](https://twitter.github.io/algebird/api/).
 
 ## Get Involved + Code of Conduct
 
-Pull requests and bug reports are always welcome!
+Pull requests and bug reports are always welcome! Check out our [Contributing guide](https://twitter.github.io/algebird/contributing.html) for information on what we most need help with and how you can get started contributing.
 
-Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
+Discussion occurs primarily on the Algebird Gitter channel: [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+We also monitor the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
+
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 We use a lightweight form of project governance inspired by the one used by Apache projects.
@@ -63,18 +66,7 @@ A list of contributors to the project can be found here: [Contributors](https://
 
 Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.12.2`.
 
-Current published artifacts are
-
-* `algebird-core_2.11`
-* `algebird-core_2.10`
-* `algebird-test_2.11`
-* `algebird-test_2.10`
-* `algebird-util_2.11`
-* `algebird-util_2.10`
-* `algebird-bijection_2.11`
-* `algebird-bijection_2.10`
-
-The suffix denotes the scala version.
+See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10 and 2.11.
 
 ## Projects using Algebird
 
@@ -84,6 +76,8 @@ The suffix denotes the scala version.
 - [Summingbird](https://github.com/twitter/summingbird)
 - [Packetloop](https://www.packetloop.com) (see [this tweet](https://twitter.com/cloudjunky/status/355073917720858626)
 - Ebay uses Algebird for machine learning: [ScalaDays talk](http://www.slideshare.net/VitalyGordon/scalable-and-flexible-machine-learning-with-scala-linkedin)
+
+Other projects built with Algebird, as compiled by the Scaladex: [![Scaladex Dependents](https://index.scala-lang.org/count.svg?q=dependencies:twitter/algebird*&subject=scaladex:&color=blue&style=flat-square)](https://index.scala-lang.org/count.svg?q=dependencies:twitter/algebird*)
 
 ## Authors
 
