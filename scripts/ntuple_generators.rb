@@ -6,7 +6,7 @@
 #
 # Run it like this:
 #
-#   ruby scripts/ntuple_generators.rb > src/main/scala/com/twitter/algebird/GeneratedAbstractAlgebra.scala
+#   ruby scripts/ntuple_generators.rb > algebird-core/src/main/scala/com/twitter/algebird/GeneratedAbstractAlgebra.scala
 
 PACKAGE_NAME = "com.twitter.algebird"
 
