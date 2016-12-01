@@ -14,6 +14,7 @@
 * Deprecates broken group/ring for `Future`/`Try`: https://github.com/twitter/algebird/pull/584
 * Add `metricsLaws[T]` to `BaseProperties` in `algebird-test`: https://github.com/twitter/algebird/pull/584
 * Modify generated `Tuple2Monoid`, etc to extend `TupleNSemigroup`, giving subclasses access to efficient `sumOption`: https://github.com/twitter/algebird/pull/585
+* optimize `Generated{Abstract,Product}Algebra.sumOption` with benchmarking https://github.com/twitter/algebird/pull/591
 
 ### Version 0.12.2 ###
 
@@ -35,7 +36,6 @@
 * Add `sortedTakeBy` and `sortedReverseTakeBy` to `Aggregator.scala`: https://github.com/twitter/algebird/pull/527
 * Add `Batched[A]` type for efficient lazy addition: https://github.com/twitter/algebird/pull/530
 * Add a default `k` value for `Aggregator.approximatePercentile`: https://github.com/twitter/algebird/pull/531
-
 
 ### Version 0.12.0 ###
 
