@@ -58,8 +58,8 @@ object ArrayBufferedOperation {
    * Returns an ArrayBufferedOperation instance that internally uses
    * the `sumOption` implementation of the supplied Semigroup[T]
    */
-  def fromSumOption[T](size: Int)(implicit sg: Semigroup[T]) =
-    new ArrayBufferedOperation[T, T](1000) with BufferedReduce[T] {
+  def fromSumOption[T](size: Int)(implicit sg: Semigroup[T]): BufferedReduce[T] =
+    new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
       // calling `.get is okay because the interface guarantees a
       // non-empty sequence.
       def operate(items: Seq[T]) = sg.sumOption(items.iterator).get
