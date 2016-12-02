@@ -22,6 +22,12 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 - All of these combine naturally in tuples, vectors, maps, options and more standard scala classes.
 - Implementations of Monoids for interesting approximation algorithms, such as Bloom filter, HyperLogLog and CountMinSketch. These allow you to think of these sophisticated operations like you might numbers, and add them up in hadoop or online to produce powerful statistics and analytics.
 
+## Using Algebird
+
+Algebird modules are available on Maven Central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.12.3`.
+
+See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10 and 2.11.
+
 ## Documentation
 
 The latest API docs are hosted at Algebird's [ScalaDoc index](api/).
