@@ -1,15 +1,15 @@
-package com.twitter.algebird.benchmark
+package com.twitter.algebird
+package benchmark
 
-import com.twitter.algebird._
 import scala.util.Random
 import com.twitter.bijection._
 
 import com.twitter.algebird.util._
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 import scala.math._
+
 class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
   import HyperLogLog._
 

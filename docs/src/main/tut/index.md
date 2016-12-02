@@ -10,7 +10,7 @@ This code is targeted at building aggregation systems (via [Scalding](https://gi
 
 ### What can you do with this code?
 
-```tut
+```tut:book
 import com.twitter.algebird._
 import com.twitter.algebird.Operators._
 Map(1 -> Max(2)) + Map(1 -> Max(3)) + Map(2 -> Max(4))
@@ -22,15 +22,21 @@ In the above, the class `Max[T]` signifies that the `+` operator should actually
 - All of these combine naturally in tuples, vectors, maps, options and more standard scala classes.
 - Implementations of Monoids for interesting approximation algorithms, such as Bloom filter, HyperLogLog and CountMinSketch. These allow you to think of these sophisticated operations like you might numbers, and add them up in hadoop or online to produce powerful statistics and analytics.
 
+## Using Algebird
+
+Algebird modules are available on Maven Central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.12.3`.
+
+See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10 and 2.11.
+
 ## Documentation
 
-The latest API docs are hosted at Algebird's [ScalaDoc index](api/#index).
+The latest API docs are hosted at Algebird's [ScalaDoc index](api/).
 
 ## Get Involved + Code of Conduct
 
-Pull requests and bug reports are always welcome!
+Pull requests and bug reports are always welcome! Check out our [Contributing guide](contributing.html) for information on what we most need help with and how you can get started contributing.
 
-Discussion occurs primarily on the [Algebird mailing list](https://groups.google.com/forum/#!forum/algebird).
+Discussion occurs primarily on the Gitter channel: [![Chat](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Issues should be reported on the [GitHub issue tracker](https://github.com/twitter/algebird/issues).
 
 We use a lightweight form of project governance inspired by the one used by Apache projects.

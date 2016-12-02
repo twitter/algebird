@@ -1,0 +1,293 @@
+options:
+
+  ###########################
+  # Data Types Menu Options #
+  ###########################
+
+  - title: Data Types
+    url: datatypes.html
+    menu_type: data
+
+  - title: Combinators
+    url: datatypes/combinator.html
+    menu_type: data
+    menu_section: combinator
+
+    nested_options:
+     - title: Scala Collections
+       url: datatypes/combinator/collections.html
+       menu_type: collections
+
+     - title: Java Collections
+       url: datatypes/combinator/java_collections.html
+       menu_type: collections
+
+     - title: Option Monoid
+       url: datatypes/combinator/option_monoid.html
+       menu_type: collections
+
+     - title: Case Class Algebra
+       url: datatypes/combinator/caseclass.html
+       menu_section: combinator
+
+     - title: Cuber
+       url: datatypes/combinator/cuber.html
+       menu_section: combinator
+
+     - title: Roller
+       url: datatypes/combinator/roller.html
+       menu_section: combinator
+
+     - title: Eventually
+       url: datatypes/combinator/eventually.html
+       menu_section: combinator
+
+     - title: Priority
+       url: datatypes/combinator/priority.html
+       menu_section: combinator
+
+     - title: Product/Tuple Algebra
+       url: datatypes/combinator/product_algebra.html
+       menu_section: combinator
+
+     - title: Monoid Statistics
+       url: datatypes/combinator/monoid_statistics.html
+       menu_section: combinator
+
+  - title: Approximate Data Types
+    url: datatypes/approx.html
+    menu_type: data
+    menu_section: approx
+
+    nested_options:
+     - title: Approximate
+       url: datatypes/approx/approximate.html
+       menu_section: approx
+
+     - title: Bloom Filter
+       url: datatypes/approx/bloom_filter.html
+       menu_section: approx
+
+     - title: Count Min Sketch
+       url: datatypes/approx/countminsketch.html
+       menu_section: approx
+
+     - title: Exponential Histogram
+       url: datatypes/approx/exponential_histogram.html
+       menu_section: approx
+
+     - title: HyperLogLog
+       url: datatypes/approx/hyperloglog.html
+       menu_section: approx
+
+     - title: HyperLogLog Series
+       url: datatypes/approx/hyperloglog_series.html
+       menu_section: approx
+
+     - title: MinHasher
+       url: datatypes/approx/min_hasher.html
+       menu_section: approx
+
+     - title: Q Tree
+       url: datatypes/approx/q_tree.html
+       menu_section: approx
+
+     - title: SpaceSaver
+       url: datatypes/approx/space_saver.html
+       menu_section: approx
+
+  - title: Summers
+    url: datatypes/summer.html
+    menu_type: data
+    menu_section: summer
+
+    nested_options:
+      - title: AdaptiveCache
+        url: datatypes/summer/adaptive_cache.html
+        menu_section: summer
+
+      - title: Batched
+        url: datatypes/summer/batched.html
+        menu_section: summer
+
+      - title: SumAll
+        url: datatypes/summer/sum_all.html
+        menu_section: summer
+
+      - title: SummingCache
+        url: datatypes/summer/summingcache.html
+        menu_section: summer
+
+      - title: SummingIterator
+        url: datatypes/summer/summingiterator.html
+        menu_section: summer
+
+      - title: SummingQueue
+        url: datatypes/summer/summingqueue.html
+        menu_section: summer
+
+  - title: Ordered Semigroups
+    url: datatypes/min_and_max.html
+    menu_type: data
+    menu_section: ordered
+
+    nested_options:
+     - title: First and Last
+       url: datatypes/first_and_last.html
+       menu_type: data
+
+     - title: Min and Max
+       url: datatypes/min_and_max.html
+       menu_section: ordered
+
+  - title: Adaptive Matrix
+    url: datatypes/adaptive_matrix.html
+    menu_type: data
+
+  - title: Adaptive Vector
+    url: datatypes/adaptive_vector.html
+    menu_type: data
+
+  - title: Affine Function
+    url: datatypes/affine_function.html
+    menu_type: data
+
+  - title: Averaged Value
+    url: datatypes/averaged_value.html
+    menu_type: data
+
+  - title: Bytes
+    url: datatypes/bytes.html
+    menu_type: data
+
+  - title: Decayed Value
+    url: datatypes/decayed_value.html
+    menu_type: data
+
+  - title: Decayed Vector
+    url: datatypes/decayed_vector.html
+    menu_type: data
+
+  - title: First Five Moments
+    url: datatypes/five_moments.html
+    menu_type: data
+
+  - title: Gaussian Distribution
+    url: datatypes/gaussian_distribution.html
+    menu_type: data
+
+  - title: Interval
+    url: datatypes/interval.html
+    menu_type: data
+
+  - title: Min Plus Algebra
+    url: datatypes/min_plus_algebra.html
+    menu_type: data
+
+  - title: ResetState
+    url: datatypes/reset_state.html
+    menu_type: data
+
+  - title: RightFolded
+    url: datatypes/right_folded.html
+    menu_type: data
+
+  - title: SetDiff
+    url: datatypes/set_diff.html
+    menu_type: data
+
+  - title: Stochastic Gradient Descent
+    url: datatypes/sgd.html
+    menu_type: data
+
+  - title: TopK
+    url: datatypes/topk.html
+    menu_type: data
+
+  #############################
+  # Type Classes Menu Options #
+  #############################
+
+  - title: Type Classes
+    url: typeclasses.html
+    menu_type: typeclasses
+    menu_section: typeclasses
+
+  - title: Abstract Algebra
+    url: typeclasses/abstract_algebra.html
+    menu_type: typeclasses
+    menu_section: abstractalgebra
+
+    nested_options:
+     - title: Semigroup
+       url: typeclasses/semigroup.html
+       menu_section: abstractalgebra
+     - title: Monoid
+       url: typeclasses/monoid.html
+       menu_section: abstractalgebra
+     - title: Group
+       url: typeclasses/group.html
+       menu_section: abstractalgebra
+     - title: Ring
+       url: typeclasses/ring.html
+       menu_section: abstractalgebra
+
+  - title: Aggregator, Preparer, Fold
+    url: typeclasses/aggregator.html
+    menu_type: typeclasses
+    menu_section: aggandprepare
+
+    nested_options:
+     - title: Aggregator
+       url: typeclasses/aggregator.html
+       menu_section: aggandprepare
+
+     - title: Preparer
+       url: typeclasses/preparer.html
+       menu_section: aggandprepare
+
+     - title: Fold
+       url: typeclasses/fold.html
+       menu_type: typeclasses
+
+  - title: Monad and Friends
+    url: typeclasses/functor.html
+    menu_type: typeclasses
+    menu_section: monadandfriends
+
+    nested_options:
+     - title: Functor
+       url: typeclasses/functor.html
+       menu_section: monadandfriends
+
+     - title: Applicative
+       url: typeclasses/applicative.html
+       menu_section: monadandfriends
+
+     - title: Monad
+       url: typeclasses/monad.html
+       menu_section: monadandfriends
+
+  - title: Predecessible
+    url: typeclasses/predecessible.html
+    menu_type: typeclasses
+
+  - title: Successible
+    url: typeclasses/successible.html
+    menu_type: typeclasses
+
+  - title: Hash128
+    url: typeclasses/hash128.html
+    menu_type: typeclasses
+
+  - title: Buffered
+    url: typeclasses/buffered.html
+    menu_type: typeclasses
+
+  ###########################
+  # Cookbook Menu Options #
+  ###########################
+
+  - title: Cookbook
+    url: cookbook.html
+    menu_type: cookbook

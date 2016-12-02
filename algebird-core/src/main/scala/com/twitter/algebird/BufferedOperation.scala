@@ -53,6 +53,19 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
   def isFlushed = buffer.isEmpty
 }
 
+object ArrayBufferedOperation {
+  /**
+   * Returns an ArrayBufferedOperation instance that internally uses
+   * the `sumOption` implementation of the supplied Semigroup[T]
+   */
+  def fromSumOption[T](size: Int)(implicit sg: Semigroup[T]): BufferedReduce[T] =
+    new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
+      // calling `.get is okay because the interface guarantees a
+      // non-empty sequence.
+      def operate(items: Seq[T]) = sg.sumOption(items.iterator).get
+    }
+}
+
 /**
  * This never emits on put, you must call flush
  * designed to be use in the stackable pattern with ArrayBufferedOperation

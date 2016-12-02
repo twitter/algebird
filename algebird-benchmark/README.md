@@ -1,6 +1,8 @@
+# algebird-benchmark
+
 [jmh](http://openjdk.java.net/projects/code-tools/jmh/)-based Benchmarks for Algebird data structures.
 
-# Usage
+## Usage
 
 Run the following commands from the top-level Algebird directory:
 
@@ -10,19 +12,19 @@ Run the following commands from the top-level Algebird directory:
 Now you can run the following commands from within the sbt REPL:
 
     # List available benchmarks
-    > run -l
+    > jmh:run -l
 
     # Run a particular benchmark
-    > run .*HLLBenchmark.*
+    > jmh:run -t1 -f1 -wi 2 -i 3 .*AveragedValueBenchmark.*
 
-    # Run all benchmarks (apparently this is broken, see https://github.com/softprops/cappi/issues/1)
-    > run .*
+    # Run all benchmarks
+    > jmh:run .*
 
-You can find further details in the [sbt-jmh](https://github.com/ktoso/sbt-jmh) documentation, which is the sbt plugin
-we use to run the jmh benchmarks.
+These options tell JMH to run the benchmark with 1 thread (`-t1`), 1 fork (`-f1`), 2 warmup iterations and 3 real iterations. You can find further details in the [sbt-jmh](https://github.com/ktoso/sbt-jmh) documentation.
 
 Example output for [CMSBenchmark](src/main/scala/com/twitter/algebird/benchmark/CMSBenchmark.scala):
 
+```
 Running:
  3 Iterations
  3 Warmups per trial
@@ -68,3 +70,4 @@ Running:
 [info] CMSBenchmark.timePlusOfFirstHundredIntegersWithLongCms    0.0000001  0.005                0.2       2048           100  thrpt    3  1768.006 ± 2623.229  ops/s
 [info] CMSBenchmark.timePlusOfRandom2048BitNumbersWithBigIntCms  0.0000001  0.005                0.2       2048           100  thrpt    3   106.443 ±  201.605  ops/s
 [info] CMSBenchmark.timePlusOfRandom2048BitNumbersWithStringCms  0.0000001  0.005                0.2       2048           100  thrpt    3   107.031 ±  139.073  ops/s
+```

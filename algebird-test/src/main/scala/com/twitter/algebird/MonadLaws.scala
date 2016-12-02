@@ -18,7 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
-
+import scala.math.Equiv
 import Monad.{ pureOp, operators }
 
 /**
@@ -30,15 +30,33 @@ object MonadLaws {
 
   def defaultEq[T] = { (t0: T, t1: T) => (t0 == t1) }
 
-  def leftIdentity[M[_], T, U](eq: (M[U], M[U]) => Boolean = defaultEq[M[U]])(implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]]) =
-    forAll { (t: T, fn: T => M[U]) => eq(t.pure[M].flatMap(fn), fn(t)) }
+  def leftIdentity[M[_], T, U](eq: (M[U], M[U]) => Boolean = defaultEq[M[U]])(implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]]) = {
+    implicit val equiv: Equiv[M[U]] = Equiv.fromFunction(eq)
+    leftIdentityEquiv[M, T, U]
+  }
 
-  def rightIdentity[M[_], T](eq: (M[T], M[T]) => Boolean = defaultEq[M[T]])(implicit monad: Monad[M], arb: Arbitrary[M[T]]) =
-    forAll { (mt: M[T]) => eq(mt.flatMap { _.pure[M] }, mt) }
+  def rightIdentity[M[_], T](eq: (M[T], M[T]) => Boolean = defaultEq[M[T]])(implicit monad: Monad[M], arb: Arbitrary[M[T]]) = {
+    implicit val equiv: Equiv[M[T]] = Equiv.fromFunction(eq)
+    rightIdentityEquiv[M, T]
+  }
 
   def associative[M[_], T, U, V](eq: (M[V], M[V]) => Boolean)(implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
-    fn2: Arbitrary[U => M[V]]) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
-    eq(mt.flatMap(f1).flatMap(f2), mt.flatMap { t => f1(t).flatMap(f2) })
+    fn2: Arbitrary[U => M[V]]) = {
+    implicit val equiv: Equiv[M[V]] = Equiv.fromFunction(eq)
+    associativeEquiv[M, T, U, V]
+  }
+
+  // Equiv versions:
+  def leftIdentityEquiv[M[_], T, U](
+    implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]], equiv: Equiv[M[U]]) =
+    forAll { (t: T, fn: T => M[U]) => Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t)) }
+
+  def rightIdentityEquiv[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
+    forAll { (mt: M[T]) => Equiv[M[T]].equiv(mt.flatMap { _.pure[M] }, mt) }
+
+  def associativeEquiv[M[_], T, U, V](implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
+    fn2: Arbitrary[U => M[V]], equiv: Equiv[M[V]]) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
+    Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap { t => f1(t).flatMap(f2) })
   }
 
   // Just generate a map and use that as a function:
@@ -51,8 +69,17 @@ object MonadLaws {
   }
 
   def monadLaws[M[_], T, U, R](eq: (M[R], M[R]) => Boolean = defaultEq[M[R]])(implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
-    arbr: Arbitrary[M[R]], fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) =
-    associative[M, T, U, R](eq) && rightIdentity[M, R](eq) && leftIdentity[M, U, R](eq)
+    arbr: Arbitrary[M[R]], fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) = {
+    implicit val eq: Equiv[T] = Equiv.universal
+    monadLawsEquiv[M, T, U, R]
+  }
+
+  def monadLawsEquiv[M[_], T, U, R](
+    implicit monad: Monad[M], arb: Arbitrary[M[T]],
+    equivT: Equiv[M[T]], equivU: Equiv[M[U]], equivR: Equiv[M[R]],
+    fn1: Arbitrary[(T) => M[U]], arbr: Arbitrary[M[R]],
+    fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) =
+    associativeEquiv[M, T, U, R] && rightIdentityEquiv[M, R] && leftIdentityEquiv[M, U, R]
 
   implicit def indexedSeqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[IndexedSeq[T]] =
     Arbitrary { arbl.arbitrary.map { _.toIndexedSeq } }

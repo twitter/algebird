@@ -27,13 +27,29 @@ import scala.annotation.{ implicitNotFound, tailrec }
 import macros.caseclass._
 
 /**
- * Semigroup:
- *   This is a class with a plus method that is associative: a+(b+c) = (a+b)+c
+ * A semigroup is any type `T` with an associative operation (`plus`):
+ *
+ * {{{
+ * a plus (b plus c) = (a plus b) plus c
+ * }}}
+ *
+ * Example instances:
+ *  - `Semigroup[Int]`: `plus` `Int#+`
+ *  - `Semigroup[List[T]]`: `plus` is `List#++`
+ *
+ * @define T T
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] with AdditiveSemigroup[T] {
   /**
-   * override this if there is a faster way to do this sum than reduceLeftOption on plus
+   * Returns an instance of `$T` calculated by summing all instances in
+   * `iter` in one pass. Returns `None` if `iter` is empty, else
+   * `Some[$T]`.
+   *
+   * @param iter instances of `$T` to be combined
+   * @return `None` if `iter` is empty, else an option value containing the summed `$T`
+   * @note Override if there is a faster way to compute this sum than
+   *       `iter.reduceLeftOption` using [[plus]].
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
@@ -57,6 +73,8 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
  * wrong, use Left.  plus does the normal thing for plus(Right, Right), or plus(Left, Left),
  * but if exactly one is Left, we return that value (to keep the error condition).
  * Typically, the left value will be a string representing the errors.
+ *
+ * @define T Either[L, R]
  */
 class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R]) extends Semigroup[Either[L, R]] {
 
