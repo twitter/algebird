@@ -38,6 +38,12 @@ class AveragedValueLaws extends CheckProperties {
     }
   }
 
+  property("AveragedValue can absorb numbers directly") {
+    forAll { (base: AveragedValue, x: Long) =>
+      (base + AveragedValue(x)) == (base + x)
+    }
+  }
+
   property("AveragedValue works by + or sumOption") {
     forAll { v: NonEmptyVector[Double] =>
       val avgs = v.items.map(AveragedValue(_))

@@ -59,6 +59,26 @@ case class AveragedValue(count: Long, value: Double) {
    * @return an instance representing the mean of this instance and `r`.
    */
   def +(r: AveragedValue): AveragedValue = AveragedGroup.plus(this, r)
+
+  /**
+   * Returns a new instance that averages `that` into this instance.
+   *
+   * @param that value to average into this instance
+   * @return an instance representing the mean of this instance and `that`.
+   */
+  def +(that: Double): AveragedValue =
+    AveragedValue(
+      count + 1L,
+      MomentsGroup.getCombinedMean(count, value, 1L, that))
+
+  /**
+   * Returns a new instance that averages `that` into this instance.
+   *
+   * @param that value to average into this instance
+   * @return an instance representing the mean of this instance and `that`.
+   */
+  def +[N](that: N)(implicit num: Numeric[N]): AveragedValue =
+    this + num.toDouble(that)
 }
 
 /**
