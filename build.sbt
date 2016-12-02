@@ -8,7 +8,7 @@ import pl.project13.scala.sbt.JmhPlugin
 import sbtunidoc.Plugin.UnidocKeys._
 import scalariform.formatter.preferences._
 
-val algebraVersion = "0.5.1"
+val algebraVersion = "0.6.0"
 val bijectionVersion = "0.9.0"
 val javaEwahVersion = "0.6.6"
 val paradiseVersion = "2.1.0"
