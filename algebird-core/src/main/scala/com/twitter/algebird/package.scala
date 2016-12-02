@@ -24,4 +24,10 @@ package object algebird {
    */
   private[algebird] abstract class AbstractIterable[T] extends Iterable[T]
   private[algebird] abstract class AbstractIterator[T] extends Iterator[T]
+
+  /**
+   * To keep code using algebird.Field compiling, we export algebra Field
+   */
+  type Field[V] = algebra.ring.Field[V]
+  val Field = algebra.ring.Field
 }

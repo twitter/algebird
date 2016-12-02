@@ -8,9 +8,13 @@ import pl.project13.scala.sbt.JmhPlugin
 import sbtunidoc.Plugin.UnidocKeys._
 import scalariform.formatter.preferences._
 
+val algebraVersion = "0.6.0"
+val bijectionVersion = "0.9.0"
+val javaEwahVersion = "0.6.6"
 val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
-val bijectionVersion = "0.9.0"
+val scalaTestVersion = "3.0.0"
+val scalacheckVersion = "1.13.1"
 val utilVersion = "6.20.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
@@ -184,13 +188,14 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
-  test := { }, // All tests reside in algebirdTest
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
-    Seq("com.googlecode.javaewah" % "JavaEWAH" % "0.6.6",
-        "org.scala-lang" % "scala-reflect" % scalaVersion) ++ {
+    Seq("com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
+        "org.typelevel" %% "algebra" % algebraVersion,
+        "org.scala-lang" % "scala-reflect" % scalaVersion,
+        "org.scalatest" %% "scalatest" % scalaTestVersion % "test") ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
       else
@@ -205,8 +210,8 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test").settings(
   testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
   libraryDependencies <++= (scalaVersion) { scalaVersion =>
-    Seq("org.scalacheck" %% "scalacheck" % "1.13.1",
-        "org.scalatest" %% "scalatest" % "3.0.0") ++ {
+    Seq("org.scalacheck" %% "scalacheck" % scalacheckVersion,
+      "org.scalatest" %% "scalatest" % scalaTestVersion) ++ {
       if (isScala210x(scalaVersion))
         Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
       else

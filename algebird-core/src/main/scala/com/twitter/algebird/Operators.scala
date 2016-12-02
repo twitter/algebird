@@ -19,7 +19,6 @@ object Operators {
   implicit def toPlus[T: Semigroup](t: T) = new PlusOp(t)
   implicit def toMinus[T: Group](t: T) = new MinusOp(t)
   implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
-  implicit def toDiv[T: Field](t: T) = new DivOp(t)
   implicit def toRichTraversableFromIterator[T](t: Iterator[T]): RichTraversable[T] =
     new RichTraversable(t)
   implicit def toRichTraversable[T](t: Traversable[T]): RichTraversable[T] =
@@ -36,10 +35,6 @@ class MinusOp[T: Group](t: T) {
 
 class TimesOp[T: Ring](t: T) {
   def *(other: T) = implicitly[Ring[T]].times(t, other)
-}
-
-class DivOp[T: Field](t: T) {
-  def /(other: T) = implicitly[Field[T]].div(t, other)
 }
 
 class RichTraversable[T](t: TraversableOnce[T]) {

@@ -17,6 +17,8 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 
+import algebra.ring.Rng
+
 /**
  * This is for the case where your Ring[T] is a Rng (i.e. there is no unit).
  * @see http://en.wikipedia.org/wiki/Pseudo-ring#Adjoining_an_identity_element
@@ -27,33 +29,36 @@ case class AdjoinedUnit[T](ones: BigInt, get: T) {
 
 object AdjoinedUnit {
   def apply[T](item: T): AdjoinedUnit[T] = new AdjoinedUnit[T](BigInt(0), item)
-  implicit def ring[T](implicit ring: Ring[T]): Ring[AdjoinedUnit[T]] = new AdjoinedUnitRing[T]
+  implicit def ring[T](implicit ring: Rng[T]): Ring[AdjoinedUnit[T]] = new AdjoinedUnitRing[T]
 }
 
-class AdjoinedUnitRing[T](implicit ring: Ring[T]) extends Ring[AdjoinedUnit[T]] {
-  val one = AdjoinedUnit[T](BigInt(1), ring.zero)
-  val zero = AdjoinedUnit[T](ring.zero)
+class AdjoinedUnitRing[T](implicit rng: Rng[T]) extends Ring[AdjoinedUnit[T]] {
+  val one = AdjoinedUnit[T](BigInt(1), rng.zero)
+  val zero = AdjoinedUnit[T](rng.zero)
+
+  private[this] val group: Group[T] =
+    new FromAlgebraGroup(rng.additive)
 
   override def isNonZero(it: AdjoinedUnit[T]) =
-    (it.ones != 0) || ring.isNonZero(it.get)
+    (it.ones != 0) || group.isNonZero(it.get)
 
   def plus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) =
-    AdjoinedUnit(left.ones + right.ones, ring.plus(left.get, right.get))
+    AdjoinedUnit(left.ones + right.ones, rng.plus(left.get, right.get))
 
   override def negate(it: AdjoinedUnit[T]) =
-    AdjoinedUnit(-it.ones, ring.negate(it.get))
+    AdjoinedUnit(-it.ones, rng.negate(it.get))
   override def minus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) =
-    AdjoinedUnit(left.ones - right.ones, ring.minus(left.get, right.get))
+    AdjoinedUnit(left.ones - right.ones, rng.minus(left.get, right.get))
 
   def times(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) = {
     // (n1, g1) * (n2, g2) = (n1*n2, (n1*g1) + (n2*g1) + (g1*g2))
     import Group.intTimes
 
     val ones = left.ones * right.ones
-    val part0 = intTimes(left.ones, right.get)(ring)
-    val part1 = intTimes(right.ones, left.get)(ring)
-    val part2 = ring.times(left.get, right.get)
-    val nonUnit = ring.plus(part0, ring.plus(part1, part2))
+    val part0 = intTimes(left.ones, right.get)(group)
+    val part1 = intTimes(right.ones, left.get)(group)
+    val part2 = rng.times(left.get, right.get)
+    val nonUnit = rng.plus(part0, rng.plus(part1, part2))
 
     AdjoinedUnit(ones, nonUnit)
   }
