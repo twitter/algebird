@@ -27,8 +27,6 @@ object field {
     override def minus(l: Float, r: Float): Float = l - r
     override def times(l: Float, r: Float): Float = l * r
     override def div(l: Float, r: Float): Float = l / r
-    override def quot(l: Float, r: Float): Float = l / r
-    override def mod(l: Float, r: Float): Float = zero
   }
   implicit object ForJFloat extends Field[JFloat] {
     override val one: JFloat = JFloat.valueOf(1.0f)
@@ -45,8 +43,6 @@ object field {
     override def minus(l: JFloat, r: JFloat): JFloat = l - r
     override def times(l: JFloat, r: JFloat): JFloat = l * r
     override def div(l: JFloat, r: JFloat): JFloat = l / r
-    override def quot(l: JFloat, r: JFloat): JFloat = l / r
-    override def mod(l: JFloat, r: JFloat): JFloat = zero
   }
   implicit object ForDouble extends Field[Double] {
     override def one: Double = 1.0
@@ -63,8 +59,6 @@ object field {
     override def minus(l: Double, r: Double): Double = l - r
     override def times(l: Double, r: Double): Double = l * r
     override def div(l: Double, r: Double): Double = l / r
-    override def quot(l: Double, r: Double): Double = l / r
-    override def mod(l: Double, r: Double): Double = zero
   }
   implicit object ForJDouble extends Field[JDouble] {
     override val one: JDouble = JDouble.valueOf(1.0)
@@ -81,8 +75,6 @@ object field {
     override def minus(l: JDouble, r: JDouble): JDouble = l - r
     override def times(l: JDouble, r: JDouble): JDouble = l * r
     override def div(l: JDouble, r: JDouble): JDouble = l / r
-    override def quot(l: JDouble, r: JDouble): JDouble = l / r
-    override def mod(l: JDouble, r: JDouble): JDouble = zero
   }
 
   /**
