@@ -10,7 +10,7 @@ import CmsTestImplicits._
 import scala.util.Random
 import CMSHasherImplicits.CMSHasherBigInt
 
-class CmsLaws extends PropSpec with PropertyChecks with Matchers {
+class CmsLaws extends CheckProperties {
 
   import BaseProperties._
 
@@ -36,42 +36,47 @@ class CmsLaws extends PropSpec with PropertyChecks with Matchers {
   property("CountMinSketch[Short] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Short](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    check(monoidLawsEquiv[CMS[Short]])
+    commutativeMonoidLawsEquiv[CMS[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    check(monoidLawsEquiv[CMS[Int]])
+    commutativeMonoidLawsEquiv[CMS[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Long](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    check(monoidLawsEquiv[CMS[Long]])
+    commutativeMonoidLawsEquiv[CMS[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[BigInt](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    check(monoidLawsEquiv[CMS[BigInt]])
+    commutativeMonoidLawsEquiv[CMS[BigInt]]
+  }
+
+  property("CountMinSketch[BigDecimal] is a Monoid") {
+    implicit val cmsMonoid = CMS.monoid[BigDecimal](EPS, DELTA, SEED)
+    implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
+    commutativeMonoidLawsEquiv[CMS[BigDecimal]]
   }
 
   property("CountMinSketch[String] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[String](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[String](cmsMonoid)
-    check(monoidLawsEquiv[CMS[String]])
+    commutativeMonoidLawsEquiv[CMS[String]]
   }
 
-  property("CountMinSketch[Bytes] is a Monoid") {
+  property("CountMinSketch[Bytes] is a commutative monoid") {
     implicit val cmsMonoid = CMS.monoid[Bytes](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
-    check(monoidLawsEquiv[CMS[Bytes]])
+    commutativeMonoidLawsEquiv[CMS[Bytes]]
   }
-
 }
 
-class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
+class TopPctCmsLaws extends CheckProperties {
 
   import BaseProperties._
 
@@ -79,6 +84,12 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   val EPS = 0.005
   val SEED = 1
   val HEAVY_HITTERS_PCT = 0.1
+
+  implicit def topCmsEquiv[K]: Equiv[TopCMS[K]] =
+    new Equiv[TopCMS[K]] {
+      def equiv(x: TopCMS[K], y: TopCMS[K]): Boolean =
+        (x ++ x) == (x ++ y)
+    }
 
   private def createArbitrary[K: FromIntLike](cmsMonoid: TopPctCMSMonoid[K]): Arbitrary[TopCMS[K]] = {
     val k = implicitly[FromIntLike[K]]
@@ -90,39 +101,44 @@ class TopPctCmsLaws extends PropSpec with PropertyChecks with Matchers {
   property("TopPctCms[Short] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    monoidLaws[TopCMS[Short]]
+    commutativeMonoidLawsEquiv[TopCMS[Short]]
   }
 
   property("TopPctCms[Int] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    monoidLaws[TopCMS[Int]]
+    commutativeMonoidLawsEquiv[TopCMS[Int]]
   }
 
   property("TopPctCms[Long] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    monoidLaws[TopCMS[Long]]
+    commutativeMonoidLawsEquiv[TopCMS[Long]]
   }
 
   property("TopPctCms[BigInt] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    monoidLaws[TopCMS[BigInt]]
+    commutativeMonoidLawsEquiv[TopCMS[BigInt]]
+  }
+
+  property("TopPctCms[BigDecimal] is a Monoid") {
+    implicit val cmsMonoid = TopPctCMS.monoid[BigDecimal](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
+    implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
+    commutativeMonoidLawsEquiv[TopCMS[BigDecimal]]
   }
 
   property("TopPctCms[String] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[String](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[String](cmsMonoid)
-    monoidLaws[TopCMS[String]]
+    commutativeMonoidLawsEquiv[TopCMS[String]]
   }
 
   property("TopPctCms[Bytes] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Bytes](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
-    monoidLaws[TopCMS[Bytes]]
+    commutativeMonoidLawsEquiv[TopCMS[Bytes]]
   }
-
 }
 
 class SparseCMSTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -273,6 +289,7 @@ class CMSShortTest extends CMSTest[Short]
 class CMSIntTest extends CMSTest[Int]
 class CMSLongTest extends CMSTest[Long]
 class CMSBigIntTest extends CMSTest[BigInt]
+class CMSBigDecimalTest extends CMSTest[BigDecimal]
 class CMSStringTest extends CMSTest[String]
 class CMSBytesTest extends CMSTest[Bytes]
 
@@ -964,6 +981,7 @@ class CMSHasherShortSpec extends CMSHasherSpec[Short]
 class CMSHasherIntSpec extends CMSHasherSpec[Int]
 class CMSHasherLongSpec extends CMSHasherSpec[Long]
 class CMSHasherBigIntSpec extends CMSHasherSpec[BigInt]
+class CMSHasherBigDecimalSpec extends CMSHasherSpec[BigDecimal]
 class CMSHasherStringSpec extends CMSHasherSpec[String]
 class CMSHasherBytesSpec extends CMSHasherSpec[Bytes]
 
@@ -1063,5 +1081,4 @@ object CmsTestImplicits {
   implicit class PairSetCast(xs: Set[(Int, Int)]) {
     def toK[T: FromIntLike]: Set[(T, T)] = xs map { _.toK[T] }
   }
-
 }

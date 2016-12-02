@@ -57,9 +57,9 @@ object Moments {
 
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
-  def apply[V <% Double](value: V) = new Moments(1L, value, 0, 0, 0)
+  def apply[V <% Double](value: V): Moments = new Moments(1L, value, 0, 0, 0)
 
-  def apply[V <% Double](m0: Long, m1: V, m2: V, m3: V, m4: V) =
+  def apply[V <% Double](m0: Long, m1: V, m2: V, m3: V, m4: V): Moments =
     new Moments(m0, m1, m2, m3, m4)
 }
 
@@ -68,16 +68,37 @@ object Moments {
  */
 object MomentsGroup extends Group[Moments] {
 
-  // When combining averages, if the counts sizes are too close we should use a different
-  // algorithm. This constant defines how close the ratio of the smaller to the total count
-  // can be.
+  /**
+   * When combining averages, if the counts sizes are too close we
+   * should use a different algorithm.  This constant defines how
+   * close the ratio of the smaller to the total count can be:
+   */
   private val STABILITY_CONSTANT = 0.1
+
+  /**
+   * Given two streams of doubles (n, an) and (k, ak) of form (count,
+   * mean), calculates the mean of the combined stream.
+   *
+   * Uses a more stable online algorithm which should be suitable for
+   * large numbers of records similar to:
+   * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
+   */
+  def getCombinedMean(n: Long, an: Double, k: Long, ak: Double): Double =
+    if (n < k) getCombinedMean(k, ak, n, an)
+    else (n + k) match {
+      case 0L => 0.0
+      case newCount if (newCount == n) => an
+      case newCount =>
+        val scaling = k.toDouble / newCount
+        // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
+        if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
+        else (n * an + k * ak) / newCount
+    }
 
   val zero = Moments(0L, 0.0, 0.0, 0.0, 0.0)
 
-  override def negate(a: Moments): Moments = {
+  override def negate(a: Moments): Moments =
     Moments(-a.count, a.m1, -a.m2, -a.m3, -a.m4)
-  }
 
   // Combines the moment calculations from two streams.
   // See http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Higher-order_statistics
@@ -104,39 +125,6 @@ object MomentsGroup extends Group[Moments] {
           4 * delta * (a.count * b.m3 - b.count * a.m3) / countCombined
 
     Moments(countCombined, meanCombined, m2, m3, m4)
-  }
-
-  /**
-   * Given two streams of doubles A and B, with the specified counts and means,
-   * calculate the mean of the combined stream.
-   */
-  def getCombinedMean(countA: Long, meanA: Double, countB: Long, meanB: Double): Double = {
-    val (big, small) =
-      if (math.abs(countA) >= math.abs(countB))
-        ((countA, meanA), (countB, meanB))
-      else
-        ((countB, meanB), (countA, meanA))
-
-    val (countBig, meanBig) = big
-    val (countSmall, meanSmall) = small
-
-    if (countSmall == 0) {
-      meanBig
-    } else {
-      val countCombined = countSmall + countBig
-      val scaling = countSmall.toDouble / countCombined
-      val meanCombined =
-        if (math.abs(scaling) < STABILITY_CONSTANT)
-          // This formula for the combined mean is only stable if
-          // countA is not approximately countB.
-          meanBig + (meanSmall - meanBig) * scaling
-        else
-          // Use this more stable formulation if the sizes of the two streams
-          // are close.
-          (countBig * meanBig + countSmall * meanSmall) / countCombined
-
-      meanCombined
-    }
   }
 }
 

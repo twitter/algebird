@@ -67,7 +67,7 @@ package com.twitter.algebird
  * some factor depending on eps."
  *
  * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]].
+ * Algebird ships with several such implicits for commonly used types such as `Long` and [[scala.BigInt]].
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
  * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
@@ -93,7 +93,7 @@ package com.twitter.algebird
  *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
  *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.  Other possibilities
+ *           typically use `Long`.  For larger domains you can try [[scala.BigInt]], for example.  Other possibilities
  *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
  *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
@@ -490,10 +490,10 @@ object CMS {
  *
  * =Usage=
  *
- * This example demonstrates how to count [[Long]] elements with [[CMS]], i.e. `K=Long`.
+ * This example demonstrates how to count `Long` elements with [[CMS]], i.e. `K=Long`.
  *
- * Note that the actual counting is always performed with a [[Long]], regardless of your choice of `K`.  That is,
- * the counting table behind the scenes is backed by [[Long]] values (at least in the current implementation), and thus
+ * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`.  That is,
+ * the counting table behind the scenes is backed by `Long` values (at least in the current implementation), and thus
  * the returned frequency estimates are always instances of `Approximate[Long]`.
  *
  * @example {{{
@@ -797,8 +797,8 @@ case class TopCMSParams[K](logic: HeavyHittersLogic[K])
  *
  * This example demonstrates how to count `Long` elements with [[TopCMS]], i.e. `K=Long`.
  *
- * Note that the actual counting is always performed with a [[Long]], regardless of your choice of `K`.  That is,
- * the counting table behind the scenes is backed by [[Long]] values (at least in the current implementation), and thus
+ * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`.  That is,
+ * the counting table behind the scenes is backed by `Long` values (at least in the current implementation), and thus
  * the returned frequency estimates are always instances of `Approximate[Long]`.
  *
  * @example {{{
@@ -1074,7 +1074,7 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  * =Usage=
  *
  * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]].
+ * Algebird ships with several such implicits for commonly used types such as `Long` and [[scala.BigInt]].
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
  * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
@@ -1097,7 +1097,7 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that
  *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
+ *           typically use `Long`.  For larger domains you can try [[scala.BigInt]], for example.
  */
 class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01) extends TopCMSMonoid[K](cms, TopPctLogic[K](heavyHittersPct))
 
@@ -1163,7 +1163,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends TopCMSA
  * =Usage=
  *
  * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as [[Long]] and [[BigInt]].
+ * Algebird ships with several such implicits for commonly used types such as `Long` and [[scala.BigInt]].
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
  * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
@@ -1185,7 +1185,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends TopCMSA
  *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that
  *           can be imported.
  *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use [[Long]].  For larger domains you can try [[BigInt]], for example.
+ *           typically use `Long`.  For larger domains you can try [[scala.BigInt]], for example.
  */
 class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100) extends TopCMSMonoid[K](cms, TopNLogic[K](heavyHittersN))
 

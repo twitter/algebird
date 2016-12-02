@@ -15,10 +15,11 @@ limitations under the License.
 */
 
 package com.twitter.algebird
+
 import org.scalacheck.Prop._
 
 class IntervalLaws extends CheckProperties {
-  import com.twitter.algebird.Generators._
+  import com.twitter.algebird.scalacheck.arbitrary._
   import com.twitter.algebird.Interval.GenIntersection
 
   property("[x, x + 1) contains x") {

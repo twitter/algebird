@@ -4,7 +4,7 @@ package object legacy {
 
   /**
    * For legacy code (Algebird versions < 0.8.1) that uses CMS we provide this functionally equivalent CMS type, which
-   * is a CMS with [[Long]]-based keys.
+   * is a CMS with `Long`-based keys.
    *
    * This type is an alias for `TopCMS[Long]` (see [[TopCMS]]).
    *
@@ -17,7 +17,7 @@ package object legacy {
 
   /**
    * For legacy code (Algebird versions < 0.8.1) that uses CMS we provide this functionally equivalent CMS monoid, which
-   * allows you to work with (e.g. create) top-% CMS instances with [[Long]]-based keys.
+   * allows you to work with (e.g. create) top-% CMS instances with `Long`-based keys.
    *
    * =Usage=
    *
@@ -38,5 +38,4 @@ package object legacy {
    */
   @deprecated("You should use TopPctCMSMonoid[Long] instead of legacy.CountMinSketchMonoid", since = "0.8.1")
   type CountMinSketchMonoid = TopPctCMSMonoid[Long]
-
 }

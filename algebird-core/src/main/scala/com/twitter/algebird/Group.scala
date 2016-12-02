@@ -108,6 +108,7 @@ object Group extends GeneratedGroupImplicits with ProductGroups {
   implicit val jshortGroup: Group[JShort] = JShortRing
   implicit val longGroup: Group[Long] = LongRing
   implicit val bigIntGroup: Group[BigInt] = BigIntRing
+  implicit val bigDecimalGroup: Group[BigDecimal] = BigDecimalRing
   implicit val jlongGroup: Group[JLong] = JLongRing
   implicit val floatGroup: Group[Float] = FloatField
   implicit val jfloatGroup: Group[JFloat] = JFloatField

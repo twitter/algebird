@@ -113,6 +113,7 @@ object LongRing extends Ring[Long] {
 }
 
 object BigIntRing extends NumericRing[BigInt]
+object BigDecimalRing extends NumericRing[BigDecimal]
 
 object Ring extends GeneratedRingImplicits with ProductRings {
   // This pattern is really useful for typeclasses
@@ -139,6 +140,7 @@ object Ring extends GeneratedRingImplicits with ProductRings {
   implicit val jshortRing: Ring[JShort] = JShortRing
   implicit val longRing: Ring[Long] = LongRing
   implicit val bigIntRing: Ring[BigInt] = BigIntRing
+  implicit val bigDecimalRing: Ring[BigDecimal] = BigDecimalRing
   implicit val jlongRing: Ring[JLong] = JLongRing
   implicit val floatRing: Ring[Float] = FloatField
   implicit val jfloatRing: Ring[JFloat] = JFloatField

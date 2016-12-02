@@ -78,5 +78,4 @@ class JavaBoxedTests extends CheckProperties {
   property("JMap[String,String] is a Monoid") {
     isAssociative[JMap[String, String]] && weakZero[JMap[String, String]]
   }
-
 }

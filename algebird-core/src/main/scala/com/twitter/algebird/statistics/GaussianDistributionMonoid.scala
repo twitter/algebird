@@ -3,8 +3,8 @@ package com.twitter.algebird.statistics
 import com.twitter.algebird.Monoid
 
 /**
- * @mean - Mean
- * @sigma2 - Variance, where sqrt(sigma2) is the standard deviation
+ * @param mean Mean
+ * @param sigma2 Variance, where sqrt(sigma2) is the standard deviation
  * aka Normal distribution
  */
 case class GaussianDistribution(mean: Double, sigma2: Double) {
@@ -23,7 +23,7 @@ object GaussianDistribution {
  * that are normally distributed, then their sum is also
  * normally distributed, with its new mean equal to the sum of two means
  * and variance equal to the sum of two variances.
- * http://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables
+ * [[http://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables]]
  */
 object GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
   override def zero = new GaussianDistribution(0, 0)
