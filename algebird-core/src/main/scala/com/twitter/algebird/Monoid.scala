@@ -29,9 +29,9 @@ import scala.collection.{ Map => ScMap }
  * Monoid (take a deep breath, and relax about the weird name):
  *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
  */
-
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
+  /** Returns the identity element of `$T` for [[plus]]. */
   def zero: T //additive identity
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v: T) {

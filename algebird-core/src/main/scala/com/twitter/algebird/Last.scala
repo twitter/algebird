@@ -16,23 +16,53 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * Last tracks the "most recent" item by the order in which items are
- * seen.
+ * Tracks the "most recent", or last, wrapped instance of `T` by the
+ * order in which items are seen.
+ *
+ * @param get wrapped instance of `T`
  */
 case class Last[@specialized(Int, Long, Float, Double) +T](get: T) {
+  /**
+   * Returns the argument `r`, always.
+   *
+   * @param r returned of `Last[U]`
+   */
   def +[U >: T](r: Last[U]): Last[U] = r
 }
 
+/**
+ * Provides a set of operations and typeclass instances needed to use
+ * [[Last]] instances.
+ */
 object Last extends LastInstances {
+  /**
+   * Returns an [[Aggregator]] that selects the last instance of `T`
+   * in the aggregated stream.
+   */
   def aggregator[T]: LastAggregator[T] = LastAggregator()
 }
 
 private[algebird] sealed abstract class LastInstances {
-  implicit def semigroup[T]: Semigroup[Last[T]] = Semigroup.from { (l, r) => r }
+  /**
+   * Returns a [[Semigroup]] instance with a `plus` implementation
+   * that always returns the last (ie, the right) `T` argument.
+   */
+  def lastSemigroup[T]: Semigroup[T] = Semigroup.from { (l, r) => r }
+
+  /**
+   * Returns a [[Semigroup]] instance for [[Last]][T]. The `plus`
+   * implementation always returns the last (ie, the right) `Last[T]`
+   * argument.
+   */
+  implicit def semigroup[T]: Semigroup[Last[T]] = lastSemigroup[Last[T]]
 }
 
+/**
+ * [[Aggregator]] that selects the last instance of `T` in the
+ * aggregated stream.
+ */
 case class LastAggregator[T]() extends Aggregator[T, T, T] {
   def prepare(v: T) = v
-  val semigroup: Semigroup[T] = Semigroup.from { (l: T, r: T) => r }
+  val semigroup: Semigroup[T] = Last.lastSemigroup[T]
   def present(v: T) = v
 }

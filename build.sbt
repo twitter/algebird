@@ -36,7 +36,6 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
       algebirdCore,
       algebirdUtil,
       algebirdBijection,
-      algebirdBenchmark,
       algebirdSpark))
   }
 

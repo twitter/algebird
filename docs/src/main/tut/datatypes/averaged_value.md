@@ -8,40 +8,89 @@ scaladoc: "#com.twitter.algebird.AveragedValue"
 
 # Averaged Value
 
-The `AveragedValue` data structure allows you to keep track of the count and mean of a stream of numbers with only one pass over the data.
+The `AveragedValue` data structure keeps track of the `count` and `mean` of a stream of numbers with a single pass over the data. The mean calculation uses a numerically stable online algorithm suitable for large numbers of records, similar to Chan et. al.'s [parallel variance algorithm on Wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm). As long as your count doesn't overflow a `Long`, the mean calculation won't overflow.
+
+You can build instances of `AveragedValue` from any numeric type:
+
+```tut:book
+import com.twitter.algebird._
+
+val longVal = AveragedValue(3L)
+val doubleVal = AveragedValue(12.0)
+val intVal = AveragedValue(15)
+```
 
 ## Algebraic Properties
 
-Here's a note on how to add them.
+Combining instances with `+` generates a new instance by adding the `count`s and averaging the `value`s:
 
-Stability... so the online algorithm here: <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm>
+```tut:book
+longVal + doubleVal
+longVal + doubleVal + intVal
+```
 
-is numerically stable when the counts are really unequal. "This algorithm is much less prone to loss of precision due to [catastrophic cancellation](https://en.wikipedia.org/wiki/Loss_of_significance)"
+`AveragedValue` is a commutative group. This means you can add instances in any order:
 
-This section on the parallel algorithm: <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm>
+```tut:book
+longVal + doubleVal == doubleVal + doubleVal
+```
 
-shows the actual algorithm that we use here.... BUT it's numerically unstable when the counts are close to each other and both large, because the numerical error in the difference of the means doesn't get scaled down. In such cases, says wiki, prefer the vanilla version. And that's exactly what we do.
+An `AveragedValue` with a count and value of `0` act as `Monoid.zero`:
 
-Also note that it's a group. You can subtract values, or negate the thing.
+```tut:book
+Monoid.zero[AveragedValue]
+longVal + Monoid.zero[AveragedValue] == longVal
+```
 
-### Notes
+Subtracting `AveragedValue`s is the opposite of addition:
 
-This means that for big data we won't overflow. If the right side is small, < 2^63 items, ie within a long, you'll use the special algo.
+```tut:book
+intVal - longVal
+intVal + doubleVal - doubleVal
+```
 
-If the numbers are roughly equal then you MIGHT get an overflow. But you're often not adding multiple enormous numbers (~2^62).
+### Stable Average Algorithm
 
-Numerically stable is key too.
+Each `AveragedValue` instance represents a stream of data. `AveragedValue` uses Chan et. al.'s [parallel algorithm](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm) to combine the mean values of each stream. Here's the calculation:
 
-## Usage Examples
+```scala
+// big and small are two AveragedValue instances
+val deltaOfMeans = big.value - small.value
+val newCount = big.count + small.count
+val newMean = small.value + deltaOfMeans * (big.count / newCount)
+```
 
-- plus, minus, negative
-- use it to fold a bunch of longs
-- show the aggregator
+As long as `newCount` stays within the bounds of `Long`, this calculation won't overflow for large `value`.
+
+The [Wikipedia presentation of this algorithm](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm) points out that if both streams are close in size, the algorithm is "prone to loss of precision due to [catastrophic cancellation](https://en.wikipedia.org/wiki/Loss_of_significance)".
+
+`AveragedValue` guards against this instability by taking a weighted average of the two instances if the smaller of the two has a count greater than `10%` of the combined count.
+
+```scala
+val newCount = big.count + small.count
+(big.count * big.value + small.count * small.value) / newCount
+```
+
+## Aggregator
+
+`AveragedValue.aggregator` returns an `Aggregator` that uses `AveragedValue` to calculate the mean of all `Double` values in a stream. For example:
+
+```tut:book
+val items = List[Double](1.0, 2.2, 3.3, 4.4, 5.5)
+AveragedValue.aggregator(items)
+```
+
+`AveragedValue.numericAggregator` works the same way for any numeric type:
+
+```tut:book
+val items = List[Int](1, 3, 5, 7)
+AveragedValue.numericAggregator[Int].apply(items)
+```
 
 ## Related Data Structures
 
-- decayedvalue
-- moments
+- [DecayedValue](decayed_value.html) calculates a decayed moving average of a stream; this allows you to approximate the mean of a bounded sliding window of the datastream.
+- In addition to count and mean, [Moments](five_moments.html) allows you to keep track of the standard deviation, skewness and kurtosis of a stream with one pass over the data.
 
 ### Links
 
