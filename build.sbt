@@ -216,6 +216,7 @@ lazy val algebirdTest = module("test").settings(
 ).dependsOn(algebirdCore)
 
 lazy val algebirdBenchmark = module("benchmark").settings(JmhPlugin.projectSettings:_*).settings(
+   coverageExcludedPackages := "com\\.twitter\\.algebird\\.benchmark.*",
    libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % bijectionVersion)
 ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile").enablePlugins(JmhPlugin)
 
