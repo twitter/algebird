@@ -1,12 +1,131 @@
 <html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><title>Algebird</title><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="Abstract Algebra for Scala." /><meta name="author" content="Algebird's contributors" /><meta name="og:image" content="/algebird/img/poster.png" /><meta name="og:title" content="Algebird" /><meta name="og:site_name" content="Algebird" /><meta name="og:url" content="http://twitter.github.io/algebird" /><meta name="og:type" content="website" /><meta name="og:description" content="Abstract Algebra for Scala." /><meta name="twitter:image" content="/algebird/img/poster.png" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="" /><link rel="icon" type="image/png" href="/algebird/img/favicon.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/algebird/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/algebird/css/style.css" /><link rel="stylesheet" href="/algebird/css/palette.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/algebird/" class="brand"><div class="brand-wrapper" style="background:url('/algebird/img/sidebar_brand.png') no-repeat"><span>Algebird</span></div></a></li> <li><a href="/algebird/datatypes.html" class="">Data Types</a></li> <li><a href="/algebird/datatypes/combinator.html" class="">Combinators</a> <ul class="sub_section"> <li><a href="/algebird/datatypes/combinator/collections.html" class="">Scala Collections</a></li> <li><a href="/algebird/datatypes/combinator/java_collections.html" class="">Java Collections</a></li> <li><a href="/algebird/datatypes/combinator/option_monoid.html" class="">Option Monoid</a></li> <li><a href="/algebird/datatypes/combinator/caseclass.html" class="">Case Class Algebra</a></li> <li><a href="/algebird/datatypes/combinator/cuber.html" class="">Cuber</a></li> <li><a href="/algebird/datatypes/combinator/roller.html" class="">Roller</a></li> <li><a href="/algebird/datatypes/combinator/eventually.html" class="">Eventually</a></li> <li><a href="/algebird/datatypes/combinator/priority.html" class="">Priority</a></li> <li><a href="/algebird/datatypes/combinator/product_algebra.html" class="">Product/Tuple Algebra</a></li> <li><a href="/algebird/datatypes/combinator/monoid_statistics.html" class="">Monoid Statistics</a></li></ul></li> <li><a href="/algebird/datatypes/approx.html" class="">Approximate Data Types</a> <ul class="sub_section"> <li><a href="/algebird/datatypes/approx/approximate.html" class="">Approximate</a></li> <li><a href="/algebird/datatypes/approx/bloom_filter.html" class="">Bloom Filter</a></li> <li><a href="/algebird/datatypes/approx/countminsketch.html" class="">Count Min Sketch</a></li> <li><a href="/algebird/datatypes/approx/exponential_histogram.html" class="">Exponential Histogram</a></li> <li><a href="/algebird/datatypes/approx/hyperloglog.html" class="">HyperLogLog</a></li> <li><a href="/algebird/datatypes/approx/hyperloglog_series.html" class="">HyperLogLog Series</a></li> <li><a href="/algebird/datatypes/approx/min_hasher.html" class="">MinHasher</a></li> <li><a href="/algebird/datatypes/approx/q_tree.html" class="">Q Tree</a></li> <li><a href="/algebird/datatypes/approx/space_saver.html" class="">SpaceSaver</a></li></ul></li> <li><a href="/algebird/datatypes/summer.html" class="">Summers</a> <ul class="sub_section"> <li><a href="/algebird/datatypes/summer/adaptive_cache.html" class="">AdaptiveCache</a></li> <li><a href="/algebird/datatypes/summer/batched.html" class="">Batched</a></li> <li><a href="/algebird/datatypes/summer/sum_all.html" class="">SumAll</a></li> <li><a href="/algebird/datatypes/summer/summingcache.html" class="">SummingCache</a></li> <li><a href="/algebird/datatypes/summer/summingiterator.html" class="">SummingIterator</a></li> <li><a href="/algebird/datatypes/summer/summingqueue.html" class="">SummingQueue</a></li></ul></li> <li><a href="/algebird/datatypes/min_and_max.html" class="">Ordered Semigroups</a> <ul class="sub_section"> <li><a href="/algebird/datatypes/first_and_last.html" class="">First and Last</a></li> <li><a href="/algebird/datatypes/min_and_max.html" class="">Min and Max</a></li></ul></li> <li><a href="/algebird/datatypes/adaptive_matrix.html" class="">Adaptive Matrix</a></li> <li><a href="/algebird/datatypes/adaptive_vector.html" class="">Adaptive Vector</a></li> <li><a href="/algebird/datatypes/affine_function.html" class="">Affine Function</a></li> <li><a href="/algebird/datatypes/averaged_value.html" class=" active ">Averaged Value</a></li> <li><a href="/algebird/datatypes/bytes.html" class="">Bytes</a></li> <li><a href="/algebird/datatypes/decayed_value.html" class="">Decayed Value</a></li> <li><a href="/algebird/datatypes/decayed_vector.html" class="">Decayed Vector</a></li> <li><a href="/algebird/datatypes/five_moments.html" class="">First Five Moments</a></li> <li><a href="/algebird/datatypes/gaussian_distribution.html" class="">Gaussian Distribution</a></li> <li><a href="/algebird/datatypes/interval.html" class="">Interval</a></li> <li><a href="/algebird/datatypes/min_plus_algebra.html" class="">Min Plus Algebra</a></li> <li><a href="/algebird/datatypes/reset_state.html" class="">ResetState</a></li> <li><a href="/algebird/datatypes/right_folded.html" class="">RightFolded</a></li> <li><a href="/algebird/datatypes/set_diff.html" class="">SetDiff</a></li> <li><a href="/algebird/datatypes/sgd.html" class="">Stochastic Gradient Descent</a></li> <li><a href="/algebird/datatypes/topk.html" class="">TopK</a></li>         </ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li class="hidden-xs"><a href="https://github.com/twitter/algebird"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li class="hidden-xs"><a href="https://github.com/twitter/algebird"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li><li><a href="#" onclick="shareSiteTwitter('Algebird Abstract Algebra for Scala.');"><i class="fa fa-twitter"></i></a></li><li><a href="#" onclick="shareSiteFacebook('Algebird Abstract Algebra for Scala.');"><i class="fa fa-facebook"></i></a></li><li><a href="#" onclick="shareSiteGoogle();"><i class="fa fa-google-plus"></i></a></li></ul></div></div></div></div><div id="content" data-github-owner="twitter" data-github-repo="algebird"><div class="content-wrapper"><section><h1 id="averaged-value">Averaged Value</h1>
 
-<h3 id="documentation-help">Documentation Help</h3>
+<p>The <code class="highlighter-rouge">AveragedValue</code> data structure keeps track of the <code class="highlighter-rouge">count</code> and <code class="highlighter-rouge">mean</code> of a stream of numbers with a single pass over the data. The mean calculation uses a numerically stable online algorithm suitable for large numbers of records, similar to Chan et. al.’s <a href="http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm">parallel variance algorithm on Wikipedia</a>. As long as your count doesn’t overflow a <code class="highlighter-rouge">Long</code>, the mean calculation won’t overflow.</p>
 
-<p>We’d love your help fleshing out this documentation! You can edit this page in your browser by clicking <a href="https://github.com/twitter/algebird/edit/develop/docs/src/main/tut/datatypes/averaged_value.md">this link</a>. These links might be helpful:</p>
+<p>You can build instances of <code class="highlighter-rouge">AveragedValue</code> from any numeric type:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">com.twitter.algebird._</span>
+<span class="c1">// import com.twitter.algebird._
+</span>
+<span class="k">val</span> <span class="n">longVal</span> <span class="k">=</span> <span class="nc">AveragedValue</span><span class="o">(</span><span class="mi">3L</span><span class="o">)</span>
+<span class="c1">// longVal: com.twitter.algebird.AveragedValue = AveragedValue(1,3.0)
+</span>
+<span class="k">val</span> <span class="n">doubleVal</span> <span class="k">=</span> <span class="nc">AveragedValue</span><span class="o">(</span><span class="mf">12.0</span><span class="o">)</span>
+<span class="c1">// doubleVal: com.twitter.algebird.AveragedValue = AveragedValue(1,12.0)
+</span>
+<span class="k">val</span> <span class="n">intVal</span> <span class="k">=</span> <span class="nc">AveragedValue</span><span class="o">(</span><span class="mi">15</span><span class="o">)</span>
+<span class="c1">// intVal: com.twitter.algebird.AveragedValue = AveragedValue(1,15.0)
+</span></code></pre>
+</div>
+
+<h2 id="algebraic-properties">Algebraic Properties</h2>
+
+<p>Combining instances with <code class="highlighter-rouge">+</code> generates a new instance by adding the <code class="highlighter-rouge">count</code>s and averaging the <code class="highlighter-rouge">value</code>s:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">longVal</span> <span class="o">+</span> <span class="n">doubleVal</span>
+<span class="c1">// res0: com.twitter.algebird.AveragedValue = AveragedValue(2,7.5)
+</span>
+<span class="n">longVal</span> <span class="o">+</span> <span class="n">doubleVal</span> <span class="o">+</span> <span class="n">intVal</span>
+<span class="c1">// res1: com.twitter.algebird.AveragedValue = AveragedValue(3,10.0)
+</span></code></pre>
+</div>
+
+<p>You can also add numbers directly to an <code class="highlighter-rouge">AveragedValue</code> instance:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">longVal</span> <span class="o">+</span> <span class="mi">12</span>
+<span class="c1">// res2: com.twitter.algebird.AveragedValue = AveragedValue(2,7.5)
+</span></code></pre>
+</div>
+
+<p><code class="highlighter-rouge">AveragedValue</code> is a commutative group. This means you can add instances in any order:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">longVal</span> <span class="o">+</span> <span class="n">doubleVal</span> <span class="o">==</span> <span class="n">doubleVal</span> <span class="o">+</span> <span class="n">doubleVal</span>
+<span class="c1">// res3: Boolean = false
+</span></code></pre>
+</div>
+
+<p>An <code class="highlighter-rouge">AveragedValue</code> with a count and value of <code class="highlighter-rouge">0</code> act as <code class="highlighter-rouge">Monoid.zero</code>:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="nc">Monoid</span><span class="o">.</span><span class="n">zero</span><span class="o">[</span><span class="kt">AveragedValue</span><span class="o">]</span>
+<span class="c1">// res4: com.twitter.algebird.AveragedValue = AveragedValue(0,0.0)
+</span>
+<span class="n">longVal</span> <span class="o">+</span> <span class="nc">Monoid</span><span class="o">.</span><span class="n">zero</span><span class="o">[</span><span class="kt">AveragedValue</span><span class="o">]</span> <span class="o">==</span> <span class="n">longVal</span>
+<span class="c1">// res5: Boolean = true
+</span></code></pre>
+</div>
+
+<p>Subtracting <code class="highlighter-rouge">AveragedValue</code>s is the opposite of addition:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">intVal</span> <span class="o">-</span> <span class="n">longVal</span>
+<span class="c1">// res6: com.twitter.algebird.AveragedValue = AveragedValue(0,0.0)
+</span>
+<span class="n">intVal</span> <span class="o">+</span> <span class="n">doubleVal</span> <span class="o">-</span> <span class="n">doubleVal</span>
+<span class="c1">// res7: com.twitter.algebird.AveragedValue = AveragedValue(1,15.0)
+</span></code></pre>
+</div>
+
+<h3 id="stable-average-algorithm">Stable Average Algorithm</h3>
+
+<p>Each <code class="highlighter-rouge">AveragedValue</code> instance represents a stream of data. <code class="highlighter-rouge">AveragedValue</code> uses Chan et. al.’s <a href="http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm">parallel algorithm</a> to combine the mean values of each stream. Here’s the calculation:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="c1">// big and small are two AveragedValue instances
+</span><span class="k">val</span> <span class="n">deltaOfMeans</span> <span class="k">=</span> <span class="n">big</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">small</span><span class="o">.</span><span class="n">value</span>
+<span class="k">val</span> <span class="n">newCount</span> <span class="k">=</span> <span class="n">big</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="n">small</span><span class="o">.</span><span class="n">count</span>
+<span class="k">val</span> <span class="n">newMean</span> <span class="k">=</span> <span class="n">small</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">deltaOfMeans</span> <span class="o">*</span> <span class="o">(</span><span class="n">big</span><span class="o">.</span><span class="n">count</span> <span class="o">/</span> <span class="n">newCount</span><span class="o">)</span>
+</code></pre>
+</div>
+
+<p>As long as <code class="highlighter-rouge">newCount</code> stays within the bounds of <code class="highlighter-rouge">Long</code>, this calculation won’t overflow for large <code class="highlighter-rouge">value</code>.</p>
+
+<p>The <a href="http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm">Wikipedia presentation of this algorithm</a> points out that if both streams are close in size, the algorithm is “prone to loss of precision due to <a href="https://en.wikipedia.org/wiki/Loss_of_significance">catastrophic cancellation</a>”.</p>
+
+<p><code class="highlighter-rouge">AveragedValue</code> guards against this instability by taking a weighted average of the two instances if the smaller of the two has a count greater than <code class="highlighter-rouge">10%</code> of the combined count.</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">newCount</span> <span class="k">=</span> <span class="n">big</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="n">small</span><span class="o">.</span><span class="n">count</span>
+<span class="o">(</span><span class="n">big</span><span class="o">.</span><span class="n">count</span> <span class="o">*</span> <span class="n">big</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">small</span><span class="o">.</span><span class="n">count</span> <span class="o">*</span> <span class="n">small</span><span class="o">.</span><span class="n">value</span><span class="o">)</span> <span class="o">/</span> <span class="n">newCount</span>
+</code></pre>
+</div>
+
+<h2 id="aggregator">Aggregator</h2>
+
+<p><code class="highlighter-rouge">AveragedValue.aggregator</code> returns an <code class="highlighter-rouge">Aggregator</code> that uses <code class="highlighter-rouge">AveragedValue</code> to calculate the mean of all <code class="highlighter-rouge">Double</code> values in a stream. For example:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="nc">List</span><span class="o">[</span><span class="kt">Double</span><span class="o">](</span><span class="mf">1.0</span><span class="o">,</span> <span class="mf">2.2</span><span class="o">,</span> <span class="mf">3.3</span><span class="o">,</span> <span class="mf">4.4</span><span class="o">,</span> <span class="mf">5.5</span><span class="o">)</span>
+<span class="c1">// items: List[Double] = List(1.0, 2.2, 3.3, 4.4, 5.5)
+</span>
+<span class="nc">AveragedValue</span><span class="o">.</span><span class="n">aggregator</span><span class="o">(</span><span class="n">items</span><span class="o">)</span>
+<span class="c1">// res8: Double = 3.28
+</span></code></pre>
+</div>
+
+<p><code class="highlighter-rouge">AveragedValue.numericAggregator</code> works the same way for any numeric type:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="nc">List</span><span class="o">[</span><span class="kt">Int</span><span class="o">](</span><span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">7</span><span class="o">)</span>
+<span class="c1">// items: List[Int] = List(1, 3, 5, 7)
+</span>
+<span class="nc">AveragedValue</span><span class="o">.</span><span class="n">numericAggregator</span><span class="o">[</span><span class="kt">Int</span><span class="o">].</span><span class="n">apply</span><span class="o">(</span><span class="n">items</span><span class="o">)</span>
+<span class="c1">// res9: Double = 4.0
+</span></code></pre>
+</div>
+
+<h2 id="related-data-structures">Related Data Structures</h2>
 
 <ul>
-  <li><a href="https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala">AveragedValue.scala</a></li>
+  <li><a href="decayed_value.html">DecayedValue</a> calculates a decayed moving average of a stream; this allows you to approximate the mean of a bounded sliding window of the datastream.</li>
+  <li>In addition to count and mean, <a href="five_moments.html">Moments</a> allows you to keep track of the standard deviation, skewness and kurtosis of a stream with one pass over the data.</li>
 </ul>
+
+<h3 id="links">Links</h3>
+
+<ul>
+  <li>Source: <a href="https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala">AveragedValue.scala</a></li>
+  <li>Tests: <a href="https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/AveragedValueLaws.scala">AveragedValueLaws.scala</a></li>
+  <li>Scaladoc: <a href="/algebird/api#com.twitter.algebird.AveragedValue">AveragedValue</a></li>
+</ul>
+
+<h3 id="documentation-help">Documentation Help</h3>
+
+<p>We’d love your help fleshing out this documentation! You can edit this page in your browser by clicking <a href="https://github.com/twitter/algebird/edit/develop/docs/src/main/tut/datatypes/averaged_value.md">this link</a>.</p>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/algebird/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });

@@ -472,7 +472,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Product6Semigroup.html" class="extype" name="com.twitter.algebird.Product6Semigroup">Product6Semigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Combines two <code>T</code> instances associatively.</p><div class="fullcomment"><div class="comment cmt"><p>Combines two <code>T</code> instances associatively.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>result of combining <code>l</code> and <code>r</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Product6Semigroup.html" class="extype" name="com.twitter.algebird.Product6Semigroup">Product6Semigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
     </li><li name="com.twitter.algebird.Monoid#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="sum(vs:TraversableOnce[T]):T"></a>
       <a id="sum(TraversableOnce[X]):X"></a>
@@ -490,8 +491,8 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
-    </li><li name="com.twitter.algebird.Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="sumOption(iter:TraversableOnce[T]):Option[T]"></a>
+    </li><li name="com.twitter.algebird.Product6Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sumOption(to:TraversableOnce[X]):Option[X]"></a>
       <a id="sumOption(TraversableOnce[X]):Option[X]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -499,16 +500,19 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">sumOption</span><span class="params">(<span name="iter">iter: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.Product6Group.X">X</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.Product6Group.X">X</span>]</span>
+        <span class="name">sumOption</span><span class="params">(<span name="to">to: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<span class="extype" name="com.twitter.algebird.Product6Group.X">X</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="com.twitter.algebird.Product6Group.X">X</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Product6Group@sumOption(iter:TraversableOnce[T]):Option[T]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Product6Group@sumOption(to:TraversableOnce[X]):Option[X]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass. Returns <code>None</code> if <code>iter</code> is empty, else
+<code>Some[T]</code>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>None</code> if <code>iter</code> is empty, else an option value containing the summed <code>T</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Product6Semigroup.html" class="extype" name="com.twitter.algebird.Product6Semigroup">Product6Semigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd><dt>Note</dt><dd><span class="cmt"><p>Override if there is a faster way to compute this sum than
+      <code>iter.reduceLeftOption</code> using <a href="Product6Semigroup.html#plus(l:X,r:X):X" class="extmbr" name="com.twitter.algebird.Product6Semigroup#plus">plus</a>.</p></span></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -628,7 +632,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Product6Monoid.html" class="extype" name="com.twitter.algebird.Product6Monoid">Product6Monoid</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns the identity element of <code>T</code> for <a href="Product6Monoid.html#plus(l:X,r:X):X" class="extmbr" name="com.twitter.algebird.Product6Monoid#plus">plus</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Returns the identity element of <code>T</code> for <a href="Product6Monoid.html#plus(l:X,r:X):X" class="extmbr" name="com.twitter.algebird.Product6Monoid#plus">plus</a>.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Product6Monoid.html" class="extype" name="com.twitter.algebird.Product6Monoid">Product6Monoid</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
     </li></ol>
             </div>
 

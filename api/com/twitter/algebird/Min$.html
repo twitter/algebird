@@ -47,13 +47,15 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Min</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Min</span><span class="result"> extends <span class="extype" name="com.twitter.algebird.MinInstances">MinInstances</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/OrderedSemigroup.scala" target="_blank">OrderedSemigroup.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a set of operations and typeclass instances needed to use
+<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a> instances.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Min.scala" target="_blank">Min.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="com.twitter.algebird.MinInstances">MinInstances</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -71,7 +73,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.Min"><span>Min</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.Min"><span>Min</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="com.twitter.algebird.MinInstances"><span>MinInstances</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -163,7 +165,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that selects the minimum instance of an
+ordered type <code>T</code> in the aggregated stream.</p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -204,7 +207,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.twitter.algebird.Min#doubleMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MinInstances#doubleMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="doubleMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Min[Double]]"></a>
       <a id="doubleMonoid:Monoid[Min[Double]]"></a>
       <h4 class="signature">
@@ -220,7 +223,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Double] with <code>zero == Double.MaxValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Double] with <code>zero == Double.MaxValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -255,6 +258,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MinInstances#equiv" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equiv[T](impliciteq:Equiv[T]):Equiv[com.twitter.algebird.Min[T]]"></a>
+      <a id="equiv[T](Equiv[T]):Equiv[Min[T]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="eq">eq: <span class="extype" name="scala.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.MinInstances.equiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Equiv">Equiv</span>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.MinInstances.equiv.T">T</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Min$@equiv[T](impliciteq:Equiv[T]):Equiv[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -278,7 +298,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.twitter.algebird.Min#floatMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MinInstances#floatMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="floatMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Min[Float]]"></a>
       <a id="floatMonoid:Monoid[Min[Float]]"></a>
       <h4 class="signature">
@@ -294,7 +314,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Float] with <code>zero == Float.MaxValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Float] with <code>zero == Float.MaxValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -329,7 +349,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.Min#intMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MinInstances#intMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="intMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Min[Int]]"></a>
       <a id="intMonoid:Monoid[Min[Int]]"></a>
       <h4 class="signature">
@@ -345,7 +365,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Int] with <code>zero == Int.MaxValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Int] with <code>zero == Int.MaxValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -363,7 +383,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.Min#longMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MinInstances#longMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="longMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Min[Long]]"></a>
       <a id="longMonoid:Monoid[Min[Long]]"></a>
       <h4 class="signature">
@@ -379,9 +399,27 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.Min#monoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="monoid[T](zero:=&gt;T)(implicitord:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Min[T]]"></a>
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Long] with <code>zero == Long.MaxValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[Long] with <code>zero == Long.MaxValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.Min#minSemigroup" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="minSemigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[T]"></a>
+      <a id="minSemigroup[T](Ordering[T]):Semigroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">minSemigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Min.minSemigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.Min.minSemigroup.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Min$@minSemigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance with a <code>plus</code> implementation
+that always returns the minimum <code>T</code> argument.</p>
+    </li><li name="com.twitter.algebird.MinInstances#monoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monoid[T](zero:=&gt;T)(implicitevidence$2:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Min[T]]"></a>
       <a id="monoid[T](⇒T)(Ordering[T]):Monoid[Min[T]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -389,14 +427,17 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">monoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="zero">zero: ⇒ <span class="extype" name="com.twitter.algebird.Min.monoid.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Min.monoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.monoid.T">T</span>]]</span>
+        <span class="name">monoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="zero">zero: ⇒ <span class="extype" name="com.twitter.algebird.MinInstances.monoid.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MinInstances.monoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.MinInstances.monoid.T">T</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Min$@monoid[T](zero:=&gt;T)(implicitord:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Min$@monoid[T](zero:=&gt;T)(implicitevidence$2:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[T] that combines
+instances using <a href="Min.html#min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" class="extmbr" name="com.twitter.algebird.Min#min">Min.min</a> and uses <code>zero</code> for its identity.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[T] that combines
+instances using <a href="Min.html#min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" class="extmbr" name="com.twitter.algebird.Min#min">Min.min</a> and uses <code>zero</code> for its identity.
+</p></div><dl class="paramcmts block"><dt class="param">zero</dt><dd class="cmt"><p>identity of the returned <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd><dt>Note</dt><dd><span class="cmt"><p><code>zero</code> must be <code>&gt;=</code> every element of <code>T</code> for the returned instance to be lawful.</p></span></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -448,8 +489,25 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.Min#semigroup" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Min[T]]"></a>
+    </li><li name="com.twitter.algebird.MinInstances#ordering" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ordering[T](implicitevidence$1:Ordering[T]):Ordering[com.twitter.algebird.Min[T]]"></a>
+      <a id="ordering[T](Ordering[T]):Ordering[Min[T]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ordering</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MinInstances.ordering.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Ordering">Ordering</span>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.MinInstances.ordering.T">T</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Min$@ordering[T](implicitevidence$1:Ordering[T]):Ordering[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.MinInstances#semigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroup[T](implicitevidence$3:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Min[T]]"></a>
       <a id="semigroup[T](Ordering[T]):Semigroup[Min[T]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -457,14 +515,16 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">semigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Min.semigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.semigroup.T">T</span>]]</span>
+        <span class="name">semigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MinInstances.semigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.MinInstances.semigroup.T">T</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Min$@semigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Min$@semigroup[T](implicitevidence$3:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Min[T]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[T].</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance for <a href="Min.html" class="extype" name="com.twitter.algebird.Min">Min</a>[T]. The <code>plus</code>
+implementation always returns the minimum <code>Min[T]</code> argument.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MinInstances</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -581,6 +641,8 @@
               <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="com.twitter.algebird.MinInstances">
+              <h3>Inherited from <span class="extype" name="com.twitter.algebird.MinInstances">MinInstances</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

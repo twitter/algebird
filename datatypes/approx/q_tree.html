@@ -73,7 +73,7 @@ For instance, <code class="highlighter-rouge">qtree.rangeCountBounds(0.5, 2.5)</
 <span class="c1">// seqQTree: List[com.twitter.algebird.QTree[Long]] = List((1,0,1,1,None,None), (1,0,1,1,None,None), (2,0,1,2,None,None), (2,0,1,2,None,None), (3,0,1,3,None,None), (3,0,1,3,None,None), (4,0,1,4,None,None), (4,0,1,4,None,None), (5,0,1,5,None,None), (5,0,1,5,None,None), (6,0,1,6,None,None), (6,0,1,6,None,None), (7,0,1,7,None,None), (7,0,1,7,None,None), (8,0,1,8,None,None), (8,0,1,8,None,None))
 </span>
 <span class="k">val</span> <span class="n">qtSemigroup</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">QTreeSemigroup</span><span class="o">[</span><span class="kt">Long</span><span class="o">](</span><span class="mi">6</span><span class="o">)</span>
-<span class="c1">// qtSemigroup: com.twitter.algebird.QTreeSemigroup[Long] = com.twitter.algebird.QTreeSemigroup@5b589c7a
+<span class="c1">// qtSemigroup: com.twitter.algebird.QTreeSemigroup[Long] = com.twitter.algebird.QTreeSemigroup@7a9a2a9b
 </span>
 <span class="k">val</span> <span class="n">sum</span> <span class="k">=</span> <span class="n">qtSemigroup</span><span class="o">.</span><span class="n">sumOption</span><span class="o">(</span><span class="n">seqQTree</span><span class="o">).</span><span class="n">get</span>
 <span class="c1">// sum: com.twitter.algebird.QTree[Long] = (0,4,16,0,Some((0,3,14,0,Some((0,2,6,0,Some((0,1,2,0,None,Some((1,0,2,2,None,None)))),Some((1,1,4,0,Some((2,0,2,4,None,None)),Some((3,0,2,6,None,None)))))),Some((1,2,8,0,Some((2,1,4,0,Some((4,0,2,8,None,None)),Some((5,0,2,10,None,None)))),Some((3,1,4,0,Some((6,0,2,12,None,None)),Some((7,0,2,14,None,None)))))))),Some((1,3,2,0,Some((2,2,2,0,Some((4,1,2,0,Some((8,0,2,16,None,None)),None)),None)),None)))

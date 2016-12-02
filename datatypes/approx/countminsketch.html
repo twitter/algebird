@@ -23,7 +23,7 @@
 <span class="c1">// HEAVY_HITTERS_PCT: Double = 0.01
 </span>
 <span class="k">val</span> <span class="nc">CMS_MONOID</span> <span class="k">=</span> <span class="nc">TopPctCMS</span><span class="o">.</span><span class="n">monoid</span><span class="o">[</span><span class="kt">Long</span><span class="o">](</span><span class="nc">EPS</span><span class="o">,</span> <span class="nc">DELTA</span><span class="o">,</span> <span class="nc">SEED</span><span class="o">,</span> <span class="nc">HEAVY_HITTERS_PCT</span><span class="o">)</span>
-<span class="c1">// CMS_MONOID: com.twitter.algebird.TopPctCMSMonoid[Long] = com.twitter.algebird.TopPctCMSMonoid@17c83a15
+<span class="c1">// CMS_MONOID: com.twitter.algebird.TopPctCMSMonoid[Long] = com.twitter.algebird.TopPctCMSMonoid@1ba0d98d
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1L</span><span class="o">,</span> <span class="mi">1L</span><span class="o">,</span> <span class="mi">3L</span><span class="o">,</span> <span class="mi">4L</span><span class="o">,</span> <span class="mi">5L</span><span class="o">)</span>
 <span class="c1">// data: List[Long] = List(1, 1, 3, 4, 5)
@@ -85,7 +85,7 @@
 <span class="c1">// PARAMS: com.twitter.algebird.SketchMapParams[String] = SketchMapParams(1,2719,19,10)
 </span>
 <span class="k">val</span> <span class="nc">MONOID</span> <span class="k">=</span> <span class="nc">SketchMap</span><span class="o">.</span><span class="n">monoid</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Long</span><span class="o">](</span><span class="nc">PARAMS</span><span class="o">)</span>
-<span class="c1">// MONOID: com.twitter.algebird.SketchMapMonoid[String,Long] = com.twitter.algebird.SketchMapMonoid@cd20c04
+<span class="c1">// MONOID: com.twitter.algebird.SketchMapMonoid[String,Long] = com.twitter.algebird.SketchMapMonoid@61ec1133
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span> <span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">),</span> <span class="o">(</span><span class="s">"3"</span><span class="o">,</span> <span class="mi">2L</span><span class="o">),</span> <span class="o">(</span><span class="s">"4"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">),</span> <span class="o">(</span><span class="s">"5"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">)</span> <span class="o">)</span>
 <span class="c1">// data: List[(String, Long)] = List((1,1), (3,2), (4,1), (5,1))

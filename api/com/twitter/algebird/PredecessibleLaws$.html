@@ -49,7 +49,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-test/src/main/scala/com/twitter/algebird/SucPredLaws.scala" target="_blank">SucPredLaws.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-test/src/main/scala/com/twitter/algebird/PredecessibleLaws.scala" target="_blank">PredecessibleLaws.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -294,7 +294,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.twitter.algebird.PredecessibleLaws#iteratePrevDecreases" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="iteratePrevDecreases[T](t:T,size:Short)(implicitevidence$6:com.twitter.algebird.Predecessible[T]):Boolean"></a>
+      <a id="iteratePrevDecreases[T](t:T,size:Short)(implicitevidence$2:com.twitter.algebird.Predecessible[T]):Boolean"></a>
       <a id="iteratePrevDecreases[T](T,Short)(Predecessible[T]):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -305,13 +305,13 @@
         <span class="name">iteratePrevDecreases</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="com.twitter.algebird.PredecessibleLaws.iteratePrevDecreases.T">T</span></span>, <span name="size">size: <span class="extype" name="scala.Short">Short</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Predecessible.html" class="extype" name="com.twitter.algebird.Predecessible">Predecessible</a>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.iteratePrevDecreases.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@iteratePrevDecreases[T](t:T,size:Short)(implicitevidence$6:com.twitter.algebird.Predecessible[T]):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@iteratePrevDecreases[T](t:T,size:Short)(implicitevidence$2:com.twitter.algebird.Predecessible[T]):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.PredecessibleLaws#law" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="law[T](t:T)(implicitevidence$5:com.twitter.algebird.Predecessible[T]):Boolean"></a>
+      <a id="law[T](t:T)(implicitevidence$1:com.twitter.algebird.Predecessible[T]):Boolean"></a>
       <a id="law[T](T)(Predecessible[T]):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -322,7 +322,7 @@
         <span class="name">law</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="com.twitter.algebird.PredecessibleLaws.law.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Predecessible.html" class="extype" name="com.twitter.algebird.Predecessible">Predecessible</a>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.law.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@law[T](t:T)(implicitevidence$5:com.twitter.algebird.Predecessible[T]):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@law[T](t:T)(implicitevidence$1:com.twitter.algebird.Predecessible[T]):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -378,26 +378,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.PredecessibleLaws#predessibleLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="predessibleLaws[T](implicitevidence$7:com.twitter.algebird.Predecessible[T],implicitevidence$8:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="predessibleLaws[T](Predecessible[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.PredecessibleLaws#predecessibleLaws" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predecessibleLaws[T](implicitevidence$3:com.twitter.algebird.Predecessible[T],implicitevidence$4:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="predecessibleLaws[T](Predecessible[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">predessibleLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Predecessible.html" class="extype" name="com.twitter.algebird.Predecessible">Predecessible</a>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predessibleLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predessibleLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">predecessibleLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Predecessible.html" class="extype" name="com.twitter.algebird.Predecessible">Predecessible</a>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predecessibleLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predecessibleLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@predessibleLaws[T](implicitevidence$7:com.twitter.algebird.Predecessible[T],implicitevidence$8:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@predecessibleLaws[T](implicitevidence$3:com.twitter.algebird.Predecessible[T],implicitevidence$4:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Use this to test your implementations:
-property(&quot;My succ&quot;) {
-predessibleLaws[MyType]
-}</p>
+      <p class="shortcomment cmt">Use this to test your implementations:</p><div class="fullcomment"><div class="comment cmt"><p>Use this to test your implementations:</p><pre>property(<span class="lit">"blah is predecessible"</span>) { predecessibleLaws[MyType] }</pre></div></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -506,7 +503,30 @@ predessibleLaws[MyType]
 
         
 
-        
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="com.twitter.algebird.PredecessibleLaws#predessibleLaws" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predessibleLaws[T](implicitevidence$5:com.twitter.algebird.Predecessible[T],implicitevidence$6:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="predessibleLaws[T](Predecessible[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) Deprecated in favor of predecessibleLaws.">predessibleLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Predecessible.html" class="extype" name="com.twitter.algebird.Predecessible">Predecessible</a>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predessibleLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.PredecessibleLaws.predessibleLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.PredecessibleLaws$@predessibleLaws[T](implicitevidence$5:com.twitter.algebird.Predecessible[T],implicitevidence$6:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> Deprecated in favor of predecessibleLaws.</p></dd></dl></div>
+    </li></ol>
+            </div>
         </div>
 
         <div id="inheritedMembers">

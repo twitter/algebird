@@ -51,7 +51,13 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Tracks the count and mean value of Doubles in a data stream.</p><p>Adding two instances of <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> with <a href="#+[N](that:N)(implicitnum:Numeric[N]):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedValue#+">+</a>
+is equivalent to taking an average of the two streams, with each
+stream weighted by its count.</p><p>The mean calculation uses a numerically stable online algorithm
+suitable for large numbers of records, similar to Chan et. al.'s
+<a href="http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm" target="_blank">parallel variance algorithm on Wikipedia</a>. As long as your count
+doesn't overflow a Long, the mean calculation won't overflow.
+</p></div><dl class="paramcmts block"><dt class="param">count</dt><dd class="cmt"><p>the number of aggregated items</p></dd><dt class="param">value</dt><dd class="cmt"><p>the average value of all aggregated items</p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="MomentsGroup$.html#getCombinedMean(n:Long,an:Double,k:Long,ak:Double):Double" class="extmbr" name="com.twitter.algebird.MomentsGroup#getCombinedMean">MomentsGroup.getCombinedMean</a> for implementation of <a href="#+[N](that:N)(implicitnum:Numeric[N]):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedValue#+">+</a></p></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
@@ -93,7 +99,7 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.twitter.algebird.AveragedValue#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.twitter.algebird.AveragedValue#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(count:Long,value:Double):com.twitter.algebird.AveragedValue"></a>
       <a id="&lt;init&gt;:AveragedValue"></a>
       <h4 class="signature">
@@ -109,7 +115,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">count</dt><dd class="cmt"><p>the number of aggregated items</p></dd><dt class="param">value</dt><dd class="cmt"><p>the average value of all aggregated items</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -153,6 +159,81 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+[N](that:N)(implicitnum:Numeric[N]):com.twitter.algebird.AveragedValue"></a>
+      <a id="+[N](N)(Numeric[N]):AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="N">N</span>]</span><span class="params">(<span name="that">that: <span class="extype" name="com.twitter.algebird.AveragedValue.+.N">N</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="num">num: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="com.twitter.algebird.AveragedValue.+.N">N</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.AveragedValue@+[N](that:N)(implicitnum:Numeric[N]):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a new instance that averages <code>that</code> into this instance.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a new instance that averages <code>that</code> into this instance.
+</p></div><dl class="paramcmts block"><dt class="param">that</dt><dd class="cmt"><p>value to average into this instance</p></dd><dt>returns</dt><dd class="cmt"><p>an instance representing the mean of this instance and <code>that</code>.</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+(that:Double):com.twitter.algebird.AveragedValue"></a>
+      <a id="+(Double):AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="params">(<span name="that">that: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.AveragedValue@+(that:Double):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a new instance that averages <code>that</code> into this instance.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a new instance that averages <code>that</code> into this instance.
+</p></div><dl class="paramcmts block"><dt class="param">that</dt><dd class="cmt"><p>value to average into this instance</p></dd><dt>returns</dt><dd class="cmt"><p>an instance representing the mean of this instance and <code>that</code>.</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+(r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue"></a>
+      <a id="+(AveragedValue):AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="params">(<span name="r">r: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.AveragedValue@+(r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Averages this instance with another <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instance.</p><div class="fullcomment"><div class="comment cmt"><p>Averages this instance with another <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instance.</p></div><dl class="paramcmts block"><dt class="param">r</dt><dd class="cmt"><p>the other instance</p></dd><dt>returns</dt><dd class="cmt"><p>an instance representing the mean of this instance and <code>r</code>.</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="-(r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue"></a>
+      <a id="-(AveragedValue):AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $minus" class="name">-</span><span class="params">(<span name="r">r: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.AveragedValue@-(r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Averages this instance with the *opposite* of the supplied
+<a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instance, effectively subtracting out that
+instance's contribution to the mean.</p><div class="fullcomment"><div class="comment cmt"><p>Averages this instance with the *opposite* of the supplied
+<a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instance, effectively subtracting out that
+instance's contribution to the mean.
+</p></div><dl class="paramcmts block"><dt class="param">r</dt><dd class="cmt"><p>the instance to subtract</p></dd><dt>returns</dt><dd class="cmt"><p>an instance with <code>r</code>'s stream subtracted out</p></dd></dl></div>
     </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -226,7 +307,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">the number of aggregated items</p>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -369,6 +450,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#unary_-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unary_-:com.twitter.algebird.AveragedValue"></a>
+      <a id="unary_-:AveragedValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: unary_$minus" class="name">unary_-</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.AveragedValue@unary_-:com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a copy of this instance with a negative value.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a copy of this instance with a negative value. Note that</p><pre>a + -b == a - b</pre></div></div>
     </li><li name="com.twitter.algebird.AveragedValue#value" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="value:Double"></a>
       <a id="value:Double"></a>
@@ -385,7 +483,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">the average value of all aggregated items</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

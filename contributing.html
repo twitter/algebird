@@ -13,6 +13,44 @@
 
 <p>Submit pull requests against the <code class="highlighter-rouge">develop</code> branch. Try not to pollute your pull request with unintended changes. Keep it simple and small.</p>
 
+<h2 id="contributing-tests">Contributing Tests</h2>
+
+<p>All tests go into the test directory of the <code class="highlighter-rouge">algebird-test</code> subproject. This is because Algebird publishes a module of helpful functions and Scalacheck laws that anyone can use to test the algebraic properties of their own data structures.</p>
+
+<p>We don’t have strong conventions around our tests, but here are a few guidelines that will help both for contributing, and when trying to find tests for existing data structures.</p>
+
+<h3 id="scalacheck-properties">Scalacheck Properties</h3>
+
+<p>If you’re adding <a href="https://scalacheck.org/">scalacheck</a> properties, make a new class that extends <code class="highlighter-rouge">com.twitter.algebird.CheckProperties</code>. Here’s an example of a new file of tests:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">package</span> <span class="nn">com.twitter.algebird</span>
+
+<span class="k">import</span> <span class="nn">org.scalacheck.Prop</span>
+
+<span class="k">class</span> <span class="nc">MaxLaws</span> <span class="k">extends</span> <span class="nc">CheckProperties</span> <span class="o">{</span>
+  <span class="n">property</span><span class="o">(</span><span class="s">"test description"</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Any instance of Prop will work.
+</span>    <span class="nc">Prop</span><span class="o">.</span><span class="n">forAll</span> <span class="o">{</span> <span class="n">x</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=&gt;</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">x</span> <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="c1">// Prop instances defined elsewhere work too:
+</span>  <span class="n">property</span><span class="o">(</span><span class="s">"Max[Long] is a commutative monoid"</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">BaseProperties</span><span class="o">.</span><span class="n">commutativeMonoidLaws</span><span class="o">[</span><span class="kt">Max</span><span class="o">[</span><span class="kt">Long</span><span class="o">]]</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<h3 id="scalatest">Scalatest</h3>
+
+<p>We use <a href="http://www.scalatest.org/">scalatest</a> for all of our other tests. <a href="https://github.com/twitter/algebird/blob/1520068ae296d65ce3c4af7a0dc40137349f76f0/algebird-test/src/test/scala/com/twitter/algebird/OperatorTest.scala#L7">OperatorTest.scala</a> provides a nice example of this style of testing.</p>
+
+<h3 id="what-need-testing-the-most">What need testing the most?</h3>
+
+<p>The best way to figure out where we need tests is to look at our <a href="https://codecov.io/github/twitter/algebird">Codecov coverage report</a>. Codecov has an incredible <a href="http://docs.codecov.io/docs/browser-extension">browser extension</a> that will embed coverage information right into the GitHub file browsing UI.</p>
+
+<p>Once you’ve got the extension installed, navigate to the <a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird">algebird-core index</a> to see file-by-file coverage percentages. Inside each file, lines that aren’t covered by tests will be highlighted red.</p>
+
 <h2 id="contributing-documentation">Contributing Documentation</h2>
 
 <p>The documentation for Algebird’s website is stored in the <code class="highlighter-rouge">docs/src/main/tut</code> directory of the <a href="https://github.com/twitter/algebird/tree/develop/docs">docs subproject</a>.</p>
@@ -89,7 +127,7 @@ gem install jekyll
 
 <p>(Other changes may be necessary, especially for large releases.)</p>
 
-<p>You can get a list of changes between release tags <code class="highlighter-rouge">v0.1.2</code> and <code class="highlighter-rouge">v0.2.0</code> via <code class="highlighter-rouge">git log v0.1.2..v0.2.0</code>. Scanning this list of commit messages is a good way to get a summary of what happened, although it does not account for conversations that occured on Github.</p>
+<p>You can get a list of changes between release tags <code class="highlighter-rouge">v0.1.2</code> and <code class="highlighter-rouge">v0.2.0</code> via <code class="highlighter-rouge">git log v0.1.2..v0.2.0</code>. Scanning this list of commit messages is a good way to get a summary of what happened, although it does not account for conversations that occured on Github. (You can see the same view on the Github UI by navigating to <a href="https://github.com/twitter/algebird/compare/v0.1.2...v0.2.0">https://github.com/twitter/algebird/compare/v0.1.2...v0.2.0</a>.)</p>
 
 <p>Once the relevant documentation changes have been committed, new <a href="https://github.com/twitter/algebird/releases">release notes</a> should be added. You can add a release by clicking the “Draft a new release” button on that page, or if the relevant release already exists, you can click “Edit release”.</p>
 

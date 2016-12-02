@@ -51,7 +51,9 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a set of operations needed to create and use
+<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instances.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -147,7 +149,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.AveragedValue#aggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.AveragedValue#aggregator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="aggregator:com.twitter.algebird.Aggregator[Double,com.twitter.algebird.AveragedValue,Double]"></a>
       <a id="aggregator:Aggregator[Double,AveragedValue,Double]"></a>
       <h4 class="signature">
@@ -163,8 +165,12 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.AveragedValue#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that uses <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> to
+calculate the mean of all <code>Double</code> values in the stream.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that uses <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> to
+calculate the mean of all <code>Double</code> values in the stream. Each
+Double value receives a count of 1 during aggregation.
+</p></div></div>
+    </li><li name="com.twitter.algebird.AveragedValue#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply[V](c:Long,v:V)(implicitevidence$2:V=&gt;Double):com.twitter.algebird.AveragedValue"></a>
       <a id="apply[V](Long,V)((V)⇒Double):AveragedValue"></a>
       <h4 class="signature">
@@ -180,8 +186,11 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.AveragedValue#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Creates an <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> with a count of of <code>c</code> and a value
+of <code>v</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Creates an <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> with a count of of <code>c</code> and a value
+of <code>v</code>.
+</p></div><dl class="paramcmts block"><dt class="tparam">V</dt><dd class="cmt"><p>type with an implicit conversion to Double</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.AveragedValue#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply[V](v:V)(implicitevidence$1:V=&gt;Double):com.twitter.algebird.AveragedValue"></a>
       <a id="apply[V](V)((V)⇒Double):AveragedValue"></a>
       <h4 class="signature">
@@ -197,7 +206,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Creates <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> with a value of <code>v</code> and a count of 1.</p><div class="fullcomment"><div class="comment cmt"><p>Creates <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> with a value of <code>v</code> and a count of 1.
+</p></div><dl class="paramcmts block"><dt class="tparam">V</dt><dd class="cmt"><p>type with an implicit conversion to Double</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -328,7 +338,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">implicit instance of <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[AveragedValue]</p>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -414,7 +424,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.AveragedValue#numericAggregator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.AveragedValue#numericAggregator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="numericAggregator[N](implicitnum:Numeric[N]):com.twitter.algebird.MonoidAggregator[N,com.twitter.algebird.AveragedValue,Double]"></a>
       <a id="numericAggregator[N](Numeric[N]):MonoidAggregator[N,AveragedValue,Double]"></a>
       <h4 class="signature">
@@ -430,7 +440,11 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that uses <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> to
+calculate the mean of all values in the stream.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that uses <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> to
+calculate the mean of all values in the stream. Each numeric
+value receives a count of <code>1</code> during aggregation.
+</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>numeric type to convert into <code>Double</code></p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

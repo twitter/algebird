@@ -45,14 +45,14 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">BaseProperties</span>
+        <span class="name">BaseProperties</span><span class="result"> extends <a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Base properties useful for all tests using Algebird's typeclasses.
 </p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-test/src/main/scala/com/twitter/algebird/BaseProperties.scala" target="_blank">BaseProperties.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="content-diagram-container">
                 <span class="toggle diagram-link">Content Hierarchy</span>
                 <div class="diagram" id="content-diagram"><svg class="package-diagram" id="graph1" viewBox="0.00 0.00 139.00 94.00" height="94pt" width="139pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 90)" class="graph" id="graph0"><polygon points="-4,4 -4,-90 135,-90 135,4 -4,4" stroke="none" fill="white"></polygon><!-- node0 --><g class="node class" id="graph1_0"><g id="a_class|graph1_0"><a xlink:title="com.twitter.algebird.BaseProperties.DefaultHigherEq" xlink:href="BaseProperties$$DefaultHigherEq.html#inheritance-diagram"><polygon points="131,-25 0,-25 0,-0 131,-0 131,-25" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-19.5" x="10.5" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-9.74951" x="31.4805" text-anchor="start">DefaultHigherEq[M]</text></a></g></g><!-- node1 --><g class="node trait" id="graph1_1"><g id="a_trait|graph1_1"><a xlink:title="com.twitter.algebird.BaseProperties.HigherEq" xlink:href="BaseProperties$$HigherEq.html#inheritance-diagram"><polygon points="115,-86 16,-86 16,-61 115,-61 115,-86" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-80.5" x="26.5" preserveAspectRatio="xMinYMin meet" height="15px" width="15px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-70.7495" x="47.3228" text-anchor="start">HigherEq[M]</text></a></g></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph1_1_0"><g id="a_inheritance|graph1_1_0"><a xlink:title="DefaultHigherEq[M] is a subtype of HigherEq[M]"><path d="M65.5,-55.6874C65.5,-45.9173 65.5,-33.8534 65.5,-25.1323" stroke="#d4d4d4" fill="none"></path><polygon points="63.7501,-55.8435 65.5,-60.8435 67.2501,-55.8435 63.7501,-55.8435" stroke="#d4d4d4" fill="none"></polygon></a></g></g></g></svg></div>
@@ -73,7 +73,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.BaseProperties"><span>BaseProperties</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.BaseProperties"><span>BaseProperties</span></li><li class="in" name="com.twitter.algebird.MetricProperties"><span>MetricProperties</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -186,6 +186,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#approxEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="approxEq(eps:Double)(f1:Double,f2:Double):Boolean"></a>
+      <a id="approxEq(Double)(Double,Double):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">approxEq</span><span class="params">(<span name="eps">eps: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="params">(<span name="f1">f1: <span class="extype" name="scala.Double">Double</span></span>, <span name="f2">f2: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@approxEq(eps:Double)(f1:Double,f2:Double):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="com.twitter.algebird.BaseProperties#arbReasonableBigDecimals" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="arbReasonableBigDecimals:org.scalacheck.Arbitrary[BigDecimal]"></a>
       <a id="arbReasonableBigDecimals:Arbitrary[BigDecimal]"></a>
@@ -244,7 +261,7 @@
               
         </dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#commutativeMonoidLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="commutativeMonoidLaws[T](implicitevidence$48:com.twitter.algebird.Monoid[T],implicitevidence$49:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeMonoidLaws[T](implicitevidence$64:com.twitter.algebird.Monoid[T],implicitevidence$65:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="commutativeMonoidLaws[T](Monoid[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -255,30 +272,30 @@
         <span class="name">commutativeMonoidLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeMonoidLaws[T](implicitevidence$48:com.twitter.algebird.Monoid[T],implicitevidence$49:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeMonoidLaws[T](implicitevidence$64:com.twitter.algebird.Monoid[T],implicitevidence$65:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#commutativeMonoidLawsEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="commutativeMonoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$46:com.twitter.algebird.Monoid[T],implicitevidence$47:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="commutativeMonoidLawsEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#commutativeMonoidLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="commutativeMonoidLawsEquiv[T](implicitevidence$68:com.twitter.algebird.Monoid[T],implicitevidence$69:org.scalacheck.Arbitrary[T],implicitevidence$70:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeMonoidLawsEquiv[T](Monoid[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">commutativeMonoidLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">commutativeMonoidLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeMonoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$46:com.twitter.algebird.Monoid[T],implicitevidence$47:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeMonoidLawsEquiv[T](implicitevidence$68:com.twitter.algebird.Monoid[T],implicitevidence$69:org.scalacheck.Arbitrary[T],implicitevidence$70:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#commutativeSemigroupLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="commutativeSemigroupLaws[T](implicitevidence$24:com.twitter.algebird.Semigroup[T],implicitevidence$25:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeSemigroupLaws[T](implicitevidence$28:com.twitter.algebird.Semigroup[T],implicitevidence$29:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="commutativeSemigroupLaws[T](Semigroup[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -289,41 +306,24 @@
         <span class="name">commutativeSemigroupLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeSemigroupLaws[T](implicitevidence$24:com.twitter.algebird.Semigroup[T],implicitevidence$25:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeSemigroupLaws[T](implicitevidence$28:com.twitter.algebird.Semigroup[T],implicitevidence$29:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#commutativeSemigroupLawsEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="commutativeSemigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$22:com.twitter.algebird.Semigroup[T],implicitevidence$23:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="commutativeSemigroupLawsEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#commutativeSemigroupLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="commutativeSemigroupLawsEquiv[T](implicitevidence$32:com.twitter.algebird.Semigroup[T],implicitevidence$33:org.scalacheck.Arbitrary[T],implicitevidence$34:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeSemigroupLawsEquiv[T](Semigroup[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">commutativeSemigroupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">commutativeSemigroupLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeSemigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$22:com.twitter.algebird.Semigroup[T],implicitevidence$23:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.twitter.algebird.BaseProperties#defaultEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="defaultEq[T](t0:T,t1:T):Boolean"></a>
-      <a id="defaultEq[T](T,T):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">defaultEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t0">t0: <span class="extype" name="com.twitter.algebird.BaseProperties.defaultEq.T">T</span></span>, <span name="t1">t1: <span class="extype" name="com.twitter.algebird.BaseProperties.defaultEq.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@defaultEq[T](t0:T,t1:T):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeSemigroupLawsEquiv[T](implicitevidence$32:com.twitter.algebird.Semigroup[T],implicitevidence$33:org.scalacheck.Arbitrary[T],implicitevidence$34:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -363,7 +363,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#fieldLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="fieldLaws[T](implicitevidence$76:com.twitter.algebird.Field[T],implicitevidence$77:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="fieldLaws[T](implicitevidence$121:com.twitter.algebird.Field[T],implicitevidence$122:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="fieldLaws[T](Field[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -374,7 +374,7 @@
         <span class="name">fieldLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Field.html" class="extype" name="com.twitter.algebird.Field">Field</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.fieldLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.fieldLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@fieldLaws[T](implicitevidence$76:com.twitter.algebird.Field[T],implicitevidence$77:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@fieldLaws[T](implicitevidence$121:com.twitter.algebird.Field[T],implicitevidence$122:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -420,7 +420,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#groupLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="groupLaws[T](implicitevidence$56:com.twitter.algebird.Group[T],implicitevidence$57:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="groupLaws[T](implicitevidence$75:com.twitter.algebird.Group[T],implicitevidence$76:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="groupLaws[T](Group[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -431,30 +431,30 @@
         <span class="name">groupLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@groupLaws[T](implicitevidence$56:com.twitter.algebird.Group[T],implicitevidence$57:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@groupLaws[T](implicitevidence$75:com.twitter.algebird.Group[T],implicitevidence$76:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#groupLawsEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="groupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$54:com.twitter.algebird.Group[T],implicitevidence$55:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="groupLawsEq[T]((T,T)⇒Boolean)(Group[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#groupLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="groupLawsEquiv[T](implicitevidence$79:com.twitter.algebird.Group[T],implicitevidence$80:org.scalacheck.Arbitrary[T],implicitevidence$81:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="groupLawsEquiv[T](Group[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">groupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">groupLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@groupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$54:com.twitter.algebird.Group[T],implicitevidence$55:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@groupLawsEquiv[T](implicitevidence$79:com.twitter.algebird.Group[T],implicitevidence$80:org.scalacheck.Arbitrary[T],implicitevidence$81:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#hasAdditiveInverses" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="hasAdditiveInverses[T](implicitevidence$52:com.twitter.algebird.Group[T],implicitevidence$53:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="hasAdditiveInverses[T](implicitevidence$73:com.twitter.algebird.Group[T],implicitevidence$74:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="hasAdditiveInverses[T](Group[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -465,13 +465,13 @@
         <span class="name">hasAdditiveInverses</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasAdditiveInverses.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasAdditiveInverses.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasAdditiveInverses[T](implicitevidence$52:com.twitter.algebird.Group[T],implicitevidence$53:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasAdditiveInverses[T](implicitevidence$73:com.twitter.algebird.Group[T],implicitevidence$74:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#hasAdditiveInversesDifferentTypes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="hasAdditiveInversesDifferentTypes[T,U&lt;:T](implicitevidence$50:com.twitter.algebird.Group[T],implicitevidence$51:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="hasAdditiveInversesDifferentTypes[T,U&lt;:T](implicitevidence$71:com.twitter.algebird.Group[T],implicitevidence$72:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
       <a id="hasAdditiveInversesDifferentTypes[T,U&lt;:T](Group[T],Arbitrary[U]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -482,13 +482,13 @@
         <span class="name">hasAdditiveInversesDifferentTypes</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.hasAdditiveInversesDifferentTypes.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasAdditiveInversesDifferentTypes.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasAdditiveInversesDifferentTypes.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasAdditiveInversesDifferentTypes[T,U&lt;:T](implicitevidence$50:com.twitter.algebird.Group[T],implicitevidence$51:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasAdditiveInversesDifferentTypes[T,U&lt;:T](implicitevidence$71:com.twitter.algebird.Group[T],implicitevidence$72:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#hasMultiplicativeInverse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="hasMultiplicativeInverse[T](implicitevidence$74:com.twitter.algebird.Field[T],implicitevidence$75:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="hasMultiplicativeInverse[T](implicitevidence$119:com.twitter.algebird.Field[T],implicitevidence$120:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="hasMultiplicativeInverse[T](Field[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -499,7 +499,7 @@
         <span class="name">hasMultiplicativeInverse</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Field.html" class="extype" name="com.twitter.algebird.Field">Field</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasMultiplicativeInverse.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.hasMultiplicativeInverse.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasMultiplicativeInverse[T](implicitevidence$74:com.twitter.algebird.Field[T],implicitevidence$75:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@hasMultiplicativeInverse[T](implicitevidence$119:com.twitter.algebird.Field[T],implicitevidence$120:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -522,7 +522,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#isAssociative" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isAssociative[T](implicitevidence$6:com.twitter.algebird.Semigroup[T],implicitevidence$7:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isAssociative[T](implicitevidence$2:com.twitter.algebird.Semigroup[T],implicitevidence$3:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="isAssociative[T](Semigroup[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -533,7 +533,7 @@
         <span class="name">isAssociative</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociative.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociative.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isAssociative[T](implicitevidence$6:com.twitter.algebird.Semigroup[T],implicitevidence$7:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isAssociative[T](implicitevidence$2:com.twitter.algebird.Semigroup[T],implicitevidence$3:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -555,25 +555,25 @@
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#isAssociativeEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isAssociativeEq[T,U&lt;:T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$2:com.twitter.algebird.Semigroup[T],implicitevidence$3:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
-      <a id="isAssociativeEq[T,U&lt;:T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[U]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#isAssociativeEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isAssociativeEquiv[T,U&lt;:T](implicitevidence$8:com.twitter.algebird.Semigroup[T],implicitevidence$9:scala.math.Equiv[T],implicitevidence$10:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="isAssociativeEquiv[T,U&lt;:T](Semigroup[T],Equiv[T],Arbitrary[U]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isAssociativeEq</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span></span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">isAssociativeEquiv</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEquiv.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEquiv.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isAssociativeEq[T,U&lt;:T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$2:com.twitter.algebird.Semigroup[T],implicitevidence$3:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isAssociativeEquiv[T,U&lt;:T](implicitevidence$8:com.twitter.algebird.Semigroup[T],implicitevidence$9:scala.math.Equiv[T],implicitevidence$10:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#isCommutative" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isCommutative[T](implicitevidence$13:com.twitter.algebird.Semigroup[T],implicitevidence$14:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isCommutative[T](implicitevidence$11:com.twitter.algebird.Semigroup[T],implicitevidence$12:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="isCommutative[T](Semigroup[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -584,30 +584,30 @@
         <span class="name">isCommutative</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutative.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutative.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isCommutative[T](implicitevidence$13:com.twitter.algebird.Semigroup[T],implicitevidence$14:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isCommutative[T](implicitevidence$11:com.twitter.algebird.Semigroup[T],implicitevidence$12:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#isCommutativeEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isCommutativeEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$11:com.twitter.algebird.Semigroup[T],implicitevidence$12:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="isCommutativeEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#isCommutativeEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isCommutativeEquiv[T](implicitevidence$15:com.twitter.algebird.Semigroup[T],implicitevidence$16:org.scalacheck.Arbitrary[T],implicitevidence$17:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="isCommutativeEquiv[T](Semigroup[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">isCommutativeEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">isCommutativeEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isCommutativeEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$11:com.twitter.algebird.Semigroup[T],implicitevidence$12:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isCommutativeEquiv[T](implicitevidence$15:com.twitter.algebird.Semigroup[T],implicitevidence$16:org.scalacheck.Arbitrary[T],implicitevidence$17:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#isDistributive" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isDistributive[T](implicitevidence$64:com.twitter.algebird.Ring[T],implicitevidence$65:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isDistributive[T](implicitevidence$94:com.twitter.algebird.Ring[T],implicitevidence$95:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="isDistributive[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -618,13 +618,13 @@
         <span class="name">isDistributive</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributive.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributive.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributive[T](implicitevidence$64:com.twitter.algebird.Ring[T],implicitevidence$65:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributive[T](implicitevidence$94:com.twitter.algebird.Ring[T],implicitevidence$95:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#isDistributiveDifferentTypes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isDistributiveDifferentTypes[T,U&lt;:T](implicitevidence$62:com.twitter.algebird.Ring[T],implicitevidence$63:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="isDistributiveDifferentTypes[T,U&lt;:T](implicitevidence$89:com.twitter.algebird.Ring[T],implicitevidence$90:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
       <a id="isDistributiveDifferentTypes[T,U&lt;:T](Ring[T],Arbitrary[U]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -635,11 +635,62 @@
         <span class="name">isDistributiveDifferentTypes</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypes.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypes.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypes.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributiveDifferentTypes[T,U&lt;:T](implicitevidence$62:com.twitter.algebird.Ring[T],implicitevidence$63:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributiveDifferentTypes[T,U&lt;:T](implicitevidence$89:com.twitter.algebird.Ring[T],implicitevidence$90:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.BaseProperties#isDistributiveDifferentTypesEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isDistributiveDifferentTypesEquiv[T,U&lt;:T](implicitevidence$91:com.twitter.algebird.Ring[T],implicitevidence$92:scala.math.Equiv[T],implicitevidence$93:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="isDistributiveDifferentTypesEquiv[T,U&lt;:T](Ring[T],Equiv[T],Arbitrary[U]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isDistributiveDifferentTypesEquiv</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypesEquiv.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypesEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypesEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveDifferentTypesEquiv.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributiveDifferentTypesEquiv[T,U&lt;:T](implicitevidence$91:com.twitter.algebird.Ring[T],implicitevidence$92:scala.math.Equiv[T],implicitevidence$93:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#isDistributiveEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isDistributiveEquiv[T](implicitevidence$96:com.twitter.algebird.Ring[T],implicitevidence$97:org.scalacheck.Arbitrary[T],implicitevidence$98:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="isDistributiveEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isDistributiveEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isDistributiveEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isDistributiveEquiv[T](implicitevidence$96:com.twitter.algebird.Ring[T],implicitevidence$97:org.scalacheck.Arbitrary[T],implicitevidence$98:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.MetricProperties#isEqualIffZero" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isEqualIffZero[T](implicitevidence$3:com.twitter.algebird.Metric[T],implicitevidence$4:org.scalacheck.Arbitrary[T],implicitevidence$5:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="isEqualIffZero[T](Metric[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isEqualIffZero</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Metric.html" class="extype" name="com.twitter.algebird.Metric">Metric</a>[<span class="extype" name="com.twitter.algebird.MetricProperties.isEqualIffZero.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.isEqualIffZero.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.isEqualIffZero.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isEqualIffZero[T](implicitevidence$3:com.twitter.algebird.Metric[T],implicitevidence$4:org.scalacheck.Arbitrary[T],implicitevidence$5:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -657,6 +708,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MetricProperties#isNonNegative" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isNonNegative[T](implicitevidence$1:com.twitter.algebird.Metric[T],implicitevidence$2:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isNonNegative[T](Metric[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isNonNegative</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Metric.html" class="extype" name="com.twitter.algebird.Metric">Metric</a>[<span class="extype" name="com.twitter.algebird.MetricProperties.isNonNegative.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.isNonNegative.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isNonNegative[T](implicitevidence$1:com.twitter.algebird.Metric[T],implicitevidence$2:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#isNonZero" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="isNonZero[V](v:V)(implicitevidence$1:com.twitter.algebird.Semigroup[V]):Boolean"></a>
       <a id="isNonZero[V](V)(Semigroup[V]):Boolean"></a>
@@ -675,7 +743,7 @@
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#isNonZeroWorksMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isNonZeroWorksMonoid[T](implicitevidence$26:com.twitter.algebird.Monoid[T],implicitevidence$27:org.scalacheck.Arbitrary[T],implicitevidence$28:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="isNonZeroWorksMonoid[T](implicitevidence$35:com.twitter.algebird.Monoid[T],implicitevidence$36:org.scalacheck.Arbitrary[T],implicitevidence$37:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
       <a id="isNonZeroWorksMonoid[T](Monoid[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -686,13 +754,13 @@
         <span class="name">isNonZeroWorksMonoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isNonZeroWorksMonoid.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isNonZeroWorksMonoid.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isNonZeroWorksMonoid.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isNonZeroWorksMonoid[T](implicitevidence$26:com.twitter.algebird.Monoid[T],implicitevidence$27:org.scalacheck.Arbitrary[T],implicitevidence$28:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isNonZeroWorksMonoid[T](implicitevidence$35:com.twitter.algebird.Monoid[T],implicitevidence$36:org.scalacheck.Arbitrary[T],implicitevidence$37:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#isNonZeroWorksRing" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isNonZeroWorksRing[T](implicitevidence$29:com.twitter.algebird.Ring[T],implicitevidence$30:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isNonZeroWorksRing[T](implicitevidence$38:com.twitter.algebird.Ring[T],implicitevidence$39:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="isNonZeroWorksRing[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -703,13 +771,47 @@
         <span class="name">isNonZeroWorksRing</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isNonZeroWorksRing.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isNonZeroWorksRing.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isNonZeroWorksRing[T](implicitevidence$29:com.twitter.algebird.Ring[T],implicitevidence$30:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isNonZeroWorksRing[T](implicitevidence$38:com.twitter.algebird.Ring[T],implicitevidence$39:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.MetricProperties#isSymmetric" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isSymmetric[T](implicitevidence$6:com.twitter.algebird.Metric[T],implicitevidence$7:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isSymmetric[T](Metric[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isSymmetric</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Metric.html" class="extype" name="com.twitter.algebird.Metric">Metric</a>[<span class="extype" name="com.twitter.algebird.MetricProperties.isSymmetric.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.isSymmetric.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isSymmetric[T](implicitevidence$6:com.twitter.algebird.Metric[T],implicitevidence$7:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></dd></dl></div>
+    </li><li name="com.twitter.algebird.MetricProperties#metricLaws" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="metricLaws[T](implicitevidence$10:com.twitter.algebird.Metric[T],implicitevidence$11:org.scalacheck.Arbitrary[T],implicitevidence$12:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="metricLaws[T](Metric[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">metricLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Metric.html" class="extype" name="com.twitter.algebird.Metric">Metric</a>[<span class="extype" name="com.twitter.algebird.MetricProperties.metricLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.metricLaws.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.metricLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@metricLaws[T](implicitevidence$10:com.twitter.algebird.Metric[T],implicitevidence$11:org.scalacheck.Arbitrary[T],implicitevidence$12:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#monoidLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="monoidLaws[T](implicitevidence$39:com.twitter.algebird.Monoid[T],implicitevidence$40:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="monoidLaws[T](implicitevidence$57:com.twitter.algebird.Monoid[T],implicitevidence$58:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="monoidLaws[T](Monoid[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -720,30 +822,13 @@
         <span class="name">monoidLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLaws[T](implicitevidence$39:com.twitter.algebird.Monoid[T],implicitevidence$40:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.twitter.algebird.BaseProperties#monoidLawsEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="monoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$41:com.twitter.algebird.Monoid[T],implicitevidence$42:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="monoidLawsEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">monoidLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$41:com.twitter.algebird.Monoid[T],implicitevidence$42:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLaws[T](implicitevidence$57:com.twitter.algebird.Monoid[T],implicitevidence$58:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#monoidLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="monoidLawsEquiv[T](implicitevidence$43:com.twitter.algebird.Monoid[T],implicitevidence$44:org.scalacheck.Arbitrary[T],implicitevidence$45:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="monoidLawsEquiv[T](implicitevidence$61:com.twitter.algebird.Monoid[T],implicitevidence$62:org.scalacheck.Arbitrary[T],implicitevidence$63:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
       <a id="monoidLawsEquiv[T](Monoid[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -754,7 +839,7 @@
         <span class="name">monoidLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLawsEquiv[T](implicitevidence$43:com.twitter.algebird.Monoid[T],implicitevidence$44:org.scalacheck.Arbitrary[T],implicitevidence$45:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLawsEquiv[T](implicitevidence$61:com.twitter.algebird.Monoid[T],implicitevidence$62:org.scalacheck.Arbitrary[T],implicitevidence$63:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -811,7 +896,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#pseudoRingLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="pseudoRingLaws[T](implicitevidence$68:com.twitter.algebird.Ring[T],implicitevidence$69:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="pseudoRingLaws[T](implicitevidence$104:com.twitter.algebird.Ring[T],implicitevidence$105:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="pseudoRingLaws[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -822,13 +907,30 @@
         <span class="name">pseudoRingLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.pseudoRingLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.pseudoRingLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@pseudoRingLaws[T](implicitevidence$68:com.twitter.algebird.Ring[T],implicitevidence$69:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@pseudoRingLaws[T](implicitevidence$104:com.twitter.algebird.Ring[T],implicitevidence$105:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#pseudoRingLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="pseudoRingLawsEquiv[T](implicitevidence$106:com.twitter.algebird.Ring[T],implicitevidence$107:org.scalacheck.Arbitrary[T],implicitevidence$108:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="pseudoRingLawsEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pseudoRingLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.pseudoRingLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.pseudoRingLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.pseudoRingLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@pseudoRingLawsEquiv[T](implicitevidence$106:com.twitter.algebird.Ring[T],implicitevidence$107:org.scalacheck.Arbitrary[T],implicitevidence$108:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#ringLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ringLaws[T](implicitevidence$72:com.twitter.algebird.Ring[T],implicitevidence$73:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="ringLaws[T](implicitevidence$114:com.twitter.algebird.Ring[T],implicitevidence$115:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="ringLaws[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -839,13 +941,47 @@
         <span class="name">ringLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.ringLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.ringLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@ringLaws[T](implicitevidence$72:com.twitter.algebird.Ring[T],implicitevidence$73:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@ringLaws[T](implicitevidence$114:com.twitter.algebird.Ring[T],implicitevidence$115:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
+    </li><li name="com.twitter.algebird.BaseProperties#ringLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ringLawsEquiv[T](implicitevidence$116:com.twitter.algebird.Ring[T],implicitevidence$117:org.scalacheck.Arbitrary[T],implicitevidence$118:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="ringLawsEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ringLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.ringLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.ringLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.ringLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@ringLawsEquiv[T](implicitevidence$116:com.twitter.algebird.Ring[T],implicitevidence$117:org.scalacheck.Arbitrary[T],implicitevidence$118:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.MetricProperties#satisfiesTriangleInequality" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="satisfiesTriangleInequality[T](implicitevidence$8:com.twitter.algebird.Metric[T],implicitevidence$9:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="satisfiesTriangleInequality[T](Metric[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">satisfiesTriangleInequality</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Metric.html" class="extype" name="com.twitter.algebird.Metric">Metric</a>[<span class="extype" name="com.twitter.algebird.MetricProperties.satisfiesTriangleInequality.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.MetricProperties.satisfiesTriangleInequality.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@satisfiesTriangleInequality[T](implicitevidence$8:com.twitter.algebird.Metric[T],implicitevidence$9:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#semigroupLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroupLaws[T](implicitevidence$15:com.twitter.algebird.Semigroup[T],implicitevidence$16:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="semigroupLaws[T](implicitevidence$21:com.twitter.algebird.Semigroup[T],implicitevidence$22:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="semigroupLaws[T](Semigroup[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -856,30 +992,13 @@
         <span class="name">semigroupLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLaws[T](implicitevidence$15:com.twitter.algebird.Semigroup[T],implicitevidence$16:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.twitter.algebird.BaseProperties#semigroupLawsEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$17:com.twitter.algebird.Semigroup[T],implicitevidence$18:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="semigroupLawsEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">semigroupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$17:com.twitter.algebird.Semigroup[T],implicitevidence$18:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLaws[T](implicitevidence$21:com.twitter.algebird.Semigroup[T],implicitevidence$22:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#semigroupLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroupLawsEquiv[T](implicitevidence$19:com.twitter.algebird.Semigroup[T],implicitevidence$20:org.scalacheck.Arbitrary[T],implicitevidence$21:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="semigroupLawsEquiv[T](implicitevidence$25:com.twitter.algebird.Semigroup[T],implicitevidence$26:org.scalacheck.Arbitrary[T],implicitevidence$27:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
       <a id="semigroupLawsEquiv[T](Semigroup[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -890,13 +1009,13 @@
         <span class="name">semigroupLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLawsEquiv[T](implicitevidence$19:com.twitter.algebird.Semigroup[T],implicitevidence$20:org.scalacheck.Arbitrary[T],implicitevidence$21:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLawsEquiv[T](implicitevidence$25:com.twitter.algebird.Semigroup[T],implicitevidence$26:org.scalacheck.Arbitrary[T],implicitevidence$27:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#semigroupSumWorks" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroupSumWorks[T](implicitevidence$8:com.twitter.algebird.Semigroup[T],implicitevidence$9:org.scalacheck.Arbitrary[T],implicitevidence$10:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="semigroupSumWorks[T](implicitevidence$18:com.twitter.algebird.Semigroup[T],implicitevidence$19:org.scalacheck.Arbitrary[T],implicitevidence$20:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
       <a id="semigroupSumWorks[T](Semigroup[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -907,13 +1026,13 @@
         <span class="name">semigroupSumWorks</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupSumWorks.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupSumWorks.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupSumWorks.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupSumWorks[T](implicitevidence$8:com.twitter.algebird.Semigroup[T],implicitevidence$9:org.scalacheck.Arbitrary[T],implicitevidence$10:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupSumWorks[T](implicitevidence$18:com.twitter.algebird.Semigroup[T],implicitevidence$19:org.scalacheck.Arbitrary[T],implicitevidence$20:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#semiringLaws" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semiringLaws[T](implicitevidence$70:com.twitter.algebird.Ring[T],implicitevidence$71:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="semiringLaws[T](implicitevidence$109:com.twitter.algebird.Ring[T],implicitevidence$110:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="semiringLaws[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -924,7 +1043,24 @@
         <span class="name">semiringLaws</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semiringLaws.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semiringLaws.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semiringLaws[T](implicitevidence$70:com.twitter.algebird.Ring[T],implicitevidence$71:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semiringLaws[T](implicitevidence$109:com.twitter.algebird.Ring[T],implicitevidence$110:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#semiringLawsEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="semiringLawsEquiv[T](implicitevidence$111:com.twitter.algebird.Ring[T],implicitevidence$112:org.scalacheck.Arbitrary[T],implicitevidence$113:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="semiringLawsEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">semiringLawsEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semiringLawsEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semiringLawsEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semiringLawsEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semiringLawsEquiv[T](implicitevidence$111:com.twitter.algebird.Ring[T],implicitevidence$112:org.scalacheck.Arbitrary[T],implicitevidence$113:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -947,7 +1083,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#timesIsAssociative" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="timesIsAssociative[T](implicitevidence$66:com.twitter.algebird.Ring[T],implicitevidence$67:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="timesIsAssociative[T](implicitevidence$99:com.twitter.algebird.Ring[T],implicitevidence$100:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="timesIsAssociative[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -958,7 +1094,24 @@
         <span class="name">timesIsAssociative</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.timesIsAssociative.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.timesIsAssociative.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@timesIsAssociative[T](implicitevidence$66:com.twitter.algebird.Ring[T],implicitevidence$67:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@timesIsAssociative[T](implicitevidence$99:com.twitter.algebird.Ring[T],implicitevidence$100:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#timesIsAssociativeEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="timesIsAssociativeEquiv[T](implicitevidence$101:com.twitter.algebird.Ring[T],implicitevidence$102:org.scalacheck.Arbitrary[T],implicitevidence$103:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="timesIsAssociativeEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">timesIsAssociativeEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.timesIsAssociativeEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.timesIsAssociativeEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.timesIsAssociativeEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@timesIsAssociativeEquiv[T](implicitevidence$101:com.twitter.algebird.Ring[T],implicitevidence$102:org.scalacheck.Arbitrary[T],implicitevidence$103:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -981,7 +1134,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#validOne" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="validOne[T](implicitevidence$58:com.twitter.algebird.Ring[T],implicitevidence$59:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="validOne[T](implicitevidence$82:com.twitter.algebird.Ring[T],implicitevidence$83:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="validOne[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -992,13 +1145,30 @@
         <span class="name">validOne</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validOne.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validOne.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validOne[T](implicitevidence$58:com.twitter.algebird.Ring[T],implicitevidence$59:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validOne[T](implicitevidence$82:com.twitter.algebird.Ring[T],implicitevidence$83:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#validOneEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validOneEquiv[T](implicitevidence$84:com.twitter.algebird.Ring[T],implicitevidence$85:org.scalacheck.Arbitrary[T],implicitevidence$86:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="validOneEquiv[T](Ring[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validOneEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validOneEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validOneEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validOneEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validOneEquiv[T](implicitevidence$84:com.twitter.algebird.Ring[T],implicitevidence$85:org.scalacheck.Arbitrary[T],implicitevidence$86:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#validZero" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="validZero[T](implicitevidence$37:com.twitter.algebird.Monoid[T],implicitevidence$38:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="validZero[T](implicitevidence$50:com.twitter.algebird.Monoid[T],implicitevidence$51:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="validZero[T](Monoid[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -1009,24 +1179,24 @@
         <span class="name">validZero</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZero.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZero.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validZero[T](implicitevidence$37:com.twitter.algebird.Monoid[T],implicitevidence$38:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validZero[T](implicitevidence$50:com.twitter.algebird.Monoid[T],implicitevidence$51:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.twitter.algebird.BaseProperties#validZeroEq" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="validZeroEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$35:com.twitter.algebird.Monoid[T],implicitevidence$36:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
-      <a id="validZeroEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
+    </li><li name="com.twitter.algebird.BaseProperties#validZeroEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validZeroEquiv[T](implicitevidence$54:com.twitter.algebird.Monoid[T],implicitevidence$55:org.scalacheck.Arbitrary[T],implicitevidence$56:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="validZeroEquiv[T](Monoid[T],Arbitrary[T],Equiv[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">validZeroEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+        <span class="name">validZeroEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validZeroEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$35:com.twitter.algebird.Monoid[T],implicitevidence$36:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validZeroEquiv[T](implicitevidence$54:com.twitter.algebird.Monoid[T],implicitevidence$55:org.scalacheck.Arbitrary[T],implicitevidence$56:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -1101,7 +1271,7 @@
               
         </dd></dl></div>
     </li><li name="com.twitter.algebird.BaseProperties#weakZero" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="weakZero[T](implicitevidence$33:com.twitter.algebird.Monoid[T],implicitevidence$34:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="weakZero[T](implicitevidence$45:com.twitter.algebird.Monoid[T],implicitevidence$46:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="weakZero[T](Monoid[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -1112,13 +1282,13 @@
         <span class="name">weakZero</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZero.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZero.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZero[T](implicitevidence$33:com.twitter.algebird.Monoid[T],implicitevidence$34:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZero[T](implicitevidence$45:com.twitter.algebird.Monoid[T],implicitevidence$46:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#weakZeroDifferentTypes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="weakZeroDifferentTypes[T,U&lt;:T](implicitevidence$31:com.twitter.algebird.Monoid[T],implicitevidence$32:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="weakZeroDifferentTypes[T,U&lt;:T](implicitevidence$40:com.twitter.algebird.Monoid[T],implicitevidence$41:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
       <a id="weakZeroDifferentTypes[T,U&lt;:T](Monoid[T],Arbitrary[U]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -1129,13 +1299,47 @@
         <span class="name">weakZeroDifferentTypes</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypes.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypes.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypes.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZeroDifferentTypes[T,U&lt;:T](implicitevidence$31:com.twitter.algebird.Monoid[T],implicitevidence$32:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZeroDifferentTypes[T,U&lt;:T](implicitevidence$40:com.twitter.algebird.Monoid[T],implicitevidence$41:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#weakZeroDifferentTypesEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="weakZeroDifferentTypesEquiv[T,U&lt;:T](implicitevidence$42:com.twitter.algebird.Monoid[T],implicitevidence$43:scala.math.Equiv[T],implicitevidence$44:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="weakZeroDifferentTypesEquiv[T,U&lt;:T](Monoid[T],Equiv[T],Arbitrary[U]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">weakZeroDifferentTypesEquiv</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypesEquiv.T">T</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypesEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypesEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroDifferentTypesEquiv.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZeroDifferentTypesEquiv[T,U&lt;:T](implicitevidence$42:com.twitter.algebird.Monoid[T],implicitevidence$43:scala.math.Equiv[T],implicitevidence$44:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.twitter.algebird.BaseProperties#weakZeroEquiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="weakZeroEquiv[T](implicitevidence$47:com.twitter.algebird.Monoid[T],implicitevidence$48:org.scalacheck.Arbitrary[T],implicitevidence$49:scala.math.Equiv[T]):org.scalacheck.Prop"></a>
+      <a id="weakZeroEquiv[T](Monoid[T],Arbitrary[T],Equiv[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">weakZeroEquiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroEquiv.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroEquiv.T">T</span>]</span>, <span name="arg2">arg2: <span class="extype" name="scala.math.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.weakZeroEquiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@weakZeroEquiv[T](implicitevidence$47:com.twitter.algebird.Monoid[T],implicitevidence$48:org.scalacheck.Arbitrary[T],implicitevidence$49:scala.math.Equiv[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
     </li><li name="com.twitter.algebird.BaseProperties#zeroAnnihilates" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="zeroAnnihilates[T](implicitevidence$60:com.twitter.algebird.Ring[T],implicitevidence$61:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="zeroAnnihilates[T](implicitevidence$87:com.twitter.algebird.Ring[T],implicitevidence$88:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
       <a id="zeroAnnihilates[T](Ring[T],Arbitrary[T]):Prop"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -1146,7 +1350,7 @@
         <span class="name">zeroAnnihilates</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Ring.html" class="extype" name="com.twitter.algebird.Ring">Ring</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.zeroAnnihilates.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.zeroAnnihilates.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@zeroAnnihilates[T](implicitevidence$60:com.twitter.algebird.Ring[T],implicitevidence$61:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@zeroAnnihilates[T](implicitevidence$87:com.twitter.algebird.Ring[T],implicitevidence$88:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -1156,11 +1360,196 @@
 
         
 
-        
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="com.twitter.algebird.BaseProperties#commutativeMonoidLawsEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="commutativeMonoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$66:com.twitter.algebird.Monoid[T],implicitevidence$67:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeMonoidLawsEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use commutativeMonoidLawsEquiv[T] with implicit Equiv[T] instance">commutativeMonoidLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeMonoidLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeMonoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$66:com.twitter.algebird.Monoid[T],implicitevidence$67:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use commutativeMonoidLawsEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#commutativeSemigroupLawsEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="commutativeSemigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$30:com.twitter.algebird.Semigroup[T],implicitevidence$31:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="commutativeSemigroupLawsEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use commutativeSemigroupLawsEquiv[T] with implicit Equiv[T] instance">commutativeSemigroupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.commutativeSemigroupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@commutativeSemigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$30:com.twitter.algebird.Semigroup[T],implicitevidence$31:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use commutativeSemigroupLawsEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#defaultEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="defaultEq[T](t0:T,t1:T):Boolean"></a>
+      <a id="defaultEq[T](T,T):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) Please use Equiv.universal, or the Equiv version of tests">defaultEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t0">t0: <span class="extype" name="com.twitter.algebird.BaseProperties.defaultEq.T">T</span></span>, <span name="t1">t1: <span class="extype" name="com.twitter.algebird.BaseProperties.defaultEq.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@defaultEq[T](t0:T,t1:T):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> Please use Equiv.universal, or the Equiv version of tests</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#groupLawsEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="groupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$77:com.twitter.algebird.Group[T],implicitevidence$78:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="groupLawsEq[T]((T,T)⇒Boolean)(Group[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use groupLawsEquiv[T] with implicit Equiv[T] instance">groupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.groupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@groupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$77:com.twitter.algebird.Group[T],implicitevidence$78:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use groupLawsEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#isAssociativeEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isAssociativeEq[T,U&lt;:T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$6:com.twitter.algebird.Semigroup[T],implicitevidence$7:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop"></a>
+      <a id="isAssociativeEq[T,U&lt;:T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[U]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use isAssociativeEquiv[T, U] with implicit Equiv[T] instance">isAssociativeEq</span><span class="tparams">[<span name="T">T</span>, <span name="U">U &lt;: <span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span></span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isAssociativeEq.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isAssociativeEq[T,U&lt;:T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$6:com.twitter.algebird.Semigroup[T],implicitevidence$7:org.scalacheck.Arbitrary[U]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use isAssociativeEquiv[T, U] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#isCommutativeEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isCommutativeEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$13:com.twitter.algebird.Semigroup[T],implicitevidence$14:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="isCommutativeEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use isCommutativeEquiv[T] with implicit Equiv[T] instance">isCommutativeEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.isCommutativeEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@isCommutativeEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$13:com.twitter.algebird.Semigroup[T],implicitevidence$14:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use isCommutativeEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#monoidLawsEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$59:com.twitter.algebird.Monoid[T],implicitevidence$60:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="monoidLawsEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use monoidLawsEquiv[T] with implicit Equiv[T] instance">monoidLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.monoidLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@monoidLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$59:com.twitter.algebird.Monoid[T],implicitevidence$60:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use monoidLawsEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#semigroupLawsEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$23:com.twitter.algebird.Semigroup[T],implicitevidence$24:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="semigroupLawsEq[T]((T,T)⇒Boolean)(Semigroup[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use semigroupLawsEquiv[T] with implicit Equiv[T] instance">semigroupLawsEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.semigroupLawsEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@semigroupLawsEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$23:com.twitter.algebird.Semigroup[T],implicitevidence$24:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use semigroupLawsEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li><li name="com.twitter.algebird.BaseProperties#validZeroEq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="validZeroEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$52:com.twitter.algebird.Monoid[T],implicitevidence$53:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop"></a>
+      <a id="validZeroEq[T]((T,T)⇒Boolean)(Monoid[T],Arbitrary[T]):Prop"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version 0.12.3) use validZeroEquiv[T] with implicit Equiv[T] instance">validZeroEq</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="eqfn">eqfn: (<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>, <span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>]</span>, <span name="arg1">arg1: <span class="extype" name="org.scalacheck.Arbitrary">Arbitrary</span>[<span class="extype" name="com.twitter.algebird.BaseProperties.validZeroEq.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.scalacheck.Prop">Prop</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.BaseProperties$@validZeroEq[T](eqfn:(T,T)=&gt;Boolean)(implicitevidence$52:com.twitter.algebird.Monoid[T],implicitevidence$53:org.scalacheck.Arbitrary[T]):org.scalacheck.Prop" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version 0.12.3)</i> use validZeroEquiv[T] with implicit Equiv[T] instance</p></dd></dl></div>
+    </li></ol>
+            </div>
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.twitter.algebird.MetricProperties">
+              <h3>Inherited from <a href="MetricProperties.html" class="extype" name="com.twitter.algebird.MetricProperties">MetricProperties</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

@@ -24,7 +24,7 @@
 <span class="c1">// import com.twitter.algebird._
 </span>
 <span class="k">val</span> <span class="n">hllMonoid</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">HyperLogLogMonoid</span><span class="o">(</span><span class="n">bits</span> <span class="k">=</span> <span class="mi">4</span><span class="o">)</span>
-<span class="c1">// hllMonoid: com.twitter.algebird.HyperLogLogMonoid = com.twitter.algebird.HyperLogLogMonoid@2ff9fe11
+<span class="c1">// hllMonoid: com.twitter.algebird.HyperLogLogMonoid = com.twitter.algebird.HyperLogLogMonoid@70816c74
 </span></code></pre>
 </div>
 
@@ -73,7 +73,7 @@
 It takes an <code class="highlighter-rouge">error</code>, which must be a Double in the range (0,1).</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">agg</span> <span class="k">=</span> <span class="nc">HyperLogLogAggregator</span><span class="o">.</span><span class="n">withErrorGeneric</span><span class="o">[</span><span class="kt">Int</span><span class="o">](</span><span class="mf">0.01</span><span class="o">)</span>
-<span class="c1">// agg: com.twitter.algebird.GenHLLAggregator[Int] = GenHLLAggregator(com.twitter.algebird.HyperLogLogMonoid@1eb47cee,com.twitter.algebird.Hash128$$anon$5@63593dd1)
+<span class="c1">// agg: com.twitter.algebird.GenHLLAggregator[Int] = GenHLLAggregator(com.twitter.algebird.HyperLogLogMonoid@5f19c35f,com.twitter.algebird.Hash128$$anon$5@a769e28)
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">5</span><span class="o">)</span>
 <span class="c1">// data: List[Int] = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
@@ -88,7 +88,7 @@ It takes an <code class="highlighter-rouge">error</code>, which must be a Double
 <p>Similar to <code class="highlighter-rouge">withErrorGeneric</code>, but takes the number of bits as an Int.</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">agg</span> <span class="k">=</span> <span class="nc">HyperLogLogAggregator</span><span class="o">.</span><span class="n">withBits</span><span class="o">[</span><span class="kt">Int</span><span class="o">](</span><span class="mi">9</span><span class="o">)</span>
-<span class="c1">// agg: com.twitter.algebird.GenHLLAggregator[Int] = GenHLLAggregator(com.twitter.algebird.HyperLogLogMonoid@3d9bc781,com.twitter.algebird.Hash128$$anon$5@63593dd1)
+<span class="c1">// agg: com.twitter.algebird.GenHLLAggregator[Int] = GenHLLAggregator(com.twitter.algebird.HyperLogLogMonoid@7f9a7f3a,com.twitter.algebird.Hash128$$anon$5@a769e28)
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">5</span><span class="o">)</span>
 <span class="c1">// data: List[Int] = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
@@ -103,7 +103,7 @@ It takes an <code class="highlighter-rouge">error</code>, which must be a Double
 <p>This is an aggregator of type <code class="highlighter-rouge">Aggregator[K, HLL, Long]</code>, which means that it presents a Long value. The Long that it returns is the estimated size of the combined HLL.</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">agg</span> <span class="k">=</span> <span class="nc">HyperLogLogAggregator</span><span class="o">.</span><span class="n">sizeWithErrorGeneric</span><span class="o">[</span><span class="kt">Int</span><span class="o">](</span><span class="mf">0.01</span><span class="o">)</span>
-<span class="c1">// agg: com.twitter.algebird.MonoidAggregator[Int,com.twitter.algebird.HLL,Long] = com.twitter.algebird.MonoidAggregator$$anon$6@655b86eb
+<span class="c1">// agg: com.twitter.algebird.MonoidAggregator[Int,com.twitter.algebird.HLL,Long] = com.twitter.algebird.MonoidAggregator$$anon$6@2c9c4584
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">5</span><span class="o">)</span>
 <span class="c1">// data: List[Int] = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
@@ -119,7 +119,7 @@ It takes an <code class="highlighter-rouge">error</code>, which must be a Double
 <span class="c1">// import HyperLogLog._
 </span>
 <span class="k">val</span> <span class="n">hll</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">HyperLogLogMonoid</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
-<span class="c1">// hll: com.twitter.algebird.HyperLogLogMonoid = com.twitter.algebird.HyperLogLogMonoid@d84deac
+<span class="c1">// hll: com.twitter.algebird.HyperLogLogMonoid = com.twitter.algebird.HyperLogLogMonoid@7e5c2173
 </span>
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">5</span><span class="o">)</span>
 <span class="c1">// data: List[Int] = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)

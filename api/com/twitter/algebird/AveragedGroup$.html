@@ -49,7 +49,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p><a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a> implementation for <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>.</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala" target="_blank">AveragedValue.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Group.html" class="extype" name="com.twitter.algebird.Group">Group</a>[<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>], <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>], <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -430,7 +430,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.twitter.algebird.AveragedGroup#plus" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="plus(cntAve1:com.twitter.algebird.AveragedValue,cntAve2:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue"></a>
+      <a id="plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue"></a>
       <a id="plus(AveragedValue,AveragedValue):AveragedValue"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -438,14 +438,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">plus</span><span class="params">(<span name="cntAve1">cntAve1: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>, <span name="cntAve2">cntAve2: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>)</span><span class="result">: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
+        <span class="name">plus</span><span class="params">(<span name="l">l: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>, <span name="r">r: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>)</span><span class="result">: <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.AveragedGroup$@plus(cntAve1:com.twitter.algebird.AveragedValue,cntAve2:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.AveragedGroup$@plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Combines two <code><code>AveragedValue</code></code> instances associatively.</p><div class="fullcomment"><div class="comment cmt"><p>Combines two <code><code>AveragedValue</code></code> instances associatively.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>result of combining <code>l</code> and <code>r</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="AveragedValue.html#+[N](that:N)(implicitnum:Numeric[N]):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedValue#+">AveragedValue.+</a> for the implementation</p></span></dd></dl></div>
     </li><li name="com.twitter.algebird.Monoid#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="sum(vs:TraversableOnce[T]):T"></a>
       <a id="sum(TraversableOnce[AveragedValue]):AveragedValue"></a>
@@ -463,8 +463,8 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
-    </li><li name="com.twitter.algebird.Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="sumOption(iter:TraversableOnce[T]):Option[T]"></a>
+    </li><li name="com.twitter.algebird.AveragedGroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sumOption(iter:TraversableOnce[com.twitter.algebird.AveragedValue]):Option[com.twitter.algebird.AveragedValue]"></a>
       <a id="sumOption(TraversableOnce[AveragedValue]):Option[AveragedValue]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -475,13 +475,13 @@
         <span class="name">sumOption</span><span class="params">(<span name="iter">iter: <span class="extype" name="scala.TraversableOnce">TraversableOnce</span>[<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.AveragedGroup$@sumOption(iter:TraversableOnce[T]):Option[T]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.AveragedGroup$@sumOption(iter:TraversableOnce[com.twitter.algebird.AveragedValue]):Option[com.twitter.algebird.AveragedValue]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Optimized implementation of <a href="#plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedGroup#plus">plus</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Optimized implementation of <a href="#plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedGroup#plus">plus</a>. Uses internal mutation to
+combine the supplied <a href="AveragedValue.html" class="extype" name="com.twitter.algebird.AveragedValue">AveragedValue</a> instances without creating
+intermediate objects.</p></div><dl class="paramcmts block"><dt class="param">iter</dt><dd class="cmt"><p>instances of <code><code>AveragedValue</code></code> to be combined</p></dd><dt>returns</dt><dd class="cmt"><p><code>None</code> if <code>iter</code> is empty, else an option value containing the summed <code><code>AveragedValue</code></code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -601,15 +601,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Uses a more stable online algorithm which should
-be suitable for large numbers of records
-similar to:
-http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-</p><div class="fullcomment"><div class="comment cmt"><p>Uses a more stable online algorithm which should
-be suitable for large numbers of records
-similar to:
-http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns the identity element of <code><code>AveragedValue</code></code> for <a href="#plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedGroup#plus">plus</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Returns the identity element of <code><code>AveragedValue</code></code> for <a href="#plus(l:com.twitter.algebird.AveragedValue,r:com.twitter.algebird.AveragedValue):com.twitter.algebird.AveragedValue" class="extmbr" name="com.twitter.algebird.AveragedGroup#plus">plus</a>.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.AveragedGroup">AveragedGroup</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
     </li></ol>
             </div>
 

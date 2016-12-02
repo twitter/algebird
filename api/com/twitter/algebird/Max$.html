@@ -47,13 +47,15 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Max</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Max</span><span class="result"> extends <span class="extype" name="com.twitter.algebird.MaxInstances">MaxInstances</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/OrderedSemigroup.scala" target="_blank">OrderedSemigroup.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a set of operations and typeclass instances needed to use
+<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a> instances.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Max.scala" target="_blank">Max.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="com.twitter.algebird.MaxInstances">MaxInstances</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -71,7 +73,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.twitter.algebird.Max"><span>Max</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.twitter.algebird.Max"><span>Max</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="com.twitter.algebird.MaxInstances"><span>MaxInstances</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -163,7 +165,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns an <a href="Aggregator.html" class="extype" name="com.twitter.algebird.Aggregator">Aggregator</a> that selects the maximum instance of an
+ordered type <code>T</code> in the aggregated stream.</p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -204,7 +207,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.twitter.algebird.Max#doubleMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MaxInstances#doubleMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="doubleMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Max[Double]]"></a>
       <a id="doubleMonoid:Monoid[Max[Double]]"></a>
       <h4 class="signature">
@@ -220,7 +223,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Double] with <code>zero == Double.MinValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Double] with <code>zero == Double.MinValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -255,6 +258,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#equiv" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equiv[T](impliciteq:Equiv[T]):Equiv[com.twitter.algebird.Max[T]]"></a>
+      <a id="equiv[T](Equiv[T]):Equiv[Max[T]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equiv</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="eq">eq: <span class="extype" name="scala.Equiv">Equiv</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.equiv.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Equiv">Equiv</span>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.MaxInstances.equiv.T">T</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Max$@equiv[T](impliciteq:Equiv[T]):Equiv[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -278,7 +298,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.twitter.algebird.Max#floatMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MaxInstances#floatMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="floatMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Max[Float]]"></a>
       <a id="floatMonoid:Monoid[Max[Float]]"></a>
       <h4 class="signature">
@@ -294,7 +314,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Float] with <code>zero == Float.MinValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Float] with <code>zero == Float.MinValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -329,7 +349,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.Max#intMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.twitter.algebird.MaxInstances#intMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="intMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Max[Int]]"></a>
       <a id="intMonoid:Monoid[Max[Int]]"></a>
       <h4 class="signature">
@@ -345,7 +365,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Int] with <code>zero == Int.MinValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Int] with <code>zero == Int.MinValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -363,8 +383,8 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.twitter.algebird.Max#listMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="listMonoid[T](implicitevidence$1:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[List[T]]]"></a>
+    </li><li name="com.twitter.algebird.MaxInstances#listMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listMonoid[T](implicitevidence$4:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[List[T]]]"></a>
       <a id="listMonoid[T](Ordering[T]):Monoid[Max[List[T]]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -372,15 +392,20 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">listMonoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Max.listMonoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="com.twitter.algebird.Max.listMonoid.T">T</span>]]]</span>
+        <span class="name">listMonoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.listMonoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.listMonoid.T">T</span>]]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Max$@listMonoid[T](implicitevidence$1:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[List[T]]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Max$@listMonoid[T](implicitevidence$4:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[List[T]]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.Max#longMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[List[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[List[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#longMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="longMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Max[Long]]"></a>
       <a id="longMonoid:Monoid[Max[Long]]"></a>
       <h4 class="signature">
@@ -396,9 +421,29 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.Max#monoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="monoid[T](zero:=&gt;T)(implicitord:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[T]]"></a>
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Long] with <code>zero == Long.MinValue</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[Long] with <code>zero == Long.MinValue</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.Max#maxSemigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="maxSemigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[T]"></a>
+      <a id="maxSemigroup[T](Ordering[T]):Semigroup[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">maxSemigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Max.maxSemigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="com.twitter.algebird.Max.maxSemigroup.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Max$@maxSemigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance with a <code>plus</code> implementation
+that always returns the maximum <code>T</code> argument.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance with a <code>plus</code> implementation
+that always returns the maximum <code>T</code> argument.
+</p></div><dl class="attributes block"> <dt>To do</dt><dd><span class="cmt"><p>Note that this is a semilattice, for when we merge  typelevel/algebra.</p></span></dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#monoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monoid[T](zero:=&gt;T)(implicitevidence$2:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[T]]"></a>
       <a id="monoid[T](⇒T)(Ordering[T]):Monoid[Max[T]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -406,14 +451,17 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">monoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="zero">zero: ⇒ <span class="extype" name="com.twitter.algebird.Max.monoid.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Max.monoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.Max.monoid.T">T</span>]]</span>
+        <span class="name">monoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="zero">zero: ⇒ <span class="extype" name="com.twitter.algebird.MaxInstances.monoid.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.monoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.MaxInstances.monoid.T">T</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Max$@monoid[T](zero:=&gt;T)(implicitord:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Max$@monoid[T](zero:=&gt;T)(implicitevidence$2:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[T] that combines
+instances using <a href="Max.html#max[U&gt;:T](r:com.twitter.algebird.Max[U])(implicitord:Ordering[U]):com.twitter.algebird.Max[U]" class="extmbr" name="com.twitter.algebird.Max#max">Max.max</a> and uses <code>zero</code> for its identity.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[T] that combines
+instances using <a href="Max.html#max[U&gt;:T](r:com.twitter.algebird.Max[U])(implicitord:Ordering[U]):com.twitter.algebird.Max[U]" class="extmbr" name="com.twitter.algebird.Max#max">Max.max</a> and uses <code>zero</code> for its identity.
+</p></div><dl class="paramcmts block"><dt class="param">zero</dt><dd class="cmt"><p>identity of the returned <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd><dt>Note</dt><dd><span class="cmt"><p><code>zero</code> must be <code>&lt;=</code> every element of <code>T</code> for the returned instance to be lawful.</p></span></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -465,8 +513,25 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.twitter.algebird.Max#semigroup" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="semigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Max[T]]"></a>
+    </li><li name="com.twitter.algebird.MaxInstances#ordering" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ordering[T](implicitevidence$1:Ordering[T]):Ordering[com.twitter.algebird.Max[T]]"></a>
+      <a id="ordering[T](Ordering[T]):Ordering[Max[T]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ordering</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.ordering.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Ordering">Ordering</span>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.MaxInstances.ordering.T">T</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Max$@ordering[T](implicitevidence$1:Ordering[T]):Ordering[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#semigroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="semigroup[T](implicitevidence$3:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Max[T]]"></a>
       <a id="semigroup[T](Ordering[T]):Semigroup[Max[T]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -474,15 +539,39 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">semigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Max.semigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.Max.semigroup.T">T</span>]]</span>
+        <span class="name">semigroup</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.semigroup.T">T</span>]</span>)</span><span class="result">: <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="com.twitter.algebird.MaxInstances.semigroup.T">T</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.twitter.algebird.Max$@semigroup[T](implicitord:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.twitter.algebird.Max$@semigroup[T](implicitevidence$3:Ordering[T]):com.twitter.algebird.Semigroup[com.twitter.algebird.Max[T]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.twitter.algebird.Max#stringMonoid" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[T].</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> instance for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[T]. The <code>plus</code>
+implementation always returns the maximum <code>Max[T]</code> argument.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#streamMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="streamMonoid[T](implicitevidence$6:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[Stream[T]]]"></a>
+      <a id="streamMonoid[T](Ordering[T]):Monoid[Max[Stream[T]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">streamMonoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.streamMonoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.streamMonoid.T">T</span>]]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Max$@streamMonoid[T](implicitevidence$6:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[Stream[T]]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[Stream[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[Stream[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#stringMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="stringMonoid:com.twitter.algebird.Monoid[com.twitter.algebird.Max[String]]"></a>
       <a id="stringMonoid:Monoid[Max[String]]"></a>
       <h4 class="signature">
@@ -498,7 +587,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[String] with <code>zero == &quot;&quot;</code></p><div class="fullcomment"><div class="comment cmt"><p><a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> for <a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[String] with <code>zero == &quot;&quot;</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -533,6 +622,28 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.MaxInstances#vectorMonoid" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="vectorMonoid[T](implicitevidence$5:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[Vector[T]]]"></a>
+      <a id="vectorMonoid[T](Ordering[T]):Monoid[Max[Vector[T]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">vectorMonoid</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.vectorMonoid.T">T</span>]</span>)</span><span class="result">: <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>[<a href="Max.html" class="extype" name="com.twitter.algebird.Max">Max</a>[<span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="com.twitter.algebird.MaxInstances.vectorMonoid.T">T</span>]]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Max$@vectorMonoid[T](implicitevidence$5:Ordering[T]):com.twitter.algebird.Monoid[com.twitter.algebird.Max[Vector[T]]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[Vector[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a> instance for <code>Max[Vector[T]]</code> that compares
+lists first by length and then element-wise by <code>T</code>, and returns
+the maximum value.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>MaxInstances</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -615,6 +726,8 @@
               <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="com.twitter.algebird.MaxInstances">
+              <h3>Inherited from <span class="extype" name="com.twitter.algebird.MaxInstances">MaxInstances</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

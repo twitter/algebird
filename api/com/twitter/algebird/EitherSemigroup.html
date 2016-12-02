@@ -53,8 +53,7 @@
 if everything is correct, use Right (it's right, get it?), if something goes
 wrong, use Left.  plus does the normal thing for plus(Right, Right), or plus(Left, Left),
 but if exactly one is Left, we return that value (to keep the error condition).
-Typically, the left value will be a string representing the errors.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Semigroup.scala" target="_blank">Semigroup.scala</a></dd></dl><div class="toggleContainer block">
+Typically, the left value will be a string representing the errors.</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Semigroup.scala" target="_blank">Semigroup.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a>[<span class="extype" name="scala.Either">Either</span>[<span class="extype" name="com.twitter.algebird.EitherSemigroup.L">L</span>, <span class="extype" name="com.twitter.algebird.EitherSemigroup.R">R</span>]], <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
@@ -391,7 +390,8 @@ Typically, the left value will be a string representing the errors.
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.EitherSemigroup">EitherSemigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Combines two <code>Either[L, R]</code> instances associatively.</p><div class="fullcomment"><div class="comment cmt"><p>Combines two <code>Either[L, R]</code> instances associatively.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>result of combining <code>l</code> and <code>r</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.EitherSemigroup">EitherSemigroup</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
     </li><li name="com.twitter.algebird.Semigroup#sumOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="sumOption(iter:TraversableOnce[T]):Option[T]"></a>
       <a id="sumOption(TraversableOnce[Either[L,R]]):Option[Either[L,R]]"></a>
@@ -408,9 +408,12 @@ Typically, the left value will be a string representing the errors.
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass. Returns <code>None</code> if <code>iter</code> is empty, else
+<code>Some[T]</code>.
+</p></div><dl class="paramcmts block"><dt class="param">iter</dt><dd class="cmt"><p>instances of <code>T</code> to be combined</p></dd><dt>returns</dt><dd class="cmt"><p><code>None</code> if <code>iter</code> is empty, else an option value containing the summed <code>T</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd><dt>Note</dt><dd><span class="cmt"><p>Override if there is a faster way to compute this sum than
+      <code>iter.reduceLeftOption</code> using <a href="Semigroup.html#plus(l:T,r:T):T" class="extmbr" name="com.twitter.algebird.Semigroup#plus">plus</a>.</p></span></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

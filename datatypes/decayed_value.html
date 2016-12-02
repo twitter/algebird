@@ -19,7 +19,7 @@
   <span class="k">val</span> <span class="n">rnd</span> <span class="k">=</span> <span class="k">new</span> <span class="n">scala</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="nc">Random</span>
   <span class="o">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="n">rnd</span><span class="o">.</span><span class="n">nextInt</span><span class="o">(</span><span class="mi">1000</span><span class="o">).</span><span class="n">toDouble</span> <span class="o">}.</span><span class="n">toSeq</span>
 <span class="o">}</span>
-<span class="c1">// data: scala.collection.immutable.Seq[Double] = Vector(967.0, 72.0, 545.0, 928.0, 582.0, 345.0, 688.0, 848.0, 524.0, 970.0)
+<span class="c1">// data: scala.collection.immutable.Seq[Double] = Vector(540.0, 447.0, 4.0, 480.0, 155.0, 44.0, 582.0, 139.0, 270.0, 841.0)
 </span>
 <span class="k">val</span> <span class="nc">HalfLife</span> <span class="k">=</span> <span class="mf">5.0</span>
 <span class="c1">// HalfLife: Double = 5.0
@@ -36,17 +36,17 @@
   <span class="n">println</span><span class="o">(</span><span class="s">"At %d: decayed=%f"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">time</span><span class="o">,</span> <span class="o">(</span><span class="n">decayed</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">normalization</span><span class="o">)))</span>
   <span class="n">decayed</span>
 <span class="o">}</span>
-<span class="c1">// At 0: decayed=134.054665
-// At 1: decayed=126.682683
-// At 2: decayed=185.836724
-// At 3: decayed=290.428381
-// At 4: decayed=333.514923
-// At 5: decayed=338.168759
-// At 6: decayed=389.770056
-// At 7: decayed=456.872304
-// At 8: decayed=470.372266
-// At 9: decayed=543.953394
-// res0: scala.collection.immutable.Seq[com.twitter.algebird.DecayedValue] = Vector(DecayedValue(0.0,-Infinity), DecayedValue(967.0,0.0), DecayedValue(913.822394707352,0.13862943611198905), DecayedValue(1340.5286004650984,0.2772588722239781), DecayedValue(2094.9979282494564,0.4158883083359671), DecayedValue(2405.8016265417773,0.5545177444479562), DecayedValue(2439.3719611646757,0.6931471805599453), DecayedValue(2811.5966348806796,0.8317766166719343), DecayedValue(3295.6370342568625,0.9704060527839233), DecayedValue(3393.0186765918797,1.1090354888959124), DecayedValue(3923.7943201813305,1.2476649250079015))
+<span class="c1">// At 0: decayed=74.859896
+// At 1: decayed=127.136682
+// At 2: decayed=111.233428
+// At 3: decayed=163.376453
+// At 4: decayed=163.715026
+// At 5: decayed=148.621903
+// At 6: decayed=210.065213
+// At 7: decayed=202.141881
+// At 8: decayed=213.404676
+// At 9: decayed=302.366917
+// res0: scala.collection.immutable.Seq[com.twitter.algebird.DecayedValue] = Vector(DecayedValue(0.0,-Infinity), DecayedValue(540.0,0.0), DecayedValue(917.097304179907,0.13862943611198905), DecayedValue(802.3795747511749,0.2772588722239781), DecayedValue(1178.51199077694,0.4158883083359671), DecayedValue(1180.9542774221018,0.5545177444479562), DecayedValue(1072.080411436778,0.6931471805599453), DecayedValue(1515.3002060750277,0.8317766166719343), DecayedValue(1458.1454479613483,0.9704060527839233), DecayedValue(1539.389341090431,1.1090354888959124), DecayedValue(2181.116258018324,1.2476649250079015))
 </span></code></pre>
 </div>
 
@@ -58,17 +58,17 @@
   <span class="n">println</span><span class="o">(</span><span class="s">"At %d: windowed=%f"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">time</span><span class="o">,</span> <span class="n">avg</span><span class="o">))</span>
   <span class="n">avg</span>
 <span class="o">}</span>
-<span class="c1">// At 0: windowed=193.400000
-// At 1: windowed=169.120000
-// At 2: windowed=244.296000
-// At 3: windowed=381.036800
-// At 4: windowed=421.229440
-// At 5: windowed=405.983552
-// At 6: windowed=462.386842
-// At 7: windowed=539.509473
-// At 8: windowed=536.407579
-// At 9: windowed=623.126063
-// res1: scala.collection.immutable.Seq[Double] = Vector(0.0, 193.4, 169.12, 244.296, 381.03679999999997, 421.22943999999995, 405.983552, 462.3868415999999, 539.50947328, 536.4075786239999, 623.1260628992)
+<span class="c1">// At 0: windowed=108.000000
+// At 1: windowed=175.800000
+// At 2: windowed=141.440000
+// At 3: windowed=209.152000
+// At 4: windowed=198.321600
+// At 5: windowed=167.457280
+// At 6: windowed=250.365824
+// At 7: windowed=228.092659
+// At 8: windowed=236.474127
+// At 9: windowed=357.379302
+// res1: scala.collection.immutable.Seq[Double] = Vector(0.0, 108.0, 175.8, 141.44, 209.152, 198.3216, 167.45728, 250.36582399999998, 228.09265919999999, 236.47412735999995, 357.379301888)
 </span></code></pre>
 </div>
 

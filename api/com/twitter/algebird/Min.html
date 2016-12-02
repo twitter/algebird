@@ -51,7 +51,10 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/OrderedSemigroup.scala" target="_blank">OrderedSemigroup.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Tracks the minimum wrapped instance of some ordered type <code>T</code>.</p><p><a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[T] is a <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a> for all types <code>T</code>. If <code>T</code> has some
+maximum element (<code>Long</code> has <code>Long.MaxValue</code>, for example), then
+<a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[T] is a <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a>.
+</p></div><dl class="paramcmts block"><dt class="param">get</dt><dd class="cmt"><p>wrapped instance of <code>T</code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/Min.scala" target="_blank">Min.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
@@ -93,7 +96,7 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.twitter.algebird.Min#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.twitter.algebird.Min#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(get:T):com.twitter.algebird.Min[T]"></a>
       <a id="&lt;init&gt;:Min[T]"></a>
       <h4 class="signature">
@@ -109,7 +112,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">get</dt><dd class="cmt"><p>wrapped instance of <code>T</code></p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -153,6 +156,24 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.Min#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]"></a>
+      <a id="+[U&gt;:T](Min[U])(Ordering[U]):Min[U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U">U &gt;: <span class="extype" name="com.twitter.algebird.Min.T">T</span></span>]</span><span class="params">(<span name="r">r: <a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.+.U">U</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Min.+.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.+.U">U</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Min@+[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Identical to <a href="#min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" class="extmbr" name="com.twitter.algebird.Min#min">min</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Identical to <a href="#min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" class="extmbr" name="com.twitter.algebird.Min#min">min</a>.
+</p></div><dl class="paramcmts block"><dt class="param">r</dt><dd class="cmt"><p>instance of <code>Min[U]</code> for comparison</p></dd></dl></div>
     </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -266,7 +287,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">wrapped instance of <code>T</code></p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -301,6 +322,26 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.Min#min" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]"></a>
+      <a id="min[U&gt;:T](Min[U])(Ordering[U]):Min[U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">min</span><span class="tparams">[<span name="U">U &gt;: <span class="extype" name="com.twitter.algebird.Min.T">T</span></span>]</span><span class="params">(<span name="r">r: <a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.min.U">U</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ord">ord: <span class="extype" name="scala.Ordering">Ordering</span>[<span class="extype" name="com.twitter.algebird.Min.min.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.Min">Min</a>[<span class="extype" name="com.twitter.algebird.Min.min.U">U</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.Min@min[U&gt;:T](r:com.twitter.algebird.Min[U])(implicitord:Ordering[U]):com.twitter.algebird.Min[U]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">If this instance wraps a smaller <code>T</code> than <code>r</code>, returns this
+instance, else returns <code>r</code>.</p><div class="fullcomment"><div class="comment cmt"><p>If this instance wraps a smaller <code>T</code> than <code>r</code>, returns this
+instance, else returns <code>r</code>.
+</p></div><dl class="paramcmts block"><dt class="param">r</dt><dd class="cmt"><p>instance of <code>Min[U]</code> for comparison</p></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>

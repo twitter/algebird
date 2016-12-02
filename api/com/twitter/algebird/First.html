@@ -51,7 +51,9 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/OrderedSemigroup.scala" target="_blank">OrderedSemigroup.scala</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Tracks the &quot;least recent&quot;, or earliest, wrapped instance of <code>T</code> by
+the order in which items are seen.
+</p></div><dl class="paramcmts block"><dt class="param">get</dt><dd class="cmt"><p>wrapped instance of <code>T</code></p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/twitter/algebird/tree/develop/algebird-core/src/main/scala/com/twitter/algebird/First.scala" target="_blank">First.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
@@ -93,7 +95,7 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.twitter.algebird.First#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.twitter.algebird.First#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(get:T):com.twitter.algebird.First[T]"></a>
       <a id="&lt;init&gt;:First[T]"></a>
       <h4 class="signature">
@@ -109,7 +111,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">get</dt><dd class="cmt"><p>wrapped instance of <code>T</code></p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -153,6 +155,24 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.twitter.algebird.First#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+[U&gt;:T](r:com.twitter.algebird.First[U]):com.twitter.algebird.First[T]"></a>
+      <a id="+[U&gt;:T](First[U]):First[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U">U &gt;: <span class="extype" name="com.twitter.algebird.First.T">T</span></span>]</span><span class="params">(<span name="r">r: <a href="" class="extype" name="com.twitter.algebird.First">First</a>[<span class="extype" name="com.twitter.algebird.First.+.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.twitter.algebird.First">First</a>[<span class="extype" name="com.twitter.algebird.First.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.twitter.algebird.First@+[U&gt;:T](r:com.twitter.algebird.First[U]):com.twitter.algebird.First[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns this instance, always.</p><div class="fullcomment"><div class="comment cmt"><p>Returns this instance, always.
+</p></div><dl class="paramcmts block"><dt class="param">r</dt><dd class="cmt"><p>ignored instance of <code>First[U]</code></p></dd></dl></div>
     </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -266,7 +286,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">wrapped instance of <code>T</code></p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>

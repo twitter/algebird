@@ -496,7 +496,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.JFloatField">JFloatField</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Combines two <code>T</code> instances associatively.</p><div class="fullcomment"><div class="comment cmt"><p>Combines two <code>T</code> instances associatively.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>result of combining <code>l</code> and <code>r</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.JFloatField">JFloatField</a> → <a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
     </li><li name="com.twitter.algebird.Ring#product" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="product(iter:TraversableOnce[T]):T"></a>
       <a id="product(TraversableOnce[Float]):Float"></a>
@@ -547,9 +548,12 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p><div class="fullcomment"><div class="comment cmt"><p>override this if there is a faster way to do this sum than reduceLeftOption on plus
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an instance of <code>T</code> calculated by summing all instances in
+<code>iter</code> in one pass. Returns <code>None</code> if <code>iter</code> is empty, else
+<code>Some[T]</code>.
+</p></div><dl class="paramcmts block"><dt class="param">iter</dt><dd class="cmt"><p>instances of <code>T</code> to be combined</p></dd><dt>returns</dt><dd class="cmt"><p><code>None</code> if <code>iter</code> is empty, else an option value containing the summed <code>T</code></p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Semigroup.html" class="extype" name="com.twitter.algebird.Semigroup">Semigroup</a></dd><dt>Note</dt><dd><span class="cmt"><p>Override if there is a faster way to compute this sum than
+      <code>iter.reduceLeftOption</code> using <a href="Semigroup.html#plus(l:T,r:T):T" class="extmbr" name="com.twitter.algebird.Semigroup#plus">plus</a>.</p></span></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -686,7 +690,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.JFloatField">JFloatField</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns the identity element of <code>T</code> for <a href="#plus(x:Float,y:Float):Float" class="extmbr" name="com.twitter.algebird.JFloatField#plus">plus</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Returns the identity element of <code>T</code> for <a href="#plus(x:Float,y:Float):Float" class="extmbr" name="com.twitter.algebird.JFloatField#plus">plus</a>.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.twitter.algebird.JFloatField">JFloatField</a> → <a href="Monoid.html" class="extype" name="com.twitter.algebird.Monoid">Monoid</a></dd></dl></div>
     </li></ol>
             </div>
 
