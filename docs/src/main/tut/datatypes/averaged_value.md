@@ -29,6 +29,12 @@ longVal + doubleVal
 longVal + doubleVal + intVal
 ```
 
+You can also add numbers directly to an `AveragedValue` instance:
+
+```tut:book
+longVal + 12
+```
+
 `AveragedValue` is a commutative group. This means you can add instances in any order:
 
 ```tut:book
