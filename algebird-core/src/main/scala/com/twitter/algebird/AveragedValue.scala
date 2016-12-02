@@ -16,57 +16,70 @@ limitations under the License.
 
 package com.twitter.algebird
 
+/**
+ * AveragedValue tracks the count and mean, or average value, of a
+ * data stream.
+ *
+ * Adding two instances of AveragedValue with `+` is equivalent to
+ * taking an average of the two streams, with each stream weighted by
+ * its count.
+ *
+ * The mean calculation uses an online algorithm suitable for large
+ * numbers of records, similar to:
+ * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
+ *
+ * See [[MomentsGroup.getCombinedMean]] for the code.
+ *
+ * @param count the number of items aggregated into this instance
+ * @param value the average value of all items aggregated into this instance
+ */
+case class AveragedValue(count: Long, value: Double) {
+  def unary_- : AveragedValue = copy(count = -count)
+  def -(r: AveragedValue): AveragedValue = AveragedGroup.minus(this, r)
+  def +(r: AveragedValue): AveragedValue = AveragedGroup.plus(this, r)
+}
+
 object AveragedValue {
+  // TODO: Change to Group[AveragedValue] in 0.13.0 (https://github.com/twitter/algebird/issues/587)
   implicit val group = AveragedGroup
+
   def aggregator: Aggregator[Double, AveragedValue, Double] = Averager
+
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
     Aggregator.prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
       .andThenPresent(_.value)
 
-  def apply[V <% Double](v: V) = new AveragedValue(1L, v)
-  def apply[V <% Double](c: Long, v: V) = new AveragedValue(c, v)
+  def apply[V <% Double](v: V): AveragedValue = apply(1L, v)
+  def apply[V <% Double](c: Long, v: V): AveragedValue = new AveragedValue(c, v)
 }
 
-case class AveragedValue(count: Long, value: Double)
-
 object AveragedGroup extends Group[AveragedValue] {
-  // When combining averages, if the counts sizes are too close we should use a different
-  // algorithm.  This constant defines how close the ratio of the smaller to the total count
-  // can be:
-  private val STABILITY_CONSTANT = 0.1
-  /**
-   * Uses a more stable online algorithm which should
-   * be suitable for large numbers of records
-   * similar to:
-   * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-   */
+  import MomentsGroup.getCombinedMean
+
   val zero = AveragedValue(0L, 0.0)
 
   override def isNonZero(av: AveragedValue) = (av.count != 0L)
 
-  override def negate(av: AveragedValue) = AveragedValue(-av.count, av.value)
+  override def negate(av: AveragedValue) = -av
 
-  def plus(cntAve1: AveragedValue, cntAve2: AveragedValue): AveragedValue = {
-    val (big, small) = if (cntAve1.count >= cntAve2.count)
-      (cntAve1, cntAve2)
-    else
-      (cntAve2, cntAve1)
-    val n = big.count
-    val k = small.count
-    val newCnt = n + k
-    if (newCnt == n) {
-      // Handle zero without allocation
-      big
-    } else if (newCnt == 0L) {
-      zero
-    } else {
-      val an = big.value
-      val ak = small.value
-      val scaling = k.toDouble / newCnt
-      // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-      val newAve = if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling) else (n * an + k * ak) / newCnt
-      new AveragedValue(newCnt, newAve)
+  override def sumOption(iter: TraversableOnce[AveragedValue]): Option[AveragedValue] =
+    if (iter.isEmpty) None
+    else {
+      var count = 0L
+      var average = 0.0
+      iter.foreach {
+        case AveragedValue(c, v) =>
+          average = getCombinedMean(count, average, c, v)
+          count += c
+      }
+      Some(AveragedValue(count, average))
     }
+
+  def plus(left: AveragedValue, right: AveragedValue): AveragedValue = {
+    val n = left.count
+    val k = right.count
+    val newAve = getCombinedMean(n, left.value, k, right.value)
+    AveragedValue(n + k, newAve)
   }
 }
 
