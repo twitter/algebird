@@ -105,7 +105,7 @@ See [the docs on `First` and `Last`](first_and_last.html) for more information.
 ### Links
 
 - Source: [Min.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/Min.scala) and [Max.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/Max.scala)
-- Tests: [MinSpec.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/MinSpec.scala) and [MaxSpec.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/MaxSpec.scala)
+- Tests: [MinLaws.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/MinLaws.scala) and [MaxLaws.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/MaxLaws.scala)
 - Scaladoc: [Min]({{site.baseurl}}/api#com.twitter.algebird.Min) and [Max]({{site.baseurl}}/api#com.twitter.algebird.Max)
 
 ### Documentation Help

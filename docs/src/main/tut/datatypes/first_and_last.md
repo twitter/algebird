@@ -72,7 +72,7 @@ See [the docs on `Min` and `Max`](min_and_max.html) for more information.
 ### Links
 
 - Source: [First.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/First.scala) and [Last.scala](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/Last.scala)
-- Tests: [FirstSpec.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/FirstSpec.scala) and [LastSpec.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/LastSpec.scala)
+- Tests: [FirstLaws.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/FirstLaws.scala) and [LastLaws.scala](https://github.com/twitter/algebird/blob/develop/algebird-test/src/test/scala/com/twitter/algebird/LastLaws.scala)
 - Scaladoc: [First]({{site.baseurl}}/api#com.twitter.algebird.First) and [Last]({{site.baseurl}}/api#com.twitter.algebird.Last)
 
 ### Documentation Help

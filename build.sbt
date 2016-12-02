@@ -36,7 +36,6 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
       algebirdCore,
       algebirdUtil,
       algebirdBijection,
-      algebirdBenchmark,
       algebirdSpark))
   }
 
@@ -166,6 +165,7 @@ lazy val algebird = Project(
   base = file("."),
   settings = sharedSettings)
   .settings(noPublishSettings)
+  .settings(coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*")
   .aggregate(
   algebirdTest,
   algebirdCore,

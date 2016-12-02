@@ -15,6 +15,7 @@
 * Add `metricsLaws[T]` to `BaseProperties` in `algebird-test`: https://github.com/twitter/algebird/pull/584
 * Modify generated `Tuple2Monoid`, etc to extend `TupleNSemigroup`, giving subclasses access to efficient `sumOption`: https://github.com/twitter/algebird/pull/585
 * optimize `Generated{Abstract,Product}Algebra.sumOption` with benchmarking https://github.com/twitter/algebird/pull/591
+* Add an efficient `sumOption`, `+`, `-` and docs to `AveragedValue`: https://github.com/twitter/algebird/pull/589
 
 ### Version 0.12.2 ###
 
