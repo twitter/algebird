@@ -23,9 +23,9 @@ package com.twitter.algebird
 // t in seconds, 1 day half life means: t => t * ln(2)/(86400.0)
 
 object DecayedValue extends java.io.Serializable {
-  def build[V <% Double](value: V, time: Double, halfLife: Double) = {
-    DecayedValue(value, time * math.log(2.0) / halfLife)
-  }
+  def build[V](value: V, time: Double, halfLife: Double)(implicit num: Numeric[V]): DecayedValue =
+    DecayedValue(num.toDouble(value), time * math.log(2.0) / halfLife)
+
   val zero = DecayedValue(0.0, Double.NegativeInfinity)
 
   def scale(newv: DecayedValue, oldv: DecayedValue, eps: Double) = {
