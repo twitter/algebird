@@ -23,5 +23,5 @@ class FirstLaws extends CheckProperties {
     }
   }
 
-  property("First[Int] is a semigroup") { semigroupLawsEquiv[First[Int]] }
+  property("First[Int] is a semigroup") { semigroupLaws[First[Int]] }
 }

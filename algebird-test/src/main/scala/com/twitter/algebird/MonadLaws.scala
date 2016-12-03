@@ -28,36 +28,34 @@ import Monad.{ pureOp, operators }
 object MonadLaws {
   import BaseProperties._
 
+  @deprecated("No longer used. Use Equiv[T] instance", since = "0.13.0")
   def defaultEq[T] = { (t0: T, t1: T) => (t0 == t1) }
 
-  def leftIdentity[M[_], T, U](eq: (M[U], M[U]) => Boolean = defaultEq[M[U]])(implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]]) = {
-    implicit val equiv: Equiv[M[U]] = Equiv.fromFunction(eq)
-    leftIdentityEquiv[M, T, U]
-  }
-
-  def rightIdentity[M[_], T](eq: (M[T], M[T]) => Boolean = defaultEq[M[T]])(implicit monad: Monad[M], arb: Arbitrary[M[T]]) = {
-    implicit val equiv: Equiv[M[T]] = Equiv.fromFunction(eq)
-    rightIdentityEquiv[M, T]
-  }
-
-  def associative[M[_], T, U, V](eq: (M[V], M[V]) => Boolean)(implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
-    fn2: Arbitrary[U => M[V]]) = {
-    implicit val equiv: Equiv[M[V]] = Equiv.fromFunction(eq)
-    associativeEquiv[M, T, U, V]
-  }
-
-  // Equiv versions:
-  def leftIdentityEquiv[M[_], T, U](
+  def leftIdentity[M[_], T, U](
     implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]], equiv: Equiv[M[U]]) =
     forAll { (t: T, fn: T => M[U]) => Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t)) }
 
-  def rightIdentityEquiv[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
+  def rightIdentity[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
     forAll { (mt: M[T]) => Equiv[M[T]].equiv(mt.flatMap { _.pure[M] }, mt) }
 
-  def associativeEquiv[M[_], T, U, V](implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
+  def associative[M[_], T, U, V](implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
     fn2: Arbitrary[U => M[V]], equiv: Equiv[M[V]]) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
     Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap { t => f1(t).flatMap(f2) })
   }
+
+  // Deprecated equiv versions:
+  @deprecated("use leftIdentity[T]", since = "0.13.0")
+  def leftIdentityEquiv[M[_], T, U](
+    implicit monad: Monad[M], arb: Arbitrary[T], arbfn: Arbitrary[(T) => M[U]], equiv: Equiv[M[U]]) =
+    leftIdentity[M, T, U]
+
+  @deprecated("use rightIdentity[T]", since = "0.13.0")
+  def rightIdentityEquiv[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
+    rightIdentity[M, T]
+
+  @deprecated("use associative[T]", since = "0.13.0")
+  def associativeEquiv[M[_], T, U, V](implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
+    fn2: Arbitrary[U => M[V]], equiv: Equiv[M[V]]) = associative[M, T, U, V]
 
   // Just generate a map and use that as a function:
   implicit def fnArb[M[_], T, U](implicit map: Arbitrary[Map[T, M[U]]],
@@ -68,18 +66,20 @@ object MonadLaws {
     ) yield ({ (t: T) => m.getOrElse(t, defu) })
   }
 
-  def monadLaws[M[_], T, U, R](eq: (M[R], M[R]) => Boolean = defaultEq[M[R]])(implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
-    arbr: Arbitrary[M[R]], fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    monadLawsEquiv[M, T, U, R]
-  }
-
+  @deprecated("use monadLaws[T]", since = "0.13.0")
   def monadLawsEquiv[M[_], T, U, R](
     implicit monad: Monad[M], arb: Arbitrary[M[T]],
     equivT: Equiv[M[T]], equivU: Equiv[M[U]], equivR: Equiv[M[R]],
     fn1: Arbitrary[(T) => M[U]], arbr: Arbitrary[M[R]],
     fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) =
-    associativeEquiv[M, T, U, R] && rightIdentityEquiv[M, R] && leftIdentityEquiv[M, U, R]
+    monadLaws[M, T, U, R]
+
+  def monadLaws[M[_], T, U, R](
+    implicit monad: Monad[M], arb: Arbitrary[M[T]],
+    equivT: Equiv[M[T]], equivU: Equiv[M[U]], equivR: Equiv[M[R]],
+    fn1: Arbitrary[(T) => M[U]], arbr: Arbitrary[M[R]],
+    fn2: Arbitrary[U => M[R]], arbu: Arbitrary[U]) =
+    associative[M, T, U, R] && rightIdentity[M, R] && leftIdentity[M, U, R]
 
   implicit def indexedSeqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[IndexedSeq[T]] =
     Arbitrary { arbl.arbitrary.map { _.toIndexedSeq } }

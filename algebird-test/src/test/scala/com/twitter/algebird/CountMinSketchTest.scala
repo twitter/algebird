@@ -36,43 +36,43 @@ class CmsLaws extends CheckProperties {
   property("CountMinSketch[Short] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Short](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Short]]
+    commutativeMonoidLaws[CMS[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Int]]
+    commutativeMonoidLaws[CMS[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[Long](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Long]]
+    commutativeMonoidLaws[CMS[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[BigInt](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[BigInt]]
+    commutativeMonoidLaws[CMS[BigInt]]
   }
 
   property("CountMinSketch[BigDecimal] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[BigDecimal](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[BigDecimal]]
+    commutativeMonoidLaws[CMS[BigDecimal]]
   }
 
   property("CountMinSketch[String] is a Monoid") {
     implicit val cmsMonoid = CMS.monoid[String](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[String](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[String]]
+    commutativeMonoidLaws[CMS[String]]
   }
 
   property("CountMinSketch[Bytes] is a commutative monoid") {
     implicit val cmsMonoid = CMS.monoid[Bytes](EPS, DELTA, SEED)
     implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Bytes]]
+    commutativeMonoidLaws[CMS[Bytes]]
   }
 }
 
@@ -101,43 +101,43 @@ class TopPctCmsLaws extends CheckProperties {
   property("TopPctCms[Short] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Short](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Short]]
+    commutativeMonoidLaws[TopCMS[Short]]
   }
 
   property("TopPctCms[Int] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Int](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Int]]
+    commutativeMonoidLaws[TopCMS[Int]]
   }
 
   property("TopPctCms[Long] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Long](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Long]]
+    commutativeMonoidLaws[TopCMS[Long]]
   }
 
   property("TopPctCms[BigInt] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[BigInt](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[BigInt]]
+    commutativeMonoidLaws[TopCMS[BigInt]]
   }
 
   property("TopPctCms[BigDecimal] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[BigDecimal](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[BigDecimal]]
+    commutativeMonoidLaws[TopCMS[BigDecimal]]
   }
 
   property("TopPctCms[String] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[String](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[String](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[String]]
+    commutativeMonoidLaws[TopCMS[String]]
   }
 
   property("TopPctCms[Bytes] is a Monoid") {
     implicit val cmsMonoid = TopPctCMS.monoid[Bytes](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
     implicit val cmsGen = createArbitrary[Bytes](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Bytes]]
+    commutativeMonoidLaws[TopCMS[Bytes]]
   }
 }
 

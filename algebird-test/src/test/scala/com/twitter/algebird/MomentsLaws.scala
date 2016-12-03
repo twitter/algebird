@@ -16,7 +16,7 @@ class MomentsLaws extends CheckProperties {
           approxEq(EPS)(ml.m3, mr.m3) &&
           approxEq(EPS)(ml.m4, mr.m4)
       }
-    groupLawsEquiv[Moments]
+    groupLaws[Moments]
   }
 }
 

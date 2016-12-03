@@ -33,9 +33,7 @@ object BaseProperties extends MetricProperties {
       (BigDecimal(base) * BigDecimal(10).pow(scale))
     })
 
-  @deprecated(
-    "Please use Equiv.universal, or the Equiv version of tests",
-    since = "0.12.3")
+  @deprecated("Please use Equiv.universal, or the Equiv version of tests", since = "0.12.3")
   def defaultEq[T](t0: T, t1: T): Boolean = t0 == t1
 
   def approxEq(eps: Double)(f1: Double, f2: Double): Boolean =
@@ -55,37 +53,39 @@ object BaseProperties extends MetricProperties {
       case _ => true
     }
 
+
   // Associative
-  def isAssociative[T: Semigroup: Arbitrary]: Prop = isAssociativeDifferentTypes[T, T]
-
-  def isAssociativeDifferentTypes[T: Semigroup, U <: T: Arbitrary]: Prop =
-    isAssociativeEquiv[T, U]
-
-  @deprecated("use isAssociativeEquiv[T, U] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use isAssociativeDifferentTypes[T, U] with implicit Equiv[T] instance", since = "0.13.0")
   def isAssociativeEq[T: Semigroup, U <: T: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    isAssociativeEquiv[T, U]
+    isAssociativeDifferentTypes[T, U]
   }
 
+  @deprecated("use isAssociativeDifferentTypes[T, U]", since = "0.13.0")
   def isAssociativeEquiv[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
+    isAssociativeDifferentTypes[T, U]
+
+  def isAssociativeDifferentTypes[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
     'isAssociativeEq |: forAll { (a: U, b: U, c: U) =>
       val semi = implicitly[Semigroup[T]]
       Equiv[T].equiv(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c))
     }
 
-  // Commutative
-  def isCommutative[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    isCommutativeEquiv[T]
-  }
+  def isAssociative[T: Semigroup: Arbitrary: Equiv]: Prop =
+    isAssociativeDifferentTypes[T, T]
 
-  @deprecated("use isCommutativeEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  // Commutative
+  @deprecated("use isCommutative[T] with implicit Equiv[T] instance", since = "0.13.0")
   def isCommutativeEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    isCommutativeEquiv[T]
+    isCommutative[T]
   }
 
+  @deprecated("use isCommutative[T]", since = "0.13.0")
   def isCommutativeEquiv[T: Semigroup: Arbitrary: Equiv]: Prop =
+    isCommutative[T]
+
+  def isCommutative[T: Semigroup: Arbitrary: Equiv]: Prop =
     'isCommutativeEq |: forAll { (a: T, b: T) =>
       val semi = implicitly[Semigroup[T]]
       Equiv[T].equiv(semi.plus(a, b), semi.plus(b, a))
@@ -100,34 +100,32 @@ object BaseProperties extends MetricProperties {
       )
     }
 
-  def semigroupLaws[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    semigroupLawsEquiv[T]
-  }
-
-  @deprecated("use semigroupLawsEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use semigroupLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def semigroupLawsEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    semigroupLawsEquiv[T]
+    semigroupLaws[T]
   }
 
+  @deprecated("use semigroupLaws[T]", since = "0.13.0")
   def semigroupLawsEquiv[T: Semigroup: Arbitrary: Equiv]: Prop =
-    isAssociativeEquiv[T, T] && semigroupSumWorks[T]
+    semigroupLaws[T]
+
+  def semigroupLaws[T: Semigroup: Arbitrary: Equiv]: Prop =
+    isAssociative[T] && semigroupSumWorks[T]
 
   // Commutative Semigroup Laws
-  def commutativeSemigroupLaws[T: Semigroup: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    commutativeSemigroupLawsEquiv[T]
-  }
-
-  @deprecated("use commutativeSemigroupLawsEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use commutativeSemigroupLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def commutativeSemigroupLawsEq[T: Semigroup: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    commutativeSemigroupLawsEquiv[T]
+    commutativeSemigroupLaws[T]
   }
 
+  @deprecated("use commutativeSemigroupLaws[T]", since = "0.13.0")
   def commutativeSemigroupLawsEquiv[T: Semigroup: Arbitrary: Equiv]: Prop =
-    semigroupLawsEquiv[T] && isCommutativeEquiv[T]
+    commutativeSemigroupLaws[T]
+
+  def commutativeSemigroupLaws[T: Semigroup: Arbitrary: Equiv]: Prop =
+    semigroupLaws[T] && isCommutative[T]
 
   def isNonZeroWorksMonoid[T: Monoid: Arbitrary: Equiv]: Prop =
     'isNonZeroWorksMonoid |: forAll { (a: T, b: T) =>
@@ -142,12 +140,11 @@ object BaseProperties extends MetricProperties {
       (Monoid.isNonZero(a) && Monoid.isNonZero(b)) || prodZero
     }
 
-  def weakZeroDifferentTypes[T: Monoid, U <: T: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    weakZeroDifferentTypesEquiv[T, U]
-  }
-
+  @deprecated("use weakZeroDifferentTypes[T, U]", since = "0.13.0")
   def weakZeroDifferentTypesEquiv[T: Monoid: Equiv, U <: T: Arbitrary]: Prop =
+    weakZeroDifferentTypes[T, U]
+
+  def weakZeroDifferentTypes[T: Monoid: Equiv, U <: T: Arbitrary]: Prop =
     'weakZeroDifferentTypes |: forAll { (a: U) =>
       val mon = implicitly[Monoid[T]]
       val zero = mon.zero
@@ -156,26 +153,22 @@ object BaseProperties extends MetricProperties {
       Equiv[T].equiv(mon.plus(a, zero), mon.plus(zero, a))
     }
 
-  def weakZero[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    weakZeroEquiv[T]
-  }
+  @deprecated("use weakZero[T]", since = "0.13.0")
+  def weakZeroEquiv[T: Monoid: Arbitrary: Equiv]: Prop = weakZero[T]
 
-  def weakZeroEquiv[T: Monoid: Arbitrary: Equiv]: Prop =
-    weakZeroDifferentTypesEquiv[T, T]
+  def weakZero[T: Monoid: Arbitrary: Equiv]: Prop =
+    weakZeroDifferentTypes[T, T]
 
-  def validZero[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    validZeroEquiv[T]
-  }
-
-  @deprecated("use validZeroEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use validZero[T] with implicit Equiv[T] instance", since = "0.13.0")
   def validZeroEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    validZeroEquiv[T]
+    validZero[T]
   }
 
-  def validZeroEquiv[T: Monoid: Arbitrary: Equiv]: Prop =
+  @deprecated("use validZero[T]", since = "0.13.0")
+  def validZeroEquiv[T: Monoid: Arbitrary: Equiv]: Prop = validZero[T]
+
+  def validZero[T: Monoid: Arbitrary: Equiv]: Prop =
     'validZeroEq |: forAll { (a: T) =>
       val mon = implicitly[Monoid[T]]
       val zero = mon.zero
@@ -184,33 +177,30 @@ object BaseProperties extends MetricProperties {
       Equiv[T].equiv(mon.plus(a, zero), mon.plus(zero, a))
     }
 
-  def monoidLaws[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    monoidLawsEquiv[T]
-  }
-
-  @deprecated("use monoidLawsEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use monoidLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def monoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    monoidLawsEquiv[T]
+    monoidLaws[T]
   }
 
-  def monoidLawsEquiv[T: Monoid: Arbitrary: Equiv]: Prop =
-    validZeroEquiv[T] && semigroupLawsEquiv[T] && isNonZeroWorksMonoid[T]
+  @deprecated("use monoidLaws[T]", since = "0.13.0")
+  def monoidLawsEquiv[T: Monoid: Arbitrary: Equiv]: Prop = monoidLaws[T]
 
-  def commutativeMonoidLaws[T: Monoid: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    commutativeMonoidLawsEquiv[T]
-  }
+  def monoidLaws[T: Monoid: Arbitrary: Equiv]: Prop =
+    validZero[T] && semigroupLaws[T] && isNonZeroWorksMonoid[T]
 
-  @deprecated("use commutativeMonoidLawsEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use commutativeMonoidLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def commutativeMonoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    commutativeMonoidLawsEquiv[T]
+    commutativeMonoidLaws[T]
   }
 
+  @deprecated("use commutativeMonoidLaws[T]", since = "0.13.0")
   def commutativeMonoidLawsEquiv[T: Monoid: Arbitrary: Equiv]: Prop =
-    monoidLawsEquiv[T] && isCommutativeEquiv[T]
+    commutativeMonoidLaws[T]
+
+  def commutativeMonoidLaws[T: Monoid: Arbitrary: Equiv]: Prop =
+    monoidLaws[T] && isCommutative[T]
 
   def hasAdditiveInversesDifferentTypes[T: Group, U <: T: Arbitrary]: Prop =
     forAll { (a: U) =>
@@ -223,27 +213,24 @@ object BaseProperties extends MetricProperties {
   def hasAdditiveInverses[T: Group: Arbitrary]: Prop =
     hasAdditiveInversesDifferentTypes[T, T]
 
-  def groupLaws[T: Group: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    groupLawsEquiv[T]
-  }
-
-  @deprecated("use groupLawsEquiv[T] with implicit Equiv[T] instance", since = "0.12.3")
+  @deprecated("use groupLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def groupLawsEq[T: Group: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
-    groupLawsEquiv[T]
+    groupLaws[T]
   }
 
+  @deprecated("use groupLaws[T]", since = "0.13.0")
   def groupLawsEquiv[T: Group: Arbitrary: Equiv]: Prop =
-    monoidLawsEquiv[T] && hasAdditiveInverses[T]
+    groupLaws[T]
+
+  def groupLaws[T: Group: Arbitrary: Equiv]: Prop =
+    monoidLaws[T] && hasAdditiveInverses[T]
 
   // Here are multiplicative properties:
-  def validOne[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    validOneEquiv[T]
-  }
+  @deprecated("use validOne[T]", since = "0.13.0")
+  def validOneEquiv[T: Ring: Arbitrary: Equiv]: Prop = validOne[T]
 
-  def validOneEquiv[T: Ring: Arbitrary: Equiv]: Prop =
+  def validOne[T: Ring: Arbitrary: Equiv]: Prop =
     'validOne |: forAll { (a: T) =>
       val rng = implicitly[Ring[T]]
       Equiv[T].equiv(rng.times(rng.one, a), rng.times(a, rng.one)) &&
@@ -257,12 +244,11 @@ object BaseProperties extends MetricProperties {
       (!ring.isNonZero(ring.times(ring.zero, a)))
     }
 
-  def isDistributiveDifferentTypes[T: Ring, U <: T: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    isDistributiveDifferentTypesEquiv[T, U]
-  }
-
+  @deprecated("use isDistributiveDifferentTypes[T, U]", since = "0.13.0")
   def isDistributiveDifferentTypesEquiv[T: Ring: Equiv, U <: T: Arbitrary]: Prop =
+    isDistributiveDifferentTypes[T, U]
+
+  def isDistributiveDifferentTypes[T: Ring: Equiv, U <: T: Arbitrary]: Prop =
     'isDistributiveDifferentTypes |:
   forAll { (a: U, b: U, c: U) =>
     val rng = implicitly[Ring[T]]
@@ -270,50 +256,43 @@ object BaseProperties extends MetricProperties {
     Equiv[T].equiv(rng.times(rng.plus(b, c), a), rng.plus(rng.times(b, a), rng.times(c, a)))
   }
 
-  def isDistributive[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    isDistributiveEquiv[T]
-  }
+  @deprecated("use isDistributive[T]", since = "0.13.0")
+  def isDistributiveEquiv[T: Ring: Arbitrary: Equiv]: Prop = isDistributive[T]
 
-  def isDistributiveEquiv[T: Ring: Arbitrary: Equiv]: Prop =
-    isDistributiveDifferentTypesEquiv[T, T]
+  def isDistributive[T: Ring: Arbitrary: Equiv]: Prop =
+    isDistributiveDifferentTypes[T, T]
 
-  def timesIsAssociative[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    timesIsAssociativeEquiv[T]
-  }
-
+  @deprecated("use timesIsAssociative[T]", since = "0.13.0")
   def timesIsAssociativeEquiv[T: Ring: Arbitrary: Equiv]: Prop =
+    timesIsAssociative[T]
+
+  def timesIsAssociative[T: Ring: Arbitrary: Equiv]: Prop =
     'timesIsAssociative |: forAll { (a: T, b: T, c: T) =>
       val rng = implicitly[Ring[T]]
       Equiv[T].equiv(rng.times(a, rng.times(b, c)), rng.times(rng.times(a, b), c))
     }
 
-  def pseudoRingLaws[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    pseudoRingLawsEquiv[T]
-  }
-
+  @deprecated("use pseudoRingLaws[T]", since = "0.13.0")
   def pseudoRingLawsEquiv[T: Ring: Arbitrary: Equiv]: Prop =
-    isDistributiveEquiv[T] && timesIsAssociativeEquiv[T] && groupLawsEquiv[T] &&
-  isCommutativeEquiv[T] && isNonZeroWorksRing[T]
+    pseudoRingLaws[T]
 
-  def semiringLaws[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    semiringLawsEquiv[T]
-  }
+  def pseudoRingLaws[T: Ring: Arbitrary: Equiv]: Prop =
+    isDistributive[T] && timesIsAssociative[T] && groupLaws[T] &&
+  isCommutative[T] && isNonZeroWorksRing[T]
 
+
+  @deprecated("use semiringLaws[T]", since = "0.13.0")
   def semiringLawsEquiv[T: Ring: Arbitrary: Equiv]: Prop =
-    isDistributiveEquiv[T] && timesIsAssociativeEquiv[T] &&
-      validOneEquiv[T] && commutativeMonoidLawsEquiv[T] &&
-      zeroAnnihilates[T] &&
-      isNonZeroWorksRing[T]
+    semiringLaws[T]
 
-  def ringLaws[T: Ring: Arbitrary]: Prop = {
-    implicit val eq: Equiv[T] = Equiv.universal
-    ringLawsEquiv[T]
-  }
+  def semiringLaws[T: Ring: Arbitrary: Equiv]: Prop =
+    isDistributive[T] && timesIsAssociative[T] &&
+      validOne[T] && commutativeMonoidLaws[T] &&
+      zeroAnnihilates[T] && isNonZeroWorksRing[T]
 
-  def ringLawsEquiv[T: Ring: Arbitrary: Equiv]: Prop =
-    validOneEquiv[T] && pseudoRingLawsEquiv[T]
+  @deprecated("use ringLaws[T]", since = "0.13.0")
+  def ringLawsEquiv[T: Ring: Arbitrary: Equiv]: Prop = ringLaws[T]
+
+  def ringLaws[T: Ring: Arbitrary: Equiv]: Prop =
+    validOne[T] && pseudoRingLaws[T]
 }

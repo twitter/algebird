@@ -20,7 +20,7 @@ class DecayedValueLaws extends CheckProperties {
       Equiv.fromFunction { (dvl, dvr) =>
         approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
       }
-    commutativeMonoidLawsEquiv[DecayedValue]
+    commutativeMonoidLaws[DecayedValue]
   }
 
   def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]) = {

@@ -25,26 +25,26 @@ class MaxLaws extends CheckProperties {
   }
 
   property("Max[Long] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[Long]]
+    commutativeMonoidLaws[Max[Long]]
   }
 
   property("Max[Double] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[Double]]
+    commutativeMonoidLaws[Max[Double]]
   }
 
   property("Max[String] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[String]]
+    commutativeMonoidLaws[Max[String]]
   }
 
   property("Max[List[Int]] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[List[Int]]]
+    commutativeMonoidLaws[Max[List[Int]]]
   }
 
   property("Max[Vector[Int]] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[Vector[Int]]]
+    commutativeMonoidLaws[Max[Vector[Int]]]
   }
 
   property("Max[Stream[Int]] is a commutative monoid") {
-    commutativeMonoidLawsEquiv[Max[Stream[Int]]]
+    commutativeMonoidLaws[Max[Stream[Int]]]
   }
 }

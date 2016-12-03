@@ -40,7 +40,7 @@ class CollectionSpecification extends CheckProperties {
             v1 == v2
           }
         }
-    groupLaws[Option[Int]] && groupLawsEquiv[Map[String, Option[Int]]]
+    groupLaws[Option[Int]] && groupLaws[Map[String, Option[Int]]]
   }
 
   property("List plus") {
@@ -70,7 +70,7 @@ class CollectionSpecification extends CheckProperties {
 
   property("Array Monoid laws") {
     implicit val equiv: Equiv[Array[Int]] = Equiv.by(_.deep)
-    monoidLawsEquiv[Array[Int]]
+    monoidLaws[Array[Int]]
   }
 
   property("Set plus") {
@@ -183,7 +183,7 @@ class CollectionSpecification extends CheckProperties {
   // TODO: this test fails sometimes due to the equiv not doing the right thing.
   // Fix by defining an Equiv.
   property("IndexedSeq is a pseudoRing") {
-    pseudoRingLawsEquiv[IndexedSeq[Int]]
+    pseudoRingLaws[IndexedSeq[Int]]
   }
 
   property("Either is a Monoid") {
@@ -301,25 +301,25 @@ class CollectionSpecification extends CheckProperties {
 
   property("AdaptiveVector[Int] has a semigroup") {
     implicit val arb = Arbitrary(arbAV(2))
-    semigroupLawsEquiv[AdaptiveVector[Int]]
+    semigroupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a monoid") {
     // TODO: remove this equiv instance once #583 is resolved.
     implicit val equiv = AdaptiveVector.denseEquiv[Int]
     implicit val arb = Arbitrary(arbAV(0))
-    monoidLawsEquiv[AdaptiveVector[Int]]
+    monoidLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a group") {
     implicit val arb = Arbitrary(arbAV(1))
-    groupLawsEquiv[AdaptiveVector[Int]]
+    groupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[String] has a monoid") {
     // TODO: remove this equiv instance once #583 is resolved.
     implicit val equiv = AdaptiveVector.denseEquiv[String]
     implicit val arb = Arbitrary(arbAV(""))
-    monoidLawsEquiv[AdaptiveVector[String]]
+    monoidLaws[AdaptiveVector[String]]
   }
 }

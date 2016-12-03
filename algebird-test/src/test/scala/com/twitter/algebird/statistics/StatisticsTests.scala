@@ -1,33 +1,23 @@
 package com.twitter.algebird.statistics
 
+import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.CheckProperties
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
 import org.scalatest.{ Matchers, _ }
 
 class StatisticsRingLaws extends CheckProperties with Matchers {
-  import com.twitter.algebird.BaseProperties._
+  implicit val statsRing = new StatisticsRing[Int]
+  implicit val arb = Arbitrary(for (v <- choose(0, 1 << 30)) yield v)
 
-  val statsRing = new StatisticsRing[Int]
-  val gen = for (v <- choose(0, 1 << 30)) yield v
-
-  property("StatisticsRing is a Ring") {
-    ringLaws[Int](statsRing, Arbitrary(gen))
-  }
-
+  property("StatisticsRing is a Ring") { ringLaws[Int] }
 }
 
 class StatisticsMonoidLaws extends CheckProperties with Matchers {
-  import com.twitter.algebird.BaseProperties._
+  implicit val statsMonoid = new StatisticsMonoid[Int]
+  implicit val arb = Arbitrary(for (v <- choose(0, 1 << 14)) yield v)
 
-  val statsMonoid = new StatisticsMonoid[Int]
-
-  val gen = for (v <- choose(0, 1 << 14)) yield v
-
-  property("StatisticsMonoid is a Monoid") {
-    monoidLaws[Int](statsMonoid, Arbitrary(gen))
-  }
-
+  property("StatisticsMonoid is a Monoid") { monoidLaws[Int] }
 }
 
 class StatisticsTest extends WordSpec with Matchers {

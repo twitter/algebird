@@ -31,7 +31,7 @@ class SketchMapLaws extends CheckProperties {
     }
 
   property("SketchMap is a commutative monoid") {
-    commutativeMonoidLawsEquiv[SketchMap[Int, Long]]
+    commutativeMonoidLaws[SketchMap[Int, Long]]
   }
 }
 
