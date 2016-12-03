@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Semigroup => ASemigroup }
+import algebra.ring.{ AdditiveSemigroup }
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -38,14 +40,7 @@ import macros.caseclass._
  * @define T T
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
-trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serializable {
-  /**
-   * Combines two `$T` instances associatively.
-   *
-   * @return result of combining `l` and `r`
-   */
-  def plus(l: T, r: T): T
-
+trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] with AdditiveSemigroup[T] {
   /**
    * Returns an instance of `$T` calculated by summing all instances in
    * `iter` in one pass. Returns `None` if `iter` is empty, else
@@ -58,6 +53,15 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends java.io.Serial
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption { plus(_, _) }
+
+  /*
+   * These are methods from algebra
+   */
+  override def trySum(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
+
+  override def additive: ASemigroup[T] = this
+  override def combine(l: T, r: T): T = plus(l, r)
+  override def combineAllOption(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
 }
 
 // For Java interop so they get the default sumOption
@@ -94,7 +98,25 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
   }
 }
 
-object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
+class FromAlgebraSemigroup[T](sg: ASemigroup[T]) extends Semigroup[T] {
+  override def plus(l: T, r: T): T = sg.combine(l, r)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] = sg.combineAllOption(ts)
+}
+
+/**
+ * An Algebra semigroup can be an Algebird semigroup
+ */
+private[algebird] trait FromAlgebraSemigroupImplicit1 {
+  implicit def fromAlgebraAdditiveSemigroup[T](implicit sg: AdditiveSemigroup[T]): Semigroup[T] =
+    new FromAlgebraSemigroup(sg.additive)
+}
+
+private[algebird] trait FromAlgebraSemigroupImplicit0 extends FromAlgebraSemigroupImplicit1 {
+  implicit def fromAlgebraSemigroup[T](implicit sg: ASemigroup[T]): Semigroup[T] =
+    new FromAlgebraSemigroup(sg)
+}
+
+object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with FromAlgebraSemigroupImplicit0 {
   def maybePlus[T](opt: Option[T], t: T)(implicit sg: Semigroup[T]): T =
     opt match {
       case None => t
@@ -111,7 +133,8 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]): Option[T] =
     sg.sumOption(iter)
 
-  def from[T](associativeFn: (T, T) => T): Semigroup[T] = new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
+  def from[T](associativeFn: (T, T) => T): Semigroup[T] =
+    new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
 
   /**
    * Same as v + v + v .. + v (i times in total)
@@ -162,23 +185,22 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups {
     }
   }
 
-  implicit val nullSemigroup: Semigroup[Null] = NullGroup
-  implicit val unitSemigroup: Semigroup[Unit] = UnitGroup
-  implicit val boolSemigroup: Semigroup[Boolean] = BooleanField
-  implicit val jboolSemigroup: Semigroup[JBool] = JBoolField
-  implicit val intSemigroup: Semigroup[Int] = IntRing
-  implicit val jintSemigroup: Semigroup[JInt] = JIntRing
-  implicit val shortSemigroup: Semigroup[Short] = ShortRing
-  implicit val jshortSemigroup: Semigroup[JShort] = JShortRing
-  implicit val longSemigroup: Semigroup[Long] = LongRing
-  implicit val bigIntSemigroup: Semigroup[BigInt] = BigIntRing
-  implicit val bigDecimalSemigroup: Semigroup[BigDecimal] = BigDecimalRing
-  implicit val jlongSemigroup: Semigroup[JLong] = JLongRing
-  implicit val floatSemigroup: Semigroup[Float] = FloatField
-  implicit val jfloatSemigroup: Semigroup[JFloat] = JFloatField
-  implicit val doubleSemigroup: Semigroup[Double] = DoubleField
-  implicit val jdoubleSemigroup: Semigroup[JDouble] = JDoubleField
-  implicit val stringSemigroup: Semigroup[String] = StringMonoid
+  implicit def nullSemigroup: Semigroup[Null] = NullGroup
+  implicit def unitSemigroup: Semigroup[Unit] = UnitGroup
+  implicit def boolSemigroup: Semigroup[Boolean] = BooleanRing
+  implicit def jboolSemigroup: Semigroup[JBool] = JBoolRing
+  implicit def intSemigroup: Semigroup[Int] = IntRing
+  implicit def jintSemigroup: Semigroup[JInt] = JIntRing
+  implicit def shortSemigroup: Semigroup[Short] = ShortRing
+  implicit def jshortSemigroup: Semigroup[JShort] = JShortRing
+  implicit def longSemigroup: Semigroup[Long] = LongRing
+  implicit def bigIntSemigroup: Semigroup[BigInt] = BigIntRing
+  implicit def jlongSemigroup: Semigroup[JLong] = JLongRing
+  implicit def floatSemigroup: Semigroup[Float] = FloatRing
+  implicit def jfloatSemigroup: Semigroup[JFloat] = JFloatRing
+  implicit def doubleSemigroup: Semigroup[Double] = DoubleRing
+  implicit def jdoubleSemigroup: Semigroup[JDouble] = JDoubleRing
+  implicit def stringSemigroup: Semigroup[String] = StringMonoid
   implicit def optionSemigroup[T: Semigroup]: Semigroup[Option[T]] = new OptionMonoid[T]
   implicit def listSemigroup[T]: Semigroup[List[T]] = new ListMonoid[T]
   implicit def seqSemigroup[T]: Semigroup[Seq[T]] = new SeqMonoid[T]

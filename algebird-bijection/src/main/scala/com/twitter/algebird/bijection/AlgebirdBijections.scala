@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird.bijection
 
-import com.twitter.algebird.{ Field, Group, Monoid, Ring, Semigroup }
+import com.twitter.algebird.{ Group, Monoid, Ring, Semigroup }
 import com.twitter.bijection.{ AbstractBijection, Bijection, ImplicitBijection, Conversion, Reverse }
 
 import Conversion.asMethod // "as" syntax
@@ -51,11 +51,6 @@ class BijectedRing[T, U](implicit val ring: Ring[T], bij: ImplicitBijection[T, U
     ring.product(iter map { _.as[T] }).as[U]
 }
 
-class BijectedField[T, U](implicit val field: Field[T], bij: ImplicitBijection[T, U]) extends BijectedRing[T, U] with Field[U] {
-  override def div(l: U, r: U): U = field.div(l.as[T], r.as[T]).as[U]
-  override def inverse(u: U): U = field.inverse(u.as[T]).as[U]
-}
-
 trait AlgebirdBijections {
   implicit def semigroupBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Semigroup[T], Semigroup[U]] =
     new AbstractBijection[Semigroup[T], Semigroup[U]] {
@@ -79,12 +74,6 @@ trait AlgebirdBijections {
     new AbstractBijection[Ring[T], Ring[U]] {
       override def apply(ring: Ring[T]) = new BijectedRing[T, U]()(ring, bij)
       override def invert(ring: Ring[U]) = new BijectedRing[U, T]()(ring, Reverse(bij.bijection))
-    }
-
-  implicit def fieldBijection[T, U](implicit bij: ImplicitBijection[T, U]): Bijection[Field[T], Field[U]] =
-    new AbstractBijection[Field[T], Field[U]] {
-      override def apply(field: Field[T]) = new BijectedField[T, U]()(field, bij)
-      override def invert(field: Field[U]) = new BijectedField[U, T]()(field, Reverse(bij.bijection))
     }
 }
 

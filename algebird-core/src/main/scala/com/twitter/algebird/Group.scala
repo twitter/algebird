@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Group => AGroup }
+import algebra.ring.AdditiveGroup
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
 import java.util.{ List => JList, Map => JMap }
 
@@ -28,10 +30,13 @@ import scala.math.Equiv
  */
 
 @implicitNotFound(msg = "Cannot find Group type class for ${T}")
-trait Group[@specialized(Int, Long, Float, Double) T] extends Monoid[T] {
-  // must override negate or minus (or both)
-  def negate(v: T): T = minus(zero, v)
-  def minus(l: T, r: T): T = plus(l, negate(r))
+trait Group[@specialized(Int, Long, Float, Double) T] extends AGroup[T] with Monoid[T] with AdditiveGroup[T] {
+  /*
+   * This are from algebra.Group
+   */
+  override def additive: AGroup[T] = this
+  override def remove(l: T, r: T): T = minus(l, r)
+  override def inverse(v: T): T = negate(v)
 }
 
 // For Java interop so they get the default methods
@@ -82,7 +87,20 @@ class ArrayGroup[T: ClassTag](implicit grp: Group[T])
   }.toArray
 }
 
-object Group extends GeneratedGroupImplicits with ProductGroups {
+class FromAlgebraGroup[T](m: AGroup[T]) extends FromAlgebraMonoid(m) with Group[T] {
+  override def negate(t: T): T = m.inverse(t)
+  override def minus(r: T, l: T): T = m.remove(r, l)
+}
+
+private[algebird] trait FromAlgebraGroupImplicit1 {
+  implicit def fromAlgebraAdditiveGroup[T](implicit m: AdditiveGroup[T]): Group[T] =
+    new FromAlgebraGroup(m.additive)
+}
+private[algebird] trait FromAlgebraGroupImplicit0 extends FromAlgebraGroupImplicit1 {
+  implicit def fromAlgebraGroup[T](implicit m: AGroup[T]): Group[T] = new FromAlgebraGroup(m)
+}
+
+object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebraGroupImplicit0 {
   // This pattern is really useful for typeclasses
   def negate[T](x: T)(implicit grp: Group[T]) = grp.negate(x)
   def minus[T](l: T, r: T)(implicit grp: Group[T]) = grp.minus(l, r)
@@ -98,24 +116,26 @@ object Group extends GeneratedGroupImplicits with ProductGroups {
       Monoid.intTimes(i, v)(grp)
     }
 
-  implicit val nullGroup: Group[Null] = NullGroup
-  implicit val unitGroup: Group[Unit] = UnitGroup
-  implicit val boolGroup: Group[Boolean] = BooleanField
-  implicit val jboolGroup: Group[JBool] = JBoolField
-  implicit val intGroup: Group[Int] = IntRing
-  implicit val jintGroup: Group[JInt] = JIntRing
-  implicit val shortGroup: Group[Short] = ShortRing
-  implicit val jshortGroup: Group[JShort] = JShortRing
-  implicit val longGroup: Group[Long] = LongRing
-  implicit val bigIntGroup: Group[BigInt] = BigIntRing
-  implicit val bigDecimalGroup: Group[BigDecimal] = BigDecimalRing
-  implicit val jlongGroup: Group[JLong] = JLongRing
-  implicit val floatGroup: Group[Float] = FloatField
-  implicit val jfloatGroup: Group[JFloat] = JFloatField
-  implicit val doubleGroup: Group[Double] = DoubleField
-  implicit val jdoubleGroup: Group[JDouble] = JDoubleField
+  implicit def nullGroup: Group[Null] = NullGroup
+  implicit def unitGroup: Group[Unit] = UnitGroup
+  implicit def boolGroup: Group[Boolean] = BooleanRing
+  implicit def jboolGroup: Group[JBool] = JBoolRing
+  implicit def intGroup: Group[Int] = IntRing
+  implicit def jintGroup: Group[JInt] = JIntRing
+  implicit def shortGroup: Group[Short] = ShortRing
+  implicit def jshortGroup: Group[JShort] = JShortRing
+  implicit def longGroup: Group[Long] = LongRing
+  implicit def bigIntGroup: Group[BigInt] = BigIntRing
+  implicit def bigDecimalGroup: Group[BigDecimal] = implicitly[Ring[BigDecimal]]
+  implicit def jlongGroup: Group[JLong] = JLongRing
+  implicit def floatGroup: Group[Float] = FloatRing
+  implicit def jfloatGroup: Group[JFloat] = JFloatRing
+  implicit def doubleGroup: Group[Double] = DoubleRing
+  implicit def jdoubleGroup: Group[JDouble] = JDoubleRing
   implicit def optionGroup[T: Group] = new OptionGroup[T]
   implicit def indexedSeqGroup[T: Group]: Group[IndexedSeq[T]] = new IndexedSeqGroup[T]
-  implicit def mapGroup[K, V](implicit group: Group[V]) = new MapGroup[K, V]()(group)
-  implicit def scMapGroup[K, V](implicit group: Group[V]) = new ScMapGroup[K, V]()(group)
+  implicit def mapGroup[K, V](implicit group: Group[V]): Group[Map[K, V]] =
+    new MapGroup[K, V]()(group)
+  implicit def scMapGroup[K, V](implicit group: Group[V]): Group[scala.collection.Map[K, V]] =
+    new ScMapGroup[K, V]()(group)
 }

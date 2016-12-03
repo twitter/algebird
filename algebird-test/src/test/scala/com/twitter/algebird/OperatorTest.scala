@@ -17,8 +17,5 @@ class OperatorTest extends WordSpec with Matchers {
       assert(Map(1 -> 3) * Map(2 -> 4) == Map[Int, Int]())
       assert(Map(1 -> 3) * Map(1 -> 4) == Map(1 -> 12))
     }
-    "allow /" in {
-      assert(true / true == true)
-    }
   }
 }

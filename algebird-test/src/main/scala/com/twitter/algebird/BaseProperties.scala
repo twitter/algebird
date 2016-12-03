@@ -316,15 +316,4 @@ object BaseProperties extends MetricProperties {
 
   def ringLawsEquiv[T: Ring: Arbitrary: Equiv]: Prop =
     validOneEquiv[T] && pseudoRingLawsEquiv[T]
-
-  def hasMultiplicativeInverse[T: Field: Arbitrary]: Prop =
-    'hasMultiplicativeInverse |: forAll { (a: T) =>
-      val fld = implicitly[Field[T]]
-      (!fld.isNonZero(a)) || {
-        val inva = fld.inverse(a)
-          (fld.times(inva, a) == fld.one) && (fld.times(a, inva) == fld.one)
-      }
-    }
-
-  def fieldLaws[T: Field: Arbitrary]: Prop = ringLaws[T] && hasMultiplicativeInverse[T]
 }

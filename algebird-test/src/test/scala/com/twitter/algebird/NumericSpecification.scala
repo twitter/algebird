@@ -131,18 +131,4 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
   property("Float times") {
     timesNumericProp[Float]
   }
-
-  property("Double div") {
-    forAll { (a: Double, b: Double) =>
-      val fld = implicitly[Field[Double]]
-      assert((!fld.isNonZero(b)) || ((a / b) == fld.div(a, b)))
-    }
-  }
-
-  property("Float div") {
-    forAll { (a: Float, b: Float) =>
-      val fld = implicitly[Field[Float]]
-      assert((!fld.isNonZero(b)) || ((a / b) == fld.div(a, b)))
-    }
-  }
 }

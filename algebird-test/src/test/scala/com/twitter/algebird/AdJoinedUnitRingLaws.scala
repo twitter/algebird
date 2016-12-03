@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import algebra.ring.Rng
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Prop.forAll
@@ -27,6 +28,8 @@ class AdjoinedUnitRingLaws extends CheckProperties {
       Group.intTimes(bi0, bi1) == (bi0 * bi1)
     }
   }
+
+  implicit def rng[T: Ring]: Rng[T] = implicitly[Ring[T]]
 
   property("AdjoinedUnit[Int] is a Ring") { ringLaws[AdjoinedUnit[Int]] }
   property("AdjoinedUnit[Long] is a Ring") { ringLaws[AdjoinedUnit[Long]] }
