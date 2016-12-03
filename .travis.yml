@@ -3,19 +3,19 @@ sudo: false
 matrix:
   include:
     - scala: 2.10.6
-      #script: ./sbt +++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
-      script: ./sbt +++$TRAVIS_SCALA_VERSION clean test
+      # script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
+      script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test"
 
     - scala: 2.11.8
-      #script: ./sbt +++$TRAVIS_SCALA_VERSION clean coverage test coverageReport mimaReportBinaryIssues docs/makeMicrosite
-      script: ./sbt +++$TRAVIS_SCALA_VERSION clean coverage test coverageReport docs/makeMicrosite
+      # script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION coverage" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION coverage" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
     - scala: 2.12.0
       jdk: oraclejdk8
-      #script: ./sbt +++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
-      script: ./sbt +++$TRAVIS_SCALA_VERSION clean test
+      # script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
+      script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test"
 
 before_install:
   - export PATH=${PATH}:./vendor/bundle
