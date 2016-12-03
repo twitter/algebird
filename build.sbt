@@ -63,7 +63,6 @@ val sharedSettings = scalariformSettings ++  Seq(
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
-    "-optimize",
     "-Xlint",
     "-language:implicitConversions",
     "-language:higherKinds",
@@ -74,6 +73,13 @@ val sharedSettings = scalariformSettings ++  Seq(
       Seq("-Xdivergence211")
     else
       Seq()
+  },
+
+  scalacOptions ++= {
+    if (scalaVersion.value startsWith "2.12")
+      Seq("-opt:l:classpath")
+    else
+      Seq("-optimize")
   },
 
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
