@@ -49,7 +49,7 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
 }
 
 object Moments {
-  implicit val group = MomentsGroup
+  implicit val group: Group[Moments] = MomentsGroup
   val aggregator = MomentsAggregator
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =

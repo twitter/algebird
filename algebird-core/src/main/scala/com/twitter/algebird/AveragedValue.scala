@@ -86,8 +86,7 @@ case class AveragedValue(count: Long, value: Double) {
  * [[AveragedValue]] instances.
  */
 object AveragedValue {
-  /** implicit instance of [[Group]][AveragedValue] */
-  implicit val group = AveragedGroup
+  implicit val group: Group[AveragedValue] = AveragedGroup
 
   /**
    * Returns an [[Aggregator]] that uses [[AveragedValue]] to
