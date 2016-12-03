@@ -39,7 +39,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue can absorb numbers directly") {
-    forAll { (base: AveragedValue, x: Long) =>
+    forAll { (base: AveragedValue, x: BigInt) =>
       (base + AveragedValue(x)) == (base + x)
     }
   }

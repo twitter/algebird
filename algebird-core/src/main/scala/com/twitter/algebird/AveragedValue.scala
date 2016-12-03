@@ -86,8 +86,7 @@ case class AveragedValue(count: Long, value: Double) {
  * [[AveragedValue]] instances.
  */
 object AveragedValue {
-  /** implicit instance of [[Group]][AveragedValue] */
-  implicit val group = AveragedGroup
+  implicit val group: Group[AveragedValue] = AveragedGroup
 
   /**
    * Returns an [[Aggregator]] that uses [[AveragedValue]] to
@@ -112,7 +111,7 @@ object AveragedValue {
    *
    * @tparam V type with an implicit conversion to Double
    */
-  def apply[V <% Double](v: V): AveragedValue = apply(1L, v)
+  def apply[V: Numeric](v: V): AveragedValue = apply(1L, v)
 
   /**
    * Creates an [[AveragedValue]] with a count of of `c` and a value
@@ -120,7 +119,8 @@ object AveragedValue {
    *
    * @tparam V type with an implicit conversion to Double
    */
-  def apply[V <% Double](c: Long, v: V): AveragedValue = new AveragedValue(c, v)
+  def apply[V](c: Long, v: V)(implicit num: Numeric[V]): AveragedValue =
+    AveragedValue(c, num.toDouble(v))
 }
 
 /**
