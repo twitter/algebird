@@ -15,8 +15,8 @@ val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.0.1"
 val scalacheckVersion = "1.13.4"
-val utilVersion210 = "6.20.0"
-val utilVersion = "6.39.0"
+val utilVersion = "6.20.0"
+val utilVersion212 = "6.39.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version startsWith "2.10" => "2.10"
@@ -234,7 +234,7 @@ lazy val algebirdBenchmark = module("benchmark")
 lazy val algebirdUtil = module("util").settings(
     libraryDependencies ++= {
       val utilV =
-        if (isScala210x(scalaVersion.value)) utilVersion210 else utilVersion
+        if (isScala212x(scalaVersion.value)) utilVersion212 else utilVersion
       Seq("com.twitter" %% "util-core" % utilV)
     }
 ).dependsOn(algebirdCore, algebirdTest % "test->test")
