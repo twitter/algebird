@@ -5,7 +5,7 @@
 # -XX:MaxPermSize=512M
 # -XX:ReservedCodeCacheSize=250M
 # -XX:+TieredCompilation
--XX:-UseGCOverheadLimit
+# -XX:-UseGCOverheadLimit
 # effectively adds GC to Perm space
 -XX:+CMSClassUnloadingEnabled
 # must be enabled for CMSClassUnloadingEnabled to work
