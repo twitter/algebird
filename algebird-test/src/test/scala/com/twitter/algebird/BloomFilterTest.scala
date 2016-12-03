@@ -11,9 +11,8 @@ class BloomFilterLaws extends CheckProperties {
 
   val NUM_HASHES = 6
   val WIDTH = 32
-  val SEED = 1
 
-  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH, SEED)
+  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH)
   implicit val bfGen =
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
@@ -28,14 +27,12 @@ class BFHashIndices extends CheckProperties {
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
-  val SEED = 1
-
   implicit val bfHash: Arbitrary[BFHash] =
     Arbitrary {
       for {
         hashes <- Gen.choose(1, 10)
         width <- Gen.choose(100, 5000000)
-      } yield BFHash(hashes, width, SEED)
+      } yield BFHash(hashes, width)
     }
 
   property("Indices are non negative") {
@@ -49,7 +46,7 @@ class BFHashIndices extends CheckProperties {
   /**
    *   This is the version of the BFHash as of before the "negative values fix"
    */
-  case class NegativeBFHash(numHashes: Int, width: Int, seed: Long = 0L) {
+  case class NegativeBFHash(numHashes: Int, width: Int) {
     val size = numHashes
 
     def apply(s: String) = nextHash(s.getBytes, numHashes)
@@ -82,7 +79,7 @@ class BFHashIndices extends CheckProperties {
       for {
         hashes <- Gen.choose(1, 10)
         width <- Gen.choose(100, 5000000)
-      } yield (BFHash(hashes, width, SEED), NegativeBFHash(hashes, width, SEED))
+      } yield (BFHash(hashes, width), NegativeBFHash(hashes, width))
     }
 
   property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") {
@@ -104,15 +101,13 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
 
   val maxNumEntries = 1000
 
-  val seed = 1
-
   def exactGenerator = for {
     numEntries <- Gen.choose(1, maxNumEntries)
     set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter(set.size, falsePositiveRate, seed)
+    val bfMonoid = BloomFilter(set.size, falsePositiveRate)
 
     val strings = set.map(_.toString).toSeq
     bfMonoid.create(strings: _*)
@@ -139,15 +134,13 @@ class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
   val maxNumEntries = 10000
   val falsePositiveRate = 0.01
 
-  val seed = 1
-
   def exactGenerator = for {
     numEntries <- Gen.choose(1, maxNumEntries)
     set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter(set.size, falsePositiveRate, seed)
+    val bfMonoid = BloomFilter(set.size, falsePositiveRate)
 
     val strings = set.map(_.toString).toSeq
     bfMonoid.create(strings: _*)
@@ -177,7 +170,6 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
 
 class BloomFilterTest extends WordSpec with Matchers {
 
-  val SEED = 1
   val RAND = new scala.util.Random
 
   "BloomFilter" should {
@@ -186,7 +178,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 100).foreach{
         _ =>
           {
-            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = bfMonoid.create(entries: _*)
@@ -198,11 +190,50 @@ class BloomFilterTest extends WordSpec with Matchers {
       }
     }
 
+    "have small false positive rate" in {
+      val iter = 10000
+
+      Seq(0.1, 0.01, 0.001).foreach { fpProb =>
+        {
+          val fps = (0 until iter).par.map{
+            _ =>
+              {
+                val numEntries = RAND.nextInt(10) + 1
+
+                val bfMonoid = BloomFilter(numEntries, fpProb)
+
+                val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
+                val bf = bfMonoid.create(entries.drop(1): _*)
+
+                if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
+              }
+          }
+
+          val observedFpProb = fps.sum / fps.size
+
+          assert(observedFpProb <= 2 * fpProb)
+        }
+      }
+    }
+
+    "approximate cardinality" in {
+      val bfMonoid = BloomFilterMonoid(10, 100000)
+      Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
+        val items = (1 until exactCardinality).map { _.toString }
+        val bf = bfMonoid.create(items: _*)
+        val size = bf.size
+
+        assert(size ~ exactCardinality)
+        assert(size.min <= size.estimate)
+        assert(size.max >= size.estimate)
+      }
+    }
+
     "work as an Aggregator" in {
       (0 to 10).foreach{
         _ =>
           {
-            val aggregator = BloomFilterAggregator(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val aggregator = BloomFilterAggregator(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = aggregator(entries)
@@ -225,7 +256,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       }
 
       val items = (1 until 10).map { _.toString }
-      val bf = BloomFilter(10, 0.1, SEED).create(items: _*)
+      val bf = BloomFilter(10, 0.1).create(items: _*)
       val bytesBeforeSizeCalled = new String(serialize(bf))
       bf.size
 
@@ -241,7 +272,7 @@ class BloomFilterTest extends WordSpec with Matchers {
     "not have negative hash values" in {
       val NUM_HASHES = 2
       val WIDTH = 4752800
-      val bfHash = BFHash(NUM_HASHES, WIDTH, SEED)
+      val bfHash = BFHash(NUM_HASHES, WIDTH)
       val s = "7024497610539761509"
       val index = bfHash.apply(s).head
 
@@ -255,7 +286,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 100).foreach {
         _ =>
           {
-            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32, SEED)
+            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = bfMonoid.create(entries: _*)

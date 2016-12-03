@@ -44,10 +44,10 @@ class RichCBitSet(val cb: CBitSet) {
 
 object BloomFilter {
 
-  def apply(numEntries: Int, fpProb: Double, seed: Int = 0) = {
+  def apply(numEntries: Int, fpProb: Double) = {
     val width = BloomFilter.optimalWidth(numEntries, fpProb)
     val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
-    BloomFilterMonoid(numHashes, width, seed)
+    BloomFilterMonoid(numHashes, width)
   }
 
   // Compute optimal number of hashes: k = m/n ln(2)
@@ -76,8 +76,8 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Monoid[BF] {
-  val hashes: BFHash = BFHash(numHashes, width, seed)
+case class BloomFilterMonoid(numHashes: Int, width: Int) extends Monoid[BF] {
+  val hashes: BFHash = BFHash(numHashes, width)
 
   val zero: BF = BFZero(hashes, width)
 
@@ -345,7 +345,7 @@ object BFInstance {
     BFInstance(hashes, BitSet.empty, width)
 }
 
-case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]] {
+case class BFHash(numHashes: Int, width: Int) extends Function1[String, Iterable[Int]] {
   val size = numHashes
 
   def apply(s: String) = nextHash(s.getBytes, numHashes)
@@ -361,19 +361,19 @@ case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1
     (upper, lower)
   }
 
-  private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
-    if (k == 0)
+  private def nextHash(bytes: Array[Byte], hashIndex: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
+    if (hashIndex == 0)
       Stream.empty
     else {
       val d = if (digested.isEmpty) {
-        val (a, b) = MurmurHash128(k)(bytes)
+        val (a, b) = MurmurHash128(hashIndex)(bytes)
         val (x1, x2) = splitLong(a)
         val (x3, x4) = splitLong(b)
         Seq(x1, x2, x3, x4)
       } else
         digested
 
-      Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
+      Stream.cons(d(0) % width, nextHash(bytes, hashIndex - 1, d.drop(1)))
     }
   }
 }
@@ -386,5 +386,5 @@ case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggr
 }
 
 object BloomFilterAggregator {
-  def apply(numHashes: Int, width: Int, seed: Int = 0): BloomFilterAggregator = BloomFilterAggregator(BloomFilterMonoid(numHashes, width, seed))
+  def apply(numHashes: Int, width: Int): BloomFilterAggregator = BloomFilterAggregator(BloomFilterMonoid(numHashes, width))
 }
