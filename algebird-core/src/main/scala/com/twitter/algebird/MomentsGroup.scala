@@ -57,10 +57,13 @@ object Moments {
 
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
-  def apply[V <% Double](value: V): Moments = new Moments(1L, value, 0, 0, 0)
+  def apply[V: Numeric](value: V)(implicit num: Numeric[V]): Moments =
+    apply(1L, num.toDouble(value), 0, 0, 0)
 
-  def apply[V <% Double](m0: Long, m1: V, m2: V, m3: V, m4: V): Moments =
-    new Moments(m0, m1, m2, m3, m4)
+  def apply[V](m0: Long, m1: V, m2: V, m3: V, m4: V)(implicit num: Numeric[V]): Moments =
+    new Moments(m0,
+      num.toDouble(m1), num.toDouble(m2),
+      num.toDouble(m3), num.toDouble(m4))
 }
 
 /**
