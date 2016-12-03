@@ -4,7 +4,7 @@
 # -Xmx3G
 # -XX:MaxPermSize=512M
 # -XX:ReservedCodeCacheSize=250M
--XX:+TieredCompilation
+# -XX:+TieredCompilation
 -XX:-UseGCOverheadLimit
 # effectively adds GC to Perm space
 -XX:+CMSClassUnloadingEnabled
