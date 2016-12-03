@@ -3,6 +3,7 @@ sudo: false
 matrix:
   include:
     - scala: 2.10.6
+      #script: ./sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - scala: 2.11.8
@@ -13,6 +14,7 @@ matrix:
 
     - scala: 2.12.0
       jdk: oraclejdk8
+      #script: ./sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
 before_install:
