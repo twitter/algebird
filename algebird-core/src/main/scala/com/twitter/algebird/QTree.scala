@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.util.hashing.MurmurHash3
+
 /**
  * A QTree provides an approximate Map[Double,A:Monoid] suitable for range queries, quantile queries,
  * and combinations of these (for example, if you use a numeric A, you can derive the inter-quartile mean).
@@ -196,6 +198,18 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   @inline def _4: A = _sum
   @inline def _5: Option[QTree[A]] = lowerChild
   @inline def _6: Option[QTree[A]] = upperChild
+
+  override lazy val hashCode: Int = MurmurHash3.productHash(this)
+
+  override def toString: String =
+    productIterator.mkString(productPrefix + "(", ",", ")")
+
+  override def equals(other: Any): Boolean =
+    other match {
+      case r: Product if productArity == r.productArity =>
+        productIterator sameElements r.productIterator
+      case _ => false
+    }
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[QTree[A]]
 
