@@ -136,18 +136,20 @@ def get_sumoption(n, bufferSize)
     "buf#{t}.put(tuple._#{i+1})"
   end.join("; ")
 
-  gets_commaed = TYPE_SYMBOLS.first(n).drop(1).map do |t|
+  gets_commaed = TYPE_SYMBOLS.first(n).map do |t|
     "buf#{t}.flush.get"
   end.join(", ")
 
   "override def sumOption(to: TraversableOnce[X]) = {
-#{buffers}
-    to.foreach { x =>
-      val tuple = unapply(x).get
-      #{put_statements}
+     if (to.isEmpty) None
+     else {
+  #{buffers}
+      to.foreach { x =>
+        val tuple = unapply(x).get
+        #{put_statements}
+      }
+      Some(apply(#{gets_commaed}))
     }
-    val a = bufA.flush
-    if (a.isDefined) Some(apply(a.get, #{gets_commaed})) else None
   }"
 end
 
