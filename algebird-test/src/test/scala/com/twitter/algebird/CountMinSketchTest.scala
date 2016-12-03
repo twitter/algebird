@@ -286,7 +286,6 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
         cms4.heavyHitters should be(Set.empty[Seq[Byte]])
       }
   }
-
 }
 
 class CMSShortTest extends CMSRingTest[Short]
@@ -388,7 +387,7 @@ class CmsProperties extends ApproximateProperties("CountMinSketch") {
   property("CMS counts total count") = toProp(new CmsTotalCountProperty[Int](), 10, 10, 0.01)
 }
 
-abstract class CMSRingTest[K: CMSHasher: Ring] extends CMSTest(implicitly[Ring[K]].fromInt(_))
+abstract class CMSRingTest[K: CMSHasher: Ring] extends CMSTest[K]((x: Int) => implicitly[Ring[K]].fromInt(x))
 
 abstract class CMSTest[K: CMSHasher](toK: Int => K) extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
 
