@@ -175,6 +175,7 @@ lazy val algebird = Project(
   settings = sharedSettings)
   .settings(noPublishSettings)
   .settings(coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*")
+  .enablePlugins(CrossPerProjectPlugin)
   .aggregate(
   algebirdTest,
   algebirdCore,
