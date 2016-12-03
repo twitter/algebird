@@ -50,7 +50,7 @@ class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
 
   property("Try is a monad") {
     import UtilAlgebras.tryMonad
-    monadLaws[Try, Int, String, Long]()
+    monadLaws[Try, Int, String, Long]
   }
 
   property("Try[Long] is a commutative semigroup") {
