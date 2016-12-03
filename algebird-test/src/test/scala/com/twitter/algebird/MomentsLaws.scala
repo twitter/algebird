@@ -22,10 +22,7 @@ class MomentsLaws extends CheckProperties {
 
 class MomentsTest extends WordSpec with Matchers {
   def testApproxEq(f1: Double, f2: Double) {
-    if (f2 == 0)
-      assert(f1 < 1e-10)
-    else
-      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
+    assert(approxEq(1e-10)(f1, f2))
   }
 
   /**

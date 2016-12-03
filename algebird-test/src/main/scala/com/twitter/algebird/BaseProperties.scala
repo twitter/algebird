@@ -150,7 +150,9 @@ object BaseProperties extends MetricProperties {
   // $COVERAGE-ON$
 
   def approxEq(eps: Double)(f1: Double, f2: Double): Boolean =
-    (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < eps
+    if (f2 == 0)
+      scala.math.abs(f1) < eps
+    else (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < eps
 
   trait HigherEq[M[_]] {
     def apply[T](m: M[T], n: M[T]): Boolean

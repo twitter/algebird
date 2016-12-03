@@ -72,7 +72,7 @@ object MonadLaws {
   def associative[M[_], T, U, V](implicit monad: Monad[M], arb: Arbitrary[M[T]], fn1: Arbitrary[(T) => M[U]],
     fn2: Arbitrary[U => M[V]], equiv: Equiv[M[V]]) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
     Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap { t => f1(t).flatMap(f2) })
-    }
+  }
 
   def monadLaws[M[_], T, U, R](
     implicit monad: Monad[M], arb: Arbitrary[M[T]],
