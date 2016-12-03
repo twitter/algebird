@@ -11,6 +11,10 @@ matrix:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
+    - scala: 2.12.0
+      jdk: oraclejdk8
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
+
 before_install:
   - export PATH=${PATH}:./vendor/bundle
 

@@ -197,12 +197,6 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   @inline def _5: Option[QTree[A]] = lowerChild
   @inline def _6: Option[QTree[A]] = upperChild
 
-  override lazy val hashCode: Int = _root_.scala.runtime.ScalaRunTime._hashCode(this)
-
-  override def toString: String = _root_.scala.runtime.ScalaRunTime._toString(this)
-
-  override def equals(other: Any): Boolean = _root_.scala.runtime.ScalaRunTime._equals(this, other)
-
   override def canEqual(other: Any): Boolean = other.isInstanceOf[QTree[A]]
 
   override def productArity: Int = 6

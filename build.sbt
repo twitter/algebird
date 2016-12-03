@@ -9,13 +9,13 @@ import sbtunidoc.Plugin.UnidocKeys._
 import scalariform.formatter.preferences._
 
 val algebraVersion = "0.6.0"
-val bijectionVersion = "0.9.0"
+val bijectionVersion = "0.9.4"
 val javaEwahVersion = "0.6.6"
 val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
-val scalaTestVersion = "3.0.0"
-val scalacheckVersion = "1.13.1"
-val utilVersion = "6.20.0"
+val scalaTestVersion = "3.0.1"
+val scalacheckVersion = "1.13.4"
+val utilVersion = "6.39.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version startsWith "2.10" => "2.10"
@@ -46,7 +46,7 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
 val sharedSettings = Project.defaultSettings ++ scalariformSettings ++  Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8"),
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0"),
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
@@ -220,7 +220,10 @@ lazy val algebirdTest = module("test").settings(
   }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
 ).dependsOn(algebirdCore)
 
-lazy val algebirdBenchmark = module("benchmark").settings(JmhPlugin.projectSettings:_*).settings(
+lazy val algebirdBenchmark = module("benchmark")
+  .settings(JmhPlugin.projectSettings:_*)
+  .settings(noPublishSettings)
+  .settings(
    coverageExcludedPackages := "com\\.twitter\\.algebird\\.benchmark.*",
    libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % bijectionVersion)
 ).dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile").enablePlugins(JmhPlugin)
