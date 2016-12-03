@@ -7,8 +7,8 @@ matrix:
       script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test"
 
     - scala: 2.11.8
-      # script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION coverage" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
-      script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION coverage" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      # script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "+++$TRAVIS_SCALA_VERSION coverageReport" "+++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
