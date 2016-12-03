@@ -6,9 +6,19 @@ matrix:
       script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - scala: 2.11.8
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport mimaReportBinaryIssues
+      #script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport mimaReportBinaryIssues docs/makeMicrosite
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport docs/makeMicrosite
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+
+before_install:
+  - export PATH=${PATH}:./vendor/bundle
+
+install:
+  - rvm use 2.2.3 --install --fuzzy
+  - gem update --system
+  - gem install sass
+  - gem install jekyll -v 3.2.1
 
 cache:
   directories:
@@ -23,3 +33,11 @@ before_cache:
   - du -h -d 2 $HOME/.sbt/
   - find $HOME/.sbt -name "*.lock" -type f -delete
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/83f5f34730d7a004992f
+    on_success: change
+    on_failure: always
+    on_start: never

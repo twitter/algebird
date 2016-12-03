@@ -27,25 +27,26 @@ import scala.annotation.implicitNotFound
  */
 object VectorSpace {
   def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] = vs.scale(v, c)
-  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit fField: Field[F], cGroup: Group[C[F]]) = new VectorSpace[F, C] {
-    def field = fField
+  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) = new VectorSpace[F, C] {
+    def ring = r
     def group = cGroup
-    def scale(v: F, c: C[F]) = if (field.isNonZero(v)) scaleFn(v, c) else cGroup.zero
+    def scale(v: F, c: C[F]) = if (r.isNonZero(v)) scaleFn(v, c) else cGroup.zero
   }
 
   // Implicits
-  implicit def indexedSeqSpace[T: Field] =
+  implicit def indexedSeqSpace[T: Ring] =
     from[T, IndexedSeq]{ (s, seq) => seq.map(Ring.times(s, _)) }
 
-  implicit def mapSpace[K, T: Field] =
+  implicit def mapSpace[K, T: Ring] =
     from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) => m.mapValues(Ring.times(s, _)) }
 
   // TODO: add implicits for java lists, arrays, and options
 }
 
-@implicitNotFound(msg = "Cannot find VectorSpace type class for Container: ${C} and Field: ${F}")
+@implicitNotFound(msg = "Cannot find VectorSpace type class for Container: ${C} and Ring: ${F}")
 trait VectorSpace[F, C[_]] extends java.io.Serializable {
-  implicit def field: Field[F]
+  implicit def ring: Ring[F]
+  def field: Ring[F] = ring // this is for compatibility with older versions
   implicit def group: Group[C[F]]
   def scale(v: F, c: C[F]): C[F]
 }

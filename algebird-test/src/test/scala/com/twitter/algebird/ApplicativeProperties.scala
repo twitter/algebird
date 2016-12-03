@@ -88,9 +88,4 @@ class ApplicativeProperties extends CheckProperties {
     implicit val optSg = new ApplicativeRing[Int, Some]
     ringLaws[Some[Int]]
   }
-
-  property("Applicative Field") {
-    implicit val optSg = new ApplicativeField[Boolean, Some]
-    fieldLaws[Some[Boolean]]
-  }
 }

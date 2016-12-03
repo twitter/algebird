@@ -138,7 +138,7 @@ class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
 }
 
 /**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
  * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
  * this generally works.
  */
@@ -149,7 +149,7 @@ class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
 }
 
 /**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
  * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
  * this generally works.
  */
@@ -158,15 +158,3 @@ class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
   lazy val one = app(ring.one)
   def times(l: M[T], r: M[T]) = app.joinWith(l, r)(ring.times)
 }
-
-/**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
- * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
- * this generally works.
- */
-class ApplicativeField[T, M[_]](implicit app: Applicative[M], fld: Field[T])
-  extends ApplicativeRing[T, M] with Field[M[T]] {
-  override def inverse(v: M[T]) = app.map(v)(fld.inverse)
-  override def div(l: M[T], r: M[T]) = app.joinWith(l, r)(fld.div)
-}
-

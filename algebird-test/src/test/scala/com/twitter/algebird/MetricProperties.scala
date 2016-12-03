@@ -16,34 +16,35 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import com.twitter.algebird.BaseProperties._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
-class BaseMetricProperties extends CheckProperties with MetricProperties {
+class MetricLaws extends CheckProperties {
   property("double metric") {
-    metricLaws[Double](defaultEqFn)
+    metricLaws[Double]
   }
 
   property("int metric") {
-    metricLaws[Int](defaultEqFn)
+    metricLaws[Int]
   }
 
   property("float metric") {
-    metricLaws[Float](defaultEqFn)
+    metricLaws[Float]
   }
 
   property("long metric") {
-    metricLaws[Long](defaultEqFn)
+    metricLaws[Long]
   }
 
   property("short metric") {
-    metricLaws[Short](defaultEqFn)
+    metricLaws[Short]
   }
 
   implicit val iterMetric = Metric.L1Iterable[Double]
 
   // TODO: we won't need this when we have an Equatable trait
-  def listEqfn(a: List[Double], b: List[Double]) = {
+  def listEqFn(a: List[Double], b: List[Double]) = {
     val maxSize = scala.math.max(a.size, b.size)
     val diffA = maxSize - a.size
     val diffB = maxSize - b.size
@@ -53,7 +54,8 @@ class BaseMetricProperties extends CheckProperties with MetricProperties {
   }
 
   property("double iterable metric") {
-    metricLaws[List[Double]](listEqfn)
+    implicit val eq: Equiv[List[Double]] = Equiv.fromFunction(listEqFn)
+    metricLaws[List[Double]]
   }
 
   implicit val mapMetric = Metric.L1Map[Int, Double]
@@ -71,33 +73,7 @@ class BaseMetricProperties extends CheckProperties with MetricProperties {
   }
 
   property("int double map metric") {
-    metricLaws[Map[Int, Double]](mapEqFn)
+    implicit val eq: Equiv[Map[Int, Double]] = Equiv.fromFunction(mapEqFn)
+    metricLaws[Map[Int, Double]]
   }
-
-}
-
-trait MetricProperties {
-  def isNonNegative[T: Metric: Arbitrary] = forAll { (a: T, b: T) =>
-    val m = Metric(a, b)
-    beGreaterThan(m, 0.0) || beCloseTo(m, 0.0)
-  }
-  def isEqualIffZero[T: Metric: Arbitrary](eqfn: (T, T) => Boolean) = forAll { (a: T, b: T) =>
-    if (eqfn(a, b)) beCloseTo(Metric(a, b), 0.0) else !beCloseTo(Metric(a, b), 0.0)
-  }
-  def isSymmetric[T: Metric: Arbitrary] = forAll { (a: T, b: T) =>
-    beCloseTo(Metric(a, b), Metric(b, a))
-  }
-  def satisfiesTriangleInequality[T: Metric: Arbitrary] = forAll { (a: T, b: T, c: T) =>
-    val m1 = Metric(a, b) + Metric(b, c)
-    val m2 = Metric(a, c)
-    beGreaterThan(m1, m2) || beCloseTo(m1, m2)
-  }
-
-  def metricLaws[T: Metric: Arbitrary](eqfn: (T, T) => Boolean) =
-    isNonNegative[T] && isEqualIffZero[T](eqfn) && isSymmetric[T] && satisfiesTriangleInequality[T]
-
-  // TODO: these are copied elsewhere in the tests. Move them to a common place
-  def beCloseTo(a: Double, b: Double, eps: Double = 1e-10) = a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
-  def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10) = a > b - eps || (a.isInfinite && b.isInfinite)
-  def defaultEqFn[T](a: T, b: T): Boolean = a == b
 }
