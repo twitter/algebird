@@ -58,7 +58,7 @@ class TopKTests extends CheckProperties {
   }
 
   property("PriorityQueueMonoid is a Monoid") {
-    monoidLawsEquiv[PriorityQueue[Int]]
+    monoidLaws[PriorityQueue[Int]]
   }
 
   implicit def tkmonoid = new TopKMonoid[Int](SIZE)
@@ -75,7 +75,7 @@ class TopKTests extends CheckProperties {
   }
 
   property("TopKMonoid is a Monoid") {
-    monoidLawsEquiv[PriorityQueue[Int]]
+    monoidLaws[PriorityQueue[Int]]
   }
 
 }

@@ -15,7 +15,7 @@ class MinHasherTest extends CheckProperties {
 
   property("MinHasher is a commutative monoid") {
     implicit val equiv: Equiv[MinHashSignature] = Equiv.by(_.bytes.toList)
-    commutativeMonoidLawsEquiv[MinHashSignature]
+    commutativeMonoidLaws[MinHashSignature]
   }
 }
 

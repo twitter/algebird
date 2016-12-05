@@ -7,20 +7,18 @@ import org.scalacheck.Gen.choose
 import org.scalacheck.Prop._
 
 class DecayedValueLaws extends CheckProperties {
+  val EPS = 0.1
+
   case class Params(mean: Double, halfLife: Double, count: Int, maxNoise: Double)
 
   implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
 
-  def approxEq(f1: Double, f2: Double) = {
-    (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 0.1
-  }
-
   property("DecayedValue Monoid laws") {
     implicit val equiv: Equiv[DecayedValue] =
       Equiv.fromFunction { (dvl, dvr) =>
-        approxEq(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
+        approxEq(EPS)(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
       }
-    commutativeMonoidLawsEquiv[DecayedValue]
+    commutativeMonoidLaws[DecayedValue]
   }
 
   def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]) = {
@@ -31,7 +29,7 @@ class DecayedValueLaws extends CheckProperties {
         DecayedValue.build(params.mean + (params.mean * noise), t, params.halfLife)
       }
       val result = decayedMonoid.sum(data)
-      approxEq(fn(result, params), params.mean)
+      approxEq(EPS)(fn(result, params), params.mean)
     }
   }
 

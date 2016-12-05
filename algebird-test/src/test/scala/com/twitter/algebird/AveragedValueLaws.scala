@@ -21,7 +21,7 @@ class AveragedValueLaws extends CheckProperties {
           approxEq(1e-10)(avl.value, avr.value) && (avl.count == avr.count)
         }
       }
-    groupLawsEquiv[AveragedValue] && isCommutativeEquiv[AveragedValue]
+    groupLaws[AveragedValue] && isCommutative[AveragedValue]
   }
 
   property("AveragedValue.aggregator returns the average") {

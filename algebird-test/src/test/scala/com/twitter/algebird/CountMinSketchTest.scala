@@ -38,43 +38,43 @@ class CmsLaws extends CheckProperties {
   property("CountMinSketch[Short] is a Monoid") {
     implicit val cmsMonoid = monoid[Short]
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Short]]
+    commutativeMonoidLaws[CMS[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
     implicit val cmsMonoid = monoid[Int]
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Int]]
+    commutativeMonoidLaws[CMS[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
     implicit val cmsMonoid = monoid[Long]
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[Long]]
+    commutativeMonoidLaws[CMS[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
     implicit val cmsMonoid = monoid[BigInt]
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[BigInt]]
+    commutativeMonoidLaws[CMS[BigInt]]
   }
 
   property("CountMinSketch[BigDecimal] is a Monoid") {
     implicit val cmsMonoid = monoid[BigDecimal]
     implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
-    commutativeMonoidLawsEquiv[CMS[BigDecimal]]
+    commutativeMonoidLaws[CMS[BigDecimal]]
   }
 
   property("CountMinSketch[String] is a Monoid") {
     implicit val cmsMonoid = monoid[String]
     implicit val cmsGen = cmsArb(cmsMonoid)(_.toString)
-    commutativeMonoidLawsEquiv[CMS[String]]
+    commutativeMonoidLaws[CMS[String]]
   }
 
   property("CountMinSketch[Bytes] is a commutative monoid") {
     implicit val cmsMonoid = monoid[Bytes]
     implicit val cmsGen = cmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
-    commutativeMonoidLawsEquiv[CMS[Bytes]]
+    commutativeMonoidLaws[CMS[Bytes]]
   }
 }
 
@@ -105,43 +105,43 @@ class TopPctCmsLaws extends CheckProperties {
   property("TopPctCms[Short] is a Monoid") {
     implicit val cmsMonoid = monoid[Short]
     implicit val cmsGen = createArbitrary[Short](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Short]]
+    commutativeMonoidLaws[TopCMS[Short]]
   }
 
   property("TopPctCms[Int] is a Monoid") {
     implicit val cmsMonoid = monoid[Int]
     implicit val cmsGen = createArbitrary[Int](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Int]]
+    commutativeMonoidLaws[TopCMS[Int]]
   }
 
   property("TopPctCms[Long] is a Monoid") {
     implicit val cmsMonoid = monoid[Long]
     implicit val cmsGen = createArbitrary[Long](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[Long]]
+    commutativeMonoidLaws[TopCMS[Long]]
   }
 
   property("TopPctCms[BigInt] is a Monoid") {
     implicit val cmsMonoid = monoid[BigInt]
     implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[BigInt]]
+    commutativeMonoidLaws[TopCMS[BigInt]]
   }
 
   property("TopPctCms[BigDecimal] is a Monoid") {
     implicit val cmsMonoid = monoid[BigDecimal]
     implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
-    commutativeMonoidLawsEquiv[TopCMS[BigDecimal]]
+    commutativeMonoidLaws[TopCMS[BigDecimal]]
   }
 
   property("TopPctCms[String] is a Monoid") {
     implicit val cmsMonoid = monoid[String]
     implicit val cmsGen = topCmsArb(cmsMonoid)(_.toString)
-    commutativeMonoidLawsEquiv[TopCMS[String]]
+    commutativeMonoidLaws[TopCMS[String]]
   }
 
   property("TopPctCms[Bytes] is a Monoid") {
     implicit val cmsMonoid = monoid[Bytes]
     implicit val cmsGen = topCmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
-    commutativeMonoidLawsEquiv[TopCMS[Bytes]]
+    commutativeMonoidLaws[TopCMS[Bytes]]
   }
 }
 

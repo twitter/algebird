@@ -10,7 +10,7 @@ class FunctionMonoidTests extends CheckProperties {
       implicit val eq: Equiv[Function1[Int, Int]] =
         Equiv.fromFunction { (f1, f2) => f1(n) == f2(n) }
 
-      monoidLawsEquiv[Function1[Int, Int]]
+      monoidLaws[Function1[Int, Int]]
     }
   }
 

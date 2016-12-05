@@ -29,7 +29,7 @@ class HyperLogLogSeriesLaws extends CheckProperties {
     Arbitrary(arbitrary[List[Timestamp]].map(ts => absorb(monoid.zero, ts)))
 
   property("HyperLogLogSeries is a Monoid") {
-    commutativeMonoidLawsEquiv[HLLSeries]
+    commutativeMonoidLaws[HLLSeries]
   }
 
   property("HyperLogLogSeries is commutative") {
