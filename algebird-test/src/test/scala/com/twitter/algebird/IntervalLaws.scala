@@ -50,13 +50,13 @@ class IntervalLaws extends CheckProperties {
 
   property("[x, x) is empty") {
     forAll { x: Int =>
-      Interval.leftClosedRightOpen(x, x).isLeft
+      Interval.leftClosedRightOpen(x, x).isEmpty
     }
   }
 
   property("(x, x] is empty") {
     forAll { x: Int =>
-      Interval.leftOpenRightClosed(x, x).isLeft
+      Interval.leftOpenRightClosed(x, x).isEmpty
     }
   }
 
