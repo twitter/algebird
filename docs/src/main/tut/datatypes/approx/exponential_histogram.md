@@ -53,8 +53,8 @@ val approximateSum = full.guess
 full.relativeError
 val maxError = actualSum * full.relativeError
 
-assert(full.guess <= actualSum + maxError)
-assert(full.guess >= actualSum - maxError)
+full.guess <= actualSum + maxError
+full.guess >= actualSum - maxError
 ```
 
 ## l-Canonical Representation
