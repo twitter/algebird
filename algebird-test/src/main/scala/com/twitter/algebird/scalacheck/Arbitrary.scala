@@ -55,4 +55,6 @@ object arbitrary extends ExpHistArb with IntervalArb {
     Arbitrary(genAveragedValue)
 
   implicit val momentsArb: Arbitrary[Moments] = Arbitrary(genMoments)
+
+  implicit val stringSpaceSaverArb: Arbitrary[SpaceSaver[String]] = Arbitrary(genStringSpaceSaver)
 }

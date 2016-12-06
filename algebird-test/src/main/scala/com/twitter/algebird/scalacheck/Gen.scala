@@ -52,4 +52,24 @@ object gen extends ExpHistGen with IntervalGen {
       m3 <- choose(-1e10, 1e50)
       m4 <- choose(0, 1e50)
     } yield new Moments(m0, m1, m2, m3, m4)
+
+  def genStringSpaceSaver: Gen[SpaceSaver[String]] =
+    Gen.frequency(
+      (1, genSSOneSpaceSaver),
+      (10, genSSManySpaceSaver))
+
+  def genSSOneSpaceSaver: Gen[SpaceSaver[String]] =
+    for {
+      capacity <- choose(2, 100)
+      item <- Gen.alphaStr
+    } yield SpaceSaver(capacity, item)
+
+  def genFixedSSOneSpaceSaver: Gen[SpaceSaver[String]] =
+    for {
+      item <- Gen.alphaStr
+    } yield SpaceSaver(10, item)
+
+  def genSSManySpaceSaver: Gen[SpaceSaver[String]] =
+    Gen.nonEmptyListOf(genFixedSSOneSpaceSaver).flatMap(l => l.reduce(_ ++ _))
+
 }
