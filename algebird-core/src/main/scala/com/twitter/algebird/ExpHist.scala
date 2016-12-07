@@ -155,7 +155,7 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
     }
 
   override def toString: String =
-    s"ExpHist(conf: $conf, time: $time, guess: $guess, lowerBoundSum: $lowerBoundSum, upperBoundSum: $upperBoundSum)"
+    s"ExpHist(conf = $conf, time = $time, guess = $guess, lowerBoundSum = $lowerBoundSum, upperBoundSum = $upperBoundSum)"
 }
 
 object ExpHist {
