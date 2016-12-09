@@ -44,10 +44,10 @@ class RichCBitSet(val cb: CBitSet) {
 
 object BloomFilter {
 
-  def apply(numEntries: Int, fpProb: Double) = {
+  def apply[A](numEntries: Int, fpProb: Double)(implicit toBytes: A => Array[Byte]) = {
     val width = BloomFilter.optimalWidth(numEntries, fpProb)
     val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
-    BloomFilterMonoid(numHashes, width)
+    BloomFilterMonoid[A](numHashes, width)(toBytes)
   }
 
   // Compute optimal number of hashes: k = m/n ln(2)
@@ -76,26 +76,26 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid(numHashes: Int, width: Int) extends Monoid[BF] {
-  val hashes: BFHash = BFHash(numHashes, width)
+case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit toBytes: A => Array[Byte]) extends Monoid[BF[A]] {
+  val hashes: BFHash[A] = BFHash[A](numHashes, width)(toBytes)
 
-  val zero: BF = BFZero(hashes, width)
+  val zero: BF[A] = BFZero[A](hashes, width)
 
   /**
    * Assume the bloom filters are compatible (same width and same hashing functions).  This
    * is the union of the 2 bloom filters.
    */
-  def plus(left: BF, right: BF): BF = left ++ right
+  def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
 
   /**
    * Create a bloom filter with one item.
    */
-  def create(item: String): BF = BFItem(item, hashes, width)
+  def create(item: A): BF[A] = BFItem(item, hashes, width)
 
   /**
    * Create a bloom filter with multiple items.
    */
-  def create(data: String*): BF = {
+  def create(data: A*): BF[A] = {
     data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
   }
 }
@@ -103,18 +103,18 @@ case class BloomFilterMonoid(numHashes: Int, width: Int) extends Monoid[BF] {
 /**
  * Bloom Filter data structure
  */
-sealed abstract class BF extends java.io.Serializable {
+sealed abstract class BF[A] extends java.io.Serializable {
   val numHashes: Int
 
   val width: Int
 
-  def ++(other: BF): BF
+  def ++(other: BF[A]): BF[A]
 
-  def +(other: String): BF
+  def +(other: A): BF[A]
 
-  def checkAndAdd(item: String): (BF, ApproximateBoolean)
+  def checkAndAdd(item: A): (BF[A], ApproximateBoolean)
 
-  def contains(item: String): ApproximateBoolean
+  def contains(item: A): ApproximateBoolean
 
   // Estimates the cardinality of the set of elements that have been
   // inserted into the Bloom Filter.
@@ -124,16 +124,16 @@ sealed abstract class BF extends java.io.Serializable {
 /**
  * Empty bloom filter.
  */
-case class BFZero(hashes: BFHash, width: Int) extends BF {
+case class BFZero[A](hashes: BFHash[A], width: Int) extends BF[A] {
   lazy val numHashes: Int = hashes.size
 
-  def ++(other: BF) = other
+  def ++(other: BF[A]) = other
 
-  def +(other: String) = BFItem(other, hashes, width)
+  def +(other: A) = BFItem[A](other, hashes, width)
 
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
 
-  def contains(item: String) = ApproximateBoolean.exactFalse
+  def contains(item: A) = ApproximateBoolean.exactFalse
 
   def size = Approximate.exact[Long](0)
 }
@@ -141,20 +141,20 @@ case class BFZero(hashes: BFHash, width: Int) extends BF {
 /**
  * Bloom Filter with 1 value.
  */
-case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
+case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
   lazy val numHashes: Int = hashes.size
 
-  def ++(other: BF): BF = {
+  def ++(other: BF[A]): BF[A] = {
     other match {
       case bf @ BFZero(_, _) => this
-      case bf @ BFItem(otherItem, _, _) => BFSparse(hashes, RichCBitSet(hashes(item): _*), width) + otherItem
+      case bf @ BFItem(otherItem, _, _) => BFSparse[A](hashes, RichCBitSet(hashes(item): _*), width) + otherItem
       case _ => other + item
     }
   }
 
-  def +(other: String) = this ++ BFItem(other, hashes, width)
+  def +(other: A) = this ++ BFItem(other, hashes, width)
 
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) = {
     if (other == item) {
       (this, ApproximateBoolean.exactTrue)
     } else {
@@ -162,19 +162,19 @@ case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
     }
   }
 
-  def contains(x: String) = ApproximateBoolean.exact(item == x)
+  def contains(x: A) = ApproximateBoolean.exact(item == x)
 
   def size = Approximate.exact[Long](1)
 }
 
-case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
+case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[A] {
   import RichCBitSet._
 
   lazy val numHashes: Int = hashes.size
 
-  @transient lazy val dense: BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
+  @transient lazy val dense: BFInstance[A] = BFInstance[A](hashes, bits.toBitSet(width), width)
 
-  def ++(other: BF): BF = {
+  def ++(other: BF[A]): BF[A] = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 
@@ -191,7 +191,7 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
     }
   }
 
-  def +(item: String): BF = {
+  def +(item: A): BF[A] = {
     val bitsToActivate = RichCBitSet(hashes(item): _*)
 
     BFSparse(hashes,
@@ -199,9 +199,9 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
       width)
   }
 
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = dense.checkAndAdd(other)
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) = dense.checkAndAdd(other)
 
-  def contains(item: String): ApproximateBoolean = dense.contains(item)
+  def contains(item: A): ApproximateBoolean = dense.contains(item)
 
   def size: Approximate[Long] = dense.size
 }
@@ -209,12 +209,12 @@ case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
 /*
  * Bloom filter with multiple values
  */
-case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
+case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF[A] {
 
   lazy val numHashes: Int = hashes.size
   lazy val numBits: Int = bits.size
 
-  def ++(other: BF) = {
+  def ++(other: BF[A]) = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 
@@ -231,20 +231,20 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
     }
   }
 
-  def +(item: String): BFInstance = {
+  def +(item: A): BFInstance[A] = {
     val itemHashes = hashes(item)
     this.+(itemHashes: _*)
   }
 
-  private def +(itemHashes: Int*): BFInstance = {
+  private def +(itemHashes: Int*): BFInstance[A] = {
     val bitsToActivate = BitSet(itemHashes: _*)
 
-    BFInstance(hashes,
+    BFInstance[A](hashes,
       bits ++ bitsToActivate,
       width)
   }
 
-  def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
+  def checkAndAdd(item: A): (BF[A], ApproximateBoolean) = {
     val itemHashes = hashes(item)
     val contained = this.contains(itemHashes: _*)
     (this.+(itemHashes: _*), contained)
@@ -255,7 +255,7 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
     true
   }
 
-  def contains(item: String): ApproximateBoolean = {
+  def contains(item: A): ApproximateBoolean = {
     val itemHashes = hashes(item)
     contains(itemHashes: _*)
   }
@@ -341,14 +341,14 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
 }
 
 object BFInstance {
-  def apply(hashes: BFHash, width: Int): BFInstance =
+  def apply[A](hashes: BFHash[A], width: Int): BFInstance[A] =
     BFInstance(hashes, BitSet.empty, width)
 }
 
-case class BFHash(numHashes: Int, width: Int) extends Function1[String, Iterable[Int]] {
+case class BFHash[A](numHashes: Int, width: Int)(implicit toBytes: A => Array[Byte]) extends Function1[A, Iterable[Int]] {
   val size = numHashes
 
-  def apply(s: String) = nextHash(s.getBytes, numHashes)
+  def apply(s: A) = nextHash(toBytes(s), numHashes)
 
   private def splitLong(x: Long) = {
     def toNonNegativeInt(x: Long) = {
@@ -378,13 +378,14 @@ case class BFHash(numHashes: Int, width: Int) extends Function1[String, Iterable
   }
 }
 
-case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggregator[String, BF, BF] {
+case class BloomFilterAggregator[A](bfMonoid: BloomFilterMonoid[A]) extends MonoidAggregator[A, BF[A], BF[A]] {
   val monoid = bfMonoid
 
-  def prepare(value: String) = monoid.create(value)
-  def present(bf: BF) = bf
+  def prepare(value: A) = monoid.create(value)
+  def present(bf: BF[A]) = bf
 }
 
 object BloomFilterAggregator {
-  def apply(numHashes: Int, width: Int): BloomFilterAggregator = BloomFilterAggregator(BloomFilterMonoid(numHashes, width))
+  def apply[A](numHashes: Int, width: Int)(implicit toBytes: A => Array[Byte]): BloomFilterAggregator[A] =
+    BloomFilterAggregator[A](BloomFilterMonoid[A](numHashes, width))
 }

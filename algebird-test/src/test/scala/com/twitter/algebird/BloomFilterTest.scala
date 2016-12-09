@@ -6,37 +6,45 @@ import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalatest.{ Matchers, WordSpec }
 import org.scalacheck.Prop._
 
+object ImplicitStringToBytesView {
+  implicit def stringToBytes(s: String): Array[Byte] = s.getBytes()
+}
+
 class BloomFilterLaws extends CheckProperties {
+
+  import ImplicitStringToBytesView.stringToBytes
   import com.twitter.algebird.BaseProperties._
 
   val NUM_HASHES = 6
   val WIDTH = 32
 
-  implicit val bfMonoid = new BloomFilterMonoid(NUM_HASHES, WIDTH)
+  implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
   implicit val bfGen =
     Arbitrary {
       for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
     }
 
   property("BloomFilter is a Monoid") {
-    monoidLaws[BF]
+    monoidLaws[BF[String]]
   }
 }
 
 class BFHashIndices extends CheckProperties {
+  import ImplicitStringToBytesView.stringToBytes
+
   val NUM_HASHES = 10
   val WIDTH = 4752800
 
-  implicit val bfHash: Arbitrary[BFHash] =
+  implicit val bfHash: Arbitrary[BFHash[String]] =
     Arbitrary {
       for {
         hashes <- Gen.choose(1, 10)
         width <- Gen.choose(100, 5000000)
-      } yield BFHash(hashes, width)
+      } yield BFHash[String](hashes, width)
     }
 
   property("Indices are non negative") {
-    forAll { (hash: BFHash, v: Long) =>
+    forAll { (hash: BFHash[String], v: Long) =>
       hash.apply(v.toString).forall { e =>
         e >= 0
       }
@@ -74,16 +82,16 @@ class BFHashIndices extends CheckProperties {
     }
   }
 
-  implicit val pairOfHashes: Arbitrary[(BFHash, NegativeBFHash)] =
+  implicit val pairOfHashes: Arbitrary[(BFHash[String], NegativeBFHash)] =
     Arbitrary {
       for {
         hashes <- Gen.choose(1, 10)
         width <- Gen.choose(100, 5000000)
-      } yield (BFHash(hashes, width), NegativeBFHash(hashes, width))
+      } yield (BFHash[String](hashes, width), NegativeBFHash(hashes, width))
     }
 
   property("Indices of the two versions of BFHashes are the same, unless the first one contains negative index") {
-    forAll { (pair: (BFHash, NegativeBFHash), v: Long) =>
+    forAll { (pair: (BFHash[String], NegativeBFHash), v: Long) =>
       val s = v.toString
       val (hash, negativeHash) = pair
       val indices = negativeHash.apply(s)
@@ -93,8 +101,11 @@ class BFHashIndices extends CheckProperties {
 }
 
 class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends ApproximateProperty {
+
+  import ImplicitStringToBytesView.stringToBytes
+
   type Exact = Set[T]
-  type Approx = BF
+  type Approx = BF[String]
 
   type Input = T
   type Result = Boolean
@@ -107,7 +118,7 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter(set.size, falsePositiveRate)
+    val bfMonoid = BloomFilter[String](set.size, falsePositiveRate)
 
     val strings = set.map(_.toString).toSeq
     bfMonoid.create(strings: _*)
@@ -121,12 +132,15 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
 
   def exactResult(s: Set[T], t: T) = s.contains(t)
 
-  def approximateResult(bf: BF, t: T) = bf.contains(t.toString)
+  def approximateResult(bf: BF[String], t: T) = bf.contains(t.toString)
 }
 
 class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
+
+  import ImplicitStringToBytesView.stringToBytes
+
   type Exact = Set[T]
-  type Approx = BF
+  type Approx = BF[String]
 
   type Input = Unit
   type Result = Long
@@ -140,7 +154,7 @@ class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter(set.size, falsePositiveRate)
+    val bfMonoid = BloomFilter[String](set.size, falsePositiveRate)
 
     val strings = set.map(_.toString).toSeq
     bfMonoid.create(strings: _*)
@@ -149,7 +163,7 @@ class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
   def inputGenerator(set: Set[T]) = Gen.const(())
 
   def exactResult(s: Set[T], u: Unit) = s.size
-  def approximateResult(bf: BF, u: Unit) = bf.size
+  def approximateResult(bf: BF[String], u: Unit) = bf.size
 }
 
 class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
@@ -170,6 +184,8 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
 
 class BloomFilterTest extends WordSpec with Matchers {
 
+  import ImplicitStringToBytesView.stringToBytes
+
   val RAND = new scala.util.Random
 
   "BloomFilter" should {
@@ -178,7 +194,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 100).foreach{
         _ =>
           {
-            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = bfMonoid.create(entries: _*)
@@ -200,7 +216,7 @@ class BloomFilterTest extends WordSpec with Matchers {
               {
                 val numEntries = RAND.nextInt(10) + 1
 
-                val bfMonoid = BloomFilter(numEntries, fpProb)
+                val bfMonoid = BloomFilter[String](numEntries, fpProb)
 
                 val entries = RAND.shuffle((0 until 1000).toList).take(numEntries + 1).map(_.toString)
                 val bf = bfMonoid.create(entries.drop(1): _*)
@@ -217,7 +233,7 @@ class BloomFilterTest extends WordSpec with Matchers {
     }
 
     "approximate cardinality" in {
-      val bfMonoid = BloomFilterMonoid(10, 100000)
+      val bfMonoid = BloomFilterMonoid[String](10, 100000)
       Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
         val items = (1 until exactCardinality).map { _.toString }
         val bf = bfMonoid.create(items: _*)
@@ -233,7 +249,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 10).foreach{
         _ =>
           {
-            val aggregator = BloomFilterAggregator(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val aggregator = BloomFilterAggregator[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = aggregator(entries)
@@ -246,7 +262,7 @@ class BloomFilterTest extends WordSpec with Matchers {
     }
 
     "not serialize @transient dense BFInstance" in {
-      def serialize(bf: BF): Array[Byte] = {
+      def serialize(bf: BF[String]): Array[Byte] = {
         val stream = new ByteArrayOutputStream()
         val out = new ObjectOutputStream(stream)
         out.writeObject(bf)
@@ -255,8 +271,9 @@ class BloomFilterTest extends WordSpec with Matchers {
         stream.toByteArray
       }
 
+
       val items = (1 until 10).map(_.toString)
-      val bf = BloomFilter(10, 0.1).create(items: _*)
+      val bf = BloomFilter[String](10, 0.1).create(items: _*)
       val bytesBeforeSizeCalled = Bytes(serialize(bf))
       val beforeSize = bf.size
       assert(bf.contains("1").isTrue)
@@ -271,7 +288,7 @@ class BloomFilterTest extends WordSpec with Matchers {
     "not have negative hash values" in {
       val NUM_HASHES = 2
       val WIDTH = 4752800
-      val bfHash = BFHash(NUM_HASHES, WIDTH)
+      val bfHash = BFHash[String](NUM_HASHES, WIDTH)
       val s = "7024497610539761509"
       val index = bfHash.apply(s).head
 
@@ -285,7 +302,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       (0 to 100).foreach {
         _ =>
           {
-            val bfMonoid = new BloomFilterMonoid(RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+            val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
             val numEntries = 5
             val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
             val bf = bfMonoid.create(entries: _*)
