@@ -2,7 +2,6 @@ import ReleaseTransformations._
 import algebird._
 import com.typesafe.sbt.SbtScalariform._
 import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 import sbtunidoc.Plugin.UnidocKeys._
@@ -33,6 +32,8 @@ def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
   * cause problems generating the documentation on scala 2.10. As the APIs for 2.10
   * and 2.11 are the same this has no effect on the resultant documentation, though
   * it does mean that the scaladocs cannot be generated when the build is in 2.10 mode.
+  *
+  * TODO: enable algebirdSpark when we turn on the algebirdSpark 2.12 build.
   */
 def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
   CrossVersion.partialVersion(sv) match {
@@ -41,8 +42,9 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
       algebirdTest,
       algebirdCore,
       algebirdUtil,
-      algebirdBijection,
-      algebirdSpark))
+      algebirdBijection
+      // algebirdSpark
+    ))
   }
 
 val sharedSettings = scalariformSettings ++  Seq(
@@ -207,9 +209,10 @@ lazy val algebirdCore = module("core").settings(
       else
         Seq()
     },
-  sourceGenerators in Compile <+= sourceManaged in Compile map { outDir: File =>
-    GenTupleAggregators.gen(outDir)
-  }, addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
+  sourceGenerators in Compile += Def.task {
+      GenTupleAggregators.gen((sourceManaged in Compile).value)
+    }.taskValue,
+  addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
 )
 
 lazy val algebirdTest = module("test").settings(
