@@ -324,7 +324,8 @@ abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty {
 }
 
 class CmsSmallFrequencyProperty[K: CMSHasher: Gen] extends CmsFrequencyProperty[K] {
-  def exactGenerator: Gen[Vector[K]] = Gen.containerOf[Vector, K](implicitly[Gen[K]])
+  def exactGenerator: Gen[Vector[K]] =
+    Gen.nonEmptyListOf[K](implicitly[Gen[K]]).map(_.toVector)
 }
 
 class CmsLargeFrequencyProperty[K: CMSHasher: Gen] extends CmsFrequencyProperty[K] {

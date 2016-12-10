@@ -258,10 +258,11 @@ class BloomFilterTest extends WordSpec with Matchers {
       val items = (1 until 10).map(_.toString)
       val bf = BloomFilter(10, 0.1).create(items: _*)
       val bytesBeforeSizeCalled = Bytes(serialize(bf))
-      bf.size
+      val beforeSize = bf.size
       assert(bf.contains("1").isTrue)
       val bytesAfterSizeCalled = Bytes(serialize(bf))
       assert(bytesBeforeSizeCalled.size == bytesAfterSizeCalled.size)
+      assert(beforeSize == bf.size)
     }
 
     /**
