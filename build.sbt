@@ -47,9 +47,8 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
 
 val sharedSettings = scalariformSettings ++  Seq(
   organization := "com.twitter",
-  scalaVersion := "2.12.0",
-  coverageEnabled := (if (scalaVersion.value startsWith "2.11") true else false),
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0"),
+  scalaVersion := "2.12.1",
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.1"),
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(

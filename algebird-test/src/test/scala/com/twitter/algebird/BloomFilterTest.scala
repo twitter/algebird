@@ -245,8 +245,8 @@ class BloomFilterTest extends WordSpec with Matchers {
       }
     }
 
-    "not serialize BFInstance" in {
-      def serialize(bf: BF) = {
+    "not serialize @transient dense BFInstance" in {
+      def serialize(bf: BF): Array[Byte] = {
         val stream = new ByteArrayOutputStream()
         val out = new ObjectOutputStream(stream)
         out.writeObject(bf)
@@ -255,15 +255,13 @@ class BloomFilterTest extends WordSpec with Matchers {
         stream.toByteArray
       }
 
-      val items = (1 until 10).map { _.toString }
+      val items = (1 until 10).map(_.toString)
       val bf = BloomFilter(10, 0.1).create(items: _*)
-      val bytesBeforeSizeCalled = new String(serialize(bf))
+      val bytesBeforeSizeCalled = Bytes(serialize(bf))
       bf.size
-
       assert(bf.contains("1").isTrue)
-
-      val bytesAfterSizeCalled = new String(serialize(bf))
-      assert(bytesBeforeSizeCalled == bytesAfterSizeCalled)
+      val bytesAfterSizeCalled = Bytes(serialize(bf))
+      assert(bytesBeforeSizeCalled.size == bytesAfterSizeCalled.size)
     }
 
     /**
@@ -306,5 +304,4 @@ class BloomFilterTest extends WordSpec with Matchers {
       }
     }
   }
-
 }
