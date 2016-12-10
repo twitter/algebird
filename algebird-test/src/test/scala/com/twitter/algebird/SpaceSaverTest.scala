@@ -26,7 +26,7 @@ class SpaceSaverLaws extends CheckProperties {
           Equiv.fromFunction { (left, right) =>
             (left consistentWith right) && (right consistentWith left)
           }
-        commutativeSemigroupLawsEquiv[SpaceSaver[Int]]
+        commutativeSemigroupLaws[SpaceSaver[Int]]
       }
     }
   }

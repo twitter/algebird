@@ -35,22 +35,22 @@ class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
 
   property("Future is a monad") {
     import UtilAlgebras.futureMonad
-    monadLawsEquiv[Future, Int, String, Long]
+    monadLaws[Future, Int, String, Long]
   }
 
   property("Future[Long] is a commutative semigroup") {
     import UtilAlgebras.futureSemigroup
-    commutativeSemigroupLawsEquiv[Future[Long]]
+    commutativeSemigroupLaws[Future[Long]]
   }
 
   property("Future[Int] is a commutative monoid") {
     import UtilAlgebras.futureMonoid
-    commutativeMonoidLawsEquiv[Future[Int]]
+    commutativeMonoidLaws[Future[Int]]
   }
 
   property("Try is a monad") {
     import UtilAlgebras.tryMonad
-    monadLaws[Try, Int, String, Long]()
+    monadLaws[Try, Int, String, Long]
   }
 
   property("Try[Long] is a commutative semigroup") {

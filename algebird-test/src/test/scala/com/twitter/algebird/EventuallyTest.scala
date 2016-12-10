@@ -7,29 +7,30 @@ import org.scalacheck.{ Gen, Arbitrary, Prop }
 class EventuallyRingLaws extends CheckProperties {
   import BaseProperties._
 
-  val eventuallyRing = new EventuallyRing[Long, Int](_.toLong)(_ > 10000)
   val lGen = for (v <- Gen.choose(0L, 1L << 30L)) yield Left(v)
   val rGen = for (v <- Gen.choose(0, 10000)) yield Right(v)
+  implicit val eitherArb: Arbitrary[Either[Long, Int]] =
+    Arbitrary(Gen.oneOf(lGen, rGen))
 
   property("EventuallyRing is a Ring") {
-    ringLaws[Either[Long, Int]](eventuallyRing, Arbitrary(Gen.oneOf(lGen, rGen)))
+    implicit val eventuallyRing = new EventuallyRing[Long, Int](_.toLong)(_ > 10000)
+    ringLaws[Either[Long, Int]]
   }
 
   property("EventuallyRing is a Ring when we always convert") {
     // This is only lawful if we compare the converted space in general.
     // in practice, for many types this is not needed. Check the laws
-    // for your instance to be sure
-    val equiv: Equiv[Either[Long, Int]] = Equiv.fromFunction[Either[Long, Int]] {
+    // for your instance to be sure.
+    implicit val equiv: Equiv[Either[Long, Int]] = Equiv.fromFunction[Either[Long, Int]] {
       case (Right(a), Right(b)) => a == b
       case (Left(a), Left(b)) => a == b
       case (Right(a), Left(b)) => (a.toLong == b)
       case (Left(a), Right(b)) => (a == (b.toLong))
     }
-    //ringLaws[Either[Long, Int]](eventuallyRing2, Arbitrary(Gen.oneOf(lGen, rGen)))
     Prop.forAll { (pred: Int => Boolean) =>
-      val eventuallyRing2 = new EventuallyRing[Long, Int](_.toLong)(pred)
-      // TODO add a ringLawsEquiv
-      monoidLawsEquiv[Either[Long, Int]](eventuallyRing2, Arbitrary(Gen.oneOf(lGen, rGen)), equiv)
+      implicit val evRing = new EventuallyRing[Long, Int](_.toLong)(pred)
+      // TODO: convert to ringLaws https://github.com/twitter/algebird/issues/598
+      monoidLaws[Either[Long, Int]]
     }
   }
 
@@ -39,12 +40,15 @@ class EventuallyRingLaws extends CheckProperties {
 class EventuallyMonoidLaws extends CheckProperties {
   import BaseProperties._
 
-  val eventuallyMonoid = new EventuallyMonoid[Int, String](_.length)(_.length > 100)
+  implicit val eventuallyMonoid =
+    new EventuallyMonoid[Int, String](_.length)(_.length > 100)
+
   val lGen = for (v <- Gen.choose(0, 1 << 14)) yield Left(v)
   val rGen = for (v <- Gen.alphaStr) yield Right(v)
+  implicit val arb = Arbitrary(Gen.oneOf(lGen, rGen))
 
   property("EventuallyMonoid is a Monoid") {
-    monoidLaws[Either[Int, String]](eventuallyMonoid, Arbitrary(Gen.oneOf(lGen, rGen)))
+    monoidLaws[Either[Int, String]]
   }
 
 }

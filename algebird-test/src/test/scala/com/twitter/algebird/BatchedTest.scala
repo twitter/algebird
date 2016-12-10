@@ -32,7 +32,7 @@ class BatchedLaws extends CheckProperties {
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {
     implicit val m: Monoid[Batched[A]] = Batched.compactingMonoid[A](size)
     property(s"CountMinSketch[$name] batched at $size is a Monoid") {
-      monoidLawsEquiv[Batched[A]]
+      monoidLaws[Batched[A]]
     }
   }
 

@@ -153,6 +153,9 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
       val absoluteError = (oldestBucketSize - 1) / 2.0
       absoluteError / minInsideWindow
     }
+
+  override def toString: String =
+    s"ExpHist(conf = $conf, time = $time, guess = $guess, lowerBoundSum = $lowerBoundSum, upperBoundSum = $upperBoundSum)"
 }
 
 object ExpHist {

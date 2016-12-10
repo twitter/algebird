@@ -136,15 +136,17 @@ def get_sumoption(n, bufferSize)
     "buf#{t}.put(tuple._#{i+1})"
   end.join("; ")
 
-  gets_commaed = TYPE_SYMBOLS.first(n).drop(1).map do |t|
+  gets_commaed = TYPE_SYMBOLS.first(n).map do |t|
     "buf#{t}.flush.get"
   end.join(", ")
 
   "override def sumOption(#{method_params}) = {
-#{buffers}
-    to.foreach { tuple => #{put_statements} }
-    val a = bufA.flush
-    if (a.isDefined) Some((a.get, #{gets_commaed})) else None
+    if (to.isEmpty) None
+    else {
+  #{buffers}
+      to.foreach { tuple => #{put_statements} }
+      Some((#{gets_commaed}))
+    }
   }"
 end
 
