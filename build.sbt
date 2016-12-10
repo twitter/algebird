@@ -54,8 +54,8 @@ val sharedSettings = scalariformSettings ++  Seq(
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
-    "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    "releases"  at "http://oss.sonatype.org/content/repositories/releases"
+    Opts.resolver.sonatypeSnapshots,
+    Opts.resolver.sonatypeReleases
   ),
 
   parallelExecution in Test := true,
@@ -212,7 +212,10 @@ lazy val algebirdCore = module("core").settings(
   sourceGenerators in Compile += Def.task {
       GenTupleAggregators.gen((sourceManaged in Compile).value)
     }.taskValue,
-  addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
+  addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
+
+  // Scala 2.12's doc task was failing.
+  sources in (Compile, doc) ~= (_ filterNot (_.absolutePath.contains("javaapi")))
 )
 
 lazy val algebirdTest = module("test").settings(
