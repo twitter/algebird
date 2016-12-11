@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
  */
 class AlgebraResolutionTest extends FunSuite {
   // A type with no built in algebird algebras
-  trait Empty { }
+  trait Empty {}
   test("algebra.Semigroup") {
     implicit def fakeSemigroup[T]: algebra.Semigroup[T] = null
     implicitly[Semigroup[Empty]]

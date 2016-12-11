@@ -50,6 +50,32 @@ case class Empty[T]() extends Interval[T] {
 }
 
 object Interval extends java.io.Serializable {
+  /**
+    * Class that only exists so that [[leftClosedRightOpen]] and
+    * [[leftOpenRightClosed]] can retain the type information of the
+    * returned interval. The compiler doesn't know anything about
+    * ordering, so without [[MaybeEmpty]] the only valid return type
+    * is [[Interval[T]]].
+    */
+  sealed abstract class MaybeEmpty[T, NonEmpty[t] <: Interval[t]] {
+    def isEmpty: Boolean
+  }
+  object MaybeEmpty {
+    /**
+      * Represents an empty interval.
+      */
+    case class SoEmpty[T, NonEmpty[t] <: Interval[t]]() extends MaybeEmpty[T, NonEmpty] {
+      override def isEmpty = true
+    }
+
+    /**
+      * Represents a non-empty interval.
+      */
+    case class NotSoEmpty[T, NonEmpty[t] <: Interval[t]](get: NonEmpty[T]) extends MaybeEmpty[T, NonEmpty] {
+      override def isEmpty = false
+    }
+  }
+
   type GenIntersection[T] = Intersection[Lower, Upper, T]
   type InLowExUp[T] = Intersection[InclusiveLower, ExclusiveUpper, T]
   type InLowInUp[T] = Intersection[InclusiveLower, InclusiveUpper, T]
@@ -58,22 +84,22 @@ object Interval extends java.io.Serializable {
 
   implicit def monoid[T]: Monoid[Interval[T]] = Monoid.from[Interval[T]](Universe[T]()) { _ && _ }
 
-  // Automatically convert from an either
-  implicit def fromEither[L[t] <: Interval[t], R[t] <: Interval[t], T](either: Either[L[T], R[T]]): Interval[T] =
-    either match {
-      case Right(i) => i
-      case Left(i) => i
+  // Automatically convert from a MaybeEmpty instance
+  implicit def fromMaybeEmpty[T, NonEmpty[t] <: Interval[t]](me: MaybeEmpty[T, NonEmpty]): Interval[T] =
+    me match {
+      case MaybeEmpty.SoEmpty() => Empty()
+      case MaybeEmpty.NotSoEmpty(i) => i
     }
 
-  def leftClosedRightOpen[T: Ordering](lower: T, upper: T): Either[Empty[T], InLowExUp[T]] =
+  def leftClosedRightOpen[T: Ordering](lower: T, upper: T): MaybeEmpty[T, InLowExUp] =
     if (Ordering[T].lt(lower, upper))
-      Right(Intersection(InclusiveLower(lower), ExclusiveUpper(upper)))
-    else Left(Empty())
+      MaybeEmpty.NotSoEmpty[T, InLowExUp](Intersection(InclusiveLower(lower), ExclusiveUpper(upper)))
+    else MaybeEmpty.SoEmpty[T, InLowExUp]()
 
-  def leftOpenRightClosed[T: Ordering](lower: T, upper: T): Either[Empty[T], ExLowInUp[T]] =
+  def leftOpenRightClosed[T: Ordering](lower: T, upper: T): MaybeEmpty[T, ExLowInUp] =
     if (Ordering[T].lt(lower, upper))
-      Right(Intersection(ExclusiveLower(lower), InclusiveUpper(upper)))
-    else Left(Empty())
+      MaybeEmpty.NotSoEmpty[T, ExLowInUp](Intersection(ExclusiveLower(lower), InclusiveUpper(upper)))
+    else MaybeEmpty.SoEmpty[T, ExLowInUp]()
 }
 
 // Marker traits to keep lower on the left in Intersection
