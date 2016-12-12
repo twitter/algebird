@@ -35,9 +35,8 @@ class SuccessibleProperties extends CheckProperties {
       (optL, optR) match {
         case (Some(l), Some(r)) => Ordering[Int].compare(l, r) == ord.compare(optL, optR)
         case (None, None) => ord.equiv(optL, optR)
-        case (None, _) => ord.gteq(optL, optR)
-        case (_, None) => ord.lteq(optL, optR)
-
+        case (None, _) => ord.compare(optL, optR) == 1
+        case (_, None) => ord.compare(optL, optR) == -1
       }
     }
   }
