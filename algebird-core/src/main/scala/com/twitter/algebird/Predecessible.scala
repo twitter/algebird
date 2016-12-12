@@ -39,14 +39,13 @@ trait Predecessible[T] extends java.io.Serializable {
   /**
    * The law is:
    * prev(t)
-   *   .map { n => partialOrdering.lteq(n, t) && (!partialOrdering.equiv(t, n)) }
+   *   .map { n => ordering.lteq(n, t) && (!ordering.equiv(t, n)) }
    *   .getOrElse(true)
-   *
-   * Note Ordering extends PartialOrdering, so we are taking a weak constraint
-   * that some items can be ordered, and namely, the sequence of items returned
-   * by prev is strictly decreasing
    */
-  def partialOrdering: PartialOrdering[T]
+  def ordering: Ordering[T]
+
+  @deprecated("use ordering instead", since = "0.13.0")
+  final def partialOrdering: PartialOrdering[T] = ordering
 }
 
 object Predecessible extends java.io.Serializable {
@@ -56,7 +55,7 @@ object Predecessible extends java.io.Serializable {
    */
   def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] = new Predecessible[T] {
     def prev(t: T) = prevFn(t)
-    def partialOrdering = ord
+    def ordering = ord
   }
   // enables: Predecessible.prev(2) == Some(1)
   def prev[T](t: T)(implicit p: Predecessible[T]): Option[T] = p.prev(t)
@@ -68,9 +67,8 @@ object Predecessible extends java.io.Serializable {
   implicit def integralPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
 }
 
-class IntegralPredecessible[T: Integral] extends Predecessible[T] {
-  private[this] val integral = implicitly[Integral[T]]
-  def prev(old: T) = {
+object IntegralPredecessible {
+  def prev[T: Integral](old: T)(implicit integral: Integral[T]): Option[T] = {
     val newV = integral.minus(old, integral.one)
     if (integral.compare(newV, old) >= 0) {
       // We wrapped around
@@ -79,6 +77,12 @@ class IntegralPredecessible[T: Integral] extends Predecessible[T] {
       Some(newV)
     }
   }
+}
 
-  def partialOrdering: PartialOrdering[T] = integral
+class IntegralPredecessible[T: Integral] extends Predecessible[T] {
+  private[this] val integral = implicitly[Integral[T]]
+
+  def prev(old: T) = IntegralPredecessible.prev(old)
+
+  def ordering: Ordering[T] = integral
 }

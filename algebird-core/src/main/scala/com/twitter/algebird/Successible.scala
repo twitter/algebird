@@ -42,14 +42,13 @@ trait Successible[T] {
   /**
    * The law is:
    * next(t)
-   *   .map { n => partialOrdering.lteq(t, n) && (!partialOrdering.equiv(t, n)) }
+   *   .map { n => ordering.lteq(t, n) && (!ordering.equiv(t, n)) }
    *   .getOrElse(true)
-   *
-   * Note Ordering extends PartialOrdering, so we are taking a weak constraint
-   * that some items can be ordered, and namely, the sequence of items returned
-   * by next is strictly increasing
    */
-  def partialOrdering: PartialOrdering[T]
+  def ordering: Ordering[T]
+
+  @deprecated("use ordering instead", since = "0.13.0")
+  final def partialOrdering: PartialOrdering[T] = ordering
 }
 
 object Successible {
@@ -59,7 +58,7 @@ object Successible {
    */
   def fromNextOrd[T](nextFn: T => Option[T])(implicit ord: Ordering[T]): Successible[T] = new Successible[T] {
     def next(t: T) = nextFn(t)
-    def partialOrdering = ord
+    def ordering = ord
   }
   // enables: Successible.next(2) == Some(3)
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
@@ -82,13 +81,10 @@ object Successible {
         case (None, None) => 0
       }
   }
-  // For some sad reason, scala does not define implicit PartialOrderings this way
-  implicit def partialFromOrdering[T](implicit ord: Ordering[T]): PartialOrdering[T] = ord
 }
 
-class IntegralSuccessible[T: Integral] extends Successible[T] {
-  private[this] val integral = implicitly[Integral[T]]
-  def next(old: T) = {
+object IntegralSuccessible {
+  def next[T](old: T)(implicit integral: Integral[T]): Option[T] = {
     val newV = integral.plus(old, integral.one)
     if (integral.compare(newV, old) <= 0) {
       None
@@ -96,6 +92,12 @@ class IntegralSuccessible[T: Integral] extends Successible[T] {
       Some(newV)
     }
   }
+}
 
-  def partialOrdering = integral
+class IntegralSuccessible[T: Integral] extends Successible[T] {
+  private[this] val integral = implicitly[Integral[T]]
+
+  def next(old: T) = IntegralSuccessible.next(old)
+
+  def ordering = integral
 }

@@ -20,18 +20,27 @@ import org.scalacheck.{ Arbitrary, Prop }
 import org.scalacheck.Prop.forAll
 
 object PredecessibleLaws {
-  // Should always be true:
-  def law[T: Predecessible](t: T): Boolean =
-    Predecessible.prev(t) match {
+  private def descending[T: Predecessible](t: T, prev: Option[T]): Boolean =
+    prev match {
       case None => true // t is the min
       case Some(p) =>
-        val pord = implicitly[Predecessible[T]].partialOrdering
-        pord.lt(p, t)
+        val ord = implicitly[Predecessible[T]].ordering
+        ord.lt(p, t)
     }
+
+  // Should always be true:
+  def law[T: Predecessible](t: T): Boolean = {
+    val prev = Predecessible.prev(t)
+    val prevPrev = Predecessible.prev(prev)
+    descending(t, prev) && descending(t, prevPrev) && (prev match {
+      case None => true
+      case Some(p) => descending(p, prevPrev)
+    })
+  }
 
   def iteratePrevDecreases[T: Predecessible](t: T, size: Short): Boolean =
     Predecessible.iteratePrev(t).take(size.toInt).sliding(2).forall {
-      case a :: b :: Nil => implicitly[Predecessible[T]].partialOrdering.lt(b, a)
+      case a :: b :: Nil => implicitly[Predecessible[T]].ordering.lt(b, a)
       case a :: Nil => true
       case s => sys.error("should never happen: " + s)
     }
@@ -40,7 +49,7 @@ object PredecessibleLaws {
    * Use this to test your implementations:
    *
    * {{{
-   * property("blah is predecessible") { predecessibleLaws[MyType] }
+   * property("MyType is predecessible") { predecessibleLaws[MyType] }
    * }}}
    */
   def predecessibleLaws[T: Predecessible: Arbitrary]: Prop =

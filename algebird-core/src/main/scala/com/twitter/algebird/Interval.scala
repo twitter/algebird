@@ -25,8 +25,8 @@ sealed trait Interval[T] extends java.io.Serializable {
   def contains(t: T)(implicit ord: Ordering[T]): Boolean
 
   def intersect(that: Interval[T])(implicit ord: Ordering[T]): Interval[T]
-  def apply(t: T)(implicit ord: Ordering[T]) = contains(t)
-  def &&(that: Interval[T])(implicit ord: Ordering[T]) = intersect(that)
+  final def apply(t: T)(implicit ord: Ordering[T]) = contains(t)
+  final def &&(that: Interval[T])(implicit ord: Ordering[T]) = intersect(that)
 
   /**
    * Map the Interval with a non-decreasing function.
@@ -293,6 +293,6 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
   def toLeftClosedRightOpen(implicit s: Successible[T]): Option[Intersection[InclusiveLower, ExclusiveUpper, T]] =
     for {
       l <- lower.least
-      g <- upper.strictUpperBound if s.partialOrdering.lt(l, g)
+      g <- upper.strictUpperBound if s.ordering.lt(l, g)
     } yield Intersection(InclusiveLower(l), ExclusiveUpper(g))
 }

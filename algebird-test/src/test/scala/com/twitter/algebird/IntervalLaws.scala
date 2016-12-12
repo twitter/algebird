@@ -22,6 +22,16 @@ class IntervalLaws extends CheckProperties {
   import com.twitter.algebird.scalacheck.arbitrary._
   import com.twitter.algebird.Interval.GenIntersection
 
+  property("mapNonDecreasing preserves contains behavior") {
+    forAll { (interval: Interval[Int], t: Int) =>
+      def nonDecreasing(i: Int): Long = (i + 1) max i
+      val mappedInterval = interval.mapNonDecreasing(nonDecreasing(_))
+      val mappedT = nonDecreasing(t)
+
+      interval.contains(t) == mappedInterval.contains(mappedT)
+    }
+  }
+
   property("[x, x + 1) contains x") {
     forAll { y: Int =>
       val x = y.asInstanceOf[Long]
