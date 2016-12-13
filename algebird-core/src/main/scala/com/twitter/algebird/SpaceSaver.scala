@@ -1,6 +1,9 @@
 package com.twitter.algebird
 
+import java.nio.ByteBuffer
+
 import scala.collection.immutable.SortedMap
+import scala.util.{ Failure, Success, Try }
 
 object SpaceSaver {
   /**
@@ -18,6 +21,99 @@ object SpaceSaver {
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
+
+  /**
+   * Encodes the SpaceSaver as a sequence of bytes containing in order
+   * - 1 byte: 1/2 => 1 = SSOne, 2 = SSMany
+   * - 4 bytes: the capacity
+   * - N bytes: the item/counters (counters as length + N*(item size + item + 2 * counters)
+   */
+  def toBytes[T](ss: SpaceSaver[T], tSerializer: T => Array[Byte]): Array[Byte] = {
+    ss match {
+      case SSOne(capacity, item) =>
+        val itemAsBytes = tSerializer(item)
+        val itemLength = itemAsBytes.length
+        //1 for the type, 4 for capacity, 4 for itemAsBytes.length
+        val buffer = new Array[Byte](1 + 4 + 4 + itemAsBytes.length)
+        ByteBuffer
+          .wrap(buffer)
+          .put(1: Byte)
+          .putInt(capacity)
+          .putInt(itemLength.toByte)
+          .put(itemAsBytes)
+        buffer
+
+      case SSMany(capacity, counters, _) => //We do not care about the buckets are thery are created by SSMany.apply
+        val buffer = scala.collection.mutable.ArrayBuffer.newBuilder[Byte]
+        buffer += (2: Byte)
+
+        var buff = ByteBuffer.allocate(4)
+        buff.putInt(capacity)
+        buffer ++= buff.array()
+
+        buff = ByteBuffer.allocate(4)
+        buff.putInt(counters.size)
+        buffer ++= buff.array()
+        counters.foreach {
+          case (item, (a, b)) =>
+            val itemAsBytes = tSerializer(item)
+
+            buff = ByteBuffer.allocate(4)
+            buff.putInt(itemAsBytes.length)
+            buffer ++= buff.array()
+
+            buffer ++= itemAsBytes
+
+            buff = ByteBuffer.allocate(8 * 2)
+            buff.putLong(a)
+            buff.putLong(b)
+            buffer ++= buff.array()
+        }
+        buffer.result.toArray
+    }
+  }
+
+  // Make sure to be reversible so fromBytes(toBytes(x)) == x
+  def fromBytes[T](bytes: Array[Byte], tDeserializer: Array[Byte] => Try[T]): Try[SpaceSaver[T]] = {
+    fromByteBuffer(ByteBuffer.wrap(bytes), buffer => tDeserializer(buffer.array()))
+  }
+
+  def fromByteBuffer[T](bb: ByteBuffer, tDeserializer: ByteBuffer => Try[T]): Try[SpaceSaver[T]] = {
+    Try {
+      bb.get.toInt match {
+        case 1 =>
+          val capacity = bb.getInt
+          val itemLength = bb.getInt
+          val itemAsBytes = new Array[Byte](itemLength)
+          bb.get(itemAsBytes)
+          tDeserializer(ByteBuffer.wrap(itemAsBytes)).map(item => SSOne(capacity, item))
+        case 2 =>
+          val capacity = bb.getInt
+
+          var countersToDeserialize = bb.getInt
+          val counters = scala.collection.mutable.Map.empty[T, (Long, Long)]
+          while (countersToDeserialize != 0) {
+            val itemLength = bb.getInt()
+            val itemAsBytes = new Array[Byte](itemLength)
+            bb.get(itemAsBytes)
+            val item = tDeserializer(ByteBuffer.wrap(itemAsBytes))
+
+            val a = bb.getLong
+            val b = bb.getLong
+
+            item match {
+              case Failure(e) => return Failure(e)
+              case Success(i) =>
+                counters += ((i, (a, b)))
+            }
+
+            countersToDeserialize -= 1
+          }
+
+          Success(SSMany(capacity, counters.toMap))
+      }
+    }.flatten
+  }
 }
 
 /**
