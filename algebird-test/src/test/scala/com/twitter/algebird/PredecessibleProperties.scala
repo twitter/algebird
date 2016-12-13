@@ -21,4 +21,8 @@ class PredecessibleProperties extends CheckProperties {
   property("Int is Predecessible") { laws[Int] }
   property("Long is Predecessible") { laws[Long] }
   property("BigInt is Predecessible") { laws[BigInt] }
+  property("Predecessible.fromPrevOrd[Int] is Predecessible") {
+    implicit val pred = Predecessible.fromPrevOrd[Int](IntegralPredecessible.prev(_))
+    laws[Int]
+  }
 }

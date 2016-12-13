@@ -17,10 +17,22 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalacheck.Prop._
+import com.twitter.algebird.scalacheck.PosNum
 
 class IntervalLaws extends CheckProperties {
   import com.twitter.algebird.scalacheck.arbitrary._
   import com.twitter.algebird.Interval.GenIntersection
+
+  property("mapNonDecreasing preserves contains behavior") {
+    forAll { (interval: Interval[Int], t: Int, inc: PosNum[Int]) =>
+      def nonDecreasing(i: Int): Long = i.toLong + inc.value
+
+      val mappedInterval: Interval[Long] = interval.mapNonDecreasing(nonDecreasing(_))
+      val mappedT: Long = nonDecreasing(t)
+
+      interval.contains(t) == mappedInterval.contains(mappedT)
+    }
+  }
 
   property("[x, x + 1) contains x") {
     forAll { y: Int =>

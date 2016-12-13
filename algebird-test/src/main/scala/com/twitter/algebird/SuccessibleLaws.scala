@@ -20,18 +20,27 @@ import org.scalacheck.{ Arbitrary, Prop }
 import org.scalacheck.Prop.forAll
 
 object SuccessibleLaws {
-  // Should always be true:
-  def law[T: Successible](t: T): Boolean =
-    Successible.next(t) match {
+  private def ascending[T: Successible](t: T, next: Option[T]): Boolean =
+    next match {
       case None => true // t is the max
       case Some(n) =>
-        val pord = implicitly[Successible[T]].partialOrdering
-        pord.lt(t, n)
+        val ord = implicitly[Successible[T]].ordering
+        ord.lt(t, n)
     }
+
+  // Should always be true:
+  def law[T: Successible](t: T): Boolean = {
+    val next = Successible.next(t)
+    val nextNext = Successible.next(next)
+    ascending(t, next) && ascending(t, nextNext) && (next match {
+      case None => true
+      case Some(n) => ascending(n, nextNext)
+    })
+  }
 
   def iterateNextIncreases[T: Successible](t: T, size: Short): Boolean =
     Successible.iterateNext(t).take(size.toInt).sliding(2).forall {
-      case a :: b :: Nil => implicitly[Successible[T]].partialOrdering.lt(a, b)
+      case a :: b :: Nil => implicitly[Successible[T]].ordering.lt(a, b)
       case a :: Nil => true
       case s => sys.error("should never happen: " + s)
     }
@@ -40,7 +49,7 @@ object SuccessibleLaws {
    * Use this to test your implementations:
    *
    * {{{
-   * property("blah is successible") { successibleLaws[MyType] }
+   * property("MyType is successible") { successibleLaws[MyType] }
    * }}}
    */
   def successibleLaws[T: Successible: Arbitrary]: Prop =
