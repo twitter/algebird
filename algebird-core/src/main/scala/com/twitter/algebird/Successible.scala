@@ -39,11 +39,12 @@ trait Successible[T] {
           .collect { case Some(t) => t }
     }
   }
+
   /**
    * The law is:
-   * next(t)
-   *   .map { n => ordering.lteq(t, n) && (!ordering.equiv(t, n)) }
-   *   .getOrElse(true)
+   * {{{
+   * next(t).map(ordering.lt(t, _)).getOrElse(true)
+   * }}}
    */
   def ordering: Ordering[T]
 

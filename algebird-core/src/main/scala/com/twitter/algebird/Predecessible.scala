@@ -36,11 +36,13 @@ trait Predecessible[T] extends java.io.Serializable {
           .collect { case Some(t) => t }
     }
   }
+
   /**
    * The law is:
-   * prev(t)
-   *   .map { n => ordering.lteq(n, t) && (!ordering.equiv(t, n)) }
-   *   .getOrElse(true)
+   *
+   * {{{
+   * prev(t).map(ordering.lt(_, t)).getOrElse(true)
+   * }}}
    */
   def ordering: Ordering[T]
 

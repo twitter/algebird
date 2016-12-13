@@ -259,8 +259,9 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
    * Goes from lowest to highest for all items
    * that are contained in this Intersection
    */
-  def leastToGreatest(implicit s: Successible[T], ord: Ordering[T]): Iterable[T] = {
+  def leastToGreatest(implicit s: Successible[T]): Iterable[T] = {
     val self = this
+    implicit val ord: Ordering[T] = s.ordering
     // TODO https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       // We have to do this because the normal takeWhile causes OOM on big intervals
@@ -271,8 +272,9 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
    * Goes from highest to lowest for all items
    * that are contained in this Intersection
    */
-  def greatestToLeast(implicit p: Predecessible[T], ord: Ordering[T]): Iterable[T] = {
+  def greatestToLeast(implicit p: Predecessible[T]): Iterable[T] = {
     val self = this
+    implicit val ord: Ordering[T] = p.ordering
     // TODO https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       // We have to do this because the normal takeWhile causes OOM on big intervals
