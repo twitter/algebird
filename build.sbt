@@ -6,6 +6,7 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 import sbtunidoc.Plugin.UnidocKeys._
 import scalariform.formatter.preferences._
+import microsites._
 
 val algebraVersion = "0.6.0"
 val bijectionVersion = "0.9.4"
@@ -266,7 +267,12 @@ lazy val docSettings = Seq(
   micrositeBaseUrl := "algebird",
   micrositeDocumentationUrl := "api",
   micrositeGithubOwner := "twitter",
-  micrositeExtraMdFiles := Map(file("CONTRIBUTING.md") -> "contributing.md"),
+  micrositeExtraMdFiles :=
+    Map(file("CONTRIBUTING.md") ->
+      ExtraMdFileConfig("contributing.md", "page", Map(
+        "title" ->  "Contributing",
+        "section" -> "contributing",
+        "position" -> "5"))),
   micrositeGithubRepo := "algebird",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
@@ -283,6 +289,12 @@ lazy val docSettings = Seq(
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
   ghpagesNoJekyll := false,
+  // // Delete this comment and uncomment the following to enable mathjax.
+  // micrositeCDNDirectives := CdnDirectives(
+  //     jsList = List(
+  //         "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+  //       )
+  //   ),
   fork in tut := true,
   fork in (ScalaUnidoc, unidoc) := true,
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
