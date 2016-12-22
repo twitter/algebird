@@ -11,17 +11,21 @@ object BloomFilterCreateBenchmark {
     Seq.fill(nbrOfStrings)(Random.nextString(lengthOfStrings))
   }
 
-  implicit def stringToBytes(s: String): Array[Byte] = s.getBytes()
-
   @State(Scope.Benchmark)
   class BloomFilterState {
-    @Param(Array("4", "5", "6"))
-    var nbrOfHashes: Int = 0
+    @Param(Array("100", "1000", "10000"))
+    var nbrOfElements: Int = 0
 
-    @Param(Array("16", "32", "64"))
-    var width: Int = 0
+    @Param(Array("0.001", "0.01"))
+    var falsePositiveRate: Double = 0
 
-    val randomString = createRandomString(1000, 10)
+    var randomStrings: Seq[String] = _
+
+    @Setup(Level.Trial)
+    def setup(): Unit = {
+      randomStrings = createRandomString(nbrOfElements, 10)
+    }
+
   }
 }
 
@@ -31,8 +35,8 @@ class BloomFilterCreateBenchmark {
 
   @Benchmark
   def createBloomFilter(bloomFilterState: BloomFilterState): BF[String] = {
-    val bfMonoid = new BloomFilterMonoid[String](bloomFilterState.nbrOfHashes, bloomFilterState.width)
-    val bf = bfMonoid.create(bloomFilterState.randomString: _*)
+    val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
+    val bf = bfMonoid.create(bloomFilterState.randomStrings: _*)
     bf
   }
 }

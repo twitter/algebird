@@ -5,18 +5,22 @@ import org.openjdk.jmh.annotations._
 
 object BloomFilterQueryBenchmark {
 
-  import BloomFilterCreateBenchmark.stringToBytes
-
   @State(Scope.Benchmark)
   class BloomFilterState {
-    @Param(Array("4", "5", "6"))
-    var nbrOfHashes: Int = 0
 
-    @Param(Array("16", "32", "64"))
-    var width: Int = 0
-    val bfMonoid = new BloomFilterMonoid[String](6, 32)
-    val randomStrings = BloomFilterCreateBenchmark.createRandomString(1000, 10)
-    val bf = bfMonoid.create(randomStrings: _*)
+    @Param(Array("100", "1000", "10000"))
+    var nbrOfElements: Int = 0
+
+    @Param(Array("0.001", "0.01"))
+    var falsePositiveRate: Double = 0
+
+    var bf: BF[String] = _
+
+    @Setup(Level.Trial)
+    def setup(): Unit = {
+      val randomStrings = BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
+      bf = BloomFilter[String](nbrOfElements, falsePositiveRate).create(randomStrings: _*)
+    }
   }
 }
 
