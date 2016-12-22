@@ -6,13 +6,8 @@ import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalatest.{ Matchers, WordSpec }
 import org.scalacheck.Prop._
 
-object ImplicitStringToBytesView {
-  implicit def stringToBytes(s: String): Array[Byte] = s.getBytes()
-}
-
 class BloomFilterLaws extends CheckProperties {
 
-  import ImplicitStringToBytesView.stringToBytes
   import com.twitter.algebird.BaseProperties._
 
   val NUM_HASHES = 6
@@ -30,7 +25,6 @@ class BloomFilterLaws extends CheckProperties {
 }
 
 class BFHashIndices extends CheckProperties {
-  import ImplicitStringToBytesView.stringToBytes
 
   val NUM_HASHES = 10
   val WIDTH = 4752800
@@ -102,8 +96,6 @@ class BFHashIndices extends CheckProperties {
 
 class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends ApproximateProperty {
 
-  import ImplicitStringToBytesView.stringToBytes
-
   type Exact = Set[T]
   type Approx = BF[String]
 
@@ -136,8 +128,6 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
 }
 
 class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
-
-  import ImplicitStringToBytesView.stringToBytes
 
   type Exact = Set[T]
   type Approx = BF[String]
@@ -183,8 +173,6 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
 }
 
 class BloomFilterTest extends WordSpec with Matchers {
-
-  import ImplicitStringToBytesView.stringToBytes
 
   val RAND = new scala.util.Random
 
@@ -270,7 +258,6 @@ class BloomFilterTest extends WordSpec with Matchers {
         stream.close()
         stream.toByteArray
       }
-
 
       val items = (1 until 10).map(_.toString)
       val bf = BloomFilter[String](10, 0.1).create(items: _*)
