@@ -44,7 +44,7 @@ class RichCBitSet(val cb: CBitSet) {
 
 object BloomFilter {
 
-  def apply[A](numEntries: Int, fpProb: Double)(implicit hash: Hash128[A]) = {
+  def apply[A](numEntries: Int, fpProb: Double)(implicit hash: Hash128[A]): BloomFilterMonoid[A] = {
     val width = BloomFilter.optimalWidth(numEntries, fpProb)
     val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
     BloomFilterMonoid[A](numHashes, width)(hash)
