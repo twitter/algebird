@@ -44,7 +44,7 @@ val bf1 = bfMonoid1.create("1", "2", "3", "4", "100")
 val approxBool1 = bf1.contains("1")
 val res1 = approxBool1.isTrue
 
-// Out you can specify a estimate of the number of elements
+// You can also specify an estimate of the number of elements
 // which will be added to the set, and a desired false positive
 // frequency like this:
 val bloomFilterMonoid2 = BloomFilter(numEntries = 100, fpProb = 0.01)
