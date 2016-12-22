@@ -30,16 +30,11 @@ example usage:
 ```tut:book
 import com.twitter.algebird._
 
-// We need to provide a implicit conversion from of the Bloom filter,
-// in this case String, to Hash128. Conveniently Hash128 has a number
-// of built in conversions so we do not need to define our own.
-implicit def stringToHash128 = Hash128.stringHash
-
 // It's possible to create a Bloom filter with a set number of
 // hashes, and with a set width.
 val NUM_HASHES = 6
 val WIDTH = 32
-val bfMonoid1 = new BloomFilterMonoid(NUM_HASHES, WIDTH)
+val bfMonoid1 = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
 val bf1 = bfMonoid1.create("1", "2", "3", "4", "100")
 val approxBool1 = bf1.contains("1")
 val res1 = approxBool1.isTrue
@@ -47,7 +42,7 @@ val res1 = approxBool1.isTrue
 // You can also specify an estimate of the number of elements
 // which will be added to the set, and a desired false positive
 // frequency like this:
-val bloomFilterMonoid2 = BloomFilter(numEntries = 100, fpProb = 0.01)
+val bloomFilterMonoid2 = BloomFilter[String](numEntries = 100, fpProb = 0.01)
 val bf2 = bloomFilterMonoid2.create("1", "2", "3", "4", "100")
 val approxBool2 = bf2.contains("1")
 val res2 = approxBool2.isTrue
