@@ -51,7 +51,7 @@ class BFHashIndices extends CheckProperties {
   case class NegativeBFHash(numHashes: Int, width: Int) {
     val size = numHashes
 
-    def apply(s: String) = nextHash(s.getBytes, numHashes)
+    def apply(s: String): Stream[Int] = nextHash(s.getBytes, numHashes)
 
     private def splitLong(x: Long) = {
       val upper = math.abs(x >> 32).toInt
@@ -94,10 +94,10 @@ class BFHashIndices extends CheckProperties {
   }
 }
 
-class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends ApproximateProperty {
+class BloomFilterFalsePositives[T: Gen: Hash128](falsePositiveRate: Double) extends ApproximateProperty {
 
   type Exact = Set[T]
-  type Approx = BF[String]
+  type Approx = BF[T]
 
   type Input = T
   type Result = Boolean
@@ -110,10 +110,10 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter[String](set.size, falsePositiveRate)
+    val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
-    val strings = set.map(_.toString).toSeq
-    bfMonoid.create(strings: _*)
+    val values = set.toSeq
+    bfMonoid.create(values: _*)
   }
 
   def inputGenerator(set: Set[T]) =
@@ -124,13 +124,13 @@ class BloomFilterFalsePositives[T: Gen](falsePositiveRate: Double) extends Appro
 
   def exactResult(s: Set[T], t: T) = s.contains(t)
 
-  def approximateResult(bf: BF[String], t: T) = bf.contains(t.toString)
+  def approximateResult(bf: BF[T], t: T) = bf.contains(t)
 }
 
-class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
+class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
 
   type Exact = Set[T]
-  type Approx = BF[String]
+  type Approx = BF[T]
 
   type Input = Unit
   type Result = Long
@@ -144,16 +144,16 @@ class BloomFilterCardinality[T: Gen] extends ApproximateProperty {
   } yield set
 
   def makeApproximate(set: Set[T]) = {
-    val bfMonoid = BloomFilter[String](set.size, falsePositiveRate)
+    val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
-    val strings = set.map(_.toString).toSeq
-    bfMonoid.create(strings: _*)
+    val values = set.toSeq
+    bfMonoid.create(values: _*)
   }
 
   def inputGenerator(set: Set[T]) = Gen.const(())
 
   def exactResult(s: Set[T], u: Unit) = s.size
-  def approximateResult(bf: BF[String], u: Unit) = bf.size
+  def approximateResult(bf: BF[T], u: Unit) = bf.size
 }
 
 class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
