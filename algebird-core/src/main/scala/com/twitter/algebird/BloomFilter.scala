@@ -255,13 +255,36 @@ object BF {
         def toIntIt(b: BF[A]): IntIterator =
           b match {
             case BFItem(it, hashes, _) => new IntIterator {
+              // the hashes can have collisions so we need
+              // to remove duplicates
               val hashvalues = hashes(it)
               java.util.Arrays.sort(hashvalues)
+
+              @annotation.tailrec
+              def uniq(src: Array[Int], dst: Array[Int], prev: Int, spos: Int, dpos: Int): Int = {
+                if (spos >= src.length) dpos
+                else if (spos == 0) {
+                  // first
+                  val first = src(0)
+                  dst(0) = first
+                  uniq(src, dst, first, spos + 1, dpos + 1)
+                } else {
+                  val cur = src(spos)
+                  if (cur == prev) uniq(src, dst, prev, spos + 1, dpos)
+                  else {
+                    dst(dpos) = cur
+                    uniq(src, dst, cur, spos + 1, dpos + 1)
+                  }
+                }
+              }
+              val uniqVs = new Array[Int](hashvalues.length)
+              val len = uniq(hashvalues, uniqVs, -1, 0, 0)
+
               var pos = 0
 
-              def hasNext: Boolean = (pos < hashvalues.length)
+              def hasNext: Boolean = (pos < len)
               def next = {
-                val n = hashvalues(pos)
+                val n = uniqVs(pos)
                 pos += 1
                 n
               }
@@ -399,8 +422,8 @@ case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
 
   override def contains(x: A) = ApproximateBoolean.exact(item == x)
 
-  def maybeContains(item: A): Boolean =
-    item == item
+  def maybeContains(x: A): Boolean =
+    item == x
 
   def size = Approximate.exact[Long](1)
 }

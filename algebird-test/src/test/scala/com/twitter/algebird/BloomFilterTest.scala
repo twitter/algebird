@@ -14,13 +14,80 @@ class BloomFilterLaws extends CheckProperties {
   val WIDTH = 32
 
   implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
-  implicit val bfGen =
+
+  def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
+    case BFZero(hashes, width) => BFSparse(hashes, RichCBitSet(), width)
+    case BFItem(item, hashes, width) => BFSparse(hashes, RichCBitSet.fromArray(hashes(item)), width)
+    case bfs @ BFSparse(_, _, _) => bfs
+    case BFInstance(hashes, bitset, width) => BFSparse(hashes, RichCBitSet.fromBitSet(bitset), width)
+  }
+
+  def toDense[A](bf: BF[A]): BFInstance[A] = bf match {
+    case BFZero(hashes, width) => BFInstance.empty[A](hashes, width)
+    case BFItem(item, hashes, width) =>
+      val bs = LongBitSet.empty(width)
+      bs += hashes(item)
+      BFInstance(hashes, bs.toBitSetNoCopy, width)
+    case bfs @ BFSparse(hashes, bitset, width) => bfs.dense
+    case bfi @ BFInstance(hashes, bitset, width) => bfi
+  }
+
+  implicit val bfGen: Arbitrary[BF[String]] =
     Arbitrary {
-      for (v <- Gen.choose(0, 10000)) yield (bfMonoid.create(v.toString))
+      val item = Gen.choose(0, 10000).map { v => bfMonoid.create(v.toString) }
+      val zero = Gen.const(bfMonoid.zero)
+      val sparse = Gen.listOf(item).map { its => toSparse(bfMonoid.sum(its)) }
+      val dense = Gen.listOf(item).map { its => toDense(bfMonoid.sum(its)) }
+      Gen.frequency((1, zero), (5, item), (10, sparse), (10, dense))
     }
 
   property("BloomFilter is a Monoid") {
-    monoidLaws[BF[String]]
+    commutativeMonoidLaws[BF[String]]
+  }
+
+  property("++ is the same as plus") {
+    forAll { (a: BF[String], b: BF[String]) =>
+      Equiv[BF[String]].equiv(a ++ b, bfMonoid.plus(a, b))
+    }
+  }
+
+  property("+ is the same as adding with create") {
+    forAll { (a: BF[String], b: String) =>
+      Equiv[BF[String]].equiv(a + b, bfMonoid.plus(a, bfMonoid.create(b)))
+    }
+  }
+
+  property("maybeContains is consistent with contains") {
+    forAll { (a: BF[String], b: String) =>
+      a.maybeContains(b) == a.contains(b).isTrue
+    }
+  }
+
+  property("after + maybeContains is true") {
+    forAll { (a: BF[String], b: String) =>
+      (a + b).maybeContains(b)
+    }
+  }
+
+  property("checkAndAdd works like check the add") {
+    forAll { (a: BF[String], b: String) =>
+      val (next, check) = a.checkAndAdd(b)
+      val next1 = a + b
+
+      Equiv[BF[String]].equiv(next, next1) &&
+        (check == a.contains(b))
+    }
+  }
+
+  property(".dense returns an equivalent BF") {
+    forAll { (a: BF[String]) =>
+      Equiv[BF[String]].equiv(toSparse(a).dense, a)
+    }
+  }
+  property("a ++ a = a for BF") {
+    forAll { (a: BF[String]) =>
+      Equiv[BF[String]].equiv(a ++ a, a)
+    }
   }
 }
 
