@@ -89,7 +89,7 @@ class BFHashIndices extends CheckProperties {
       val s = v.toString
       val (hash, negativeHash) = pair
       val indices = negativeHash.apply(s)
-      indices == hash.apply(s) || indices.exists(_ < 0)
+      (indices == (hash.apply(s).toStream)) || indices.exists(_ < 0)
     }
   }
 }
