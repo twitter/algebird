@@ -216,9 +216,9 @@ class AggregatorLaws extends CheckProperties {
     }
   }
 
-  property("MonoidAggregator.composeCollect is like filter + compose") {
+  property("MonoidAggregator.collectBefore is like filter + compose") {
     forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Option[Int]) =>
-      val cp = ag.composeBefore[Int] { case x if fn(x).isDefined => fn(x).get }
+      val cp = ag.collectBefore[Int] { case x if fn(x).isDefined => fn(x).get }
       val fp = ag.composePrepare[Int](fn(_).get).filterBefore[Int](fn(_).isDefined)
       cp(in) == fp(in)
     }
