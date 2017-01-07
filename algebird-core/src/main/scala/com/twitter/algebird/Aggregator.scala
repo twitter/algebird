@@ -513,6 +513,16 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     }
 
   /**
+   * Only transform values where the function is defined, else discard
+   */
+  def composeBefore[A2](fn: PartialFunction[A2, A]): MonoidAggregator[A2, B, C] =
+    new MonoidAggregator[A2, B, C] {
+      def prepare(a: A2) = if (fn.isDefinedAt(a)) self.prepare(fn(a)) else self.monoid.zero
+      def monoid = self.monoid
+      def present(b: B) = self.present(b)
+    }
+
+  /**
    * Only aggregate items that match a predicate
    */
   def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
