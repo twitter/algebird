@@ -135,12 +135,33 @@ class AggregatorLaws extends CheckProperties {
     }
   }
   property("Aggregator.sortedTake same as List.sorted.take") {
-    // sortByTake currently fails this law
     forAll { (in: List[Int], t0: Int) =>
       val t = math.max(t0, 1)
       val l = in.sorted.take(t)
       val a = (Aggregator.sortedTake[Int](t).apply(in))
       l == a
+    }
+  }
+  property("Aggregator.sortByTake same as List.sortBy(fn).take") {
+    forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sortBy(fn).take(t)
+      val a = (Aggregator.sortByTake(t)(fn).apply(in))
+      // since we considered two things equivalent under fn,
+      // we have to use that here:
+      val ord = Ordering.Iterable(Ordering.by(fn))
+      ord.equiv(l, a)
+    }
+  }
+  property("Aggregator.sortByReverseTake same as List.sortBy(fn).reverse.take") {
+    forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sortBy(fn).reverse.take(t)
+      val a = (Aggregator.sortByReverseTake(t)(fn).apply(in))
+      // since we considered two things equivalent under fn,
+      // we have to use that here:
+      val ord = Ordering.Iterable(Ordering.by(fn))
+      ord.equiv(l, a)
     }
   }
   property("Aggregator.immutableSortedTake same as List.sorted.take") {
