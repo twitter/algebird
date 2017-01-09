@@ -6,15 +6,7 @@ import org.scalacheck.{ Arbitrary, Gen, Properties }
 import org.scalatest.{ Matchers, WordSpec }
 import org.scalacheck.Prop._
 
-class BloomFilterLaws extends CheckProperties {
-
-  import com.twitter.algebird.BaseProperties._
-
-  val NUM_HASHES = 6
-  val WIDTH = 32
-
-  implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
-
+object BloomFilterTestUtils {
   def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
     case BFZero(hashes, width) => BFSparse(hashes, RichCBitSet(), width)
     case BFItem(item, hashes, width) => BFSparse(hashes, RichCBitSet.fromArray(hashes(item)), width)
@@ -31,6 +23,17 @@ class BloomFilterLaws extends CheckProperties {
     case bfs @ BFSparse(hashes, bitset, width) => bfs.dense
     case bfi @ BFInstance(hashes, bitset, width) => bfi
   }
+}
+
+class BloomFilterLaws extends CheckProperties {
+
+  import com.twitter.algebird.BaseProperties._
+  import BloomFilterTestUtils._
+
+  val NUM_HASHES = 6
+  val WIDTH = 32
+
+  implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
 
   implicit val bfGen: Arbitrary[BF[String]] =
     Arbitrary {
@@ -48,6 +51,27 @@ class BloomFilterLaws extends CheckProperties {
   property("++ is the same as plus") {
     forAll { (a: BF[String], b: BF[String]) =>
       Equiv[BF[String]].equiv(a ++ b, bfMonoid.plus(a, b))
+    }
+  }
+
+  property("the distance between a filter and itself should be 0") {
+    forAll { (a: BF[String]) =>
+      BloomFilter.hammingDistance(a, a) == 0
+    }
+  }
+
+  property("all equivalent filters should have 0 Hamming distance") {
+    forAll { (a: BF[String], b: BF[String]) =>
+      if (Equiv[BF[String]].equiv(a, b))
+        BloomFilter.hammingDistance(a, b) == 0
+      else
+        BloomFilter.hammingDistance(a, b) != 0
+    }
+  }
+
+  property("distance between filters should be symetrical") {
+    forAll { (a: BF[String], b: BF[String]) =>
+      BloomFilter.hammingDistance(a, b) == BloomFilter.hammingDistance(b, a)
     }
   }
 
@@ -376,4 +400,56 @@ class BloomFilterTest extends WordSpec with Matchers {
       }
     }
   }
+
+  "BloomFilters" should {
+    "should not be able to compute Hamming distance to each other when they are note" +
+      "of equal width and have the same number of hashes" in {
+
+        val elems = Seq("A", "B", "C")
+
+        val bfMonoid1 = new BloomFilterMonoid[String](numHashes = 4, width = 64)
+        val bf1 = bfMonoid1.create(elems: _*)
+
+        val bfMonoid2 = new BloomFilterMonoid[String](numHashes = 5, width = 64)
+        val bf2 = bfMonoid2.create(elems: _*)
+
+        val bfMonoid3 = new BloomFilterMonoid[String](numHashes = 5, width = 128)
+        val bf3 = bfMonoid3.create(elems: _*)
+
+        assertThrows[AssertionError]{
+          BloomFilter.hammingDistance(bf1, bf2)
+        }
+
+        assertThrows[AssertionError]{
+          BloomFilter.hammingDistance(bf2, bf3)
+        }
+
+      }
+
+    "be able to compute compute Hamming distance to each other" in {
+      import BloomFilterTestUtils._
+
+      def createBFWithItems(entries: Seq[String]): BF[String] = {
+        val numOfHashes = 3
+        val width = 64
+        val bfMonoid = new BloomFilterMonoid[String](numOfHashes, width)
+        bfMonoid.create(entries: _*)
+      }
+
+      val firstBloomFilter = createBFWithItems(Seq("A"))
+      val secondBloomFilter = createBFWithItems(Seq("C"))
+
+      val distance1 = BloomFilter.hammingDistance(firstBloomFilter, secondBloomFilter)
+      assert(distance1 === 4)
+
+      val thirdBloomFilter = createBFWithItems(Seq("A", "B", "C"))
+      // Make it dense to make sure that that case is also covered
+      // even though these examples are small and thus sparse.
+      val forthBloomFilter = toDense(createBFWithItems(Seq("C", "D", "E")))
+
+      val distance2 = BloomFilter.hammingDistance(thirdBloomFilter, forthBloomFilter)
+      assert(distance2 === 8)
+    }
+  }
+
 }

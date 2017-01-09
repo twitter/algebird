@@ -171,6 +171,47 @@ object BloomFilter {
 
     Approximate[Long](nl, n, nr, scala.math.max(0, prob))
   }
+
+  /**
+   * Compute the Hamming distance between the two Bloom filters
+   * `a` and `b`. The distance is defined as the number of bits that
+   * need to change to in order to transform one filter into the other.
+   */
+  def hammingDistance[A](a: BF[A], b: BF[A]): Int = {
+    assert((a.width == b.width) && (a.numHashes == b.numHashes),
+      "To compute a distance between two Bloom filters they" +
+        "have to be of equal width and the same number of hashes." +
+        s"A was of width ${a.width} and had ${a.numHashes}, and" +
+        s"A was of width ${b.width} and had ${b.numHashes}")
+
+    def toBitSet(x: BF[A]): BitSet = {
+      x match {
+        case BFZero(_, _) => BitSet()
+        case BFItem(item, hashes, _) => {
+          val hashvalues = hashes(item)
+          BitSet(hashvalues: _*)
+        }
+        case BFSparse(_, cbitset, width) => {
+          import RichCBitSet._
+          cbitset.toBitSet(width)
+        }
+        case BFInstance(_, bitset, _) => {
+          bitset
+        }
+      }
+    }
+
+    val aSet = toBitSet(a)
+    val bSet = toBitSet(b)
+
+    if (aSet.isEmpty) {
+      b.numBits
+    } else if (bSet.isEmpty) {
+      a.numBits
+    } else {
+      (aSet ^ bSet).size
+    }
+  }
 }
 
 /**
