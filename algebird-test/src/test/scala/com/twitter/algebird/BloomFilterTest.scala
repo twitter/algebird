@@ -402,7 +402,7 @@ class BloomFilterTest extends WordSpec with Matchers {
   }
 
   "BloomFilters" should {
-    "should not be able to compute Hamming distance to each other when they are note" +
+    "should not be able to compute Hamming distance to each other when they are not " +
       "of equal width and have the same number of hashes" in {
 
         val elems = Seq("A", "B", "C")
