@@ -379,9 +379,9 @@ sealed abstract class BF[A] extends java.io.Serializable {
    */
   def hammingDistance(that: BF[A]): Int = {
     assert((this.width == that.width) && (this.numHashes == that.numHashes),
-      "To compute a distance between two Bloom filters they" +
-        "have to be of equal width and the same number of hashes." +
-        s"A was of width ${this.width} and had ${this.numHashes}, and" +
+      "To compute a distance between two Bloom filters they " +
+        "have to be of equal width and the same number of hashes. " +
+        s"A was of width ${this.width} and had ${this.numHashes}, and " +
         s"B was of width ${that.width} and had ${that.numHashes}")
 
     val aSet = this.toBitSet
