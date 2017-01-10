@@ -377,7 +377,7 @@ sealed abstract class BF[A] extends java.io.Serializable {
    * `a` and `b`. The distance is defined as the number of bits that
    * need to change to in order to transform one filter into the other.
    */
-  def hammingDistance[A](that: BF[A]): Int = {
+  def hammingDistance(that: BF[A]): Int = {
     assert((this.width == that.width) && (this.numHashes == that.numHashes),
       "To compute a distance between two Bloom filters they" +
         "have to be of equal width and the same number of hashes." +
