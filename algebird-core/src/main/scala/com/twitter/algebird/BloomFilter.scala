@@ -381,8 +381,8 @@ sealed abstract class BF[A] extends java.io.Serializable {
     assert((this.width == that.width) && (this.numHashes == that.numHashes),
       "To compute a distance between two Bloom filters they " +
         "have to be of equal width and the same number of hashes. " +
-        s"A was of width ${this.width} and had ${this.numHashes}, and " +
-        s"B was of width ${that.width} and had ${that.numHashes}")
+        s"A was of width ${this.width} and had ${this.numHashes} hashes, and " +
+        s"B was of width ${that.width} and had ${that.numHashes} hashes.")
 
     val aSet = this.toBitSet
     val bSet = that.toBitSet
