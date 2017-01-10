@@ -60,12 +60,21 @@ class BloomFilterLaws extends CheckProperties {
     }
   }
 
+  property("the distance between a filter and an empty filter should be the the number of bits" +
+    "set in the existing filter") {
+    forAll { (a: BF[String]) =>
+      a.hammingDistance(bfMonoid.zero) == a.numBits
+    }
+  }
+
   property("all equivalent filters should have 0 Hamming distance") {
     forAll { (a: BF[String], b: BF[String]) =>
       if (Equiv[BF[String]].equiv(a, b))
         a.hammingDistance(b) == 0
-      else
-        a.hammingDistance(b) != 0
+      else {
+        val dist = a.hammingDistance(b)
+        (dist > 0) && (dist <= a.width)
+      }
     }
   }
 
@@ -449,6 +458,11 @@ class BloomFilterTest extends WordSpec with Matchers {
 
       val distance2 = thirdBloomFilter.hammingDistance(forthBloomFilter)
       assert(distance2 === 8)
+
+      val emptyBloomFilter = createBFWithItems(List())
+      val distanceToEmpty = thirdBloomFilter.hammingDistance(emptyBloomFilter)
+      assert(distanceToEmpty === thirdBloomFilter.numBits)
+
     }
   }
 
