@@ -56,22 +56,22 @@ class BloomFilterLaws extends CheckProperties {
 
   property("the distance between a filter and itself should be 0") {
     forAll { (a: BF[String]) =>
-      BloomFilter.hammingDistance(a, a) == 0
+      a.hammingDistance(a) == 0
     }
   }
 
   property("all equivalent filters should have 0 Hamming distance") {
     forAll { (a: BF[String], b: BF[String]) =>
       if (Equiv[BF[String]].equiv(a, b))
-        BloomFilter.hammingDistance(a, b) == 0
+        a.hammingDistance(b) == 0
       else
-        BloomFilter.hammingDistance(a, b) != 0
+        a.hammingDistance(b) != 0
     }
   }
 
-  property("distance between filters should be symetrical") {
+  property("distance between filters should be symmetrical") {
     forAll { (a: BF[String], b: BF[String]) =>
-      BloomFilter.hammingDistance(a, b) == BloomFilter.hammingDistance(b, a)
+      a.hammingDistance(b) == b.hammingDistance(a)
     }
   }
 
@@ -417,11 +417,11 @@ class BloomFilterTest extends WordSpec with Matchers {
         val bf3 = bfMonoid3.create(elems: _*)
 
         assertThrows[AssertionError]{
-          BloomFilter.hammingDistance(bf1, bf2)
+          bf1.hammingDistance(bf2)
         }
 
         assertThrows[AssertionError]{
-          BloomFilter.hammingDistance(bf2, bf3)
+          bf2.hammingDistance(bf3)
         }
 
       }
@@ -439,7 +439,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       val firstBloomFilter = createBFWithItems(Seq("A"))
       val secondBloomFilter = createBFWithItems(Seq("C"))
 
-      val distance1 = BloomFilter.hammingDistance(firstBloomFilter, secondBloomFilter)
+      val distance1 = firstBloomFilter.hammingDistance(secondBloomFilter)
       assert(distance1 === 4)
 
       val thirdBloomFilter = createBFWithItems(Seq("A", "B", "C"))
@@ -447,7 +447,7 @@ class BloomFilterTest extends WordSpec with Matchers {
       // even though these examples are small and thus sparse.
       val forthBloomFilter = toDense(createBFWithItems(Seq("C", "D", "E")))
 
-      val distance2 = BloomFilter.hammingDistance(thirdBloomFilter, forthBloomFilter)
+      val distance2 = thirdBloomFilter.hammingDistance(forthBloomFilter)
       assert(distance2 === 8)
     }
   }
