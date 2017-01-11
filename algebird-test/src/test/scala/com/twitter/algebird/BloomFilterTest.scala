@@ -60,7 +60,7 @@ class BloomFilterLaws extends CheckProperties {
     }
   }
 
-  property("the distance between a filter and an empty filter should be the the number of bits" +
+  property("the distance between a filter and an empty filter should be the number of bits" +
     "set in the existing filter") {
     forAll { (a: BF[String]) =>
       a.hammingDistance(bfMonoid.zero) == a.numBits
@@ -411,31 +411,7 @@ class BloomFilterTest extends WordSpec with Matchers {
   }
 
   "BloomFilters" should {
-    "should not be able to compute Hamming distance to each other when they are not " +
-      "of equal width and have the same number of hashes" in {
-
-        val elems = Seq("A", "B", "C")
-
-        val bfMonoid1 = new BloomFilterMonoid[String](numHashes = 4, width = 64)
-        val bf1 = bfMonoid1.create(elems: _*)
-
-        val bfMonoid2 = new BloomFilterMonoid[String](numHashes = 5, width = 64)
-        val bf2 = bfMonoid2.create(elems: _*)
-
-        val bfMonoid3 = new BloomFilterMonoid[String](numHashes = 5, width = 128)
-        val bf3 = bfMonoid3.create(elems: _*)
-
-        assertThrows[AssertionError]{
-          bf1.hammingDistance(bf2)
-        }
-
-        assertThrows[AssertionError]{
-          bf2.hammingDistance(bf3)
-        }
-
-      }
-
-    "be able to compute compute Hamming distance to each other" in {
+    "be able to compute Hamming distance to each other" in {
       import BloomFilterTestUtils._
 
       def createBFWithItems(entries: Seq[String]): BF[String] = {
