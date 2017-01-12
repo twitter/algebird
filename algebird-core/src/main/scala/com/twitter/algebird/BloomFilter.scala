@@ -369,12 +369,35 @@ sealed abstract class BF[A] extends java.io.Serializable {
   // Estimates the cardinality of the set of elements that have been
   // inserted into the Bloom Filter.
   def size: Approximate[Long]
+
+  def toBitSet: BitSet
+
+  /**
+   * Compute the Hamming distance between the two Bloom filters
+   * `a` and `b`. The distance is defined as the number of bits that
+   * need to change to in order to transform one filter into the other.
+   */
+  def hammingDistance(that: BF[A]): Int = {
+    val aSet = this.toBitSet
+    val bSet = that.toBitSet
+
+    if (aSet.isEmpty) {
+      that.numBits
+    } else if (bSet.isEmpty) {
+      this.numBits
+    } else {
+      (aSet ^ bSet).size
+    }
+  }
 }
 
 /**
  * Empty bloom filter.
  */
 case class BFZero[A](hashes: BFHash[A], width: Int) extends BF[A] {
+
+  def toBitSet: BitSet = BitSet()
+
   def numHashes: Int = hashes.size
 
   def numBits = 0
@@ -398,6 +421,11 @@ case class BFZero[A](hashes: BFHash[A], width: Int) extends BF[A] {
 case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
   def numHashes: Int = hashes.size
   def numBits = numHashes
+
+  def toBitSet: BitSet = {
+    val hashvalues = hashes(item)
+    BitSet(hashvalues: _*)
+  }
 
   private[algebird] def toSparse: BFSparse[A] =
     BFSparse[A](hashes, RichCBitSet.fromArray(hashes(item)), width)
@@ -432,6 +460,8 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
   import RichCBitSet._
 
   def numHashes: Int = hashes.size
+
+  def toBitSet: BitSet = bits.toBitSet(width)
 
   def numBits: Int = {
     val it = bits.intIterator
@@ -515,6 +545,8 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
    * The number of bits set to true
    */
   def numBits: Int = bits.size
+
+  def toBitSet: BitSet = bits
 
   def ++(other: BF[A]) = {
     require(this.width == other.width)
