@@ -152,10 +152,12 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
  */
 class SetMonoid[T] extends Monoid[Set[T]] {
   override def zero = Set[T]()
-  override def plus(left: Set[T], right: Set[T]) = {
-    val (longer, shorter) = if (left.size > right.size) (left, right) else (right, left)
-    longer ++ shorter
-  }
+  override def plus(left: Set[T], right: Set[T]) =
+    if (left.size > right.size) {
+      left ++ right
+    } else {
+      right ++ left
+    }
   override def sumOption(items: TraversableOnce[Set[T]]): Option[Set[T]] =
     if (items.isEmpty) None
     else {
