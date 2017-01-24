@@ -378,16 +378,21 @@ sealed abstract class BF[A] extends java.io.Serializable {
    * need to change to in order to transform one filter into the other.
    */
   def hammingDistance(that: BF[A]): Int = {
-    val aSet = this.toBitSet
-    val bSet = that.toBitSet
 
-    if (aSet.isEmpty) {
-      that.numBits
-    } else if (bSet.isEmpty) {
-      this.numBits
-    } else {
-      (aSet ^ bSet).size
+    (this, that) match {
+      // Comparing with empty filter should give number
+      // of bits in other set
+      case (x: BFZero[A], y: BFZero[A]) => 0
+      case (x: BFZero[A], y: BF[A]) => y.numBits
+      case (x: BF[A], y: BFZero[A]) => x.numBits
+
+      // Special case for Sparse vs. Sparse
+      case (x: BFSparse[A], y: BFSparse[A]) => x.bits.xorCardinality(y.bits)
+
+      // Otherwise compare as bit sets
+      case (_, _) => (this.toBitSet ^ that.toBitSet).size
     }
+
   }
 }
 
