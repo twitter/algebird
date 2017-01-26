@@ -25,8 +25,6 @@ object BloomFilterDistanceBenchmark {
   @State(Scope.Benchmark)
   class BloomFilterState {
 
-    import BloomFilterCreateBenchmark.createRandomString
-
     val nbrOfElements: Int = 1000
     val falsePositiveRate = 0.01
 
