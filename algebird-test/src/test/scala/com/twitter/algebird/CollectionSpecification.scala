@@ -8,23 +8,7 @@ import org.scalacheck.Prop._
 
 class CollectionSpecification extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
-
-  implicit def arbMin[T: Arbitrary]: Arbitrary[Min[T]] =
-    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Min(x) } }
-  implicit def arbMax[T: Arbitrary]: Arbitrary[Max[T]] =
-    Arbitrary { implicitly[Arbitrary[T]].arbitrary.map{ x => Max(x) } }
-  implicit def arbOrVal: Arbitrary[OrVal] =
-    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => OrVal(b) } }
-  implicit def arbAndVal: Arbitrary[AndVal] =
-    Arbitrary { implicitly[Arbitrary[Boolean]].arbitrary.map{ b => AndVal(b) } }
-
-  property("MinSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Min[Int]]
-  }
-
-  property("MaxSemigroup is a commutative semigroup") {
-    commutativeSemigroupLaws[Max[Int]]
-  }
+  import com.twitter.algebird.scalacheck.arbitrary._
 
   property("OrValMonoid is a commutative monoid") {
     commutativeMonoidLaws[OrVal]
@@ -32,18 +16,6 @@ class CollectionSpecification extends CheckProperties {
 
   property("AndValMonoid is a commutative monoid") {
     commutativeMonoidLaws[AndVal]
-  }
-
-  property("Min[Int] is a monoid") {
-    monoidLaws[Min[Int]]
-  }
-
-  property("Max[String] is a monoid") {
-    monoidLaws[Max[String]]
-  }
-
-  property("Max[List[Int]] is a monoid") {
-    monoidLaws[Max[List[Int]]]
   }
 
   property("Either is a Semigroup") {
@@ -59,15 +31,16 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Option Group laws") {
-    groupLaws[Option[Int]] && groupLawsEq[Map[String, Option[Int]]]{
-      (a: Map[String, Option[Int]], b: Map[String, Option[Int]]) =>
-        val keys: Set[String] = a.keySet | b.keySet
-        keys.forall { key: String =>
-          val v1: Int = a.getOrElse(key, None).getOrElse(0)
-          val v2: Int = b.getOrElse(key, None).getOrElse(0)
-          v1 == v2
+    implicit val equiv: Equiv[Map[String, Option[Int]]] =
+        Equiv.fromFunction { (a, b) =>
+          val keys: Set[String] = a.keySet | b.keySet
+          keys.forall { key: String =>
+            val v1: Int = a.getOrElse(key, None).getOrElse(0)
+            val v2: Int = b.getOrElse(key, None).getOrElse(0)
+            v1 == v2
+          }
         }
-    }
+    groupLaws[Option[Int]] && groupLaws[Map[String, Option[Int]]]
   }
 
   property("List plus") {
@@ -96,9 +69,8 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Array Monoid laws") {
-    monoidLawsEq[Array[Int]]{
-      case (a, b) => a.deep == b.deep
-    }
+    implicit val equiv: Equiv[Array[Int]] = Equiv.by(_.deep)
+    monoidLaws[Array[Int]]
   }
 
   property("Set plus") {
@@ -209,7 +181,7 @@ class CollectionSpecification extends CheckProperties {
   }
 
   // TODO: this test fails sometimes due to the equiv not doing the right thing.
-  // Fix by defining and Equiv and having all the properties use an implicit Equiv
+  // Fix by defining an Equiv.
   property("IndexedSeq is a pseudoRing") {
     pseudoRingLaws[IndexedSeq[Int]]
   }
@@ -230,14 +202,23 @@ class CollectionSpecification extends CheckProperties {
     }
   }
 
-  property("sumByKey works") {
+  property("MapAlgebra.sumByKey works") {
     forAll { (keys: List[Int], values: List[Int]) =>
       import com.twitter.algebird.Operators._
       val tupList = keys.zip(values)
-      (tupList.sumByKey.filter { _._2 != 0 } ==
-        tupList.groupBy { _._1 }
+      val expected = tupList.groupBy { _._1 }
         .mapValues { v => v.map { _._2 }.sum }
-        .filter { _._2 != 0 })
+        .filter { _._2 != 0 }
+      MapAlgebra.sumByKey(tupList) == expected && tupList.sumByKey == expected
+    }
+  }
+
+  property("MapAlgebra.group works") {
+    forAll { (keys: List[Int], values: List[Int]) =>
+      import com.twitter.algebird.Operators._
+      val tupList = keys.zip(values)
+      val expected = tupList.groupBy(_._1).mapValues(_.map(_._2).toList)
+      MapAlgebra.group(tupList) == expected && tupList.group == expected
     }
   }
 
@@ -312,26 +293,33 @@ class CollectionSpecification extends CheckProperties {
       } yield AdaptiveVector.fromVector(Vector(l: _*), sparse),
       for {
         m <- Arbitrary.arbitrary[Map[Int, T]]
-      } yield AdaptiveVector.fromMap(m.filter{ case (k, _) => (k < 1000) && (k >= 0) },
-        sparse, 1000))
+      } yield AdaptiveVector.fromMap(m.filter { case (k, _) => (k < 1000) && (k >= 0) },
+        sparse, 1000),
+      for {
+        size <- Gen.posNum[Int]
+      } yield AdaptiveVector.fromMap(Map.empty, sparse, size))
 
   property("AdaptiveVector[Int] has a semigroup") {
     implicit val arb = Arbitrary(arbAV(2))
-    semigroupLawsEquiv[AdaptiveVector[Int]]
+    semigroupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a monoid") {
+    // TODO: remove this equiv instance once #583 is resolved.
+    implicit val equiv = AdaptiveVector.denseEquiv[Int]
     implicit val arb = Arbitrary(arbAV(0))
-    monoidLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+    monoidLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a group") {
     implicit val arb = Arbitrary(arbAV(1))
-    groupLawsEq[AdaptiveVector[Int]](Equiv[AdaptiveVector[Int]].equiv)
+    groupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[String] has a monoid") {
+    // TODO: remove this equiv instance once #583 is resolved.
+    implicit val equiv = AdaptiveVector.denseEquiv[String]
     implicit val arb = Arbitrary(arbAV(""))
-    monoidLawsEq[AdaptiveVector[String]](Equiv[AdaptiveVector[String]].equiv)
+    monoidLaws[AdaptiveVector[String]]
   }
 }

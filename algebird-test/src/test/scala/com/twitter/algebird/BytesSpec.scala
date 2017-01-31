@@ -12,7 +12,7 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
 
   "has a sane equals function" in {
     val random = new scala.util.Random
-    forAll((Gen.choose(1, 4096), "wordLength")) { (wordLength: Int) =>
+    forAll((Gen.choose(0, 4096), "wordLength")) { (wordLength: Int) =>
       // Given two different array instances that have the same content.
       val word = random.nextString(wordLength)
       val array1 = word.getBytes
@@ -63,7 +63,7 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
 
   "has a sane hashCode function" in {
     val random = new scala.util.Random
-    forAll((Gen.choose(1, 4096), "wordLength")) { (wordLength: Int) =>
+    forAll((Gen.choose(0, 4096), "wordLength")) { (wordLength: Int) =>
       // Given two Bytes instances that are equal.
       val word = random.nextString(wordLength)
       val array1 = word.getBytes
@@ -78,7 +78,7 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
       // Beyond the standard contract of `hashCode` (which is covered above), we also want small changes to an instance
       // to result in a different hash code.  The verifications below (combined with the generator-driven test setup)
       // are a naive smoke test.
-      val appended = Bytes(bytes1.array :+ bytes1.array.head)
+      val appended = Bytes(bytes1.array :+ random.nextInt.toByte)
       bytes1.hashCode shouldNot be(appended.hashCode)
 
       if (bytes1.array.length > 1) {
@@ -90,7 +90,7 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
 
   "provides an Ordering typeclass" in {
     val random = new scala.util.Random
-    forAll((Gen.choose(1, 4096), "wordLength")) { (wordLength: Int) =>
+    forAll((Gen.choose(0, 4096), "wordLength")) { (wordLength: Int) =>
       val word = random.nextString(wordLength)
       val array1 = word.getBytes
       val array2 = word.getBytes
@@ -115,8 +115,8 @@ class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyCheck
       suffixed should be > bytes1
 
       // 4. a Bytes instances and a "shorter" Bytes instance.
-      if (bytes1.array.length > 1) {
-        val shortened = Bytes(bytes1.array.tail)
+      if (bytes1.array.length > 0) {
+        val shortened = Bytes(bytes1.array.dropRight(1))
         bytes1 should be > shortened
         shortened should be < bytes1
       }

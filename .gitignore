@@ -4,6 +4,8 @@
 *.jar
 *~
 
+sonatype.sbt
+
 #sbt
 /project/target/
 /project/project/target
@@ -47,3 +49,6 @@ project/build/target/
 project/plugins/target/
 project/plugins/lib_managed/
 project/plugins/src_managed/
+
+# Auto-copied by sbt-microsites
+docs/src/main/tut/contributing.md

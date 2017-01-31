@@ -16,42 +16,30 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import com.twitter.algebird.BaseProperties._
+import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Arbitrary
 
 class CombinatorTest extends CheckProperties {
-  import com.twitter.algebird.BaseProperties._
 
-  implicit def minArb[T: Arbitrary]: Arbitrary[Min[T]] = Arbitrary {
-    Arbitrary.arbitrary[T].map { t => Min(t) }
+  private def fold(m: Max[Int], l: List[Int]): List[Int] = {
+    val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
+    l.sortWith { (l, r) =>
+      val (sl, sr) = (sortfn(l), sortfn(r))
+      if (sl == sr) l < r else sl < sr
+    }
   }
-  implicit def maxArb[T: Arbitrary]: Arbitrary[Max[T]] = Arbitrary {
-    Arbitrary.arbitrary[T].map { t => Max(t) }
-  }
 
-  implicit val sg: Semigroup[(Max[Int], List[Int])] =
-    new SemigroupCombinator({ (m: Max[Int], l: List[Int]) =>
-      val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
-      l.sortWith { (l, r) =>
-        val (sl, sr) = (sortfn(l), sortfn(r))
-        if (sl == sr) l < r else sl < sr
-      }
-    })
+  implicit val sg: Semigroup[(Max[Int], List[Int])] = new SemigroupCombinator(fold)
+  implicit val mond: Monoid[(Max[Int], List[Int])] = new MonoidCombinator(fold)
 
-  implicit val mond: Monoid[(Max[Int], List[Int])] =
-    new MonoidCombinator({ (m: Max[Int], l: List[Int]) =>
-      val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
-      l.sortWith { (l, r) =>
-        val (sl, sr) = (sortfn(l), sortfn(r))
-        if (sl == sr) l < r else sl < sr
-      }
-    })
   // Make sure the lists start sorted:
   implicit def pairArb(implicit lista: Arbitrary[List[Int]]): Arbitrary[(Max[Int], List[Int])] =
     Arbitrary {
-      for (
-        m <- Arbitrary.arbitrary[Max[Int]];
+      for {
+        m <- Arbitrary.arbitrary[Max[Int]]
         l <- Arbitrary.arbitrary[List[Int]]
-      ) yield mond.plus(mond.zero, (m, l))
+      } yield mond.plus(mond.zero, (m, l))
     }
 
   property("SemigroupCombinator with mod sortfn forms a Semigroup") {
@@ -84,5 +72,4 @@ class CombinatorTest extends CheckProperties {
   property("MonoidCombinator with top-K forms a Monoid") {
     monoidLaws[(Map[Int, Int], Set[Int])]
   }
-
 }

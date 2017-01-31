@@ -48,8 +48,8 @@ class AggregatorLaws extends CheckProperties {
 
   property("composing two Aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
-      val c = GeneratedTupleAggregator.from2(ag1, ag2)
-      in.isEmpty || c(in) == (ag1(in), ag2(in))
+      val c = GeneratedTupleAggregator.from2((ag1, ag2))
+      in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
 
@@ -57,7 +57,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
       type AggInt[T] = Aggregator[Int, _, T]
       val c = Applicative.join[AggInt, Int, String](ag1, ag2)
-      in.isEmpty || c(in) == (ag1(in), ag2(in))
+      in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
 
@@ -65,7 +65,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[(Int, String)], ag1: Aggregator[Int, Int, Int], ag2: Aggregator[String, Set[String], Double]) =>
       val c = ag1.zip(ag2)
       val (as, bs) = in.unzip
-      in.isEmpty || c(in) == (ag1(as), ag2(bs))
+      in.isEmpty || c(in) == ((ag1(as), ag2(bs)))
     }
   }
 
@@ -76,6 +76,16 @@ class AggregatorLaws extends CheckProperties {
     }
   }
 
+  def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]) =
+    forAll { in: List[T] =>
+      val aggregator = Aggregator.numericSum[T]
+      aggregator(in) == in.map(num.toDouble).sum
+    }
+  property("Aggregator.numericSum is correct for Ints") { checkNumericSum[Int] }
+  property("Aggregator.numericSum is correct for Longs") { checkNumericSum[Long] }
+  property("Aggregator.numericSum is correct for Doubles") { checkNumericSum[Double] }
+  property("Aggregator.numericSum is correct for Floats") { checkNumericSum[Float] }
+
   implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B], m: Monoid[B], present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
@@ -84,6 +94,95 @@ class AggregatorLaws extends CheckProperties {
       def prepare(a: A) = pp(a)
       def monoid = m
       def present(b: B) = ps(b)
+    }
+  }
+
+  property("Aggregator.count is like List.count") {
+    forAll { (in: List[Int], fn: Int => Boolean) =>
+      in.count(fn) == (Aggregator.count(fn)(in))
+    }
+  }
+  property("Aggregator.exists is like List.exists") {
+    forAll { (in: List[Int], fn: Int => Boolean) =>
+      in.exists(fn) == (Aggregator.exists(fn)(in))
+    }
+  }
+  property("Aggregator.forall is like List.forall") {
+    forAll { (in: List[Int], fn: Int => Boolean) =>
+      in.forall(fn) == (Aggregator.forall(fn)(in))
+    }
+  }
+  property("Aggregator.head is like List.head") {
+    forAll { (in: List[Int]) =>
+      in.headOption == (Aggregator.head.applyOption(in))
+    }
+  }
+  property("Aggregator.last is like List.last") {
+    forAll { (in: List[Int]) =>
+      in.lastOption == (Aggregator.last.applyOption(in))
+    }
+  }
+  property("Aggregator.maxBy is like List.maxBy") {
+    forAll { (head: Int, in: List[Int], fn: Int => Int) =>
+      val nonempty = head :: in
+      nonempty.maxBy(fn) == (Aggregator.maxBy(fn).apply(nonempty))
+    }
+  }
+  property("Aggregator.minBy is like List.minBy") {
+    forAll { (head: Int, in: List[Int], fn: Int => Int) =>
+      val nonempty = head :: in
+      nonempty.minBy(fn) == (Aggregator.minBy(fn).apply(nonempty))
+    }
+  }
+  property("Aggregator.sortedTake same as List.sorted.take") {
+    forAll { (in: List[Int], t0: Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sorted.take(t)
+      val a = (Aggregator.sortedTake[Int](t).apply(in))
+      l == a
+    }
+  }
+  property("Aggregator.sortByTake same as List.sortBy(fn).take") {
+    forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sortBy(fn).take(t)
+      val a = (Aggregator.sortByTake(t)(fn).apply(in))
+      // since we considered two things equivalent under fn,
+      // we have to use that here:
+      val ord = Ordering.Iterable(Ordering.by(fn))
+      ord.equiv(l, a)
+    }
+  }
+  property("Aggregator.sortByReverseTake same as List.sortBy(fn).reverse.take") {
+    forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sortBy(fn).reverse.take(t)
+      val a = (Aggregator.sortByReverseTake(t)(fn).apply(in))
+      // since we considered two things equivalent under fn,
+      // we have to use that here:
+      val ord = Ordering.Iterable(Ordering.by(fn))
+      ord.equiv(l, a)
+    }
+  }
+  property("Aggregator.immutableSortedTake same as List.sorted.take") {
+    forAll { (in: List[Int], t0: Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sorted.take(t)
+      val a = (Aggregator.immutableSortedTake[Int](t).apply(in))
+      l == a
+    }
+  }
+  property("Aggregator.immutableSortedReverseTake same as List.sorted.reverse.take") {
+    forAll { (in: List[Int], t0: Int) =>
+      val t = math.max(t0, 1)
+      val l = in.sorted.reverse.take(t)
+      val a = (Aggregator.immutableSortedReverseTake[Int](t).apply(in))
+      l == a
+    }
+  }
+  property("Aggregator.toList is identity on lists") {
+    forAll { (in: List[Int]) =>
+      in == Aggregator.toList(in)
     }
   }
 
@@ -114,6 +213,14 @@ class AggregatorLaws extends CheckProperties {
   property("MonoidAggregator.filter is correct") {
     forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Boolean) =>
       ag.filterBefore(fn).apply(in) == ag.apply(in.filter(fn))
+    }
+  }
+
+  property("MonoidAggregator.collectBefore is like filter + compose") {
+    forAll { (in: List[Int], ag: MonoidAggregator[Int, Int, Int], fn: Int => Option[Int]) =>
+      val cp = ag.collectBefore[Int] { case x if fn(x).isDefined => fn(x).get }
+      val fp = ag.composePrepare[Int](fn(_).get).filterBefore[Int](fn(_).isDefined)
+      cp(in) == fp(in)
     }
   }
 }

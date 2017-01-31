@@ -19,8 +19,10 @@ object Operators {
   implicit def toPlus[T: Semigroup](t: T) = new PlusOp(t)
   implicit def toMinus[T: Group](t: T) = new MinusOp(t)
   implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
-  implicit def toDiv[T: Field](t: T) = new DivOp(t)
-  implicit def toRichTraversable[T](t: Traversable[T]) = new RichTraversable(t)
+  implicit def toRichTraversableFromIterator[T](t: Iterator[T]): RichTraversable[T] =
+    new RichTraversable(t)
+  implicit def toRichTraversable[T](t: Traversable[T]): RichTraversable[T] =
+    new RichTraversable(t)
 }
 
 class PlusOp[T: Semigroup](t: T) {
@@ -35,14 +37,14 @@ class TimesOp[T: Ring](t: T) {
   def *(other: T) = implicitly[Ring[T]].times(t, other)
 }
 
-class DivOp[T: Field](t: T) {
-  def /(other: T) = implicitly[Field[T]].div(t, other)
-}
-
 class RichTraversable[T](t: TraversableOnce[T]) {
   def sumByKey[K, V](implicit ev: <:<[T, (K, V)], sg: Semigroup[V]): Map[K, V] =
-    MapAlgebra.sumByKey(t.map { _.asInstanceOf[(K, V)] })
+    MapAlgebra.sumByKey(t.asInstanceOf[TraversableOnce[(K, V)]])
 
-  def monoidSum(implicit monoid: Monoid[T]) = Monoid.sum(t)
-  def ringProduct(implicit ring: Ring[T]) = Ring.product(t)
+  def group[K, V](implicit ev: <:<[T, (K, V)]): Map[K, List[V]] =
+    MapAlgebra.group(t.asInstanceOf[TraversableOnce[(K, V)]])
+
+  def monoidSum(implicit monoid: Monoid[T]) = monoid.sum(t)
+  def sumOption(implicit sg: Semigroup[T]) = sg.sumOption(t)
+  def ringProduct(implicit ring: Ring[T]) = ring.product(t)
 }

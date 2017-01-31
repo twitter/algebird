@@ -33,11 +33,9 @@ class TopKTests extends CheckProperties {
     implicitly[Arbitrary[List[Int]]].arbitrary.map { qmonoid.build(_) }
   }
 
-  def q2l(q1: PriorityQueue[Int]): List[Int] = q1.iterator.asScala.toList.sorted
+  def q2l(q: PriorityQueue[Int]): List[Int] = q.iterator.asScala.toList.sorted
 
-  def eqFn(q1: PriorityQueue[Int], q2: PriorityQueue[Int]): Boolean = {
-    q2l(q1) == q2l(q2)
-  }
+  implicit val eq: Equiv[PriorityQueue[Int]] = Equiv.by(q2l)
 
   def pqIsCorrect(items: List[List[Int]]): Boolean = {
     val correct = items.flatten.sorted.take(SIZE)
@@ -60,7 +58,7 @@ class TopKTests extends CheckProperties {
   }
 
   property("PriorityQueueMonoid is a Monoid") {
-    monoidLawsEq[PriorityQueue[Int]](eqFn)
+    monoidLaws[PriorityQueue[Int]]
   }
 
   implicit def tkmonoid = new TopKMonoid[Int](SIZE)
@@ -77,7 +75,7 @@ class TopKTests extends CheckProperties {
   }
 
   property("TopKMonoid is a Monoid") {
-    monoidLawsEq[PriorityQueue[Int]](eqFn)
+    monoidLaws[PriorityQueue[Int]]
   }
 
 }

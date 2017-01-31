@@ -25,14 +25,6 @@ class JavaBoxedTests extends CheckProperties {
       yield JLong.valueOf(v)
   }
 
-  property("Boolean is a Field") {
-    fieldLaws[Boolean]
-  }
-
-  property("JBoolean is a Field") {
-    fieldLaws[JBool]
-  }
-
   property("Int is a Ring") {
     ringLaws[Int]
   }
@@ -78,5 +70,4 @@ class JavaBoxedTests extends CheckProperties {
   property("JMap[String,String] is a Monoid") {
     isAssociative[JMap[String, String]] && weakZero[JMap[String, String]]
   }
-
 }

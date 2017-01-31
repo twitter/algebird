@@ -26,26 +26,30 @@ class MonadProperties extends CheckProperties {
   import MonadLaws._
 
   property("list") {
-    monadLaws[List, Int, String, Long]()
+    monadLaws[List, Int, String, Long]
   }
 
   property("option") {
-    monadLaws[Option, Int, String, Long]()
+    monadLaws[Option, Int, String, Long]
   }
 
   property("indexedseq") {
-    monadLaws[IndexedSeq, Int, String, Long]()
+    monadLaws[IndexedSeq, Int, String, Long]
   }
 
   property("vector") {
-    monadLaws[Vector, Int, String, Long]()
+    monadLaws[Vector, Int, String, Long]
   }
 
   property("set") {
-    monadLaws[Set, Int, String, Long]()
+    monadLaws[Set, Int, String, Long]
   }
 
   property("seq") {
-    monadLaws[Seq, Int, String, Long]()
+    monadLaws[Seq, Int, String, Long]
+  }
+
+  property("identity") {
+    monadLaws[Identity, Int, String, Long]
   }
 }

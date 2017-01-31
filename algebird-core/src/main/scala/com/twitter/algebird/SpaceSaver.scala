@@ -1,6 +1,9 @@
 package com.twitter.algebird
 
+import java.nio.ByteBuffer
+
 import scala.collection.immutable.SortedMap
+import scala.util.{ Failure, Success, Try }
 
 object SpaceSaver {
   /**
@@ -9,9 +12,108 @@ object SpaceSaver {
    */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
+  /**
+   * Construct SpaceSaver with given capacity containing a single item with provided exact count.
+   * This is the public api to create a new SpaceSaver.
+   */
+  def apply[T](capacity: Int, item: T, count: Long): SpaceSaver[T] = SSMany(capacity, Map(item -> ((count, 0L))))
+
   private[algebird] val ordering = Ordering.by[(_, (Long, Long)), (Long, Long)]{ case (item, (count, err)) => (-count, err) }
 
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] = new SpaceSaverSemigroup[T]
+
+  /**
+   * Encodes the SpaceSaver as a sequence of bytes containing in order
+   * - 1 byte: 1/2 => 1 = SSOne, 2 = SSMany
+   * - 4 bytes: the capacity
+   * - N bytes: the item/counters (counters as length + N*(item size + item + 2 * counters)
+   */
+  def toBytes[T](ss: SpaceSaver[T], tSerializer: T => Array[Byte]): Array[Byte] = {
+    ss match {
+      case SSOne(capacity, item) =>
+        val itemAsBytes = tSerializer(item)
+        val itemLength = itemAsBytes.length
+        //1 for the type, 4 for capacity, 4 for itemAsBytes.length
+        val buffer = new Array[Byte](1 + 4 + 4 + itemAsBytes.length)
+        ByteBuffer
+          .wrap(buffer)
+          .put(1: Byte)
+          .putInt(capacity)
+          .putInt(itemLength.toByte)
+          .put(itemAsBytes)
+        buffer
+
+      case SSMany(capacity, counters, _) => //We do not care about the buckets are thery are created by SSMany.apply
+        val buffer = scala.collection.mutable.ArrayBuffer.newBuilder[Byte]
+        buffer += (2: Byte)
+
+        var buff = ByteBuffer.allocate(4)
+        buff.putInt(capacity)
+        buffer ++= buff.array()
+
+        buff = ByteBuffer.allocate(4)
+        buff.putInt(counters.size)
+        buffer ++= buff.array()
+        counters.foreach {
+          case (item, (a, b)) =>
+            val itemAsBytes = tSerializer(item)
+
+            buff = ByteBuffer.allocate(4)
+            buff.putInt(itemAsBytes.length)
+            buffer ++= buff.array()
+
+            buffer ++= itemAsBytes
+
+            buff = ByteBuffer.allocate(8 * 2)
+            buff.putLong(a)
+            buff.putLong(b)
+            buffer ++= buff.array()
+        }
+        buffer.result.toArray
+    }
+  }
+
+  // Make sure to be reversible so fromBytes(toBytes(x)) == x
+  def fromBytes[T](bytes: Array[Byte], tDeserializer: Array[Byte] => Try[T]): Try[SpaceSaver[T]] = {
+    fromByteBuffer(ByteBuffer.wrap(bytes), buffer => tDeserializer(buffer.array()))
+  }
+
+  def fromByteBuffer[T](bb: ByteBuffer, tDeserializer: ByteBuffer => Try[T]): Try[SpaceSaver[T]] = {
+    Try {
+      bb.get.toInt match {
+        case 1 =>
+          val capacity = bb.getInt
+          val itemLength = bb.getInt
+          val itemAsBytes = new Array[Byte](itemLength)
+          bb.get(itemAsBytes)
+          tDeserializer(ByteBuffer.wrap(itemAsBytes)).map(item => SSOne(capacity, item))
+        case 2 =>
+          val capacity = bb.getInt
+
+          var countersToDeserialize = bb.getInt
+          val counters = scala.collection.mutable.Map.empty[T, (Long, Long)]
+          while (countersToDeserialize != 0) {
+            val itemLength = bb.getInt()
+            val itemAsBytes = new Array[Byte](itemLength)
+            bb.get(itemAsBytes)
+            val item = tDeserializer(ByteBuffer.wrap(itemAsBytes))
+
+            val a = bb.getLong
+            val b = bb.getLong
+
+            item match {
+              case Failure(e) => return Failure(e)
+              case Success(i) =>
+                counters += ((i, (a, b)))
+            }
+
+            countersToDeserialize -= 1
+          }
+
+          Success(SSMany(capacity, counters.toMap))
+      }
+    }.flatten
+  }
 }
 
 /**
@@ -84,12 +186,12 @@ sealed abstract class SpaceSaver[T] {
     (counters.keys ++ that.counters.keys).forall{ item => (frequency(item) - that.frequency(item)) ~ 0 }
 }
 
-case class SSOne[T](capacity: Int, item: T) extends SpaceSaver[T] {
+case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
   def min: Long = 0L
 
-  def counters: Map[T, (Long, Long)] = Map(item -> (1L, 1L))
+  def counters: Map[T, (Long, Long)] = Map(item -> ((1L, 1L)))
 
   def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSOne[_] => SSMany(this).add(other)
@@ -101,14 +203,14 @@ object SSMany {
   private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] =
     SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
 
-  private def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
+  private[algebird] def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
     SSMany(capacity, counters, bucketsFromCounters(counters))
 
   private[algebird] def apply[T](one: SSOne[T]): SSMany[T] =
-    SSMany(one.capacity, Map(one.item -> (1L, 0L)), SortedMap(1L -> Set(one.item)))
+    SSMany(one.capacity, Map(one.item -> ((1L, 0L))), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
+case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]]) extends SpaceSaver[T] {
   private val exact: Boolean = counters.size < capacity
 
   val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
@@ -116,7 +218,7 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
     val (count, err) = counters(item)
-    val counters1 = counters + (item -> (count + 1L, err)) // increment by one
+    val counters1 = counters + (item -> ((count + 1L, err))) // increment by one
     val currBucket = buckets(count) // current bucket
     val buckets1 = {
       if (currBucket.size == 1) // delete current bucket since it will be empty
@@ -141,7 +243,7 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
 
   // introduce new item
   private def introduce(item: T, count: Long, err: Long) = {
-    val counters1 = counters + (item -> (count, err))
+    val counters1 = counters + (item -> ((count, err)))
     val buckets1 = buckets + (count -> (buckets.getOrElse(count, Set()) + item))
     SSMany(capacity, counters1, buckets1)
   }
@@ -164,7 +266,7 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
       .map { key =>
         val (count1, err1) = counters.getOrElse(key, (min, min))
         val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
-        (key -> (count1 + count2, err1 + err2))
+        (key -> ((count1 + count2, err1 + err2)))
       }
       .sorted(SpaceSaver.ordering)
       .take(capacity)
@@ -178,6 +280,5 @@ case class SSMany[T](capacity: Int, counters: Map[T, (Long, Long)], buckets: Sor
 }
 
 class SpaceSaverSemigroup[T] extends Semigroup[SpaceSaver[T]] {
-
   override def plus(x: SpaceSaver[T], y: SpaceSaver[T]): SpaceSaver[T] = x ++ y
 }

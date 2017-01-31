@@ -20,49 +20,156 @@ import scala.collection.immutable.BitSet
 import scala.collection.JavaConverters._
 
 import com.googlecode.javaewah.{ EWAHCompressedBitmap => CBitSet }
+import com.googlecode.javaewah.IntIterator
 
 object RichCBitSet {
-  def apply(x: Int*) = {
-    CBitSet.bitmapOf(x.sorted: _*)
+  def apply(xs: Int*): CBitSet = fromArray(xs.toArray)
+
+  // this sorts the array in-place
+  def fromArray(x: Array[Int]): CBitSet = {
+    val bs = new CBitSet
+    bs += x
+  }
+  def fromBitSet(bs: BitSet): CBitSet = {
+    val nbs = new CBitSet
+    val it = bs.iterator
+    while (it.hasNext) { nbs.set(it.next) }
+    nbs
   }
   implicit def cb2rcb(cb: CBitSet): RichCBitSet = new RichCBitSet(cb)
 }
 
 // An enrichment to give some scala-like operators to the compressed
 // bit set.
-class RichCBitSet(val cb: CBitSet) {
+class RichCBitSet(val cb: CBitSet) extends AnyVal {
   def ++(b: CBitSet): CBitSet = cb.or(b)
 
   def ==(b: CBitSet): Boolean = cb.equals(b)
 
+  def +=(xs: Array[Int]): cb.type = {
+    var idx = 0
+    java.util.Arrays.sort(xs)
+    while (idx < xs.length) {
+      cb.set(xs(idx))
+      idx += 1
+    }
+    cb
+  }
+
   def toBitSet(width: Int): BitSet = {
-    val a = new Array[Long]((width + 63) / 64)
-    cb.asScala.foreach{ i: java.lang.Integer => a(i.intValue / 64) |= 1L << (i.intValue % 64) }
-    BitSet.fromBitMask(a)
+    val a = LongBitSet.empty(width)
+    val iter = cb.intIterator
+    while (iter.hasNext) {
+      val i = iter.next
+      a.set(i)
+    }
+    a.toBitSetNoCopy
+  }
+}
+
+private[algebird] case class LongBitSet(toArray: Array[Long]) extends AnyVal {
+  def toBitSetNoCopy: BitSet = {
+    BitSet.fromBitMaskNoCopy(toArray)
+  }
+
+  def set(i: Int): Unit = {
+    toArray(i / 64) |= 1L << (i % 64)
+  }
+
+  def +=(xs: Array[Int]): Unit = {
+    var idx = 0
+    while (idx < xs.length) {
+      set(xs(idx))
+      idx += 1
+    }
+  }
+
+  def +=(it: IntIterator): Unit = {
+    while (it.hasNext) { set(it.next) }
+  }
+}
+
+private[algebird] object LongBitSet {
+  def empty(size: Int): LongBitSet = LongBitSet(new Array[Long]((size + 63) / 64))
+  def fromCBitSet(cb: CBitSet, width: Int): LongBitSet = {
+    val lbs = empty(width)
+    lbs += cb.intIterator
+    lbs
   }
 }
 
 object BloomFilter {
 
-  def apply(numEntries: Int, fpProb: Double, seed: Int = 0) = {
-    val width = BloomFilter.optimalWidth(numEntries, fpProb)
-    val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
-    BloomFilterMonoid(numHashes, width, seed)
-  }
+  def apply[A](numEntries: Int, fpProb: Double)(implicit hash: Hash128[A]): BloomFilterMonoid[A] =
+    BloomFilter.optimalWidth(numEntries, fpProb) match {
+      case None =>
+        throw new java.lang.IllegalArgumentException(
+          s"BloomFilter cannot guarantee the specified false positive probability for the number of entries! (numEntries: $numEntries, fpProb: $fpProb)")
+      case Some(width) =>
+        val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
+        BloomFilterMonoid[A](numHashes, width)(hash)
+    }
 
   // Compute optimal number of hashes: k = m/n ln(2)
   def optimalNumHashes(numEntries: Int, width: Int): Int = math.ceil(width / numEntries * math.log(2)).toInt
 
   // Compute optimal width: m = - n ln(p) / (ln(2))^2
-  def optimalWidth(numEntries: Int, fpProb: Double): Int = {
+  // return None if we can't meet this false positive probability
+  def optimalWidth(numEntries: Int, fpProb: Double): Option[Int] = {
     val widthEstimate = math.ceil(-1 * numEntries * math.log(fpProb) / math.log(2) / math.log(2)).toInt
 
-    if (widthEstimate == Int.MaxValue) {
-      throw new java.lang.IllegalArgumentException(
-        "BloomFilter cannot guarantee the specified false positive probability for the number of entries!")
-    }
+    if (widthEstimate == Int.MaxValue) None
+    else Some(widthEstimate)
+  }
 
-    return widthEstimate
+  /**
+   * Cardinality estimates are taken from Theorem 1 on page 15 of
+   * "Cardinality estimation and dynamic length adaptation for Bloom filters"
+   * by Papapetrou, Siberski, and Nejdl:
+   * http://www.softnet.tuc.gr/~papapetrou/publications/Bloomfilters-DAPD.pdf
+   *
+   * Roughly, by using bounds on the expected number of true bits after n elements
+   * have been inserted into the Bloom filter, we can go from the actual number of
+   * true bits (which is known) to an estimate of the cardinality.
+   *
+   * approximationWidth defines an interval around the maximum-likelihood cardinality
+   * estimate. Namely, the approximation returned is of the form
+   * (min, estimate, max) =
+   *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
+   */
+  def sizeEstimate(numBits: Int, numHashes: Int, width: Int, approximationWidth: Double = 0.05): Approximate[Long] = {
+    assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
+
+    /**
+     * s(n) is the expected number of bits that have been set to true after
+     * n elements have been inserted into the Bloom filter.
+     * This is \hat{S}(n) in the cardinality estimation paper used above.
+     */
+    def s(n: Int): Double =
+      width * (1 - scala.math.pow(1 - 1.0 / width, numHashes * n))
+
+    /**
+     * sInverse(t) is the maximum likelihood value for the number of elements
+     * that have been inserted into the Bloom filter when it has t bits set to true.
+     * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.
+     */
+    def sInverse(t: Int): Double =
+      scala.math.log1p(-t.toDouble / width) / (numHashes * scala.math.log1p(-1.0 / width))
+
+    // Variable names correspond to those used in the paper.
+    val t = numBits
+    val n = sInverse(t).round.toInt
+    // Take the min and max because the probability formula assumes
+    // nl <= sInverse(t - 1) and sInverse(t + 1) <= nr
+    val nl = scala.math.min(sInverse(t - 1).floor, (1 - approximationWidth) * n).toInt
+    val nr = scala.math.max(sInverse(t + 1).ceil, (1 + approximationWidth) * n).toInt
+    val prob =
+      1 -
+        scala.math.exp(t - 1 - s(nl)) *
+        scala.math.pow(s(nl) / (t - 1), t - 1) -
+        scala.math.exp(-scala.math.pow(t + 1 - s(nr), 2) / (2 * s(nr)))
+
+    Approximate[Long](nl, n, nr, scala.math.max(0, prob))
   }
 }
 
@@ -76,192 +183,163 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid(numHashes: Int, width: Int, seed: Int) extends Monoid[BF] {
-  val hashes: BFHash = BFHash(numHashes, width, seed)
+case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) extends Monoid[BF[A]] {
+  val hashes: BFHash[A] = BFHash[A](numHashes, width)(hash)
 
-  val zero: BF = BFZero(hashes, width)
+  val zero: BF[A] = BFZero[A](hashes, width)
 
   /**
    * Assume the bloom filters are compatible (same width and same hashing functions).  This
    * is the union of the 2 bloom filters.
    */
-  def plus(left: BF, right: BF): BF = left ++ right
+  def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
 
+  override def sumOption(as: TraversableOnce[BF[A]]): Option[BF[A]] =
+    if (as.isEmpty) None
+    else {
+      // share a single mutable bitset
+      val longBitSet = LongBitSet.empty(width)
+      var sets = 0
+
+      @inline def set(i: Int): Unit = {
+        longBitSet.set(i)
+        sets += 1
+      }
+
+      var oneItem: BFItem[A] = null
+
+      @inline def add(it: BFItem[A]): Unit = {
+        oneItem = it
+        val hs = hashes(it.item)
+        var pos = 0
+        while (pos < hs.length) {
+          set(hs(pos))
+          pos += 1
+        }
+      }
+
+      as.foreach {
+        case BFZero(_, _) => ()
+        case bf @ BFItem(_, _, _) => add(bf)
+        case BFSparse(_, cbitset, _) =>
+          val iter = cbitset.intIterator
+          while (iter.hasNext) { set(iter.next) }
+
+        case BFInstance(_, bitset, _) =>
+          // these Ints are boxed so, that's a minor bummer
+          val iter = bitset.iterator
+          while (iter.hasNext) { set(iter.next) }
+      }
+      if (sets == 0) Some(zero)
+      else if (sets == numHashes && (oneItem != null)) Some(oneItem)
+      else if (sets < (width / 10)) {
+        val sbs = RichCBitSet.fromBitSet(longBitSet.toBitSetNoCopy)
+        Some(BFSparse(hashes, sbs, width))
+      } else Some(BFInstance(hashes, longBitSet.toBitSetNoCopy, width))
+    }
   /**
    * Create a bloom filter with one item.
    */
-  def create(item: String): BF = BFItem(item, hashes, width)
+  def create(item: A): BF[A] = BFItem(item, hashes, width)
 
   /**
    * Create a bloom filter with multiple items.
    */
-  def create(data: String*): BF = {
-    data.foldLeft(zero) { case (acc, x) => plus(acc, create(x)) }
-  }
+  def create(data: A*): BF[A] = sum(data.iterator.map(BFItem(_, hashes, width)))
+}
+
+object BF {
+  implicit def equiv[A]: Equiv[BF[A]] =
+    new Equiv[BF[A]] {
+      def equiv(a: BF[A], b: BF[A]): Boolean = {
+        def toIntIt(b: BF[A]): IntIterator =
+          b match {
+            case BFItem(it, hashes, _) => new IntIterator {
+              // the hashes can have collisions so we need
+              // to remove duplicates
+              val hashvalues = hashes(it)
+              java.util.Arrays.sort(hashvalues)
+
+              @annotation.tailrec
+              def uniq(src: Array[Int], dst: Array[Int], prev: Int, spos: Int, dpos: Int): Int = {
+                if (spos >= src.length) dpos
+                else if (spos == 0) {
+                  // first
+                  val first = src(0)
+                  dst(0) = first
+                  uniq(src, dst, first, spos + 1, dpos + 1)
+                } else {
+                  val cur = src(spos)
+                  if (cur == prev) uniq(src, dst, prev, spos + 1, dpos)
+                  else {
+                    dst(dpos) = cur
+                    uniq(src, dst, cur, spos + 1, dpos + 1)
+                  }
+                }
+              }
+              val uniqVs = new Array[Int](hashvalues.length)
+              val len = uniq(hashvalues, uniqVs, -1, 0, 0)
+
+              var pos = 0
+
+              def hasNext: Boolean = (pos < len)
+              def next = {
+                val n = uniqVs(pos)
+                pos += 1
+                n
+              }
+            }
+            case BFSparse(_, cbitset, _) => cbitset.intIterator
+            case BFInstance(_, bitset, _) => new IntIterator {
+              val boxedIter = bitset.iterator
+              def hasNext = boxedIter.hasNext
+              def next = boxedIter.next
+            }
+            case BFZero(_, _) => new IntIterator {
+              def hasNext = false
+              def next = sys.error("BFZero has no hashes set")
+            }
+          }
+
+        def eqIntIter(a: IntIterator, b: IntIterator): Boolean = {
+          while (a.hasNext && b.hasNext) {
+            if (!(a.next == b.next)) return false
+          }
+          a.hasNext == b.hasNext
+        }
+
+        (a eq b) || (
+          (a.numHashes == b.numHashes) &&
+          (a.width == b.width) &&
+          eqIntIter(toIntIt(a), toIntIt(b)))
+      }
+    }
 }
 
 /**
  * Bloom Filter data structure
  */
-sealed abstract class BF extends java.io.Serializable {
-  val numHashes: Int
+sealed abstract class BF[A] extends java.io.Serializable {
+  def numHashes: Int
+  def width: Int
 
-  val width: Int
+  /**
+   * The number of bits set to true in the bloom filter
+   */
+  def numBits: Int
+  /**
+   * Proportion of bits that are set to true.
+   */
+  def density = numBits.toDouble / width
 
-  def ++(other: BF): BF
+  def ++(other: BF[A]): BF[A]
 
-  def +(other: String): BF
+  def +(other: A): BF[A]
 
-  def checkAndAdd(item: String): (BF, ApproximateBoolean)
+  def checkAndAdd(item: A): (BF[A], ApproximateBoolean)
 
-  def contains(item: String): ApproximateBoolean
-
-  // Estimates the cardinality of the set of elements that have been
-  // inserted into the Bloom Filter.
-  def size: Approximate[Long]
-}
-
-/**
- * Empty bloom filter.
- */
-case class BFZero(hashes: BFHash, width: Int) extends BF {
-  lazy val numHashes: Int = hashes.size
-
-  def ++(other: BF) = other
-
-  def +(other: String) = BFItem(other, hashes, width)
-
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
-
-  def contains(item: String) = ApproximateBoolean.exactFalse
-
-  def size = Approximate.exact[Long](0)
-}
-
-/**
- * Bloom Filter with 1 value.
- */
-case class BFItem(item: String, hashes: BFHash, width: Int) extends BF {
-  lazy val numHashes: Int = hashes.size
-
-  def ++(other: BF): BF = {
-    other match {
-      case bf @ BFZero(_, _) => this
-      case bf @ BFItem(otherItem, _, _) => BFSparse(hashes, RichCBitSet(hashes(item): _*), width) + otherItem
-      case _ => other + item
-    }
-  }
-
-  def +(other: String) = this ++ BFItem(other, hashes, width)
-
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = {
-    if (other == item) {
-      (this, ApproximateBoolean.exactTrue)
-    } else {
-      (this + other, ApproximateBoolean.exactFalse)
-    }
-  }
-
-  def contains(x: String) = ApproximateBoolean.exact(item == x)
-
-  def size = Approximate.exact[Long](1)
-}
-
-case class BFSparse(hashes: BFHash, bits: CBitSet, width: Int) extends BF {
-  import RichCBitSet._
-
-  lazy val numHashes: Int = hashes.size
-
-  @transient lazy val dense: BFInstance = BFInstance(hashes, bits.toBitSet(width), width)
-
-  def ++(other: BF): BF = {
-    require(this.width == other.width)
-    require(this.numHashes == other.numHashes)
-
-    other match {
-      case bf @ BFZero(_, _) => this
-      case bf @ BFItem(item, _, _) => this + item
-      case bf @ BFSparse(_, otherBits, _) => {
-        // assume same hashes used
-        BFSparse(hashes,
-          bits ++ otherBits,
-          width)
-      }
-      case _ => other ++ this
-    }
-  }
-
-  def +(item: String): BF = {
-    val bitsToActivate = RichCBitSet(hashes(item): _*)
-
-    BFSparse(hashes,
-      bits ++ bitsToActivate,
-      width)
-  }
-
-  def checkAndAdd(other: String): (BF, ApproximateBoolean) = dense.checkAndAdd(other)
-
-  def contains(item: String): ApproximateBoolean = dense.contains(item)
-
-  def size: Approximate[Long] = dense.size
-}
-
-/*
- * Bloom filter with multiple values
- */
-case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
-
-  lazy val numHashes: Int = hashes.size
-  lazy val numBits: Int = bits.size
-
-  def ++(other: BF) = {
-    require(this.width == other.width)
-    require(this.numHashes == other.numHashes)
-
-    other match {
-      case bf @ BFZero(_, _) => this
-      case bf @ BFItem(item, _, _) => this + item
-      case bf @ BFSparse(_, _, _) => this ++ bf.dense
-      case bf @ BFInstance(_, otherBits, _) => {
-        // assume same hashes used
-        BFInstance(hashes,
-          bits ++ otherBits,
-          width)
-      }
-    }
-  }
-
-  def +(item: String): BFInstance = {
-    val itemHashes = hashes(item)
-    this.+(itemHashes: _*)
-  }
-
-  private def +(itemHashes: Int*): BFInstance = {
-    val bitsToActivate = BitSet(itemHashes: _*)
-
-    BFInstance(hashes,
-      bits ++ bitsToActivate,
-      width)
-  }
-
-  def checkAndAdd(item: String): (BF, ApproximateBoolean) = {
-    val itemHashes = hashes(item)
-    val contained = this.contains(itemHashes: _*)
-    (this.+(itemHashes: _*), contained)
-  }
-
-  private def bitSetContains(bs: BitSet, il: Int*): Boolean = {
-    il.foreach { i => if (!bs.contains(i)) return false }
-    true
-  }
-
-  def contains(item: String): ApproximateBoolean = {
-    val itemHashes = hashes(item)
-    contains(itemHashes: _*)
-  }
-
-  private[algebird] def contains(itemHashes: Int*): ApproximateBoolean = {
-    if (bitSetContains(bits, itemHashes: _*)) {
+  def contains(item: A): ApproximateBoolean = {
+    if (maybeContains(item)) {
       // The false positive probability (the probability that the Bloom filter erroneously
       // claims that an element x is in the set when x is not) is roughly
       // p = (1 - e^(-numHashes * setCardinality / width))^numHashes
@@ -282,109 +360,295 @@ case class BFInstance(hashes: BFHash, bits: BitSet, width: Int) extends BF {
     }
   }
 
-  // Proportion of bits that are set to true.
-  def density = numBits.toDouble / width
+  /**
+   * This may be faster if you don't care about evaluating
+   * the false positive probability
+   */
+  def maybeContains(item: A): Boolean
+
+  // Estimates the cardinality of the set of elements that have been
+  // inserted into the Bloom Filter.
+  def size: Approximate[Long]
+
+  def toBitSet: BitSet
 
   /**
-   * Cardinality estimates are taken from Theorem 1 on page 15 of
-   * "Cardinality estimation and dynamic length adaptation for Bloom filters"
-   * by Papapetrou, Siberski, and Nejdl:
-   * http://www.softnet.tuc.gr/~papapetrou/publications/Bloomfilters-DAPD.pdf
-   *
-   * Roughly, by using bounds on the expected number of true bits after n elements
-   * have been inserted into the Bloom filter, we can go from the actual number of
-   * true bits (which is known) to an estimate of the cardinality.
-   *
-   * approximationWidth defines an interval around the maximum-likelihood cardinality
-   * estimate. Namely, the approximation returned is of the form
-   * (min, estimate, max) =
-   *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
+   * Compute the Hamming distance between the two Bloom filters
+   * `a` and `b`. The distance is defined as the number of bits that
+   * need to change to in order to transform one filter into the other.
    */
-  lazy val size: Approximate[Long] = size(approximationWidth = 0.05)
-  def size(approximationWidth: Double = 0.05): Approximate[Long] = {
-    assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
+  def hammingDistance(that: BF[A]): Int = {
 
-    // Variable names correspond to those used in the paper.
-    val t = numBits
-    val n = sInverse(t).round.toInt
-    // Take the min and max because the probability formula assumes
-    // nl <= sInverse(t - 1) and sInverse(t + 1) <= nr
-    val nl = scala.math.min(sInverse(t - 1).floor, (1 - approximationWidth) * n).toInt
-    val nr = scala.math.max(sInverse(t + 1).ceil, (1 + approximationWidth) * n).toInt
-    val prob =
-      1 -
-        scala.math.exp(t - 1 - s(nl)) *
-        scala.math.pow(s(nl) / (t - 1), t - 1) -
-        scala.math.exp(-scala.math.pow(t + 1 - s(nr), 2) / (2 * s(nr)))
+    (this, that) match {
+      // Comparing with empty filter should give number
+      // of bits in other set
+      case (x: BFZero[A], y: BFZero[A]) => 0
+      case (x: BFZero[A], y: BF[A]) => y.numBits
+      case (x: BF[A], y: BFZero[A]) => x.numBits
 
-    Approximate[Long](nl, n, nr, scala.math.max(0, prob))
+      // Special case for Sparse vs. Sparse
+      case (x: BFSparse[A], y: BFSparse[A]) => x.bits.xorCardinality(y.bits)
+
+      // Otherwise compare as bit sets
+      case (_, _) => (this.toBitSet ^ that.toBitSet).size
+    }
+
+  }
+}
+
+/**
+ * Empty bloom filter.
+ */
+case class BFZero[A](hashes: BFHash[A], width: Int) extends BF[A] {
+
+  def toBitSet: BitSet = BitSet()
+
+  def numHashes: Int = hashes.size
+
+  def numBits = 0
+
+  def ++(other: BF[A]) = other
+
+  def +(other: A) = BFItem[A](other, hashes, width)
+
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) = (this + other, ApproximateBoolean.exactFalse)
+
+  override def contains(item: A) = ApproximateBoolean.exactFalse
+
+  def maybeContains(item: A): Boolean = false
+
+  def size = Approximate.exact[Long](0)
+}
+
+/**
+ * Bloom Filter with 1 value.
+ */
+case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
+  def numHashes: Int = hashes.size
+  def numBits = numHashes
+
+  def toBitSet: BitSet = {
+    val hashvalues = hashes(item)
+    BitSet(hashvalues: _*)
+  }
+
+  private[algebird] def toSparse: BFSparse[A] =
+    BFSparse[A](hashes, RichCBitSet.fromArray(hashes(item)), width)
+
+  def ++(other: BF[A]): BF[A] = {
+    other match {
+      case bf @ BFZero(_, _) => this
+      case bf @ BFItem(otherItem, _, _) => toSparse + otherItem
+      case _ => other + item
+    }
+  }
+
+  def +(other: A) = this ++ BFItem(other, hashes, width)
+
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) = {
+    if (other == item) {
+      (this, ApproximateBoolean.exactTrue)
+    } else {
+      (this + other, ApproximateBoolean.exactFalse)
+    }
+  }
+
+  override def contains(x: A) = ApproximateBoolean.exact(item == x)
+
+  def maybeContains(x: A): Boolean =
+    item == x
+
+  def size = Approximate.exact[Long](1)
+}
+
+case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[A] {
+  import RichCBitSet._
+
+  def numHashes: Int = hashes.size
+
+  def toBitSet: BitSet = bits.toBitSet(width)
+
+  def numBits: Int = {
+    val it = bits.intIterator
+    var count = 0
+    while (it.hasNext) {
+      count += 1
+      it.next
+    }
+    count
   }
 
   /**
-   * s(n) is the expected number of bits that have been set to true after
-   * n elements have been inserted into the Bloom filter.
-   * This is \hat{S}(n) in the cardinality estimation paper used above.
+   * Convert to a dense representation
    */
-  private def s(n: Int): Double = {
-    width * (1 - scala.math.pow(1 - 1.0 / width, numHashes * n))
+  def dense: BFInstance[A] = BFInstance[A](hashes, bits.toBitSet(width), width)
+
+  def ++(other: BF[A]): BF[A] = {
+    require(this.width == other.width)
+    require(this.numHashes == other.numHashes)
+
+    other match {
+      case bf @ BFZero(_, _) => this
+      case bf @ BFItem(item, _, _) => this + item
+      case bf @ BFSparse(_, otherBits, _) => {
+        // assume same hashes used
+
+        // This is expensive in general.
+        // We check to see if we are filling < 5%
+        // of the bits, if so, stay sparse, if not go dense
+        val newMaxSize = numBits + bf.numBits
+        if (newMaxSize < (width / 10)) {
+          BFSparse(hashes,
+            bits ++ otherBits,
+            width)
+        } else {
+          // Make a dense bitset
+          val lbs = LongBitSet.empty(width)
+          lbs += bits.intIterator
+          lbs += otherBits.intIterator
+          BFInstance(hashes, lbs.toBitSetNoCopy, width)
+        }
+      }
+      case _ => other ++ this
+    }
   }
 
+  def +(item: A): BF[A] = {
+    val bitsToActivate = bits.clone
+    bitsToActivate += hashes(item)
+
+    BFSparse(hashes,
+      bitsToActivate,
+      width)
+  }
+
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+    (this + other, contains(other))
+
+  def maybeContains(item: A): Boolean = {
+    val il = hashes(item)
+    var idx = 0
+    while (idx < il.length) {
+      val i = il(idx)
+      if (!bits.get(i)) return false
+      idx += 1
+    }
+    true
+  }
+
+  def size: Approximate[Long] =
+    BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
+}
+
+/*
+ * Bloom filter with multiple values
+ */
+case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF[A] {
+
+  def numHashes: Int = hashes.size
   /**
-   * sInverse(t) is the maximum likelihood value for the number of elements
-   * that have been inserted into the Bloom filter when it has t bits set to true.
-   * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.
+   * The number of bits set to true
    */
-  private def sInverse(t: Int): Double = {
-    scala.math.log(1 - t.toDouble / width) / (numHashes * scala.math.log(1 - 1.0 / width))
+  def numBits: Int = bits.size
+
+  def toBitSet: BitSet = bits
+
+  def ++(other: BF[A]) = {
+    require(this.width == other.width)
+    require(this.numHashes == other.numHashes)
+
+    other match {
+      case BFZero(_, _) => this
+      case BFItem(item, _, _) => this + item
+      case BFSparse(_, otherBits, _) =>
+        // assume same hashes used
+        BFInstance(hashes, bits | (new RichCBitSet(otherBits)).toBitSet(width), width)
+      case bf @ BFInstance(_, otherBits, _) => {
+        // assume same hashes used
+        BFInstance(hashes, bits ++ otherBits, width)
+      }
+    }
   }
 
+  def +(item: A): BFInstance[A] = {
+    val itemHashes = hashes(item)
+    val thisBS = LongBitSet.empty(width)
+    thisBS += itemHashes
+
+    BFInstance[A](hashes,
+      bits | (thisBS.toBitSetNoCopy),
+      width)
+  }
+
+  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+    (this + other, contains(other))
+
+  def maybeContains(item: A): Boolean = {
+    val il = hashes(item)
+    var idx = 0
+    while (idx < il.length) {
+      val i = il(idx)
+      if (!bits.contains(i)) return false
+      idx += 1
+    }
+    true
+  }
+
+  // use an approximation width of 0.05
+  def size: Approximate[Long] =
+    BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
 }
 
 object BFInstance {
-  def apply(hashes: BFHash, width: Int): BFInstance =
+  def apply[A](hashes: BFHash[A], width: Int): BFInstance[A] =
+    empty(hashes, width)
+
+  def empty[A](hashes: BFHash[A], width: Int): BFInstance[A] =
     BFInstance(hashes, BitSet.empty, width)
 }
 
-case class BFHash(numHashes: Int, width: Int, seed: Long = 0L) extends Function1[String, Iterable[Int]] {
-  val size = numHashes
+case class BFHash[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) {
+  def size = numHashes
 
-  def apply(s: String) = nextHash(s.getBytes, numHashes)
+  def apply(s: A): Array[Int] = nextHash(s, 0, new Array[Int](4), 4, new Array[Int](numHashes))
 
-  private def splitLong(x: Long) = {
-    def toNonNegativeInt(x: Long) = {
-      val y = math.abs(x).toInt // y may be negative (Integer.MIN_VALUE)
-      y & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
-    }
+  private def splitLong(x: Long, buffer: Array[Int], idx: Int): Unit = {
+    // unfortunately, this is the function we committed to some time ago, and we have tests
+    // locking it down. x.toInt & 0x7fffffff should work, but this gives a few different values
+    def toNonNegativeInt(x: Long): Int =
+      (math.abs(x).toInt) & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
 
     val upper = toNonNegativeInt(x >> 32)
     val lower = toNonNegativeInt((x << 32) >> 32)
-    (upper, lower)
+    buffer(idx) = upper
+    buffer(idx + 1) = lower
   }
 
-  private def nextHash(bytes: Array[Byte], k: Int, digested: Seq[Int] = Seq.empty): Stream[Int] = {
-    if (k == 0)
-      Stream.empty
+  @annotation.tailrec
+  private def nextHash(valueToHash: A, hashIndex: Int, buffer: Array[Int], bidx: Int, target: Array[Int]): Array[Int] = {
+    if (hashIndex == numHashes) target
     else {
-      val d = if (digested.isEmpty) {
-        val (a, b) = MurmurHash128(k)(bytes)
-        val (x1, x2) = splitLong(a)
-        val (x3, x4) = splitLong(b)
-        Seq(x1, x2, x3, x4)
-      } else
-        digested
+      val thisBidx = if (bidx > 3) {
+        val (a, b) = hash.hashWithSeed((numHashes - hashIndex).toLong, valueToHash)
+        splitLong(a, buffer, 0)
+        splitLong(b, buffer, 2)
+        0
+      } else bidx
 
-      Stream.cons(d(0) % width, nextHash(bytes, k - 1, d.drop(1)))
+      target(hashIndex) = buffer(thisBidx) % width
+      nextHash(valueToHash, hashIndex + 1, buffer, thisBidx + 1, target)
     }
   }
 }
 
-case class BloomFilterAggregator(bfMonoid: BloomFilterMonoid) extends MonoidAggregator[String, BF, BF] {
+case class BloomFilterAggregator[A](bfMonoid: BloomFilterMonoid[A]) extends MonoidAggregator[A, BF[A], BF[A]] {
   val monoid = bfMonoid
 
-  def prepare(value: String) = monoid.create(value)
-  def present(bf: BF) = bf
+  def prepare(value: A) = monoid.create(value)
+  def present(bf: BF[A]) = bf
 }
 
 object BloomFilterAggregator {
-  def apply(numHashes: Int, width: Int, seed: Int = 0): BloomFilterAggregator = BloomFilterAggregator(BloomFilterMonoid(numHashes, width, seed))
+  def apply[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]): BloomFilterAggregator[A] =
+    BloomFilterAggregator[A](BloomFilterMonoid[A](numHashes, width))
 }

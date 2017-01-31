@@ -5,7 +5,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{ Gen, Arbitrary }
 
 object SketchMapTestImplicits {
-  val DELTA = 1E-8
+  val DELTA = 1E-6
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10
@@ -16,18 +16,22 @@ class SketchMapLaws extends CheckProperties {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  val params = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
+  val params = SketchMapParams[Int](SEED, EPS, 1e-3, HEAVY_HITTERS_COUNT)
   implicit val smMonoid = SketchMap.monoid[Int, Long](params)
   implicit val smGen = Arbitrary {
     for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
   }
 
-  // TODO: SketchMap's heavy hitters are not strictly associative (approximately they are)
-  property("SketchMap is a Monoid") {
-    commutativeMonoidLawsEq[SketchMap[Int, Long]] { (left, right) =>
+  // TODO: SketchMap's heavy hitters are not strictly associative
+  // (approximately they are)
+  implicit def equiv[K, V]: Equiv[SketchMap[K, V]] =
+    Equiv.fromFunction { (left, right) =>
       (left.valuesTable == right.valuesTable) &&
         (left.totalValue == right.totalValue)
     }
+
+  property("SketchMap is a commutative monoid") {
+    commutativeMonoidLaws[SketchMap[Int, Long]]
   }
 }
 
@@ -58,7 +62,7 @@ class SketchMapTest extends WordSpec with Matchers {
 
       val three = MONOID.create((1, 3L))
       assert(MONOID.frequency(three, 1) == 3L)
-      val four = MONOID.create(1, 4L)
+      val four = MONOID.create((1, 4L))
       assert(MONOID.frequency(four, 1) == 4L)
       val sm2 = MONOID.plus(four, three)
       assert(MONOID.frequency(sm2, 1) == 7L)

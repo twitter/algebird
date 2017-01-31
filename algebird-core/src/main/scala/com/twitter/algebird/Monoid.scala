@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ Monoid => AMonoid }
+import algebra.ring.{ AdditiveMonoid }
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 import scala.reflect.ClassTag
@@ -29,10 +31,8 @@ import scala.collection.{ Map => ScMap }
  * Monoid (take a deep breath, and relax about the weird name):
  *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
  */
-
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
-trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
-  def zero: T //additive identity
+trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] with AMonoid[T] with AdditiveMonoid[T] {
   def isNonZero(v: T): Boolean = (v != zero)
   def assertNotZero(v: T) {
     if (!isNonZero(v)) {
@@ -47,8 +47,14 @@ trait Monoid[@specialized(Int, Long, Float, Double) T] extends Semigroup[T] {
       None
     }
   }
-  // Override this if there is a more efficient means to implement this
-  def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
+  override def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
+
+  /**
+   * These are from algebra.Monoid
+   */
+  override def additive: AMonoid[T] = this
+  override def empty: T = zero
+  override def combineAll(t: TraversableOnce[T]): T = sum(t)
 }
 
 // For Java interop so they get the default methods
@@ -146,7 +152,12 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
  */
 class SetMonoid[T] extends Monoid[Set[T]] {
   override def zero = Set[T]()
-  override def plus(left: Set[T], right: Set[T]) = left ++ right
+  override def plus(left: Set[T], right: Set[T]) =
+    if (left.size > right.size) {
+      left ++ right
+    } else {
+      right ++ left
+    }
   override def sumOption(items: TraversableOnce[Set[T]]): Option[Set[T]] =
     if (items.isEmpty) None
     else {
@@ -222,7 +233,21 @@ object AndValMonoid extends Monoid[AndVal] {
     else Some(AndVal(its.forall(_.get)))
 }
 
-object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
+class FromAlgebraMonoid[T](m: AMonoid[T]) extends FromAlgebraSemigroup(m) with Monoid[T] {
+  override def sum(ts: TraversableOnce[T]): T = m.combineAll(ts)
+  override def zero: T = m.empty
+}
+
+private[algebird] trait FromAlgebraMonoidImplicit1 {
+  implicit def fromAlgebraAdditiveMonoid[T](implicit m: AdditiveMonoid[T]): Monoid[T] =
+    new FromAlgebraMonoid(m.additive)
+}
+
+private[algebird] trait FromAlgebraMonoidImplicit0 extends FromAlgebraMonoidImplicit1 {
+  implicit def fromAlgebraMonoid[T](implicit m: AMonoid[T]): Monoid[T] = new FromAlgebraMonoid(m)
+}
+
+object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlgebraMonoidImplicit0 {
   // This pattern is really useful for typeclasses
   def zero[T](implicit mon: Monoid[T]) = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples
@@ -261,22 +286,23 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids {
     }
   }
 
-  implicit val nullMonoid: Monoid[Null] = NullGroup
-  implicit val unitMonoid: Monoid[Unit] = UnitGroup
-  implicit val boolMonoid: Monoid[Boolean] = BooleanField
-  implicit val jboolMonoid: Monoid[JBool] = JBoolField
-  implicit val intMonoid: Monoid[Int] = IntRing
-  implicit val jintMonoid: Monoid[JInt] = JIntRing
-  implicit val shortMonoid: Monoid[Short] = ShortRing
-  implicit val jshortMonoid: Monoid[JShort] = JShortRing
-  implicit val bigIntMonoid: Monoid[BigInt] = BigIntRing
-  implicit val longMonoid: Monoid[Long] = LongRing
-  implicit val jlongMonoid: Monoid[JLong] = JLongRing
-  implicit val floatMonoid: Monoid[Float] = FloatField
-  implicit val jfloatMonoid: Monoid[JFloat] = JFloatField
-  implicit val doubleMonoid: Monoid[Double] = DoubleField
-  implicit val jdoubleMonoid: Monoid[JDouble] = JDoubleField
-  implicit val stringMonoid: Monoid[String] = StringMonoid
+  implicit def nullMonoid: Monoid[Null] = NullGroup
+  implicit def unitMonoid: Monoid[Unit] = UnitGroup
+  implicit def boolMonoid: Monoid[Boolean] = BooleanRing
+  implicit def jboolMonoid: Monoid[JBool] = JBoolRing
+  implicit def intMonoid: Monoid[Int] = IntRing
+  implicit def jintMonoid: Monoid[JInt] = JIntRing
+  implicit def shortMonoid: Monoid[Short] = ShortRing
+  implicit def jshortMonoid: Monoid[JShort] = JShortRing
+  implicit def bigIntMonoid: Monoid[BigInt] = BigIntRing
+  implicit def bigDecimalMonoid: Monoid[BigDecimal] = implicitly[Ring[BigDecimal]]
+  implicit def longMonoid: Monoid[Long] = LongRing
+  implicit def jlongMonoid: Monoid[JLong] = JLongRing
+  implicit def floatMonoid: Monoid[Float] = FloatRing
+  implicit def jfloatMonoid: Monoid[JFloat] = JFloatRing
+  implicit def doubleMonoid: Monoid[Double] = DoubleRing
+  implicit def jdoubleMonoid: Monoid[JDouble] = JDoubleRing
+  implicit def stringMonoid: Monoid[String] = StringMonoid
   implicit def optionMonoid[T: Semigroup]: Monoid[Option[T]] = new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]

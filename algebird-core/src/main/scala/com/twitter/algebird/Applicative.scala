@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
+import scala.collection.generic.CanBuildFrom
 
 /**
  * Simple implementation of an Applicative type-class.
@@ -83,6 +84,17 @@ object Applicative {
     app.join(m1, m2, m3, m4, m5)
   def sequence[M[_], T](ms: Seq[M[T]])(implicit app: Applicative[M]): M[Seq[T]] =
     app.sequence(ms)
+  /**
+   * A Generic sequence that uses CanBuildFrom
+   */
+  def sequenceGen[M[_], T, S[X] <: TraversableOnce[X], R[_]](ms: S[M[T]])(implicit app: Applicative[M], cbf: CanBuildFrom[Nothing, T, R[T]]): M[R[T]] = {
+    val bldr = cbf()
+    val mbldr = ms.toIterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
+      app.joinWith(mb, mt)(_ += _)
+    }
+    app.map(mbldr)(_.result)
+  }
+
   def joinWith[M[_], T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V)(implicit app: Applicative[M]): M[V] =
     app.joinWith(mt, mu)(fn)
 
@@ -96,7 +108,7 @@ object Applicative {
 // This is the enrichment pattern to allow syntax like: 1.pure[List] == List(1)
 // if we put a pure method in Applicative, it would take two type parameters, only one
 // of which could be inferred, and it's annoying to write Applicative.pure[Int,List](1)
-class PureOp[A](a: A) {
+class PureOp[A](val a: A) extends AnyVal {
   def pure[M[_]](implicit app: Applicative[M]) = app(a)
 }
 
@@ -126,7 +138,7 @@ class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
 }
 
 /**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
  * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
  * this generally works.
  */
@@ -137,7 +149,7 @@ class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
 }
 
 /**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
  * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
  * this generally works.
  */
@@ -146,15 +158,3 @@ class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
   lazy val one = app(ring.one)
   def times(l: M[T], r: M[T]) = app.joinWith(l, r)(ring.times)
 }
-
-/**
- * Group, Ring, and Field ARE NOT AUTOMATIC. You have to check that the laws hold for your
- * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
- * this generally works.
- */
-class ApplicativeField[T, M[_]](implicit app: Applicative[M], fld: Field[T])
-  extends ApplicativeRing[T, M] with Field[M[T]] {
-  override def inverse(v: M[T]) = app.map(v)(fld.inverse)
-  override def div(l: M[T], r: M[T]) = app.joinWith(l, r)(fld.div)
-}
-
