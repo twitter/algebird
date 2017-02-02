@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import algebra.CommutativeGroup
+
 /**
  * Tracks the count and mean value of Doubles in a data stream.
  *
@@ -128,7 +130,7 @@ object AveragedValue {
  *
  * @define T `AveragedValue`
  */
-object AveragedGroup extends Group[AveragedValue] {
+object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[AveragedValue] {
   import MomentsGroup.getCombinedMean
 
   val zero = AveragedValue(0L, 0.0)

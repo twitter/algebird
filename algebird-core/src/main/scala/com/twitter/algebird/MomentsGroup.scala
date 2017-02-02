@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import algebra.CommutativeGroup
+
 /**
  * A class to calculate the first five central moments over a sequence of Doubles.
  * Given the first five central moments, we can then calculate metrics like skewness
@@ -49,7 +51,7 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
 }
 
 object Moments {
-  implicit val group: Group[Moments] = MomentsGroup
+  implicit val group: Group[Moments] with CommutativeGroup[Moments] = MomentsGroup
   val aggregator = MomentsAggregator
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
@@ -69,7 +71,7 @@ object Moments {
 /**
  * A monoid to perform moment calculations.
  */
-object MomentsGroup extends Group[Moments] {
+object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
 
   /**
    * When combining averages, if the counts sizes are too close we

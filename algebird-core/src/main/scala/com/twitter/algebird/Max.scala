@@ -17,6 +17,8 @@ package com.twitter.algebird
 
 import scala.annotation.tailrec
 
+import algebra.{ BoundedSemilattice, Semilattice }
+
 /**
  * Tracks the maximum wrapped instance of some ordered type `T`.
  *
@@ -58,20 +60,16 @@ object Max extends MaxInstances {
   /**
    * Returns a [[Semigroup]] instance with a `plus` implementation
    * that always returns the maximum `T` argument.
-   *
-   * @todo Note that this is a semilattice, for when we merge  typelevel/algebra.
    */
-  def maxSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] =
-    Semigroup.from { (l: T, r: T) => ord.max(l, r) }
+  def maxSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
+    new Semigroup[T] with Semilattice[T] {
+      def plus(l: T, r: T): T = ord.max(l, r)
+    }
 }
 
 private[algebird] sealed abstract class MaxInstances {
   implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Max[T]] = Equiv.by(_.get)
   implicit def ordering[T: Ordering]: Ordering[Max[T]] = Ordering.by(_.get)
-
-  private[this] def plus[T](implicit ord: Ordering[T]) = {
-    (l: Max[T], r: Max[T]) => if (ord.gteq(l.get, r.get)) l else r
-  }
 
   /**
    * Returns a [[Monoid]] instance for [[Max]][T] that combines
@@ -80,29 +78,37 @@ private[algebird] sealed abstract class MaxInstances {
    * @param zero identity of the returned [[Monoid]] instance
    * @note `zero` must be `<=` every element of `T` for the returned instance to be lawful.
    */
-  def monoid[T: Ordering](zero: => T): Monoid[Max[T]] = Monoid.from(Max(zero))(plus)
+  def monoid[T: Ordering](z: => T): Monoid[Max[T]] with BoundedSemilattice[Max[T]] =
+    new Monoid[Max[T]] with BoundedSemilattice[Max[T]] {
+      val zero = Max(z)
+      val ord = implicitly[Ordering[T]]
+      def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
+    }
 
   /**
    * Returns a [[Semigroup]] instance for [[Max]][T]. The `plus`
    * implementation always returns the maximum `Max[T]` argument.
    */
-  implicit def semigroup[T: Ordering]: Semigroup[Max[T]] =
+  implicit def semigroup[T: Ordering]: Semigroup[Max[T]] with Semilattice[Max[T]] =
     // There's no need to override `sumOption`, since the default
     // implementation does no allocation other than the outer `Option`
     // and `plus` doesn't do any allocation.
-    Semigroup.from(plus)
+    new Semigroup[Max[T]] with Semilattice[Max[T]] {
+      val ord = implicitly[Ordering[T]]
+      def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
+    }
 
   /** [[Monoid]] for [[Max]][Int] with `zero == Int.MinValue` */
-  implicit def intMonoid: Monoid[Max[Int]] = monoid(Int.MinValue)
+  implicit def intMonoid: Monoid[Max[Int]] with BoundedSemilattice[Max[Int]] = monoid(Int.MinValue)
 
   /** [[Monoid]] for [[Max]][Long] with `zero == Long.MinValue` */
-  implicit def longMonoid: Monoid[Max[Long]] = monoid(Long.MinValue)
+  implicit def longMonoid: Monoid[Max[Long]] with BoundedSemilattice[Max[Long]] = monoid(Long.MinValue)
 
   /** [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue` */
-  implicit def doubleMonoid: Monoid[Max[Double]] = monoid(Double.MinValue)
+  implicit def doubleMonoid: Monoid[Max[Double]] with BoundedSemilattice[Max[Double]] = monoid(Double.MinValue)
 
   /** [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue` */
-  implicit def floatMonoid: Monoid[Max[Float]] = monoid(Float.MinValue)
+  implicit def floatMonoid: Monoid[Max[Float]] with BoundedSemilattice[Max[Float]] = monoid(Float.MinValue)
 
   /** [[Monoid]] for [[Max]][String] with `zero == ""` */
   implicit def stringMonoid: Monoid[Max[String]] = monoid("")
@@ -112,7 +118,7 @@ private[algebird] sealed abstract class MaxInstances {
    * lists first by length and then element-wise by `T`, and returns
    * the maximum value.
    */
-  implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] = monoid[List[T]](Nil)(
+  implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] with BoundedSemilattice[Max[List[T]]] = monoid[List[T]](Nil)(
     new Ordering[List[T]] {
       @tailrec
       final override def compare(left: List[T], right: List[T]): Int = {
@@ -153,7 +159,7 @@ private[algebird] sealed abstract class MaxInstances {
    * lists first by length and then element-wise by `T`, and returns
    * the maximum value.
    */
-  implicit def vectorMonoid[T: Ordering]: Monoid[Max[Vector[T]]] =
+  implicit def vectorMonoid[T: Ordering]: Monoid[Max[Vector[T]]] with BoundedSemilattice[Max[Vector[T]]] =
     monoid[Vector[T]](Vector.empty[T])(
       new Ordering[Vector[T]] {
         def compare(l: Vector[T], r: Vector[T]): Int = {
@@ -167,7 +173,7 @@ private[algebird] sealed abstract class MaxInstances {
    * lists first by length and then element-wise by `T`, and returns
    * the maximum value.
    */
-  implicit def streamMonoid[T: Ordering]: Monoid[Max[Stream[T]]] =
+  implicit def streamMonoid[T: Ordering]: Monoid[Max[Stream[T]]] with BoundedSemilattice[Max[Stream[T]]] =
     monoid[Stream[T]](Stream.empty[T])(
       new Ordering[Stream[T]] {
         def compare(l: Stream[T], r: Stream[T]): Int = {

@@ -16,9 +16,10 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.breakOut
+import algebra.CommutativeMonoid
 import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird.matrix.AdaptiveMatrix
+import scala.collection.breakOut
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
@@ -40,7 +41,7 @@ case class SketchMapHash[K](hasher: CMSHash[Long], seed: Int)(implicit serializa
  * Responsible for creating instances of SketchMap.
  */
 class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrdering: Ordering[V], monoid: Monoid[V])
-  extends Monoid[SketchMap[K, V]] {
+  extends Monoid[SketchMap[K, V]] with CommutativeMonoid[SketchMap[K, V]] {
 
   /**
    * A zero Sketch Map is one with zero elements.

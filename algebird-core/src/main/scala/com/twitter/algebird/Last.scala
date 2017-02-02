@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.Band
+
 /**
  * Tracks the "most recent", or last, wrapped instance of `T` by the
  * order in which items are seen.
@@ -47,14 +49,22 @@ private[algebird] sealed abstract class LastInstances {
    * Returns a [[Semigroup]] instance with a `plus` implementation
    * that always returns the last (ie, the right) `T` argument.
    */
-  def lastSemigroup[T]: Semigroup[T] = Semigroup.from { (l, r) => r }
+  def lastSemigroup[T]: Semigroup[T] with Band[T] =
+    new Semigroup[T] with Band[T] {
+      def plus(l: T, r: T): T = r
+      override def sumOption(ts: TraversableOnce[T]): Option[T] = {
+        var res: Option[T] = None
+        ts.foreach { t => res = Some(t) }
+        res
+      }
+    }
 
   /**
    * Returns a [[Semigroup]] instance for [[Last]][T]. The `plus`
    * implementation always returns the last (ie, the right) `Last[T]`
    * argument.
    */
-  implicit def semigroup[T]: Semigroup[Last[T]] = lastSemigroup[Last[T]]
+  implicit def semigroup[T]: Semigroup[Last[T]] with Band[Last[T]] = lastSemigroup[Last[T]]
 }
 
 /**
