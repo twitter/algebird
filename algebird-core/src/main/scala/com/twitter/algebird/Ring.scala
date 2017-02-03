@@ -161,6 +161,12 @@ class FromAlgebraRing[T](r: ARing[T]) extends Ring[T] {
   override def product(ts: TraversableOnce[T]): T = r.product(ts)
 }
 
+/**
+ * In some legacy cases, we have implemented Rings where we lacked
+ * the full laws. This allows you to be precise (only implement
+ * the structure you have), but unsafely use it as a Ring in legacy code
+ * that is expecting a Ring.
+ */
 class UnsafeFromAlgebraRig[T](r: Rig[T]) extends Ring[T] {
   override def zero: T = r.zero
   override def one: T = r.one
@@ -175,6 +181,12 @@ class UnsafeFromAlgebraRig[T](r: Rig[T]) extends Ring[T] {
   override def product(ts: TraversableOnce[T]): T = r.product(ts)
 }
 
+/**
+ * In some legacy cases, we have implemented Rings where we lacked
+ * the full laws. This allows you to be precise (only implement
+ * the structure you have), but unsafely use it as a Ring in legacy code
+ * that is expecting a Ring.
+ */
 class UnsafeFromAlgebraRng[T](r: Rng[T]) extends Ring[T] {
   override def zero: T = r.zero
   override def one: T =
@@ -187,7 +199,7 @@ class UnsafeFromAlgebraRng[T](r: Rng[T]) extends Ring[T] {
   override def times(a: T, b: T): T = r.times(a, b)
   override def product(ts: TraversableOnce[T]): T =
     if (ts.isEmpty) one
-    else ts.reduce(r.times)
+    else ts.reduce(r.times) // avoid calling one, since that will throw here
 }
 
 private[algebird] trait RingImplicits0 extends NumericRingProvider {

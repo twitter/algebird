@@ -78,12 +78,14 @@ private[algebird] sealed abstract class MaxInstances {
    * @param zero identity of the returned [[Monoid]] instance
    * @note `zero` must be `<=` every element of `T` for the returned instance to be lawful.
    */
-  def monoid[T: Ordering](z: => T): Monoid[Max[T]] with BoundedSemilattice[Max[T]] =
+  def monoid[T: Ordering](zero: => T): Monoid[Max[T]] with BoundedSemilattice[Max[T]] = {
+    val z = zero // avoid confusion below when overriding zero
     new Monoid[Max[T]] with BoundedSemilattice[Max[T]] {
       val zero = Max(z)
       val ord = implicitly[Ordering[T]]
       def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
     }
+  }
 
   /**
    * Returns a [[Semigroup]] instance for [[Max]][T]. The `plus`
@@ -104,10 +106,18 @@ private[algebird] sealed abstract class MaxInstances {
   /** [[Monoid]] for [[Max]][Long] with `zero == Long.MinValue` */
   implicit def longMonoid: Monoid[Max[Long]] with BoundedSemilattice[Max[Long]] = monoid(Long.MinValue)
 
-  /** [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue` */
+  /**
+   * [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue`
+   * Note: MinValue > NegativeInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
   implicit def doubleMonoid: Monoid[Max[Double]] with BoundedSemilattice[Max[Double]] = monoid(Double.MinValue)
 
-  /** [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue` */
+  /**
+   * [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue`
+   * Note: MinValue > NegativeInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
   implicit def floatMonoid: Monoid[Max[Float]] with BoundedSemilattice[Max[Float]] = monoid(Float.MinValue)
 
   /** [[Monoid]] for [[Max]][String] with `zero == ""` */
