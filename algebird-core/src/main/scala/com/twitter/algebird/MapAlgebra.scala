@@ -15,10 +15,10 @@ limitations under the License.
 */
 package com.twitter.algebird
 
-import scala.collection.{ Map => ScMap }
-import scala.collection.mutable.{ Builder, Map => MMap }
-
 import com.twitter.algebird.macros.{ Cuber, Roller }
+import scala.collection.mutable.{ Builder, Map => MMap }
+import scala.collection.{ Map => ScMap }
+import algebra.ring.Rng
 
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
@@ -132,15 +132,10 @@ class ScMapGroup[K, V](implicit val group: Group[V]) extends ScMapMonoid[K, V]()
 /**
  * You can think of this as a Sparse vector ring
  */
-trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Ring[M] with MapOperations[K, V, M] {
+trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Rng[M] with MapOperations[K, V, M] {
 
   implicit def ring: Ring[V]
 
-  // It is possible to implement this, but we need a special "identity map" which we
-  // deal with as if it were map with all possible keys (.get(x) == ring.one for all x).
-  // Then we have to manage the delta from this map as we add elements.  That said, it
-  // is not actually needed in matrix multiplication, so we are punting on it for now.
-  override def one = sys.error("multiplicative identity for Map unimplemented")
   override def times(x: M, y: M): M = {
     val (big, small, bigOnLeft) = if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
     small.foldLeft(zero) { (oldMap, kv) =>

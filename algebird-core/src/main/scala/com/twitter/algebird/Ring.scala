@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
-import algebra.ring.{ Ring => ARing }
+import algebra.ring.{ Ring => ARing, Rig, Rng }
 import algebra.CommutativeGroup
 
 import scala.annotation.implicitNotFound
@@ -161,6 +161,47 @@ class FromAlgebraRing[T](r: ARing[T]) extends Ring[T] {
   override def product(ts: TraversableOnce[T]): T = r.product(ts)
 }
 
+/**
+ * In some legacy cases, we have implemented Rings where we lacked
+ * the full laws. This allows you to be precise (only implement
+ * the structure you have), but unsafely use it as a Ring in legacy code
+ * that is expecting a Ring.
+ */
+class UnsafeFromAlgebraRig[T](r: Rig[T]) extends Ring[T] {
+  override def zero: T = r.zero
+  override def one: T = r.one
+  override def plus(a: T, b: T): T = r.plus(a, b)
+  override def negate(t: T): T =
+    sys.error(s"$r is a Rig, there is no additive inverse")
+  override def minus(a: T, b: T): T =
+    sys.error(s"$r is a Rig, there is no additive inverse")
+  override def sum(ts: TraversableOnce[T]): T = r.sum(ts)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] = r.trySum(ts)
+  override def times(a: T, b: T): T = r.times(a, b)
+  override def product(ts: TraversableOnce[T]): T = r.product(ts)
+}
+
+/**
+ * In some legacy cases, we have implemented Rings where we lacked
+ * the full laws. This allows you to be precise (only implement
+ * the structure you have), but unsafely use it as a Ring in legacy code
+ * that is expecting a Ring.
+ */
+class UnsafeFromAlgebraRng[T](r: Rng[T]) extends Ring[T] {
+  override def zero: T = r.zero
+  override def one: T =
+    sys.error(s"multiplicative identity for Rng $r unimplemented")
+  override def plus(a: T, b: T): T = r.plus(a, b)
+  override def negate(t: T): T = r.negate(t)
+  override def minus(a: T, b: T): T = r.minus(a, b)
+  override def sum(ts: TraversableOnce[T]): T = r.sum(ts)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] = r.trySum(ts)
+  override def times(a: T, b: T): T = r.times(a, b)
+  override def product(ts: TraversableOnce[T]): T =
+    if (ts.isEmpty) one
+    else ts.reduce(r.times) // avoid calling one, since that will throw here
+}
+
 private[algebird] trait RingImplicits0 extends NumericRingProvider {
   implicit def fromAlgebraRing[T](implicit r: ARing[T]): Ring[T] =
     new FromAlgebraRing(r)
@@ -202,8 +243,14 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
   implicit def doubleRing: Ring[Double] = DoubleRing
   implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
   implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
+  /**
+   * This is actually a Rng but we leave the unsafe Ring for legacy reasons
+   */
   implicit def mapRing[K, V](implicit ring: Ring[V]): Ring[Map[K, V]] =
-    new MapRing[K, V]()(ring)
+    new UnsafeFromAlgebraRng(new MapRing[K, V]()(ring))
+  /**
+   * This is actually a Rng but we leave the unsafe Ring for legacy reasons
+   */
   implicit def scMapRing[K, V](implicit ring: Ring[V]): Ring[scala.collection.Map[K, V]] =
-    new ScMapRing[K, V]()(ring)
+    new UnsafeFromAlgebraRng(new ScMapRing[K, V]()(ring))
 }

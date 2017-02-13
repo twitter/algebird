@@ -19,6 +19,8 @@ package com.twitter.algebird
 import java.nio.ByteBuffer
 import java.lang.Math
 
+import algebra.BoundedSemilattice
+
 /** A super lightweight (hopefully) version of BitSet */
 @deprecated("This is no longer used.", since = "0.12.3")
 case class BitSetLite(in: Array[Byte]) {
@@ -550,7 +552,7 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
  * Error is about 1.04/sqrt(2^{bits}), so you want something like 12 bits for 1% error
  * which means each HLLInstance is about 2^{12} = 4kb per instance.
  */
-class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] {
+class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilattice[HLL] {
   import HyperLogLog._
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
