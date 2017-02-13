@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import algebra.ring.Rig
+
 /*
  * The Min-Plus algebra, or tropical semi-ring is useful for computing shortest
  * paths on graphs:
@@ -30,10 +32,8 @@ sealed trait MinPlus[+V] extends Any with java.io.Serializable
 case object MinPlusZero extends MinPlus[Nothing]
 case class MinPlusValue[V](get: V) extends AnyVal with MinPlus[V]
 
-class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends Ring[MinPlus[V]] {
+class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends Rig[MinPlus[V]] {
   override def zero = MinPlusZero
-  override def negate(mv: MinPlus[V]) =
-    sys.error("MinPlus is a semi-ring, there is no additive inverse")
   override def one: MinPlus[V] = MinPlusValue(monoid.zero)
   // a+b = min(a,b)
   override def plus(left: MinPlus[V], right: MinPlus[V]) =
@@ -54,5 +54,9 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
 }
 
 object MinPlus extends java.io.Serializable {
-  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] = new MinPlusSemiring[V]
+  /**
+   * This is unsafe but here for legacy reasons
+   */
+  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] = new UnsafeFromAlgebraRig(rig[V])
+  implicit def rig[V: Monoid: Ordering]: Rig[MinPlus[V]] = new MinPlusSemiring[V]
 }
