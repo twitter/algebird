@@ -64,9 +64,9 @@ A list of contributors to the project can be found here: [Contributors](https://
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.12.3`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.13.0`.
 
-See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10 and 2.11.
+See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10, 2.11 and 2.12.
 
 ## Projects using Algebird
 
