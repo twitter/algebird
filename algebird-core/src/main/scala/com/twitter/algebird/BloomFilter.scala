@@ -16,11 +16,11 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.immutable.BitSet
-import scala.collection.JavaConverters._
-
-import com.googlecode.javaewah.{ EWAHCompressedBitmap => CBitSet }
+import algebra.BoundedSemilattice
 import com.googlecode.javaewah.IntIterator
+import com.googlecode.javaewah.{ EWAHCompressedBitmap => CBitSet }
+import scala.collection.JavaConverters._
+import scala.collection.immutable.BitSet
 
 object RichCBitSet {
   def apply(xs: Int*): CBitSet = fromArray(xs.toArray)
@@ -183,7 +183,7 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  */
-case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) extends Monoid[BF[A]] {
+case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) extends Monoid[BF[A]] with BoundedSemilattice[BF[A]] {
   val hashes: BFHash[A] = BFHash[A](numHashes, width)(hash)
 
   val zero: BF[A] = BFZero[A](hashes, width)

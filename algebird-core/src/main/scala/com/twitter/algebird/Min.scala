@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.{ BoundedSemilattice, Semilattice }
+
 /**
  * Tracks the minimum wrapped instance of some ordered type `T`.
  *
@@ -57,17 +59,15 @@ object Min extends MinInstances {
    * Returns a [[Semigroup]] instance with a `plus` implementation
    * that always returns the minimum `T` argument.
    */
-  def minSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] =
-    Semigroup.from { (l: T, r: T) => ord.min(l, r) }
+  def minSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
+    new Semigroup[T] with Semilattice[T] {
+      def plus(l: T, r: T) = ord.min(l, r)
+    }
 }
 
 private[algebird] sealed abstract class MinInstances {
   implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Min[T]] = Equiv.by(_.get)
   implicit def ordering[T: Ordering]: Ordering[Min[T]] = Ordering.by(_.get)
-
-  private[this] def plus[T](implicit ord: Ordering[T]) = {
-    (l: Min[T], r: Min[T]) => if (ord.lteq(l.get, r.get)) l else r
-  }
 
   /**
    * Returns a [[Monoid]] instance for [[Min]][T] that combines
@@ -76,25 +76,44 @@ private[algebird] sealed abstract class MinInstances {
    * @param zero identity of the returned [[Monoid]] instance
    * @note `zero` must be `>=` every element of `T` for the returned instance to be lawful.
    */
-  def monoid[T: Ordering](zero: => T): Monoid[Min[T]] = Monoid.from(Min(zero))(plus)
+  def monoid[T: Ordering](zero: => T): Monoid[Min[T]] with BoundedSemilattice[Min[T]] = {
+    val z = zero // avoid confusion below when overriding zero
+    new Monoid[Min[T]] with BoundedSemilattice[Min[T]] {
+      val zero = Min(z)
+      val ord = implicitly[Ordering[T]]
+      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
+    }
+  }
 
   /**
    * Returns a [[Semigroup]] instance for [[Min]][T]. The `plus`
    * implementation always returns the minimum `Min[T]` argument.
    */
-  implicit def semigroup[T: Ordering]: Semigroup[Min[T]] = Semigroup.from(plus)
+  implicit def semigroup[T: Ordering]: Semigroup[Min[T]] with Semilattice[Min[T]] =
+    new Semigroup[Min[T]] with Semilattice[Min[T]] {
+      val ord = implicitly[Ordering[T]]
+      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.gteq(l.get, r.get)) l else r
+    }
 
   /** [[Monoid]] for [[Min]][Int] with `zero == Int.MaxValue` */
-  implicit def intMonoid: Monoid[Min[Int]] = monoid(Int.MaxValue)
+  implicit def intMonoid: Monoid[Min[Int]] with BoundedSemilattice[Min[Int]] = monoid(Int.MaxValue)
 
   /** [[Monoid]] for [[Min]][Long] with `zero == Long.MaxValue` */
-  implicit def longMonoid: Monoid[Min[Long]] = monoid(Long.MaxValue)
+  implicit def longMonoid: Monoid[Min[Long]] with BoundedSemilattice[Min[Long]] = monoid(Long.MaxValue)
 
-  /** [[Monoid]] for [[Min]][Double] with `zero == Double.MaxValue` */
-  implicit def doubleMonoid: Monoid[Min[Double]] = monoid(Double.MaxValue)
+  /**
+   * [[Monoid]] for [[Min]][Double] with `zero == Double.MaxValue`
+   * Note: MaxValue < PositiveInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
+  implicit def doubleMonoid: Monoid[Min[Double]] with BoundedSemilattice[Min[Double]] = monoid(Double.MaxValue)
 
-  /** [[Monoid]] for [[Min]][Float] with `zero == Float.MaxValue` */
-  implicit def floatMonoid: Monoid[Min[Float]] = monoid(Float.MaxValue)
+  /**
+   * [[Monoid]] for [[Min]][Float] with `zero == Float.MaxValue`
+   * Note: MaxValue < PositiveInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
+  implicit def floatMonoid: Monoid[Min[Float]] with BoundedSemilattice[Min[Float]] = monoid(Float.MaxValue)
 }
 
 /**

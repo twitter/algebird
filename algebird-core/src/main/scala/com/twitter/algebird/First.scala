@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.twitter.algebird
 
+import algebra.Band
+
 /**
  * Tracks the "least recent", or earliest, wrapped instance of `T` by
  * the order in which items are seen.
@@ -51,8 +53,8 @@ private[algebird] sealed abstract class FirstInstances {
    * head of the `TraversableOnce` instance, leaving the rest
    * untouched.
    */
-  def firstSemigroup[T]: Semigroup[T] =
-    new Semigroup[T] {
+  def firstSemigroup[T]: Semigroup[T] with Band[T] =
+    new Semigroup[T] with Band[T] {
       def plus(l: T, r: T): T = l
 
       override def sumOption(iter: TraversableOnce[T]): Option[T] =
@@ -64,7 +66,7 @@ private[algebird] sealed abstract class FirstInstances {
    * implementation always returns the first (ie, the left) `First[T]`
    * argument.
    */
-  implicit def semigroup[T]: Semigroup[First[T]] = firstSemigroup[First[T]]
+  implicit def semigroup[T]: Semigroup[First[T]] with Band[First[T]] = firstSemigroup[First[T]]
 }
 
 /**
