@@ -67,7 +67,32 @@ object Max extends MaxInstances {
     }
 }
 
-private[algebird] sealed abstract class MaxInstances {
+private[algebird] sealed abstract class MaxInstances extends LowPriorityMaxInstances {
+  /** [[Monoid]] for [[Max]][Int] with `zero == Int.MinValue` */
+  implicit def intMonoid: Monoid[Max[Int]] with BoundedSemilattice[Max[Int]] = monoid(Int.MinValue)
+
+  /** [[Monoid]] for [[Max]][Long] with `zero == Long.MinValue` */
+  implicit def longMonoid: Monoid[Max[Long]] with BoundedSemilattice[Max[Long]] = monoid(Long.MinValue)
+
+  /**
+   * [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue`
+   * Note: MinValue > NegativeInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
+  implicit def doubleMonoid: Monoid[Max[Double]] with BoundedSemilattice[Max[Double]] = monoid(Double.MinValue)
+
+  /**
+   * [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue`
+   * Note: MinValue > NegativeInfinity, but people may
+   * be relying on this emitting a non-infinite number. Sadness
+   */
+  implicit def floatMonoid: Monoid[Max[Float]] with BoundedSemilattice[Max[Float]] = monoid(Float.MinValue)
+
+  /** [[Monoid]] for [[Max]][String] with `zero == ""` */
+  implicit def stringMonoid: Monoid[Max[String]] = monoid("")
+}
+
+private[algebird] sealed abstract class LowPriorityMaxInstances {
   implicit def equiv[T](implicit eq: Equiv[T]): Equiv[Max[T]] = Equiv.by(_.get)
   implicit def ordering[T: Ordering]: Ordering[Max[T]] = Ordering.by(_.get)
 
@@ -99,29 +124,6 @@ private[algebird] sealed abstract class MaxInstances {
       val ord = implicitly[Ordering[T]]
       def plus(l: Max[T], r: Max[T]): Max[T] = if (ord.gteq(l.get, r.get)) l else r
     }
-
-  /** [[Monoid]] for [[Max]][Int] with `zero == Int.MinValue` */
-  implicit def intMonoid: Monoid[Max[Int]] with BoundedSemilattice[Max[Int]] = monoid(Int.MinValue)
-
-  /** [[Monoid]] for [[Max]][Long] with `zero == Long.MinValue` */
-  implicit def longMonoid: Monoid[Max[Long]] with BoundedSemilattice[Max[Long]] = monoid(Long.MinValue)
-
-  /**
-   * [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue`
-   * Note: MinValue > NegativeInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
-   */
-  implicit def doubleMonoid: Monoid[Max[Double]] with BoundedSemilattice[Max[Double]] = monoid(Double.MinValue)
-
-  /**
-   * [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue`
-   * Note: MinValue > NegativeInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
-   */
-  implicit def floatMonoid: Monoid[Max[Float]] with BoundedSemilattice[Max[Float]] = monoid(Float.MinValue)
-
-  /** [[Monoid]] for [[Max]][String] with `zero == ""` */
-  implicit def stringMonoid: Monoid[Max[String]] = monoid("")
 
   /**
    * Returns a [[Monoid]] instance for `Max[List[T]]` that compares
