@@ -16,6 +16,11 @@ class MaxLaws extends CheckProperties {
   // Test equiv import.
   val equiv = implicitly[Equiv[Max[Int]]]
 
+  // Testing that these ones can be found
+  val sgInt = implicitly[Semigroup[Max[Int]]]
+  val sgString = implicitly[Semigroup[Max[String]]]
+  val monoidString = implicitly[Monoid[Max[String]]]
+
   property("Max.{ +, max } works on ints") { maxTest[Int] }
 
   property("Max.aggregator returns the maximum item") {
