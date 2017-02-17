@@ -114,7 +114,7 @@ object HyperLogLog {
 
   /**
    * The value 'w' is represented as a bitset (encoding in
-   * `bytes`). This function counds the number of leading zeros in 'w'.
+   * `bytes`). This function counts the number of leading zeros in 'w'.
    *
    * Each byte is treated as a set of bits (little-endian). That is,
    * the one bit represents the first value, then the two bit, then
