@@ -3,7 +3,7 @@ sudo: false
 matrix:
   include:
     - scala: 2.10.6
-      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues"
+      script: ./sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
       #script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - scala: 2.11.8
