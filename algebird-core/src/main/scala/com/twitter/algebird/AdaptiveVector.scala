@@ -82,47 +82,91 @@ object AdaptiveVector {
     else fromVector(toVector(v), sv)
 
   private class AVSemigroup[V: Semigroup] extends Semigroup[AdaptiveVector[V]] {
-    private def valueIsNonZero(v: V): Boolean = implicitly[Semigroup[V]] match {
-      case m: Monoid[_] => m.isNonZero(v)
-      case _ => true
+
+    private def alignSparseValues(left: AdaptiveVector[V], right: AdaptiveVector[V]): (AdaptiveVector[V], AdaptiveVector[V]) = {
+      if (left.sparseValue != right.sparseValue) {
+        if (left.denseCount > right.denseCount) (withSparse(left, right.sparseValue), right)
+        else (left, withSparse(right, left.sparseValue))
+      } else { (left, right) }
     }
 
-    def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) = {
+    def isZeroVector(v: AdaptiveVector[V]): Boolean = implicitly[Semigroup[V]] match {
+      case m: Monoid[_] =>
+        (v.size == 0) || {
+          val sparseAreZero = if (m.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
+          sparseAreZero && v.denseIterator.forall { idxv => !m.isNonZero(idxv._2) }
+        }
+      case _ => (v.size == 0)
+    }
+
+    def isZeroValue(v: V): Boolean = implicitly[Semigroup[V]] match {
+      case m: Monoid[_] => !m.isNonZero(v)
+      case _ => false
+    }
+
+    def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]): AdaptiveVector[V] = {
       if (left.sparseValue != right.sparseValue) {
-        if (left.denseCount > right.denseCount) plus(withSparse(left, right.sparseValue), right)
-        else plus(left, withSparse(right, left.sparseValue))
+        val (newLeft, newRight) = alignSparseValues(left, right)
+        plus(newLeft, newRight)
       } else {
         // they have the same sparse value
         val maxSize = Ordering[Int].max(left.size, right.size)
         (left, right) match {
+          case _ if isZeroVector(left) => right
+          case _ if isZeroVector(right) => left
           case (DenseVector(lv, ls, ld), DenseVector(rv, rs, rd)) =>
             val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
               case v: Vector[_] => v.asInstanceOf[Vector[V]]
               case notV => Vector(notV: _*)
             }
             fromVector(vec, ls)
-
-          case _ if valueIsNonZero(left.sparseValue) =>
+          case _ if !isZeroValue(left.sparseValue) => // sparseValue is NOT monoid.zero
             fromVector(Vector(Semigroup.plus(toVector(left): IndexedSeq[V],
               toVector(right): IndexedSeq[V]): _*),
               left.sparseValue)
-          case _ => // sparse is zero:
+          case _ => // sparseValue IS zero
             fromMap(Semigroup.plus(toMap(left), toMap(right)),
               left.sparseValue,
               maxSize)
         }
       }
     }
+
+    // private def monoidPlus(left: AdaptiveVector[V], right: AdaptiveVector[V]): AdaptiveVector[V] = {
+    //   if (left.sparseValue != right.sparseValue) { monoidPlus(alignSparseValues(left, right)) }
+    //   else {
+    //     val maxSize = Ordering[Int].max(left.size, right.size)
+    //     val m = implicitly[Monoid[V]]
+    //     (left, right) match {
+    //       case _ if isZeroVector(left) => right
+    //       case _ if isZeroVector(right) => left
+    //       case (DenseVector(_, _, _), DenseVector(_, _, _)) => semigroupPlus(left, right)
+    //       case _ if m.isNonzero(left.sparseValue) => // sparseValue is NOT monoid.zero
+    //         semigroupPlus(left, right)
+    //       case _ => // sparseValue IS zero
+    //         fromMap(Semigroup.plus(toMap(left), toMap(right)),
+    //           left.sparseValue,
+    //           maxSize)
+    //     }
+    //   }
+    // }
+
+    // def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) = {
+    //   implicitly[Semigroup[V]] match {
+    //     case m: Monoid[_] => monoidPlus(left, right)
+    //     case _ => semigroupPlus(left, right)
+    //   }
+    // }
   }
   private class AVMonoid[V: Monoid] extends AVSemigroup[V] with Monoid[AdaptiveVector[V]] {
     val zero = AdaptiveVector.fill[V](0)(Monoid.zero[V])
     override def isNonZero(v: AdaptiveVector[V]) = !isZero(v)
-
-    def isZero(v: AdaptiveVector[V]) = (v.size == 0) || {
-      val sparseAreZero = if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
-      sparseAreZero &&
-        v.denseIterator.forall { idxv => !Monoid.isNonZero(idxv._2) }
-    }
+    def isZero(v: AdaptiveVector[V]) = isZeroVector(v)
+    // def isZero(v: AdaptiveVector[V]) = (v.size == 0) || {
+    //   val sparseAreZero = if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
+    //   sparseAreZero &&
+    //     v.denseIterator.forall { idxv => !Monoid.isNonZero(idxv._2) }
+    // }
   }
   private class AVGroup[V: Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
     override def negate(v: AdaptiveVector[V]) =
@@ -153,11 +197,26 @@ object AdaptiveVector {
     Equiv[V].equiv(l.sparseValue, r.sparseValue) && iteq
   }
 
-  implicit def equiv[V: Equiv]: Equiv[AdaptiveVector[V]] =
-    Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
-      (l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
-        toVector(l).view.zip(toVector(r)).forall { case (lv, rv) => Equiv[V].equiv(lv, rv) })
+  implicit def equiv[V: Equiv]: Equiv[AdaptiveVector[V]] = {
+
+    def isExtension(left: AdaptiveVector[V], right: AdaptiveVector[V]): Boolean = {
+      if (left.size > right.size) {
+        val diff = left.size - right.size
+        left == right.extend(diff)
+        // This is morally correct, but may be very inefficient.
+        // A better option might be to define take/drop
+        // and see if left.drop(right.size) is all sparseValues
+      } else { isExtension(right, left) }
     }
+
+    Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
+      if (isExtension(l, r)) true
+      else {
+        (l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
+          toVector(l).view.zip(toVector(r)).forall { case (lv, rv) => Equiv[V].equiv(lv, rv) })
+      }
+    }
+  }
 }
 
 /**
