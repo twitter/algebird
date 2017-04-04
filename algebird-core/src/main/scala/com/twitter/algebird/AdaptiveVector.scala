@@ -172,8 +172,8 @@ object AdaptiveVector {
 
     Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
       (isZeroVector(l) && isZeroVector(r)) ||
-        ((l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
-          toVector(l).view.zip(toVector(r)).forall { case (lv, rv) => Equiv[V].equiv(lv, rv) }))
+        ((l.size == r.size) && (denseEquiv[V].equiv(l, r)) ||
+          (toVector(l).view.zip(toVector(r)).forall { case (lv, rv) => Equiv[V].equiv(lv, rv) }))
     }
   }
 }

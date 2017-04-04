@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{ Arbitrary, Gen, Prop }
 
 import scala.collection.mutable.{ Map => MMap }
 import scala.collection.{ Map => ScMap }
@@ -299,21 +299,28 @@ class CollectionSpecification extends CheckProperties {
         size <- Gen.posNum[Int]
       } yield AdaptiveVector.fromMap(Map.empty, sparse, size))
 
+
+  def dontSumSparseValues[T: Semigroup: Arbitrary]: Prop =
+    'dontSumSparseValues |: forAll { (a: T) =>
+      val sem: Semigroup[T] = implicitly
+      def denseCount(v: T): Int = v match {
+        case v: AdaptiveVector[_] => v.denseCount
+        case _ => 0
+      }
+      denseCount(sem.plus(a,a)) == denseCount(a)
+    }
+
   property("AdaptiveVector[Int] has a semigroup") {
     implicit val arb = Arbitrary(arbAV(2))
     semigroupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a monoid when sparseValue IS monoid.zero") {
-    // TODO: remove this equiv instance once #583 is resolved.
-    // implicit val equiv = AdaptiveVector.denseEquiv[Int]
     implicit val arb = Arbitrary(arbAV(0))
     monoidLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a monoid when sparseValue is NOT monoid.zero") {
-    // TODO: remove this equiv instance once #583 is resolved.
-    // implicit val equiv = AdaptiveVector.denseEquiv[Int]
     implicit val arb = Arbitrary(arbAV(2))
     monoidLaws[AdaptiveVector[Int]]
   }
@@ -323,27 +330,18 @@ class CollectionSpecification extends CheckProperties {
     groupLaws[AdaptiveVector[Int]]
   }
 
-  // property("AdaptiveVector[String] has a monoid when sparseValue IS monoid.zero") {
-  //   // TODO: remove this equiv instance once #583 is resolved.
-  //   // implicit val equiv = AdaptiveVector.denseEquiv[String]
-  //   implicit val arb = Arbitrary(arbAV(""))
-  //   monoidLaws[AdaptiveVector[String]]
-  // }
+  property("AdaptiveVector[String] has a monoid when sparseValue IS monoid.zero") {
+    implicit val arb = Arbitrary(arbAV(""))
+    monoidLaws[AdaptiveVector[String]]
+  }
 
   property("AdaptiveVector[String] has a monoid when sparseValue is NOT monoid.zero") {
-    // TODO: remove this equiv instance once #583 is resolved.
-    // implicit val equiv = AdaptiveVector.denseEquiv[String]
     implicit val arb = Arbitrary(arbAV("yo"))
     monoidLaws[AdaptiveVector[String]]
   }
 
-  // property("AdaptiveVector[Int] semigroup does not sum sparseValues") {
-  //   forAll { magnitude: Int =>
-  //     val size = if ( magnitude > 0 ) { magnitude } else { -magnitude }
-  //     val v = SparseVector(Map.empty, 2, size)
-  //     // A vector of sparseValues which are NOT monoid.zero
-  //     Semigroup.plus(v, v) == v
-  //   }
-  // }
-
+  property("AdaptiveVector[Int] semigroup does not sum sparseValues") {
+    implicit val arb = Arbitrary(arbAV(1))
+    dontSumSparseValues[AdaptiveVector[Int]]
+  }
 }
