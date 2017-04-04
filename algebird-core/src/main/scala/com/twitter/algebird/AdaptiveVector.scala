@@ -104,7 +104,7 @@ object AdaptiveVector {
       case _ => false
     }
 
-    def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]): AdaptiveVector[V] = {
+    def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) = {
       if (left.sparseValue != right.sparseValue) {
         val (newLeft, newRight) = alignSparseValues(left, right)
         plus(newLeft, newRight)
