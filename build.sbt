@@ -183,8 +183,8 @@ lazy val algebird = Project(
   algebirdCore,
   algebirdUtil,
   algebirdBijection,
-  algebirdBenchmark//,
-  //algebirdSpark
+  algebirdBenchmark,
+  algebirdSpark
 )
 
 def module(name: String) = {
