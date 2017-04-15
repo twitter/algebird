@@ -195,8 +195,6 @@ object AdaptiveVector {
 
     Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
       (l, r) match {
-        // don't need this case
-        // if we allow sparseVectors of different lengths
         case _ if (isZeroVector(l) && isZeroVector(r)) =>
           (l.size == 0) || (r.size == 0) || Equiv[V].equiv(l.sparseValue, r.sparseValue)
         case (l @ DenseVector(_, lsv, _), r @ DenseVector(_, rsv, _)) =>
