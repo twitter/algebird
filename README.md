@@ -1,5 +1,7 @@
 ## Algebird
 
+[![Join the chat at https://gitter.im/twitter/algebird](https://badges.gitter.im/twitter/algebird.svg)](https://gitter.im/twitter/algebird?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build status](https://img.shields.io/travis/twitter/algebird/develop.svg)](http://travis-ci.org/twitter/algebird)
 [![Codecov branch](https://img.shields.io/codecov/c/github/twitter/algebird/develop.svg?maxAge=3600)](https://codecov.io/github/twitter/algebird)
 [![Latest version](https://index.scala-lang.org/twitter/algebird/algebird-core/latest.svg?color=orange)](https://index.scala-lang.org/twitter/algebird/algebird-core)
