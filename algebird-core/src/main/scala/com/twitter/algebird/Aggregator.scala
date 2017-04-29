@@ -54,6 +54,8 @@ object Aggregator extends java.io.Serializable {
     def present(reduction: T) = reduction
   }
 
+  def count[T]: MonoidAggregator[T, Long, Long] = count[T] { (t: T) => true}
+
   /**
    * Obtain an [[Aggregator]] that uses an efficient append operation for faster aggregation.
    * Equivalent to {{{ appendSemigroup(prep, appnd, identity[T]_)(sg) }}}
