@@ -78,3 +78,26 @@ trait AlgebirdBijections {
 }
 
 object AlgebirdBijections extends AlgebirdBijections
+
+trait ImplicitBijectedAlgebraics extends AlgebirdBijections {
+  // The following is necessary in order to ensure that the automatic algebraic bijections don't diverge in the typechecker
+  sealed class =!=[A, B]
+
+  sealed trait LowerPriorityImplicits {
+    implicit def equal[A]: =!=[A, A] = sys.error("should not be called")
+  }
+
+  object =!= extends LowerPriorityImplicits {
+    implicit def nequal[A, B](implicit same: A =:= B = null): =!=[A, B] =
+      if (same != null) sys.error("should not be called explicitly with same type")
+      else new =!=[A, B]
+  }
+
+  implicit def bijSemi[T, U](implicit bij: ImplicitBijection[T, U], ev: T =!= U, t: Semigroup[T]): Semigroup[U] = t.as[Semigroup[U]]
+  implicit def bijMonoid[T, U](implicit bij: ImplicitBijection[T, U], ev: T =!= U, t: Monoid[T]): Monoid[U] = t.as[Monoid[U]]
+  implicit def bijGroup[T, U](implicit bij: ImplicitBijection[T, U], ev: T =!= U, t: Group[T]): Group[U] = t.as[Group[U]]
+  implicit def bijRing[T, U](implicit bij: ImplicitBijection[T, U], ev: T =!= U, t: Ring[T]): Ring[U] = t.as[Ring[U]]
+  implicit def bijField[T, U](implicit bij: ImplicitBijection[T, U], ev: T =!= U, t: Field[T]): Field[U] = t.as[Field[U]]
+}
+
+object ImplicitBijectedAlgebraics extends ImplicitBijectedAlgebraics
