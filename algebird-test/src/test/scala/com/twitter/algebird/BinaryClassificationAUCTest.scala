@@ -21,18 +21,22 @@ import org.scalacheck.Gen.choose
 import org.scalactic.TolerantNumerics
 import org.scalatest.{ Matchers, _ }
 
-class CurveMonoidLaws extends CheckProperties {
+class ConfusionCurveMonoidLaws extends CheckProperties {
   import BaseProperties._
+  import BinaryClassificationAUC._
 
-  implicit val semigroup = CurveMonoid
   implicit val gen = Arbitrary {
     for (
       v <- choose(0, 10000)
-    ) yield Curve(List(ConfusionMatrix(truePositive = v)))
+    ) yield ConfusionCurve(List(ConfusionMatrix(truePositive = v)))
   }
 
   property("Curve is associative") {
-    isAssociative[Curve]
+    isAssociative[ConfusionCurve]
+  }
+
+  property("Curve is a monoid") {
+    monoidLaws[ConfusionCurve]
   }
 }
 

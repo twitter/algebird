@@ -34,6 +34,10 @@ class BinaryClassificationConfusionMatrixMonoidLaws extends CheckProperties {
   property("ConfusionMatrix is associative") {
     isAssociative[ConfusionMatrix]
   }
+
+  property("ConfusionMatrix is a monoid") {
+    monoidLaws[ConfusionMatrix]
+  }
 }
 
 class BinaryClassificationConfusionMatrixTest extends WordSpec with Matchers {

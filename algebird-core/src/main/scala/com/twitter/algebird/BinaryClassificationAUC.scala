@@ -22,19 +22,18 @@ package com.twitter.algebird
  *
  * @param matrices List of Matrices
  */
-case class Curve(matrices: List[ConfusionMatrix])
+case class ConfusionCurve(matrices: List[ConfusionMatrix])
 
 /**
  * Given a List of (x,y) this functions computes the
  * Area Under the Curve
  */
 object AreaUnderCurve {
-  private def trapezoid(points: Seq[(Double, Double)]): Double = {
-    require(points.length == 2)
-    val x = points.head
-    val y = points.last
-    (y._1 - x._1) * (y._2 + x._2) / 2.0
-  }
+  private def trapezoid(points: Seq[(Double, Double)]): Double =
+    points match {
+      case Seq((x1, x2), (y1, y2)) => (y1 - x1) * (y2 + x2) / 2.0
+      case _ => sys.error("Points must be of length 2.")
+    }
 
   def of(curve: List[(Double, Double)]): Double = {
     curve.toIterator.sliding(2).withPartial(false).aggregate(0.0)(
@@ -51,12 +50,13 @@ case object PR extends AUCMetric
  * Sums Curves which are a series of Confusion Matrices
  * with different thresholds
  */
-case object CurveMonoid extends Monoid[Curve] {
-  def zero = Curve(Nil)
-  override def plus(left: Curve, right: Curve): Curve = {
+case object ConfusionCurveMonoid extends Monoid[ConfusionCurve] {
+  def zero = ConfusionCurve(Nil)
+  override def plus(left: ConfusionCurve, right: ConfusionCurve): ConfusionCurve = {
     val sg = BinaryClassificationConfusionMatrixMonoid
-    Curve(
-      left.matrices.zip(right.matrices)
+
+    ConfusionCurve(
+      left.matrices.zipAll(right.matrices, sg.zero, sg.zero)
         .map{ case (cl, cr) => sg.plus(cl, cr) })
   }
 }
@@ -76,10 +76,10 @@ case object CurveMonoid extends Monoid[Curve] {
  * @param samples Number of samples, defaults to 100
  */
 case class BinaryClassificationAUCAggregator(metric: AUCMetric, samples: Int = 100)
-  extends Aggregator[BinaryPrediction, Curve, Double]
+  extends Aggregator[BinaryPrediction, ConfusionCurve, Double]
   with Serializable {
 
-  private def linspace(a: Double, b: Double, length: Int = 100): Array[Double] = {
+  private def linspace(a: Double, b: Double, length: Int): Array[Double] = {
     val increment = (b - a) / (length - 1)
     Array.tabulate(length)(i => a + increment * i)
   }
@@ -87,11 +87,11 @@ case class BinaryClassificationAUCAggregator(metric: AUCMetric, samples: Int = 1
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators = thresholds.map(BinaryClassificationConfusionMatrixAggregator(_)).toList
 
-  def prepare(input: BinaryPrediction): Curve = Curve(aggregators.map(_.prepare(input)))
+  def prepare(input: BinaryPrediction): ConfusionCurve = ConfusionCurve(aggregators.map(_.prepare(input)))
 
-  def semigroup: Semigroup[Curve] = CurveMonoid
+  def semigroup: Semigroup[ConfusionCurve] = ConfusionCurveMonoid
 
-  def present(c: Curve): Double = {
+  def present(c: ConfusionCurve): Double = {
     val total = c.matrices.map { matrix =>
       val scores = BinaryClassificationConfusionMatrixAggregator().present(matrix)
       metric match {
@@ -107,4 +107,8 @@ case class BinaryClassificationAUCAggregator(metric: AUCMetric, samples: Int = 1
 
     AreaUnderCurve.of(combined)
   }
+}
+
+object BinaryClassificationAUC {
+  implicit def monoid: Monoid[ConfusionCurve] = ConfusionCurveMonoid
 }
