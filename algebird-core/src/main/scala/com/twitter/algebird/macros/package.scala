@@ -12,7 +12,7 @@ package object macros {
 
     val isCaseClass = tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
     if (!isCaseClass)
-      c.abort(c.enclosingPosition, s"$T is not a clase class")
+      c.abort(c.enclosingPosition, s"$T is not a case class")
   }
 
   private[macros] def getParams[T](c: Context)(implicit T: c.WeakTypeTag[T]): List[c.universe.MethodSymbol] = {

@@ -16,7 +16,7 @@ object ArbitraryCaseClassMacro {
 
     val isCaseClass = tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass
     if (!isCaseClass)
-      c.abort(c.enclosingPosition, s"$T is not a clase class")
+      c.abort(c.enclosingPosition, s"$T is not a case class")
 
     val params = getParams(c)
     val types = getParamTypes(c)
