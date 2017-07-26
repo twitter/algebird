@@ -278,6 +278,20 @@ class BloomFilterTest extends WordSpec with Matchers {
 
   "BloomFilter" should {
 
+    "be possible to create from an iterator" in {
+      val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val bf = bfMonoid.create(entries.iterator)
+      assert(bf.isInstanceOf[BF[String]])
+    }
+
+    "be possible to create from a sequence" in {
+      val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val bf = bfMonoid.create(entries: _*)
+      assert(bf.isInstanceOf[BF[String]])
+    }
+
     "identify all true positives" in {
       (0 to 100).foreach{
         _ =>

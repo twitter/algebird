@@ -245,7 +245,12 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
   /**
    * Create a bloom filter with multiple items.
    */
-  def create(data: A*): BF[A] = sum(data.iterator.map(BFItem(_, hashes, width)))
+  def create(data: A*): BF[A] = create(data.iterator)
+
+  /**
+    * Create a bloom filter with multiple items from an iterator
+    */
+  def create(data: Iterator[A]): BF[A] = sum(data.map(BFItem(_, hashes, width)))
 }
 
 object BF {
