@@ -79,7 +79,7 @@ val sharedSettings = scalariformSettings ++  Seq(
 
   scalacOptions ++= {
     if (scalaVersion.value startsWith "2.12")
-      Seq("-opt:l:classpath")
+      Seq()
     else
       Seq("-optimize")
   },
@@ -251,7 +251,7 @@ lazy val algebirdBijection = module("bijection").settings(
 ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdSpark = module("spark").settings(
-    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided",
+    libraryDependencies += "org.apache.spark" % "spark-core_2.10" % "1.3.0" % "provided",
     crossScalaVersions := crossScalaVersions.value.filterNot(_.startsWith("2.12"))
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
