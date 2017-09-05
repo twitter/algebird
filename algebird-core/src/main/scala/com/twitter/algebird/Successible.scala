@@ -24,7 +24,7 @@ package com.twitter.algebird
  * which our ordering is violating. This is also useful for closed sets which have a fixed
  * progression.
  */
-trait Successible[T] {
+trait Successible[T] extends Serializable {
   def next(old: T): Option[T]
   def next(old: Option[T]): Option[T] = old.flatMap(next)
   def iterateNext(old: T): Iterable[T] = {
