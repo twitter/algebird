@@ -27,8 +27,8 @@ import scala.math.Equiv
 object BaseProperties extends MetricProperties {
   val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
     for {
-      scale <- Gen.choose(-128, +128)
-      base <- implicitly[Arbitrary[BigInt]].arbitrary
+      scale <- Gen.choose(-4, +4)
+      base <- implicitly[Arbitrary[Int]].arbitrary
     } yield {
       (BigDecimal(base) * BigDecimal(10).pow(scale))
     })
