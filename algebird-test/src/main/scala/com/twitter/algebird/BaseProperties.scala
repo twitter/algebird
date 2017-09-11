@@ -33,7 +33,7 @@ object BaseProperties extends MetricProperties {
    */
   val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
     for {
-      scale <- Gen.choose(-8, +8)
+      scale <- Gen.choose(-7, +7)
       base <- implicitly[Arbitrary[Int]].arbitrary
     } yield {
       (BigDecimal(base) * BigDecimal(10).pow(scale))
