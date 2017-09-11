@@ -25,9 +25,15 @@ import scala.math.Equiv
  * Base properties useful for all tests using Algebird's typeclasses.
  */
 object BaseProperties extends MetricProperties {
+  /**
+   * We generate a restricted set of BigDecimals for our tests because if we use
+   * the full range then the way we lose precision in addition does not satisfy
+   * the distributive property perfectly. This means BigDecimal isn't truly
+   * a Ring under it's very strict Equiv.
+   */
   val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
     for {
-      scale <- Gen.choose(-4, +4)
+      scale <- Gen.choose(-8, +8)
       base <- implicitly[Arbitrary[Int]].arbitrary
     } yield {
       (BigDecimal(base) * BigDecimal(10).pow(scale))
