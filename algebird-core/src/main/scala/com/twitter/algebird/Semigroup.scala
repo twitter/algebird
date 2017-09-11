@@ -195,6 +195,7 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
   implicit def jshortSemigroup: Semigroup[JShort] = JShortRing
   implicit def longSemigroup: Semigroup[Long] = LongRing
   implicit def bigIntSemigroup: Semigroup[BigInt] = BigIntRing
+  implicit def bigDecimalSemigroup: Semigroup[BigDecimal] = implicitly[Ring[BigDecimal]]
   implicit def jlongSemigroup: Semigroup[JLong] = JLongRing
   implicit def floatSemigroup: Semigroup[Float] = FloatRing
   implicit def jfloatSemigroup: Semigroup[JFloat] = JFloatRing
