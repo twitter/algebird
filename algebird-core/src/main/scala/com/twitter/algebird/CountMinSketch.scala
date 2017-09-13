@@ -265,8 +265,8 @@ object CMSFunctions {
    */
   @throws[IllegalArgumentException]("if depth is too large, causing precision errors when computing delta")
   def delta(depth: Int): Double = {
-    val i = 1.0 / scala.math.exp(depth)
-    require(i != 0.0, s"depth must be smaller as it causes precision errors when computing delta ($depth led to an invalid delta of 0.0)")
+    val i = scala.math.exp(-depth)
+    require(i > 0.0, s"depth must be smaller as it causes precision errors when computing delta ($depth led to an invalid delta of $i)")
     i
   }
 

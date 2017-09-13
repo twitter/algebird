@@ -930,7 +930,7 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("throw IAE when deriving depth from invalid delta values") {
-    val invalidDeltas = Table("invalidDelta", 0.0, 1E-330, 1E-400)
+    val invalidDeltas = Table("invalidDelta", 0.0, 1.0, 2.0, -1.0)
     forAll(invalidDeltas) { (invalidDelta: Double) =>
       val exception = intercept[IllegalArgumentException] {
         CMSFunctions.depth(invalidDelta)
@@ -961,7 +961,7 @@ class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
   }
 
   property("throw IAE for invalid delta values") {
-    val invalidDeltas = Table("invalidDelta", 0.0, 1.0, 2.0, 100.0, 1E-330, 1E-400)
+    val invalidDeltas = Table("invalidDelta", 0.0, 1.0, 2.0, 100.0, -0.1)
     forAll(invalidDeltas) { (invalidDelta: Double) =>
       val exception = intercept[IllegalArgumentException] {
         CMSParams(AnyHashes, AnyEps, invalidDelta)
