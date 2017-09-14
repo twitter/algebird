@@ -79,7 +79,7 @@ val sharedSettings = scalariformSettings ++  Seq(
 
   scalacOptions ++= {
     if (scalaVersion.value startsWith "2.12")
-      Seq("-opt-inline-from:com.twitter.algebird.**")
+      Seq("-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
     else
       Seq("-optimize")
   },
