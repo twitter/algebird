@@ -92,6 +92,31 @@ class IntervalLaws extends CheckProperties {
     }
   }
 
+  property("[x, y).isEmpty == (x >= y)") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(InclusiveLower(x), ExclusiveUpper(y))
+      intr.isEmpty == (x >= y)
+    }
+  }
+  property("(x, y).isEmpty == (x >= (y - 1))") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(ExclusiveLower(x), ExclusiveUpper(y))
+      intr.isEmpty == (x >= (y - 1))
+    }
+  }
+  property("[x, y].isEmpty == x > y") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(InclusiveLower(x), InclusiveUpper(y))
+      intr.isEmpty == (x > y)
+    }
+  }
+  property("(x, y].isEmpty = x >= y") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(ExclusiveLower(x), InclusiveUpper(y))
+      intr.isEmpty == (x >= y)
+    }
+  }
+
   property("If an intersection contains, both of the intervals contain") {
     forAll { (item: Long, i1: Interval[Long], i2: Interval[Long]) =>
       (i1 && i2).contains(item) == (i1(item) && i2(item))
@@ -311,6 +336,24 @@ class IntervalLaws extends CheckProperties {
           case Universe() => true
           case _ => false
         })
+      }
+    }
+  }
+
+  property("invalid closed bounds are empty") {
+    forAll { (a: Long, b: Long) =>
+      (a == b) || {
+        val soempty = if (a < b) Interval.closed(b, a) else Interval.closed(a, b)
+        soempty.isEmpty
+      }
+    }
+  }
+
+  property("invalid open bounds are empty") {
+    forAll { (a: Long, b: Long) =>
+      (a == b) || {
+        val soempty = if (a < b) Interval.open(b, a) else Interval.open(a, b)
+        soempty.isEmpty
       }
     }
   }
