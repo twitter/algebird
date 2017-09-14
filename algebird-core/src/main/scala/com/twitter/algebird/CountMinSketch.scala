@@ -72,7 +72,7 @@ import algebra.CommutativeMonoid
  * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * convert items of your (unsupported) type `K` to a supported type such as `Double`, and then use the `contramap`
  * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
  * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
  * starting point.
@@ -1079,7 +1079,7 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * convert items of your (unsupported) type `K` to a supported type such as `Double`, and then use the `contramap`
  * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
  * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
  * starting point.
@@ -1168,7 +1168,7 @@ case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends TopCMSA
  * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * convert items of your (unsupported) type `K` to a supported type such as `Double`, and then use the `contramap`
  * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
  * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
  * starting point.

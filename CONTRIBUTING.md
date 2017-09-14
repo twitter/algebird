@@ -1,10 +1,3 @@
----
-layout: page
-title:  "Contributing"
-section: "contributing"
-position: 5
----
-
 # Contributing to Algebird
 
 This page lists recommendations and requirements for how to best contribute to Algebird. We strive to obey these as best as possible. As always, thanks for contributing--we hope these guidelines make it easier and shed some light on our approach and processes.
