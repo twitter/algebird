@@ -101,7 +101,8 @@ class IntervalLaws extends CheckProperties {
   property("(x, y).isEmpty == (x >= (y - 1))") {
     forAll { (x: Int, y: Int) =>
       val intr = Intersection(ExclusiveLower(x), ExclusiveUpper(y))
-      intr.isEmpty == (x >= (y - 1))
+      val isEmpty = if (y > Int.MinValue) x >= (y - 1) else true
+      intr.isEmpty == isEmpty
     }
   }
   property("[x, y].isEmpty == x > y") {
