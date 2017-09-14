@@ -49,8 +49,8 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
 
 val sharedSettings = scalariformSettings ++  Seq(
   organization := "com.twitter",
-  scalaVersion := "2.12.1",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.1"),
+  scalaVersion := "2.12.3",
+  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
   ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
@@ -79,7 +79,7 @@ val sharedSettings = scalariformSettings ++  Seq(
 
   scalacOptions ++= {
     if (scalaVersion.value startsWith "2.12")
-      Seq("-opt:l:classpath")
+      Seq("-opt-inline-from:com.twitter.algebird.**")
     else
       Seq("-optimize")
   },
