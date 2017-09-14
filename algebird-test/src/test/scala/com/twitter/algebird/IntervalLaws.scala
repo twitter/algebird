@@ -41,6 +41,26 @@ class IntervalLaws extends CheckProperties {
     }
   }
 
+  property("[x, x + 1] contains x, x+1") {
+    forAll { y: Int =>
+      val x = y.asInstanceOf[Long]
+      val intr = Interval.closed(x, x + 1)
+      intr.contains(x) &&
+        intr.contains(x + 1) &&
+        (!intr.contains(x + 2)) &&
+        (!intr.contains(x - 1))
+    }
+  }
+  property("(x, x + 2) contains x+1") {
+    forAll { y: Int =>
+      val x = y.asInstanceOf[Long]
+      val intr = Interval.open(x, x + 2)
+      intr.contains(x + 1) &&
+        (!intr.contains(x + 2)) &&
+        (!intr.contains(x))
+    }
+  }
+
   property("(x, x + 1] contains x + 1") {
     forAll { y: Int =>
       val x = y.asInstanceOf[Long]
@@ -69,6 +89,32 @@ class IntervalLaws extends CheckProperties {
   property("(x, x] is empty") {
     forAll { x: Int =>
       Interval.leftOpenRightClosed(x, x).isEmpty
+    }
+  }
+
+  property("[x, y).isEmpty == (x >= y)") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(InclusiveLower(x), ExclusiveUpper(y))
+      intr.isEmpty == (x >= y)
+    }
+  }
+  property("(x, y).isEmpty == (x >= (y - 1))") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(ExclusiveLower(x), ExclusiveUpper(y))
+      val isEmpty = if (y > Int.MinValue) x >= (y - 1) else true
+      intr.isEmpty == isEmpty
+    }
+  }
+  property("[x, y].isEmpty == x > y") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(InclusiveLower(x), InclusiveUpper(y))
+      intr.isEmpty == (x > y)
+    }
+  }
+  property("(x, y].isEmpty = x >= y") {
+    forAll { (x: Int, y: Int) =>
+      val intr = Intersection(ExclusiveLower(x), InclusiveUpper(y))
+      intr.isEmpty == (x >= y)
     }
   }
 
@@ -212,6 +258,104 @@ class IntervalLaws extends CheckProperties {
             }
           }
         })
+    }
+  }
+
+  property("if Interval.isEmpty then it contains nothing") {
+    forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
+      if (intr.isEmpty) {
+        (i :: rest).exists(intr(_)) == false
+      } else true
+    }
+  }
+  property("nothing is smaller than least") {
+    forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
+      intr.boundedLeast match {
+        case Some(l) => (i :: rest).forall { v =>
+          !intr(v) || (l <= v)
+        }
+        case None => true
+      }
+    }
+  }
+  property("nothing is bigger than greatest") {
+    forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
+      intr.boundedGreatest match {
+        case Some(u) => (i :: rest).forall { v =>
+          !intr(v) || (v <= u)
+        }
+        case None => true
+      }
+    }
+  }
+  property("(a && b).boundedLeast >= max(a.boundedLeast, b.boundedLeast)") {
+    forAll { (a: Interval[Long], b: Interval[Long]) =>
+      (a && b).boundedLeast match {
+        case Some(l) =>
+          (a.boundedLeast, b.boundedLeast) match {
+            case (Some(v), None) => v == l
+            case (None, Some(v)) => v == l
+            case (Some(v1), Some(v2)) => l == math.max(v1, v2)
+            case (None, None) => false // should never happen
+          }
+        case None => true
+      }
+    }
+  }
+  property("(a && b).boundedGreatest <= max(a.boundedGreatest, b.boundedGreatest)") {
+    forAll { (a: Interval[Long], b: Interval[Long]) =>
+      (a && b).boundedGreatest match {
+        case Some(l) =>
+          (a.boundedGreatest, b.boundedGreatest) match {
+            case (Some(v), None) => v == l
+            case (None, Some(v)) => v == l
+            case (Some(v1), Some(v2)) => l == math.min(v1, v2)
+            case (None, None) => false // should never happen
+          }
+        case None => true
+      }
+    }
+  }
+  property("if boundedLeast is none, we are Universe, Upper or isEmpty is true") {
+    forAll { (a: Interval[Long]) =>
+      a.boundedLeast match {
+        case Some(_) => true
+        case None => a.isEmpty || (a match {
+          case _: Upper[_] => true
+          case Universe() => true
+          case _ => false
+        })
+      }
+    }
+  }
+  property("if boundedGreatest is none, we are Universe, Lower or isEmpty is true") {
+    forAll { (a: Interval[Long]) =>
+      a.boundedGreatest match {
+        case Some(_) => true
+        case None => a.isEmpty || (a match {
+          case _: Lower[_] => true
+          case Universe() => true
+          case _ => false
+        })
+      }
+    }
+  }
+
+  property("invalid closed bounds are empty") {
+    forAll { (a: Long, b: Long) =>
+      (a == b) || {
+        val soempty = if (a < b) Interval.closed(b, a) else Interval.closed(a, b)
+        soempty.isEmpty
+      }
+    }
+  }
+
+  property("invalid open bounds are empty") {
+    forAll { (a: Long, b: Long) =>
+      (a == b) || {
+        val soempty = if (a < b) Interval.open(b, a) else Interval.open(a, b)
+        soempty.isEmpty
+      }
     }
   }
 }

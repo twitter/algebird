@@ -101,6 +101,69 @@ object Interval extends java.io.Serializable {
     if (Ordering[T].lt(lower, upper))
       MaybeEmpty.NotSoEmpty[T, ExLowInUp](Intersection(ExclusiveLower(lower), InclusiveUpper(upper)))
     else MaybeEmpty.SoEmpty[T, ExLowInUp]()
+
+  def closed[T: Ordering](lower: T, upper: T): MaybeEmpty[T, InLowInUp] =
+    if (Ordering[T].lteq(lower, upper))
+      MaybeEmpty.NotSoEmpty[T, InLowInUp](Intersection(InclusiveLower(lower), InclusiveUpper(upper)))
+    else MaybeEmpty.SoEmpty[T, InLowInUp]()
+
+  def open[T: Ordering](lower: T, upper: T): MaybeEmpty[T, ExLowExUp] =
+    if (Ordering[T].lt(lower, upper))
+      MaybeEmpty.NotSoEmpty[T, ExLowExUp](Intersection(ExclusiveLower(lower), ExclusiveUpper(upper)))
+    else MaybeEmpty.SoEmpty[T, ExLowExUp]()
+
+  /**
+   * This is here for binary compatibility reasons. These methods should
+   * be moved to Interval, which should also be an abstract class for
+   * better binary compatibility at the next incompatible change
+   */
+  implicit final class IntervalMethods[T](val intr: Interval[T]) extends AnyVal {
+    def isEmpty(implicit succ: Successible[T], pred: Predecessible[T]): Boolean = intr match {
+      case Empty() => true
+      case Universe() => false
+      case Intersection(InclusiveLower(l), ExclusiveUpper(u)) =>
+        !succ.ordering.lt(l, u)
+      case Intersection(InclusiveLower(l), InclusiveUpper(u)) =>
+        !succ.ordering.lteq(l, u)
+      case Intersection(ExclusiveLower(l), ExclusiveUpper(u)) =>
+        !succ.next(l).exists(succ.ordering.lt(_, u))
+      case Intersection(ExclusiveLower(l), InclusiveUpper(u)) =>
+        !succ.next(l).exists(succ.ordering.lteq(_, u))
+      case InclusiveLower(l) => false // we at least have l
+      case InclusiveUpper(u) => false //false // we at least have u
+      case ExclusiveLower(l) =>
+        succ.next(l).isEmpty
+      case ExclusiveUpper(u) =>
+        pred.prev(u).isEmpty
+    }
+
+    /**
+     * If this returns Some(t), then intr.contains(t) and there
+     * is no s less than t such that intr.contains(s)
+     *
+     * if this returns None, it may be Empty, Upper or Universe
+     */
+    def boundedLeast(implicit succ: Successible[T]): Option[T] =  intr match {
+      case Empty() => None
+      case Universe() => None
+      case u: Upper[_] => None
+      case i@Intersection(_, _) => i.least
+      case l: Lower[_] => l.least
+    }
+    /**
+     * If this returns Some(t), then intr.contains(t) and there
+     * is no s greater than t such that intr.contains(s)
+     *
+     * if this returns None, it may be Empty, Lower, or Universe
+     */
+    def boundedGreatest(implicit pred: Predecessible[T]): Option[T] =  intr match {
+      case Empty() => None
+      case Universe() => None
+      case l: Lower[_] => None
+      case i@Intersection(_, _) => i.greatest
+      case u: Upper[_] => u.greatest
+    }
+  }
 }
 
 // Marker traits to keep lower on the left in Intersection
@@ -255,6 +318,9 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     Intersection(newLower, newUpper)
   }
 
+  def least(implicit s: Successible[T]): Option[T] =
+    lower.least.filter(upper.contains(_)(s.ordering))
+
   /**
    * Goes from lowest to highest for all items
    * that are contained in this Intersection
@@ -268,6 +334,9 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
       def iterator = lower.toIterable.iterator.takeWhile(self.upper.contains(_))
     }
   }
+
+  def greatest(implicit p: Predecessible[T]): Option[T] =
+    upper.greatest.filter(lower.contains(_)(p.ordering))
   /**
    * Goes from highest to lowest for all items
    * that are contained in this Intersection
