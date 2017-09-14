@@ -100,11 +100,11 @@ val sharedSettings = scalariformSettings ++  Seq(
     checkSnapshotDependencies,
     inquireVersions,
     runClean,
-    runTest,
+    releaseStepCommandAndRemaining("+test"), // formerly runTest, here to deal with algebird-spark
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    publishArtifacts,
+    releaseStepCommandAndRemaining("+publishSigned"), // formerly publishArtifacts, here to deal with algebird-spark
     setNextVersion,
     commitNextVersion,
     ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
@@ -183,8 +183,8 @@ lazy val algebird = Project(
   algebirdCore,
   algebirdUtil,
   algebirdBijection,
-  algebirdBenchmark,
-  algebirdSpark
+  algebirdBenchmark
+  //algebirdSpark
 )
 
 def module(name: String) = {
