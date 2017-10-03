@@ -140,7 +140,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
       val smhash: SketchMapHash[K] = SketchMapHash(CMSHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
-      new (K => Int) { override def apply(k: K) = smhash(k) }
+      (k: K) => smhash(k)
     }
   }
 
