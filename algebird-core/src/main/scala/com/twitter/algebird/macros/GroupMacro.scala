@@ -13,7 +13,7 @@ object GroupMacro {
     ensureCaseClass(c)
 
     val implicitGroups = getParams(c).map {
-      param => q"implicitly[_root_.com.twitter.algebird.Group[${param.returnType}]]"
+      param => q"implicitly[_root_.com.twitter.algebird.Group[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val res = q"""

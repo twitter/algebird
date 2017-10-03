@@ -16,7 +16,7 @@ object RingMacro {
     val companion = getCompanionObject(c)
 
     val implicitRings = params.map {
-      param => q"implicitly[_root_.com.twitter.algebird.Ring[${param.returnType}]]"
+      param => q"implicitly[_root_.com.twitter.algebird.Ring[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val timesList = params.zip(implicitRings).map {

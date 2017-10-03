@@ -13,7 +13,7 @@ object SemigroupMacro {
     ensureCaseClass(c)
 
     val implicitSemigroups = getParams(c).map {
-      param => q"implicitly[_root_.com.twitter.algebird.Semigroup[${param.returnType}]]"
+      param => q"implicitly[_root_.com.twitter.algebird.Semigroup[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val res = q"""
