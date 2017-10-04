@@ -117,6 +117,13 @@ val sharedSettings = scalariformSettings(autoformat = true) ++  Seq(
         Opts.resolver.sonatypeStaging
     ),
 
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/twitter/algebird"),
+      "scm:git@github.com:twitter/algebird.git"
+    )
+  ),
+
   pomExtra := (
     <url>https://github.com/twitter/algebird</url>
     <licenses>
