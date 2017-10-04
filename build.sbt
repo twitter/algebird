@@ -1,10 +1,8 @@
 import ReleaseTransformations._
 import algebird._
-import com.typesafe.sbt.SbtScalariform._
-import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
-import sbtunidoc.Plugin.UnidocKeys._
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
 val algebraVersion = "0.7.0"
@@ -47,7 +45,8 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
     ))
   }
 
-val sharedSettings = scalariformSettings ++  Seq(
+// TODO: figure out the correct value for the autoformat
+val sharedSettings = scalariformSettings(autoformat = true) ++  Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.11",
   crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
@@ -107,7 +106,7 @@ val sharedSettings = scalariformSettings ++  Seq(
     releaseStepCommandAndRemaining("+publishSigned"), // formerly publishArtifacts, here to deal with algebird-spark
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    ReleaseStep(action = releaseStepCommand("sonatypeReleaseAll")),
     pushChanges),
 
 
@@ -173,11 +172,10 @@ def youngestForwardCompatible(subProj: String) =
 
 lazy val algebird = Project(
   id = "algebird",
-  base = file("."),
-  settings = sharedSettings)
+  base = file("."))
+  .settings(sharedSettings)
   .settings(noPublishSettings)
   .settings(coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*")
-  .enablePlugins(CrossPerProjectPlugin)
   .aggregate(
   algebirdTest,
   algebirdCore,
@@ -189,7 +187,7 @@ lazy val algebird = Project(
 
 def module(name: String) = {
   val id = "algebird-%s".format(name)
-  Project(id = id, base = file(id), settings = sharedSettings ++ Seq(
+  Project(id = id, base = file(id)).settings(sharedSettings ++ Seq(
     Keys.name := id,
     mimaPreviousArtifacts := youngestForwardCompatible(name).toSet)
   )
@@ -266,7 +264,7 @@ lazy val docSettings = Seq(
   micrositeBaseUrl := "algebird",
   micrositeDocumentationUrl := "api",
   micrositeGithubOwner := "twitter",
-  micrositeExtraMdFiles := Map(file("CONTRIBUTING.md") -> "contributing.md"),
+  micrositeExtraMdFiles := Map(file("CONTRIBUTING.md") -> microsites.ExtraMdFileConfig("contributing.md", "contributing")),
   micrositeGithubRepo := "algebird",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
@@ -297,12 +295,10 @@ lazy val docSettings = Seq(
 // Documentation is generated for projects defined in
 // `docsSourcesAndProjects`.
 lazy val docs = project
-  .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin, TutPlugin, ScalaUnidocPlugin, GhpagesPlugin)
   .settings(moduleName := "algebird-docs")
   .settings(sharedSettings)
   .settings(noPublishSettings)
-  .settings(unidocSettings)
-  .settings(ghpages.settings)
   .settings(docSettings)
-  .settings(tutScalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
+  .settings((scalacOptions in Tut) ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
   .dependsOn(algebirdCore)
