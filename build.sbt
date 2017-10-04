@@ -127,10 +127,6 @@ val sharedSettings = scalariformSettings(autoformat = true) ++  Seq(
         <comments>A business-friendly OSS license</comments>
       </license>
     </licenses>
-    <scm>
-      <url>git@github.com:twitter/algebird.git</url>
-      <connection>scm:git:git@github.com:twitter/algebird.git</connection>
-    </scm>
     <developers>
       <developer>
         <id>oscar</id>
