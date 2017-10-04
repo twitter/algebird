@@ -12,9 +12,11 @@ object CaseClassMacrosTest extends Properties("Case class macros") {
 
   implicit val arbitraryFoo: Arbitrary[Foo] = arbitrary[Foo]
   implicit val arbitraryBar: Arbitrary[Bar] = arbitrary[Bar]
+  implicit val arbitraryBaz: Arbitrary[Baz[Int]] = arbitrary[Baz[Int]]
 
   case class Foo(a: Int, b: Short, c: Long)
   case class Bar(a: Boolean, foo: Foo)
+  case class Baz[A](a: A, b: Short, c: A)
 
   property("Foo is a Semigroup") = semigroupLaws[Foo]
   property("Foo is a Monoid") = monoidLaws[Foo]
@@ -25,4 +27,9 @@ object CaseClassMacrosTest extends Properties("Case class macros") {
   property("Bar is a Monoid") = monoidLaws[Bar]
   property("Bar is a Group") = groupLaws[Bar]
   property("Bar is a Ring") = ringLaws[Bar]
+
+  property("Baz[Int] is a Semigroup") = semigroupLaws[Baz[Int]]
+  property("Baz[Int] is a Monoid") = monoidLaws[Baz[Int]]
+  property("Baz[Int] is a Group") = groupLaws[Baz[Int]]
+  property("Baz[Int] is a Ring") = ringLaws[Baz[Int]]
 }
