@@ -153,9 +153,9 @@ lazy val formattingPreferences = {
 }
 
 lazy val noPublishSettings = Seq(
-    publish := (),
-    publishLocal := (),
-    test := (),
+    publish := {},
+    publishLocal := {},
+    test := {},
     publishArtifact := false
   )
 
