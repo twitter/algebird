@@ -112,18 +112,15 @@ case class WindowMonoid[T](
 
   def plusM(a: Window[T], b: Window[T])(implicit m: Monoid[T]): Window[T] =
     if (b.items.size >= windowSize) {
-      var q = b.items
-      while (q.size > windowSize) {
-        q = q.tail
-      }
-      val total = m.sum(q)
-      Window(total, q)
+      val items = b.items.takeRight(windowSize)
+      val total = m.sum(items)
+      Window(total, items)
     } else {
       // we need windowSize - b.items.size from `a`
       val fromA = a.items.takeRight(windowSize - b.items.size)
-      val res = fromA ++ b.items
+      val items = fromA ++ b.items
       val total = m.sum(fromA) + b.total
-      Window(total, res)
+      Window(total, items)
     }
 
     def fromTraversable(ts: Traversable[T]): Window[T] = {
