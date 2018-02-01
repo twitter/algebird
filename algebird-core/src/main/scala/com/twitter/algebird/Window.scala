@@ -25,6 +25,34 @@ import scala.collection.immutable.Queue
  *
  * @param total Known running total of `T`
  * @param items queue of known trailing elements.
+ *
+ *  Example usage:
+ *
+ *  case class W28[T](window: Window[T]) {
+ *    def total = this.window.total
+ *    def items = this.window.items
+ *    def size = this.window.size
+ *  }
+ *
+ *  object W28 {
+ *    val windowSize = 28
+ *    def apply[T](v: T): W28[T] = W28[T](Window(v))
+ *
+ *    implicit def w28Monoid[T](implicit p: Priority[Group[T], Monoid[T]]): Monoid[W28[T]] =
+ *      new Monoid[W28[T]] {
+ *        private val WT: Monoid[Window[T]] = WindowMonoid[T](windowSize)
+ *        def zero = W28[T](WT.zero)
+ *        def plus(a: W28[T], b: W28[T]): W28[T] =
+ *          W28[T](WT.plus(a.window, b.window))
+ *      }
+ *  }
+ *  val elements = getElements()
+ *
+ *  val trailing90Totals =
+ *    elements
+ *      .map{ W90 }
+ *      .scanLeft(W90(0)) { (a, b) => a + b }
+ *      .map{ _.total }
  */
 
 case class Window[T](total: T, items: Queue[T]) {
@@ -39,7 +67,7 @@ object Window {
 /**
  * Provides a natural monoid for combining windows truncated to some window size.
  *
- * @param windowSize
+ * @param windowSize Upper limit of the number of items in a window.
  */
 
 
@@ -111,30 +139,3 @@ case class WindowMonoid[T](
       }
     }
 }
-
-/*
-  Example usage:
-
-  case class W90[T](window: Window[T]) {
-    def total = this.window.total
-  }
-
-  object W90 {
-    def apply[T](v: T): W90[T] = W90[T](new Window(v))
-
-    implicit def w90Monoid[T: Monoid]: Monoid[W90[T]] = new Monoid[W90[T]] {
-      private val WT: Monoid[Window[T]] = WindowMonoid[T](90)
-      def zero = W90[T](WT.zero)
-      def plus(a: W90[T], b: W90[T]): W90[T] =
-        W90[T](WT.plus(a.window, b.window))
-    }
-  }
-
-  val elements = getElements()
-
-  val trailing90Totals =
-    elements
-      .map{ W90 ( _ ) }
-      .foldLeft(W90(0)) { (a, b) => a + b }
-      .map{ _.total }
- */
