@@ -77,6 +77,8 @@ case class WindowMonoid[T](
 )(implicit p: Priority[Group[T], Monoid[T]])
     extends Monoid[Window[T]] {
 
+  require(windowSize >= 1, "Windows must have positive sizes")
+
   def zero = p.fold(g => Window(g.zero))(m => Window(m.zero))
 
   def plus(a: Window[T], b: Window[T]): Window[T] =
