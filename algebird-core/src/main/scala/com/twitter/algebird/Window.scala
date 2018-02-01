@@ -62,7 +62,7 @@ case class Window[T](total: T, items: Queue[T]) {
 
 object Window {
   def apply[T](v: T): Window[T] = Window[T](v, Queue[T](v))
-  def from[T](ts: Traversable[T])(implicit m: WindowMonoid[T]) = m.fromTraversable(ts)
+  def from[T](ts: Iterable[T])(implicit m: WindowMonoid[T]) = m.fromIterable(ts)
 }
 
 /**
@@ -124,22 +124,22 @@ case class WindowMonoid[T](
       Window(total, items)
     }
 
-  def fromTraversable(ts: Traversable[T]): Window[T] = {
+  override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] =
+    if (ws.isEmpty) None
+    else {
+      val it = ws.toIterator
+      var queue = Queue.empty[T]
+      while (it.hasNext) {
+        queue = (queue ++ it.next.items).takeRight(windowSize)
+      }
+      val monT: Monoid[T] = p.join
+      Some(Window(monT.sum(queue), queue))
+    }
+
+  def fromIterable(ts: Iterable[T]): Window[T] = {
     val monT: Monoid[T] = p.join
     val right = ts.toList.takeRight(windowSize)
     val total = monT.sum(right)
     Window(total, Queue(right: _*))
-  }
-
-  override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] = {
-    if(ws.isEmpty) None
-    else {
-      val it = ws.toIterator
-      var queue = Queue[T]()
-      while (it.hasNext) {
-        queue = (queue ++ it.next.items).takeRight(windowSize)
-      }
-      Some(fromTraversable(queue))
-    }
   }
 }
