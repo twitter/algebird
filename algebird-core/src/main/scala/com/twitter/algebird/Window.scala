@@ -76,17 +76,11 @@ case class WindowMonoid[T](
     windowSize: Int
 )(implicit p: Priority[Group[T], Monoid[T]])
     extends Monoid[Window[T]] {
-  val zero =
-    p match {
-      case Priority.Preferred(g) => Window(g.zero)
-      case Priority.Fallback(m)  => Window(m.zero)
-    }
+
+  def zero = p.fold(g => Window(g.zero))(m => Window(m.zero))
 
   def plus(a: Window[T], b: Window[T]): Window[T] =
-    p match {
-      case Priority.Preferred(g) => plusG(a, b)(g)
-      case Priority.Fallback(m)  => plusM(a, b)(m)
-    }
+    p.fold(g => plusG(a, b)(g))(m => plusM(a, b)(m))
 
   def plusG(a: Window[T], b: Window[T])(implicit g: Group[T]): Window[T] =
     if (b.items.size >= windowSize) {
