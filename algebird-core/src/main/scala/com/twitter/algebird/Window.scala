@@ -123,22 +123,22 @@ case class WindowMonoid[T](
       Window(total, items)
     }
 
-    def fromTraversable(ts: Traversable[T]): Window[T] = {
-      val monT: Monoid[T] = p.join
-      val right = ts.toList.takeRight(windowSize)
-      val total = monT.sum(right)
-      Window(total, Queue(right: _*))
-    }
+  def fromTraversable(ts: Traversable[T]): Window[T] = {
+    val monT: Monoid[T] = p.join
+    val right = ts.toList.takeRight(windowSize)
+    val total = monT.sum(right)
+    Window(total, Queue(right: _*))
+  }
 
-    override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] = {
-      if(ws.isEmpty) None
-      else {
-        val it = ws.toIterator
-        var queue = Queue[T]()
-        while (it.hasNext) {
-          queue = (queue ++ it.next.items).takeRight(windowSize)
-        }
-        Some(fromTraversable(queue))
+  override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] = {
+    if(ws.isEmpty) None
+    else {
+      val it = ws.toIterator
+      var queue = Queue[T]()
+      while (it.hasNext) {
+        queue = (queue ++ it.next.items).takeRight(windowSize)
       }
+      Some(fromTraversable(queue))
     }
+  }
 }
