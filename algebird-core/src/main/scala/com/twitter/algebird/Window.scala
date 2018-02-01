@@ -98,10 +98,16 @@ case class WindowMonoid[T](
       Window(total, q)
     } else {
       // we need windowSize - b.items.size from `a`
-      val fromA = a.items.takeRight(windowSize - b.items.size)
-      val res = fromA ++ b.items
-      val total = g.sum(fromA) + b.total
-      Window(total, res)
+      var truncA = a.items
+      var totalA = a.total
+      val truncTo = windowSize - b.size
+      while (truncA.size > truncTo) {
+        totalA = totalA - truncA.head
+        truncA = truncA.tail
+      }
+      val items = truncA ++ b.items
+      val total = totalA + b.total
+      Window(total, items)
     }
 
   def plusM(a: Window[T], b: Window[T])(implicit m: Monoid[T]): Window[T] =
