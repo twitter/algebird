@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.collection.immutable.Queue
+import Operators._
 
 /**
  *
