@@ -79,7 +79,7 @@ case class WindowMonoid[T](
 
   require(windowSize >= 1, "Windows must have positive sizes")
 
-  def zero = p.fold(g => Window(g.zero))(m => Window(m.zero))
+  def zero = p.fold(g => Window[T](g.zero, Queue.empty[T]))(m => Window(m.zero, Queue.empty[T]))
 
   def plus(a: Window[T], b: Window[T]): Window[T] =
     p.fold(g => plusG(a, b)(g))(m => plusM(a, b)(m))
@@ -133,9 +133,12 @@ case class WindowMonoid[T](
     }
 
   def fromIterable(ts: Iterable[T]): Window[T] = {
-    val monT: Monoid[T] = p.join
-    val right = ts.toList.takeRight(windowSize)
-    val total = monT.sum(right)
-    Window(total, Queue(right: _*))
+    if(ts.size == 0) zero
+    else {
+      val monT: Monoid[T] = p.join
+      val right = ts.toList.takeRight(windowSize)
+      val total = monT.sum(right)
+      Window(total, Queue(right: _*))
+    }
   }
 }
