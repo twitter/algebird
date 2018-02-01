@@ -98,6 +98,18 @@ case class WindowMonoid[T](
       val total = monT.sum(right)
       Window(total, Queue(right: _*))
     }
+
+    override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] = {
+      if(ws.isEmpty) None
+      else {
+        val it = ws.toIterator
+        var queue = Queue[T]()
+        while (it.hasNext) {
+          queue = (queue ++ it.next.items).takeRight(windowSize)
+        }
+        Some(fromTraversable(queue))
+      }
+    }
 }
 
 /*
