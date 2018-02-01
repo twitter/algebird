@@ -33,6 +33,7 @@ case class Window[T](total: T, items: Queue[T]) {
 
 object Window {
   def apply[T](v: T): Window[T] = Window[T](v, Queue[T](v))
+  def from[T](ts: Traversable[T])(implicit m: WindowMonoid[T]) = m.fromTraversable(ts)
 }
 
 /**
@@ -89,6 +90,13 @@ case class WindowMonoid[T](
       val res = fromA ++ b.items
       val total = m.sum(fromA) + b.total
       Window(total, res)
+    }
+
+    def fromTraversable(ts: Traversable[T]): Window[T] = {
+      val monT: Monoid[T] = p.join
+      val right = ts.toList.takeRight(windowSize)
+      val total = monT.sum(right)
+      Window(total, Queue(right: _*))
     }
 }
 
