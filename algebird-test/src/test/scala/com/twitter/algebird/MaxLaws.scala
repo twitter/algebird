@@ -31,7 +31,7 @@ class MaxLaws extends CheckProperties {
 
   property("Max.aggregator returns the maximum item") {
     forAll { v: NonEmptyVector[Int] =>
-      v.sorted.last == Max.aggregator[Int].apply(v.items)
+      v.items.max == Max.aggregator[Int].apply(v.items)
     }
   }
 
