@@ -13,6 +13,12 @@ class MaxLaws extends CheckProperties {
       l + r == realMax && (l max r) == realMax
     }
 
+  def maxSemiGroupTest[T: Arbitrary: Ordering] =
+    forAll { v: NonEmptyVector[T] =>
+      val maxItems = v.items.map { Max(_) }
+      v.items.max == Max.semigroup[T].combineAllOption(maxItems).get.get
+    }
+
   // Test equiv import.
   val equiv = implicitly[Equiv[Max[Int]]]
 
@@ -29,12 +35,9 @@ class MaxLaws extends CheckProperties {
     }
   }
 
-  property("Max.semigroup returns the maximum item") {
-    forAll { v: NonEmptyVector[Int] =>
-      val maxItems = v.items.map { Max(_) }
-      v.sorted.last == Max.semigroup[Int].combineAllOption(maxItems).get.get
-    }
-  }
+  property("Max.semigroup[Int] returns the maximum item") { maxSemiGroupTest[Int] }
+
+  property("Max.semigroup[Char] returns the maximum item") { maxSemiGroupTest[Char] }
 
   property("Max[Long] is a commutative monoid") {
     commutativeMonoidLaws[Max[Long]]
