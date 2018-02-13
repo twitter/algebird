@@ -26,6 +26,13 @@ class MinLaws extends CheckProperties {
     }
   }
 
+  property("Min.semigroup returns the minimum item") {
+    forAll { v: NonEmptyVector[Int] =>
+      val minItems = v.items.map { Min(_) }
+      v.sorted.head == Min.semigroup[Int].combineAllOption(minItems).get.get
+    }
+  }
+
   property("Min[String] is a commutative semigroup") {
     commutativeSemigroupLaws[Min[String]]
   }

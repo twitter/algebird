@@ -92,7 +92,7 @@ private[algebird] sealed abstract class MinInstances {
   implicit def semigroup[T: Ordering]: Semigroup[Min[T]] with Semilattice[Min[T]] =
     new Semigroup[Min[T]] with Semilattice[Min[T]] {
       val ord = implicitly[Ordering[T]]
-      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.gteq(l.get, r.get)) l else r
+      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
     }
 
   /** [[Monoid]] for [[Min]][Int] with `zero == Int.MaxValue` */

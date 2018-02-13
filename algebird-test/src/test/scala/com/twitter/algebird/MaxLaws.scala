@@ -29,6 +29,13 @@ class MaxLaws extends CheckProperties {
     }
   }
 
+  property("Max.semigroup returns the maximum item") {
+    forAll { v: NonEmptyVector[Int] =>
+      val maxItems = v.items.map { Max(_) }
+      v.sorted.last == Max.semigroup[Int].combineAllOption(maxItems).get.get
+    }
+  }
+
   property("Max[Long] is a commutative monoid") {
     commutativeMonoidLaws[Max[Long]]
   }
