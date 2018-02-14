@@ -13,6 +13,12 @@ class MinLaws extends CheckProperties {
       l + r == realMin && (l min r) == realMin
     }
 
+  def minSemigroupTest[T: Arbitrary: Ordering] =
+    forAll { v: NonEmptyVector[T] =>
+      val minItems = v.items.map { Min(_) }
+      v.items.min == Min.semigroup[T].combineAllOption(minItems).get.get
+    }
+
   // Test equiv import.
   val equiv = implicitly[Equiv[Min[Int]]]
 
@@ -22,9 +28,13 @@ class MinLaws extends CheckProperties {
 
   property("Min.aggregator returns the minimum item") {
     forAll { v: NonEmptyVector[Int] =>
-      v.sorted.head == Min.aggregator[Int].apply(v.items)
+      v.items.min == Min.aggregator[Int].apply(v.items)
     }
   }
+
+  property("Min.semigroup[Int] returns the minimum item") { minSemigroupTest[Int] }
+
+  property("Min.semigroup[Char] returns the minimum item") { minSemigroupTest[Char] }
 
   property("Min[String] is a commutative semigroup") {
     commutativeSemigroupLaws[Min[String]]
