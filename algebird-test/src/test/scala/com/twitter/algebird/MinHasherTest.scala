@@ -31,6 +31,15 @@ class MinHasherSpec extends WordSpec with Matchers {
     assert(error < epsilon)
   }
 
+  def testLazyMinHasher[H](mh: LazyMinHasher[H], similarity: Double, epsilon: Double) = {
+    val (set1, set2) = randomSets(similarity)
+
+    val exact = exactSimilarity(set1, set2)
+    val sim = lazyApproxSimilarity(mh, set1, set2)
+    val error: Double = math.abs(exact - sim)
+    assert(error < epsilon)
+  }
+
   def randomSets(similarity: Double) = {
     val s = 10000
     val uniqueFraction = if (similarity == 1.0) 0.0 else (1 - similarity) / (1 + similarity)
@@ -52,15 +61,36 @@ class MinHasherSpec extends WordSpec with Matchers {
     mh.similarity(sig1, sig2)
   }
 
+  def lazyApproxSimilarity[T, H](mh: LazyMinHasher[H], x: Set[T], y: Set[T]) = {
+    val sig1 = x.map{ l => mh.init(l.toString) }.reduce{ (a, b) => mh.plus(a, b) }
+    val sig2 = y.map{ l => mh.init(l.toString) }.reduce{ (a, b) => mh.plus(a, b) }
+    mh.similarity(sig1, sig2)
+  }
+
+  val bands: Int = 1024
+
   "MinHasher32" should {
     "measure 0.5 similarity in 1024 bytes with < 0.1 error" in {
-      test(new MinHasher32(0.5, 1024), 0.5, 0.1)
+      test(new MinHasher32(0.5, bands), 0.5, 0.1)
     }
     "measure 0.8 similarity in 1024 bytes with < 0.1 error" in {
-      test(new MinHasher32(0.8, 1024), 0.8, 0.1)
+      test(new MinHasher32(0.8, bands), 0.8, 0.1)
     }
     "measure 1.0 similarity in 1024 bytes with < 0.01 error" in {
-      test(new MinHasher32(1.0, 1024), 1.0, 0.01)
+      test(new MinHasher32(1.0, bands), 1.0, 0.01)
     }
   }
+
+  "LazyMinHasher" should {
+    "measure 0.5 similarity in 1024 bytes with < 0.1 error" in {
+      testLazyMinHasher(new LazyMinHasher(new MinHasher32(0.5, bands)), 0.5, 0.1)
+    }
+    "measure 0.8 similarity in 1024 bytes with < 0.1 error" in {
+      testLazyMinHasher(new LazyMinHasher(new MinHasher32(0.8, bands)), 0.8, 0.1)
+    }
+    "measure 1.0 similarity in 1024 bytes with < 0.01 error" in {
+      testLazyMinHasher(new LazyMinHasher(new MinHasher32(1.0, bands)), 1.0, 0.01)
+    }
+  }
+
 }
