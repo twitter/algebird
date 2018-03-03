@@ -26,6 +26,44 @@ object MinHasher {
     (hashes, bands)
   }
 
+  // Providing an extension method on MinHasher[H] to preserve binary compatibility
+  implicit class similarityMultiExtender[H](val h: MinHasher[H]) extends AnyVal {
+    /**
+     * Generalized Jaccard similarity estimation for multiple sets (size of intersection / size of union).
+     * Jsim(S1..Sn) = P(hmin1 == hmin2 == ... == hminn) / numHashes
+     */
+    def similarityMulti(sigs: MinHashSignature*): Double =
+      h match {
+        case h32: MinHasher32 => MinHasher32.similarityMulti(h32, sigs: _*)
+        case h16: MinHasher16 => MinHasher16.similarityMulti(h16, sigs: _*)
+      }
+  }
+}
+
+object MinHasher32 {
+  private def buildArrayMulti(h: MinHasher32, hasherbuffers: Seq[Array[Byte]])(fn: Seq[Int] => Int): Array[Byte] = {
+    val intBuffers = hasherbuffers.map(b => ByteBuffer.wrap(b).asIntBuffer)
+    h.buildArray(fn(intBuffers.map(_.get).toVector))
+  }
+
+  def similarityMulti(h: MinHasher32, sigs: MinHashSignature*)(implicit n: Numeric[Int]): Double = {
+    buildArrayMulti(h, sigs.map(_.bytes))(vals => if (vals.forall(_ == vals.head)) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / h.numHashes
+  }
+}
+
+object MinHasher16 {
+  private def buildArrayMulti(h: MinHasher16, hasherbuffers: Seq[Array[Byte]])(fn: Seq[Char] => Char): Array[Byte] = {
+    val charBuffers = hasherbuffers.map(b => ByteBuffer.wrap(b).asCharBuffer)
+    h.buildArray(fn(charBuffers.map(_.get).toVector))
+  }
+
+  def similarityMulti(h: MinHasher16, sigs: MinHashSignature*)(implicit n: Numeric[Char]): Double = {
+    buildArrayMulti(h, sigs.map(_.bytes))(vals => if (vals.forall(_ == vals.head)) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / h.numHashes
+  }
 }
 
 /**
