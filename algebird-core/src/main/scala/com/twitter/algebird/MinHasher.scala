@@ -26,6 +26,44 @@ object MinHasher {
     (hashes, bands)
   }
 
+  // Providing an extension method on MinHasher[H] to preserve binary compatibility
+  implicit class similarityMultiExtender[H](val h: MinHasher[H]) extends AnyVal {
+    /**
+     * Generalized Jaccard similarity estimation for multiple sets (size of intersection / size of union).
+     * Jsim(S1..Sn) = P(hmin1 == hmin2 == ... == hminn) / numHashes
+     */
+    def similarityMulti(sigs: MinHashSignature*): Double =
+      h match {
+        case h32: MinHasher32 => MinHasher32.similarityMulti(h32, sigs: _*)
+        case h16: MinHasher16 => MinHasher16.similarityMulti(h16, sigs: _*)
+      }
+  }
+}
+
+object MinHasher32 {
+  private def buildArrayMulti(h: MinHasher32, hasherbuffers: Seq[Array[Byte]])(fn: Seq[Int] => Int): Array[Byte] = {
+    val intBuffers = hasherbuffers.map(b => ByteBuffer.wrap(b).asIntBuffer)
+    h.buildArray(fn(intBuffers.map(_.get).toVector))
+  }
+
+  def similarityMulti(h: MinHasher32, sigs: MinHashSignature*)(implicit n: Numeric[Int]): Double = {
+    buildArrayMulti(h, sigs.map(_.bytes))(vals => if (vals.forall(_ == vals.head)) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / h.numHashes
+  }
+}
+
+object MinHasher16 {
+  private def buildArrayMulti(h: MinHasher16, hasherbuffers: Seq[Array[Byte]])(fn: Seq[Char] => Char): Array[Byte] = {
+    val charBuffers = hasherbuffers.map(b => ByteBuffer.wrap(b).asCharBuffer)
+    h.buildArray(fn(charBuffers.map(_.get).toVector))
+  }
+
+  def similarityMulti(h: MinHasher16, sigs: MinHashSignature*)(implicit n: Numeric[Char]): Double = {
+    buildArrayMulti(h, sigs.map(_.bytes))(vals => if (vals.forall(_ == vals.head)) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / h.numHashes
+  }
 }
 
 /**
@@ -88,16 +126,6 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
     buildArray(left.bytes, right.bytes){ (l, r) => if (l == r) n.one else n.zero }
       .map{ _.toDouble }.sum / numHashes
 
-  /**
-   * Generalized Jaccard similarity estimation for multiple sets (size of intersection / size of union).
-   * Jsim(S1..Sn) = P(hmin1 == hmin2 == ... == hminn) / numHashes
-   */
-  def similarityMulti(sigs: MinHashSignature*): Double = {
-    buildArrayMulti(sigs.map(_.bytes))(vals => if (vals.forall(_ == vals.head)) n.one else n.zero)
-      .map(_.toDouble)
-      .sum / numHashes
-  }
-
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
   def buckets(sig: MinHashSignature): List[Long] =
     sig.bytes.grouped(numRows * hashSize)
@@ -140,12 +168,6 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
 
   /** Decode two signatures into hash values, combine them somehow, and produce a new array */
   protected def buildArray(left: Array[Byte], right: Array[Byte])(fn: (H, H) => H): Array[Byte]
-
-  /**
-   * Decode multiple signatures into hash values and combine them using given fn.
-   * This version is used by the new similarityMulti.
-   */
-  protected def buildArrayMulti(buffers: Seq[Array[Byte]])(fn: Seq[H] => H): Array[Byte]
 }
 
 class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashes, numBands) {
@@ -169,11 +191,6 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
     val leftBuffer = ByteBuffer.wrap(left).asIntBuffer
     val rightBuffer = ByteBuffer.wrap(right).asIntBuffer
     buildArray{ fn(leftBuffer.get, rightBuffer.get) }
-  }
-
-  protected def buildArrayMulti(buffers: Seq[Array[Byte]])(fn: Seq[Int] => Int): Array[Byte] = {
-    val intBuffers = buffers.map(b => ByteBuffer.wrap(b).asIntBuffer)
-    buildArray(fn(intBuffers.map(_.get).toVector))
   }
 
   /** Seems to work, but experimental and not generic yet */
@@ -205,10 +222,5 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
     val leftBuffer = ByteBuffer.wrap(left).asCharBuffer
     val rightBuffer = ByteBuffer.wrap(right).asCharBuffer
     buildArray{ fn(leftBuffer.get, rightBuffer.get) }
-  }
-
-  protected def buildArrayMulti(buffers: Seq[Array[Byte]])(fn: Seq[Char] => Char): Array[Byte] = {
-    val intBuffers = buffers.map(b => ByteBuffer.wrap(b).asCharBuffer)
-    buildArray(fn(intBuffers.map(_.get).toVector))
   }
 }
