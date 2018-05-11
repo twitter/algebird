@@ -185,7 +185,7 @@ lazy val algebird = Project(
   algebirdUtil,
   algebirdBijection,
   algebirdBenchmark,
-  algebirdShapeless
+  algebirdGeneric
   //algebirdSpark
 )
 
@@ -257,7 +257,8 @@ lazy val algebirdSpark = module("spark").settings(
     crossScalaVersions := crossScalaVersions.value.filterNot(_.startsWith("2.12"))
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
-lazy val algebirdShapeless = module("generic").settings(
+lazy val algebirdGeneric = module("generic").settings(
+    addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6")
