@@ -184,7 +184,8 @@ lazy val algebird = Project(
   algebirdCore,
   algebirdUtil,
   algebirdBijection,
-  algebirdBenchmark
+  algebirdBenchmark,
+  algebirdShapeless
   //algebirdSpark
 )
 
@@ -254,6 +255,12 @@ lazy val algebirdBijection = module("bijection").settings(
 lazy val algebirdSpark = module("spark").settings(
     libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided",
     crossScalaVersions := crossScalaVersions.value.filterNot(_.startsWith("2.12"))
+  ).dependsOn(algebirdCore, algebirdTest % "test->test")
+
+lazy val algebirdShapeless = module("shapeless").settings(
+    libraryDependencies ++= Seq(
+      "com.chuusai" %% "shapeless" % "2.3.3",
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6")
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")

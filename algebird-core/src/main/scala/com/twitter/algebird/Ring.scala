@@ -55,6 +55,11 @@ trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with Commu
 // For Java interop so they get the default methods
 abstract class AbstractRing[T] extends Ring[T]
 
+class ConstantRing[T](constant: T) extends ConstantGroup[T](constant) with Ring[T] {
+  def one = constant
+  def times(a: T, b: T) = constant
+}
+
 class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
   override def zero = num.zero
   override def one = num.one
@@ -229,6 +234,7 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
     if (it.isEmpty) None
     else Some(rng.product(it))
 
+  implicit val unitRing: Ring[Unit] = new ConstantRing(())
   implicit def boolRing: Ring[Boolean] = BooleanRing
   implicit def jboolRing: Ring[JBool] = JBoolRing
   implicit def intRing: Ring[Int] = IntRing
