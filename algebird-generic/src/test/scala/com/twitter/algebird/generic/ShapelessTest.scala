@@ -13,6 +13,7 @@ import com.twitter.algebird.BaseProperties.{ semigroupLaws, monoidLaws, groupLaw
 case class Row(x: Int, y: Long)
 
 object ShapelessTest extends Properties("Shapeless Instances") {
+
   property("semigroup laws") =
     semigroupLaws[Int :: String :: HNil]
 
@@ -25,6 +26,8 @@ object ShapelessTest extends Properties("Shapeless Instances") {
   property("ring laws") =
     ringLaws[Int :: Long :: HNil]
 
+  implicit val rowRing: Ring[Row] = genericRing
+  implicit val rowOrd: Ordering[Row] = genericOrdering
   property("ring laws on row") =
     ringLaws[Row]
 

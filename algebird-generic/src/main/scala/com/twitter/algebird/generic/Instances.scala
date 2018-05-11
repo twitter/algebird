@@ -23,7 +23,7 @@ abstract class Shapeless3 extends Shapeless2 {
     new HConsRing(a, lb.value)
   }
 
-  implicit def genericRing[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Ring[Repr]): Ring[A] =
+  def genericRing[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Ring[Repr]): Ring[A] =
     new InvariantRing(gen.from _, gen.to _)
 }
 
@@ -40,7 +40,7 @@ abstract class Shapeless2 extends Shapeless1 {
     new HConsGroup(a, lb.value)
   }
 
-  implicit def genericGroup[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Group[Repr]): Group[A] =
+  def genericGroup[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Group[Repr]): Group[A] =
     new InvariantGroup(gen.from _, gen.to _)
 }
 
@@ -57,7 +57,7 @@ abstract class Shapeless1 extends Shapeless0 {
     new HConsMonoid(a, lb.value)
   }
 
-  implicit def genericMonoid[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Monoid[Repr]): Monoid[A] =
+  def genericMonoid[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Monoid[Repr]): Monoid[A] =
     new InvariantMonoid(gen.from _, gen.to _)
 }
 
@@ -71,7 +71,7 @@ abstract class Shapeless0 {
     lb: Lazy[Semigroup[B]]): Semigroup[A :: B] =
     new HConsSemigroup[A, B](a, lb.value)
 
-  implicit def genericSemigroup[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Semigroup[Repr]): Semigroup[A] =
+  def genericSemigroup[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Semigroup[Repr]): Semigroup[A] =
     new InvariantSemigroup(gen.from _, gen.to _)
 }
 

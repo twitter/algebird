@@ -20,7 +20,13 @@ object EquivOrdering extends EquivOrdering1 {
       override def equiv(a: HNil, b: HNil) = true
     }
 
-  implicit def genericOrdering[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Ordering[Repr]): Ordering[A] =
+  /**
+   * this is intentionally not implicit to avoid superceding the instance that may be
+   * set up in a companion
+   *
+   * use it with implicit val myOrd: Ordering[MyType] = genericOrdering
+   */
+  def genericOrdering[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Ordering[Repr]): Ordering[A] =
     r.on(gen.to _)
 }
 
@@ -34,7 +40,13 @@ abstract class EquivOrdering1 {
         a.equiv(x.head, y.head) && b.equiv(x.tail, y.tail)
     }
 
-  implicit def genericEquiv[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Equiv[Repr]): Equiv[A] =
+  /**
+   * this is intentionally not implicit to avoid superceding the instance that may be
+   * set up in a companion
+   *
+   * use it with implicit val myEqv: Equiv[MyType] = genericEquiv
+   */
+  def genericEquiv[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Equiv[Repr]): Equiv[A] =
     new Equiv[A] {
       def equiv(left: A, right: A) = r.equiv(gen.to(left), gen.to(right))
     }
