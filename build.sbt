@@ -166,7 +166,7 @@ lazy val noPublishSettings = Seq(
   * This returns the youngest jar we released that is compatible with
   * the current.
   */
-val noBinaryCompatCheck = Set[String]("benchmark", "caliper")
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic")
 
 def youngestForwardCompatible(subProj: String) =
   Some(subProj)
@@ -257,7 +257,7 @@ lazy val algebirdSpark = module("spark").settings(
     crossScalaVersions := crossScalaVersions.value.filterNot(_.startsWith("2.12"))
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
-lazy val algebirdShapeless = module("shapeless").settings(
+lazy val algebirdShapeless = module("generic").settings(
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6")

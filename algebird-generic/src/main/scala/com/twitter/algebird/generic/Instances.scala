@@ -1,4 +1,4 @@
-package com.twitter.algebird.shapeless
+package com.twitter.algebird.generic
 
 import shapeless._
 import com.twitter.algebird._
@@ -12,16 +12,15 @@ object Shapeless extends Shapeless3 {
 
 abstract class Shapeless3 extends Shapeless2 {
   /**
-   * Pairwise ring for arbitrary heterogenuous lists (HList).
+   * Pairwise ring for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsRing[A, B <: HList](implicit
-    la: Lazy[Ring[A]],
-    b: Ring[B]): Ring[A :: B] = {
+    a: Ring[A],
+    lb: Lazy[Ring[B]]): Ring[A :: B] = {
     // We use Lazy[Ring[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
-    val a = la.value
-    new HConsRing(a, b)
+    new HConsRing(a, lb.value)
   }
 
   implicit def genericRing[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Ring[Repr]): Ring[A] =
@@ -30,16 +29,15 @@ abstract class Shapeless3 extends Shapeless2 {
 
 abstract class Shapeless2 extends Shapeless1 {
   /**
-   * Pairwise group for arbitrary heterogenuous lists (HList).
+   * Pairwise group for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsGroup[A, B <: HList](implicit
-    la: Lazy[Group[A]],
-    b: Group[B]): Group[A :: B] = {
+    a: Group[A],
+    lb: Lazy[Group[B]]): Group[A :: B] = {
     // We use Lazy[Group[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
-    val a = la.value
-    new HConsGroup(a, b)
+    new HConsGroup(a, lb.value)
   }
 
   implicit def genericGroup[A, Repr](implicit gen: Generic.Aux[A, Repr], r: Group[Repr]): Group[A] =
@@ -48,16 +46,15 @@ abstract class Shapeless2 extends Shapeless1 {
 
 abstract class Shapeless1 extends Shapeless0 {
   /**
-   * Pairwise monoid for arbitrary heterogenuous lists (HList).
+   * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsMonoid[A, B <: HList](implicit
-    la: Lazy[Monoid[A]],
-    b: Monoid[B]): Monoid[A :: B] = {
+    a: Monoid[A],
+    lb: Lazy[Monoid[B]]): Monoid[A :: B] = {
     // We use Lazy[Monoid[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
-    val a = la.value
-    new HConsMonoid(a, b)
+    new HConsMonoid(a, lb.value)
   }
 
   implicit def genericMonoid[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Monoid[Repr]): Monoid[A] =
@@ -67,13 +64,15 @@ abstract class Shapeless1 extends Shapeless0 {
 abstract class Shapeless0 {
 
   /**
-   * Pairwise monoid for arbitrary heterogenuous lists (HList).
+   * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsSemigroup[A, B <: HList](implicit
-    la: Lazy[Semigroup[A]],
-    b: Semigroup[B]): Semigroup[A :: B] =
-    new HConsSemigroup[A, B](la.value, b)
+    a: Semigroup[A],
+    lb: Lazy[Semigroup[B]]): Semigroup[A :: B] =
+    new HConsSemigroup[A, B](a, lb.value)
 
+  implicit def genericSemigroup[A, Repr](implicit gen: Generic.Aux[A, Repr], m: Semigroup[Repr]): Semigroup[A] =
+    new InvariantSemigroup(gen.from _, gen.to _)
 }
 
 class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val b: Semigroup[B]) extends Semigroup[A :: B] {

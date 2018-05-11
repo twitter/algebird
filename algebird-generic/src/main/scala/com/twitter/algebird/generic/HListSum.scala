@@ -1,4 +1,4 @@
-package com.twitter.algebird.shapeless
+package com.twitter.algebird.generic
 
 import shapeless._
 import shapeless.ops.hlist.ToList

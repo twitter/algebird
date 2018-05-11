@@ -1,4 +1,4 @@
-package com.twitter.algebird.shapeless
+package com.twitter.algebird.generic
 
 import com.twitter.algebird.{ Semigroup, Monoid, Group, Ring }
 import org.scalacheck.ScalacheckShapeless._
@@ -28,6 +28,12 @@ object ShapelessTest extends Properties("Shapeless Instances") {
   property("ring laws on row") =
     ringLaws[Row]
 
+  // check we can find generics
+  genericSemigroup[Row, Int :: Long :: HNil]
+  genericMonoid[Row, Int :: Long :: HNil]
+  genericGroup[Row, Int :: Long :: HNil]
+  genericRing[Row, Int :: Long :: HNil]
+
   property("Semigroup matches tuple") = forAll { (a: Int :: String :: HNil, b: Int :: String :: HNil) =>
     Semigroup.plus(a, b) == ((a.head + b.head) :: (a.tail.head + b.tail.head) :: HNil)
   }
@@ -43,5 +49,14 @@ object ShapelessTest extends Properties("Shapeless Instances") {
 
   property("Ring matches tuple") = forAll { (a: Int :: Long :: HNil, b: Int :: Long :: HNil) =>
     Ring.times(a, b) == ((a.head * b.head) :: (a.tail.head * b.tail.head) :: HNil)
+  }
+
+  property("HList.sum(1) works (1)") = forAll { (a: Int :: HNil) =>
+    HListSum.sum(a) == a.head
+    HListSum.sum1(a) == a.head
+  }
+  property("HList.sum(1) works (2)") = forAll { (a: Int :: Int :: HNil) =>
+    HListSum.sum(a) == (a.head + a.tail.head)
+    HListSum.sum1(a) == (a.head + a.tail.head)
   }
 }
