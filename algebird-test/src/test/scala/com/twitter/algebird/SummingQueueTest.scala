@@ -12,18 +12,20 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
 
 object SummingCacheTest {
   case class Capacity(cap: Int) extends AnyVal
-  implicit val capArb = Arbitrary { for (c <- Gen.choose(0, 1024)) yield Capacity(c) }
+  implicit val capArb = Arbitrary {
+    for (c <- Gen.choose(0, 1024)) yield Capacity(c)
+  }
 }
 
 class SummingCacheTest extends CheckProperties {
@@ -32,7 +34,8 @@ class SummingCacheTest extends CheckProperties {
   // Get the zero-aware map equiv
   import SummingIteratorTest.mapEquiv
 
-  def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K, V]] = SummingCache[K, V](c.cap)
+  def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K, V]] =
+    SummingCache[K, V](c.cap)
 
   // Maps are tricky to compare equality for since zero values are often removed
   def test[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
@@ -40,7 +43,7 @@ class SummingCacheTest extends CheckProperties {
     val mitems = items.map { Map(_) }
     implicit val mapEq = mapEquiv[K, V]
     StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
-      StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
+    StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
   }
 
   property("puts are like sums (Int, Int)") {
@@ -59,7 +62,8 @@ class SummingCacheTest extends CheckProperties {
 class AdaptiveCacheTest extends SummingCacheTest {
   import SummingCacheTest._
 
-  override def newCache[K, V: Monoid](c: Capacity) = new AdaptiveCache[K, V](c.cap)
+  override def newCache[K, V: Monoid](c: Capacity) =
+    new AdaptiveCache[K, V](c.cap)
 }
 
 class SummingWithHitsCacheTest extends SummingCacheTest {
@@ -144,7 +148,9 @@ class SummingQueueTest extends CheckProperties {
       val empties = items.map { sb.put(_).isEmpty }
       val correct = Stream
         .continually(Stream(true, true, true, false))
-        .flatMap { s => s }
+        .flatMap { s =>
+          s
+        }
         .take(empties.size)
         .toList
       empties == correct

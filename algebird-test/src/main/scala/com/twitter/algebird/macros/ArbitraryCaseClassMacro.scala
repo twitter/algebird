@@ -6,7 +6,7 @@ import scala.reflect.runtime.universe._
 
 import com.twitter.algebird._
 
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{Arbitrary, Gen}
 
 object ArbitraryCaseClassMacro {
   def caseClassGen[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Gen[T]] = {
@@ -26,7 +26,8 @@ object ArbitraryCaseClassMacro {
         fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[$t]"
     }
 
-    val paramsList = params.map(param => q"${param.name.asInstanceOf[TermName]}")
+    val paramsList =
+      params.map(param => q"${param.name.asInstanceOf[TermName]}")
     val companion = tpe.typeSymbol.companionSymbol
 
     val res = q"""

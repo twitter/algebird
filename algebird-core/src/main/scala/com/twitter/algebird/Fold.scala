@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import java.io.Serializable
@@ -38,6 +38,7 @@ import scala.collection.mutable.Builder
  * See the companion object for constructors.
  */
 sealed trait Fold[-I, +O] extends Serializable {
+
   /**
    * Users can ignore this type.
    *
@@ -83,10 +84,11 @@ sealed trait Fold[-I, +O] extends Serializable {
       override def build(): FoldState[X, I2, Q] = {
         val first = self.build()
         val second = other.build()
-        new FoldState(
-          { case ((x, y), i) => (first.add(x, i), second.add(y, i)) },
-          (first.start, second.start),
-          { case (x, y) => f(first.end(x), second.end(y)) })
+        new FoldState({
+          case ((x, y), i) => (first.add(x, i), second.add(y, i))
+        }, (first.start, second.start), {
+          case (x, y) => f(first.end(x), second.end(y))
+        })
       }
     }
   }
@@ -105,9 +107,8 @@ sealed trait Fold[-I, +O] extends Serializable {
     val self = this
     new Fold[H, O] {
       type X = self.X
-      override def build(): FoldState[X, H, O] = {
+      override def build(): FoldState[X, H, O] =
         self.build().contramap(f)
-      }
     }
   }
 
@@ -154,21 +155,22 @@ sealed trait Fold[-I, +O] extends Serializable {
  * Folding over Seq(x, y) would produce the result
  *   end(add(add(start, x), y))
  */
-final class FoldState[X, -I, +O] private[algebird] (
-  val add: (X, I) => X,
-  val start: X,
-  val end: X => O) extends Serializable {
+final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val start: X, val end: X => O)
+    extends Serializable {
+
   /**
    * Transforms the output type of the FoldState (see Fold.map).
    */
   def map[P](f: O => P): FoldState[X, I, P] =
-    new FoldState(add, start, end andThen f)
+    new FoldState(add, start, end.andThen(f))
 
   /**
    * Transforms the input type of the FoldState (see Fold.contramap).
    */
   def contramap[H](f: H => I): FoldState[X, H, O] =
-    new FoldState({ (x, h) => add(x, f(h)) }, start, end)
+    new FoldState({ (x, h) =>
+      add(x, f(h))
+    }, start, end)
 }
 
 /**
@@ -180,17 +182,21 @@ final class FoldState[X, -I, +O] private[algebird] (
  * support scans (producing a stream of intermediate outputs by calling "end" at each step).
  */
 object Fold {
+
   /**
    * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
    */
-  implicit def applicative[I]: Applicative[({ type L[O] = Fold[I, O] })#L] = new FoldApplicative[I]
+  implicit def applicative[I]: Applicative[({ type L[O] = Fold[I, O] })#L] =
+    new FoldApplicative[I]
 
   /**
    * Turn a common Scala foldLeft into a Fold.
    * The accumulator MUST be immutable and serializable.
    */
   def foldLeft[I, O](o: O)(add: (O, I) => O): Fold[I, O] =
-    fold[O, I, O](add, o, { o => o })
+    fold[O, I, O](add, o, { o =>
+      o
+    })
 
   /**
    * A general way of defining Folds that supports a separate accumulator type.
@@ -222,17 +228,19 @@ object Fold {
       type X = Seq[Any]
       override def build(): FoldState[Seq[Any], I, Seq[O]] = {
         val bs: Seq[FoldState[Any, I, O]] =
-          ms map { _.build().asInstanceOf[FoldState[Any, I, O]] }
+          ms.map { _.build().asInstanceOf[FoldState[Any, I, O]] }
         val adds =
-          bs map { _.add }
+          bs.map { _.add }
         val ends =
           bs.map { _.end }
         val starts: Seq[Any] =
           bs.map { _.start }
-        val add: (Seq[Any], I) => Seq[Any] =
-          { (xs, i) => adds zip xs map { case (f, x) => f(x, i) } }
-        val end: (Seq[Any] => Seq[O]) =
-          { xs => ends zip xs map { case (f, x) => f(x) } }
+        val add: (Seq[Any], I) => Seq[Any] = { (xs, i) =>
+          adds.zip(xs).map { case (f, x) => f(x, i) }
+        }
+        val end: (Seq[Any] => Seq[O]) = { xs =>
+          ends.zip(xs).map { case (f, x) => f(x) }
+        }
         new FoldState(add, starts, end)
       }
     }
@@ -241,10 +249,9 @@ object Fold {
    * Simple Fold that collects elements into a container.
    */
   def container[I, C[_]](implicit cbf: CanBuildFrom[C[I], I, C[I]]): Fold[I, C[I]] =
-    Fold.foldMutable[Builder[I, C[I]], I, C[I]] (
-      { case (b, i) => b += i },
-      { _ => cbf.apply },
-      { _.result })
+    Fold.foldMutable[Builder[I, C[I]], I, C[I]]({ case (b, i) => b += i }, { _ =>
+      cbf.apply
+    }, { _.result })
 
   /**
    * An even simpler Fold that collects into a Seq.  Shorthand for "container[I, Seq];" fewer type
@@ -272,7 +279,7 @@ object Fold {
   def first[I]: Fold[I, Option[I]] =
     Fold.foldLeft[I, Option[I]](None) {
       case (None, i) => Some(i)
-      case (x, _) => x
+      case (x, _)    => x
     }
 
   /**
@@ -286,9 +293,9 @@ object Fold {
    */
   def max[I](implicit ordering: Ordering[I]): Fold[I, Option[I]] =
     Fold.foldLeft[I, Option[I]](None) {
-      case (None, i) => Some(i)
+      case (None, i)                                    => Some(i)
       case (Some(y), i) if (ordering.compare(y, i) < 0) => Some(i)
-      case (x, _) => x
+      case (x, _)                                       => x
     }
 
   /**
@@ -296,9 +303,9 @@ object Fold {
    */
   def min[I](implicit ordering: Ordering[I]): Fold[I, Option[I]] =
     Fold.foldLeft[I, Option[I]](None) {
-      case (None, i) => Some(i)
+      case (None, i)                                    => Some(i)
       case (Some(y), i) if (ordering.compare(y, i) > 0) => Some(i)
-      case (x, _) => x
+      case (x, _)                                       => x
     }
 
   /**
@@ -312,7 +319,7 @@ object Fold {
    */
   def sumOption[T](implicit sg: Semigroup[T]): Fold[T, Option[T]] =
     Fold.foldLeft(None: Option[T]) {
-      case (None, i) => Some(i)
+      case (None, i)    => Some(i)
       case (Some(l), r) => Some(sg.plus(l, r))
     }
 
@@ -333,14 +340,18 @@ object Fold {
    * Note this does not short-circuit enumeration of the sequence.
    */
   def forall[I](pred: I => Boolean): Fold[I, Boolean] =
-    foldLeft(true) { (b, i) => b && pred(i) }
+    foldLeft(true) { (b, i) =>
+      b && pred(i)
+    }
 
   /**
    * A Fold that returns "true" if any element of the sequence statisfies the predicate.
    * Note this does not short-circuit enumeration of the sequence.
    */
   def exists[I](pred: I => Boolean): Fold[I, Boolean] =
-    foldLeft(false) { (b, i) => b || pred(i) }
+    foldLeft(false) { (b, i) =>
+      b || pred(i)
+    }
 
   /**
    * A Fold that counts the number of elements satisfying the predicate.
@@ -348,7 +359,7 @@ object Fold {
   def count[I](pred: I => Boolean): Fold[I, Long] =
     foldLeft(0L) {
       case (c, i) if pred(i) => c + 1L
-      case (c, _) => c
+      case (c, _)            => c
     }
 }
 

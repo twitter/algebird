@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import algebra.Band
@@ -24,6 +24,7 @@ import algebra.Band
  * @param get wrapped instance of `T`
  */
 case class Last[@specialized(Int, Long, Float, Double) +T](get: T) {
+
   /**
    * Returns the argument `r`, always.
    *
@@ -37,6 +38,7 @@ case class Last[@specialized(Int, Long, Float, Double) +T](get: T) {
  * [[Last]] instances.
  */
 object Last extends LastInstances {
+
   /**
    * Returns an [[Aggregator]] that selects the last instance of `T`
    * in the aggregated stream.
@@ -45,6 +47,7 @@ object Last extends LastInstances {
 }
 
 private[algebird] sealed abstract class LastInstances {
+
   /**
    * Returns a [[Semigroup]] instance with a `plus` implementation
    * that always returns the last (ie, the right) `T` argument.
@@ -54,7 +57,9 @@ private[algebird] sealed abstract class LastInstances {
       def plus(l: T, r: T): T = r
       override def sumOption(ts: TraversableOnce[T]): Option[T] = {
         var res: Option[T] = None
-        ts.foreach { t => res = Some(t) }
+        ts.foreach { t =>
+          res = Some(t)
+        }
         res
       }
     }
@@ -64,7 +69,8 @@ private[algebird] sealed abstract class LastInstances {
    * implementation always returns the last (ie, the right) `Last[T]`
    * argument.
    */
-  implicit def semigroup[T]: Semigroup[Last[T]] with Band[Last[T]] = lastSemigroup[Last[T]]
+  implicit def semigroup[T]: Semigroup[Last[T]] with Band[Last[T]] =
+    lastSemigroup[Last[T]]
 }
 
 /**

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 /**
@@ -31,7 +31,8 @@ trait Predecessible[T] extends java.io.Serializable {
     // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       def iterator =
-        Iterator.iterate[Option[T]](Some(old)) { self.prev(_) }
+        Iterator
+          .iterate[Option[T]](Some(old)) { self.prev(_) }
           .takeWhile(_.isDefined)
           .collect { case Some(t) => t }
     }
@@ -51,14 +52,16 @@ trait Predecessible[T] extends java.io.Serializable {
 }
 
 object Predecessible extends java.io.Serializable {
+
   /**
    * This makes it easy to construct from a function when T has an ordering, which is common
    * Note, your function must respect the ordering
    */
-  def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] = new Predecessible[T] {
-    def prev(t: T) = prevFn(t)
-    def ordering = ord
-  }
+  def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] =
+    new Predecessible[T] {
+      def prev(t: T) = prevFn(t)
+      def ordering = ord
+    }
   // enables: Predecessible.prev(2) == Some(1)
   def prev[T](t: T)(implicit p: Predecessible[T]): Option[T] = p.prev(t)
   def prev[T](t: Option[T])(implicit p: Predecessible[T]): Option[T] = p.prev(t)
@@ -66,7 +69,8 @@ object Predecessible extends java.io.Serializable {
   def iteratePrev[T](first: T)(implicit p: Predecessible[T]): Iterable[T] =
     p.iteratePrev(first)
 
-  implicit def integralPrev[N: Integral]: Predecessible[N] = new IntegralPredecessible[N]
+  implicit def integralPrev[N: Integral]: Predecessible[N] =
+    new IntegralPredecessible[N]
 }
 
 object IntegralPredecessible {

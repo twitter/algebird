@@ -64,7 +64,7 @@ sealed abstract class Batched[T] extends Serializable {
   def iterator: Iterator[T] =
     this match {
       case Batched.Item(t) => Iterator.single(t)
-      case b => new Batched.ForwardItemsIterator(b)
+      case b               => new Batched.ForwardItemsIterator(b)
     }
 
   /**
@@ -83,7 +83,7 @@ sealed abstract class Batched[T] extends Serializable {
   def reverseIterator: Iterator[T] =
     this match {
       case Batched.Item(t) => Iterator.single(t)
-      case b => new Batched.ReverseItemsIterator(b)
+      case b               => new Batched.ReverseItemsIterator(b)
     }
 
   /**
@@ -109,7 +109,8 @@ object Batched {
    * is empty, and `Some(batch)` otherwise.
    */
   def items[T](ts: TraversableOnce[T]): Option[Batched[T]] =
-    if (ts.isEmpty) None else {
+    if (ts.isEmpty) None
+    else {
       val it = ts.toIterator
       val t0 = it.next
       Some(Item(t0).append(it))
@@ -140,7 +141,7 @@ object Batched {
    */
   implicit def semigroup[A]: Semigroup[Batched[A]] =
     new Semigroup[Batched[A]] {
-      def plus(x: Batched[A], y: Batched[A]): Batched[A] = x combine y
+      def plus(x: Batched[A], y: Batched[A]): Batched[A] = x.combine(y)
     }
 
   /**
@@ -175,11 +176,13 @@ object Batched {
    * (e.g. when there is temporary mutable state used to make
    * summation fast).
    */
-  def aggregator[A, B, C](batchSize: Int, agg: Aggregator[A, B, C]): Aggregator[A, Batched[B], C] = new Aggregator[A, Batched[B], C] {
-    def prepare(a: A): Batched[B] = Item(agg.prepare(a))
-    def semigroup: Semigroup[Batched[B]] = new BatchedSemigroup(batchSize)(agg.semigroup)
-    def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
-  }
+  def aggregator[A, B, C](batchSize: Int, agg: Aggregator[A, B, C]): Aggregator[A, Batched[B], C] =
+    new Aggregator[A, Batched[B], C] {
+      def prepare(a: A): Batched[B] = Item(agg.prepare(a))
+      def semigroup: Semigroup[Batched[B]] =
+        new BatchedSemigroup(batchSize)(agg.semigroup)
+      def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
+    }
 
   /**
    * This monoid aggregator batches up `agg` so that all the addition
@@ -189,7 +192,8 @@ object Batched {
    * (e.g. when there is temporary mutable state used to make
    * summation fast).
    */
-  def monoidAggregator[A, B, C](batchSize: Int, agg: MonoidAggregator[A, B, C]): MonoidAggregator[A, Batched[B], C] =
+  def monoidAggregator[A, B, C](batchSize: Int,
+                                agg: MonoidAggregator[A, B, C]): MonoidAggregator[A, Batched[B], C] =
     new MonoidAggregator[A, Batched[B], C] {
       def prepare(a: A): Batched[B] = Item(agg.prepare(a))
       def monoid: Monoid[Batched[B]] = new BatchedMonoid(batchSize)(agg.monoid)
@@ -197,15 +201,19 @@ object Batched {
     }
 
   def foldOption[T: Semigroup](batchSize: Int): Fold[T, Option[T]] =
-    Fold.foldLeft[T, Option[Batched[T]]](Option.empty[Batched[T]]) {
-      case (Some(b), t) => Some(b.combine(Item(t)).compact(batchSize))
-      case (None, t) => Some(Item(t))
-    }.map(_.map(_.sum))
+    Fold
+      .foldLeft[T, Option[Batched[T]]](Option.empty[Batched[T]]) {
+        case (Some(b), t) => Some(b.combine(Item(t)).compact(batchSize))
+        case (None, t)    => Some(Item(t))
+      }
+      .map(_.map(_.sum))
 
   def fold[T](batchSize: Int)(implicit m: Monoid[T]): Fold[T, T] =
-    Fold.foldLeft[T, Batched[T]](Batched(m.zero)) { (b, t) =>
-      b.combine(Item(t)).compact(batchSize)
-    }.map(_.sum)
+    Fold
+      .foldLeft[T, Batched[T]](Batched(m.zero)) { (b, t) =>
+        b.combine(Item(t)).compact(batchSize)
+      }
+      .map(_.sum)
 
   /**
    * This represents a single (unbatched) value.
@@ -321,7 +329,9 @@ class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T
  * than `batchSize` values in it. When more values are added, the
  * tree is compacted using `m`.
  */
-class BatchedMonoid[T: Monoid](batchSize: Int) extends BatchedSemigroup[T](batchSize) with Monoid[Batched[T]] {
+class BatchedMonoid[T: Monoid](batchSize: Int)
+    extends BatchedSemigroup[T](batchSize)
+    with Monoid[Batched[T]] {
   val zero: Batched[T] = Batched(Monoid.zero)
 
   // if we knew that (a+b=0) only for (a=0, b=0), we could instead do:

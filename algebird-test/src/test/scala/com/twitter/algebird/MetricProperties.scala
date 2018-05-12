@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -61,16 +61,15 @@ class MetricLaws extends CheckProperties {
   implicit val mapMetric = Metric.L1Map[Int, Double]
 
   // TODO: we won't need this when we have an Equatable trait
-  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) = {
+  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) =
     (a.keySet ++ b.keySet).forall { key =>
       (a.get(key), b.get(key)) match {
         case (Some(aVal), Some(bVal)) => aVal == bVal
-        case (Some(aVal), None) => aVal == 0.0
-        case (None, Some(bVal)) => bVal == 0.0
-        case _ => true
+        case (Some(aVal), None)       => aVal == 0.0
+        case (None, Some(bVal))       => bVal == 0.0
+        case _                        => true
       }
     }
-  }
 
   property("int double map metric") {
     implicit val eq: Equiv[Map[Int, Double]] = Equiv.fromFunction(mapEqFn)

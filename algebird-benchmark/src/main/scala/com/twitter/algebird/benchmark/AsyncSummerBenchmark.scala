@@ -6,10 +6,10 @@ import java.util.concurrent.atomic.AtomicLong
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import com.twitter.algebird.{ HyperLogLogMonoid, _ }
+import com.twitter.algebird.{HyperLogLogMonoid, _}
 import com.twitter.algebird.util.summer._
 import com.twitter.bijection._
-import com.twitter.util.{ Await, Duration, FuturePool }
+import com.twitter.util.{Await, Duration, FuturePool}
 
 import scala.util.Random
 
@@ -20,7 +20,8 @@ object AsyncSummerBenchmark {
   val workPool = FuturePool(executor)
   implicit val hllMonoid = new HyperLogLogMonoid(24)
 
-  def hll[T](t: T)(implicit monoid: HyperLogLogMonoid, inj: Injection[T, Array[Byte]]): HLL = monoid.create(inj(t))
+  def hll[T](t: T)(implicit monoid: HyperLogLogMonoid, inj: Injection[T, Array[Byte]]): HLL =
+    monoid.create(inj(t))
 
   @State(Scope.Benchmark)
   class SummerState {
@@ -60,7 +61,8 @@ object AsyncSummerBenchmark {
 
       bufferSize = BufferSize(buffSizeInt)
       nullSummer = new NullSummer[Long, HLL](Counter("tuplesIn"), Counter("tuplesOut"))
-      asyncNonCompactListSum = new AsyncListSum[Long, HLL](bufferSize,
+      asyncNonCompactListSum = new AsyncListSum[Long, HLL](
+        bufferSize,
         flushFrequency,
         memoryFlushPercent,
         Counter("memory"),
@@ -72,8 +74,10 @@ object AsyncSummerBenchmark {
         Counter("tuplesOut"),
         workPool,
         Compact(false),
-        CompactionSize(0))
-      asyncCompactListSum = new AsyncListSum[Long, HLL](bufferSize,
+        CompactionSize(0)
+      )
+      asyncCompactListSum = new AsyncListSum[Long, HLL](
+        bufferSize,
         flushFrequency,
         memoryFlushPercent,
         Counter("memory"),
@@ -85,8 +89,10 @@ object AsyncSummerBenchmark {
         Counter("tuplesOut"),
         workPool,
         Compact(true),
-        CompactionSize(500))
-      asyncMapSum = new AsyncMapSum[Long, HLL](bufferSize,
+        CompactionSize(500)
+      )
+      asyncMapSum = new AsyncMapSum[Long, HLL](
+        bufferSize,
         flushFrequency,
         memoryFlushPercent,
         Counter("memory"),
@@ -95,7 +101,8 @@ object AsyncSummerBenchmark {
         Counter("tuplesOut"),
         Counter("size"),
         workPool)
-      syncSummingQueue = new SyncSummingQueue[Long, HLL](bufferSize,
+      syncSummingQueue = new SyncSummingQueue[Long, HLL](
+        bufferSize,
         flushFrequency,
         memoryFlushPercent,
         Counter("memory"),
@@ -103,7 +110,8 @@ object AsyncSummerBenchmark {
         Counter("size"),
         Counter("puts"),
         Counter("tuplesIn"),
-        Counter("tuplesOut"))
+        Counter("tuplesOut")
+      )
 
       val inputData: IndexedSeq[(Long, HLL)] = (0L until numInputItems).map { inputKey =>
         val pos = rnd.nextInt(10)
@@ -134,10 +142,13 @@ class AsyncSummerBenchmark {
     Await.result(summer.addAll(state.inputItems(batch)))
   }
 
-  def timeAsyncNonCompactListSum(state: SummerState) = fn(state, state.asyncNonCompactListSum)
-  def timeAsyncCompactListSum(state: SummerState) = fn(state, state.asyncCompactListSum)
+  def timeAsyncNonCompactListSum(state: SummerState) =
+    fn(state, state.asyncNonCompactListSum)
+  def timeAsyncCompactListSum(state: SummerState) =
+    fn(state, state.asyncCompactListSum)
   def timeAsyncMapSum(state: SummerState) = fn(state, state.asyncMapSum)
-  def timeSyncSummingQueue(state: SummerState) = fn(state, state.syncSummingQueue)
+  def timeSyncSummingQueue(state: SummerState) =
+    fn(state, state.syncSummingQueue)
   def timeNullSummer(state: SummerState) = fn(state, state.nullSummer)
 
 }

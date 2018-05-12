@@ -14,7 +14,9 @@ class FirstLaws extends CheckProperties {
   }
 
   property("First.+ should work") {
-    forAll { (l: First[Int], r: First[Int]) => l + r == l }
+    forAll { (l: First[Int], r: First[Int]) =>
+      l + r == l
+    }
   }
 
   property("First.aggregator returns the first item") {

@@ -32,7 +32,8 @@ final case class Bytes(array: Array[Byte]) extends java.io.Serializable {
 
   require(array != null, "array must not be null")
 
-  override def hashCode: Int = scala.util.hashing.MurmurHash3.arrayHash(array, Bytes.HashSeed)
+  override def hashCode: Int =
+    scala.util.hashing.MurmurHash3.arrayHash(array, Bytes.HashSeed)
 
   /**
    * Implementation detail: This `equals` method is defined in terms of the wrapped array, which is a mutable field.
@@ -42,10 +43,11 @@ final case class Bytes(array: Array[Byte]) extends java.io.Serializable {
    */
   override def equals(that: Any): Boolean = that match {
     case Bytes(thatArray) => java.util.Arrays.equals(array, thatArray)
-    case _ => false
+    case _                => false
   }
 
-  override def toString: String = array.map(_.toString).mkString("Bytes(", ",", ")")
+  override def toString: String =
+    array.map(_.toString).mkString("Bytes(", ",", ")")
 
   def apply(idx: Int) = array.apply(idx)
 
@@ -57,7 +59,8 @@ object Bytes {
   private val HashSeed = 0
 
   implicit val ordering: Ordering[Bytes] = new Ordering[Bytes] {
-    def compare(a: Bytes, b: Bytes): Int = ByteBuffer.wrap(a.array).compareTo(ByteBuffer.wrap(b.array))
+    def compare(a: Bytes, b: Bytes): Int =
+      ByteBuffer.wrap(a.array).compareTo(ByteBuffer.wrap(b.array))
   }
 
 }

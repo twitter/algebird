@@ -12,21 +12,25 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util
 
 import com.twitter.algebird._
-import com.twitter.util.{ Await, Future }
+import com.twitter.util.{Await, Future}
 
 import scala.util.Random
 
 object TunnelMonoidProperties {
   def testTunnelMonoid[I, V](makeRandomInput: Int => I,
-    makeTunnel: I => V,
-    collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(implicit monoid: Monoid[I],
+                             makeTunnel: I => V,
+                             collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(
+      implicit
+      monoid: Monoid[I],
       superMonoid: Monoid[V]) = {
     val r = new Random
-    val numbers = (1 to 40).map { _ => makeRandomInput(r.nextInt) }
+    val numbers = (1 to 40).map { _ =>
+      makeRandomInput(r.nextInt)
+    }
     def helper(seeds: Seq[I], toFeed: I) = {
       val tunnels = seeds.map(makeTunnel)
       @annotation.tailrec
@@ -46,11 +50,12 @@ object TunnelMonoidProperties {
     }
     numbers.forall { _ =>
       val toFeed = makeRandomInput(r.nextInt)
-      val finalResults = helper(numbers, toFeed) zip helper(numbers, toFeed) map {
-        case (f1, f2) => for {
-          b1 <- f1
-          b2 <- f2
-        } yield b1 == b2
+      val finalResults = helper(numbers, toFeed).zip(helper(numbers, toFeed)).map {
+        case (f1, f2) =>
+          for {
+            b1 <- f1
+            b2 <- f2
+          } yield b1 == b2
       }
       Await.result(Future.collect(finalResults).map { _.forall(identity) })
     }

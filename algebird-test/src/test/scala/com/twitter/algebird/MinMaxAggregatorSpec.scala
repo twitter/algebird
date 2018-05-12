@@ -8,13 +8,14 @@ class MinMaxAggregatorSpec extends WordSpec with Matchers {
   case object TestElementB extends TestElementParent
   case object TestElementC extends TestElementParent
 
-  implicit val testOrdering = Ordering.fromLessThan[TestElementParent]((x, y) => (x, y) match {
-    case (TestElementA, TestElementA) => false
-    case (TestElementA, _) => true
-    case (TestElementB, TestElementB) => false
-    case (TestElementB, TestElementA) => false
-    case (TestElementB, TestElementC) => true
-    case (TestElementC, _) => false
+  implicit val testOrdering = Ordering.fromLessThan[TestElementParent]((x, y) =>
+    (x, y) match {
+      case (TestElementA, TestElementA) => false
+      case (TestElementA, _)            => true
+      case (TestElementB, TestElementB) => false
+      case (TestElementB, TestElementA) => false
+      case (TestElementB, TestElementC) => true
+      case (TestElementC, _)            => false
   })
 
   val data = List(TestElementC, TestElementA, TestElementB)

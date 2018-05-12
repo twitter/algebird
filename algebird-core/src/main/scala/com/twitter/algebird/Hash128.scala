@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -47,18 +47,21 @@ object Hash128 extends java.io.Serializable {
 
   val DefaultSeed = 12345678L
 
-  def murmur128ArrayByte(seed: Long): Hash128[Array[Byte]] = new Hash128[Array[Byte]] {
-    val DefaultSeed = seed
-    def hashWithSeed(seed: Long, k: Array[Byte]) = MurmurHash128(seed)(k)
-  }
-  def murmur128ArrayInt(seed: Long): Hash128[Array[Int]] = new Hash128[Array[Int]] {
-    val DefaultSeed = seed
-    def hashWithSeed(seed: Long, k: Array[Int]) = MurmurHash128(seed)(k)
-  }
-  def murmur128ArrayLong(seed: Long): Hash128[Array[Long]] = new Hash128[Array[Long]] {
-    val DefaultSeed = seed
-    def hashWithSeed(seed: Long, k: Array[Long]) = MurmurHash128(seed)(k)
-  }
+  def murmur128ArrayByte(seed: Long): Hash128[Array[Byte]] =
+    new Hash128[Array[Byte]] {
+      val DefaultSeed = seed
+      def hashWithSeed(seed: Long, k: Array[Byte]) = MurmurHash128(seed)(k)
+    }
+  def murmur128ArrayInt(seed: Long): Hash128[Array[Int]] =
+    new Hash128[Array[Int]] {
+      val DefaultSeed = seed
+      def hashWithSeed(seed: Long, k: Array[Int]) = MurmurHash128(seed)(k)
+    }
+  def murmur128ArrayLong(seed: Long): Hash128[Array[Long]] =
+    new Hash128[Array[Long]] {
+      val DefaultSeed = seed
+      def hashWithSeed(seed: Long, k: Array[Long]) = MurmurHash128(seed)(k)
+    }
 
   /**
    * This serializes the string into UTF-8, then hashes. This is different

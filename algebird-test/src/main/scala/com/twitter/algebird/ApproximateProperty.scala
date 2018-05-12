@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalacheck.{ Gen, Prop, Properties, Test }
+import org.scalacheck.{Gen, Prop, Properties, Test}
 import org.scalacheck.util.Pretty
 
 trait ApproximateProperty {
@@ -25,14 +25,16 @@ object ApproximateProperty {
    *  Useful because `Gen.listOfN(n, gen).sample` gives us Option[List[T]],
    *  while we often want List[T].
    */
-  @annotation.tailrec private def genListOf[T](n: Int, gen: Gen[T], trial: Int = 100): List[T] = {
+  @annotation.tailrec
+  private def genListOf[T](n: Int, gen: Gen[T], trial: Int = 100): List[T] =
     Gen.listOfN(n, gen).sample match {
       case Some(xs) => xs
-      case _ => if (trial <= 0) Nil else genListOf(n, gen, trial - 1)
+      case _        => if (trial <= 0) Nil else genListOf(n, gen, trial - 1)
     }
-  }
 
-  private def successesAndProbabilities(a: ApproximateProperty, objectReps: Int, inputReps: Int): List[(Int, Double, List[String])] =
+  private def successesAndProbabilities(a: ApproximateProperty,
+                                        objectReps: Int,
+                                        inputReps: Int): List[(Int, Double, List[String])] =
     genListOf(objectReps, a.exactGenerator)
       .flatMap { exact =>
         val approx = a.makeApproximate(exact)
@@ -45,7 +47,10 @@ object ApproximateProperty {
             None
           } else {
             val successInt = if (success.isTrue) 1 else 0
-            val messages = if (success.isTrue) List() else List(s"Exact result: $exactResult. Approx result: $approxResult.")
+            val messages =
+              if (success.isTrue) List()
+              else
+                List(s"Exact result: $exactResult. Approx result: $approxResult.")
             Some((successInt, success.withProb, messages))
           }
         }
@@ -65,13 +70,16 @@ object ApproximateProperty {
       // TODO Make sure this is correct
       val diff = scala.math.sqrt(-n * scala.math.log(falsePositiveRate) / 2.0)
 
-      val success = if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
+      val success =
+        if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
 
       // Args that get printed when Scalacheck runs the test
       val argsList: List[(String, String)] = {
-        val results = List(("Successes", s"$successes (out of $n)"),
+        val results = List(
+          ("Successes", s"$successes (out of $n)"),
           ("Expected successes", "%.2f".format(sumOfProbabilities)),
-          ("Required successes", "%.2f".format(sumOfProbabilities - diff)))
+          ("Required successes", "%.2f".format(sumOfProbabilities - diff))
+        )
 
         val exampleFailures =
           if (success == Prop.False)
@@ -81,7 +89,10 @@ object ApproximateProperty {
         val zeroProbTests = objectReps * inputReps - n
         val testsReturnedZeroProb =
           if (zeroProbTests > 0) {
-            List(("Omitted results", s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."))
+            List(
+              (
+                "Omitted results",
+                s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."))
           } else List()
 
         results ++ exampleFailures ++ testsReturnedZeroProb
@@ -101,7 +112,10 @@ object ApproximateProperty {
    * TODO use `new Prop` like the above `toProp` method so that we can
    * have useful error messages.
    */
-  def toProp(a: Seq[ApproximateProperty], objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop = {
+  def toProp(a: Seq[ApproximateProperty],
+             objectReps: Int,
+             inputReps: Int,
+             falsePositiveRate: Double): Prop = {
     require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
     val list = a.flatMap { approximateProp =>

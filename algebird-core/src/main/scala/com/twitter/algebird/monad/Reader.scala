@@ -28,13 +28,16 @@ sealed trait Reader[-Env, +T] {
   def flatMap[E1 <: Env, U](next: T => Reader[E1, U]): Reader[E1, U] =
     FlatMappedReader[E1, T, U](this, next)
   def map[U](thatFn: T => U): Reader[Env, U] =
-    FlatMappedReader(this, { (t: T) => ConstantReader(thatFn(t)) })
+    FlatMappedReader(this, { (t: T) =>
+      ConstantReader(thatFn(t))
+    })
 }
 
 final case class ConstantReader[+T](get: T) extends Reader[Any, T] {
   override def apply(env: Any) = get
   override def map[U](fn: T => U) = ConstantReader(fn(get))
-  override def flatMap[E1 <: Any, U](next: T => Reader[E1, U]): Reader[E1, U] = next(get)
+  override def flatMap[E1 <: Any, U](next: T => Reader[E1, U]): Reader[E1, U] =
+    next(get)
 }
 final case class ReaderFn[E, +T](fn: E => T) extends Reader[E, T] {
   override def apply(env: E) = fn(env)
@@ -44,14 +47,16 @@ final case class FlatMappedReader[E, U, +T](first: Reader[E, U], fn: U => Reader
     @annotation.tailrec
     def loop(r: Reader[E, Any], stack: List[(Any) => Reader[E, Any]]): Any =
       r match {
-        case ConstantReader(get) => stack match {
-          case head :: tail => loop(head(get), tail)
-          case Nil => get
-        }
-        case ReaderFn(fn) => stack match {
-          case head :: tail => loop(head(fn(env)), tail)
-          case Nil => fn(env)
-        }
+        case ConstantReader(get) =>
+          stack match {
+            case head :: tail => loop(head(get), tail)
+            case Nil          => get
+          }
+        case ReaderFn(fn) =>
+          stack match {
+            case head :: tail => loop(head(fn(env)), tail)
+            case Nil          => fn(env)
+          }
         case FlatMappedReader(first, nextFn) => loop(first, nextFn :: stack)
       }
     loop(first, List(fn.asInstanceOf[(Any) => Reader[E, Any]])).asInstanceOf[T]
@@ -64,8 +69,10 @@ object Reader {
 
   class ReaderM[Env] extends Monad[({ type Result[T] = Reader[Env, T] })#Result] {
     def apply[T](t: T) = ConstantReader(t)
-    def flatMap[T, U](self: Reader[Env, T])(next: T => Reader[Env, U]) = self.flatMap(next)
+    def flatMap[T, U](self: Reader[Env, T])(next: T => Reader[Env, U]) =
+      self.flatMap(next)
     override def map[T, U](self: Reader[Env, T])(fn: T => U) = self.map(fn)
   }
-  implicit def monad[Env]: Monad[({ type Result[T] = Reader[Env, T] })#Result] = new ReaderM[Env]
+  implicit def monad[Env]: Monad[({ type Result[T] = Reader[Env, T] })#Result] =
+    new ReaderM[Env]
 }

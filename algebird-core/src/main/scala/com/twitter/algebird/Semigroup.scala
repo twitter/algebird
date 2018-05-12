@@ -12,17 +12,24 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
-import algebra.{ Semigroup => ASemigroup }
-import algebra.ring.{ AdditiveSemigroup }
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
-import java.util.{ List => JList, Map => JMap }
+import algebra.{Semigroup => ASemigroup}
+import algebra.ring.{AdditiveSemigroup}
+import java.lang.{
+  Integer => JInt,
+  Short => JShort,
+  Long => JLong,
+  Float => JFloat,
+  Double => JDouble,
+  Boolean => JBool
+}
+import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{ Map => MMap }
-import scala.collection.{ Map => ScMap }
-import scala.annotation.{ implicitNotFound, tailrec }
+import scala.collection.mutable.{Map => MMap}
+import scala.collection.{Map => ScMap}
+import scala.annotation.{implicitNotFound, tailrec}
 
 import macros.caseclass._
 
@@ -41,6 +48,7 @@ import macros.caseclass._
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] with AdditiveSemigroup[T] {
+
   /**
    * Returns an instance of `$T` calculated by summing all instances in
    * `iter` in one pass. Returns `None` if `iter` is empty, else
@@ -61,7 +69,8 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] 
 
   override def additive: ASemigroup[T] = this
   override def combine(l: T, r: T): T = plus(l, r)
-  override def combineAllOption(iter: TraversableOnce[T]): Option[T] = sumOption(iter)
+  override def combineAllOption(iter: TraversableOnce[T]): Option[T] =
+    sumOption(iter)
 }
 
 // For Java interop so they get the default sumOption
@@ -76,9 +85,10 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
  *
  * @define T Either[L, R]
  */
-class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R]) extends Semigroup[Either[L, R]] {
+class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R])
+    extends Semigroup[Either[L, R]] {
 
-  override def plus(l: Either[L, R], r: Either[L, R]) = {
+  override def plus(l: Either[L, R], r: Either[L, R]) =
     if (l.isLeft) {
       // l is Left, r may or may not be:
       if (r.isRight) {
@@ -95,12 +105,12 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
       //both l and r are Right values:
       Right(semigroupr.plus(l.right.get, r.right.get))
     }
-  }
 }
 
 class FromAlgebraSemigroup[T](sg: ASemigroup[T]) extends Semigroup[T] {
   override def plus(l: T, r: T): T = sg.combine(l, r)
-  override def sumOption(ts: TraversableOnce[T]): Option[T] = sg.combineAllOption(ts)
+  override def sumOption(ts: TraversableOnce[T]): Option[T] =
+    sg.combineAllOption(ts)
 }
 
 /**
@@ -116,15 +126,18 @@ private[algebird] trait FromAlgebraSemigroupImplicit0 extends FromAlgebraSemigro
     new FromAlgebraSemigroup(sg)
 }
 
-object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with FromAlgebraSemigroupImplicit0 {
+object Semigroup
+    extends GeneratedSemigroupImplicits
+    with ProductSemigroups
+    with FromAlgebraSemigroupImplicit0 {
   def maybePlus[T](opt: Option[T], t: T)(implicit sg: Semigroup[T]): T =
     opt match {
-      case None => t
+      case None    => t
       case Some(s) => sg.plus(s, t)
     }
   def maybePlus[T](t: T, opt: Option[T])(implicit sg: Semigroup[T]): T =
     opt match {
-      case None => t
+      case None    => t
       case Some(u) => sg.plus(t, u)
     }
   // This pattern is really useful for typeclasses
@@ -146,7 +159,8 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
   }
 
   @tailrec
-  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(implicit sg: Semigroup[T]): T = {
+  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(
+      implicit sg: Semigroup[T]): T =
     if (i == 0) {
       vaccMemo._1
     } else {
@@ -155,13 +169,14 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
        */
       val half = i / 2
       val rem = i % 2
-      val newAccMemo = if (rem == 0) vaccMemo else {
-        val (res, newMemo) = timesPow2(pow, v, vaccMemo._2)
-        (sg.plus(vaccMemo._1, res), newMemo)
-      }
+      val newAccMemo =
+        if (rem == 0) vaccMemo
+        else {
+          val (res, newMemo) = timesPow2(pow, v, vaccMemo._2)
+          (sg.plus(vaccMemo._1, res), newMemo)
+        }
       intTimesRec(half, v, pow + 1, newAccMemo)
     }
-  }
 
   // Returns (2^power) * v = (2^(power - 1) v + 2^(power - 1) v)
   private def timesPow2[T](power: Int, v: T, memo: Vector[T])(implicit sg: Semigroup[T]): (T, Vector[T]) = {
@@ -195,22 +210,30 @@ object Semigroup extends GeneratedSemigroupImplicits with ProductSemigroups with
   implicit def jshortSemigroup: Semigroup[JShort] = JShortRing
   implicit def longSemigroup: Semigroup[Long] = LongRing
   implicit def bigIntSemigroup: Semigroup[BigInt] = BigIntRing
-  implicit def bigDecimalSemigroup: Semigroup[BigDecimal] = implicitly[Ring[BigDecimal]]
+  implicit def bigDecimalSemigroup: Semigroup[BigDecimal] =
+    implicitly[Ring[BigDecimal]]
   implicit def jlongSemigroup: Semigroup[JLong] = JLongRing
   implicit def floatSemigroup: Semigroup[Float] = FloatRing
   implicit def jfloatSemigroup: Semigroup[JFloat] = JFloatRing
   implicit def doubleSemigroup: Semigroup[Double] = DoubleRing
   implicit def jdoubleSemigroup: Semigroup[JDouble] = JDoubleRing
   implicit def stringSemigroup: Semigroup[String] = StringMonoid
-  implicit def optionSemigroup[T: Semigroup]: Semigroup[Option[T]] = new OptionMonoid[T]
+  implicit def optionSemigroup[T: Semigroup]: Semigroup[Option[T]] =
+    new OptionMonoid[T]
   implicit def listSemigroup[T]: Semigroup[List[T]] = new ListMonoid[T]
   implicit def seqSemigroup[T]: Semigroup[Seq[T]] = new SeqMonoid[T]
-  implicit def indexedSeqSemigroup[T: Semigroup]: Semigroup[IndexedSeq[T]] = new IndexedSeqSemigroup[T]
+  implicit def indexedSeqSemigroup[T: Semigroup]: Semigroup[IndexedSeq[T]] =
+    new IndexedSeqSemigroup[T]
   implicit def jlistSemigroup[T]: Semigroup[JList[T]] = new JListMonoid[T]
   implicit def setSemigroup[T]: Semigroup[Set[T]] = new SetMonoid[T]
-  implicit def mapSemigroup[K, V: Semigroup]: Semigroup[Map[K, V]] = new MapMonoid[K, V]
-  implicit def scMapSemigroup[K, V: Semigroup]: Semigroup[ScMap[K, V]] = new ScMapMonoid[K, V]
-  implicit def jmapSemigroup[K, V: Semigroup]: Semigroup[JMap[K, V]] = new JMapMonoid[K, V]
-  implicit def eitherSemigroup[L: Semigroup, R: Semigroup]: Semigroup[Either[L, R]] = new EitherSemigroup[L, R]
-  implicit def function1Semigroup[T]: Semigroup[Function1[T, T]] = new Function1Monoid[T]
+  implicit def mapSemigroup[K, V: Semigroup]: Semigroup[Map[K, V]] =
+    new MapMonoid[K, V]
+  implicit def scMapSemigroup[K, V: Semigroup]: Semigroup[ScMap[K, V]] =
+    new ScMapMonoid[K, V]
+  implicit def jmapSemigroup[K, V: Semigroup]: Semigroup[JMap[K, V]] =
+    new JMapMonoid[K, V]
+  implicit def eitherSemigroup[L: Semigroup, R: Semigroup]: Semigroup[Either[L, R]] =
+    new EitherSemigroup[L, R]
+  implicit def function1Semigroup[T]: Semigroup[Function1[T, T]] =
+    new Function1Monoid[T]
 }

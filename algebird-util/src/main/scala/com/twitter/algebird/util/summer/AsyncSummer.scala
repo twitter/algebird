@@ -12,16 +12,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{ Duration, Future }
+import com.twitter.util.{Duration, Future}
 
 /**
  * @author Ian O Connell
  */
-
 trait AsyncSummer[T, +M <: Iterable[T]] { self =>
   def flush: Future[M]
   def tick: Future[M]
@@ -34,9 +33,10 @@ trait AsyncSummer[T, +M <: Iterable[T]] { self =>
     val oldSelf = self
     new AsyncSummerProxy[T, M] {
       override val self = oldSelf
-      override def cleanup = {
-        oldSelf.cleanup.flatMap { _ => cleanup }
-      }
+      override def cleanup =
+        oldSelf.cleanup.flatMap { _ =>
+          cleanup
+        }
     }
   }
 }
@@ -61,7 +61,8 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   protected def memoryIncr: Incrementor
   protected def timeoutIncr: Incrementor
 
-  protected def timedOut = (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
+  protected def timedOut =
+    (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
   protected lazy val runtime = Runtime.getRuntime
 
   protected def memoryWaterMark = {
@@ -69,7 +70,7 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
     used > softMemoryFlush.v
   }
 
-  def tick: Future[M] = {
+  def tick: Future[M] =
     if (timedOut) {
       timeoutIncr.incr
       lastDump = System.currentTimeMillis // reset the timeout condition
@@ -81,5 +82,4 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
     } else {
       Future.value(emptyResult)
     }
-  }
 }

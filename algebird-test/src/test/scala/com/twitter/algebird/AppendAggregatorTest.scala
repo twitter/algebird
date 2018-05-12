@@ -7,11 +7,10 @@ class AppendAggregatorTest extends WordSpec with Matchers {
   val mpty = Vector.empty[Int]
 
   // test the methods that appendSemigroup method defines or overrides
-  def testMethodsSemigroup[E, M, P](
-    agg1: Aggregator[E, M, P],
-    agg2: Aggregator[E, M, P],
-    data: Seq[E],
-    empty: Seq[E]) {
+  def testMethodsSemigroup[E, M, P](agg1: Aggregator[E, M, P],
+                                    agg2: Aggregator[E, M, P],
+                                    data: Seq[E],
+                                    empty: Seq[E]) {
 
     val n = data.length
     val (half1, half2) = data.splitAt(n / 2)
@@ -23,7 +22,7 @@ class AppendAggregatorTest extends WordSpec with Matchers {
 
     agg1.present(lhs) should be(agg2.present(lhs))
 
-    agg1(data) should be (agg2(data))
+    agg1(data) should be(agg2(data))
 
     agg1.applyOption(data) should be(agg2.applyOption(data))
     agg1.applyOption(empty) should be(agg2.applyOption(empty))
@@ -36,15 +35,14 @@ class AppendAggregatorTest extends WordSpec with Matchers {
   }
 
   // test the methods that appendMonoid method defines or overrides
-  def testMethodsMonoid[E, M, P](
-    agg1: MonoidAggregator[E, M, P],
-    agg2: MonoidAggregator[E, M, P],
-    data: Seq[E],
-    empty: Seq[E]) {
+  def testMethodsMonoid[E, M, P](agg1: MonoidAggregator[E, M, P],
+                                 agg2: MonoidAggregator[E, M, P],
+                                 data: Seq[E],
+                                 empty: Seq[E]) {
 
     testMethodsSemigroup(agg1, agg2, data, empty)
 
-    agg1(empty) should be (agg2(empty))
+    agg1(empty) should be(agg2(empty))
     agg1.appendAll(data) should be(agg2.appendAll(data))
   }
 
@@ -62,7 +60,8 @@ class AppendAggregatorTest extends WordSpec with Matchers {
       }
 
       val agg1 = Aggregator.prepareMonoid((e: Int) => Set(e))(setMonoid)
-      val agg2 = Aggregator.appendMonoid((m: Set[Int], e: Int) => m + e)(setMonoid)
+      val agg2 =
+        Aggregator.appendMonoid((m: Set[Int], e: Int) => m + e)(setMonoid)
 
       testMethodsMonoid(agg1, agg2, data, mpty)
     }
@@ -71,7 +70,8 @@ class AppendAggregatorTest extends WordSpec with Matchers {
   "appendSemigroup" should {
     "be equivalent to integer semigroup aggregator" in {
       val agg1 = Aggregator.fromSemigroup[Int]
-      val agg2 = Aggregator.appendSemigroup(identity[Int]_, (m: Int, e: Int) => m + e)
+      val agg2 =
+        Aggregator.appendSemigroup(identity[Int] _, (m: Int, e: Int) => m + e)
       testMethodsSemigroup(agg1, agg2, data, mpty)
     }
 
@@ -81,7 +81,8 @@ class AppendAggregatorTest extends WordSpec with Matchers {
       }
 
       val agg1 = Aggregator.prepareSemigroup((e: Int) => Set(e))(setSemigroup)
-      val agg2 = Aggregator.appendSemigroup((e: Int) => Set(e), (m: Set[Int], e: Int) => m + e)(setSemigroup)
+      val agg2 =
+        Aggregator.appendSemigroup((e: Int) => Set(e), (m: Set[Int], e: Int) => m + e)(setSemigroup)
 
       testMethodsSemigroup(agg1, agg2, data, mpty)
     }

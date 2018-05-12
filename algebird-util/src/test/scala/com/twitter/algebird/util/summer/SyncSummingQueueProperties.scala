@@ -16,32 +16,34 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.PropertyChecks
 
 class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Matchers {
   import AsyncSummerLaws._
   property("Summing with and without the summer should match") {
-    forAll { (inputs: List[List[(Int, Long)]],
-      flushFrequency: FlushFrequency,
-      bufferSize: BufferSize,
-      memoryFlushPercent: MemoryFlushPercent) =>
-      val timeOutCounter = Counter("timeOut")
-      val sizeCounter = Counter("size")
-      val memoryCounter = Counter("memory")
-      val tuplesIn = Counter("tuplesIn")
-      val tuplesOut = Counter("tuplesOut")
-      val putCounter = Counter("put")
-      val summer = new SyncSummingQueue[Int, Long](bufferSize,
-        flushFrequency,
-        memoryFlushPercent,
-        memoryCounter,
-        timeOutCounter,
-        sizeCounter,
-        putCounter,
-        tuplesIn,
-        tuplesOut)
-      assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
+    forAll {
+      (inputs: List[List[(Int, Long)]],
+       flushFrequency: FlushFrequency,
+       bufferSize: BufferSize,
+       memoryFlushPercent: MemoryFlushPercent) =>
+        val timeOutCounter = Counter("timeOut")
+        val sizeCounter = Counter("size")
+        val memoryCounter = Counter("memory")
+        val tuplesIn = Counter("tuplesIn")
+        val tuplesOut = Counter("tuplesOut")
+        val putCounter = Counter("put")
+        val summer = new SyncSummingQueue[Int, Long](
+          bufferSize,
+          flushFrequency,
+          memoryFlushPercent,
+          memoryCounter,
+          timeOutCounter,
+          sizeCounter,
+          putCounter,
+          tuplesIn,
+          tuplesOut)
+        assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }
 

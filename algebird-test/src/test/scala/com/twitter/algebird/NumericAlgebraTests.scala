@@ -3,11 +3,12 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary, Prop, Properties }
+import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 
 class NumericAlgebraTests extends CheckProperties {
   import BaseProperties._
-  implicit val arbitraryBigDecimalsHere = BaseProperties.arbReasonableBigDecimals
+  implicit val arbitraryBigDecimalsHere =
+    BaseProperties.arbReasonableBigDecimals
 
   property(s"test int") {
     // check resolution:

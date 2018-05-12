@@ -52,7 +52,8 @@ class GeneratedAbstractAlgebraLaws extends CheckProperties {
     ringLaws[T] && isCommutative[T]
   }
   property("tuple14 is a ring") {
-    type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
+    type T =
+      (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
     ringLaws[T] && isCommutative[T]
   }
   property("tuple15 is a ring") {
@@ -76,15 +77,57 @@ class GeneratedAbstractAlgebraLaws extends CheckProperties {
     ringLaws[T] && isCommutative[T]
   }
   property("tuple20 is a ring") {
-    type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
+    type T =
+      (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
     ringLaws[T] && isCommutative[T]
   }
   property("tuple21 is a ring") {
-    type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
+    type T = (Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int)
     ringLaws[T] && isCommutative[T]
   }
   property("tuple22 is a ring") {
-    type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
+    type T = (Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int,
+              Int)
     ringLaws[T] && isCommutative[T]
   }
 }

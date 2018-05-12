@@ -51,10 +51,13 @@ object HllBenchmark {
 
       val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
       def setSize = rng.nextInt(10) + 1 // 1 -> 10
-      def hll(elements: Set[Long]): HLL = hllMonoid.batchCreate(elements)(byteEncoder)
+      def hll(elements: Set[Long]): HLL =
+        hllMonoid.batchCreate(elements)(byteEncoder)
 
       val inputIntermediate = (0L until numElements).map { _ =>
-        val setElements = (0 until setSize).map{ _ => rng.nextInt(1000).toLong }.toSet
+        val setElements = (0 until setSize).map { _ =>
+          rng.nextInt(1000).toLong
+        }.toSet
         (pow(numInputKeys, rng.nextFloat).toLong, List(hll(setElements)))
       }
       inputData = MapAlgebra.sumByKey(inputIntermediate).map(_._2).toSeq
@@ -65,24 +68,19 @@ object HllBenchmark {
 class HllBenchmark {
   import HllBenchmark._
   @Benchmark
-  def timeSumOption(state: HLLState, bh: Blackhole) = {
+  def timeSumOption(state: HLLState, bh: Blackhole) =
     state.inputData.foreach { vals =>
       bh.consume(state.hllMonoid.sumOption(vals))
     }
-
-  }
-
   @Benchmark
-  def timeOldSumOption(state: HLLState, bh: Blackhole) = {
+  def timeOldSumOption(state: HLLState, bh: Blackhole) =
     state.inputData.foreach { d =>
       bh.consume(state.oldHllMonoid.sumOption(d))
     }
-  }
 
   @Benchmark
-  def timePlus(state: HLLState, bh: Blackhole) = {
+  def timePlus(state: HLLState, bh: Blackhole) =
     state.inputData.foreach { vals =>
       bh.consume(vals.reduce(state.hllMonoid.plus(_, _)))
     }
-  }
 }

@@ -18,8 +18,10 @@ object BloomFilterQueryBenchmark {
 
     @Setup(Level.Trial)
     def setup(): Unit = {
-      val randomStrings = BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
-      bf = BloomFilter[String](nbrOfElements, falsePositiveRate).create(randomStrings: _*)
+      val randomStrings =
+        BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
+      bf = BloomFilter[String](nbrOfElements, falsePositiveRate)
+        .create(randomStrings: _*)
     }
   }
 }
@@ -28,7 +30,6 @@ class BloomFilterQueryBenchmark {
   import BloomFilterQueryBenchmark._
 
   @Benchmark
-  def queryBloomFilter(bloomFilterState: BloomFilterState): ApproximateBoolean = {
+  def queryBloomFilter(bloomFilterState: BloomFilterState): ApproximateBoolean =
     bloomFilterState.bf.contains("1")
-  }
 }

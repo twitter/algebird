@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util
 
 import com.twitter.algebird._
-import com.twitter.util.{ Future, Promise, Return }
+import com.twitter.util.{Future, Promise, Return}
 
 /**
  * This Monoid allows code to depends on the results of asynchronous
@@ -86,14 +86,15 @@ object Tunnel {
    * this will throw an error if the value is different from the previous
    * value that was used.
    */
-  def properPromiseUpdate[V](promise: Promise[V], newV: V): Unit = {
+  def properPromiseUpdate[V](promise: Promise[V], newV: V): Unit =
     if (!promise.updateIfEmpty(Return(newV))) {
       promise.foreach { oldV =>
-        assert(oldV == newV, "Cannot set a promise multiple times with different values."
-          + " Old value: %s  New value: %s".format(oldV, newV))
+        assert(
+          oldV == newV,
+          "Cannot set a promise multiple times with different values."
+            + " Old value: %s  New value: %s".format(oldV, newV))
       }
     }
-  }
 
   def from[V](fn: V => V): Tunnel[V] = {
     val prom = new Promise[V]

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -36,6 +36,7 @@ import algebra.CommutativeGroup
  * @param value the average value of all aggregated items
  */
 case class AveragedValue(count: Long, value: Double) {
+
   /**
    * Returns a copy of this instance with a negative value. Note that
    *
@@ -69,9 +70,7 @@ case class AveragedValue(count: Long, value: Double) {
    * @return an instance representing the mean of this instance and `that`.
    */
   def +(that: Double): AveragedValue =
-    AveragedValue(
-      count + 1L,
-      MomentsGroup.getCombinedMean(count, value, 1L, that))
+    AveragedValue(count + 1L, MomentsGroup.getCombinedMean(count, value, 1L, that))
 
   /**
    * Returns a new instance that averages `that` into this instance.
@@ -105,7 +104,10 @@ object AveragedValue {
    * @tparam N numeric type to convert into `Double`
    */
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
-    Aggregator.prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
+    Aggregator
+      .prepareMonoid { n: N =>
+        AveragedValue(num.toDouble(n))
+      }
       .andThenPresent(_.value)
 
   /**

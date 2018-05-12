@@ -1,16 +1,14 @@
 package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
-import org.scalacheck.{ Arbitrary, Gen }
-import org.scalatest.{ Matchers, _ }
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.{Matchers, _}
 import scala.math.Equiv
 
 class MinHasherTest extends CheckProperties {
   implicit val mhMonoid = new MinHasher32(0.5, 512)
   implicit val mhGen = Arbitrary {
-    for (
-      v <- Gen.choose(0, 10000)
-    ) yield (mhMonoid.init(v))
+    for (v <- Gen.choose(0, 10000)) yield (mhMonoid.init(v))
   }
 
   property("MinHasher is a commutative monoid") {
@@ -33,22 +31,49 @@ class MinHasherSpec extends WordSpec with Matchers {
 
   def randomSets(similarity: Double) = {
     val s = 10000
-    val uniqueFraction = if (similarity == 1.0) 0.0 else (1 - similarity) / (1 + similarity)
+    val uniqueFraction =
+      if (similarity == 1.0) 0.0 else (1 - similarity) / (1 + similarity)
     val sharedFraction = 1 - uniqueFraction
-    val unique1 = 1.to((s * uniqueFraction).toInt).map{ i => math.random }.toSet
-    val unique2 = 1.to((s * uniqueFraction).toInt).map{ i => math.random }.toSet
+    val unique1 = 1
+      .to((s * uniqueFraction).toInt)
+      .map { i =>
+        math.random
+      }
+      .toSet
+    val unique2 = 1
+      .to((s * uniqueFraction).toInt)
+      .map { i =>
+        math.random
+      }
+      .toSet
 
-    val shared = 1.to((s * sharedFraction).toInt).map{ i => math.random }.toSet
+    val shared = 1
+      .to((s * sharedFraction).toInt)
+      .map { i =>
+        math.random
+      }
+      .toSet
     (unique1 ++ shared, unique2 ++ shared)
   }
 
-  def exactSimilarity[T](x: Set[T], y: Set[T]) = {
+  def exactSimilarity[T](x: Set[T], y: Set[T]) =
     (x & y).size.toDouble / (x ++ y).size
-  }
 
   def approxSimilarity[T, H](mh: MinHasher[H], x: Set[T], y: Set[T]) = {
-    val sig1 = x.map{ l => mh.init(l.toString) }.reduce{ (a, b) => mh.plus(a, b) }
-    val sig2 = y.map{ l => mh.init(l.toString) }.reduce{ (a, b) => mh.plus(a, b) }
+    val sig1 = x
+      .map { l =>
+        mh.init(l.toString)
+      }
+      .reduce { (a, b) =>
+        mh.plus(a, b)
+      }
+    val sig2 = y
+      .map { l =>
+        mh.init(l.toString)
+      }
+      .reduce { (a, b) =>
+        mh.plus(a, b)
+      }
     mh.similarity(sig1, sig2)
   }
 

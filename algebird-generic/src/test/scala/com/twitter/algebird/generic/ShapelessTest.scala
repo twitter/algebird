@@ -1,6 +1,6 @@
 package com.twitter.algebird.generic
 
-import com.twitter.algebird.{ Semigroup, Monoid, Group, Ring }
+import com.twitter.algebird.{Group, Monoid, Ring, Semigroup}
 import org.scalacheck.ScalacheckShapeless._
 import Shapeless._
 import shapeless._
@@ -8,28 +8,23 @@ import EquivOrdering._
 
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
-import com.twitter.algebird.BaseProperties.{ semigroupLaws, monoidLaws, groupLaws, ringLaws }
+import com.twitter.algebird.BaseProperties.{groupLaws, monoidLaws, ringLaws, semigroupLaws}
 
 case class Row(x: Int, y: Long)
 
 object ShapelessTest extends Properties("Shapeless Instances") {
 
-  property("semigroup laws") =
-    semigroupLaws[Int :: String :: HNil]
+  property("semigroup laws") = semigroupLaws[Int :: String :: HNil]
 
-  property("monoid laws") =
-    monoidLaws[Int :: String :: HNil]
+  property("monoid laws") = monoidLaws[Int :: String :: HNil]
 
-  property("group laws") =
-    groupLaws[Int :: Long :: HNil]
+  property("group laws") = groupLaws[Int :: Long :: HNil]
 
-  property("ring laws") =
-    ringLaws[Int :: Long :: HNil]
+  property("ring laws") = ringLaws[Int :: Long :: HNil]
 
   implicit val rowRing: Ring[Row] = genericRing
   implicit val rowOrd: Ordering[Row] = genericOrdering
-  property("ring laws on row") =
-    ringLaws[Row]
+  property("ring laws on row") = ringLaws[Row]
 
   // check we can find generics
   genericSemigroup[Row, Int :: Long :: HNil]

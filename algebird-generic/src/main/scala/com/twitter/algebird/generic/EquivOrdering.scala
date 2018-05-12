@@ -4,8 +4,8 @@ import shapeless._
 
 object EquivOrdering extends EquivOrdering1 {
   implicit def hconsOrdering[A, B <: HList](implicit
-    a: Ordering[A],
-    lb: Lazy[Ordering[B]]): Ordering[A :: B] =
+                                            a: Ordering[A],
+                                            lb: Lazy[Ordering[B]]): Ordering[A :: B] =
     new Ordering[A :: B] {
       val b = lb.value
       def compare(x: A :: B, y: A :: B): Int = {

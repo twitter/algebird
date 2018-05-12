@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -42,11 +42,12 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
       val row = rows(rhow)
       val t = row.get(j0) match {
         case Some(t0) => Math.max(t0, timestamp)
-        case None => timestamp
+        case None     => timestamp
       }
       rows.updated(rhow, row.updated(j0, t))
     } else {
-      val padded = (rows.size until rhow).foldLeft(rows)((rs, _) => rs :+ Map.empty)
+      val padded =
+        (rows.size until rhow).foldLeft(rows)((rs, _) => rs :+ Map.empty)
       padded :+ Map(j0 -> timestamp)
     }
     HLLSeries(bits, newRows)
@@ -83,9 +84,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
    * @return New HLLSeries only including RhoWs for values seen at or after the given timestamp
    */
   def since(threshold: Long): HLLSeries =
-    HLLSeries(
-      bits,
-      rows.map{ _.filter{ case (j, ts) => ts >= threshold } })
+    HLLSeries(bits, rows.map { _.filter { case (j, ts) => ts >= threshold } })
 
   def toHLL: HLL = {
     val monoid = new HyperLogLogMonoid(bits)
@@ -93,7 +92,9 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     else {
       monoid.sum(rows.iterator.zipWithIndex.map {
         case (map, i) =>
-          SparseHLL(bits, map.mapValues { ts => Max((i + 1).toByte) })
+          SparseHLL(bits, map.mapValues { ts =>
+            Max((i + 1).toByte)
+          })
       })
     }
   }
@@ -152,7 +153,7 @@ class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
       left.foldLeft(right) {
         case (m, (k, lv)) =>
           m.updated(k, m.get(k) match {
-            case None => lv
+            case None     => lv
             case Some(rv) => Math.max(lv, rv)
           })
       }

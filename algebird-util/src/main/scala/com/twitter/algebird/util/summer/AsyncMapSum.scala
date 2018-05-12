@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{ Duration, Future, FuturePool }
+import com.twitter.util.{Duration, Future, FuturePool}
 import java.util.concurrent.ArrayBlockingQueue
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
@@ -24,24 +24,24 @@ import scala.collection.JavaConverters._
 /**
  * @author Ian O Connell
  */
-
 class AsyncMapSum[Key, Value](bufferSize: BufferSize,
-  override val flushFrequency: FlushFrequency,
-  override val softMemoryFlush: MemoryFlushPercent,
-  override val memoryIncr: Incrementor,
-  override val timeoutIncr: Incrementor,
-  insertOp: Incrementor,
-  tuplesOut: Incrementor,
-  sizeIncr: Incrementor,
-  workPool: FuturePool)(implicit semigroup: Semigroup[Value])
-  extends AsyncSummer[(Key, Value), Map[Key, Value]]
-  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+                              override val flushFrequency: FlushFrequency,
+                              override val softMemoryFlush: MemoryFlushPercent,
+                              override val memoryIncr: Incrementor,
+                              override val timeoutIncr: Incrementor,
+                              insertOp: Incrementor,
+                              tuplesOut: Incrementor,
+                              sizeIncr: Incrementor,
+                              workPool: FuturePool)(implicit semigroup: Semigroup[Value])
+    extends AsyncSummer[(Key, Value), Map[Key, Value]]
+    with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
   protected override val emptyResult = Map.empty[Key, Value]
 
-  private[this] final val queue = new ArrayBlockingQueue[Map[Key, Value]](bufferSize.v, true)
+  private[this] final val queue =
+    new ArrayBlockingQueue[Map[Key, Value]](bufferSize.v, true)
   override def isFlushed: Boolean = queue.size == 0
 
   override def flush: Future[Map[Key, Value]] = {

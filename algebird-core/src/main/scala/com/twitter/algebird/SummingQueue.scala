@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -30,7 +30,6 @@ package com.twitter.algebird
  * @author Ashu Singhal
  * @author Oscar Boykin
  */
-
 import java.io.Serializable
 import java.util.concurrent.ArrayBlockingQueue
 
@@ -42,7 +41,7 @@ object SummingQueue {
 }
 
 class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: Semigroup[V])
-  extends StatefulSummer[V] {
+    extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
@@ -70,12 +69,11 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
   /**
    * drain the queue and return the sum. If empty, return None
    */
-  def flush: Option[V] = {
+  def flush: Option[V] =
     queueOption.flatMap { queue =>
       val toSum = ListBuffer[V]()
       queue.drainTo(toSum.asJava)
       Semigroup.sumOption(toSum)
     }
-  }
   def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
 }

@@ -29,7 +29,9 @@ object EitherMonad {
     override def map[T, U](self: Either[L, T])(fn: T => U): Either[L, U] =
       self.right.map(fn)
   }
-  implicit def monad[L]: Monad[({ type RightT[R] = Either[L, R] })#RightT] = new Error[L]
+  implicit def monad[L]: Monad[({ type RightT[R] = Either[L, R] })#RightT] =
+    new Error[L]
 
-  def assert[L](truth: Boolean, failure: => L): Either[L, Unit] = if (truth) Right(()) else Left(failure)
+  def assert[L](truth: Boolean, failure: => L): Either[L, Unit] =
+    if (truth) Right(()) else Left(failure)
 }

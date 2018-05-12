@@ -17,8 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 package scalacheck
 
-import org.scalacheck.{ Arbitrary, Gen }
-import org.scalacheck.Arbitrary.{ arbitrary => getArbitrary }
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary.{arbitrary => getArbitrary}
 import Gen.oneOf
 
 trait IntervalGen {
@@ -59,14 +59,19 @@ trait IntervalArb {
   implicit def intervalArb[T](implicit arb: Arbitrary[T], ord: Ordering[T]): Arbitrary[Interval[T]] =
     Arbitrary(
       oneOf(
-        genUniverse[T], genEmpty[T],
-        genInclusiveLower[T], genExclusiveLower[T],
-        genInclusiveUpper[T], genExclusiveUpper[T],
+        genUniverse[T],
+        genEmpty[T],
+        genInclusiveLower[T],
+        genExclusiveLower[T],
+        genInclusiveUpper[T],
+        genExclusiveUpper[T],
         genIntersection[T]))
 
-  implicit def lowerIntArb[T: Arbitrary: Ordering]: Arbitrary[Lower[T]] = Arbitrary(genLower)
+  implicit def lowerIntArb[T: Arbitrary: Ordering]: Arbitrary[Lower[T]] =
+    Arbitrary(genLower)
 
-  implicit def upperIntArb[T: Arbitrary: Ordering]: Arbitrary[Upper[T]] = Arbitrary(genUpper)
+  implicit def upperIntArb[T: Arbitrary: Ordering]: Arbitrary[Upper[T]] =
+    Arbitrary(genUpper)
 
   implicit def intersectionArb[T: Arbitrary: Ordering]: Arbitrary[Interval.GenIntersection[T]] =
     Arbitrary(genIntersection)

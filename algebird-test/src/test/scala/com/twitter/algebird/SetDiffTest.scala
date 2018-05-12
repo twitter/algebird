@@ -2,14 +2,16 @@ package com.twitter.algebird
 
 import org.scalacheck._
 import org.scalacheck.Prop._
-import org.scalatest.{ WordSpec, Matchers }
+import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.prop.Checkers
 
 import Arbitrary.arbitrary
 
 object SetDiffTest {
   implicit def arbSetDiff[T: Arbitrary]: Arbitrary[SetDiff[T]] =
-    Arbitrary(arbitrary[(Set[T], Set[T])].map { case (a, b) => SetDiff.of(a, b) })
+    Arbitrary(arbitrary[(Set[T], Set[T])].map {
+      case (a, b) => SetDiff.of(a, b)
+    })
 }
 
 class SetDiffTest extends WordSpec with Matchers with Checkers {
@@ -32,11 +34,11 @@ class SetDiffTest extends WordSpec with Matchers with Checkers {
     "SetDiffs are the same as updating the set" in {
       check { (init: Set[Int], items: List[Either[Int, Int]]) =>
         val updated = items.foldLeft(init) {
-          case (s, Left(i)) => s - i
+          case (s, Left(i))  => s - i
           case (s, Right(i)) => s + i
         }
         val diff = Monoid.sum(items.map {
-          case Left(i) => SetDiff.remove(i)
+          case Left(i)  => SetDiff.remove(i)
           case Right(i) => SetDiff.add(i)
         })
         updated == diff(init)
@@ -44,32 +46,32 @@ class SetDiffTest extends WordSpec with Matchers with Checkers {
     }
     "+ is the same as SetDiff.add" in {
       check { (d: SetDiff[Int], inc: Int) =>
-        d + inc == (d merge (SetDiff.add(inc)))
+        d + inc == (d.merge(SetDiff.add(inc)))
       }
     }
     "- is the same as SetDiff.remove" in {
       check { (d: SetDiff[Int], dec: Int) =>
-        d - dec == (d merge (SetDiff.remove(dec)))
+        d - dec == (d.merge(SetDiff.remove(dec)))
       }
     }
     "++ is the same as SetDiff.addAll" in {
       check { (d: SetDiff[Int], inc: Set[Int]) =>
-        d ++ inc == (d merge (SetDiff.addAll(inc)))
+        d ++ inc == (d.merge(SetDiff.addAll(inc)))
       }
     }
     "-- is the same as SetDiff.removeAll" in {
       check { (d: SetDiff[Int], dec: Set[Int]) =>
-        d -- dec == (d merge (SetDiff.removeAll(dec)))
+        d -- dec == (d.merge(SetDiff.removeAll(dec)))
       }
     }
     "+ then - is the same as -" in {
       check { (i: Int) =>
-        (SetDiff.add(i) merge SetDiff.remove(i)) == SetDiff.remove(i)
+        (SetDiff.add(i).merge(SetDiff.remove(i))) == SetDiff.remove(i)
       }
     }
     "- then + is the same as +" in {
       check { (i: Int) =>
-        (SetDiff.remove(i) merge SetDiff.add(i)) == SetDiff.add(i)
+        (SetDiff.remove(i).merge(SetDiff.add(i))) == SetDiff.add(i)
       }
     }
 
@@ -90,7 +92,7 @@ class SetDiffTest extends WordSpec with Matchers with Checkers {
       check { (ops: List[Either[Int, Int]]) =>
         val built = ops.foldLeft(SetDiff.empty[Int]) {
           case (diff, Left(remove)) => diff - remove
-          case (diff, Right(add)) => diff + add
+          case (diff, Right(add))   => diff + add
         }
         (built.add & built.remove).isEmpty
       }
@@ -98,7 +100,7 @@ class SetDiffTest extends WordSpec with Matchers with Checkers {
 
     "apply distributes over merge" in {
       check { (init: Set[Int], a: SetDiff[Int], b: SetDiff[Int]) =>
-        (a merge b)(init) == b(a(init))
+        a.merge(b)(init) == b(a(init))
       }
     }
 
@@ -106,7 +108,7 @@ class SetDiffTest extends WordSpec with Matchers with Checkers {
       check { (set: Set[Int], a: SetDiff[Int]) =>
         a.strictApply(set) match {
           case None =>
-            ((a.remove diff set).nonEmpty || (a.add & set).nonEmpty) &&
+            (a.remove.diff(set).nonEmpty || (a.add & set).nonEmpty) &&
               (a.invert(a(set)) != set) // invert only succeeds when strictApply does
           /*
            * And if it DOES succeed it inverts!

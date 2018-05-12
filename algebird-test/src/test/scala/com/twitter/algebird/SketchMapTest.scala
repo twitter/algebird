@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{Arbitrary, Gen}
 
 object SketchMapTestImplicits {
   val DELTA = 1E-6
@@ -27,7 +27,7 @@ class SketchMapLaws extends CheckProperties {
   implicit def equiv[K, V]: Equiv[SketchMap[K, V]] =
     Equiv.fromFunction { (left, right) =>
       (left.valuesTable == right.valuesTable) &&
-        (left.totalValue == right.totalValue)
+      (left.totalValue == right.totalValue)
     }
 
   property("SketchMap is a commutative monoid") {
@@ -47,7 +47,9 @@ class SketchMapTest extends WordSpec with Matchers {
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
-      val data = (0 to (totalCount - 1)).map { _ => (RAND.nextInt(range), 1L) }
+      val data = (0 to (totalCount - 1)).map { _ =>
+        (RAND.nextInt(range), 1L)
+      }
       val sm = MONOID.create(data)
       assert(sm.totalValue == totalCount)
     }
@@ -110,20 +112,20 @@ class SketchMapTest extends WordSpec with Matchers {
       // Monoid that takes the smaller number.
       val smallerMonoid: Monoid[Long] = new Monoid[Long] {
         override def zero: Long = Long.MaxValue
-        override def plus(first: Long, second: Long): Long = {
+        override def plus(first: Long, second: Long): Long =
           if (first < second) {
             first
           } else {
             second
           }
-        }
       }
 
       // Ordering that orders from biggest to smallest (so that HeavyHitters
       // are the smallest numbers).
       val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
 
-      val monoid = SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
+      val monoid =
+        SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)
 
       val sm1 = monoid.create((100, 10L))
       assert(monoid.heavyHitters(sm1) == List((100, 10L)))

@@ -11,17 +11,17 @@ object Shapeless extends Shapeless3 {
 }
 
 abstract class Shapeless3 extends Shapeless2 {
+
   /**
    * Pairwise ring for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsRing[A, B <: HList](implicit
-    a: Ring[A],
-    lb: Lazy[Ring[B]]): Ring[A :: B] = {
+                                        a: Ring[A],
+                                        lb: Lazy[Ring[B]]): Ring[A :: B] =
     // We use Lazy[Ring[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
     new HConsRing(a, lb.value)
-  }
 
   /**
    * this is intentionally not implicit to avoid superceding the instance that may be
@@ -34,17 +34,17 @@ abstract class Shapeless3 extends Shapeless2 {
 }
 
 abstract class Shapeless2 extends Shapeless1 {
+
   /**
    * Pairwise group for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsGroup[A, B <: HList](implicit
-    a: Group[A],
-    lb: Lazy[Group[B]]): Group[A :: B] = {
+                                         a: Group[A],
+                                         lb: Lazy[Group[B]]): Group[A :: B] =
     // We use Lazy[Group[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
     new HConsGroup(a, lb.value)
-  }
 
   /**
    * this is intentionally not implicit to avoid superceding the instance that may be
@@ -57,17 +57,17 @@ abstract class Shapeless2 extends Shapeless1 {
 }
 
 abstract class Shapeless1 extends Shapeless0 {
+
   /**
    * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsMonoid[A, B <: HList](implicit
-    a: Monoid[A],
-    lb: Lazy[Monoid[B]]): Monoid[A :: B] = {
+                                          a: Monoid[A],
+                                          lb: Lazy[Monoid[B]]): Monoid[A :: B] =
     // We use Lazy[Monoid[A]] to avoid bogus ambiguous implicits at
     // the type-level. There is no value-level laziness needed, so we
     // immediately evaluate la.value.
     new HConsMonoid(a, lb.value)
-  }
 
   /**
    * this is intentionally not implicit to avoid superceding the instance that may be
@@ -85,8 +85,8 @@ abstract class Shapeless0 {
    * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
   implicit def hconsSemigroup[A, B <: HList](implicit
-    a: Semigroup[A],
-    lb: Lazy[Semigroup[B]]): Semigroup[A :: B] =
+                                             a: Semigroup[A],
+                                             lb: Lazy[Semigroup[B]]): Semigroup[A :: B] =
     new HConsSemigroup[A, B](a, lb.value)
 
   /**
@@ -99,7 +99,8 @@ abstract class Shapeless0 {
     new InvariantSemigroup(gen.from _, gen.to _)
 }
 
-class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val b: Semigroup[B]) extends Semigroup[A :: B] {
+class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val b: Semigroup[B])
+    extends Semigroup[A :: B] {
   def plus(x: A :: B, y: A :: B): A :: B =
     a.plus(x.head, y.head) :: b.plus(x.tail, y.tail)
 
@@ -129,7 +130,9 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
     }
 }
 
-class HConsMonoid[A, B <: HList](a: Monoid[A], b: Monoid[B]) extends HConsSemigroup(a, b) with Monoid[A :: B] {
+class HConsMonoid[A, B <: HList](a: Monoid[A], b: Monoid[B])
+    extends HConsSemigroup(a, b)
+    with Monoid[A :: B] {
   val zero: A :: B = a.zero :: b.zero
 }
 

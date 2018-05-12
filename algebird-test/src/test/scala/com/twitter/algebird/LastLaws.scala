@@ -14,7 +14,9 @@ class LastLaws extends CheckProperties {
   }
 
   property("Last.+ should work") {
-    forAll { (l: Last[Int], r: Last[Int]) => l + r == r }
+    forAll { (l: Last[Int], r: Last[Int]) =>
+      l + r == r
+    }
   }
 
   property("Last.aggregator returns the last item") {

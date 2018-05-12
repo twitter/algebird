@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary, Prop, Properties }
+import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Arbitrary.arbitrary
 
 import scala.collection.BitSet
@@ -27,7 +27,8 @@ import Helpers.arbitraryBatched
 class BatchedLaws extends CheckProperties {
 
   import BaseProperties._
-  implicit val arbitraryBigDecimalsHere = BaseProperties.arbReasonableBigDecimals
+  implicit val arbitraryBigDecimalsHere =
+    BaseProperties.arbReasonableBigDecimals
 
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {
     implicit val m: Monoid[Batched[A]] = Batched.compactingMonoid[A](size)

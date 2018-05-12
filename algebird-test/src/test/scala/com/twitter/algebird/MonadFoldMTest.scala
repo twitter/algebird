@@ -12,7 +12,8 @@ class MonadFoldMTest extends WordSpec with Matchers {
 
       val first = Monad.foldM(0, List(2, 8, 3, 1))(binSmalls)
       assert(first == Some(14))
-      def binSmalls2(x: Int, y: String): Option[Int] = if (y == "11") None else Some(x + y.toInt)
+      def binSmalls2(x: Int, y: String): Option[Int] =
+        if (y == "11") None else Some(x + y.toInt)
 
       val second = Monad.foldM(0, List("2", "11", "3", "1"))(binSmalls2)
       assert(second == None)

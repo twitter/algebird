@@ -17,8 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 package scalacheck
 
-import org.scalacheck.{ Arbitrary, Gen }
-import org.scalacheck.Arbitrary.{ arbitrary => getArbitrary }
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary.{arbitrary => getArbitrary}
 import Gen._
 
 /**
@@ -54,9 +54,7 @@ object gen extends ExpHistGen with IntervalGen {
     } yield new Moments(m0, m1, m2, m3, m4)
 
   def genStringSpaceSaver: Gen[SpaceSaver[String]] =
-    Gen.frequency(
-      (1, genSSOneSpaceSaver),
-      (10, genSSManySpaceSaver))
+    Gen.frequency((1, genSSOneSpaceSaver), (10, genSSManySpaceSaver))
 
   def genSSOneSpaceSaver: Gen[SpaceSaver[String]] =
     for {

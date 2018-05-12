@@ -12,13 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
+import java.lang.{
+  Integer => JInt,
+  Short => JShort,
+  Long => JLong,
+  Float => JFloat,
+  Double => JDouble,
+  Boolean => JBool
+}
 
 import scala.annotation.implicitNotFound
+
 /**
  * This class represents a vector space. For the required properties see:
  *
@@ -26,19 +34,26 @@ import scala.annotation.implicitNotFound
  *
  */
 object VectorSpace {
-  def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] = vs.scale(v, c)
-  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) = new VectorSpace[F, C] {
-    def ring = r
-    def group = cGroup
-    def scale(v: F, c: C[F]) = if (r.isNonZero(v)) scaleFn(v, c) else cGroup.zero
-  }
+  def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] =
+    vs.scale(v, c)
+  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) =
+    new VectorSpace[F, C] {
+      def ring = r
+      def group = cGroup
+      def scale(v: F, c: C[F]) =
+        if (r.isNonZero(v)) scaleFn(v, c) else cGroup.zero
+    }
 
   // Implicits
   implicit def indexedSeqSpace[T: Ring] =
-    from[T, IndexedSeq]{ (s, seq) => seq.map(Ring.times(s, _)) }
+    from[T, IndexedSeq] { (s, seq) =>
+      seq.map(Ring.times(s, _))
+    }
 
   implicit def mapSpace[K, T: Ring] =
-    from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) => m.mapValues(Ring.times(s, _)) }
+    from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
+      m.mapValues(Ring.times(s, _))
+    }
 
   // TODO: add implicits for java lists, arrays, and options
 }

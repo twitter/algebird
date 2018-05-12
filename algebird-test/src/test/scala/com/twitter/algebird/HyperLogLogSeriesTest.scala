@@ -2,10 +2,10 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalacheck.{ Gen, Arbitrary, Properties, Prop }
+import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Arbitrary.arbitrary
 
-import HyperLogLog.{ int2Bytes, long2Bytes }
+import HyperLogLog.{int2Bytes, long2Bytes}
 
 class HyperLogLogSeriesLaws extends CheckProperties {
   import BaseProperties._
@@ -69,7 +69,9 @@ class HyperLogLogSeriesLaws extends CheckProperties {
     // possible future regressions (where the error rate gets worse
     // than expected).
     val cardinalities = List(1024, 2048, 4096, 8192, 16384, 32768, 65536)
-    cardinalities.forall { n => verify(n, 0.1) }
+    cardinalities.forall { n =>
+      verify(n, 0.1)
+    }
   }
 }
 
@@ -92,10 +94,11 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
     monoid.sum(hllSeries)
   }
 
-  def exactGenerator: Gen[Seq[(Long, Long)]] = for {
-    data <- Gen.listOfN(100, Gen.choose(Long.MinValue, Long.MaxValue))
-    timestamps = 1L to 100L
-  } yield data.zip(timestamps)
+  def exactGenerator: Gen[Seq[(Long, Long)]] =
+    for {
+      data <- Gen.listOfN(100, Gen.choose(Long.MinValue, Long.MaxValue))
+      timestamps = 1L to 100L
+    } yield data.zip(timestamps)
 
   // arbitrary timestamp
   def inputGenerator(timestampedData: Exact): Gen[Long] =
@@ -114,6 +117,5 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
 class HLLSeriesProperties extends ApproximateProperties("HyperLogLogSeries") {
   import ApproximateProperty.toProp
 
-  property("properly calculates .since") =
-    toProp(new HLLSeriesSinceProperty, 1, 100, 0.01)
+  property("properly calculates .since") = toProp(new HLLSeriesSinceProperty, 1, 100, 0.01)
 }

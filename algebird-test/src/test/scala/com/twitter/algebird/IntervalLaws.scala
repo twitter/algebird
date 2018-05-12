@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -27,7 +27,8 @@ class IntervalLaws extends CheckProperties {
     forAll { (interval: Interval[Int], t: Int, inc: PosNum[Int]) =>
       def nonDecreasing(i: Int): Long = i.toLong + inc.value
 
-      val mappedInterval: Interval[Long] = interval.mapNonDecreasing(nonDecreasing(_))
+      val mappedInterval: Interval[Long] =
+        interval.mapNonDecreasing(nonDecreasing(_))
       val mappedT: Long = nonDecreasing(t)
 
       interval.contains(t) == mappedInterval.contains(mappedT)
@@ -46,9 +47,9 @@ class IntervalLaws extends CheckProperties {
       val x = y.asInstanceOf[Long]
       val intr = Interval.closed(x, x + 1)
       intr.contains(x) &&
-        intr.contains(x + 1) &&
-        (!intr.contains(x + 2)) &&
-        (!intr.contains(x - 1))
+      intr.contains(x + 1) &&
+      (!intr.contains(x + 2)) &&
+      (!intr.contains(x - 1))
     }
   }
   property("(x, x + 2) contains x+1") {
@@ -56,8 +57,8 @@ class IntervalLaws extends CheckProperties {
       val x = y.asInstanceOf[Long]
       val intr = Interval.open(x, x + 2)
       intr.contains(x + 1) &&
-        (!intr.contains(x + 2)) &&
-        (!intr.contains(x))
+      (!intr.contains(x + 2)) &&
+      (!intr.contains(x))
     }
   }
 
@@ -128,7 +129,7 @@ class IntervalLaws extends CheckProperties {
     forAll { (item: Long, intr: Interval[Long]) =>
       intr match {
         case Empty() => !intr.contains(item)
-        case _ => true // may be here
+        case _       => true // may be here
       }
     }
   }
@@ -163,29 +164,32 @@ class IntervalLaws extends CheckProperties {
     }
   }
 
-  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) = {
+  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) =
     if (low.intersects(upper)) {
-      low.least.map { lb =>
-        // This is the usual case
-        upper.contains(lb) || {
-          // but possibly we have: (lb, lb+1)
-          Equiv[Option[Long]].equiv(Some(lb), upper.strictUpperBound)
+      low.least
+        .map { lb =>
+          // This is the usual case
+          upper.contains(lb) || {
+            // but possibly we have: (lb, lb+1)
+            Equiv[Option[Long]].equiv(Some(lb), upper.strictUpperBound)
+          }
         }
-      }.getOrElse(true) &&
-        (low && upper match {
-          case Intersection(_, _) => true
-          case _ => false
-        })
+        .getOrElse(true) &&
+      (low && upper match {
+        case Intersection(_, _) => true
+        case _                  => false
+      })
     } else {
       // nothing is in both
       low.least.map(upper.contains(_) == false).getOrElse(true) &&
-        items.forall { i => (low.contains(i) && upper.contains(i)) == false } &&
-        (low && upper match {
-          case Empty() => true
-          case _ => false
-        })
+      items.forall { i =>
+        (low.contains(i) && upper.contains(i)) == false
+      } &&
+      (low && upper match {
+        case Empty() => true
+        case _       => false
+      })
     }
-  }
   property("If an a Lower intersects an Upper, the intersection is non Empty") {
     forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
       (lowerUpperIntersection(low, upper, items))
@@ -196,17 +200,21 @@ class IntervalLaws extends CheckProperties {
   property("(n, n+1) follows the intersect law") {
     forAll { (n: Long) =>
       ((n == Long.MaxValue) ||
-        lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n + 1L), Nil))
+      lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n + 1L), Nil))
     }
   }
 
   property("toLeftClosedRightOpen is an Injection") {
     forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
-      (intr.toLeftClosedRightOpen.map {
-        case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
-          val intr2 = Interval.leftClosedRightOpen(low, high)
-          tests.forall { t => intr(t) == intr2(t) }
-      }.getOrElse(true)) // none means this can't be expressed as this kind of interval
+      (intr.toLeftClosedRightOpen
+        .map {
+          case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
+            val intr2 = Interval.leftClosedRightOpen(low, high)
+            tests.forall { t =>
+              intr(t) == intr2(t)
+            }
+        }
+        .getOrElse(true)) // none means this can't be expressed as this kind of interval
     }
   }
 
@@ -246,18 +254,17 @@ class IntervalLaws extends CheckProperties {
       ((items1.size < 2) || items1.sliding(2).forall { it =>
         it.toList match {
           case low :: high :: Nil if low + 1L == high => true
-          case _ => false
+          case _                                      => false
         }
-      } &&
-        {
-          val items2 = intr.greatestToLeast.take(100)
-          (items2.size < 2) || items2.sliding(2).forall { it =>
-            it.toList match {
-              case high :: low :: Nil if low + 1L == high => true
-              case _ => false
-            }
+      } && {
+        val items2 = intr.greatestToLeast.take(100)
+        (items2.size < 2) || items2.sliding(2).forall { it =>
+          it.toList match {
+            case high :: low :: Nil if low + 1L == high => true
+            case _                                      => false
           }
-        })
+        }
+      })
     }
   }
 
@@ -271,9 +278,10 @@ class IntervalLaws extends CheckProperties {
   property("nothing is smaller than least") {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedLeast match {
-        case Some(l) => (i :: rest).forall { v =>
-          !intr(v) || (l <= v)
-        }
+        case Some(l) =>
+          (i :: rest).forall { v =>
+            !intr(v) || (l <= v)
+          }
         case None => true
       }
     }
@@ -281,9 +289,10 @@ class IntervalLaws extends CheckProperties {
   property("nothing is bigger than greatest") {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedGreatest match {
-        case Some(u) => (i :: rest).forall { v =>
-          !intr(v) || (v <= u)
-        }
+        case Some(u) =>
+          (i :: rest).forall { v =>
+            !intr(v) || (v <= u)
+          }
         case None => true
       }
     }
@@ -293,10 +302,10 @@ class IntervalLaws extends CheckProperties {
       (a && b).boundedLeast match {
         case Some(l) =>
           (a.boundedLeast, b.boundedLeast) match {
-            case (Some(v), None) => v == l
-            case (None, Some(v)) => v == l
+            case (Some(v), None)      => v == l
+            case (None, Some(v))      => v == l
             case (Some(v1), Some(v2)) => l == math.max(v1, v2)
-            case (None, None) => false // should never happen
+            case (None, None)         => false // should never happen
           }
         case None => true
       }
@@ -307,10 +316,10 @@ class IntervalLaws extends CheckProperties {
       (a && b).boundedGreatest match {
         case Some(l) =>
           (a.boundedGreatest, b.boundedGreatest) match {
-            case (Some(v), None) => v == l
-            case (None, Some(v)) => v == l
+            case (Some(v), None)      => v == l
+            case (None, Some(v))      => v == l
             case (Some(v1), Some(v2)) => l == math.min(v1, v2)
-            case (None, None) => false // should never happen
+            case (None, None)         => false // should never happen
           }
         case None => true
       }
@@ -320,11 +329,12 @@ class IntervalLaws extends CheckProperties {
     forAll { (a: Interval[Long]) =>
       a.boundedLeast match {
         case Some(_) => true
-        case None => a.isEmpty || (a match {
-          case _: Upper[_] => true
-          case Universe() => true
-          case _ => false
-        })
+        case None =>
+          a.isEmpty || (a match {
+            case _: Upper[_] => true
+            case Universe()  => true
+            case _           => false
+          })
       }
     }
   }
@@ -332,11 +342,12 @@ class IntervalLaws extends CheckProperties {
     forAll { (a: Interval[Long]) =>
       a.boundedGreatest match {
         case Some(_) => true
-        case None => a.isEmpty || (a match {
-          case _: Lower[_] => true
-          case Universe() => true
-          case _ => false
-        })
+        case None =>
+          a.isEmpty || (a match {
+            case _: Lower[_] => true
+            case Universe()  => true
+            case _           => false
+          })
       }
     }
   }
@@ -344,7 +355,8 @@ class IntervalLaws extends CheckProperties {
   property("invalid closed bounds are empty") {
     forAll { (a: Long, b: Long) =>
       (a == b) || {
-        val soempty = if (a < b) Interval.closed(b, a) else Interval.closed(a, b)
+        val soempty =
+          if (a < b) Interval.closed(b, a) else Interval.closed(a, b)
         soempty.isEmpty
       }
     }

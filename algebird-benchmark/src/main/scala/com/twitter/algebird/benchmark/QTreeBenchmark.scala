@@ -64,34 +64,28 @@ object QTreeBenchmark {
 class QTreeBenchmark {
   import QTreeBenchmark._
   @Benchmark
-  def timeSumOptionUnit(state: QTreeState) = {
+  def timeSumOptionUnit(state: QTreeState) =
     state.qtreeUnit.sumOption(state.inputDataUnit)
-  }
 
   @Benchmark
-  def timeSumOptionLong(state: QTreeState) = {
+  def timeSumOptionLong(state: QTreeState) =
     state.qtreeLong.sumOption(state.inputDataLong)
-  }
 
   @Benchmark
-  def timeSumOptionDouble(state: QTreeState) = {
+  def timeSumOptionDouble(state: QTreeState) =
     state.qtreeDouble.sumOption(state.inputDataDouble)
-  }
 
   @Benchmark
-  def timePlusUnit(state: QTreeState): QTree[Unit] = {
+  def timePlusUnit(state: QTreeState): QTree[Unit] =
     state.inputDataUnit.tail.reduce(state.qtreeUnit.plus)
-  }
 
   @Benchmark
-  def timePlusLong(state: QTreeState): QTree[Long] = {
+  def timePlusLong(state: QTreeState): QTree[Long] =
     state.inputDataLong.tail.reduce(state.qtreeLong.plus)
-  }
 
   @Benchmark
-  def timePlusDouble(state: QTreeState): QTree[Double] = {
+  def timePlusDouble(state: QTreeState): QTree[Double] =
     state.inputDataDouble.tail.reduce(state.qtreeDouble.plus)
-  }
 
   @Benchmark
   def timeQuantileBounds(state: QTreeState) = {

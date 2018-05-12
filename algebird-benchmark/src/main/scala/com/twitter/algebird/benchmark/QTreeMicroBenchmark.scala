@@ -29,7 +29,7 @@ object QTreeMicroBenchmark {
   }
 
   @annotation.tailrec
-  private final def extendToLevelDoubleBranch[A](q: QTree[A], n: Int)(implicit monoid: Monoid[A]): QTree[A] = {
+  private final def extendToLevelDoubleBranch[A](q: QTree[A], n: Int)(implicit monoid: Monoid[A]): QTree[A] =
     if (n <= q.level)
       q
     else {
@@ -44,10 +44,9 @@ object QTreeMicroBenchmark {
 
       extendToLevelDoubleBranch(parent, n)
     }
-  }
 
   @annotation.tailrec
-  private final def extendToLevelSingleBranch[A](q: QTree[A], n: Int)(implicit monoid: Monoid[A]): QTree[A] = {
+  private final def extendToLevelSingleBranch[A](q: QTree[A], n: Int)(implicit monoid: Monoid[A]): QTree[A] =
     if (n <= q.level)
       q
     else {
@@ -62,7 +61,6 @@ object QTreeMicroBenchmark {
 
       extendToLevelSingleBranch(parent, n)
     }
-  }
 }
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

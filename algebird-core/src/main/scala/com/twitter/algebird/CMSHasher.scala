@@ -32,7 +32,8 @@ trait CMSHasher[K] extends java.io.Serializable {
    * }}}
    */
   def on[L](f: L => K) = new CMSHasher[L] {
-    override def hash(a: Int, b: Int, width: Int)(x: L): Int = self.hash(a, b, width)(f(x))
+    override def hash(a: Int, b: Int, width: Int)(x: L): Int =
+      self.hash(a, b, width)(f(x))
   }
 
   /**
@@ -77,7 +78,8 @@ object CMSHasher {
 
   }
 
-  implicit val cmsHasherShort: CMSHasher[Short] = CMSHasherInt.contramap(x => x.toInt)
+  implicit val cmsHasherShort: CMSHasher[Short] =
+    CMSHasherInt.contramap(x => x.toInt)
 
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
@@ -131,11 +133,13 @@ object CMSHasher {
   }
 
   implicit object CMSHasherBytes extends CMSHasher[Bytes] {
-    override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int = hashBytes(a, b, width)(x.array)
+    override def hash(a: Int, b: Int, width: Int)(x: Bytes): Int =
+      hashBytes(a, b, width)(x.array)
   }
 
   implicit object CMSHasherByteArray extends CMSHasher[Array[Byte]] {
-    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = hashBytes(a, b, width)(x)
+    override def hash(a: Int, b: Int, width: Int)(x: Array[Byte]): Int =
+      hashBytes(a, b, width)(x)
   }
 
   // Note: CMSHasher[BigInt] not provided here but in CMSHasherImplicits for legacy support reasons. New hashers
@@ -144,7 +148,8 @@ object CMSHasher {
   implicit object CMSHasherBigDecimal extends CMSHasher[BigDecimal] {
     override def hash(a: Int, b: Int, width: Int)(x: BigDecimal): Int = {
 
-      val uh = scala.util.hashing.MurmurHash3.arrayHash(x.underlying.unscaledValue.toByteArray, a)
+      val uh = scala.util.hashing.MurmurHash3
+        .arrayHash(x.underlying.unscaledValue.toByteArray, a)
       val hash = scala.util.hashing.MurmurHash3.productHash((uh, x.scale), a)
 
       // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable

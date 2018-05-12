@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -35,51 +35,56 @@ package com.twitter.algebird
  * @param E eventual type
  * @param O original type
  */
-class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit eventualSemigroup: Semigroup[E], originalSemigroup: Semigroup[O]) extends Semigroup[Either[E, O]] {
+class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
+    implicit eventualSemigroup: Semigroup[E],
+    originalSemigroup: Semigroup[O])
+    extends Semigroup[Either[E, O]] {
 
   import scala.collection.mutable.Buffer
 
-  override def plus(x: Either[E, O], y: Either[E, O]) = {
+  override def plus(x: Either[E, O], y: Either[E, O]) =
     x match {
-      case Left(xe) => y match {
-        case Left(ye) => left(eventualSemigroup.plus(xe, ye))
-        case Right(yo) => left(eventualSemigroup.plus(xe, convert(yo)))
-      }
-      case Right(xo) => y match {
-        case Left(ye) => left(eventualSemigroup.plus(convert(xo), ye))
-        case Right(yo) => conditionallyConvert(originalSemigroup.plus(xo, yo))
-      }
+      case Left(xe) =>
+        y match {
+          case Left(ye)  => left(eventualSemigroup.plus(xe, ye))
+          case Right(yo) => left(eventualSemigroup.plus(xe, convert(yo)))
+        }
+      case Right(xo) =>
+        y match {
+          case Left(ye)  => left(eventualSemigroup.plus(convert(xo), ye))
+          case Right(yo) => conditionallyConvert(originalSemigroup.plus(xo, yo))
+        }
     }
-  }
 
   private val maxBuffer = 1000
 
   /**
    * used to avoid materializing the entire input in memory
    */
-  private[this] final def checkSize[T: Semigroup](buffer: Buffer[T]): Unit = {
+  private[this] final def checkSize[T: Semigroup](buffer: Buffer[T]): Unit =
     if (buffer.size > maxBuffer) {
       val sum = Semigroup.sumOption(buffer)
       buffer.clear
       sum.foreach(buffer += _)
     }
-  }
 
   override def sumOption(iter: TraversableOnce[Either[E, O]]): Option[Either[E, O]] = {
 
     def toEventualBuffer[R](buffer: Buffer[O], e: E): Left[Buffer[E], R] = {
       val newBuffer = Buffer[E]()
-      Semigroup.sumOption(buffer).foreach { sum => newBuffer += convert(sum) }
+      Semigroup.sumOption(buffer).foreach { sum =>
+        newBuffer += convert(sum)
+      }
       newBuffer += e
       Left(newBuffer)
     }
 
-    (iter.foldLeft[Either[Buffer[E], Buffer[O]]] (Right(Buffer[O]())) {
+    (iter.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]())) {
       case (buffer @ Left(be), v) =>
         // turns the list of either into an either of lists
         checkSize(be)
         v match {
-          case Left(ve) => be += ve
+          case Left(ve)  => be += ve
           case Right(vo) => be += convert(vo)
         }
         buffer // left stays left we just add to the buffer and convert if needed
@@ -97,17 +102,19 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
       case Left(be) => Semigroup.sumOption(be).map(left(_))
       case Right(bo) =>
         if (bo.lengthCompare(1) <= 0) bo.headOption.map(Right(_))
-        else Semigroup.sumOption(bo).map(conditionallyConvert(_)) // and optionally convert
+        else
+          Semigroup
+            .sumOption(bo)
+            .map(conditionallyConvert(_)) // and optionally convert
     }
   }
 
-  protected def conditionallyConvert(o: O): Either[E, O] = {
+  protected def conditionallyConvert(o: O): Either[E, O] =
     if (mustConvert(o)) {
       left(convert(o))
     } else {
       Right(o)
     }
-  }
 
   // Overriden by EventuallyGroup to ensure that the group laws are obeyed.
   protected def left(e: E): Either[E, O] = Left(e)
@@ -117,8 +124,10 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
 /**
  * @see EventuallySemigroup
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lSemigroup: Semigroup[E], rMonoid: Monoid[O]) extends EventuallySemigroup[E, O](convert)(mustConvert)
-  with Monoid[Either[E, O]] {
+class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lSemigroup: Semigroup[E],
+                                                                         rMonoid: Monoid[O])
+    extends EventuallySemigroup[E, O](convert)(mustConvert)
+    with Monoid[Either[E, O]] {
 
   override def zero = Right(Monoid.zero[O])
 
@@ -127,15 +136,16 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implici
 /**
  * @see EventuallySemigroup
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E], rGroup: Group[O]) extends EventuallyMonoid[E, O](convert)(mustConvert)
-  with Group[Either[E, O]] {
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E],
+                                                                        rGroup: Group[O])
+    extends EventuallyMonoid[E, O](convert)(mustConvert)
+    with Group[Either[E, O]] {
 
-  override def negate(x: Either[E, O]) = {
+  override def negate(x: Either[E, O]) =
     x match {
-      case Left(xe) => left(Group.negate(xe))
+      case Left(xe)  => left(Group.negate(xe))
       case Right(xo) => Right(Group.negate(xo))
     }
-  }
 
   override def left(e: E) = if (Monoid.isNonZero(e)) Left(e) else zero
 
@@ -144,32 +154,34 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
 /**
  * @see EventuallySemigroup
  */
-class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lRing: Ring[E], rRing: Ring[O]) extends EventuallyGroup[E, O](convert)(mustConvert)
-  with Ring[Either[E, O]] {
+class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lRing: Ring[E],
+                                                                       rRing: Ring[O])
+    extends EventuallyGroup[E, O](convert)(mustConvert)
+    with Ring[Either[E, O]] {
 
   override def one = Right(Ring.one[O])
 
-  override def times(x: Either[E, O], y: Either[E, O]) = {
+  override def times(x: Either[E, O], y: Either[E, O]) =
     x match {
-      case Left(xe) => y match {
-        case Left(ye) => left(Ring.times(xe, ye))
-        case Right(yo) => left(Ring.times(xe, convert(yo)))
-      }
-      case Right(xo) => y match {
-        case Left(ye) => left(Ring.times(convert(xo), ye))
-        case Right(yo) => conditionallyConvert(Ring.times(xo, yo))
-      }
+      case Left(xe) =>
+        y match {
+          case Left(ye)  => left(Ring.times(xe, ye))
+          case Right(yo) => left(Ring.times(xe, convert(yo)))
+        }
+      case Right(xo) =>
+        y match {
+          case Left(ye)  => left(Ring.times(convert(xo), ye))
+          case Right(yo) => conditionallyConvert(Ring.times(xo, yo))
+        }
     }
-  }
 
 }
 
-trait AbstractEventuallyAggregator[A, E, O, C]
-  extends Aggregator[A, Either[E, O], C] {
+trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O], C] {
   def prepare(a: A) = Right(rightAggregator.prepare(a))
   def present(b: Either[E, O]) = b match {
     case Right(o) => rightAggregator.present(o)
-    case Left(e) => presentLeft(e)
+    case Left(e)  => presentLeft(e)
   }
 
   def presentLeft(e: E): C
@@ -181,8 +193,7 @@ trait AbstractEventuallyAggregator[A, E, O, C]
   def rightAggregator: Aggregator[A, O, C]
 }
 
-trait EventuallyAggregator[A, E, O, C]
-  extends AbstractEventuallyAggregator[A, E, O, C] {
+trait EventuallyAggregator[A, E, O, C] extends AbstractEventuallyAggregator[A, E, O, C] {
 
   //avoid init order issues and cyclical references
   @transient lazy val semigroup =
@@ -190,8 +201,8 @@ trait EventuallyAggregator[A, E, O, C]
 }
 
 trait EventuallyMonoidAggregator[A, E, O, C]
-  extends AbstractEventuallyAggregator[A, E, O, C]
-  with MonoidAggregator[A, Either[E, O], C] {
+    extends AbstractEventuallyAggregator[A, E, O, C]
+    with MonoidAggregator[A, Either[E, O], C] {
 
   def rightAggregator: MonoidAggregator[A, O, C]
 

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.statistics
 
 /**
@@ -43,10 +43,12 @@ private class IterCallStatistics(threadSafe: Boolean) {
     def pow2(i: Int): Int = 1 << i
 
     override def toString =
-      distribution.zipWithIndex.map {
-        case (v, i) =>
-          (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
-      }.mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
+      distribution.zipWithIndex
+        .map {
+          case (v, i) =>
+            (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
+        }
+        .mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
 
   }
 

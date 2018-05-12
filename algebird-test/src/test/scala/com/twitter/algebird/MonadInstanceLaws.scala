@@ -31,7 +31,7 @@ class MonadInstanceLaws extends CheckProperties {
   property("Trampoline should run without stackoverflow") {
     forAll { (b: Int) =>
       val bsmall = b % 1000000
-      ping(bsmall, 0).get == (bsmall max 0)
+      ping(bsmall, 0).get == (bsmall.max(0))
     }
   }
 
@@ -49,18 +49,22 @@ class MonadInstanceLaws extends CheckProperties {
   property("State behaves correctly") {
     forAll { (in: Int, head: Long, fns: List[(Int) => Either[String, (Int, Long)]]) =>
       val mons = fns.map { StateWithError(_) }
-      val init = StateWithError.const[Int, Long](head): StateWithError[Int, String, Long]
+      val init =
+        StateWithError.const[Int, Long](head): StateWithError[Int, String, Long]
       val comp = mons.foldLeft(init) { (old, fn) =>
-        old.flatMap { x => fn } // just bind
+        old.flatMap { x =>
+          fn
+        } // just bind
       }
-      comp(in) == (fns.foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
-        oldState.right.flatMap { case (s, v) => fn(s) }
-      })
+      comp(in) == (fns
+        .foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
+          oldState.right.flatMap { case (s, v) => fn(s) }
+        })
     }
   }
 
   class MutableBox(var item: Int) {
-    def inc(v: Int) = { item += v }
+    def inc(v: Int) = item += v
   }
 
   property("Reader behaves correctly") {
@@ -76,9 +80,12 @@ class MonadInstanceLaws extends CheckProperties {
         }
       }
       // Now apply them all:
-      val bigReader = readers.foldLeft(Reader.const(()): Reader[MutableBox, Unit]) { (oldr, thisR) =>
-        oldr.flatMap { x => thisR } // just sequence them
-      }
+      val bigReader =
+        readers.foldLeft(Reader.const(()): Reader[MutableBox, Unit]) { (oldr, thisR) =>
+          oldr.flatMap { x =>
+            thisR
+          } // just sequence them
+        }
       // apply:
       val result = bigReader(m1)
 

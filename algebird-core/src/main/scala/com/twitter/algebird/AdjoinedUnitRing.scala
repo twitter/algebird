@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import scala.annotation.tailrec
@@ -29,7 +29,8 @@ case class AdjoinedUnit[T](ones: BigInt, get: T) {
 
 object AdjoinedUnit {
   def apply[T](item: T): AdjoinedUnit[T] = new AdjoinedUnit[T](BigInt(0), item)
-  implicit def ring[T](implicit ring: Rng[T]): Ring[AdjoinedUnit[T]] = new AdjoinedUnitRing[T]
+  implicit def ring[T](implicit ring: Rng[T]): Ring[AdjoinedUnit[T]] =
+    new AdjoinedUnitRing[T]
 }
 
 class AdjoinedUnitRing[T](implicit rng: Rng[T]) extends Ring[AdjoinedUnit[T]] {

@@ -12,10 +12,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
-import algebra.{ BoundedSemilattice, Semilattice }
+import algebra.{BoundedSemilattice, Semilattice}
 
 /**
  * Tracks the minimum wrapped instance of some ordered type `T`.
@@ -27,6 +27,7 @@ import algebra.{ BoundedSemilattice, Semilattice }
  * @param get wrapped instance of `T`
  */
 case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
+
   /**
    * If this instance wraps a smaller `T` than `r`, returns this
    * instance, else returns `r`.
@@ -49,11 +50,13 @@ case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
  * [[Min]] instances.
  */
 object Min extends MinInstances {
+
   /**
    * Returns an [[Aggregator]] that selects the minimum instance of an
    * ordered type `T` in the aggregated stream.
    */
-  def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] = MinAggregator()(ord)
+  def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] =
+    MinAggregator()(ord)
 
   /**
    * Returns a [[Semigroup]] instance with a `plus` implementation
@@ -81,7 +84,8 @@ private[algebird] sealed abstract class MinInstances {
     new Monoid[Min[T]] with BoundedSemilattice[Min[T]] {
       val zero = Min(z)
       val ord = implicitly[Ordering[T]]
-      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
+      def plus(l: Min[T], r: Min[T]): Min[T] =
+        if (ord.lteq(l.get, r.get)) l else r
     }
   }
 
@@ -92,28 +96,33 @@ private[algebird] sealed abstract class MinInstances {
   implicit def semigroup[T: Ordering]: Semigroup[Min[T]] with Semilattice[Min[T]] =
     new Semigroup[Min[T]] with Semilattice[Min[T]] {
       val ord = implicitly[Ordering[T]]
-      def plus(l: Min[T], r: Min[T]): Min[T] = if (ord.lteq(l.get, r.get)) l else r
+      def plus(l: Min[T], r: Min[T]): Min[T] =
+        if (ord.lteq(l.get, r.get)) l else r
     }
 
   /** [[Monoid]] for [[Min]][Int] with `zero == Int.MaxValue` */
-  implicit def intMonoid: Monoid[Min[Int]] with BoundedSemilattice[Min[Int]] = monoid(Int.MaxValue)
+  implicit def intMonoid: Monoid[Min[Int]] with BoundedSemilattice[Min[Int]] =
+    monoid(Int.MaxValue)
 
   /** [[Monoid]] for [[Min]][Long] with `zero == Long.MaxValue` */
-  implicit def longMonoid: Monoid[Min[Long]] with BoundedSemilattice[Min[Long]] = monoid(Long.MaxValue)
+  implicit def longMonoid: Monoid[Min[Long]] with BoundedSemilattice[Min[Long]] =
+    monoid(Long.MaxValue)
 
   /**
    * [[Monoid]] for [[Min]][Double] with `zero == Double.MaxValue`
    * Note: MaxValue < PositiveInfinity, but people may
    * be relying on this emitting a non-infinite number. Sadness
    */
-  implicit def doubleMonoid: Monoid[Min[Double]] with BoundedSemilattice[Min[Double]] = monoid(Double.MaxValue)
+  implicit def doubleMonoid: Monoid[Min[Double]] with BoundedSemilattice[Min[Double]] =
+    monoid(Double.MaxValue)
 
   /**
    * [[Monoid]] for [[Min]][Float] with `zero == Float.MaxValue`
    * Note: MaxValue < PositiveInfinity, but people may
    * be relying on this emitting a non-infinite number. Sadness
    */
-  implicit def floatMonoid: Monoid[Min[Float]] with BoundedSemilattice[Min[Float]] = monoid(Float.MaxValue)
+  implicit def floatMonoid: Monoid[Min[Float]] with BoundedSemilattice[Min[Float]] =
+    monoid(Float.MaxValue)
 }
 
 /**

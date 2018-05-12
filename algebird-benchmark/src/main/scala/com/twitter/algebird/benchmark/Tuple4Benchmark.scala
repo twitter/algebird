@@ -11,6 +11,7 @@ object Tuple4Benchmark {
   type Long4 = (Long, Long, Long, Long)
   @State(Scope.Benchmark)
   class Tuple4State {
+
     /**
      * This monoid lives in `GeneratedAbstractAlgebra.scala`.
      */
@@ -30,9 +31,8 @@ object Tuple4Benchmark {
     private def randL: Long = Random.nextInt(1000).toLong
 
     @Setup(Level.Trial)
-    def setup(): Unit = {
+    def setup(): Unit =
       inputData = Seq.fill(numElements)((randL, randL, randL, randL))
-    }
   }
 }
 

@@ -1,6 +1,6 @@
 package com.twitter.algebird.macros
 
-import scala.language.experimental.{ macros => sMacros }
+import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
@@ -12,8 +12,8 @@ object SemigroupMacro {
 
     ensureCaseClass(c)
 
-    val implicitSemigroups = getParams(c).map {
-      param => q"implicitly[_root_.com.twitter.algebird.Semigroup[${param.typeSignatureIn(T.tpe)}]]"
+    val implicitSemigroups = getParams(c).map { param =>
+      q"implicitly[_root_.com.twitter.algebird.Semigroup[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val res = q"""
@@ -42,7 +42,8 @@ object SemigroupMacro {
     val params = getParams(c)
     val companion = getCompanionObject(c)
 
-    val sumOptionsGetted: List[c.Tree] = params.map(param => q"${param.name.asInstanceOf[TermName]}.get")
+    val sumOptionsGetted: List[c.Tree] =
+      params.map(param => q"${param.name.asInstanceOf[TermName]}.get")
     val getSumOptions = params.zip(implicitInstances).map {
       case (param, instance) =>
         q"val ${param.name.asInstanceOf[TermName]} = $instance.sumOption(items.iterator.map(_.$param))"

@@ -21,7 +21,8 @@ package com.twitter.algebird
  * is in fact a Set[T] => Set[T], but doesn't extend Function1 since
  * that brings in a pack of methods that we don't necessarily want.
  */
-sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) { self =>
+sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) {
+  self =>
   def +(t: T): SetDiff[T] = SetDiff(add + t, remove - t)
   def -(t: T): SetDiff[T] = SetDiff(add - t, remove + t)
   def ++(ts: Iterable[T]): SetDiff[T] = SetDiff(add ++ ts, remove -- ts)
@@ -56,14 +57,17 @@ sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) { se
 }
 
 object SetDiff {
+
   /**
    * Keeping this constructor private prevents creation of ad-hoc,
    * invalid `SetDiff` instances. `SetDiff`s must be created by
    * construction with the supplied helper methods below.
    */
-  private[SetDiff] def apply[T](add: Set[T], remove: Set[T]): SetDiff[T] = new SetDiff[T](add, remove) {}
+  private[SetDiff] def apply[T](add: Set[T], remove: Set[T]): SetDiff[T] =
+    new SetDiff[T](add, remove) {}
 
-  implicit def monoid[T]: Monoid[SetDiff[T]] = Monoid.from(SetDiff.empty[T])(_ merge _)
+  implicit def monoid[T]: Monoid[SetDiff[T]] =
+    Monoid.from(SetDiff.empty[T])(_.merge(_))
 
   private def areDisjoint[T](a: Set[T], b: Set[T]): Boolean =
     if (a.size > b.size) areDisjoint(b, a)
