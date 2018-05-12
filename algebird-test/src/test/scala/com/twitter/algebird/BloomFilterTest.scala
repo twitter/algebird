@@ -341,7 +341,9 @@ class BloomFilterTest extends WordSpec with Matchers {
 
           val observedFpProb = fps.sum / fps.size
 
-          assert(observedFpProb <= 2 * fpProb)
+          // the 2.5 is a fudge factor to make the probability of it low
+          // in tests
+          assert(observedFpProb <= 2.5 * fpProb)
         }
       }
     }
