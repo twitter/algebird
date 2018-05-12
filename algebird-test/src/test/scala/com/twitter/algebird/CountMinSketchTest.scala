@@ -967,13 +967,17 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
   // For all i > 709, CMSFunctions.delta(i) will return 0.0, which is not the mathematically correct value but rather
   // the asymptote of the delta function.
   property("throw IAE when deriving delta from invalid depth values") {
-    val maxValidDelta = 709
+    val maxValidDelta = 745
     forAll(Gen.choose(maxValidDelta + 1, 10000)) { (invalidDepth: Int) =>
-      val exception = intercept[IllegalArgumentException] {
-        CMSFunctions.delta(invalidDepth)
+      // due to shrinking we can shrink to an invalid size, double check the size:
+      // this is a known issue in scalacheck
+      if (invalidDepth > maxValidDelta) {
+        val exception = intercept[IllegalArgumentException] {
+          CMSFunctions.delta(invalidDepth)
+        }
+        (exception.getMessage should fullyMatch).regex(
+          """requirement failed: depth must be smaller as it causes precision errors when computing delta \(\d+ led to an invalid delta of 0.0\)""")
       }
-      (exception.getMessage should fullyMatch).regex(
-        """requirement failed: depth must be smaller as it causes precision errors when computing delta \(\d+ led to an invalid delta of 0.0\)""")
     }
   }
 
