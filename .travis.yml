@@ -14,7 +14,7 @@ matrix:
 
     - scala: 2.12.3
       jdk: oraclejdk8
-      script: sbt "++$TRAVIS_SCALA_VERSION clean" "++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      script: sbt "++$TRAVIS_SCALA_VERSION clean" "++$TRAVIS_SCALA_VERSION test" "scalafmt::test test:scalafmt::test" "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
       #script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
 
 before_install:

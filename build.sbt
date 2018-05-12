@@ -2,8 +2,6 @@ import ReleaseTransformations._
 import algebird._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-import scalariform.formatter.preferences._
 
 val algebraVersion = "0.7.0"
 val bijectionVersion = "0.9.4"
@@ -45,12 +43,10 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
     ))
   }
 
-// TODO: figure out the correct value for the autoformat
-val sharedSettings = scalariformSettings(autoformat = true) ++  Seq(
+val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.11",
   crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
-  ScalariformKeys.preferences := formattingPreferences,
 
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
@@ -147,13 +143,6 @@ val sharedSettings = scalariformSettings(autoformat = true) ++  Seq(
       </developer>
     </developers>)
 ) ++ mimaDefaultSettings
-
-lazy val formattingPreferences = {
-  import scalariform.formatter.preferences._
-  FormattingPreferences().
-    setPreference(AlignParameters, false).
-    setPreference(PreserveSpaceBeforeArguments, true)
-}
 
 lazy val noPublishSettings = Seq(
     publish := {},
