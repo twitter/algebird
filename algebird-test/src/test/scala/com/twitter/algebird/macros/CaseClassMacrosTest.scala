@@ -45,11 +45,15 @@ object CaseClassMacrosTest extends Properties("Case class macros") {
 
   //
   // importing the case class macros does not break wrappers:
-  property("importing caseclass._ doesn't break Max") = forAll { (x: Int, y: Int) =>
-    Semigroup.plus(Max(x), Max(y)) == Max(x.max(y))
-  }
+  {
+    import caseclass._
 
-  property("importing caseclass._ doesn't break Last") = forAll { (x: Int, y: Int) =>
-    Semigroup.plus(Last(x), Last(y)) == Last(y)
+    property("importing caseclass._ doesn't break Max") = forAll { (x: Int, y: Int) =>
+      Semigroup.plus(Max(x), Max(y)) == Max(x.max(y))
+    }
+
+    property("importing caseclass._ doesn't break Last") = forAll { (x: Int, y: Int) =>
+      Semigroup.plus(Last(x), Last(y)) == Last(y)
+    }
   }
 }
