@@ -46,7 +46,7 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
 val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.11",
-  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
+  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.6"),
 
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
