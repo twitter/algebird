@@ -19,16 +19,16 @@ class FoldTest extends WordSpec {
   }
 
   def run[I, O](fold: Fold[I, O], cases: Case[I, O]*): Unit =
-    cases.foreach { c => assert(c.runCase(fold) === c.expected) }
+    cases.foreach { c =>
+      assert(c.runCase(fold) === c.expected)
+    }
 
   "Fold" should {
 
     "foldLeft" in {
-      run[String, String](
-        Fold.foldLeft("") { (a, b) => a ++ b },
-        Zero(""),
-        One("1", "1"),
-        Many(Seq("1", "2", "3"), "123"))
+      run[String, String](Fold.foldLeft("") { (a, b) =>
+        a ++ b
+      }, Zero(""), One("1", "1"), Many(Seq("1", "2", "3"), "123"))
     }
 
     "seq" in {
@@ -41,11 +41,7 @@ class FoldTest extends WordSpec {
     }
 
     "const" in {
-      run[Int, String](
-        Fold.const("42"),
-        Zero("42"),
-        One(1, "42"),
-        Many(Seq(1, 2, 3), "42"))
+      run[Int, String](Fold.const("42"), Zero("42"), One(1, "42"), Many(Seq(1, 2, 3), "42"))
     }
 
     "first" in {
@@ -83,36 +79,23 @@ class FoldTest extends WordSpec {
     }
 
     "sum" in {
-      run[Int, Int](
-        Fold.sum,
-        Zero(0),
-        One(1, 1),
-        Many(Seq(1, 2, 3), 6),
-        Many(Seq(2, 1, 3), 6))
+      run[Int, Int](Fold.sum, Zero(0), One(1, 1), Many(Seq(1, 2, 3), 6), Many(Seq(2, 1, 3), 6))
     }
 
     "size" in {
-      run[String, Long](
-        Fold.size,
-        Zero(0),
-        One("1", 1),
-        Many(Seq("1", "2", "3"), 3))
+      run[String, Long](Fold.size, Zero(0), One("1", 1), Many(Seq("1", "2", "3"), 3))
     }
 
     "average" in {
-      run[Int, Double](
-        Fold.sum[Int].joinWith(Fold.size) { (s, c) => s.toDouble / c },
-        One(1, 1.0),
-        Many(Seq(1, 2, 3), 2.0),
-        Many(Seq(2, 1, 3), 2.0))
+      run[Int, Double](Fold.sum[Int].joinWith(Fold.size) { (s, c) =>
+        s.toDouble / c
+      }, One(1, 1.0), Many(Seq(1, 2, 3), 2.0), Many(Seq(2, 1, 3), 2.0))
     }
 
     "sequence" in {
-      run[Int, Seq[Long]](
-        Fold.sequence(Seq(Fold.count { _ < 0 }, Fold.count { _ >= 0 })),
-        Zero(Seq(0, 0)),
-        One(1, Seq(0, 1)),
-        Many(Seq(-2, -1, 0, 1, 2), Seq(2, 3)))
+      run[Int, Seq[Long]](Fold.sequence(Seq(Fold.count { _ < 0 }, Fold.count {
+        _ >= 0
+      })), Zero(Seq(0, 0)), One(1, Seq(0, 1)), Many(Seq(-2, -1, 0, 1, 2), Seq(2, 3)))
     }
 
   }

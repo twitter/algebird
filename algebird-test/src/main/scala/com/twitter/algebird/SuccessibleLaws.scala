@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Prop }
+import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
 object SuccessibleLaws {
@@ -33,7 +33,7 @@ object SuccessibleLaws {
     val next = Successible.next(t)
     val nextNext = Successible.next(next)
     ascending(t, next) && ascending(t, nextNext) && (next match {
-      case None => true
+      case None    => true
       case Some(n) => ascending(n, nextNext)
     })
   }
@@ -41,8 +41,8 @@ object SuccessibleLaws {
   def iterateNextIncreases[T: Successible](t: T, size: Short): Boolean =
     Successible.iterateNext(t).take(size.toInt).sliding(2).forall {
       case a :: b :: Nil => implicitly[Successible[T]].ordering.lt(a, b)
-      case a :: Nil => true
-      case s => sys.error("should never happen: " + s)
+      case a :: Nil      => true
+      case s             => sys.error("should never happen: " + s)
     }
 
   /**

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import algebra.Band
@@ -24,6 +24,7 @@ import algebra.Band
  * @param get wrapped instance of `T`
  */
 case class First[@specialized(Int, Long, Float, Double) +T](get: T) {
+
   /**
    * Returns this instance, always.
    *
@@ -37,6 +38,7 @@ case class First[@specialized(Int, Long, Float, Double) +T](get: T) {
  * [[First]] instances.
  */
 object First extends FirstInstances {
+
   /**
    * Returns an [[Aggregator]] that selects the first instance of `T`
    * in the aggregated stream.
@@ -45,6 +47,7 @@ object First extends FirstInstances {
 }
 
 private[algebird] sealed abstract class FirstInstances {
+
   /**
    * Returns a [[Semigroup]] instance with a `plus` implementation
    * that always returns the first (ie, the left) `T` argument.
@@ -66,7 +69,8 @@ private[algebird] sealed abstract class FirstInstances {
    * implementation always returns the first (ie, the left) `First[T]`
    * argument.
    */
-  implicit def semigroup[T]: Semigroup[First[T]] with Band[First[T]] = firstSemigroup[First[T]]
+  implicit def semigroup[T]: Semigroup[First[T]] with Band[First[T]] =
+    firstSemigroup[First[T]]
 }
 
 /**

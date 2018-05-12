@@ -33,8 +33,8 @@ class AveragedValueLaws extends CheckProperties {
   property("AveragedValue instances subtract") {
     forAll { (l: AveragedValue, r: AveragedValue) =>
       l + -l == Monoid.zero[AveragedValue] &&
-        l - l == Monoid.zero[AveragedValue] &&
-        l - r == l + -r
+      l - l == Monoid.zero[AveragedValue] &&
+      l - r == l + -r
     }
   }
 
@@ -51,7 +51,7 @@ class AveragedValueLaws extends CheckProperties {
       val byPlus = avgs.reduce(_ + _)
 
       approxEq(1e-10)(avg(v.items), sumOpt.value) &&
-        approxEq(1e-10)(sumOpt.value, byPlus.value)
+      approxEq(1e-10)(sumOpt.value, byPlus.value)
     }
   }
 

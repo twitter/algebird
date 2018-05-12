@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -27,23 +27,28 @@ object StatefulSummerLaws {
       // neither are non-zero
       true
     } else {
-      (for (a <- v0; b <- v1; eq = Equiv[V].equiv(a, b)) yield eq).getOrElse(false)
+      (for {
+        a <- v0
+        b <- v1
+        eq = Equiv[V].equiv(a, b)
+      } yield eq).getOrElse(false)
     }
   }
   def sumIsPreserved[V: Semigroup: Equiv](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
     summer.flush
     val sg = Semigroup.sumOption(items)
-    val wsummer = Monoid.plus(Monoid.sum(items.map { summer.put(_) }.filter { _.isDefined }), summer.flush)
+    val wsummer = Monoid.plus(Monoid.sum(items.map { summer.put(_) }.filter {
+      _.isDefined
+    }), summer.flush)
     zeroEquiv(sg, wsummer) && summer.isFlushed
   }
   // Law 2:
-  def isFlushedIsConsistent[V](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
+  def isFlushedIsConsistent[V](summer: StatefulSummer[V], items: Iterable[V]): Boolean =
     items.forall { v =>
       summer.put(v)
       (summer.isFlushed == summer.flush.isEmpty) &&
-        // Now flush should empty
-        summer.isFlushed &&
-        summer.flush.isEmpty
+      // Now flush should empty
+      summer.isFlushed &&
+      summer.flush.isEmpty
     }
-  }
 }

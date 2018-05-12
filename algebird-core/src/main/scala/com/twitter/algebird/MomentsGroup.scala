@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -31,31 +31,40 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
   def mean = m1
 
   // Population variance, not sample variance.
-  def variance = if (count > 1)
-    m2 / count
-  else /* don't return junk when the moment is not defined */
-    Double.NaN
+  def variance =
+    if (count > 1)
+      m2 / count
+    else
+      /* don't return junk when the moment is not defined */
+      Double.NaN
 
   // Population standard deviation, not sample standard deviation.
   def stddev = math.sqrt(variance)
 
-  def skewness = if (count > 2)
-    math.sqrt(count) * m3 / math.pow(m2, 1.5)
-  else /* don't return junk when the moment is not defined */
-    Double.NaN
+  def skewness =
+    if (count > 2)
+      math.sqrt(count) * m3 / math.pow(m2, 1.5)
+    else
+      /* don't return junk when the moment is not defined */
+      Double.NaN
 
-  def kurtosis = if (count > 3)
-    count * m4 / math.pow(m2, 2) - 3
-  else /* don't return junk when the moment is not defined */
-    Double.NaN
+  def kurtosis =
+    if (count > 3)
+      count * m4 / math.pow(m2, 2) - 3
+    else
+      /* don't return junk when the moment is not defined */
+      Double.NaN
 }
 
 object Moments {
-  implicit val group: Group[Moments] with CommutativeGroup[Moments] = MomentsGroup
+  implicit val group: Group[Moments] with CommutativeGroup[Moments] =
+    MomentsGroup
   val aggregator = MomentsAggregator
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
-    Aggregator.prepareMonoid { n: N => Moments(num.toDouble(n)) }
+    Aggregator.prepareMonoid { n: N =>
+      Moments(num.toDouble(n))
+    }
 
   // Create a Moments object given a single value. This is useful for
   // initializing moment calculations at the start of a stream.
@@ -63,9 +72,7 @@ object Moments {
     apply(1L, num.toDouble(value), 0, 0, 0)
 
   def apply[V](m0: Long, m1: V, m2: V, m3: V, m4: V)(implicit num: Numeric[V]): Moments =
-    new Moments(m0,
-      num.toDouble(m1), num.toDouble(m2),
-      num.toDouble(m3), num.toDouble(m4))
+    new Moments(m0, num.toDouble(m1), num.toDouble(m2), num.toDouble(m3), num.toDouble(m4))
 }
 
 /**
@@ -90,15 +97,16 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
    */
   def getCombinedMean(n: Long, an: Double, k: Long, ak: Double): Double =
     if (n < k) getCombinedMean(k, ak, n, an)
-    else (n + k) match {
-      case 0L => 0.0
-      case newCount if (newCount == n) => an
-      case newCount =>
-        val scaling = k.toDouble / newCount
-        // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-        if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
-        else (n * an + k * ak) / newCount
-    }
+    else
+      (n + k) match {
+        case 0L                          => 0.0
+        case newCount if (newCount == n) => an
+        case newCount =>
+          val scaling = k.toDouble / newCount
+          // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
+          if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
+          else (n * an + k * ak) / newCount
+      }
 
   val zero = Moments(0L, 0.0, 0.0, 0.0, 0.0)
 
@@ -125,9 +133,9 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
     val m4 = a.m4 + b.m4 +
       math.pow(delta, 4) * a.count * b.count * (math.pow(a.count, 2) -
         a.count * b.count + math.pow(b.count, 2)) / math.pow(countCombined, 3) +
-        6 * math.pow(delta, 2) * (math.pow(a.count, 2) * b.m2 +
-          math.pow(b.count, 2) * a.m2) / math.pow(countCombined, 2) +
-          4 * delta * (a.count * b.m3 - b.count * a.m3) / countCombined
+      6 * math.pow(delta, 2) * (math.pow(a.count, 2) * b.m2 +
+        math.pow(b.count, 2) * a.m2) / math.pow(countCombined, 2) +
+      4 * delta * (a.count * b.m3 - b.count * a.m3) / countCombined
 
     Moments(countCombined, meanCombined, m2, m3, m4)
   }

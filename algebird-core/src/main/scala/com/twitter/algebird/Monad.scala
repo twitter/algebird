@@ -12,15 +12,22 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
-import java.util.{ List => JList, Map => JMap }
+import java.lang.{
+  Integer => JInt,
+  Short => JShort,
+  Long => JLong,
+  Float => JFloat,
+  Double => JDouble,
+  Boolean => JBool
+}
+import java.util.{List => JList, Map => JMap}
 
 import scala.annotation.implicitNotFound
-import scala.util.{ Failure, Success, Try }
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.util.{Failure, Success, Try}
+import scala.concurrent.{ExecutionContext, Future}
 import collection.GenTraversable
 
 /**
@@ -38,10 +45,13 @@ import collection.GenTraversable
 @implicitNotFound(msg = "Cannot find Monad type class for ${M}")
 trait Monad[M[_]] extends Applicative[M] {
   def flatMap[T, U](m: M[T])(fn: (T) => M[U]): M[U]
-  override def map[T, U](m: M[T])(fn: (T) => U): M[U] = flatMap(m)((t: T) => apply(fn(t)))
+  override def map[T, U](m: M[T])(fn: (T) => U): M[U] =
+    flatMap(m)((t: T) => apply(fn(t)))
   override def join[T, U](mt: M[T], mu: M[U]): M[(T, U)] =
     flatMap(mt) { (t: T) =>
-      map(mu) { (u: U) => (t, u) }
+      map(mu) { (u: U) =>
+        (t, u)
+      }
     }
 }
 
@@ -54,15 +64,20 @@ abstract class AbstractMonad[M[_]] extends Monad[M]
  * Follows the type-class pattern for the Monad trait
  */
 object Monad {
+
   /** Get the Monad for a type, e.g: Monad[List] */
   def apply[M[_]](implicit monad: Monad[M]): Monad[M] = monad
-  def flatMap[M[_], T, U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) = monad.flatMap(m)(fn)
-  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) = monad.map(m)(fn)
+  def flatMap[M[_], T, U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) =
+    monad.flatMap(m)(fn)
+  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) =
+    monad.map(m)(fn)
   def foldM[M[_], T, U](acc: T, xs: GenTraversable[U])(fn: (T, U) => M[T])(implicit monad: Monad[M]): M[T] =
     if (xs.isEmpty)
       monad.apply(acc)
     else
-      monad.flatMap(fn(acc, xs.head)){ t: T => foldM(t, xs.tail)(fn) }
+      monad.flatMap(fn(acc, xs.head)) { t: T =>
+        foldM(t, xs.tail)(fn)
+      }
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {
@@ -91,7 +106,8 @@ object Monad {
   }
   implicit val indexedseq: Monad[IndexedSeq] = new Monad[IndexedSeq] {
     def apply[T](v: T) = IndexedSeq(v);
-    def flatMap[T, U](m: IndexedSeq[T])(fn: (T) => IndexedSeq[U]) = m.flatMap(fn)
+    def flatMap[T, U](m: IndexedSeq[T])(fn: (T) => IndexedSeq[U]) =
+      m.flatMap(fn)
   }
   implicit val scalaTry: Monad[Try] = new Monad[Try] {
     def apply[T](t: T): Try[T] = Success(t)
@@ -100,21 +116,26 @@ object Monad {
     override def join[T, U](t: Try[T], u: Try[U]): Try[(T, U)] =
       // make the common case fast:
       if (t.isSuccess && u.isSuccess) Success((t.get, u.get))
-      else (t, u) match {
-        case (Failure(e), _) => Failure(e)
-        case (_, Failure(e)) => Failure(e)
-        // One must be a failure due to being in the else branch
-        case (_, _) => sys.error("unreachable, but the compiler can't see that")
-      }
+      else
+        (t, u) match {
+          case (Failure(e), _) => Failure(e)
+          case (_, Failure(e)) => Failure(e)
+          // One must be a failure due to being in the else branch
+          case (_, _) =>
+            sys.error("unreachable, but the compiler can't see that")
+        }
   }
-  implicit def scalaFuture(implicit ec: ExecutionContext): Monad[Future] = new Monad[Future] {
-    def apply[T](t: T): Future[T] = Future.successful(t)
-    def flatMap[T, U](t: Future[T])(fn: T => Future[U]): Future[U] = t.flatMap(fn)
-    override def map[T, U](t: Future[T])(fn: T => U): Future[U] = t.map(fn)
-    override def join[T, U](t: Future[T], u: Future[U]): Future[(T, U)] = t.zip(u)
-    override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] =
-      Future.sequence(fs)
-  }
+  implicit def scalaFuture(implicit ec: ExecutionContext): Monad[Future] =
+    new Monad[Future] {
+      def apply[T](t: T): Future[T] = Future.successful(t)
+      def flatMap[T, U](t: Future[T])(fn: T => Future[U]): Future[U] =
+        t.flatMap(fn)
+      override def map[T, U](t: Future[T])(fn: T => U): Future[U] = t.map(fn)
+      override def join[T, U](t: Future[T], u: Future[U]): Future[(T, U)] =
+        t.zip(u)
+      override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] =
+        Future.sequence(fs)
+    }
 
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
   // import Monad.{pureOp, operators} to get
@@ -130,4 +151,3 @@ object Monad {
 class MonadOperators[A, M[_]](m: M[A])(implicit monad: Monad[M]) extends ApplicativeOperators[A, M](m) {
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)
 }
-

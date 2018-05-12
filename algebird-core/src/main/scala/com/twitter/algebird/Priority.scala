@@ -15,12 +15,12 @@ package com.twitter.algebird
  */
 sealed trait Priority[+P, +F] {
 
-  import Priority.{ Preferred, Fallback }
+  import Priority.{Fallback, Preferred}
 
   def fold[B](f1: P => B)(f2: F => B): B =
     this match {
       case Preferred(x) => f1(x)
-      case Fallback(y) => f2(y)
+      case Fallback(y)  => f2(y)
     }
 
   def join[U >: P with F]: U =
@@ -29,7 +29,7 @@ sealed trait Priority[+P, +F] {
   def bimap[P2, F2](f1: P => P2)(f2: F => F2): Priority[P2, F2] =
     this match {
       case Preferred(x) => Preferred(f1(x))
-      case Fallback(y) => Fallback(f2(y))
+      case Fallback(y)  => Fallback(f2(y))
     }
 
   def toEither: Either[P, F] =

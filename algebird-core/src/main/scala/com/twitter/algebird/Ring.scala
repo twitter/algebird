@@ -12,14 +12,22 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
-import algebra.ring.{ Ring => ARing, Rig, Rng }
+import java.lang.{
+  Integer => JInt,
+  Short => JShort,
+  Long => JLong,
+  Float => JFloat,
+  Double => JDouble,
+  Boolean => JBool
+}
+import algebra.ring.{Ring => ARing, Rig, Rng}
 import algebra.CommutativeGroup
 
 import scala.annotation.implicitNotFound
+
 /**
  * Ring: Group + multiplication (see: http://en.wikipedia.org/wiki/Ring_%28mathematics%29)
  *  and the three elements it defines:
@@ -248,12 +256,15 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
   implicit def jfloatRing: Ring[JFloat] = JFloatRing
   implicit def doubleRing: Ring[Double] = DoubleRing
   implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
-  implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] = new IndexedSeqRing[T]
+  implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] =
+    new IndexedSeqRing[T]
+
   /**
    * This is actually a Rng but we leave the unsafe Ring for legacy reasons
    */
   implicit def mapRing[K, V](implicit ring: Ring[V]): Ring[Map[K, V]] =
     new UnsafeFromAlgebraRng(new MapRing[K, V]()(ring))
+
   /**
    * This is actually a Rng but we leave the unsafe Ring for legacy reasons
    */

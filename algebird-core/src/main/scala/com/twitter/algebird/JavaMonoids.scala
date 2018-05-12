@@ -12,11 +12,18 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
-import java.lang.{ Integer => JInt, Short => JShort, Long => JLong, Float => JFloat, Double => JDouble, Boolean => JBool }
-import java.util.{ Map => JMap, List => JList }
+import java.lang.{
+  Integer => JInt,
+  Short => JShort,
+  Long => JLong,
+  Float => JFloat,
+  Double => JDouble,
+  Boolean => JBool
+}
+import java.util.{Map => JMap, List => JList}
 
 import scala.collection.JavaConverters._
 
@@ -68,10 +75,12 @@ object JDoubleRing extends Ring[JDouble] {
 object JBoolRing extends Ring[JBool] {
   override val zero = JBool.FALSE
   override val one = JBool.TRUE
-  override def plus(x: JBool, y: JBool) = JBool.valueOf(x.booleanValue ^ y.booleanValue)
+  override def plus(x: JBool, y: JBool) =
+    JBool.valueOf(x.booleanValue ^ y.booleanValue)
   override def negate(x: JBool) = x
   override def minus(x: JBool, y: JBool) = plus(x, y)
-  override def times(x: JBool, y: JBool) = JBool.valueOf(x.booleanValue & y.booleanValue)
+  override def times(x: JBool, y: JBool) =
+    JBool.valueOf(x.booleanValue & y.booleanValue)
 }
 
 /**
@@ -99,7 +108,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
 
   val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(_)
-    case _ => (_ => true)
+    case _              => (_ => true)
   }
 
   override def isNonZero(x: JMap[K, V]) =
@@ -111,7 +120,8 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
       case _ => true
     })
   override def plus(x: JMap[K, V], y: JMap[K, V]) = {
-    val (big, small, bigOnLeft) = if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
+    val (big, small, bigOnLeft) =
+      if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
     val vsemi = implicitly[Semigroup[V]]
     val result = new java.util.HashMap[K, V](big.size + small.size)
     result.putAll(big)
@@ -120,7 +130,8 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
       val smallV = kv.getValue
       if (big.containsKey(smallK)) {
         val bigV = big.get(smallK)
-        val newV = if (bigOnLeft) vsemi.plus(bigV, smallV) else vsemi.plus(smallV, bigV)
+        val newV =
+          if (bigOnLeft) vsemi.plus(bigV, smallV) else vsemi.plus(smallV, bigV)
         if (nonZero(newV))
           result.put(smallK, newV)
         else

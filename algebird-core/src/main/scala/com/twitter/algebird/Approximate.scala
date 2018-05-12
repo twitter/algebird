@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -35,7 +35,7 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
     ApproximateBoolean(answer, withProb * that.withProb)
   }
 
-  def ||(that: ApproximateBoolean): ApproximateBoolean = {
+  def ||(that: ApproximateBoolean): ApproximateBoolean =
     if (isTrue || that.isTrue) {
       // We need at least one of them to be true:
       val newP = List(this, that)
@@ -47,9 +47,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
       // We need both of these to be correct to believe it is false:
       ApproximateBoolean(false, withProb * that.withProb)
     }
-  }
 
-  def &&(that: ApproximateBoolean): ApproximateBoolean = {
+  def &&(that: ApproximateBoolean): ApproximateBoolean =
     if (isTrue && that.isTrue) {
       // We need both to be correct:
       ApproximateBoolean(true, withProb * that.withProb)
@@ -61,7 +60,6 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
         .max
       ApproximateBoolean(false, newP)
     }
-  }
 
   def contains(b: Boolean): ApproximateBoolean = if (isTrue) this else not
 }
@@ -73,7 +71,9 @@ object ApproximateBoolean {
 }
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
-case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(implicit val numeric: Numeric[N]) extends ApproximateSet[N] {
+case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(
+    implicit val numeric: Numeric[N])
+    extends ApproximateSet[N] {
   require(numeric.lteq(min, estimate) && numeric.lteq(estimate, max))
 
   /**
@@ -81,7 +81,8 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
    * Contract is:
    * Prob(boundsContain(estimate)) >= probWithinBounds
    */
-  def boundsContain(v: N): Boolean = numeric.lteq(min, v) && numeric.lteq(v, max)
+  def boundsContain(v: N): Boolean =
+    numeric.lteq(min, v) && numeric.lteq(v, max)
 
   def contains(v: N): ApproximateBoolean =
     ApproximateBoolean(boundsContain(v), probWithinBounds)
@@ -96,14 +97,15 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
 
   def +(right: Approximate[N]): Approximate[N] = {
     val n = numeric
-    Approximate(n.plus(min, right.min),
+    Approximate(
+      n.plus(min, right.min),
       n.plus(estimate, right.estimate),
       n.plus(max, right.max),
       probWithinBounds * right.probWithinBounds)
   }
-  def -(right: Approximate[N]): Approximate[N] = {
+  def -(right: Approximate[N]): Approximate[N] =
     this.+(right.negate)
-  }
+
   /**
    * This is not distributive, because:
    * a*(b+c) has two probability multiplications
@@ -126,8 +128,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
 
       val newProb = probWithinBounds * right.probWithinBounds
 
-      Approximate(ends.min, n.times(estimate, right.estimate),
-        ends.max, newProb)
+      Approximate(ends.min, n.times(estimate, right.estimate), ends.max, newProb)
     }
 
   def isZero: Boolean =

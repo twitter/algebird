@@ -1,14 +1,14 @@
 package com.twitter.algebird
 
-import com.twitter.algebird.scalacheck.{ PosNum, NonEmptyVector }
+import com.twitter.algebird.scalacheck.{NonEmptyVector, PosNum}
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.PropSpec
 import org.scalatest.prop.PropertyChecks
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
 
 class ExpHistLaws extends PropSpec with PropertyChecks {
-  import ExpHist.{ Bucket, Canonical, Config, Timestamp }
+  import ExpHist.{Bucket, Canonical, Config, Timestamp}
 
   property("Increment example from DGIM paper") {
     // Returns a vector of bucket sizes from largest to smallest.
@@ -118,19 +118,21 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
       // dropped off of its tail.
       val histograms = (0 until numBuckets).scanLeft(hist) {
         case (e, _) =>
-          e.copy(
-            buckets = e.buckets.init,
-            total = e.total - e.oldestBucketSize)
+          e.copy(buckets = e.buckets.init, total = e.total - e.oldestBucketSize)
       }
 
       // every histogram's relative error stays within bounds.
-      histograms.foreach { e => assert(e.relativeError <= e.conf.epsilon) }
+      histograms.foreach { e =>
+        assert(e.relativeError <= e.conf.epsilon)
+      }
     }
   }
 
   property("Invariant 2: bucket sizes are nondecreasing powers of two") {
     forAll { e: ExpHist =>
-      assert(e.buckets.forall { b => isPowerOfTwo(b.size) })
+      assert(e.buckets.forall { b =>
+        isPowerOfTwo(b.size)
+      })
 
       // sizes are nondecreasing:
       val sizes = e.buckets.map(_.size)
@@ -154,9 +156,11 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
     // since every bucket has the same timestamp, if nothing expires
     // then the upper bound is equal to the actual total.
     forAll { (conf: Config, bucket: Bucket) =>
-      assert(ExpHist.empty(conf)
-        .add(bucket.size, bucket.timestamp)
-        .upperBoundSum == bucket.size)
+      assert(
+        ExpHist
+          .empty(conf)
+          .add(bucket.size, bucket.timestamp)
+          .upperBoundSum == bucket.size)
     }
   }
 
@@ -194,9 +198,11 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
     forAll { (bucket: Bucket, conf: Config) =>
       val e = ExpHist.empty(conf)
 
-      val incs = (0L until bucket.size).foldLeft(e) {
-        case (acc, _) => acc.inc(bucket.timestamp)
-      }.step(bucket.timestamp)
+      val incs = (0L until bucket.size)
+        .foldLeft(e) {
+          case (acc, _) => acc.inc(bucket.timestamp)
+        }
+        .step(bucket.timestamp)
       val adds = e.add(bucket.size, bucket.timestamp)
       assert(incs == adds)
     }
@@ -240,7 +246,9 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
       assert(rebucketed.map(_.size) == desired)
 
       // all bucket sizes are now powers of two.
-      assert(rebucketed.forall { b => isPowerOfTwo(b.size) })
+      assert(rebucketed.forall { b =>
+        isPowerOfTwo(b.size)
+      })
     }
   }
 }
@@ -285,10 +293,9 @@ class CanonicalLaws extends PropSpec with PropertyChecks {
     forAll { (i: PosNum[Long], k: PosNum[Short]) =>
       val lower = k.value
       val upper = lower + 1
-      assert(
-        fromLong(i.value, k.value).rep.init.forall { numBuckets =>
-          lower <= numBuckets && numBuckets <= upper
-        })
+      assert(fromLong(i.value, k.value).rep.init.forall { numBuckets =>
+        lower <= numBuckets && numBuckets <= upper
+      })
     }
   }
 }

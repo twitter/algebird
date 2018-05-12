@@ -7,9 +7,8 @@ import scala.util.Random
 
 object BloomFilterCreateBenchmark {
 
-  def createRandomString(nbrOfStrings: Int, lengthOfStrings: Int): Seq[String] = {
+  def createRandomString(nbrOfStrings: Int, lengthOfStrings: Int): Seq[String] =
     Seq.fill(nbrOfStrings)(Random.nextString(lengthOfStrings))
-  }
 
   @State(Scope.Benchmark)
   class BloomFilterState {
@@ -22,9 +21,8 @@ object BloomFilterCreateBenchmark {
     var randomStrings: Seq[String] = _
 
     @Setup(Level.Trial)
-    def setup(): Unit = {
+    def setup(): Unit =
       randomStrings = createRandomString(nbrOfElements, 10)
-    }
 
   }
 }
@@ -40,4 +38,3 @@ class BloomFilterCreateBenchmark {
     bf
   }
 }
-

@@ -16,15 +16,14 @@ object AveragedValueBenchmark {
     var inputData: Seq[AveragedValue] = _
 
     @Setup(Level.Trial)
-    def setup(): Unit = {
+    def setup(): Unit =
       inputData = Seq.fill(numElements)(AveragedValue(Random.nextInt(1000).toLong))
-    }
   }
 }
 
 class AveragedValueBenchmark {
   import AveragedValueBenchmark._
-  import AveragedGroup.{ plus, sumOption }
+  import AveragedGroup.{plus, sumOption}
 
   @Benchmark
   def timePlus(state: AVState, bh: Blackhole) =

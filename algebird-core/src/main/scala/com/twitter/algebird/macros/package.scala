@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import scala.language.experimental.{ macros => sMacros }
+import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
@@ -15,7 +15,8 @@ package object macros {
       c.abort(c.enclosingPosition, s"$T is not a case class")
   }
 
-  private[macros] def getParams[T](c: Context)(implicit T: c.WeakTypeTag[T]): List[c.universe.MethodSymbol] = {
+  private[macros] def getParams[T](c: Context)(
+      implicit T: c.WeakTypeTag[T]): List[c.universe.MethodSymbol] = {
     import c.universe._
 
     val tpe = weakTypeOf[T]
@@ -43,7 +44,8 @@ package object macros {
 
     val tpe = weakTypeOf[T]
     tpe.declarations.collect {
-      case m: MethodSymbol if m.isCaseAccessor => normalized(m.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
+      case m: MethodSymbol if m.isCaseAccessor =>
+        normalized(m.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
     }.toList
   }
 

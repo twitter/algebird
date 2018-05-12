@@ -10,7 +10,6 @@ import scala.util.Random.nextString
  *
  * We benchmark different `K` types as well as different input data streams.
  */
-
 object TopCMSBenchmark {
   import CMSHasherImplicits.CMSHasherBigInt
 

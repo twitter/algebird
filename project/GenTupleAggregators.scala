@@ -5,8 +5,9 @@ import sbt._
 object GenTupleAggregators {
   def gen(dir: File) = {
     val tupleAggPlace = dir / "com" / "twitter" / "algebird" / "GeneratedTupleAggregators.scala"
-    IO.write(tupleAggPlace,
-"""package com.twitter.algebird
+    IO.write(
+      tupleAggPlace,
+      """package com.twitter.algebird
 
 object GeneratedTupleAggregator extends GeneratedTupleAggregator
 
@@ -14,13 +15,14 @@ trait GeneratedTupleAggregator {
 """ + genMethods(22, "implicit def", None) + "\n" + "}")
 
     val multiAggPlace = dir / "com" / "twitter" / "algebird" / "MultiAggregator.scala"
-    IO.write(multiAggPlace,
-"""package com.twitter.algebird
+    IO.write(
+      multiAggPlace,
+      """package com.twitter.algebird
 
 object MultiAggregator {
 """ +
-      genMethods(22, "def", Some("apply")) + "\n" +
-      genMethods(22, "def", Some("apply"), true) + "\n" + "}")
+        genMethods(22, "def", Some("apply")) + "\n" +
+        genMethods(22, "def", Some("apply"), true) + "\n" + "}")
 
     val mapAggPlace = dir / "com" / "twitter" / "algebird" / "MapAggregator.scala"
     IO.write(
@@ -40,8 +42,7 @@ object MultiAggregator {
       |  ${genMapMethods(22)}
       |  ${genMapMethods(22, isMonoid = true)}
       |}
-      """.stripMargin
-    )
+      """.stripMargin)
 
     Seq(tupleAggPlace, multiAggPlace, mapAggPlace)
   }
@@ -70,10 +71,10 @@ object MultiAggregator {
     def present(b: %s) = (%s)
   }
 }""".format(defStr, methodName, bs, cs, i, aggs, aggType, tupleBs, tupleCs,
-            aggType, tupleBs, tupleCs,
-            prepares,
-            semiType, semigroup,
-            tupleBs, present)
+        aggType, tupleBs, tupleCs,
+        prepares,
+        semiType, semigroup,
+        tupleBs, present)
     }).mkString("\n")
   }
 

@@ -11,10 +11,10 @@ class MomentsLaws extends CheckProperties {
     implicit val equiv: Equiv[Moments] =
       Equiv.fromFunction { (ml, mr) =>
         (ml.m0 == mr.m0) &&
-          approxEq(EPS)(ml.m1, mr.m1) &&
-          approxEq(EPS)(ml.m2, mr.m2) &&
-          approxEq(EPS)(ml.m3, mr.m3) &&
-          approxEq(EPS)(ml.m4, mr.m4)
+        approxEq(EPS)(ml.m1, mr.m1) &&
+        approxEq(EPS)(ml.m2, mr.m2) &&
+        approxEq(EPS)(ml.m3, mr.m3) &&
+        approxEq(EPS)(ml.m4, mr.m4)
       }
     groupLaws[Moments]
   }
@@ -30,7 +30,9 @@ class MomentsTest extends WordSpec with Matchers {
    * the list's central moments.
    */
   def getMoments(xs: List[Double]): Moments =
-    xs.foldLeft(MomentsGroup.zero) { (m, x) => MomentsGroup.plus(m, Moments(x)) }
+    xs.foldLeft(MomentsGroup.zero) { (m, x) =>
+      MomentsGroup.plus(m, Moments(x))
+    }
 
   "Moments should count" in {
     val m1 = getMoments(List(1, 2, 3, 4, 5))

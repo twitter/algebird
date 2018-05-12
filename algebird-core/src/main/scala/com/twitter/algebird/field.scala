@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
-import java.lang.{ Float => JFloat, Double => JDouble }
+import java.lang.{Float => JFloat, Double => JDouble}
+
 /**
  * This is here to ease transition to using algebra.Field as the field
  * type. Intended use is to do:
@@ -83,7 +84,8 @@ object field {
    */
   implicit class AlgebirdFieldEnrichments[T](val field: Field[T]) extends AnyVal {
     def assertNotZero(t: T): Unit =
-      if (t == field.zero) throw new IllegalArgumentException(s"found $t, require ${field.zero}")
+      if (t == field.zero)
+        throw new IllegalArgumentException(s"found $t, require ${field.zero}")
       else ()
 
     def nonZeroOption(t: T): Option[T] =

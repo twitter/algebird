@@ -1,16 +1,25 @@
 package com.twitter.algebird
 
-import java.lang.{ Boolean => JBool, Double => JDouble, Float => JFloat, Integer => JInt, Long => JLong, Short => JShort }
-import java.util.{ List => JList, Map => JMap }
+import java.lang.{
+  Boolean => JBool,
+  Double => JDouble,
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
+}
+import java.util.{List => JList, Map => JMap}
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 
 import scala.collection.JavaConverters._
 
 class JavaBoxedTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val jboolArg = Arbitrary { for (v <- Gen.oneOf(JBool.TRUE, JBool.FALSE)) yield v }
+  implicit val jboolArg = Arbitrary {
+    for (v <- Gen.oneOf(JBool.TRUE, JBool.FALSE)) yield v
+  }
   implicit val jintArg = Arbitrary {
     for (v <- Gen.choose(Int.MinValue, Int.MaxValue))
       yield JInt.valueOf(v)
@@ -60,7 +69,11 @@ class JavaBoxedTests extends CheckProperties {
   }
 
   implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup] = Arbitrary {
-    implicitly[Arbitrary[Map[K, V]]].arbitrary.map { _.filter { kv => isNonZero[V](kv._2) }.asJava }
+    implicitly[Arbitrary[Map[K, V]]].arbitrary.map {
+      _.filter { kv =>
+        isNonZero[V](kv._2)
+      }.asJava
+    }
   }
 
   property("JMap[String,Int] is a Monoid") {

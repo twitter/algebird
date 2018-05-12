@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 
 class RightFoldedTest extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
@@ -11,12 +11,17 @@ class RightFoldedTest extends CheckProperties {
     }
   implicit def rightFoldedToFold[In: Arbitrary]: Arbitrary[RightFoldedToFold[In]] =
     Arbitrary {
-      for (v <- implicitly[Arbitrary[In]].arbitrary) yield RightFoldedToFold(List(v))
+      for (v <- implicitly[Arbitrary[In]].arbitrary)
+        yield RightFoldedToFold(List(v))
     }
   implicit def rightFolded[In: Arbitrary, Out: Arbitrary]: Arbitrary[RightFolded[In, Out]] =
-    Arbitrary { Gen.oneOf(rightFoldedValue[Out].arbitrary, rightFoldedToFold[In].arbitrary) }
+    Arbitrary {
+      Gen.oneOf(rightFoldedValue[Out].arbitrary, rightFoldedToFold[In].arbitrary)
+    }
 
-  implicit val rightFoldedMonoid = RightFolded.monoid[Int, Long] { (i, l) => l + i.toLong }
+  implicit val rightFoldedMonoid = RightFolded.monoid[Int, Long] { (i, l) =>
+    l + i.toLong
+  }
 
   property("RightFolded is a monoid") {
     monoidLaws[RightFolded[Int, Long]]

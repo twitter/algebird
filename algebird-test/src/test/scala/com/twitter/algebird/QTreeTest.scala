@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -23,7 +23,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.{Matchers, PropSpec}
 
 import java.util.Arrays
 
@@ -32,9 +32,7 @@ class QTreeLaws extends CheckProperties {
 
   implicit val qtSemigroup = new QTreeSemigroup[Long](4)
   implicit val qtGen = Arbitrary {
-    for (
-      v <- choose(0L, 10000L)
-    ) yield (QTree(v))
+    for (v <- choose(0L, 10000L)) yield (QTree(v))
   }
 
   property("QTree is associative") {
@@ -43,13 +41,14 @@ class QTreeLaws extends CheckProperties {
 }
 
 class QTreeTest extends WordSpec with Matchers {
-  def randomList(n: Long) = {
-    (1L to n).map{ i => math.random }
-  }
+  def randomList(n: Long) =
+    (1L to n).map { i =>
+      math.random
+    }
 
   def buildQTree(k: Int, list: Seq[Double]) = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
-    qtSemigroup.sumOption(list.map{ QTree(_) }).get
+    qtSemigroup.sumOption(list.map { QTree(_) }).get
   }
 
   def trueQuantile[T: Ordering](list: Seq[T], q: Double): T = {
@@ -59,7 +58,7 @@ class QTreeTest extends WordSpec with Matchers {
   }
 
   def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
-    list.filter{ _ >= from }.filter{ _ < to }.sum
+    list.filter { _ >= from }.filter { _ < to }.sum
 
   for (k <- Seq(3, 11, 51, 101)) {
     s"QTree with elements (1 to $k)" should {

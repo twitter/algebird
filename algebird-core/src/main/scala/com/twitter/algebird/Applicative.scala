@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
@@ -40,13 +40,15 @@ trait Applicative[M[_]] extends Functor[M] {
   def join[T, U](mt: M[T], mu: M[U]): M[(T, U)]
   def sequence[T](ms: Seq[M[T]]): M[Seq[T]] =
     ms match {
-      case Seq() => apply(Seq.empty)
-      case Seq(m) => map(m) { Seq(_) }
+      case Seq()     => apply(Seq.empty)
+      case Seq(m)    => map(m) { Seq(_) }
       case Seq(m, n) => joinWith(m, n) { Seq(_, _) }
       case _ =>
         val mb =
           ms.foldLeft(apply(Seq.newBuilder[T])) { (mb, mt) =>
-            joinWith(mb, mt) { (b, t) => b += t }
+            joinWith(mb, mt) { (b, t) =>
+              b += t
+            }
           }
         map(mb) { _.result }
     }
@@ -57,10 +59,18 @@ trait Applicative[M[_]] extends Functor[M] {
     joinWith(join(m1, m2), m3) { case ((t1, t2), t3) => (t1, t2, t3) }
 
   def join[T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4]): M[(T1, T2, T3, T4)] =
-    joinWith(join(join(m1, m2), m3), m4) { case (((t1, t2), t3), t4) => (t1, t2, t3, t4) }
+    joinWith(join(join(m1, m2), m3), m4) {
+      case (((t1, t2), t3), t4) => (t1, t2, t3, t4)
+    }
 
-  def join[T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5]): M[(T1, T2, T3, T4, T5)] =
-    joinWith(join(join(join(m1, m2), m3), m4), m5) { case ((((t1, t2), t3), t4), t5) => (t1, t2, t3, t4, t5) }
+  def join[T1, T2, T3, T4, T5](m1: M[T1],
+                               m2: M[T2],
+                               m3: M[T3],
+                               m4: M[T4],
+                               m5: M[T5]): M[(T1, T2, T3, T4, T5)] =
+    joinWith(join(join(join(m1, m2), m3), m4), m5) {
+      case ((((t1, t2), t3), t4), t5) => (t1, t2, t3, t4, t5)
+    }
 }
 
 /**
@@ -72,22 +82,27 @@ abstract class AbstractApplicative[M[_]] extends Applicative[M]
  * Follows the type-class pattern for the Applicative trait
  */
 object Applicative {
+
   /** Get the Applicative for a type, e.g: Applicative[List] */
   def apply[M[_]](implicit app: Applicative[M]): Applicative[M] = app
   def join[M[_], T, U](mt: M[T], mu: M[U])(implicit app: Applicative[M]): M[(T, U)] =
     app.join(mt, mu)
   def join[M[_], T1, T2, T3](m1: M[T1], m2: M[T2], m3: M[T3])(implicit app: Applicative[M]): M[(T1, T2, T3)] =
     app.join(m1, m2, m3)
-  def join[M[_], T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4])(implicit app: Applicative[M]): M[(T1, T2, T3, T4)] =
+  def join[M[_], T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4])(
+      implicit app: Applicative[M]): M[(T1, T2, T3, T4)] =
     app.join(m1, m2, m3, m4)
-  def join[M[_], T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5])(implicit app: Applicative[M]): M[(T1, T2, T3, T4, T5)] =
+  def join[M[_], T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5])(
+      implicit app: Applicative[M]): M[(T1, T2, T3, T4, T5)] =
     app.join(m1, m2, m3, m4, m5)
   def sequence[M[_], T](ms: Seq[M[T]])(implicit app: Applicative[M]): M[Seq[T]] =
     app.sequence(ms)
+
   /**
    * A Generic sequence that uses CanBuildFrom
    */
-  def sequenceGen[M[_], T, S[X] <: TraversableOnce[X], R[_]](ms: S[M[T]])(implicit app: Applicative[M], cbf: CanBuildFrom[Nothing, T, R[T]]): M[R[T]] = {
+  def sequenceGen[M[_], T, S[X] <: TraversableOnce[X], R[_]](
+      ms: S[M[T]])(implicit app: Applicative[M], cbf: CanBuildFrom[Nothing, T, R[T]]): M[R[T]] = {
     val bldr = cbf()
     val mbldr = ms.toIterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
       app.joinWith(mb, mt)(_ += _)
@@ -124,8 +139,7 @@ class ApplicativeOperators[A, M[_]](m: M[A])(implicit app: Applicative[M]) exten
 /**
  * This is a Semigroup, for all Applicatives.
  */
-class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T])
-  extends Semigroup[M[T]] {
+class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T]) extends Semigroup[M[T]] {
   def plus(l: M[T], r: M[T]) = ap.joinWith(l, r)(sg.plus)
 }
 
@@ -133,7 +147,8 @@ class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T
  * This is a Monoid, for all Applicatives.
  */
 class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
-  extends ApplicativeSemigroup[T, M] with Monoid[M[T]] {
+    extends ApplicativeSemigroup[T, M]
+    with Monoid[M[T]] {
   lazy val zero = app(mon.zero)
 }
 
@@ -143,7 +158,8 @@ class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
  * this generally works.
  */
 class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
-  extends ApplicativeMonoid[T, M] with Group[M[T]] {
+    extends ApplicativeMonoid[T, M]
+    with Group[M[T]] {
   override def negate(v: M[T]) = app.map(v)(grp.negate)
   override def minus(l: M[T], r: M[T]) = app.joinWith(l, r)(grp.minus)
 }
@@ -154,7 +170,8 @@ class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
  * this generally works.
  */
 class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
-  extends ApplicativeGroup[T, M] with Ring[M[T]] {
+    extends ApplicativeGroup[T, M]
+    with Ring[M[T]] {
   lazy val one = app(ring.one)
   def times(l: M[T], r: M[T]) = app.joinWith(l, r)(ring.times)
 }

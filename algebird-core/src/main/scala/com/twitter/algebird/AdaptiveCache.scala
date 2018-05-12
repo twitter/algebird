@@ -12,14 +12,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
 /**
  * @author Avi Bryant
  */
-
 import collection.mutable.HashMap
 import ref.SoftReference
 
@@ -32,24 +31,25 @@ import ref.SoftReference
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
   private val map = new SoftReference(new HashMap[K, V]())
 
-  def size = map.get.map{ _.size }.getOrElse(0)
+  def size = map.get.map { _.size }.getOrElse(0)
 
-  def clear(): Unit = { map.get.foreach{ _.clear } }
+  def clear(): Unit = map.get.foreach { _.clear }
 
-  def stopGrowing(): Unit = { map.clear }
+  def stopGrowing(): Unit = map.clear
 
   def put(in: Map[K, V]) {
     if (map.get.isDefined) {
       in.foreach {
         case (k, v) =>
           val newValue =
-            map
-              .get
-              .flatMap{ _.get(k) }
-              .map{ oldV => sgv.plus(oldV, v) }
+            map.get
+              .flatMap { _.get(k) }
+              .map { oldV =>
+                sgv.plus(oldV, v)
+              }
               .getOrElse(v)
 
-          map.get.foreach{ _.put(k, newValue) }
+          map.get.foreach { _.put(k, newValue) }
       }
     }
   }
@@ -65,7 +65,7 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
  * have enough headroom to double the capacity.
  */
 class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.0)
-  extends StatefulSummer[Map[K, V]] {
+    extends StatefulSummer[Map[K, V]] {
 
   require(maxCapacity >= 0, "Cannot have negative capacity")
   private var currentCapacity = 1
@@ -74,18 +74,20 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
   private val sentinelCache = new SentinelCache[K, V]
 
   private def update(evicted: Option[Map[K, V]]) = {
-    evicted.foreach{ e => sentinelCache.put(e) }
+    evicted.foreach { e =>
+      sentinelCache.put(e)
+    }
 
     var ret = evicted
 
     if (currentCapacity < maxCapacity &&
-      sentinelCache.size > (currentCapacity * growthMargin)) {
+        sentinelCache.size > (currentCapacity * growthMargin)) {
       currentCapacity = (currentCapacity * 2).min(maxCapacity)
 
       ret = (ret, summingCache.flush) match {
         case (Some(l), Some(r)) => Some(semigroup.plus(l, r))
-        case (l, None) => l
-        case (None, r) => r
+        case (l, None)          => l
+        case (None, r)          => r
       }
 
       summingCache = new SummingWithHitsCache(currentCapacity)
@@ -100,7 +102,8 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
 
   override def semigroup = summingCache.semigroup
 
-  override def put(m: Map[K, V]): Option[Map[K, V]] = update(summingCache.put(m))
+  override def put(m: Map[K, V]): Option[Map[K, V]] =
+    update(summingCache.put(m))
 
   override def flush: Option[Map[K, V]] = {
     val ret = summingCache.flush

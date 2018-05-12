@@ -12,19 +12,22 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird.matrix
-import scala.collection.mutable.{ ArrayBuffer, Map => MMap }
+import scala.collection.mutable.{ArrayBuffer, Map => MMap}
 
 import com.twitter.algebird.Monoid
 
-case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSeq[V]) extends AdaptiveMatrix[V] {
+case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSeq[V])
+    extends AdaptiveMatrix[V] {
   val valueMonoid = implicitly[Monoid[V]]
 
-  private[this] def tupToIndex(position: (Int, Int)) = position._1 * cols + position._2
+  private[this] def tupToIndex(position: (Int, Int)) =
+    position._1 * cols + position._2
 
-  override def getValue(position: (Int, Int)): V = rowsByColumns(tupToIndex(position))
+  override def getValue(position: (Int, Int)): V =
+    rowsByColumns(tupToIndex(position))
 
   override def updated(position: (Int, Int), value: V): DenseMatrix[V] =
     DenseMatrix[V](rows, cols, rowsByColumns.updated(tupToIndex(position), value))
@@ -39,4 +42,3 @@ case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSe
   }
 
 }
-

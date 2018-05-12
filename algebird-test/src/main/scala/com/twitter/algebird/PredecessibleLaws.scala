@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
-import org.scalacheck.{ Arbitrary, Prop }
+import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
 object PredecessibleLaws {
@@ -33,7 +33,7 @@ object PredecessibleLaws {
     val prev = Predecessible.prev(t)
     val prevPrev = Predecessible.prev(prev)
     descending(t, prev) && descending(t, prevPrev) && (prev match {
-      case None => true
+      case None    => true
       case Some(p) => descending(p, prevPrev)
     })
   }
@@ -41,8 +41,8 @@ object PredecessibleLaws {
   def iteratePrevDecreases[T: Predecessible](t: T, size: Short): Boolean =
     Predecessible.iteratePrev(t).take(size.toInt).sliding(2).forall {
       case a :: b :: Nil => implicitly[Predecessible[T]].ordering.lt(b, a)
-      case a :: Nil => true
-      case s => sys.error("should never happen: " + s)
+      case a :: Nil      => true
+      case s             => sys.error("should never happen: " + s)
     }
 
   /**

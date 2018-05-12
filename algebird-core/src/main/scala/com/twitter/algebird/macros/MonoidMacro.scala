@@ -1,6 +1,6 @@
 package com.twitter.algebird.macros
 
-import scala.language.experimental.{ macros => sMacros }
+import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
@@ -12,8 +12,8 @@ object MonoidMacro {
 
     ensureCaseClass(c)
 
-    val implicitMonoids = getParams(c).map {
-      param => q"implicitly[_root_.com.twitter.algebird.Monoid[${param.typeSignatureIn(T.tpe)}]]"
+    val implicitMonoids = getParams(c).map { param =>
+      q"implicitly[_root_.com.twitter.algebird.Monoid[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val res = q"""

@@ -12,46 +12,46 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util.summer
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.twitter.algebird._
-import com.twitter.util.{ Future, FuturePool }
+import com.twitter.util.{Future, FuturePool}
 
 import scala.collection.JavaConverters._
 import scala.collection.breakOut
-import scala.collection.mutable.{ Set => MSet }
+import scala.collection.mutable.{Set => MSet}
 import com.twitter.algebird.util.UtilAlgebras._
 
 /**
  * @author Ian O Connell
  */
-
 class AsyncListSum[Key, Value](bufferSize: BufferSize,
-  override val flushFrequency: FlushFrequency,
-  override val softMemoryFlush: MemoryFlushPercent,
-  override val memoryIncr: Incrementor,
-  override val timeoutIncr: Incrementor,
-  insertOp: Incrementor,
-  insertFails: Incrementor,
-  sizeIncr: Incrementor,
-  tuplesIn: Incrementor,
-  tuplesOut: Incrementor,
-  workPool: FuturePool,
-  compact: Compact,
-  compatSize: CompactionSize)(implicit sg: Semigroup[Value])
-  extends AsyncSummer[(Key, Value), Map[Key, Value]]
-  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+                               override val flushFrequency: FlushFrequency,
+                               override val softMemoryFlush: MemoryFlushPercent,
+                               override val memoryIncr: Incrementor,
+                               override val timeoutIncr: Incrementor,
+                               insertOp: Incrementor,
+                               insertFails: Incrementor,
+                               sizeIncr: Incrementor,
+                               tuplesIn: Incrementor,
+                               tuplesOut: Incrementor,
+                               workPool: FuturePool,
+                               compact: Compact,
+                               compatSize: CompactionSize)(implicit sg: Semigroup[Value])
+    extends AsyncSummer[(Key, Value), Map[Key, Value]]
+    with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
   private case class MapContainer(privBuf: List[Future[Value]], size: Int, compact: Compact) {
-    def this(v: Value, compact: Compact) = this(List[Future[Value]](Future.value(v)), 1, compact)
+    def this(v: Value, compact: Compact) =
+      this(List[Future[Value]](Future.value(v)), 1, compact)
 
-    def addValue(v: Value): (MapContainer, Int) = {
+    def addValue(v: Value): (MapContainer, Int) =
       if (compact.flag && size > compatSizeInt) {
         val newV = workPool {
           fSg.sumOption(Future.value(v) :: privBuf).get
@@ -60,18 +60,18 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
       } else {
         (new MapContainer(Future.value(v) :: privBuf, size + 1, compact), 1)
       }
-    }
 
     override def equals(o: Any) = o match {
       case that: MapContainer => that eq this
-      case _ => false
+      case _                  => false
     }
 
     lazy val toSeq = privBuf.reverse
   }
 
   protected override val emptyResult = Map.empty[Key, Value]
-  private[this] final val queueMap = new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
+  private[this] final val queueMap =
+    new ConcurrentHashMap[Key, MapContainer](bufferSize.v)
   private[this] final val elementsInCache = new AtomicInteger(0)
   val fSg: Semigroup[Future[Value]] = implicitly[Semigroup[Future[Value]]]
   private[this] val innerBuffSize = bufferSize.v
@@ -126,22 +126,22 @@ class AsyncListSum[Key, Value](bufferSize: BufferSize,
     }
   }
 
-  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = workPool {
-    insertOp.incr
-    vals.foreach {
-      case (k, v) =>
-        doInsert(k, v)
-    }
+  def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
+    workPool {
+      insertOp.incr
+      vals.foreach {
+        case (k, v) =>
+          doInsert(k, v)
+      }
 
-    if (elementsInCache.get >= innerBuffSize) {
-      sizeIncr.incr
-      flush
-    } else {
-      Future.value(Map.empty[Key, Value])
-    }
-  }.flatten
+      if (elementsInCache.get >= innerBuffSize) {
+        sizeIncr.incr
+        flush
+      } else {
+        Future.value(Map.empty[Key, Value])
+      }
+    }.flatten
 }
 
 case class CompactionSize(toInt: Int) extends AnyVal
 case class Compact(flag: Boolean) extends AnyVal
-

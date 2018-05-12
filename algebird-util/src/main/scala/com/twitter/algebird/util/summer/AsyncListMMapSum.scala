@@ -12,15 +12,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{ Duration, Future, FuturePool }
+import com.twitter.util.{Duration, Future, FuturePool}
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ Set => MSet, ListBuffer, Map => MMap }
+import scala.collection.mutable.{Set => MSet, ListBuffer, Map => MMap}
 import scala.collection.breakOut
 
 /**
@@ -29,18 +29,17 @@ import scala.collection.breakOut
  * This is a simple asyncronous summer, where a shared mutable map is used between all readers/writers.
  * When flushing it acquires the lock, drains the mutable map but does the compaction without holding the lock.
  */
-
 class AsyncListMMapSum[Key, Value](bufferSize: BufferSize,
-  override val flushFrequency: FlushFrequency,
-  override val softMemoryFlush: MemoryFlushPercent,
-  override val memoryIncr: Incrementor,
-  override val timeoutIncr: Incrementor,
-  tuplesOut: Incrementor,
-  insertOp: Incrementor,
-  sizeIncr: Incrementor,
-  workPool: FuturePool)(implicit sg: Semigroup[Value])
-  extends AsyncSummer[(Key, Value), Map[Key, Value]]
-  with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+                                   override val flushFrequency: FlushFrequency,
+                                   override val softMemoryFlush: MemoryFlushPercent,
+                                   override val memoryIncr: Incrementor,
+                                   override val timeoutIncr: Incrementor,
+                                   tuplesOut: Incrementor,
+                                   insertOp: Incrementor,
+                                   sizeIncr: Incrementor,
+                                   workPool: FuturePool)(implicit sg: Semigroup[Value])
+    extends AsyncSummer[(Key, Value), Map[Key, Value]]
+    with WithFlushConditions[(Key, Value), Map[Key, Value]] {
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
   private[this] final val queueMap = MMap[Key, ListBuffer[Value]]()

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.util.summer
 
 import java.util.concurrent.ArrayBlockingQueue
@@ -26,21 +26,23 @@ import scala.collection.mutable.ListBuffer
 /**
  * @author Ian O Connell
  */
-
 case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
-  override val flushFrequency: FlushFrequency,
-  override val softMemoryFlush: MemoryFlushPercent,
-  override val memoryIncr: Incrementor,
-  override val timeoutIncr: Incrementor,
-  sizeIncr: Incrementor,
-  insertOps: Incrementor,
-  tuplesIn: Incrementor,
-  tuplesOut: Incrementor)(implicit semigroup: Semigroup[Value]) extends AsyncSummer[(Key, Value), Map[Key, Value]] with WithFlushConditions[(Key, Value), Map[Key, Value]] {
+                                        override val flushFrequency: FlushFrequency,
+                                        override val softMemoryFlush: MemoryFlushPercent,
+                                        override val memoryIncr: Incrementor,
+                                        override val timeoutIncr: Incrementor,
+                                        sizeIncr: Incrementor,
+                                        insertOps: Incrementor,
+                                        tuplesIn: Incrementor,
+                                        tuplesOut: Incrementor)(implicit semigroup: Semigroup[Value])
+    extends AsyncSummer[(Key, Value), Map[Key, Value]]
+    with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
   protected override val emptyResult = Map.empty[Key, Value]
 
-  private[this] final val squeue: CustomSummingQueue[Map[Key, Value]] = new CustomSummingQueue(bufferSize.v, sizeIncr, insertOps)
+  private[this] final val squeue: CustomSummingQueue[Map[Key, Value]] =
+    new CustomSummingQueue(bufferSize.v, sizeIncr, insertOps)
   override def isFlushed: Boolean = squeue.isFlushed
 
   def flush: Future[Map[Key, Value]] = {
@@ -50,18 +52,21 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    val outputs = squeue.put(Monoid.sum(vals.map { i =>
-      tuplesIn.incr
-      Map(i)
-    })).getOrElse(Map.empty)
+    val outputs = squeue
+      .put(Monoid.sum(vals.map { i =>
+        tuplesIn.incr
+        Map(i)
+      }))
+      .getOrElse(Map.empty)
 
     tuplesOut.incrBy(outputs.size)
     Future.value(outputs)
   }
 }
 
-class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incrementor)(override implicit val semigroup: Semigroup[V])
-  extends StatefulSummer[V] {
+class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incrementor)(
+    override implicit val semigroup: Semigroup[V])
+    extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
@@ -91,12 +96,11 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
   /**
    * drain the queue and return the sum. If empty, return None
    */
-  def flush: Option[V] = {
+  def flush: Option[V] =
     queueOption.flatMap { queue =>
       val toSum = ListBuffer[V]()
       queue.drainTo(toSum.asJava)
       Semigroup.sumOption(toSum)
     }
-  }
   def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
 }

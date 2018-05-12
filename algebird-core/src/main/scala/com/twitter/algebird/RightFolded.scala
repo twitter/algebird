@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -30,15 +30,18 @@ object RightFolded {
 
       val zero = RightFoldedZero
 
-      def plus(left: RightFolded[In, Out], right: RightFolded[In, Out]) = left match {
-        case RightFoldedValue(_) => left
-        case RightFoldedZero => right
-        case RightFoldedToFold(lList) => right match {
-          case RightFoldedZero => RightFoldedToFold(lList)
-          case RightFoldedValue(vr) => RightFoldedValue(lList.foldRight(vr)(foldfn))
-          case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
+      def plus(left: RightFolded[In, Out], right: RightFolded[In, Out]) =
+        left match {
+          case RightFoldedValue(_) => left
+          case RightFoldedZero     => right
+          case RightFoldedToFold(lList) =>
+            right match {
+              case RightFoldedZero => RightFoldedToFold(lList)
+              case RightFoldedValue(vr) =>
+                RightFoldedValue(lList.foldRight(vr)(foldfn))
+              case RightFoldedToFold(rList) => RightFoldedToFold(lList ++ rList)
+            }
         }
-      }
     }
 }
 

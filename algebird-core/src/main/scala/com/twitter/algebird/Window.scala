@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -56,14 +56,14 @@ import Operators._
  *      .scanLeft(W90(0)) { (a, b) => a + b }
  *      .map{ _.total }
  */
-
 case class Window[T](total: T, items: Queue[T]) {
   def size: Int = items.size
 }
 
 object Window extends Serializable {
   def apply[T](v: T): Window[T] = Window[T](v, Queue[T](v))
-  def fromIterable[T](ts: Iterable[T])(implicit m: WindowMonoid[T]) = m.fromIterable(ts)
+  def fromIterable[T](ts: Iterable[T])(implicit m: WindowMonoid[T]) =
+    m.fromIterable(ts)
 
   /**
    * Build a monoid from either a group or a monoid
@@ -71,7 +71,7 @@ object Window extends Serializable {
   def monoid[T](size: Int)(implicit p: Priority[Group[T], Monoid[T]]): WindowMonoid[T] =
     p match {
       case Priority.Preferred(grp) => monoidFromGroup(size)(grp)
-      case Priority.Fallback(mon) => monoidFromMonoid(size)(mon)
+      case Priority.Fallback(mon)  => monoidFromMonoid(size)(mon)
     }
 
   /**
@@ -146,7 +146,7 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
       Some(Window(monoid.sum(queue), queue))
     }
 
-  def fromIterable(ts: Iterable[T]): Window[T] = {
+  def fromIterable(ts: Iterable[T]): Window[T] =
     if (ts.isEmpty) zero
     else {
       var queue = Queue.empty[T]
@@ -165,17 +165,18 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
       val total = monoid.sum(queue)
       Window(total, queue)
     }
-  }
 }
 
-final case class WindowMonoidFromMonoid[T](windowSize: Int)(implicit m: Monoid[T]) extends WindowMonoid[T](windowSize) {
+final case class WindowMonoidFromMonoid[T](windowSize: Int)(implicit m: Monoid[T])
+    extends WindowMonoid[T](windowSize) {
   def monoid: Monoid[T] = m
 
   override def plus(a: Window[T], b: Window[T]): Window[T] =
     Window.combineWithMonoid(windowSize, a, b)
 }
 
-final case class WindowMonoidFromGroup[T](windowSize: Int)(implicit val group: Group[T]) extends WindowMonoid[T](windowSize) {
+final case class WindowMonoidFromGroup[T](windowSize: Int)(implicit val group: Group[T])
+    extends WindowMonoid[T](windowSize) {
   def monoid: Monoid[T] = group
 
   def plus(a: Window[T], b: Window[T]): Window[T] =

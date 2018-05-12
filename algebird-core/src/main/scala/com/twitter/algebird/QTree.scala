@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -38,9 +38,9 @@ import scala.util.hashing.MurmurHash3
  *
  * Keys must be >= 0.
  */
-
 object QTree {
   val DefaultLevel: Int = -16
+
   /**
    * level gives a bin size of 2^level. By default the bin size is 1/65536 (level = -16)
    */
@@ -48,31 +48,21 @@ object QTree {
     val offset = math.floor(kv._1 / math.pow(2.0, level)).toLong
     require(offset >= 0, "QTree can not accept negative values")
 
-    new QTree(kv._2,
-      offset,
-      level,
-      1,
-      null,
-      null)
+    new QTree(kv._2, offset, level, 1, null, null)
   }
 
   def apply[A](kv: (Long, A)): QTree[A] = {
     require(kv._1 >= 0, "QTree can not accept negative values")
 
-    new QTree(kv._2,
-      kv._1,
-      0,
-      1,
-      null,
-      null)
+    new QTree(kv._2, kv._1, 0, 1, null, null)
   }
 
   def apply[A](offset: Long,
-    level: Int,
-    count: Long,
-    sum: A, //the sum at just this node (*not* including its children)
-    lowerChild: Option[QTree[A]],
-    upperChild: Option[QTree[A]]): QTree[A] = {
+               level: Int,
+               count: Long,
+               sum: A, //the sum at just this node (*not* including its children)
+               lowerChild: Option[QTree[A]],
+               upperChild: Option[QTree[A]]): QTree[A] = {
     require(offset >= 0, "QTree can not accept negative values")
 
     new QTree(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
@@ -84,6 +74,7 @@ object QTree {
    * If you truly just care about the counts/histogram, see the value method.
    */
   def apply(k: Long): QTree[Long] = apply(k -> k)
+
   /**
    * uses 1/65636 as the bin size, if you want to control that see other apply
    * or value methods.
@@ -104,25 +95,32 @@ object QTree {
    * features of QTree, you can save some space by using QTree[Unit]
    */
   def value(v: Long): QTree[Unit] = apply(v -> (()))
+
   /**
    * If you are sure you only care about the approximate histogram
    * features of QTree, you can save some space by using QTree[Unit]
    * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
    */
-  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] = apply(v -> (()), level)
+  def value(v: Double, level: Int = DefaultLevel): QTree[Unit] =
+    apply(v -> (()), level)
 
-  private[algebird] def mergePeers[@specialized(Int, Long, Float, Double) A](left: QTree[A], right: QTree[A])(implicit monoid: Monoid[A]): QTree[A] = {
+  private[algebird] def mergePeers[@specialized(Int, Long, Float, Double) A](left: QTree[A], right: QTree[A])(
+      implicit monoid: Monoid[A]): QTree[A] = {
     assert(right.lowerBound == left.lowerBound, "lowerBound " + right.lowerBound + " != " + left.lowerBound)
     assert(right.level == left.level, "level " + right.level + " != " + left.level)
 
-    new QTree[A](monoid.plus(left.sum, right.sum),
+    new QTree[A](
+      monoid.plus(left.sum, right.sum),
       left.offset,
-      left.level, left.count + right.count,
+      left.level,
+      left.count + right.count,
       mergeOptions(left.lowerChildNullable, right.lowerChildNullable),
-      mergeOptions(left.upperChildNullable, right.upperChildNullable))
+      mergeOptions(left.upperChildNullable, right.upperChildNullable)
+    )
   }
 
-  private def mergeOptions[A](aNullable: QTree[A], bNullable: QTree[A])(implicit monoid: Monoid[A]): QTree[A] =
+  private def mergeOptions[A](aNullable: QTree[A], bNullable: QTree[A])(
+      implicit monoid: Monoid[A]): QTree[A] =
     if (aNullable != null) {
       if (bNullable != null) {
         mergePeers(aNullable, bNullable)
@@ -131,41 +129,47 @@ object QTree {
 
   private[algebird] val cachedRangeCacheSize: Int = 20
   private[algebird] val cachedRangeLowerBound: Int = cachedRangeCacheSize * -1
-  private[algebird] val rangeLut: Array[Double] = (cachedRangeLowerBound until cachedRangeCacheSize).map { level =>
-    math.pow(2.0, level)
-  }.toArray[Double]
+  private[algebird] val rangeLut: Array[Double] =
+    (cachedRangeLowerBound until cachedRangeCacheSize)
+      .map { level =>
+        math.pow(2.0, level)
+      }
+      .toArray[Double]
 }
 
 class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extends Semigroup[QTree[A]] {
+
   /** Override this if you want to change how frequently sumOption calls compress */
   def compressBatchSize: Int = 50
   def plus(left: QTree[A], right: QTree[A]) = left.merge(right).compress(k)
-  override def sumOption(items: TraversableOnce[QTree[A]]): Option[QTree[A]] = if (items.isEmpty) None
-  else {
-    // only call compressBatchSize once
-    val batchSize = compressBatchSize
-    var count = 1 // start at 1, so we only compress after batchSize items
-    val iter = items.toIterator
-    var result = iter.next // due to not being empty, this does not throw
-    while (iter.hasNext) {
-      result = result.merge(iter.next)
-      count += 1
-      if (count % batchSize == 0) {
-        result = result.compress(k)
+  override def sumOption(items: TraversableOnce[QTree[A]]): Option[QTree[A]] =
+    if (items.isEmpty) None
+    else {
+      // only call compressBatchSize once
+      val batchSize = compressBatchSize
+      var count = 1 // start at 1, so we only compress after batchSize items
+      val iter = items.toIterator
+      var result = iter.next // due to not being empty, this does not throw
+      while (iter.hasNext) {
+        result = result.merge(iter.next)
+        count += 1
+        if (count % batchSize == 0) {
+          result = result.compress(k)
+        }
       }
+      Some(result.compress(k))
     }
-    Some(result.compress(k))
-  }
 }
 
 class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
-  _sum: A, //the sum at just this node (*not* including its children)
-  _offset: Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
-  _level: Int,
-  _count: Long, //the total count for this node and all of its children
-  _lowerChildNullable: QTree[A],
-  _upperChildNullable: QTree[A])
-  extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]] with Serializable {
+    _sum: A, //the sum at just this node (*not* including its children)
+    _offset: Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
+    _level: Int,
+    _count: Long, //the total count for this node and all of its children
+    _lowerChildNullable: QTree[A],
+    _upperChildNullable: QTree[A])
+    extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]]
+    with Serializable {
   import QTree._
 
   val range: Double =
@@ -180,12 +184,19 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   def lowerChild: Option[QTree[A]] = Option(_lowerChildNullable)
   def upperChild: Option[QTree[A]] = Option(_upperChildNullable)
 
-  def this(offset: Long, level: Int, count: Long, sum: A, lowerChild: Option[QTree[A]], upperChild: Option[QTree[A]]) =
+  def this(offset: Long,
+           level: Int,
+           count: Long,
+           sum: A,
+           lowerChild: Option[QTree[A]],
+           upperChild: Option[QTree[A]]) =
     this(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
 
   // Helpers to access the nullable ones from inside the QTree work
-  @inline private[algebird] def lowerChildNullable: QTree[A] = _lowerChildNullable
-  @inline private[algebird] def upperChildNullable: QTree[A] = _upperChildNullable
+  @inline private[algebird] def lowerChildNullable: QTree[A] =
+    _lowerChildNullable
+  @inline private[algebird] def upperChildNullable: QTree[A] =
+    _upperChildNullable
 
   @inline def offset: Long = _offset
   @inline def level: Int = _level
@@ -207,7 +218,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   override def equals(other: Any): Boolean =
     other match {
       case r: Product if productArity == r.productArity =>
-        productIterator sameElements r.productIterator
+        productIterator.sameElements(r.productIterator)
       case _ => false
     }
 
@@ -216,7 +227,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   override def productArity: Int = 6
 
   @annotation.tailrec
-  private[algebird] final def extendToLevel(n: Int)(implicit monoid: Monoid[A]): QTree[A] = {
+  private[algebird] final def extendToLevel(n: Int)(implicit monoid: Monoid[A]): QTree[A] =
     if (n <= level)
       this
     else {
@@ -233,7 +244,6 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
 
       parent.extendToLevel(n)
     }
-  }
 
   /**
    *
@@ -309,35 +319,34 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * Get the bounds on the sums within a range (not percentile)
    * This along with the rangeCountBounds can tell you the mean over a range
    */
-  def rangeSumBounds(from: Double, to: Double)(implicit monoid: Monoid[A]): (A, A) = {
+  def rangeSumBounds(from: Double, to: Double)(implicit monoid: Monoid[A]): (A, A) =
     if (from <= lowerBound && to >= upperBound) {
       val s = totalSum
       (s, s)
     } else if (from < upperBound && to >= lowerBound) {
       val ((lower1, upper1), (lower2, upper2)) =
-        mapChildrenWithDefault((monoid.zero, monoid.zero)){ _.rangeSumBounds(from, to) }
-      (monoid.plus(lower1, lower2),
-        monoid.plus(sum, monoid.plus(upper1, upper2)))
+        mapChildrenWithDefault((monoid.zero, monoid.zero)) {
+          _.rangeSumBounds(from, to)
+        }
+      (monoid.plus(lower1, lower2), monoid.plus(sum, monoid.plus(upper1, upper2)))
     } else {
       (monoid.zero, monoid.zero)
     }
-  }
 
   /**
    * Return upper and lower bounds on the counts that appear in a given range
    */
-  def rangeCountBounds(from: Double, to: Double): (Long, Long) = {
+  def rangeCountBounds(from: Double, to: Double): (Long, Long) =
     if (from <= lowerBound && to >= upperBound) {
       val s = count
       (s, s)
     } else if (from < upperBound && to >= lowerBound) {
       val ((lower1, upper1), (lower2, upper2)) =
-        mapChildrenWithDefault((0L, 0L)){ _.rangeCountBounds(from, to) }
+        mapChildrenWithDefault((0L, 0L)) { _.rangeCountBounds(from, to) }
       (lower1 + lower2, parentCount + upper1 + upper2)
     } else {
       (0L, 0L)
     }
-  }
 
   /**
    * Users should never need to call this if they are adding QTrees using the Semigroup
@@ -375,13 +384,13 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
 
   // If we don't prune we MUST return child
   @inline
-  private def pruneChild(minCount: Long,
-    childNullable: QTree[A])(implicit m: Monoid[A]): QTree[A] =
+  private def pruneChild(minCount: Long, childNullable: QTree[A])(implicit m: Monoid[A]): QTree[A] =
     if (childNullable == null)
       null
     else {
       val newChild = childNullable.pruneChildren(minCount)
-      if (newChild eq childNullable) childNullable // need to pass the same reference if we don't change
+      if (newChild eq childNullable)
+        childNullable // need to pass the same reference if we don't change
       else newChild
     }
 
@@ -391,7 +400,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * to estimate serialization size.
    */
   def size: Int = {
-    val childSizes = mapChildrenWithDefault(0){ _.size }
+    val childSizes = mapChildrenWithDefault(0) { _.size }
     1 + childSizes._1 + childSizes._2
   }
 
@@ -399,17 +408,15 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * Total sum over the entire tree.
    */
   def totalSum(implicit monoid: Monoid[A]): A = {
-    val childSums = mapChildrenWithDefault(monoid.zero){ _.totalSum }
+    val childSums = mapChildrenWithDefault(monoid.zero) { _.totalSum }
     monoid.plus(sum, monoid.plus(childSums._1, childSums._2))
   }
 
-  private def mapChildrenWithDefault[T](default: T)(fn: QTree[A] => T): (T, T) = {
-    (lowerChild.map(fn).getOrElse(default),
-      upperChild.map(fn).getOrElse(default))
-  }
+  private def mapChildrenWithDefault[T](default: T)(fn: QTree[A] => T): (T, T) =
+    (lowerChild.map(fn).getOrElse(default), upperChild.map(fn).getOrElse(default))
 
   private def parentCount = {
-    val childCounts = mapChildrenWithDefault(0L){ _.count }
+    val childCounts = mapChildrenWithDefault(0L) { _.count }
     _count - childCounts._1 - childCounts._2
   }
 
@@ -424,8 +431,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       print(" (" + parentCount + ")")
     }
     println(" {" + _sum + "}")
-    lowerChild.foreach{ _.dump }
-    upperChild.foreach{ _.dump }
+    lowerChild.foreach { _.dump }
+    upperChild.foreach { _.dump }
   }
 
   /**
@@ -449,10 +456,12 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
 
 trait QTreeAggregatorLike[T] {
   def percentile: Double
+
   /**
    * This is the depth parameter for the QTreeSemigroup
    */
   def k: Int
+
   /**
    * We convert T to a Double, then the Double is converted
    * to a Long by using a 2^level bucket size.
@@ -472,9 +481,10 @@ object QTreeAggregator {
  * The items that are iterated over to produce this approximation cannot be negative.
  * Returns an Intersection which represents the bounded approximation.
  */
-case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
-  extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
-  with QTreeAggregatorLike[T] {
+case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
+    implicit val num: Numeric[T])
+    extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
+    with QTreeAggregatorLike[T] {
 
   def present(qt: QTree[Unit]) = {
     val (lower, upper) = qt.quantileBounds(percentile)
@@ -488,9 +498,10 @@ case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.Defau
  * it instead returns the lower bound of the percentile.
  * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
  */
-case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit val num: Numeric[T])
-  extends Aggregator[T, QTree[Unit], Double]
-  with QTreeAggregatorLike[T] {
+case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
+    implicit val num: Numeric[T])
+    extends Aggregator[T, QTree[Unit], Double]
+    with QTreeAggregatorLike[T] {
 
   def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1
 }

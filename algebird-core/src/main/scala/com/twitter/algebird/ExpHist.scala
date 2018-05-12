@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import java.lang.{ Long => JLong }
+import java.lang.{Long => JLong}
 import scala.annotation.tailrec
 import scala.collection.mutable.Builder
 
@@ -38,8 +38,11 @@ import scala.collection.mutable.Builder
  * @param total total ticks tracked. `total == buckets.map(_.size).sum`
  * @param time current timestamp of this instance.
  */
-case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total: Long, time: ExpHist.Timestamp) {
-  import ExpHist.{ Bucket, Canonical, Timestamp }
+case class ExpHist(conf: ExpHist.Config,
+                   buckets: Vector[ExpHist.Bucket],
+                   total: Long,
+                   time: ExpHist.Timestamp) {
+  import ExpHist.{Bucket, Canonical, Timestamp}
 
   /**
    * Steps this instance forward to the new supplied time. Any
@@ -96,10 +99,13 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
    * into this exponential histogram instance.
    */
   def fold: Fold[Bucket, ExpHist] =
-    Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist](
-      { case (b, bucket) => b += bucket },
-      { _ => Vector.newBuilder[Bucket] },
-      { x => addAll(x.result) })
+    Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist]({
+      case (b, bucket) => b += bucket
+    }, { _ =>
+      Vector.newBuilder[Bucket]
+    }, { x =>
+      addAll(x.result)
+    })
 
   // This internal method assumes that the instance is stepped forward
   // already, and does NOT try to step internally. It also assumes
@@ -108,9 +114,7 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
   private[ExpHist] def addAllWithoutStep(items: Vector[Bucket], delta: Long): ExpHist = {
     val inputs = items ++ buckets
     val desiredBuckets = Canonical.bucketsFromLong(total + delta, conf.l)
-    copy(
-      buckets = ExpHist.rebucket(inputs, desiredBuckets),
-      total = total + delta)
+    copy(buckets = ExpHist.rebucket(inputs, desiredBuckets), total = total + delta)
   }
 
   def oldestBucketSize: Long = if (total == 0) 0L else buckets.last.size
@@ -159,6 +163,7 @@ case class ExpHist(conf: ExpHist.Config, buckets: Vector[ExpHist.Bucket], total:
 }
 
 object ExpHist {
+
   /**
    * Value class wrapper around timestamps (>= 0) used by each bucket.
    */
@@ -177,7 +182,9 @@ object ExpHist {
   case class Bucket(size: Long, timestamp: Timestamp)
 
   object Bucket {
-    implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket => (b.timestamp, b.size) }
+    implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket =>
+      (b.timestamp, b.size)
+    }
   }
 
   /**
@@ -193,7 +200,8 @@ object ExpHist {
 
     // Returns the last timestamp before the window. any ts <= [the
     // returned timestamp] is outside the window.
-    def expiration(currTime: Timestamp): Timestamp = Timestamp(currTime.toLong - windowSize)
+    def expiration(currTime: Timestamp): Timestamp =
+      Timestamp(currTime.toLong - windowSize)
 
     // Drops all buckets with an expired timestamp, based on the
     // configured window and the supplied current time.
@@ -211,7 +219,8 @@ object ExpHist {
   /**
    * Returns an empty instance with the supplied Config.
    */
-  def empty(conf: Config): ExpHist = ExpHist(conf, Vector.empty, 0L, Timestamp(0L))
+  def empty(conf: Config): ExpHist =
+    ExpHist(conf, Vector.empty, 0L, Timestamp(0L))
 
   /**
    *  Returns an instance directly from a number `i`. All buckets in
@@ -266,7 +275,7 @@ object ExpHist {
   @tailrec private[this] def drop(toDrop: Long, input: Vector[Bucket]): Vector[Bucket] = {
     val (b @ Bucket(count, _)) +: tail = input
     (toDrop - count) match {
-      case 0 => tail
+      case 0          => tail
       case x if x < 0 => b.copy(size = -x) +: tail
       case x if x > 0 => drop(x, tail)
     }
@@ -309,12 +318,15 @@ object ExpHist {
     @inline private[this] def floorPowerOfTwo(x: Long): Int =
       JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
 
-    @inline private[this] def modPow2Minus1(i: Int, exp2: Int): Int = i & ((1 << exp2) - 1)
+    @inline private[this] def modPow2Minus1(i: Int, exp2: Int): Int =
+      i & ((1 << exp2) - 1)
     @inline private[this] def quotientPow2(i: Int, exp2: Int): Int = i >>> exp2
     @inline private[this] def bit(i: Int, idx: Int): Int = (i >>> idx) & 1
 
     private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
-      (0 until bits).map { idx => offset + bit(i, idx) }.toVector
+      (0 until bits).map { idx =>
+        offset + bit(i, idx)
+      }.toVector
 
     /**
      * @param s the number to convert to l-canonical form
@@ -357,8 +369,7 @@ object ExpHist {
         val denom = l + 1
         val j = floorPowerOfTwo(num / denom)
         val offset = (num - (denom << j)).toInt
-        CanonicalVector(
-          binarize(modPow2Minus1(offset, j), j, l) :+ (quotientPow2(offset, j) + 1))
+        CanonicalVector(binarize(modPow2Minus1(offset, j), j, l) :+ (quotientPow2(offset, j) + 1))
       }
 
     /**
@@ -386,8 +397,8 @@ object ExpHist {
         val offset = (num - (denom << j)).toInt
         val prefixRep = modPow2Minus1(offset, j)
 
-        (0 until j).toVector.flatMap {
-          idx => Vector.fill(l + bit(prefixRep, idx))(1L << idx)
+        (0 until j).toVector.flatMap { idx =>
+          Vector.fill(l + bit(prefixRep, idx))(1L << idx)
         } ++ List.fill(quotientPow2(offset, j) + 1)(1L << j)
       }
   }
@@ -414,9 +425,8 @@ object ExpHist {
      * @return vector of powers of 2 (where ret.sum == the original s)
      */
     def toBuckets: Vector[Long] =
-      rep.iterator
-        .zipWithIndex
-        .flatMap { case (i, exp) => Iterator.fill(i)(1L << exp) }
-        .toVector
+      rep.iterator.zipWithIndex.flatMap {
+        case (i, exp) => Iterator.fill(i)(1L << exp)
+      }.toVector
   }
 }

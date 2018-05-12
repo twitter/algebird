@@ -1,6 +1,6 @@
 package com.twitter.algebird.macros
 
-import scala.language.experimental.{ macros => sMacros }
+import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
 import scala.reflect.runtime.universe._
 
@@ -15,8 +15,8 @@ object RingMacro {
     val params = getParams(c)
     val companion = getCompanionObject(c)
 
-    val implicitRings = params.map {
-      param => q"implicitly[_root_.com.twitter.algebird.Ring[${param.typeSignatureIn(T.tpe)}]]"
+    val implicitRings = params.map { param =>
+      q"implicitly[_root_.com.twitter.algebird.Ring[${param.typeSignatureIn(T.tpe)}]]"
     }
 
     val timesList = params.zip(implicitRings).map {
@@ -38,4 +38,3 @@ object RingMacro {
   }
 
 }
-

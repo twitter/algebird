@@ -18,9 +18,9 @@ package com.twitter.algebird
 package util
 
 import com.twitter.algebird.BaseProperties._
-import com.twitter.algebird.MonadLaws.{ monadLawsEquiv, monadLaws }
-import com.twitter.util.{ Await, Future, Return, Throw, Try }
-import org.scalacheck.{ Arbitrary, Gen }
+import com.twitter.algebird.MonadLaws.{monadLaws, monadLawsEquiv}
+import com.twitter.util.{Await, Future, Return, Throw, Try}
+import org.scalacheck.{Arbitrary, Gen}
 import scala.util.control.NonFatal
 
 class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
@@ -67,9 +67,11 @@ class UtilAlgebraProperties extends CheckProperties with UtilGenerators {
 trait UtilGenerators {
   def returnGen[T](g: Gen[T]): Gen[Return[T]] = g.map(Return(_))
   def throwGen[T](g: Gen[Exception]): Gen[Throw[T]] = g.map(Throw[T](_))
-  def tryGen[T](s: Gen[T], f: Gen[Exception]): Gen[Try[T]] = Gen.oneOf(returnGen(s), throwGen(f))
+  def tryGen[T](s: Gen[T], f: Gen[Exception]): Gen[Try[T]] =
+    Gen.oneOf(returnGen(s), throwGen(f))
 
-  def futureGen[T](s: Gen[T], f: Gen[Exception]): Gen[Future[T]] = tryGen(s, f).map(Future.const[T](_))
+  def futureGen[T](s: Gen[T], f: Gen[Exception]): Gen[Future[T]] =
+    tryGen(s, f).map(Future.const[T](_))
 
   implicit def tryArb[T](implicit arb: Arbitrary[T], err: Arbitrary[Exception]): Arbitrary[Try[T]] =
     Arbitrary(tryGen(arb.arbitrary, err.arbitrary))

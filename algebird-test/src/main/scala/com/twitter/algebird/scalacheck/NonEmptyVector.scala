@@ -17,8 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 package scalacheck
 
-import org.scalacheck.{ Arbitrary, Gen }
-import Arbitrary.{ arbitrary => getArbitrary }
+import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary.{arbitrary => getArbitrary}
 
 case class NonEmptyVector[T](items: Vector[T]) {
   def sorted(implicit ev: Ordering[T]): Vector[T] = items.sorted

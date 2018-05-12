@@ -10,7 +10,7 @@ class MaxLaws extends CheckProperties {
   def maxTest[T: Arbitrary: Ordering] =
     forAll { (l: Max[T], r: Max[T]) =>
       val realMax = Max(Ordering[T].max(l.get, r.get))
-      l + r == realMax && (l max r) == realMax
+      l + r == realMax && (l.max(r)) == realMax
     }
 
   def maxSemiGroupTest[T: Arbitrary: Ordering] =
@@ -35,9 +35,13 @@ class MaxLaws extends CheckProperties {
     }
   }
 
-  property("Max.semigroup[Int] returns the maximum item") { maxSemiGroupTest[Int] }
+  property("Max.semigroup[Int] returns the maximum item") {
+    maxSemiGroupTest[Int]
+  }
 
-  property("Max.semigroup[Char] returns the maximum item") { maxSemiGroupTest[Char] }
+  property("Max.semigroup[Char] returns the maximum item") {
+    maxSemiGroupTest[Char]
+  }
 
   property("Max[Long] is a commutative monoid") {
     commutativeMonoidLaws[Max[Long]]

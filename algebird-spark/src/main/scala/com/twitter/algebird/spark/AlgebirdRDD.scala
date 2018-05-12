@@ -58,7 +58,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](part: Partitioner,
+  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](
+    part: Partitioner,
     agg: Aggregator[V1, U, V2])(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] = {
     /*
      * This mapValues implementation allows us to avoid needing the V1 ClassTag, which would
@@ -107,7 +108,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * T.
    */
   def sumOption(implicit sg: Semigroup[T], ct: ClassTag[T]): Option[T] = {
-    val partialReduce: RDD[T] = rdd.mapPartitions({ itT => sg.sumOption(itT).toIterator },
+    val partialReduce: RDD[T] = rdd.mapPartitions(
+      { itT => sg.sumOption(itT).toIterator },
       preservesPartitioning = true)
 
     // my reading of the docs is that we do want a shuffle at this stage to

@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 

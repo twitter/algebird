@@ -10,7 +10,7 @@ class MinLaws extends CheckProperties {
   def minTest[T: Arbitrary: Ordering] =
     forAll { (l: Min[T], r: Min[T]) =>
       val realMin = Min(Ordering[T].min(l.get, r.get))
-      l + r == realMin && (l min r) == realMin
+      l + r == realMin && (l.min(r)) == realMin
     }
 
   def minSemigroupTest[T: Arbitrary: Ordering] =
@@ -24,7 +24,9 @@ class MinLaws extends CheckProperties {
 
   property("Min.{ +, min } works on ints") { minTest[Int] }
 
-  property("Min should work on non-monoid types like String") { minTest[String] }
+  property("Min should work on non-monoid types like String") {
+    minTest[String]
+  }
 
   property("Min.aggregator returns the minimum item") {
     forAll { v: NonEmptyVector[Int] =>
@@ -32,9 +34,13 @@ class MinLaws extends CheckProperties {
     }
   }
 
-  property("Min.semigroup[Int] returns the minimum item") { minSemigroupTest[Int] }
+  property("Min.semigroup[Int] returns the minimum item") {
+    minSemigroupTest[Int]
+  }
 
-  property("Min.semigroup[Char] returns the minimum item") { minSemigroupTest[Char] }
+  property("Min.semigroup[Char] returns the minimum item") {
+    minSemigroupTest[Char]
+  }
 
   property("Min[String] is a commutative semigroup") {
     commutativeSemigroupLaws[Min[String]]

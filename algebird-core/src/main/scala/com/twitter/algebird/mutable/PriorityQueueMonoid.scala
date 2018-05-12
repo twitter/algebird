@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird.mutable
 
 import com.twitter.algebird.Monoid
@@ -40,7 +40,7 @@ class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid
     q
   }
   def build(items: Iterable[K]): PriorityQueue[K] = {
-    val q = new PriorityQueue(items.size max MINQUEUESIZE, ord.reverse);
+    val q = new PriorityQueue(items.size.max(MINQUEUESIZE), ord.reverse);
     items.foreach { item =>
       if (q.size < max || ord.lteq(item, q.peek)) {
         q.add(item)
@@ -57,7 +57,8 @@ class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid
   override def isNonZero(q: PriorityQueue[K]) = q.size > 0
 
   override def plus(left: PriorityQueue[K], right: PriorityQueue[K]): PriorityQueue[K] = {
-    val (bigger, smaller) = if (left.size >= right.size) (left, right) else (right, left)
+    val (bigger, smaller) =
+      if (left.size >= right.size) (left, right) else (right, left)
     var biggest = bigger.peek
 
     var next = smaller.poll

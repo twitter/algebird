@@ -23,26 +23,28 @@ class AsyncMapSumProperties extends CheckProperties {
   import com.twitter.algebird.util.summer.AsyncSummerLaws._
 
   property("Summing with and without the summer should match") {
-    forAll { (inputs: List[List[(Int, Long)]],
-      flushFrequency: FlushFrequency,
-      bufferSize: BufferSize,
-      memoryFlushPercent: MemoryFlushPercent) =>
-      val timeOutCounter = Counter("timeOut")
-      val sizeCounter = Counter("size")
-      val memoryCounter = Counter("memory")
-      val insertOp = Counter("insertOp")
-      val tuplesOut = Counter("tuplesOut")
+    forAll {
+      (inputs: List[List[(Int, Long)]],
+       flushFrequency: FlushFrequency,
+       bufferSize: BufferSize,
+       memoryFlushPercent: MemoryFlushPercent) =>
+        val timeOutCounter = Counter("timeOut")
+        val sizeCounter = Counter("size")
+        val memoryCounter = Counter("memory")
+        val insertOp = Counter("insertOp")
+        val tuplesOut = Counter("tuplesOut")
 
-      val summer = new AsyncMapSum[Int, Long](bufferSize,
-        flushFrequency,
-        memoryFlushPercent,
-        memoryCounter,
-        timeOutCounter,
-        insertOp,
-        tuplesOut,
-        sizeCounter,
-        workPool)
-      (summingWithAndWithoutSummerShouldMatch(summer, inputs))
+        val summer = new AsyncMapSum[Int, Long](
+          bufferSize,
+          flushFrequency,
+          memoryFlushPercent,
+          memoryCounter,
+          timeOutCounter,
+          insertOp,
+          tuplesOut,
+          sizeCounter,
+          workPool)
+        (summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }
 

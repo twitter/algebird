@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 /**
@@ -34,7 +34,8 @@ trait Successible[T] extends Serializable {
     // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
       def iterator =
-        Iterator.iterate[Option[T]](Some(old)) { self.next(_) }
+        Iterator
+          .iterate[Option[T]](Some(old)) { self.next(_) }
           .takeWhile(_.isDefined)
           .collect { case Some(t) => t }
     }
@@ -53,6 +54,7 @@ trait Successible[T] extends Serializable {
 }
 
 object Successible {
+
   /**
    * This makes it easy to construct from a function when T has an ordering, which is common
    * Note, your function must respect the ordering
@@ -63,25 +65,28 @@ object Successible {
   }
   // enables: Successible.next(2) == Some(3)
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
-  def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] = succ.next(t)
+  def next[T](t: Option[T])(implicit succ: Successible[T]): Option[T] =
+    succ.next(t)
   def iterateNext[T](old: T)(implicit succ: Successible[T]): Iterable[T] =
     succ.iterateNext(old)
 
-  implicit def integralSucc[N: Integral]: Successible[N] = new IntegralSuccessible[N]
+  implicit def integralSucc[N: Integral]: Successible[N] =
+    new IntegralSuccessible[N]
 
   /**
    * The difference between this and the default ordering on Option[T] is that it treats None
    * as the max value, instead of the minimum value.
    */
-  def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] = new Ordering[Option[T]] {
-    def compare(left: Option[T], right: Option[T]) =
-      (left, right) match {
-        case (Some(l), Some(r)) => ord.compare(l, r)
-        case (Some(l), None) => -1
-        case (None, Some(r)) => 1
-        case (None, None) => 0
-      }
-  }
+  def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] =
+    new Ordering[Option[T]] {
+      def compare(left: Option[T], right: Option[T]) =
+        (left, right) match {
+          case (Some(l), Some(r)) => ord.compare(l, r)
+          case (Some(l), None)    => -1
+          case (None, Some(r))    => 1
+          case (None, None)       => 0
+        }
+    }
 }
 
 object IntegralSuccessible {

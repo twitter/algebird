@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -29,44 +29,49 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
   def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
     // We need summands to be the same length
     val (leftSummand, rightSummand, remainder) = if (left.size > right.size) {
-      (left.view(0, right.size),
-        right,
-        left.view(right.size, left.size))
+      (left.view(0, right.size), right, left.view(right.size, left.size))
     } else {
-      (left,
-        right.view(0, left.size),
-        right.view(left.size, right.size))
+      (left, right.view(0, left.size), right.view(left.size, right.size))
     }
 
     val sum = leftSummand
       .zip(rightSummand)
-      .map { tup => semi.plus(tup._1, tup._2) }
+      .map { tup =>
+        semi.plus(tup._1, tup._2)
+      }
 
     (sum ++ remainder).toIndexedSeq
   }
 }
 
-class IndexedSeqMonoid[T](implicit mont: Monoid[T]) extends IndexedSeqSemigroup[T] with Monoid[IndexedSeq[T]] {
+class IndexedSeqMonoid[T](implicit mont: Monoid[T])
+    extends IndexedSeqSemigroup[T]
+    with Monoid[IndexedSeq[T]] {
   def zero = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]) =
-    v.exists { t => mont.isNonZero(t) }
+    v.exists { t =>
+      mont.isNonZero(t)
+    }
 }
 
-class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T]()(grp)
-  with Group[IndexedSeq[T]] {
+class IndexedSeqGroup[T](implicit grp: Group[T])
+    extends IndexedSeqMonoid[T]()(grp)
+    with Group[IndexedSeq[T]] {
   override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map { grp.negate(_) }
 }
 
-class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng)
-  with Ring[IndexedSeq[T]] {
+class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng) with Ring[IndexedSeq[T]] {
 
   // TODO
-  def one = sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
+  def one =
+    sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
 
   def times(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] =
     // We don't need to pad, because 0 * x = 0
     left.view
       .zip(right)
-      .map { tup => rng.times(tup._1, tup._2) }
+      .map { tup =>
+        rng.times(tup._1, tup._2)
+      }
       .toIndexedSeq
 }

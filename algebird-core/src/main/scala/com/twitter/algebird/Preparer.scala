@@ -10,6 +10,7 @@ package com.twitter.algebird
  * monoidAggregate or a related method, to produce an Aggregator instance.
  */
 sealed trait Preparer[A, T] extends java.io.Serializable {
+
   /**
    * Produce a new MonoidAggregator which includes the Preparer's transformation chain in its prepare stage.
    */
@@ -31,16 +32,19 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
    * Filter out values that do not meet the predicate.
    * Like flatMap, this limits future aggregations to MonoidAggregator.
    */
-  def filter(fn: T => Boolean) = flatMap { t => if (fn(t)) Some(t) else None }
+  def filter(fn: T => Boolean) = flatMap { t =>
+    if (fn(t)) Some(t) else None
+  }
 
   def collect[U](p: PartialFunction[T, U]): FlatMapPreparer[A, U] =
-    flatMap { t => if (p.isDefinedAt(t)) Some(p(t)) else None }
+    flatMap { t =>
+      if (p.isDefinedAt(t)) Some(p(t)) else None
+    }
 
   /**
    * count and following methods all just call monoidAggregate with one of the standard Aggregators.
    * see the Aggregator object for more docs.
    */
-
   def count(pred: T => Boolean) = monoidAggregate(Aggregator.count(pred))
   def exists(pred: T => Boolean) = monoidAggregate(Aggregator.exists(pred))
   def forall(pred: T => Boolean) = monoidAggregate(Aggregator.forall(pred))
@@ -86,6 +90,7 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
 }
 
 object Preparer {
+
   /**
    * This is the expected entry point for creating a new Preparer.
    */
@@ -123,8 +128,8 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
    *
    * We really need to generate N versions of this for 3-way, 4-way etc splits.
    */
-
-  def split[B1, B2, C1, C2](fn: MapPreparer[T, T] => (Aggregator[T, B1, C1], Aggregator[T, B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
+  def split[B1, B2, C1, C2](fn: MapPreparer[T, T] => (Aggregator[T, B1, C1], Aggregator[T, B2, C2]))
+    : Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(MapPreparer.identity[T])
     aggregate(a1.join(a2))
   }
@@ -133,7 +138,6 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
    * head and following methods all just call aggregate with one of the standard Aggregators.
    * see the Aggregator object for more docs.
    */
-
   def head = aggregate(Aggregator.head)
   def last = aggregate(Aggregator.last)
   def max(implicit ord: Ordering[T]) = aggregate(Aggregator.max)
@@ -153,6 +157,7 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
 }
 
 object MapPreparer {
+
   /**
    * Create a concrete MapPreparer.
    */
@@ -166,7 +171,8 @@ object MapPreparer {
     val prepareFn = (a: A) => a
     override def map[U](fn: A => U) = MapPreparer(fn)
     override def flatMap[U](fn: A => TraversableOnce[U]) = FlatMapPreparer(fn)
-    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) = aggregator
+    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) =
+      aggregator
     override def aggregate[B, C](aggregator: Aggregator[A, B, C]) = aggregator
   }
 }
@@ -180,10 +186,14 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
   def prepareFn: A => TraversableOnce[T]
 
   def map[U](fn: T => U): FlatMapPreparer[A, U] =
-    FlatMapPreparer { a: A => prepareFn(a).map(fn) }
+    FlatMapPreparer { a: A =>
+      prepareFn(a).map(fn)
+    }
 
   def flatMap[U](fn: T => TraversableOnce[U]) =
-    FlatMapPreparer { a: A => prepareFn(a).flatMap(fn) }
+    FlatMapPreparer { a: A =>
+      prepareFn(a).flatMap(fn)
+    }
 
   def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C] =
     aggregator.sumBefore.composePrepare(prepareFn)
@@ -192,12 +202,14 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
    * alias of monoidAggregate for convenience
    * unlike MapPreparer's aggregate, can only take MonoidAggregator
    */
-  def aggregate[B, C](aggregator: MonoidAggregator[T, B, C]) = monoidAggregate(aggregator)
+  def aggregate[B, C](aggregator: MonoidAggregator[T, B, C]) =
+    monoidAggregate(aggregator)
 
   /**
    * Like monoidAggregate, but using an implicit Monoid to construct the Aggregator
    */
-  def sum(implicit monoid: Monoid[T]) = monoidAggregate(Aggregator.fromMonoid(monoid))
+  def sum(implicit monoid: Monoid[T]) =
+    monoidAggregate(Aggregator.fromMonoid(monoid))
 
   /**
    * Split the processing into two parallel aggregations.
@@ -207,18 +219,23 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
    *
    * We really need to generate N versions of this for 3-way, 4-way etc splits.
    */
-
-  def split[B1, B2, C1, C2](fn: FlatMapPreparer[TraversableOnce[T], T] => (MonoidAggregator[TraversableOnce[T], B1, C1], MonoidAggregator[TraversableOnce[T], B2, C2])): Aggregator[A, (B1, B2), (C1, C2)] = {
+  def split[B1, B2, C1, C2](
+      fn: FlatMapPreparer[TraversableOnce[T], T] => (MonoidAggregator[TraversableOnce[T], B1, C1],
+                                                     MonoidAggregator[TraversableOnce[T], B2, C2]))
+    : Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(FlatMapPreparer.identity[T])
     a1.join(a2).composePrepare(prepareFn)
   }
 }
 
 object FlatMapPreparer {
+
   /**
    * Create a concrete FlatMapPreparer.
    */
-  def apply[A, T](fn: A => TraversableOnce[T]) = new FlatMapPreparer[A, T] { val prepareFn = fn }
+  def apply[A, T](fn: A => TraversableOnce[T]) = new FlatMapPreparer[A, T] {
+    val prepareFn = fn
+  }
 
   /**
    * This is purely an optimization for the case of flatMapping by identity.
@@ -228,11 +245,16 @@ object FlatMapPreparer {
     val prepareFn = (a: TraversableOnce[A]) => a
 
     override def map[U](fn: A => U) =
-      FlatMapPreparer{ a: TraversableOnce[A] => a.map(fn) }
+      FlatMapPreparer { a: TraversableOnce[A] =>
+        a.map(fn)
+      }
 
     override def flatMap[U](fn: A => TraversableOnce[U]) =
-      FlatMapPreparer{ a: TraversableOnce[A] => a.flatMap(fn) }
+      FlatMapPreparer { a: TraversableOnce[A] =>
+        a.flatMap(fn)
+      }
 
-    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) = aggregator.sumBefore
+    override def monoidAggregate[B, C](aggregator: MonoidAggregator[A, B, C]) =
+      aggregator.sumBefore
   }
 }

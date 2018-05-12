@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import scala.annotation.tailrec
@@ -43,6 +43,8 @@ class SemigroupCombinator[A: Semigroup, B: Semigroup](fold: (A, B) => B) extends
   }
 }
 
-class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B) extends SemigroupCombinator[A, B](fold) with Monoid[(A, B)] {
+class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B)
+    extends SemigroupCombinator[A, B](fold)
+    with Monoid[(A, B)] {
   def zero = (Monoid.zero[A], Monoid.zero[B])
 }

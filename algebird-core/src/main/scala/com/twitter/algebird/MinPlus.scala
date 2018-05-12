@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -41,7 +41,8 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
     (left, right) match {
       case (MinPlusZero, _) => right
       case (_, MinPlusZero) => left
-      case (MinPlusValue(lv), MinPlusValue(rv)) => if (ord.lteq(lv, rv)) left else right
+      case (MinPlusValue(lv), MinPlusValue(rv)) =>
+        if (ord.lteq(lv, rv)) left else right
     }
 
   // a*b = a+b
@@ -49,14 +50,18 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
     (left, right) match {
       case (MinPlusZero, _) => MinPlusZero
       case (_, MinPlusZero) => MinPlusZero
-      case (MinPlusValue(lv), MinPlusValue(rv)) => MinPlusValue(monoid.plus(lv, rv))
+      case (MinPlusValue(lv), MinPlusValue(rv)) =>
+        MinPlusValue(monoid.plus(lv, rv))
     }
 }
 
 object MinPlus extends java.io.Serializable {
+
   /**
    * This is unsafe but here for legacy reasons
    */
-  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] = new UnsafeFromAlgebraRig(rig[V])
-  implicit def rig[V: Monoid: Ordering]: Rig[MinPlus[V]] = new MinPlusSemiring[V]
+  implicit def semiring[V: Monoid: Ordering]: Ring[MinPlus[V]] =
+    new UnsafeFromAlgebraRig(rig[V])
+  implicit def rig[V: Monoid: Ordering]: Rig[MinPlus[V]] =
+    new MinPlusSemiring[V]
 }

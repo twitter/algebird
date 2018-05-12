@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalatest.{ PropSpec, Matchers }
+import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
@@ -35,16 +35,19 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     val mon = implicitly[Monoid[T]]
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
-    assert((a == mon.plus(mon.zero, a)) &&
-      (a == mon.plus(a, mon.zero)) &&
-      (a == grp.minus(a, grp.zero)) &&
-      (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero }))
+    assert(
+      (a == mon.plus(mon.zero, a)) &&
+        (a == mon.plus(a, mon.zero)) &&
+        (a == grp.minus(a, grp.zero)) &&
+        (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero }))
   }
 
   def zeroProps[T: Monoid: Numeric] = {
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
-    assert((num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon.nonZeroOption(mon.zero) == None))
+    assert(
+      (num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon
+        .nonZeroOption(mon.zero) == None))
   }
 
   property("Int zero") {
@@ -92,7 +95,9 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
   def oneNumericProp[T: Ring: Numeric: Arbitrary] = forAll { (a: T) =>
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
-    assert((num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring.times(ring.one, a)))
+    assert(
+      (num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring
+        .times(ring.one, a)))
   }
   property("Int one") {
     oneNumericProp[Int]

@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -25,19 +25,19 @@ import scala.math.Equiv
  * Base properties useful for all tests using Algebird's typeclasses.
  */
 object BaseProperties extends MetricProperties {
+
   /**
    * We generate a restricted set of BigDecimals for our tests because if we use
    * the full range then the way we lose precision in addition does not satisfy
    * the distributive property perfectly. This means BigDecimal isn't truly
    * a Ring under it's very strict Equiv.
    */
-  val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(
-    for {
-      scale <- Gen.choose(-7, +7)
-      base <- implicitly[Arbitrary[Int]].arbitrary
-    } yield {
-      (BigDecimal(base) * BigDecimal(10).pow(scale))
-    })
+  val arbReasonableBigDecimals: Arbitrary[BigDecimal] = Arbitrary(for {
+    scale <- Gen.choose(-7, +7)
+    base <- implicitly[Arbitrary[Int]].arbitrary
+  } yield {
+    (BigDecimal(base) * BigDecimal(10).pow(scale))
+  })
 
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.
   @deprecated("Please use Equiv.universal, or the Equiv version of tests", since = "0.12.3")
@@ -109,7 +109,7 @@ object BaseProperties extends MetricProperties {
   @deprecated("use monoidLaws[T]", since = "0.13.0")
   def monoidLawsEquiv[T: Monoid: Arbitrary: Equiv]: Prop = monoidLaws[T]
 
-    @deprecated("use commutativeMonoidLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
+  @deprecated("use commutativeMonoidLaws[T] with implicit Equiv[T] instance", since = "0.13.0")
   def commutativeMonoidLawsEq[T: Monoid: Arbitrary](eqfn: (T, T) => Boolean): Prop = {
     implicit val eq: Equiv[T] = Equiv.fromFunction(eqfn)
     commutativeMonoidLaws[T]
@@ -171,7 +171,7 @@ object BaseProperties extends MetricProperties {
   def isNonZero[V: Semigroup](v: V): Boolean =
     implicitly[Semigroup[V]] match {
       case mon: Monoid[_] => mon.isNonZero(v)
-      case _ => true
+      case _              => true
     }
 
   def isAssociativeDifferentTypes[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
@@ -193,10 +193,7 @@ object BaseProperties extends MetricProperties {
   // Semigroup Laws
   def semigroupSumWorks[T: Semigroup: Arbitrary: Equiv]: Prop =
     'semigroupSumWorks |: forAll { (head: T, tail: List[T]) =>
-      Equiv[T].equiv(
-        Semigroup.sumOption(head :: tail).get,
-        tail.foldLeft(head)(Semigroup.plus(_, _))
-      )
+      Equiv[T].equiv(Semigroup.sumOption(head :: tail).get, tail.foldLeft(head)(Semigroup.plus(_, _)))
     }
 
   def semigroupLaws[T: Semigroup: Arbitrary: Equiv]: Prop =
@@ -277,11 +274,11 @@ object BaseProperties extends MetricProperties {
 
   def isDistributiveDifferentTypes[T: Ring: Equiv, U <: T: Arbitrary]: Prop =
     'isDistributiveDifferentTypes |:
-  forAll { (a: U, b: U, c: U) =>
-    val rng = implicitly[Ring[T]]
-    Equiv[T].equiv(rng.times(a, rng.plus(b, c)), rng.plus(rng.times(a, b), rng.times(a, c))) &&
-    Equiv[T].equiv(rng.times(rng.plus(b, c), a), rng.plus(rng.times(b, a), rng.times(c, a)))
-  }
+      forAll { (a: U, b: U, c: U) =>
+      val rng = implicitly[Ring[T]]
+      Equiv[T].equiv(rng.times(a, rng.plus(b, c)), rng.plus(rng.times(a, b), rng.times(a, c))) &&
+      Equiv[T].equiv(rng.times(rng.plus(b, c), a), rng.plus(rng.times(b, a), rng.times(c, a)))
+    }
 
   def isDistributive[T: Ring: Arbitrary: Equiv]: Prop =
     isDistributiveDifferentTypes[T, T]
@@ -294,7 +291,7 @@ object BaseProperties extends MetricProperties {
 
   def pseudoRingLaws[T: Ring: Arbitrary: Equiv]: Prop =
     isDistributive[T] && timesIsAssociative[T] && groupLaws[T] &&
-  isCommutative[T] && isNonZeroWorksRing[T]
+      isCommutative[T] && isNonZeroWorksRing[T]
 
   def semiringLaws[T: Ring: Arbitrary: Equiv]: Prop =
     isDistributive[T] && timesIsAssociative[T] &&

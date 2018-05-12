@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
@@ -38,9 +38,11 @@ abstract class AbstractFunctor[M[_]] extends Functor[M]
  * Follows the type-class pattern for the Functor trait
  */
 object Functor {
+
   /** Get the Functor for a type, e.g: Functor[List] */
   def apply[M[_]](implicit functor: Functor[M]): Functor[M] = functor
-  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit functor: Functor[M]) = functor.map(m)(fn)
+  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit functor: Functor[M]) =
+    functor.map(m)(fn)
 
   implicit def operators[A, M[_]](m: M[A])(implicit functor: Functor[M]) =
     new FunctorOperators(m)(functor)

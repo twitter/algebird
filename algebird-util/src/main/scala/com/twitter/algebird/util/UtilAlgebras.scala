@@ -17,7 +17,7 @@
 package com.twitter.algebird.util
 
 import com.twitter.algebird._
-import com.twitter.util.{ Future, Return, Try }
+import com.twitter.util.{Future, Return, Try}
 
 object UtilAlgebras {
   implicit val futureMonad: Monad[Future] = new Monad[Future] {
@@ -40,7 +40,8 @@ object UtilAlgebras {
      * We override sequence with more efficient implementations than
      * just using flatMap
      */
-    override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] = Future.collect(fs)
+    override def sequence[T](fs: Seq[Future[T]]): Future[Seq[T]] =
+      Future.collect(fs)
   }
   implicit val tryMonad: Monad[Try] = new Monad[Try] {
     def apply[T](v: T) = Return(v)
@@ -48,9 +49,13 @@ object UtilAlgebras {
     def flatMap[T, U](m: Try[T])(fn: T => Try[U]) = m.flatMap(fn)
   }
 
-  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] = new ApplicativeSemigroup[T, Future]
-  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] = new ApplicativeMonoid[T, Future]
+  implicit def futureSemigroup[T: Semigroup]: Semigroup[Future[T]] =
+    new ApplicativeSemigroup[T, Future]
+  implicit def futureMonoid[T: Monoid]: Monoid[Future[T]] =
+    new ApplicativeMonoid[T, Future]
 
-  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] = new ApplicativeSemigroup[T, Try]
-  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] = new ApplicativeMonoid[T, Try]
+  implicit def trySemigroup[T: Semigroup]: Semigroup[Try[T]] =
+    new ApplicativeSemigroup[T, Try]
+  implicit def tryMonoid[T: Monoid]: Monoid[Try[T]] =
+    new ApplicativeMonoid[T, Try]
 }

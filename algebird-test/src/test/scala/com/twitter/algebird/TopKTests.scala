@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.algebird
 
@@ -40,7 +40,9 @@ class TopKTests extends CheckProperties {
   def pqIsCorrect(items: List[List[Int]]): Boolean = {
     val correct = items.flatten.sorted.take(SIZE)
     // Have to do this last since this monoid is mutating inputs
-    q2l(Monoid.sum(items.map { l => qmonoid.build(l) })) == correct
+    q2l(Monoid.sum(items.map { l =>
+      qmonoid.build(l)
+    })) == correct
   }
 
   property("PriorityQueueMonoid works") {
@@ -48,6 +50,7 @@ class TopKTests extends CheckProperties {
       pqIsCorrect(items)
     }
   }
+
   /**
    * The following were specific bugs that we failed some prior
    * scalacheck (yay for randomized testing)
@@ -70,7 +73,13 @@ class TopKTests extends CheckProperties {
   property("TopKMonoid works") {
     forAll { (its: List[List[Int]]) =>
       val correct = its.flatten.sorted.take(SIZE)
-      Equiv[List[Int]].equiv(Monoid.sum(its.map { l => tkmonoid.build(l) }).items, correct)
+      Equiv[List[Int]].equiv(
+        Monoid
+          .sum(its.map { l =>
+            tkmonoid.build(l)
+          })
+          .items,
+        correct)
     }
   }
 
