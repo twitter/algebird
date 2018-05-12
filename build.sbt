@@ -152,15 +152,15 @@ lazy val noPublishSettings = Seq(
   )
 
 /**
-  * This returns the youngest jar we released that is compatible with
+  * This returns the previous jar we released that is compatible with
   * the current.
   */
 val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic")
 
-def youngestForwardCompatible(subProj: String) =
+def previousVersion(subProj: String) =
   Some(subProj)
     .filterNot(noBinaryCompatCheck.contains(_))
-    .map { s => "com.twitter" %% ("algebird-" + s) % "0.13.0" }
+    .map { s => "com.twitter" %% ("algebird-" + s) % "0.13.4" }
 
 lazy val algebird = Project(
   id = "algebird",
@@ -182,7 +182,7 @@ def module(name: String) = {
   val id = "algebird-%s".format(name)
   Project(id = id, base = file(id)).settings(sharedSettings ++ Seq(
     Keys.name := id,
-    mimaPreviousArtifacts := youngestForwardCompatible(name).toSet)
+    mimaPreviousArtifacts := previousVersion(name).toSet)
   )
 }
 
