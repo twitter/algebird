@@ -15,8 +15,6 @@ limitations under the License.
  */
 package com.twitter.algebird
 
-import scala.annotation.tailrec
-
 import algebra.ring.Rng
 
 /**

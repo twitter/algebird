@@ -16,11 +16,8 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet, ListBuffer, Map => MMap}
+import com.twitter.util.{Future, FuturePool}
+import scala.collection.mutable.{ListBuffer, Map => MMap}
 import scala.collection.breakOut
 
 /**

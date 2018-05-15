@@ -19,11 +19,6 @@ package com.twitter.algebird
 /**
  * @author Oscar Boykin
  */
-import java.util.concurrent.ArrayBlockingQueue
-
-import java.util.{LinkedHashMap => JLinkedHashMap, Map => JMap}
-import scala.collection.mutable.{Map => MMap}
-import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 /**

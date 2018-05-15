@@ -2,7 +2,6 @@ package com.twitter.algebird.macros
 
 import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
-import scala.reflect.runtime.universe._
 
 /**
  * "Cubes" a case class or tuple, i.e. for a tuple of type

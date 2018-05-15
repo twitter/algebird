@@ -30,7 +30,6 @@ package com.twitter.algebird
  * @author Ashu Singhal
  * @author Oscar Boykin
  */
-import java.io.Serializable
 import java.util.concurrent.ArrayBlockingQueue
 
 import scala.collection.JavaConverters._

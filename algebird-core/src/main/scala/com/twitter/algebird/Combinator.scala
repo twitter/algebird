@@ -15,10 +15,6 @@ limitations under the License.
  */
 package com.twitter.algebird
 
-import scala.annotation.tailrec
-import scala.annotation.implicitNotFound
-import scala.math.Equiv
-
 /**
  * This is a combinator on semigroups, after you do the plus, you transform B with a fold function
  * This will not be valid for all fold functions. You need to prove that it is still associative.

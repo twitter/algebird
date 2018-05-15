@@ -15,7 +15,7 @@ limitations under the License.
  */
 
 package com.twitter.algebird.matrix
-import scala.collection.mutable.{ArrayBuffer, Map => MMap}
+import scala.collection.mutable.ArrayBuffer
 
 import com.twitter.algebird.Monoid
 

@@ -19,7 +19,6 @@ package scalacheck
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.{arbitrary => getArbitrary}
-import Gen.oneOf
 
 /**
  * Arbitrary instances for Algebird data structures.

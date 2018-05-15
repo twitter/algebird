@@ -25,7 +25,6 @@ import Monad.{operators, pureOp}
  * Basic Monad laws, useful for testing any monad.
  */
 object MonadLaws {
-  import BaseProperties._
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.
   @deprecated("No longer used. Use Equiv[T] instance", since = "0.13.0")
   def defaultEq[T] = { (t0: T, t1: T) =>

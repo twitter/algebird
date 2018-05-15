@@ -2,7 +2,6 @@ package com.twitter.algebird.macros
 
 import scala.language.experimental.macros
 import scala.reflect.macros.Context
-import scala.reflect.runtime.universe._
 
 import com.twitter.algebird._
 
