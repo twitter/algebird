@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
+import com.twitter.util.{Future, FuturePool}
 import java.util.concurrent.ArrayBlockingQueue
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._

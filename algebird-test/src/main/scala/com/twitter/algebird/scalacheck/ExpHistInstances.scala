@@ -18,8 +18,6 @@ package com.twitter.algebird
 package scalacheck
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.Arbitrary.{arbitrary => getArbitrary}
-import Gen.oneOf
 
 trait ExpHistGen {
   import ExpHist.{Bucket, Config, Timestamp}

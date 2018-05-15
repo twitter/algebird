@@ -16,13 +16,9 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 import com.twitter.algebird._
-import com.twitter.util.{Duration, Future, FuturePool}
-import java.util.concurrent.{ArrayBlockingQueue, ConcurrentHashMap}
+import com.twitter.util.Future
 
 import scala.collection.mutable.ListBuffer
-import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet, ListBuffer}
 
 /**
  * @author Ian O Connell
@@ -43,8 +39,6 @@ case class RollOverFrequency(toLong: Long)
 case class HeavyHittersPercent(toFloat: Float)
 
 class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, roFreq: RollOverFrequency) {
-
-  import CMSHasherImplicits._
 
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
@@ -107,7 +101,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 
     if (hh.containsKey(item)) {
       val v = hh.get(item)
-      val newItemCount = +1L
+      val newItemCount = v + 1L
       if (newItemCount < hhMinReq) {
         pruneHH()
       } else {

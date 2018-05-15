@@ -19,12 +19,9 @@ package com.twitter.algebird
 /**
  * @author Oscar Boykin
  */
-import java.util.concurrent.ArrayBlockingQueue
-
 import java.util.{LinkedHashMap => JLinkedHashMap, Map => JMap}
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.JavaConverters._
-import scala.annotation.tailrec
 
 object SummingCache {
   def apply[K, V: Semigroup](cap: Int): SummingCache[K, V] =

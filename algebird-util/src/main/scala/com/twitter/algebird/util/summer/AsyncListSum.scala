@@ -22,7 +22,6 @@ import com.twitter.algebird._
 import com.twitter.util.{Future, FuturePool}
 
 import scala.collection.JavaConverters._
-import scala.collection.breakOut
 import scala.collection.mutable.{Set => MSet}
 import com.twitter.algebird.util.UtilAlgebras._
 

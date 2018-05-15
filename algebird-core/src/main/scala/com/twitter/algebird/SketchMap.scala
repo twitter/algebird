@@ -17,7 +17,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.CommutativeMonoid
-import com.twitter.algebird.CMSHasherImplicits._
 import com.twitter.algebird.matrix.AdaptiveMatrix
 import scala.collection.breakOut
 

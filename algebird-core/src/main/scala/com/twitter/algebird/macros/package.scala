@@ -1,8 +1,6 @@
 package com.twitter.algebird
 
-import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
-import scala.reflect.runtime.universe._
 
 package object macros {
   private[macros] def ensureCaseClass[T](c: Context)(implicit T: c.WeakTypeTag[T]): Unit = {

@@ -19,7 +19,6 @@ package com.twitter.algebird
 import algebra.BoundedSemilattice
 import com.googlecode.javaewah.IntIterator
 import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
-import scala.collection.JavaConverters._
 import scala.collection.immutable.BitSet
 
 object RichCBitSet {

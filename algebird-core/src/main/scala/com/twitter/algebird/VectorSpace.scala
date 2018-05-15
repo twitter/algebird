@@ -16,15 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
-  Double => JDouble,
-  Boolean => JBool
-}
-
 import scala.annotation.implicitNotFound
 
 /**

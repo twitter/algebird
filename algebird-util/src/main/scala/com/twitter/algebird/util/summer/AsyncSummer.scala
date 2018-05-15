@@ -15,8 +15,7 @@ limitations under the License.
  */
 package com.twitter.algebird.util.summer
 
-import com.twitter.algebird._
-import com.twitter.util.{Duration, Future}
+import com.twitter.util.Future
 
 /**
  * @author Ian O Connell
@@ -52,7 +51,6 @@ trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
 }
 
 trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
-  private[this] val className = getClass.getName
   protected var lastDump: Long = System.currentTimeMillis
   protected def softMemoryFlush: MemoryFlushPercent
   protected def flushFrequency: FlushFrequency

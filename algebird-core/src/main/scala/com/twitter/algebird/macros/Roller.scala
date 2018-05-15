@@ -2,7 +2,6 @@ package com.twitter.algebird.macros
 
 import scala.language.experimental.{macros => sMacros}
 import scala.reflect.macros.Context
-import scala.reflect.runtime.universe._
 
 /**
  * Given a TupleN, produces a sequence of (N + 1) tuples each of arity N

@@ -15,8 +15,6 @@ limitations under the License.
  */
 package com.twitter.algebird.util.summer
 
-import com.twitter.util.Duration
-
 /**
  * @author Ian O Connell
  */

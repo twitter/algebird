@@ -17,9 +17,6 @@ package com.twitter.algebird.mutable
 
 import com.twitter.algebird.Monoid
 
-import scala.annotation.tailrec
-import scala.collection.JavaConverters._
-
 import java.util.PriorityQueue
 
 /**
