@@ -172,11 +172,11 @@ class SetMonoid[T] extends Monoid[Set[T]] {
   override def sumOption(items: TraversableOnce[Set[T]]): Option[Set[T]] =
     if (items.isEmpty) None
     else {
-      val mutable = scala.collection.mutable.Set[T]()
+      val builder = Set.newBuilder[T]
       items.foreach { s =>
-        mutable ++= s
+        builder ++= s
       }
-      Some(mutable.toSet)
+      Some(builder.result())
     }
 }
 
