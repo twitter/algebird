@@ -20,8 +20,8 @@ class CuckooFilterTest extends WordSpec with Matchers {
       println("leading 0 in 64 ::" + Integer.numberOfLeadingZeros(64))
       println("leading 0 in 128::" + Integer.numberOfLeadingZeros(128))
 
-      println("Value : " + hashed(1))
-      println("hash % and the rest  " + (hashed(1) & 0x7fffffffffffffffL))
+      println("Value : " + hashed)
+      println("hash % and the rest  " + (hashed & 0x7fffffffffffffffL))
 
 
       val buffer  = new Array[Byte]( 10 * 14)
@@ -29,7 +29,7 @@ class CuckooFilterTest extends WordSpec with Matchers {
 
       val f = 32 - Integer.numberOfLeadingZeros(5)
       println("leading 0 ::" + f)
-      assert(hashed.length == 2)
+
     }
 
 
