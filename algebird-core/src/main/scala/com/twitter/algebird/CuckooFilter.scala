@@ -39,7 +39,7 @@ case class CuckooFilterMonoid[A](fingerPrintBit: Int, fingerprintBucket: Int, ma
   /**
     * Create a cuckoo filter with one item.
     */
-  def create(item: A): CF[A] = CFItem[A](item, new CFHash[A](), fingerprintBucket, fingerPrintBit, totalBuckets)
+  def create(item: A): CF[A] = CFItem[A](item, new CFHash[A](), fingerprintBucket,  totalBuckets)
 
   /**
     * Create a cuckoo filter with multiple items.
@@ -88,7 +88,7 @@ sealed abstract class CF[A] extends java.io.Serializable {
 /**
   * Empty cuckoo filter
   **/
-case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hash: Hash128[A]) extends CF[A] {
+case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hash: Hash128[A]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
@@ -100,7 +100,7 @@ case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: 
 
   override def ++(other: CF[A]): CF[A] = other
 
-  override def +(other: A): CF[A] = new CFItem[A](other, new CFHash[A](), fingerPrintBit, fingerPrintBucket, totalBuckets = totalBuckets)
+  override def +(other: A): CF[A] = new CFItem[A](other, new CFHash[A](), fingerPrintBucket, totalBuckets)
 
   override def bucketBits: Int = 0
 
@@ -111,7 +111,7 @@ case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: 
   * One item cuckoo
   **/
 
-case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerprintBit: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Long]) extends CF[A] {
+case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Long]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
@@ -123,10 +123,10 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerp
   override def size: Approximate[Long] = ???
 
   override def ++(other: CF[A]): CF[A] = {
-    CFInstance(cFHash, Array.fill[BitSet](totalBuckets)(new BitSet(fingerprintBucket * fingerprintBit)), fingerprintBucket, fingerprintBit, totalBuckets)
+    CFInstance(cFHash, Array.fill[BitSet](totalBuckets)(new BitSet(fingerprintBucket * 32)), fingerprintBucket, totalBuckets)
   }
 
-  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerprintBucket, fingerprintBit, totalBuckets)
+  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerprintBucket, totalBuckets)
 
   override def bucketBits: Int = ???
 
@@ -139,7 +139,6 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerp
 case class CFInstance[A](hash: CFHash[A],
                          cuckooBitSet: Array[BitSet],
                          fingerprintBucket: Int,
-                         fingerprintBit: Int,
                          totalBuckets: Int)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Long]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
@@ -156,7 +155,7 @@ case class CFInstance[A](hash: CFHash[A],
   override def ++(other: CF[A]): CF[A] = {
     other match {
 
-      case CFZero(_, _, _) => this
+      case CFZero(_, _) => this
     }
   }
 
@@ -196,7 +195,7 @@ case class CFInstance[A](hash: CFHash[A],
 
   override def +(other: A): CFInstance[A] = {
     if (insert(other)) {
-      return new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, fingerprintBit, totalBuckets)
+      return new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
     }
     throw new RuntimeException("can't add element to a full cuckoo filter.")
   }
@@ -218,7 +217,7 @@ case class CFInstance[A](hash: CFHash[A],
 
   override def bucketIndex(hash: Long): Int = ???
 
-  override def bucketBits: Int = fingerprintBit * fingerprintBucket
+  override def bucketBits: Int = fingerprintBucket * 32
 }
 
 // Let's be generic because the fingerprint have to be hashable
