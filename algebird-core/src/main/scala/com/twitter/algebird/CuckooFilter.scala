@@ -190,17 +190,18 @@ case class CFInstance[A](hash: CFHash[A],
   }
 
   private def insert(elem: A): Boolean = {
-    val fp = new Fingerprint[A]().apply(elem)
-    val h = hash(1, elem) % totalBuckets
-    val k = (fp ^ h) % totalBuckets
-    insertFingerprint(h.toInt, fp) || insertFingerprint(k.toInt, fp) || {
+    val hashed = hashes(elem)
+
+    val (h, k, fp) = hashes(elem)
+
+    insertFingerprint(h, fp) || insertFingerprint(k, fp) || {
       // choose random index to start kick
       var index = if (Random.nextBoolean()) k else h
       for (n <- 0 until maxKicks) {
-        val fingerprintKicked = swapRandomFingerprint(index.toInt, fp)
+        val fingerprintKicked = swapRandomFingerprint(index, fp)
         // partial cuckoo hash key
         index = (index ^ hashFingerprint(fingerprintKicked)) % totalBuckets
-        if (insertFingerprint(index.toInt, fingerprintKicked)) {
+        if (insertFingerprint(index, fingerprintKicked)) {
           return true
         }
       }
@@ -250,22 +251,22 @@ case class CFInstance[A](hash: CFHash[A],
     false
   }
 
-  def hashes(elem: A): (Long, Long, Int) = {
+  def hashes(elem: A): (Int, Int, Int) = {
     val fp = new Fingerprint[A]().apply(elem)
-    val h = hash(1, elem) % totalBuckets
+    val h = hash(1, elem).toInt % totalBuckets
     val k = (fp ^ h) % totalBuckets
     (h, k, fp)
   }
 
 
   override def lookup(elem: A): Boolean = {
-    val h = hashes(elem)
-    isFingerprintInBuck(cuckooBitSet(h._1.toInt), h._3) || isFingerprintInBuck(cuckooBitSet(h._2.toInt), h._3)
+    val (h, k, fp) = hashes(elem)
+    isFingerprintInBuck(cuckooBitSet(h), fp) || isFingerprintInBuck(cuckooBitSet(k), fp)
   }
 
   override def delete(elem: A): Boolean = {
-    val h = hashes(elem)
-    if (deleteFingerprint(h._1.toInt, h._3) || deleteFingerprint(h._2.toInt, h._3))
+    val (h, k, fp) = hashes(elem)
+    if (deleteFingerprint(h, fp) || deleteFingerprint(k, fp))
       return true
     false
   }
