@@ -17,7 +17,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import com.googlecode.javaewah.EWAHCompressedBitmap
 import com.googlecode.javaewah.datastructure.BitSet
 import org.scalatest.{Matchers, WordSpec}
 
@@ -31,8 +30,6 @@ import org.scalatest.{Matchers, WordSpec}
 
 
 class CuckooFilterTest extends WordSpec with Matchers {
-
-  val mockHash =
 
     "a cuckoo filter " should {
 

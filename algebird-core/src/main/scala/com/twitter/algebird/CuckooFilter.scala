@@ -81,6 +81,8 @@ sealed abstract class CF[A] extends java.io.Serializable {
 
   def +(other: A): CF[A]
 
+  def -(other : A) : CF[A]
+
   def checkAndAdd(item: A): (CF[A], ApproximateBoolean)
 
   def contains(item: A): ApproximateBoolean = {
@@ -120,6 +122,8 @@ case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit h
   override def lookup(elem: A): Boolean = false
 
   override def delete(item: A): Boolean = false
+
+  override def -(other: A): CF[A] = this
 }
 
 /**
@@ -143,6 +147,8 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, totalBu
   override def lookup(elem: A): Boolean = elem == item
 
   override def delete(item: A): Boolean = false
+
+  override def -(other: A): CF[A] = CFZero(fingerprintBucket, totalBuckets)
 }
 
 /**
@@ -242,7 +248,6 @@ case class CFInstance[A](hash: CFHash[A],
       if (it.next() == fp)
         true
     false
-    false
   }
 
   def hashes(elem: A): (Long, Long, Int) = {
@@ -254,7 +259,8 @@ case class CFInstance[A](hash: CFHash[A],
 
 
   override def lookup(elem: A): Boolean = {
-    true
+    val h = hashes(elem)
+    isFingerprintInBuck(cuckooBitSet(h._1.toInt), h._3) || isFingerprintInBuck(cuckooBitSet(h._2.toInt), h._3)
   }
 
   override def delete(elem: A): Boolean = {
@@ -262,6 +268,11 @@ case class CFInstance[A](hash: CFHash[A],
     if (deleteFingerprint(h._1.toInt, h._3) || deleteFingerprint(h._2.toInt, h._3))
       return true
     false
+  }
+
+  override def -(other: A): CF[A] = {
+    delete(other)
+    new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
   }
 }
 
@@ -276,14 +287,11 @@ private[algebird] case class Fingerprint[A: Hash128]() {
   }
 }
 
-
 /**
   * The hash class for cuckoo
   **/
 private[algebird] case class CFHash[A]()(implicit hash: Hash128[A]) {
-
   def apply(seed: Long, valueToHash: A): Long = {
-
     val hashed = hash.hashWithSeed(seed, valueToHash)._1
     math.abs(hashed.toByte).toByte
 
