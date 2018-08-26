@@ -202,7 +202,7 @@ case class CFInstance[A](hash: CFHash[A],
     }
   }
 
-  private def hashFingerprint(fp : Int) : Int ={
+  private def hashFingerprint(fp: Int): Int = {
     hashFingerprintRaw.hash(fp)._1.toInt & 0x7fffffff
   }
 
