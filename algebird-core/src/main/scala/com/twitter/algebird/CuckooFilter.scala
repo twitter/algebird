@@ -1,9 +1,7 @@
 package com.twitter.algebird
 
 import algebra.BoundedSemilattice
-
-import scala.annotation.tailrec
-import scala.collection.BitSet
+import com.googlecode.javaewah.datastructure.BitSet
 import scala.util.Random
 
 /**
@@ -29,29 +27,29 @@ object CuckooFilter {
   * The cuckoo filter monoid
   **/
 // TODO : Add the fingerprint size.
-case class CuckooFilterMonoid[A](fingerprintBucket: Int, maxKicks: Int = 3, totalBuckets: Int = 256)(
+case class CuckooFilterMonoid[A](fingerPrintBit: Int, fingerprintBucket: Int, maxKicks: Int = 3, totalBuckets: Int = 256)(
   implicit h1: Hash128[A])
   extends Monoid[CF[A]]
     with BoundedSemilattice[CF[A]] {
 
-  override def zero: CF[A] = ???
+  override def zero: CF[A] = CFZero(fingerPrintBit, fingerprintBucket)
 
-  override def plus(x: CF[A], y: CF[A]): CF[A] = ???
+  override def plus(left: CF[A], right: CF[A]): CF[A] = left ++ right
 
   /**
     * Create a cuckoo filter with one item.
     */
-  def create(item: A): BF[A] = ???
+  def create(item: A): CF[A] = CFItem[A](item, new CFHash[A](), fingerprintBucket, fingerPrintBit, totalBuckets)
 
   /**
     * Create a cuckoo filter with multiple items.
     */
-  def create(data: A*): BF[A] = create(data.iterator)
+  def create(data: A*): CF[A] = create(data.iterator)
 
   /**
     * Create a cuckoo filter with multiple items from an iterator
     */
-  def create(data: Iterator[A]): BF[A] = ???
+  def create(data: Iterator[A]): CF[A] = ???
 
 }
 
@@ -72,7 +70,7 @@ sealed abstract class CF[A] extends java.io.Serializable {
 
   def contains(item: A): ApproximateBoolean = {
     if (maybeContains(item)) {
-      // Bloom filter stuff here
+      // cuckoo checking here
     }
     // That's the deal
     ApproximateBoolean.exactFalse
@@ -82,10 +80,6 @@ sealed abstract class CF[A] extends java.io.Serializable {
 
   def numBits: Int
 
-  def width: Int
-
-  def density: Double = numBits.toDouble / width
-
   val maxKicks = 256
 
   def size: Approximate[Long]
@@ -94,15 +88,13 @@ sealed abstract class CF[A] extends java.io.Serializable {
 /**
   * Empty cuckoo filter
   **/
-case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hash : Hash128[A]) extends CF[A] {
+case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hash: Hash128[A]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
   override def maybeContains(item: A): Boolean = ???
 
-  override def numBits: Int = ???
-
-  override def width: Int = ???
+  override def numBits: Int = 0
 
   override def size: Approximate[Long] = Approximate.zero
 
@@ -119,7 +111,7 @@ case class CFZero[A](fingerPrintBit: Int, fingerPrintBucket: Int, totalBuckets: 
   * One item cuckoo
   **/
 
-case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerprintBit: Int, totalBuckets: Int = 256) extends CF[A] {
+case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerprintBit: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Long]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
@@ -127,13 +119,14 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerp
 
   override def numBits: Int = ??? // cFHash.generateFingerPrint(cFHash(item)(1))
 
-  override def width: Int = ???
 
   override def size: Approximate[Long] = ???
 
-  override def ++(other: CF[A]): CF[A] = ??? //CFInstance()
+  override def ++(other: CF[A]): CF[A] = {
+    CFInstance(cFHash, Array.fill[BitSet](totalBuckets)(new BitSet(fingerprintBucket * fingerprintBit)), fingerprintBucket, fingerprintBit, totalBuckets)
+  }
 
-  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerprintBucket, fingerprintBit,  totalBuckets)
+  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerprintBucket, fingerprintBit, totalBuckets)
 
   override def bucketBits: Int = ???
 
@@ -143,27 +136,20 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, fingerp
 /**
   * Multiple items cuckoo
   **/
-
-/**
-  * cuckooBit = new Array
-  *
-  * */
-
 case class CFInstance[A](hash: CFHash[A],
                          cuckooBitSet: Array[BitSet],
-                         fingerprintBit: Int,
                          fingerprintBucket: Int,
-                         totalBuckets: Int)(implicit hashFingerprint : Hash128[A], hashFingerprintRaw : Hash128[Long]) extends CF[A] {
+                         fingerprintBit: Int,
+                         totalBuckets: Int)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Long]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
   override def maybeContains(item: A): Boolean = ???
 
+
   override def numBits: Int = {
     cuckooBitSet.foldLeft(0)((z, b) => z + b.size)
   }
-
-  override def width: Int = ???
 
   override def size: Approximate[Long] = ???
 
@@ -174,33 +160,33 @@ case class CFInstance[A](hash: CFHash[A],
     }
   }
 
-  def swapFingerPrint(bucketIndex : Int,  fingerprint : Long): Long = {
+  def swapFingerPrint(bucketIndex: Int, fingerprint: Long): Long = {
+    println("swap fingerprint !")
     val bucket = cuckooBitSet(bucketIndex)
-    if (bucket.isEmpty){
+    if (bucket.empty()) {
       val randomIndex = Random.nextInt(bucket.size)
-      val fingerRandom = bucket.toList(randomIndex)
+      val fingerRandom = List(bucket)(randomIndex)
 
-      cuckooBitSet.update(randomIndex, (bucket - fingerRandom) + fingerprint.toInt)
-      return fingerRandom
+      return 1L //fingerRandom
     }
     fingerprint
   }
 
-  private def insert(elem : A) : Boolean = {
-    // TODO : it's wrong
+  private def insert(elem: A): Boolean = {
     // TODO: type issue, too much .toInt in my taste
+    println(s"elem : $elem")
     val fp = new Fingerprint[A]().apply(elem)
-
     val h = hash(1, elem) % totalBuckets
     val k = (fp ^ h) % totalBuckets
-    (insertFingerprint(h.toInt, fp) || insertFingerprint(k.toInt, fp)) || {
+    insertFingerprint(h.toInt, fp) || insertFingerprint(k.toInt, fp) || {
       // choose random index to start kick
       var index = if (Random.nextBoolean()) k else h
       for (n <- 0 until maxKicks) {
         val fingerprintKicked = swapFingerPrint(index.toInt, fp)
+        // partial cuckoo hash key
         index = index ^ hashFingerprintRaw.hash(fingerprintKicked)._1 % totalBuckets
         if (cuckooBitSet(index.toInt).size != fingerprintBucket) {
-          cuckooBitSet.update(index.toInt, cuckooBitSet(index.toInt) + fingerprintKicked.toInt)
+          // cuckooBitSet.update(index.toInt, cuckooBitSet(index.toInt) + fingerprintKicked.toInt)
           true
         }
       }
@@ -209,33 +195,41 @@ case class CFInstance[A](hash: CFHash[A],
   }
 
   override def +(other: A): CFInstance[A] = {
-    insert(other)
-    new CFInstance[A](hash, cuckooBitSet, fingerprintBit, fingerprintBucket, totalBuckets)
+    if (insert(other)) {
+      return new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, fingerprintBit, totalBuckets)
+    }
+    throw new RuntimeException("can't add element to a full cuckoo filter.")
   }
 
 
-  private def deleteFingerprint(index: Int, fp: Long): Unit = {
-    cuckooBitSet.update(index, cuckooBitSet(index) - fp.toInt)
+  private def deleteFingerprint(index: Int, fp: Byte): Unit = {
+    cuckooBitSet(index).flip(fp.toInt)
   }
 
-  private def insertFingerprint(index: Int, fp: Long): Boolean = {
-    if (cuckooBitSet(index).size < fingerprintBucket) {
-      cuckooBitSet.update(index, cuckooBitSet(index) + fp.toInt)
+  private def insertFingerprint(index: Int, fp: Byte): Boolean = {
+    // TODO : you can make it better
+    if (cuckooBitSet(index).cardinality() < fingerprintBucket) {
+      cuckooBitSet(index).set(fp)
       return true
     }
+
     false
   }
 
-  override def bucketBits: Int = fingerprintBit * fingerprintBucket
-
   override def bucketIndex(hash: Long): Int = ???
+
+  override def bucketBits: Int = fingerprintBit * fingerprintBucket
 }
 
 // Let's be generic because the fingerprint have to be hashable
-private[algebird] case class Fingerprint[A : Hash128]() {
+private[algebird] case class Fingerprint[A: Hash128]() {
+
   def seedFingerprint = 128
-  def apply(elem: A)(implicit hash: Hash128[A]): Long ={
-    hash.hashWithSeed(seedFingerprint, elem)._1
+
+  def apply(elem: A)(implicit hash: Hash128[A]): Byte = {
+    val hashed = hash.hashWithSeed(seedFingerprint, elem)._1
+    val absolut = math.abs(hashed.toByte).toByte
+    absolut
   }
 }
 
@@ -246,7 +240,10 @@ private[algebird] case class Fingerprint[A : Hash128]() {
 private[algebird] case class CFHash[A]()(implicit hash: Hash128[A]) {
 
   def apply(seed: Long, valueToHash: A): Long = {
-    hash.hashWithSeed(seed, valueToHash)._1
+
+    val hashed = hash.hashWithSeed(seed, valueToHash)._1
+    math.abs(hashed.toByte).toByte
+
   }
 
 }
