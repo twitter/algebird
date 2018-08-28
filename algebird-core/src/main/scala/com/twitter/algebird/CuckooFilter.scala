@@ -29,10 +29,15 @@ import scala.util.Random
   *  - http://www.eecs.harvard.edu/%7Emichaelm/postscripts/cuckoo-conext2014.pdf
   *  - https://github.com/irfansharif/cfilter
   * By nature, this filter isn't commutative
-  *
   * From the inital paper, there is no problem to consider || fingerprint|| = ln(N) where N = fingerprintPerBucket * totalBucket
   * "" as long as we use reasonably sized buckets, the fingerprint size can remain small. "", we'll use a a 32 bits fingerprint.
-  **/
+  *
+  * We choose to put a fixed size for the fingerprint.
+  *
+  * TODO : Add the metrics for optimal size see  ASYMPTOTIC BEHAVIOR section of the paper.
+  * TODO : Make cuckoo filter works like an aggregator like the BloomFilter.
+  * TODO : Lookup method have to return a Approximate number like the size method (sometimes you can't insert an element).
+  * */
 
 
 object CuckooFilter {
