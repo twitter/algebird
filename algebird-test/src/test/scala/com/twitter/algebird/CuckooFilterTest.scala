@@ -18,51 +18,71 @@ limitations under the License.
 package com.twitter.algebird
 
 import com.googlecode.javaewah.datastructure.BitSet
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 
-//class CuckooFilterLaws extends CheckProperties {
-//
-//  property("CuckooFilter is a Monoid") {
-//    commutativeMonoidLaws[CF[String]]
-//  }
-//
-//}
+class CuckooFilterLaws extends CheckProperties {
+
+  val NB_BUCKET = 32
+  val FP_BUCKET = 8
+
+  implicit val cfMonoid: CuckooFilterMonoid[String] = new CuckooFilterMonoid[String](FP_BUCKET, NB_BUCKET)
+
+  implicit val cfGen: Arbitrary[CF[String]] = Arbitrary {
+    val item = Gen.choose(0, 10000).map { v =>
+      cfMonoid.create(v.toString)
+    }
+    val zero = Gen.const(cfMonoid.zero)
+
+    Gen.frequency((5, item))
+  }
+
+
+  //  property("CuckooFilter is a Monoid") {
+  //    commutativeMonoidLaws[CF[String]]
+  //  }
+
+}
 
 
 class CuckooFilterTest extends WordSpec with Matchers {
 
-    "a cuckoo filter " should {
+  "a cuckoo filter " should {
 
-      "Add a fingerprint to the filter" in {
-        val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
+    "Add a fingerprint to the filter" in {
+      val bs = Array.fill[BitSet](255)(new BitSet(64 * 4))
 
-        val cuckooTest = CFInstance[String](new CFHash[String](), bs, 8, 255)
-        val hashedValue = 114
-        val cuckoo = cuckooTest + "item-1"
-        assert(cuckoo.cuckooBitSet(hashedValue).cardinality() == 1)
-      }
+      bs(1).set(252)
 
-      "Add to other bucket if first bucket is full" in {
-        val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
 
-        var cuckooTest = CFInstance[String](new CFHash[String](), bs, 1, 255)
-        val secondHasValue = 17
-        cuckooTest = cuckooTest + "item-1"
-        cuckooTest = cuckooTest + "item-1"
-        assert(cuckooTest.cuckooBitSet(secondHasValue).cardinality() == 1)
-      }
-
-      "should kick a element if buckets are full" in {
-        val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
-
-        var cuckooTest = CFInstance[String](new CFHash[String](), bs, 1, 255)
-        cuckooTest = cuckooTest + "item-10"
-        cuckooTest = cuckooTest + "item-10"
-        cuckooTest = cuckooTest + "item-10"
-        assert((cuckooTest.cuckooBitSet.map(_.cardinality()) foldLeft 0) (_ + _) == 3)
-      }
+      val cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
+      val hashedValue = 114
+      val cuckoo = cuckooTest + "item-1"
+      assert(cuckoo.cuckooBitSet(hashedValue).cardinality() == 1)
 
     }
+
+    "Add to other bucket if first bucket is full" in {
+      val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
+
+      var cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
+      val secondHasValue = 17
+      cuckooTest = cuckooTest + "item-1"
+      cuckooTest = cuckooTest + "item-1"
+      assert(cuckooTest.cuckooBitSet(secondHasValue).cardinality() == 1)
+    }
+
+    "should kick a element if buckets are full" in {
+      val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
+
+      var cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
+      cuckooTest = cuckooTest + "item-10"
+      cuckooTest = cuckooTest + "item-10"
+      cuckooTest = cuckooTest + "item-10"
+      assert((cuckooTest.cuckooBitSet.map(_.cardinality()) foldLeft 0) (_ + _) == 3)
+    }
+
+  }
 
 
 }
