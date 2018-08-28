@@ -17,11 +17,14 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import com.googlecode.javaewah.datastructure.BitSet
+import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
+import com.twitter.algebird.BaseProperties.commutativeMonoidLaws
+import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 
-class CuckooFilterLaws extends CheckProperties {
+
+class CuckooFilterLawsTest extends CheckProperties {
 
   val NB_BUCKET = 32
   val FP_BUCKET = 8
@@ -32,48 +35,100 @@ class CuckooFilterLaws extends CheckProperties {
     val item = Gen.choose(0, 10000).map { v =>
       cfMonoid.create(v.toString)
     }
-    val zero = Gen.const(cfMonoid.zero)
 
+    val zero = Gen.const(cfMonoid.zero)
     Gen.frequency((5, item))
   }
 
+  property("CuckooFilter  is a Monoid") {
+    commutativeMonoidLaws[CF[String]]
+  }
 
-  //  property("CuckooFilter is a Monoid") {
-  //    commutativeMonoidLaws[CF[String]]
-  //  }
+  property("++ is the same as plus") {
+    forAll { (a: CF[String], b: CF[String]) =>
+      Equiv[CF[String]].equiv(a ++ b, cfMonoid.plus(a, b))
+    }
+  }
 
+  property("+ is the same as adding with create") {
+    forAll { (a: CF[String], b: String) =>
+      Equiv[CF[String]].equiv(a + b, cfMonoid.plus(a, cfMonoid.create(b)))
+    }
+  }
 }
 
 
 class CuckooFilterTest extends WordSpec with Matchers {
 
+  val RAND = new scala.util.Random
+
+  "a cuckoo item " should {
+    "be ++ with other CFItem" in {
+      val a = new CFItem[String]("Aline", new CFHash[String](255), 5 )
+      val b = new CFItem[String]("pour qu'elle revienne", new CFHash[String](255), 5 )
+      val c = a ++b
+      assert(c.isInstanceOf[CFInstance[String]])
+      assert(c.lookup("Aline") && c.lookup("pour qu'elle revienne"))
+    }
+
+  }
+
+
+  "a cuckoo can be equiv to other cuckoo" in {
+  }
+
+  "a cuckoo filter hash " should {
+    "provide positive values" in {
+      val cfHash = new CFHash[String](255)
+      val entries = (0 until 100).map(_ => RAND.nextInt.toString).map(cfHash(_))
+      assert(entries.forall(e => e._1 >= 0 && e._2 >= 0 && e._3 >= 0))
+    }
+  }
+
+
   "a cuckoo filter " should {
 
+    // 255 buckets by default
+    "be constructed from an iterator" in {
+      val cfMonoid = new CuckooFilterMonoid[String](RAND.nextInt(10) + 1)
+
+      val entries = (0 until 10).map(_ => RAND.nextInt.toString)
+      val monoid = cfMonoid.create(entries.iterator)
+      assert(monoid.isInstanceOf[CF[String]])
+    }
+
+    // 255 buckets by default
+    "be constructed from an seq" in {
+      val cfMonoid = new CuckooFilterMonoid[String](RAND.nextInt(10) + 1)
+
+      val entries = (0 until 10).map(_ => RAND.nextInt.toString)
+      val monoid = cfMonoid.create(entries: _*)
+      assert(monoid.isInstanceOf[CF[String]])
+    }
+
+
     "Add a fingerprint to the filter" in {
-      val bs = Array.fill[BitSet](255)(new BitSet(64 * 4))
-
-      bs(1).set(252)
-
+      val bs = Array.fill[CBitSet](255)(new CBitSet(64 * 4))
 
       val cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
-      val hashedValue = 114
-      val cuckoo = cuckooTest + "item-1"
+      val hashedValue = 75
+      var cuckoo = cuckooTest + "item-1"
+
       assert(cuckoo.cuckooBitSet(hashedValue).cardinality() == 1)
 
     }
-
     "Add to other bucket if first bucket is full" in {
-      val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
+      val bs = Array.fill[CBitSet](255)(new CBitSet(8 * 8 + 8))
 
       var cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
-      val secondHasValue = 17
+      val secondHasValue = 184
       cuckooTest = cuckooTest + "item-1"
       cuckooTest = cuckooTest + "item-1"
       assert(cuckooTest.cuckooBitSet(secondHasValue).cardinality() == 1)
     }
 
-    "should kick a element if buckets are full" in {
-      val bs = Array.fill[BitSet](255)(new BitSet(8 * 8 + 8))
+    "Kick a element if buckets are full" in {
+      val bs = Array.fill[CBitSet](255)(new CBitSet(8 * 8 + 8))
 
       var cuckooTest = CFInstance[String](new CFHash[String](255), bs, 1, 255)
       cuckooTest = cuckooTest + "item-10"
@@ -84,5 +139,5 @@ class CuckooFilterTest extends WordSpec with Matchers {
 
   }
 
-
+//
 }

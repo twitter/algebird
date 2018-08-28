@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.BoundedSemilattice
-import com.googlecode.javaewah.datastructure.BitSet
+import com.googlecode.javaewah.{IntIterator, EWAHCompressedBitmap => CBitSet}
 
 import scala.util.Random
 
@@ -54,7 +54,9 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
 
   val cFHash: CFHash[A] = CFHash[A](totalBuckets)
 
-  override def plus(left: CF[A], right: CF[A]): CF[A] = left ++ right
+  def plus(left: CF[A], right: CF[A]): CF[A] = left ++ right
+
+  val zero: CF[A] = CFZero(fingerprintBucket)
 
   /**
     * it's come from the BloomFilter. But I don't think it's a good idea because insertion from scratch
@@ -62,7 +64,7 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
   override def sumOption(iter: TraversableOnce[CF[A]]): Option[CF[A]] =
     if (iter.isEmpty) None
     else {
-      val buckets = Array.fill[BitSet](totalBuckets)(new BitSet(fingerprintBucket))
+      val buckets = Array.fill[CBitSet](totalBuckets)(new CBitSet(fingerprintBucket))
       var sets = 0
 
       @inline def setFingerprint(index: Int, fp: Int): Unit = {
@@ -89,16 +91,13 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
         })
       })
 
-      if (sets == 0) return Some(zero)
-      else if (sets == 1) return Some(oneItem)
+      if (sets == 0) Some(zero)
+      else if (sets == 1) Some(oneItem)
       else {
-        return Some(CFInstance[A](cFHash, buckets, fingerprintBucket, totalBuckets))
+        Some(CFInstance[A](cFHash, buckets, fingerprintBucket, totalBuckets))
       }
-      //var oneItem : BFItem[A] = iter.toList.head
-      null
     }
 
-  override def zero: CF[A] = CFZero(fingerprintBucket)
 
   /**
     * Create a cuckoo filter with one item.
@@ -113,9 +112,79 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
   /**
     * Create a cuckoo filter with multiple items from an iterator
     */
-  def create(data: Iterator[A]): CF[A] = ???
+  def create(data: Iterator[A]): CF[A] = sum(data.map(CFItem(_, cFHash, fingerprintBucket, totalBuckets)))
 
 }
+
+object CF {
+  implicit def equiv[A]: Equiv[CF[A]] =
+    new Equiv[CF[A]] {
+      override def equiv(x: CF[A], y: CF[A]): Boolean = {
+
+        def toIntIt(c: CF[A]): IntIterator = c match {
+          case CFItem(item, hash, _, _) =>
+            new IntIterator {
+              val (_, _, fp) = hash(item)
+              var pos = 0
+
+              override def hasNext: Boolean = pos < 1
+
+              override def next(): Int = {
+                pos += 1
+                fp
+              }
+            }
+          case CFInstance(_, bs, fpBck, _) =>
+            new IntIterator {
+
+              // IntIterator for a Array[CbitSet]
+              var intIterators: Array[IntIterator] = bs.map(_.intIterator())
+
+              override def hasNext: Boolean = {
+                if (intIterators.isEmpty) return false
+
+                intIterators.exists(_.hasNext)
+              }
+
+              override def next(): Int = {
+                if (intIterators.isEmpty) throw new IllegalAccessException()
+
+                intIterators = intIterators.filter(_.hasNext)
+                val (iteratorHasNext, idx) = intIterators.zipWithIndex.find(e => e._1.hasNext)
+                  .getOrElse(throw new IllegalAccessException())
+
+                val nextVal = iteratorHasNext.next()
+                intIterators.update(idx, iteratorHasNext)
+                nextVal
+              }
+            }
+          case CFZero(_, _) =>
+            new IntIterator {
+              def hasNext = false
+
+              def next = sys.error("BFZero has no hashes set")
+            }
+        }
+
+        def equiIntIter(a: IntIterator, b: IntIterator): Boolean = {
+          while (a.hasNext && b.hasNext) {
+            if (!(a.next() == b.next)) {
+              return false
+            }
+          }
+          a.hasNext == b.hasNext
+        }
+
+        val xit = toIntIt(x)
+        val yit = toIntIt(y)
+
+        (x eq y) || (x.bucketNumber == y.bucketNumber) &&
+          (x.fingerprintBucket == y.fingerprintBucket) && equiIntIter(toIntIt(x), toIntIt(y))
+      }
+    }
+
+}
+
 
 /**
   * Cuckoo data structure abstract
@@ -123,6 +192,10 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
 sealed abstract class CF[A] extends java.io.Serializable {
 
   val maxKicks = 256
+
+  val bucketNumber: Int
+
+  val fingerprintBucket: Int
 
   def ++(other: CF[A]): CF[A]
 
@@ -169,13 +242,16 @@ case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit h
   override def delete(item: A): Boolean = false
 
   override def -(other: A): CF[A] = this
+
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
   * One item cuckoo
   **/
 
-case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Int]) extends CF[A] {
+case class CFItem[A](item: A, cFHash: CFHash[A], fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Int]) extends CF[A] {
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
@@ -183,26 +259,40 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerprintBucket: Int, totalBu
 
   override def size: Approximate[Long] = ???
 
-  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerprintBucket, totalBuckets)
+  override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerPrintBucket, totalBuckets)
 
-  override def ++(other: CF[A]): CF[A] = {
-    CFInstance(cFHash, Array.fill[BitSet](totalBuckets)(new BitSet(fingerprintBucket * 32)), fingerprintBucket, totalBuckets)
+  def toInstance(): CFInstance[A] = {
+    new CFInstance[A](cFHash, Array.fill[CBitSet](totalBuckets)(new CBitSet(fingerPrintBucket)), fingerPrintBucket, totalBuckets) + item
+  }
+
+  override def ++(other: CF[A]): CF[A] = other match {
+
+    case CFZero(_, _) => this
+
+    case cfInstance@CFInstance(_, _, _, _) => cfInstance + item
+
+    case cfItem@CFItem(_, _, _, _) =>
+      toInstance() + cfItem.item
   }
 
   override def lookup(elem: A): Boolean = elem == item
 
   override def delete(item: A): Boolean = false
 
-  override def -(other: A): CF[A] = if (item == other) CFZero(fingerprintBucket, totalBuckets) else this
+  override def -(other: A): CF[A] = if (item == other) CFZero(fingerPrintBucket, totalBuckets) else this
+
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
   * Multiple items cuckoo
   **/
 case class CFInstance[A](hash: CFHash[A],
-                         cuckooBitSet: Array[BitSet],
-                         fingerprintBucket: Int,
+                         cuckooBitSet: Array[CBitSet],
+                         fingerPrintBucket: Int,
                          totalBuckets: Int)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Int]) extends CF[A] {
+
 
   override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
 
@@ -213,6 +303,11 @@ case class CFInstance[A](hash: CFHash[A],
   override def ++(other: CF[A]): CF[A] = {
     other match {
       case CFZero(_, _) => this
+      case cfItem@CFItem(_, _, _, _) => this + cfItem.item
+      case CFInstance(_, cuckooBit, fpBucket, totalBck) =>
+        require(fpBucket == fingerprintBucket)
+        require(totalBck == totalBuckets)
+        CFInstance(hash, cuckooBitSet.zip(cuckooBit).map(e => e._1.or(e._2)), fingerprintBucket, totalBuckets)
     }
   }
 
@@ -225,7 +320,6 @@ case class CFInstance[A](hash: CFHash[A],
 
   private def insert(elem: A): Boolean = {
     val (h, k, fp) = hashes(elem)
-    println(s"generate hases : $h and $k and fp : $fp")
     insertFingerprint(h, fp) || insertFingerprint(k, fp) || {
       // choose random index to start kick
       var index = if (Random.nextBoolean()) k else h
@@ -260,10 +354,10 @@ case class CFInstance[A](hash: CFHash[A],
 
   private def deleteFingerprint(indexBucket: Int, fp: Int): Boolean = {
     val bucket = cuckooBitSet(indexBucket)
-    if (bucket.empty() || isFingerprintInBuck(bucket, fp))
+    if (bucket.isEmpty || isFingerprintInBuck(bucket, fp))
       return false
     val it = bucket.intIterator()
-    val bitSet = new BitSet(fingerprintBucket * 64 + 8)
+    val bitSet = new CBitSet(fingerprintBucket * 64 + 8)
     while (it.hasNext) {
       if (it.next() != fp)
         bitSet.set(it.next())
@@ -272,11 +366,12 @@ case class CFInstance[A](hash: CFHash[A],
     true
   }
 
-  private def isFingerprintInBuck(bucket: BitSet, fp: Int): Boolean = {
+  private def isFingerprintInBuck(bucket: CBitSet, fp: Int): Boolean = {
     val it = bucket.intIterator()
     while (it.hasNext)
-      if (it.next() == fp)
-        true
+      if (it.next() == fp) {
+        return true
+      }
     false
   }
 
@@ -313,6 +408,9 @@ case class CFInstance[A](hash: CFHash[A],
       return true
     false
   }
+
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
@@ -321,7 +419,7 @@ case class CFInstance[A](hash: CFHash[A],
 private[algebird] case class CFHash[A](totalBuckets: Int)(implicit hash: Hash128[A]) {
   def apply(valueToHash: A): (Int, Int, Int) = {
     val fp = fingerprint(valueToHash)
-    val h = hash.hash(valueToHash)._1.toInt % totalBuckets
+    val h = hash.hash(valueToHash)._1.toInt & 0x7fffffff % totalBuckets
     val k = (fp ^ h) % totalBuckets
     (h, k, fp)
   }
