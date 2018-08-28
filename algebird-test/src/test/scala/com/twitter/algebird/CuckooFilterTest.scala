@@ -55,6 +55,32 @@ class CuckooFilterLawsTest extends CheckProperties {
       Equiv[CF[String]].equiv(a + b, cfMonoid.plus(a, cfMonoid.create(b)))
     }
   }
+  property("a ++ a = a for CF") {
+    forAll { (a: CF[String]) =>
+      Equiv[CF[String]].equiv(a ++ a, a)
+    }
+  }
+
+}
+
+
+class CuckooFilterHashTest extends CheckProperties {
+  val NUM_HASHES = 10000
+  val BCK_SIZE = 300
+
+  implicit val cfHash: Arbitrary[CFHash[String]] = Arbitrary {
+    for {
+      bckSize <- Gen.choose(100, BCK_SIZE)
+    } yield CFHash[String](bckSize)
+  }
+
+  property("Hash is always positiv ") {
+    forAll { (hash: CFHash[String], v: Long) =>
+      val (h, k, fp) = hash.apply(v.toString)
+      h > 0 && k > 0 && fp > 0
+    }
+  }
+
 }
 
 
@@ -64,27 +90,14 @@ class CuckooFilterTest extends WordSpec with Matchers {
 
   "a cuckoo item " should {
     "be ++ with other CFItem" in {
-      val a = new CFItem[String]("Aline", new CFHash[String](255), 5 )
-      val b = new CFItem[String]("pour qu'elle revienne", new CFHash[String](255), 5 )
-      val c = a ++b
+      val a = new CFItem[String]("Aline", new CFHash[String](255), 5)
+      val b = new CFItem[String]("pour qu'elle revienne", new CFHash[String](255), 5)
+      val c = a ++ b
       assert(c.isInstanceOf[CFInstance[String]])
       assert(c.lookup("Aline") && c.lookup("pour qu'elle revienne"))
     }
 
   }
-
-
-  "a cuckoo can be equiv to other cuckoo" in {
-  }
-
-  "a cuckoo filter hash " should {
-    "provide positive values" in {
-      val cfHash = new CFHash[String](255)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString).map(cfHash(_))
-      assert(entries.forall(e => e._1 >= 0 && e._2 >= 0 && e._3 >= 0))
-    }
-  }
-
 
   "a cuckoo filter " should {
 
@@ -139,5 +152,5 @@ class CuckooFilterTest extends WordSpec with Matchers {
 
   }
 
-//
+  //
 }

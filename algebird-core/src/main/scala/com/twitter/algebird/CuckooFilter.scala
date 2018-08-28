@@ -53,10 +53,9 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
     with BoundedSemilattice[CF[A]] {
 
   val cFHash: CFHash[A] = CFHash[A](totalBuckets)
+  val zero: CF[A] = CFZero(fingerprintBucket)
 
   def plus(left: CF[A], right: CF[A]): CF[A] = left ++ right
-
-  val zero: CF[A] = CFZero(fingerprintBucket)
 
   /**
     * it's come from the BloomFilter. But I don't think it's a good idea because insertion from scratch
@@ -175,9 +174,6 @@ object CF {
           a.hasNext == b.hasNext
         }
 
-        val xit = toIntIt(x)
-        val yit = toIntIt(y)
-
         (x eq y) || (x.bucketNumber == y.bucketNumber) &&
           (x.fingerprintBucket == y.fingerprintBucket) && equiIntIter(toIntIt(x), toIntIt(y))
       }
@@ -203,21 +199,9 @@ sealed abstract class CF[A] extends java.io.Serializable {
 
   def -(other: A): CF[A]
 
-  def checkAndAdd(item: A): (CF[A], ApproximateBoolean)
-
-  def contains(item: A): ApproximateBoolean = {
-    if (maybeContains(item)) {
-      // cuckoo checking here
-    }
-    // That's the deal
-    ApproximateBoolean.exactFalse
-  }
-
   def delete(item: A): Boolean
 
   def lookup(item: A): Boolean
-
-  def maybeContains(item: A): Boolean
 
   def size: Approximate[Long]
 }
@@ -227,9 +211,8 @@ sealed abstract class CF[A] extends java.io.Serializable {
   **/
 case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hash: Hash128[A]) extends CF[A] {
 
-  override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
-
-  override def maybeContains(item: A): Boolean = ???
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 
   override def size: Approximate[Long] = Approximate.zero
 
@@ -242,9 +225,6 @@ case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit h
   override def delete(item: A): Boolean = false
 
   override def -(other: A): CF[A] = this
-
-  override val bucketNumber: Int = totalBuckets
-  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
@@ -253,17 +233,12 @@ case class CFZero[A](fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit h
 
 case class CFItem[A](item: A, cFHash: CFHash[A], fingerPrintBucket: Int, totalBuckets: Int = 256)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Int]) extends CF[A] {
 
-  override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 
-  override def maybeContains(item: A): Boolean = ???
-
-  override def size: Approximate[Long] = ???
+  override def size: Approximate[Long] = Approximate.exact[Long](1)
 
   override def +(other: A): CF[A] = this ++ CFItem[A](other, cFHash, fingerPrintBucket, totalBuckets)
-
-  def toInstance(): CFInstance[A] = {
-    new CFInstance[A](cFHash, Array.fill[CBitSet](totalBuckets)(new CBitSet(fingerPrintBucket)), fingerPrintBucket, totalBuckets) + item
-  }
 
   override def ++(other: CF[A]): CF[A] = other match {
 
@@ -275,14 +250,15 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerPrintBucket: Int, totalBu
       toInstance() + cfItem.item
   }
 
+  def toInstance(): CFInstance[A] = {
+    new CFInstance[A](cFHash, Array.fill[CBitSet](totalBuckets)(new CBitSet(fingerPrintBucket)), fingerPrintBucket, totalBuckets) + item
+  }
+
   override def lookup(elem: A): Boolean = elem == item
 
   override def delete(item: A): Boolean = false
 
   override def -(other: A): CF[A] = if (item == other) CFZero(fingerPrintBucket, totalBuckets) else this
-
-  override val bucketNumber: Int = totalBuckets
-  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
@@ -293,10 +269,8 @@ case class CFInstance[A](hash: CFHash[A],
                          fingerPrintBucket: Int,
                          totalBuckets: Int)(implicit hashFingerprint: Hash128[A], hashFingerprintRaw: Hash128[Int]) extends CF[A] {
 
-
-  override def checkAndAdd(item: A): (CF[A], ApproximateBoolean) = ???
-
-  override def maybeContains(item: A): Boolean = ???
+  override val bucketNumber: Int = totalBuckets
+  override val fingerprintBucket: Int = fingerPrintBucket
 
   override def size: Approximate[Long] = ???
 
@@ -352,6 +326,35 @@ case class CFInstance[A](hash: CFHash[A],
     fingerprint
   }
 
+  private def insertFingerprint(index: Int, fp: Int): Boolean = {
+    if (cuckooBitSet(index).cardinality() < fingerprintBucket) {
+      cuckooBitSet(index).set(fp)
+      return true
+    }
+    false
+  }
+
+  private def hashFingerprint(fp: Int): Int = {
+    hashFingerprintRaw.hash(fp)._1.toInt & 0x7fffffff
+  }
+
+  override def lookup(elem: A): Boolean = {
+    val (h, k, fp) = hashes(elem)
+    isFingerprintInBuck(cuckooBitSet(h), fp) || isFingerprintInBuck(cuckooBitSet(k), fp)
+  }
+
+  override def -(other: A): CF[A] = {
+    delete(other)
+    new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
+  }
+
+  override def delete(elem: A): Boolean = {
+    val (h, k, fp) = hashes(elem)
+    if (deleteFingerprint(h, fp) || deleteFingerprint(k, fp))
+      return true
+    false
+  }
+
   private def deleteFingerprint(indexBucket: Int, fp: Int): Boolean = {
     val bucket = cuckooBitSet(indexBucket)
     if (bucket.isEmpty || isFingerprintInBuck(bucket, fp))
@@ -375,42 +378,9 @@ case class CFInstance[A](hash: CFHash[A],
     false
   }
 
-  private def hashFingerprint(fp: Int): Int = {
-    hashFingerprintRaw.hash(fp)._1.toInt & 0x7fffffff
-  }
-
-  private def insertFingerprint(index: Int, fp: Int): Boolean = {
-    if (cuckooBitSet(index).cardinality() < fingerprintBucket) {
-      cuckooBitSet(index).set(fp)
-      return true
-    }
-    false
-  }
-
   def hashes(elem: A): (Int, Int, Int) = {
     hash(elem)
   }
-
-
-  override def lookup(elem: A): Boolean = {
-    val (h, k, fp) = hashes(elem)
-    isFingerprintInBuck(cuckooBitSet(h), fp) || isFingerprintInBuck(cuckooBitSet(k), fp)
-  }
-
-  override def -(other: A): CF[A] = {
-    delete(other)
-    new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
-  }
-
-  override def delete(elem: A): Boolean = {
-    val (h, k, fp) = hashes(elem)
-    if (deleteFingerprint(h, fp) || deleteFingerprint(k, fp))
-      return true
-    false
-  }
-
-  override val bucketNumber: Int = totalBuckets
-  override val fingerprintBucket: Int = fingerPrintBucket
 }
 
 /**
