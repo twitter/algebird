@@ -37,7 +37,7 @@ import scala.util.Random
   * TODO : Add the metrics for optimal size see  ASYMPTOTIC BEHAVIOR section of the paper.
   * TODO : Make cuckoo filter works like an aggregator like the BloomFilter.
   * TODO : Lookup method have to return a Approximate number like the size method (sometimes you can't insert an element).
-  * */
+  **/
 
 
 object CuckooFilter {
@@ -80,7 +80,7 @@ case class CuckooFilterMonoid[A](fingerprintBucket: Int, totalBuckets: Int = 256
 
       @inline def add(cfItem: CFItem[A]): Unit = {
         oneItem = cfItem
-        val (h, k, fp) = cFHash(cfItem.item)
+        val (h, _, fp) = cFHash(cfItem.item)
         setFingerprint(h, fp)
       }
 
@@ -138,7 +138,7 @@ object CF {
                 fp
               }
             }
-          case CFInstance(_, bs, fpBck, _) =>
+          case CFInstance(_, bs, _, _) =>
             new IntIterator {
 
               // IntIterator for a Array[CbitSet]
@@ -166,7 +166,7 @@ object CF {
             new IntIterator {
               def hasNext = false
 
-              def next = sys.error("BFZero has no hashes set")
+              def next: Int = sys.error("BFZero has no hashes set")
             }
         }
 
@@ -252,10 +252,10 @@ case class CFItem[A](item: A, cFHash: CFHash[A], fingerPrintBucket: Int, totalBu
     case cfInstance@CFInstance(_, _, _, _) => cfInstance + item
 
     case cfItem@CFItem(_, _, _, _) =>
-      toInstance() + cfItem.item
+      toInstance + cfItem.item
   }
 
-  def toInstance(): CFInstance[A] = {
+  def toInstance: CFInstance[A] = {
     new CFInstance[A](cFHash, Array.fill[CBitSet](totalBuckets)(new CBitSet(fingerPrintBucket)), fingerPrintBucket, totalBuckets) + item
   }
 
@@ -331,6 +331,20 @@ case class CFInstance[A](hash: CFHash[A],
     fingerprint
   }
 
+  private def deleteFingerprint(indexBucket: Int, fp: Int): Boolean = {
+    val bucket = cuckooBitSet(indexBucket)
+    if (bucket.isEmpty || isFingerprintInBuck(bucket, fp))
+      return false
+    val it = bucket.intIterator()
+    val bitSet = new CBitSet(fingerprintBucket * 64 + 8)
+    while (it.hasNext) {
+      if (it.next() != fp)
+        bitSet.set(it.next())
+    }
+    cuckooBitSet.update(indexBucket, bitSet)
+    true
+  }
+
   private def insertFingerprint(index: Int, fp: Int): Boolean = {
     if (cuckooBitSet(index).cardinality() < fingerprintBucket) {
       cuckooBitSet(index).set(fp)
@@ -348,32 +362,6 @@ case class CFInstance[A](hash: CFHash[A],
     isFingerprintInBuck(cuckooBitSet(h), fp) || isFingerprintInBuck(cuckooBitSet(k), fp)
   }
 
-  override def -(other: A): CF[A] = {
-    delete(other)
-    new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
-  }
-
-  override def delete(elem: A): Boolean = {
-    val (h, k, fp) = hashes(elem)
-    if (deleteFingerprint(h, fp) || deleteFingerprint(k, fp))
-      return true
-    false
-  }
-
-  private def deleteFingerprint(indexBucket: Int, fp: Int): Boolean = {
-    val bucket = cuckooBitSet(indexBucket)
-    if (bucket.isEmpty || isFingerprintInBuck(bucket, fp))
-      return false
-    val it = bucket.intIterator()
-    val bitSet = new CBitSet(fingerprintBucket * 64 + 8)
-    while (it.hasNext) {
-      if (it.next() != fp)
-        bitSet.set(it.next())
-    }
-    cuckooBitSet.update(indexBucket, bitSet)
-    true
-  }
-
   private def isFingerprintInBuck(bucket: CBitSet, fp: Int): Boolean = {
     val it = bucket.intIterator()
     while (it.hasNext)
@@ -385,6 +373,18 @@ case class CFInstance[A](hash: CFHash[A],
 
   def hashes(elem: A): (Int, Int, Int) = {
     hash(elem)
+  }
+
+  override def -(other: A): CF[A] = {
+    delete(other)
+    new CFInstance[A](hash, cuckooBitSet, fingerprintBucket, totalBuckets)
+  }
+
+  override def delete(elem: A): Boolean = {
+    val (h, k, fp) = hashes(elem)
+    if (deleteFingerprint(h, fp) || deleteFingerprint(k, fp))
+      return true
+    false
   }
 }
 

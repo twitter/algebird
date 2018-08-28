@@ -77,7 +77,7 @@ class CuckooFilterHashTest extends CheckProperties {
   property("Hash is always positiv ") {
     forAll { (hash: CFHash[String], v: Long) =>
       val (h, k, fp) = hash.apply(v.toString)
-      h > 0 && k > 0 && fp > 0
+      h >= 0 && k >= 0 && fp >= 0
     }
   }
 
