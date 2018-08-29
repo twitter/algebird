@@ -1,4 +1,3 @@
-
 /*
 Copyright 2012 Twitter, Inc.
 
@@ -22,7 +21,6 @@ import com.twitter.algebird.BaseProperties.commutativeMonoidLaws
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
-
 
 class CuckooFilterLawsTest extends CheckProperties {
 
@@ -63,7 +61,6 @@ class CuckooFilterLawsTest extends CheckProperties {
 
 }
 
-
 class CuckooFilterHashTest extends CheckProperties {
   val NUM_HASHES = 10000
   val BCK_SIZE = 300
@@ -82,7 +79,6 @@ class CuckooFilterHashTest extends CheckProperties {
   }
 
 }
-
 
 class CuckooFilterTest extends WordSpec with Matchers {
 
@@ -119,7 +115,6 @@ class CuckooFilterTest extends WordSpec with Matchers {
       assert(monoid.isInstanceOf[CF[String]])
     }
 
-
     "Add a fingerprint to the filter" in {
       val bs = Array.fill[CBitSet](255)(new CBitSet(64 * 4))
 
@@ -147,7 +142,7 @@ class CuckooFilterTest extends WordSpec with Matchers {
       cuckooTest = cuckooTest + "item-10"
       cuckooTest = cuckooTest + "item-10"
       cuckooTest = cuckooTest + "item-10"
-      assert((cuckooTest.cuckooBitSet.map(_.cardinality()) foldLeft 0) (_ + _) == 3)
+      assert(cuckooTest.cuckooBitSet.map(_.cardinality()).foldLeft(0)(_ + _) == 3)
     }
 
   }
