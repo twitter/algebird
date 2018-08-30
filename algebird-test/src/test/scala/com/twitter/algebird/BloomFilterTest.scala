@@ -2,9 +2,9 @@ package com.twitter.algebird
 
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
-import org.scalacheck.Prop._
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.{Arbitrary, Gen, Properties}
 import org.scalatest.{Matchers, WordSpec}
+import org.scalacheck.Prop._
 
 object BloomFilterTestUtils {
   def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
@@ -29,8 +29,8 @@ object BloomFilterTestUtils {
 
 class BloomFilterLaws extends CheckProperties {
 
-  import BloomFilterTestUtils._
   import com.twitter.algebird.BaseProperties._
+  import BloomFilterTestUtils._
 
   val NUM_HASHES = 6
   val WIDTH = 32
@@ -155,7 +155,7 @@ class BFHashIndices extends CheckProperties {
   }
 
   /**
-   * This is the version of the BFHash as of before the "negative values fix"
+   *   This is the version of the BFHash as of before the "negative values fix"
    */
   case class NegativeBFHash(numHashes: Int, width: Int) {
     val size = numHashes
@@ -264,12 +264,10 @@ class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
   def inputGenerator(set: Set[T]) = Gen.const(())
 
   def exactResult(s: Set[T], u: Unit) = s.size
-
   def approximateResult(bf: BF[T], u: Unit) = bf.size
 }
 
 class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
-
   import ApproximateProperty.toProp
 
   for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {
@@ -353,9 +351,7 @@ class BloomFilterTest extends WordSpec with Matchers {
     "approximate cardinality" in {
       val bfMonoid = BloomFilterMonoid[String](10, 100000)
       Seq(10, 100, 1000, 10000).foreach { exactCardinality =>
-        val items = (1 until exactCardinality).map {
-          _.toString
-        }
+        val items = (1 until exactCardinality).map { _.toString }
         val bf = bfMonoid.create(items: _*)
         val size = bf.size
 
@@ -412,6 +408,7 @@ class BloomFilterTest extends WordSpec with Matchers {
 
       assert(index >= 0)
     }
+
     "return his size event if it's saturated" in {
       val bfMonoid = BloomFilterMonoid[String](5, 13)
       val strings = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(_.toString)
