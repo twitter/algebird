@@ -77,7 +77,6 @@ See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algeb
 - [Scio](https://github.com/spotify/scio)
 - [Packetloop](https://www.packetloop.com) (see [this tweet](https://twitter.com/cloudjunky/status/355073917720858626))
 - Ebay uses Algebird for machine learning: [ScalaDays talk](http://www.slideshare.net/VitalyGordon/scalable-and-flexible-machine-learning-with-scala-linkedin)
-- [Apple (FEAR Team)](https://news.ycombinator.com/item?id=16969118)
 
 Other projects built with Algebird, as compiled by the Scaladex: [![Scaladex Dependents](https://index.scala-lang.org/count.svg?q=dependencies:twitter/algebird*&subject=scaladex:&color=blue&style=flat-square)](https://index.scala-lang.org/search?q=dependencies:twitter/algebird-core)
 
