@@ -22,10 +22,21 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 
+object CuckooTestUtils {
+
+  def toInstances[A](cf: CF[A]): CFInstance[A] = cf match {
+    case CFZero(hash, fp, bck)             => CFInstance[A](hash, fp, bck)
+    case CFItem(hash, fp, bck, it)         => CFInstance.apply[A](hash, fp, bck) + it
+    case instance @ CFInstance(_, _, _, _) => instance
+  }
+}
+
 class CuckooFilterLawsTest extends CheckProperties {
 
-  val NB_BUCKET = 32
-  val FP_BUCKET = 8
+  import CuckooTestUtils._
+
+  val NB_BUCKET = 256
+  val FP_BUCKET = 64
 
   implicit val cfMonoid: CuckooFilterMonoid[String] = new CuckooFilterMonoid[String](FP_BUCKET, NB_BUCKET)
 
@@ -33,9 +44,11 @@ class CuckooFilterLawsTest extends CheckProperties {
     val item = Gen.choose(0, 10000).map { v =>
       cfMonoid.create(v.toString)
     }
-
+    val dense = Gen.listOf(item).map { its =>
+      toInstances[String](cfMonoid.sum(its))
+    }
     val zero = Gen.const(cfMonoid.zero)
-    Gen.frequency((5, item))
+    Gen.frequency((10, dense), (5, item))
   }
 
   property("CuckooFilter  is a Monoid") {
@@ -56,6 +69,12 @@ class CuckooFilterLawsTest extends CheckProperties {
   property("a ++ a = a for CF") {
     forAll { (a: CF[String]) =>
       Equiv[CF[String]].equiv(a ++ a, a)
+    }
+  }
+
+  property("after + lookup is true") {
+    forAll { (a: CF[String], b: String) =>
+      (a + b).lookup(b)
     }
   }
 
@@ -86,8 +105,8 @@ class CuckooFilterTest extends WordSpec with Matchers {
 
   "a cuckoo item " should {
     "be ++ with other CFItem" in {
-      val a = new CFItem[String]("Aline", new CFHash[String](255), 5)
-      val b = new CFItem[String]("pour qu'elle revienne", new CFHash[String](255), 5)
+      val a = new CFItem[String](new CFHash[String](255), 5, 255, "Aline")
+      val b = new CFItem[String](new CFHash[String](255), 5, 255, "pour qu'elle revienne")
       val c = a ++ b
       assert(c.isInstanceOf[CFInstance[String]])
       assert(c.lookup("Aline") && c.lookup("pour qu'elle revienne"))
@@ -142,10 +161,30 @@ class CuckooFilterTest extends WordSpec with Matchers {
       cuckooTest = cuckooTest + "item-10"
       cuckooTest = cuckooTest + "item-10"
       cuckooTest = cuckooTest + "item-10"
-      assert(cuckooTest.cuckooBitSet.map(_.cardinality()).foldLeft(0)(_ + _) == 3)
+      assert(cuckooTest.cuckooBitSet.map(_.cardinality()).sum == 3)
     }
 
-  }
+    "work as an Aggregator" in {
+      (0 to 10).foreach { _ =>
+        {
+          val aggregator = CuckooFilterAggregator[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+          val numEntries = 5
+          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+          val bf = aggregator(entries)
 
-  //
+          entries.foreach { i =>
+            assert(bf.lookup(i))
+          }
+        }
+      }
+    }
+
+    "be used like a bloomfilter" in {
+      val bfMonoid1 = new CuckooFilterMonoid[String](32, 256)
+      val bf1 = bfMonoid1.create("1", "2", "3", "4", "100")
+      val lookup = bf1.lookup("1")
+      assert(lookup)
+
+    }
+  }
 }
