@@ -354,7 +354,6 @@ class BloomFilterTest extends WordSpec with Matchers {
         val items = (1 until exactCardinality).map { _.toString }
         val bf = bfMonoid.create(items: _*)
         val size = bf.size
-
         assert(size ~ exactCardinality)
         assert(size.min <= size.estimate)
         assert(size.max >= size.estimate)
@@ -408,23 +407,16 @@ class BloomFilterTest extends WordSpec with Matchers {
 
       assert(index >= 0)
     }
+  }
 
-    "return his size event if it's saturated" in {
+  "BloomFilter method `size`" should {
+
+    "return the appropriate size when it's saturated " in {
       val bfMonoid = BloomFilterMonoid[String](5, 13)
-      val strings = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(_.toString)
+      val strings = List(8, 9, 8, 10, 1, 8, 11, 12, 13, 14, 15, 67, 18981, 1122, 86787).map(_.toString)
       val bf = bfMonoid.create(strings: _*)
-
-      assert(bf.size.min > 0)
+      assert(bf.size.isZero)
     }
-
-    "return a max approximate size if it's saturated" in {
-      val bfMonoid = BloomFilterMonoid[String](5, 13)
-      val strings = List(8, 9, 8, 10, 1, 8, 11, 7, 7, 1).map(_.toString)
-      val bf = bfMonoid.create(strings: _*)
-      // even it's seems big. This assert fail..
-      assert(bf.size.max < strings.length * 100)
-    }
-
   }
 
   "BloomFilter method `checkAndAdd`" should {
