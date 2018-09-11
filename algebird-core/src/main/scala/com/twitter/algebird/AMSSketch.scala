@@ -53,9 +53,9 @@ class AMSSketch {
 
 trait AMSCounting[K, C[_]] {
 
-  def +(item : K)
+  def +(item : K) : C[K]
 
-  def ++(other : C[K])
+  def ++(other : C[K]) : C[K]
 
   def f1 : Long = totalCount
 
@@ -67,46 +67,46 @@ trait AMSCounting[K, C[_]] {
 }
 
 class AMSMonoid[K : CMSHasher](depth : Int, buckets : Int) extends Monoid[AMS[K]] with CommutativeMonoid[AMS[K]] {
-  override def zero: AMS[K] = ???
+  val params  = AMSParams(AMSFunction.generateHash(depth, buckets), depth, buckets)
 
-  override def plus(x: AMS[K], y: AMS[K]): AMS[K] = ???
+  override def zero: AMS[K] = AMSZero[K](params)
+
+  override def plus(x: AMS[K], y: AMS[K]): AMS[K] = x ++ y
 }
 
-class AMSZero[A](override val params: AMSParams[A]) extends  AMS[A](params) {
+case class AMSZero[A](override val params: AMSParams[A]) extends  AMS[A](params) {
   override def depth: Int = 0
 
   override val totalCount: Long = 0
 
   override def buckets: Int = 0
 
-  override def +(item: A): Unit = ???
-
-  override def ++(other: AMS[A]): Unit = ???
 
   override def innerProduct(other: AMS[A]): Approximate[Long] = ???
 
-  override def f2: Approximate[Long] = ???
+  override def +(item: A): AMS[A] = ???
+
+  override def ++(other: AMS[A]): AMS[A] = ???
 }
 
-class AMSItem[A](item : A,
+case class AMSItem[A](item : A,
                  override val totalCount : Long,
                  override val params: AMSParams[A])
   extends AMS[A](params) {
-  
+
   override def depth: Int = 1
 
   override def buckets: Int = 1
 
-  override def +(item: A): Unit = ???
-
-  override def ++(other: AMS[A]): Unit = ???
 
   override def innerProduct(other: AMS[A]): Approximate[Long] = ???
 
-  override def f2: Approximate[Long] = ???
+  override def +(item: A): AMS[A] = ???
+
+  override def ++(other: AMS[A]): AMS[A] = ???
 }
 
-class AMSInstances[A](countsTable: CountsTable[A],
+case class AMSInstances[A](countsTable: CountsTable[A],
                       override val params: AMSParams[A],
                       override val totalCount: Long)
   extends  AMS[A](params) {
@@ -115,13 +115,12 @@ class AMSInstances[A](countsTable: CountsTable[A],
 
   override def buckets: Int = params.bucket
 
-  override def +(item: A): Unit = ???
-
-  override def ++(other: AMS[A]): Unit = ???
 
   override def innerProduct(other: AMS[A]): Approximate[Long] = ???
 
-  override def f2: Approximate[Long] = ???
+  override def +(item: A): AMS[A] = ???
+
+  override def ++(other: AMS[A]): AMS[A] = ???
 }
 
 
@@ -138,5 +137,7 @@ sealed abstract class AMS[A](val params: AMSParams[A]) extends AMSCounting[A, AM
   def depth : Int
 
   def buckets : Int
+
+  override val  f2: Approximate[Long] = innerProduct(this)
 }
 
