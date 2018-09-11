@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import cats.kernel.CommutativeMonoid
+import com.twitter.algebird.CMSInstance.CountsTable
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -15,28 +16,18 @@ import scala.util.Random
   *
   * */
 
-
-object AMSSketch {
-  def apply[A](buckets : Int, depth : Int)(implicit hash: Hash128[A]):  AMSSketch = new AMSSketch()
-}
-
-class AMSSketch {
-
-}
-
-
-
-class AMSSketchMonoid[K : CMSHash[K]]() extends Monoid[CMS[K]] with CommutativeMonoid[CMS[K]] {
-  override def zero: CMS[K] = ???
-
-  override def plus(x: CMS[K], y: CMS[K]): CMS[K] = ???
-}
-
-class AMSSketchZero[A]() extends  AMSSketchMonoid[A] {
+case class AMSParams[K](hashes : Seq[CMSHash[K]],
+                        depth : Int,
+                        bucket : Int){
+  require(depth > 0 && bucket > 0, "buckets and depth should be positive")
+  require(
+    hashes.size >= depth,
+    s"we require at least $depth hash functions")
 }
 
 object AMSFunction  {
-  def fourwise[K : CMSHasher](a : Long, b : Long, c : Long, d : Long, x : Long)(implicit hash128: Hash128[Long]) : Long = {
+
+  def fourwise[K : CMSHasher](a : Long, b : Long, c : Long, d : Long, x : Long) : Long = {
     1L
   }
 
@@ -44,17 +35,108 @@ object AMSFunction  {
 
     @tailrec
     def createHash(buffer : Seq[CMSHash[K]], idx : Int, seed : Int): Seq[CMSHash[K]] ={
-      if (idx == 0 ) buffer else createHash(buffer:+CMSHasher[K](Random.nextInt(seed)), idx - 1, seed)
+      if (idx == 0 ) buffer else createHash(buffer:+CMSHash[K](Random.nextInt(seed), 0, counters), idx - 1, seed)
     }
-
-
-
-    null
+    createHash(Seq.empty[CMSHash[K]], numHashes, counters)
   }
+}
+
+
+object AMSSketch {
+  def apply[A](buckets : Int, depth : Int):  AMSSketch = new AMSSketch()
+}
+
+class AMSSketch {
+
 
 }
 
-sealed abstract class AMS[A] {
+trait AMSCounting[K, C[_]] {
 
+  def +(item : K)
+
+  def ++(other : C[K])
+
+  def f1 : Long = totalCount
+
+  def innerProduct(other: C[K]): Approximate[Long]
+
+  def f2 : Approximate[Long]
+
+  def totalCount : Long
+}
+
+class AMSMonoid[K : CMSHasher](depth : Int, buckets : Int) extends Monoid[AMS[K]] with CommutativeMonoid[AMS[K]] {
+  override def zero: AMS[K] = ???
+
+  override def plus(x: AMS[K], y: AMS[K]): AMS[K] = ???
+}
+
+class AMSZero[A](override val params: AMSParams[A]) extends  AMS[A](params) {
+  override def depth: Int = 0
+
+  override val totalCount: Long = 0
+
+  override def buckets: Int = 0
+
+  override def +(item: A): Unit = ???
+
+  override def ++(other: AMS[A]): Unit = ???
+
+  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
+
+  override def f2: Approximate[Long] = ???
+}
+
+class AMSItem[A](item : A,
+                 override val totalCount : Long,
+                 override val params: AMSParams[A])
+  extends AMS[A](params) {
+  
+  override def depth: Int = 1
+
+  override def buckets: Int = 1
+
+  override def +(item: A): Unit = ???
+
+  override def ++(other: AMS[A]): Unit = ???
+
+  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
+
+  override def f2: Approximate[Long] = ???
+}
+
+class AMSInstances[A](countsTable: CountsTable[A],
+                      override val params: AMSParams[A],
+                      override val totalCount: Long)
+  extends  AMS[A](params) {
+
+  override def depth: Int = params.depth
+
+  override def buckets: Int = params.bucket
+
+  override def +(item: A): Unit = ???
+
+  override def ++(other: AMS[A]): Unit = ???
+
+  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
+
+  override def f2: Approximate[Long] = ???
+}
+
+
+object AMSInstances {
+  def apply[A](params: AMSParams[A]): AMSInstances[A] = {
+    val countsTable = CountsTable[A](params.depth, params.bucket)
+    new AMSInstances[A](countsTable, params, 0)
+  }
+}
+
+
+sealed abstract class AMS[A](val params: AMSParams[A]) extends AMSCounting[A, AMS] {
+
+  def depth : Int
+
+  def buckets : Int
 }
 
