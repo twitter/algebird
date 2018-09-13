@@ -35,7 +35,7 @@ object AMSFunction  {
 
     @tailrec
     def createHash(buffer : Seq[CMSHash[K]], idx : Int, seed : Int): Seq[CMSHash[K]] ={
-      if (idx == 0 ) buffer else createHash(buffer:+CMSHash[K](Random.nextInt(seed), 0, counters), idx - 1, seed)
+      if (idx == 0 ) buffer else createHash(buffer:+CMSHash[K](Random.nextInt(), 0, counters), idx - 1, seed)
     }
     createHash(Seq.empty[CMSHash[K]], numHashes, counters)
   }
@@ -53,7 +53,9 @@ class AMSSketch {
 
 trait AMSCounting[K, C[_]] {
 
-  def +(item : K) : C[K]
+  def +(item: K): C[K] = this + (item, 1L)
+
+  def +(item : K, count : Long) : C[K]
 
   def ++(other : C[K]) : C[K]
 
@@ -67,11 +69,22 @@ trait AMSCounting[K, C[_]] {
 }
 
 class AMSMonoid[K : CMSHasher](depth : Int, buckets : Int) extends Monoid[AMS[K]] with CommutativeMonoid[AMS[K]] {
-  val params  = AMSParams(AMSFunction.generateHash(depth, buckets), depth, buckets)
+  val params = AMSParams(AMSFunction.generateHash(depth, buckets), depth, buckets)
 
   override def zero: AMS[K] = AMSZero[K](params)
 
   override def plus(x: AMS[K], y: AMS[K]): AMS[K] = x ++ y
+
+  /**
+    * Creates a sketch out of a single item.
+    */
+  def create(item: K): AMS[K] = AMSItem[K](item, 1L, params)
+
+  /**
+    * Creates a sketch out of multiple items.
+    */
+  def create(data: Seq[K]): AMS[K] = ???
+
 }
 
 case class AMSZero[A](override val params: AMSParams[A]) extends  AMS[A](params) {
@@ -81,12 +94,12 @@ case class AMSZero[A](override val params: AMSParams[A]) extends  AMS[A](params)
 
   override def buckets: Int = 0
 
-
   override def innerProduct(other: AMS[A]): Approximate[Long] = ???
 
-  override def +(item: A): AMS[A] = ???
 
-  override def ++(other: AMS[A]): AMS[A] = ???
+  override def ++(other: AMS[A]): AMS[A] = other
+
+  override def +(item: A, count: Long): AMS[A] = AMSItem(item, count, params)
 }
 
 case class AMSItem[A](item : A,
@@ -94,16 +107,24 @@ case class AMSItem[A](item : A,
                  override val params: AMSParams[A])
   extends AMS[A](params) {
 
-  override def depth: Int = 1
+  override def depth: Int = params.depth
 
-  override def buckets: Int = 1
+  override def buckets: Int = params.bucket
 
 
-  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
+  override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate[Long](0, 0, 0, 0.1)
 
-  override def +(item: A): AMS[A] = ???
+  override def ++(other: AMS[A]): AMS[A] = other match {
+    case other : AMSZero[A] => this
 
-  override def ++(other: AMS[A]): AMS[A] = ???
+    case other : AMSItem[A] => AMSInstances(params) + (item, totalCount) + (other.item, other.totalCount)
+
+    case other : AMSInstances[A] => other + (item, totalCount)
+  }
+
+  override def +(item: A, count: Long): AMS[A] = {
+    AMSInstances(params) + (this.item , totalCount) + (item, count)
+  }
 }
 
 case class AMSInstances[A](countsTable: CountsTable[A],
@@ -115,12 +136,25 @@ case class AMSInstances[A](countsTable: CountsTable[A],
 
   override def buckets: Int = params.bucket
 
-
-  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
-
-  override def +(item: A): AMS[A] = ???
+  override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate[Long](0, 0, 0, 0.1)
 
   override def ++(other: AMS[A]): AMS[A] = ???
+
+  override def +(item: A, count: Long): AMS[A] = {
+    require(count >= 0 , "cannot add negative count element to AMS Sketch")
+
+    if (count != 0L){
+      var offset = 0
+      params.hashes.foreach(hash => {
+        val h = hash(item) % params.bucket
+        val mult = Random.nextInt(1)
+        if (mult == 1) countsTable + ((0, h) , count ) else countsTable + ((0, h) , -count )
+        offset += 1
+      })
+      AMSInstances(countsTable, params, totalCount + count)
+    }
+    else this
+  }
 }
 
 
