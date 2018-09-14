@@ -1,4 +1,3 @@
-
 package com.twitter.algebird
 
 import cats.kernel.CommutativeMonoid
@@ -15,28 +14,25 @@ import scala.util.Random
  * - A other hash function gj maps element from U  to {-1, +1}
  *
  * */
-case class AMSParams[K : CMSHasher](depth: Int, bucket: Int) {
+case class AMSParams[K: CMSHasher](depth: Int, bucket: Int) {
   require(depth > 0 && bucket > 0, "buckets and depth should be positive")
 
-  def randoms: Seq[Seq[Int]] = AMSFunction.generateRandom(depth)
+  val randoms: Seq[Seq[Int]] = AMSFunction.generateRandom(depth)
 
-  def hash(a : Int, b : Int, width : Int = Int.MaxValue) : CMSHash[K] = CMSHash[K](a, b, width)
+  def hash(a: Int, b: Int, width: Int = Int.MaxValue): CMSHash[K] = CMSHash[K](a, b, width)
 
 }
 
 object AMSFunction {
   val fourwiseSize = 6
 
-  def generateRandom(depht : Int) : Seq[Seq[Int]]= {
+  def generateRandom(depht: Int): Seq[Seq[Int]] =
     Seq.fill[Seq[Int]](fourwiseSize)(Seq.fill[Int](depht)(Random.nextInt().abs))
-  }
 
-
-  def hashValue[K : CMSHasher](item : K, a : Int, b : Int, width : Int = Int.MaxValue) : Int = {
+  def hashValue[K: CMSHasher](item: K, a: Int, b: Int, width: Int = Int.MaxValue): Int =
     CMSHash[K](a, b, width).apply(item)
-  }
 
-  def fourwise(a : Int, b : Int, c : Int, d : Int, itemHashed : Int) : Long = {
+  def fourwise(a: Int, b: Int, c: Int, d: Int, itemHashed: Int): Long = {
     val hash1 = CMSHash[Int](itemHashed, a, Int.MaxValue).apply(b)
     val hash2 = CMSHash[Int](hash1, itemHashed, Int.MaxValue).apply(c)
     val hash3 = CMSHash[Int](hash2, itemHashed, Int.MaxValue).apply(d)
@@ -44,15 +40,13 @@ object AMSFunction {
     hash3
   }
 
-  def generateHash[K : CMSHasher](numHashes : Int, counters : Int) : Seq[CMSHash[K]] = {
+  def generateHash[K: CMSHasher](numHashes: Int, counters: Int): Seq[CMSHash[K]] = {
 
     @tailrec
-    def createHash(buffer : Seq[CMSHash[K]], idx : Int, seed : Int): Seq[CMSHash[K]] ={
-      if (idx == 0 ) buffer else createHash(buffer:+CMSHash[K](Random.nextInt(), 0, counters), idx - 1, seed)
-    }
+    def createHash(buffer: Seq[CMSHash[K]], idx: Int, seed: Int): Seq[CMSHash[K]] =
+      if (idx == 0) buffer else createHash(buffer :+ CMSHash[K](Random.nextInt(), 0, counters), idx - 1, seed)
     createHash(Seq.empty[CMSHash[K]], numHashes, counters)
   }
-
 }
 
 object AMSSketch {
@@ -83,7 +77,7 @@ trait AMSCounting[K, C[_]] {
 class AMSMonoid[K: CMSHasher](depth: Int, buckets: Int)
     extends Monoid[AMS[K]]
     with CommutativeMonoid[AMS[K]] {
-  val params = AMSParams[K](depth, buckets )
+  val params = AMSParams[K](depth, buckets)
 
   override def zero: AMS[K] = AMSZero[K](params)
 
@@ -150,7 +144,7 @@ case class AMSInstances[A](countsTable: CountsTable[A],
 
   override def buckets: Int = params.bucket
 
-    // TODO
+  // TODO
   override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate[Long](0, 0, 0, 0.1)
 
   override def ++(other: AMS[A]): AMS[A] = ???
@@ -164,10 +158,12 @@ case class AMSInstances[A](countsTable: CountsTable[A],
 
         val hash = params.hash(params.randoms.head(j), params.randoms(1)(j), buckets).apply(item)
 
-        val mult = AMSFunction.fourwise(params.randoms(2)(j),
+        val mult = AMSFunction.fourwise(
+          params.randoms(2)(j),
           params.randoms(3)(j),
           params.randoms(4)(j),
-          params.randoms(5)(j), hash)
+          params.randoms(5)(j),
+          hash)
 
         // TODO : To be changed.
         if ((mult & 1) == 1) countsTable + ((offset, hash), count)
@@ -180,7 +176,24 @@ case class AMSInstances[A](countsTable: CountsTable[A],
   }
 
   override def frequency(item: A): Approximate[Long] = {
-    for (n <- 0 until params.depth) {}
+    var estimate = Array.emptyLongArray
+    var offset = 0
+    for (j <- 1 until params.depth) {
+      val hash = params.hash(params.randoms.head(j - 1), params.randoms(1)(j - 1), buckets).apply(item)
+      val mult = AMSFunction.fourwise(
+        params.randoms(2)(j - 1),
+        params.randoms(3)(j - 1),
+        params.randoms(4)(j - 1),
+        params.randoms(5)(j - 1),
+        hash)
+      if ((mult & 1) == 1) estimate = estimate.+:(countsTable.getCount((offset, hash)))
+      else estimate = estimate.+:(-countsTable.getCount((offset, hash)))
+
+      offset += 1
+    }
+    if (params.depth == 1) return Approximate.exact(estimate.head)
+    else if (params.depth == 2) Approximate(estimate(0), (estimate(0) + estimate(1)) / 2, estimate(1), 0.5)
+
     Approximate.exact(0L)
   }
 }

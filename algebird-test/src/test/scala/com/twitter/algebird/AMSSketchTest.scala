@@ -22,10 +22,9 @@ class AMSSketchItemTest extends WordSpec with Matchers {
 
   "an AMSItem " should {
     "return an instance with other item" in {
-      val params = AMSParams[String]( width, buckets)
+      val params = AMSParams[String](width, buckets)
       val amsIt = AMSItem[String]("item-0", 1, params)
       val res = amsIt + ("item-1", 1)
-
       assert(res.totalCount == 2)
       assert(res.isInstanceOf[AMSInstances[String]])
     }
@@ -38,7 +37,7 @@ class AMSSketchInstanceTest extends WordSpec with Matchers {
   "AMSSketch instance " should {
 
     "add item and update the count " in {
-      val params = AMSParams[String]( width, buckets)
+      val params = AMSParams[String](width, buckets)
       val aMSInstances = AMSInstances(params)
       val res = aMSInstances + ("item-2", 1)
       assert(res.totalCount == 1)
