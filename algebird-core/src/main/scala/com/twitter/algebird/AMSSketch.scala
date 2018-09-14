@@ -36,8 +36,13 @@ object AMSFunction {
     val hash1 = CMSHash[Int](itemHashed, a, Int.MaxValue).apply(b)
     val hash2 = CMSHash[Int](hash1, itemHashed, Int.MaxValue).apply(c)
     val hash3 = CMSHash[Int](hash2, itemHashed, Int.MaxValue).apply(d)
-
     hash3
+  }
+
+  // TODO : linear in average but ... not the best
+  def median(raw: Vector[Long]): Long = {
+    val (lower, upper) = raw.sortWith(_ < _).splitAt(raw.size / 2)
+    if (raw.size % 2 == 0) (lower.last + upper.head) / 2 else upper.head
   }
 
   def generateHash[K: CMSHasher](numHashes: Int, counters: Int): Seq[CMSHash[K]] = {
@@ -102,13 +107,15 @@ case class AMSZero[A](override val params: AMSParams[A]) extends AMS[A](params) 
 
   override def buckets: Int = 0
 
-  override def innerProduct(other: AMS[A]): Approximate[Long] = ???
+  override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate.exact(0L)
 
   override def ++(other: AMS[A]): AMS[A] = other
 
   override def +(item: A, count: Long): AMS[A] = AMSItem(item, count, params)
 
   override def frequency(item: A): Approximate[Long] = Approximate.exact(0L)
+
+  override def f2: Approximate[Long] = Approximate.exact(0L)
 }
 
 case class AMSItem[A](item: A, override val totalCount: Long, override val params: AMSParams[A])
@@ -118,7 +125,8 @@ case class AMSItem[A](item: A, override val totalCount: Long, override val param
 
   override def buckets: Int = params.bucket
 
-  override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate[Long](0, 0, 0, 0.1)
+  override def innerProduct(other: AMS[A]): Approximate[Long] =
+    Approximate.exact(totalCount) * other.frequency(item)
 
   override def ++(other: AMS[A]): AMS[A] = other match {
     case other: AMSZero[A] => this
@@ -133,6 +141,8 @@ case class AMSItem[A](item: A, override val totalCount: Long, override val param
 
   override def frequency(item: A): Approximate[Long] =
     if (this.item == item) Approximate.exact(1L) else Approximate.exact(0L)
+
+  override def f2: Approximate[Long] = innerProduct(this)
 }
 
 case class AMSInstances[A](countsTable: CountsTable[A],
@@ -144,40 +154,63 @@ case class AMSInstances[A](countsTable: CountsTable[A],
 
   override def buckets: Int = params.bucket
 
-  // TODO
-  override def innerProduct(other: AMS[A]): Approximate[Long] = Approximate[Long](0, 0, 0, 0.1)
+  private def compatible(other: AMSInstances[A]): Boolean =
+    other.params.depth == depth && other.buckets == buckets && other.params.randoms == params.randoms
 
-  override def ++(other: AMS[A]): AMS[A] = ???
+  override def innerProduct(other: AMS[A]): Approximate[Long] = other match {
+    case other: AMSInstances[A] =>
+      require(compatible(other))
+      def innerProductAt(rawId: Int): Long =
+        (0 until buckets).iterator.map { w =>
+          countsTable.getCount((rawId, w)) * other.countsTable.getCount((rawId, w))
+        }.sum
+
+      val estimate = (0 until depth).map(innerProductAt)
+      if (depth == 1) Approximate.exact(estimate.head)
+      else if (depth == 2) Approximate.exact((estimate.head + estimate.last) / 2)
+      else Approximate(0, AMSFunction.median(estimate.toVector), totalCount * other.totalCount, 0.5)
+
+    case _ => other.innerProduct(this)
+
+  }
+
+  override def ++(other: AMS[A]): AMS[A] = other match {
+    case other: AMSItem[A] => this + (other.item, other.totalCount)
+    case other: AMSZero[A] => this
+    case other: AMSInstances[A] =>
+      require(other.params.randoms == params.randoms)
+
+      // tcheck integrity here.
+      val newCountTable = other.countsTable ++ countsTable
+      val newTotalCount = other.totalCount + totalCount
+
+      AMSInstances[A](newCountTable, params, newTotalCount)
+  }
 
   override def +(item: A, count: Long): AMS[A] = {
     require(count >= 0, "cannot add negative count element to AMS Sketch")
+
     if (count != 0L) {
-      var offset = 0
-
-      for (j <- 0 until depth) {
-
-        val hash = params.hash(params.randoms.head(j), params.randoms(1)(j), buckets).apply(item)
-
-        val mult = AMSFunction.fourwise(
-          params.randoms(2)(j),
-          params.randoms(3)(j),
-          params.randoms(4)(j),
-          params.randoms(5)(j),
-          hash)
-
-        // TODO : To be changed.
-        if ((mult & 1) == 1) countsTable + ((offset, hash), count)
-        else countsTable + ((offset, hash), -count)
-
-        offset += 1
+      val newCountsTable = (0 until depth).foldLeft(countsTable) {
+        case (table, j) =>
+          val hash = params.hash(params.randoms.head(j), params.randoms(1)(j), buckets).apply(item)
+          val mult = AMSFunction.fourwise(
+            params.randoms(2)(j),
+            params.randoms(3)(j),
+            params.randoms(4)(j),
+            params.randoms(5)(j),
+            hash)
+          if ((mult & 1) == 1) table + ((j, hash), count)
+          else table + ((j, hash), -count)
       }
-      AMSInstances(countsTable, params, totalCount + count)
+      AMSInstances(newCountsTable, params, totalCount + count)
     } else this
   }
 
   override def frequency(item: A): Approximate[Long] = {
-    var estimate = Array.emptyLongArray
+    var estimate = Vector.empty[Long]
     var offset = 0
+
     for (j <- 1 until params.depth) {
       val hash = params.hash(params.randoms.head(j - 1), params.randoms(1)(j - 1), buckets).apply(item)
       val mult = AMSFunction.fourwise(
@@ -191,26 +224,37 @@ case class AMSInstances[A](countsTable: CountsTable[A],
 
       offset += 1
     }
-    if (params.depth == 1) return Approximate.exact(estimate.head)
+    if (params.depth == 1) Approximate.exact(estimate.head)
     else if (params.depth == 2) Approximate(estimate(0), (estimate(0) + estimate(1)) / 2, estimate(1), 0.5)
+    else {
+      Approximate(0, AMSFunction.median(estimate), Int.MaxValue, 1.0)
+    }
+  }
 
-    Approximate.exact(0L)
+  override def f2: Approximate[Long] = {
+
+    def f2At(idx: Int): Long =
+      (0 until buckets).iterator.map { bucketIndex =>
+        countsTable.getCount((idx, bucketIndex)) * countsTable.getCount((idx, bucketIndex))
+      }.sum
+
+    val estimate = (1 until depth).map(f2At)
+
+    if (depth == 1) Approximate.exact(estimate(0))
+    else if (depth == 2) Approximate.exact((estimate(0) + estimate(1)) / 2)
+    else Approximate.exact(AMSFunction.median(estimate.toVector))
+
   }
 }
 
 object AMSInstances {
   def apply[A](params: AMSParams[A]): AMSInstances[A] = {
     val countsTable = CountsTable[A](params.depth, params.bucket)
-
     new AMSInstances[A](countsTable, params, 0)
   }
 }
 
 sealed abstract class AMS[A](val params: AMSParams[A]) extends AMSCounting[A, AMS] {
-
   def depth: Int
-
   def buckets: Int
-
-  override val f2: Approximate[Long] = innerProduct(this)
 }
