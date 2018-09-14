@@ -1,3 +1,19 @@
+/*
+Copyright 2012 Twitter, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
 package com.twitter.algebird
 
 import cats.kernel.CommutativeMonoid
@@ -6,14 +22,98 @@ import com.twitter.algebird.CMSInstance.CountsTable
 import scala.annotation.tailrec
 import scala.util.Random
 
+case class AMSAggregator[K](amsMonoid: AMSMonoid[K]) extends MonoidAggregator[K, AMS[K], AMS[K]] {
+  val monoid = amsMonoid
+
+  def prepare(value: K): AMS[K] = monoid.create(value)
+
+  def present(cms: AMS[K]): AMS[K] = cms
+}
+
 /**
- * AMS sketch : maintaining a array of counts with all element arriving.
- *
- * AMS is a matrix of d x t counters (d row of length t).
- * - Each row j, a hash function hj(x) -> {1, ..., t} , x in U
- * - A other hash function gj maps element from U  to {-1, +1}
- *
- * */
+  * AMSMonoid for a better f2 moment vector result. and a better joint between two of them.
+  *
+  * */
+class AMSMonoid[K: CMSHasher](depth: Int, buckets: Int)
+  extends Monoid[AMS[K]]
+    with CommutativeMonoid[AMS[K]] {
+  val params: AMSParams[K] = AMSParams[K](depth, buckets)
+
+  var count : Long = 0
+
+  override def zero: AMS[K] = AMSZero[K](params)
+
+  override def plus(x: AMS[K], y: AMS[K]): AMS[K] = x ++ y
+
+  override def sumOption(iter: TraversableOnce[AMS[K]]): Option[AMS[K]] =
+    if (iter.isEmpty)None
+    else {
+      var sets = 0
+
+      var countsTableMonoid = CountsTable[K](depth, buckets)
+
+      @inline def updateCountsTable(pos : (Int, Int), count : Long) : CountsTable[K]  = {
+        countsTableMonoid + (pos, count)
+      }
+
+      var oneItem : AMSItem[K] = null
+
+      @inline def addItem(it : AMSItem[K]) : CountsTable[K] = {
+        sets += 1
+        oneItem = it
+        count += 1
+        (0 until depth).foldLeft(countsTableMonoid) {
+          case (table, j) =>
+            val hash = params.hash(params.randoms.head(j), params.randoms(1)(j), buckets).apply(it.item)
+            val mult = AMSFunction.fourwise(
+              params.randoms(2)(j),
+              params.randoms(3)(j),
+              params.randoms(4)(j),
+              params.randoms(5)(j),
+              hash)
+            if ((mult & 1) == 1) table + ((j, hash), it.totalCount)
+            else table + ((j, hash), -it.totalCount)
+        }
+      }
+      iter.foreach( {
+        case AMSZero( _) => ()
+        case it@ AMSItem(_, _, _) => countsTableMonoid = addItem(it)
+        case AMSInstances(amsCountTable , _, totalCount) =>
+          sets += 1
+          amsCountTable.counts.zipWithIndex.foreach(counts => counts._1.zipWithIndex.foreach(c =>{
+            count += c._1
+            updateCountsTable((counts._2, c._2), c._1)
+          }))
+      })
+      if (sets == 0) Some(zero)
+      else if (sets == 1) Some(oneItem)
+      else Some(AMSInstances[K](params, countsTableMonoid, count))
+    }
+
+
+  /**
+    * Creates a sketch out of a single item.
+    */
+  def create(item: K): AMS[K] = AMSItem[K](item, 1L, params)
+
+  /**
+    * Creates a sketch out of multiple items.
+    */
+  def create(data: Seq[K]): AMS[K] = {
+    sum(data.map(AMSItem(_, 1, params )))
+  }
+
+}
+
+
+/**
+  * AMS sketch : maintaining a array of counts with all element arriving.
+  *
+  * AMS is a matrix of d x t counters (d row of length t).
+  * - Each row j, a hash function hj(x) -> {1, ..., t} , x in U
+  * - A other hash function gj maps element from U  to {-1, +1}
+  *
+  * */
 case class AMSParams[K: CMSHasher](depth: Int, bucket: Int) {
   require(depth > 0 && bucket > 0, "buckets and depth should be positive")
 
@@ -33,10 +133,10 @@ object AMSFunction {
     CMSHash[K](a, b, width).apply(item)
 
   def fourwise(a: Int, b: Int, c: Int, d: Int, itemHashed: Int): Long = {
-    val hash1 = CMSHash[Int](itemHashed, a, Int.MaxValue).apply(b)
-    val hash2 = CMSHash[Int](hash1, itemHashed, Int.MaxValue).apply(c)
-    val hash3 = CMSHash[Int](hash2, itemHashed, Int.MaxValue).apply(d)
-    hash3
+    var hash = CMSHash[Int](itemHashed, a, Int.MaxValue).apply(b)
+    hash = CMSHash[Int](hash, itemHashed, Int.MaxValue).apply(c)
+    hash = CMSHash[Int](hash, itemHashed, Int.MaxValue).apply(d)
+    hash
   }
 
   // TODO : linear in average but ... not the best
@@ -53,12 +153,6 @@ object AMSFunction {
     createHash(Seq.empty[CMSHash[K]], numHashes, counters)
   }
 }
-
-object AMSSketch {
-  def apply[A](buckets: Int, depth: Int): AMSSketch = new AMSSketch()
-}
-
-class AMSSketch {}
 
 trait AMSCounting[K, C[_]] {
 
@@ -77,27 +171,6 @@ trait AMSCounting[K, C[_]] {
   def frequency(item: K): Approximate[Long]
 
   def totalCount: Long
-}
-
-class AMSMonoid[K: CMSHasher](depth: Int, buckets: Int)
-    extends Monoid[AMS[K]]
-    with CommutativeMonoid[AMS[K]] {
-  val params = AMSParams[K](depth, buckets)
-
-  override def zero: AMS[K] = AMSZero[K](params)
-
-  override def plus(x: AMS[K], y: AMS[K]): AMS[K] = x ++ y
-
-  /**
-   * Creates a sketch out of a single item.
-   */
-  def create(item: K): AMS[K] = AMSItem[K](item, 1L, params)
-
-  /**
-   * Creates a sketch out of multiple items.
-   */
-  def create(data: Seq[K]): AMS[K] = ???
-
 }
 
 case class AMSZero[A](override val params: AMSParams[A]) extends AMS[A](params) {
@@ -227,7 +300,7 @@ case class AMSInstances[A](countsTable: CountsTable[A],
     if (params.depth == 1) Approximate.exact(estimate.head)
     else if (params.depth == 2) Approximate(estimate(0), (estimate(0) + estimate(1)) / 2, estimate(1), 0.5)
     else {
-      Approximate(0, AMSFunction.median(estimate), Int.MaxValue, 1.0)
+      Approximate.exact(AMSFunction.median(estimate))
     }
   }
 
@@ -251,6 +324,11 @@ object AMSInstances {
   def apply[A](params: AMSParams[A]): AMSInstances[A] = {
     val countsTable = CountsTable[A](params.depth, params.bucket)
     new AMSInstances[A](countsTable, params, 0)
+  }
+
+  def apply[A](params: AMSParams[A], tables : CountsTable[A], count : Long): AMSInstances[A] = {
+    val countsTable = CountsTable[A](params.depth, params.bucket)
+    new AMSInstances[A](tables, params, count)
   }
 }
 
