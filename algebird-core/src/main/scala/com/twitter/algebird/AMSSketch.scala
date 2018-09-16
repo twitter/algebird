@@ -22,6 +22,9 @@ import com.twitter.algebird.CMSInstance.CountsTable
 import scala.annotation.tailrec
 import scala.util.Random
 
+/**
+ * Aggregagtor for AMS
+ * */
 case class AMSAggregator[K](amsMonoid: AMSMonoid[K]) extends MonoidAggregator[K, AMS[K], AMS[K]] {
   val monoid: AMSMonoid[K] = amsMonoid
 
@@ -38,8 +41,25 @@ object AMSAggregator {
 
 /**
  * AMSMonoid for a better f2 moment vector result. and a better joint between two of them.
+ * reference : http://dimacs.rutgers.edu/%7Egraham/pubs/papers/encalgs-ams.pdf
+ * and https://www.cs.rutgers.edu/~muthu/ams.c
  *
- * */
+ * ==Join size estimation==
+ *
+ * https://people.cs.umass.edu/%7Emcgregor/711S12/sketches1.pdf p. 26
+ * part : Comparing AMS and Count-Min sketches for join size estimation.
+ *
+ * what's join size ?
+ * used to  answer to something like :
+ * SELECT COUNT(*) FROM F, F’
+ *   WHERE F.id = F’.id
+ *
+ * Count Min Sketch :
+ * f ·f' =F2 with error N^2 / depth
+ *
+ * AMS :
+ * f .f' = SQRT( F2(f) F2(f') / depth )
+  **/
 class AMSMonoid[K: CMSHasher](depth: Int, buckets: Int)
     extends Monoid[AMS[K]]
     with CommutativeMonoid[AMS[K]] {
@@ -139,6 +159,11 @@ object AMSFunction {
   def hashValue[K: CMSHasher](item: K, a: Int, b: Int, width: Int = Int.MaxValue): Int =
     CMSHash[K](a, b, width).apply(item)
 
+  /**
+   * To ensure the random element is really random and "pure" see :
+   * https://lucatrevisan.wordpress.com/2009/11/12/the-large-deviation-of-fourwise-independent-random-variables/
+   * to more details.
+   * */
   def fourwise(a: Int, b: Int, c: Int, d: Int, itemHashed: Int): Long = {
     var hash = CMSHash[Int](itemHashed, a, Int.MaxValue).apply(b)
     hash = CMSHash[Int](hash, itemHashed, Int.MaxValue).apply(c)
@@ -146,7 +171,7 @@ object AMSFunction {
     hash
   }
 
-  // TODO : linear in average but ... not the best, median select is good stuff
+  // TODO : linear in average but ... not the best, median select is better
   def median(raw: Vector[Long]): Long = {
     val (lower, upper) = raw.sortWith(_ < _).splitAt(raw.size / 2)
     if (raw.size % 2 == 0) (lower.last + upper.head) / 2 else upper.head
@@ -157,12 +182,14 @@ object AMSFunction {
     @tailrec
     def createHash(buffer: Seq[CMSHash[K]], idx: Int, seed: Int): Seq[CMSHash[K]] =
       if (idx == 0) buffer
-      else
-        createHash(buffer :+ CMSHash[K](Random.nextInt(), 0, counters), idx - 1, seed)
+      else createHash(buffer :+ CMSHash[K](Random.nextInt(), 0, counters), idx - 1, seed)
     createHash(Seq.empty[CMSHash[K]], numHashes, counters)
   }
 }
 
+/**
+ * All the method needed for user to take manipulate AMS : metrics and operators.
+ * */
 trait AMSCounting[K, C[_]] {
 
   def +(item: K): C[K] = this + (item, 1L)
@@ -182,11 +209,17 @@ trait AMSCounting[K, C[_]] {
   def totalCount: Long
 }
 
+/**
+ * The abstract trait for AMS
+ * */
 sealed abstract class AMS[A](val params: AMSParams[A]) extends AMSCounting[A, AMS] {
   def depth: Int
   def buckets: Int
 }
 
+/**
+ * The AMSZero element
+ * */
 case class AMSZero[A](override val params: AMSParams[A]) extends AMS[A](params) {
   override def depth: Int = 0
 
@@ -206,6 +239,9 @@ case class AMSZero[A](override val params: AMSParams[A]) extends AMS[A](params) 
   override def f2: Approximate[Long] = Approximate.exact(0L)
 }
 
+/**
+ * An AMS with just one item
+ * */
 case class AMSItem[A](item: A, override val totalCount: Long, override val params: AMSParams[A])
     extends AMS[A](params) {
 
@@ -234,6 +270,9 @@ case class AMSItem[A](item: A, override val totalCount: Long, override val param
   override def f2: Approximate[Long] = innerProduct(this)
 }
 
+/**
+ * The Instances AMS algorithm with several values inside.
+ * */
 case class AMSInstances[A](countsTable: CountsTable[A],
                            override val params: AMSParams[A],
                            override val totalCount: Long)
@@ -299,6 +338,11 @@ case class AMSInstances[A](countsTable: CountsTable[A],
     } else this
   }
 
+  /**
+   * Determine approximative count of a value.
+   * There's not enough doc on it
+   * TODO : Create proper approximation.
+   * */
   override def frequency(item: A): Approximate[Long] = {
     var estimate = Vector.empty[Long]
     var offset = 0
@@ -327,6 +371,9 @@ case class AMSInstances[A](countsTable: CountsTable[A],
     }
   }
 
+  /**
+   * This is much easier and faster than the count min sketch algorithm.
+   * */
   override def f2: Approximate[Long] = {
 
     def f2At(idx: Int): Long =
@@ -349,8 +396,6 @@ object AMSInstances {
     new AMSInstances[A](countsTable, params, 0)
   }
 
-  def apply[A](params: AMSParams[A], tables: CountsTable[A], count: Long): AMSInstances[A] = {
-    val countsTable = CountsTable[A](params.depth, params.bucket)
+  def apply[A](params: AMSParams[A], tables: CountsTable[A], count: Long): AMSInstances[A] =
     new AMSInstances[A](tables, params, count)
-  }
 }
