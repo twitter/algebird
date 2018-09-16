@@ -15,11 +15,98 @@ limitations under the License.
  */
 package com.twitter.algebird
 
+import com.twitter.algebird.CMSInstance.CountsTable
+import org.scalacheck.Prop.forAll
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 
-class AMSSketchMonoidTest
+object AMSTestUtils {
 
+  def toInstances[A](ams: AMS[A]): AMSInstances[A] = ams match {
+    case AMSZero(params) => AMSInstances(params)
+    case AMSItem(it, count, params) =>
+      (AMSInstances.apply(params) + it).asInstanceOf[AMSInstances[A]]
+    case instance @ AMSInstances(_, _, _) => instance
+  }
+}
 
+class AMSSketchMonoidTest extends CheckProperties {
+
+  import BaseProperties._
+
+  val depht = 2
+  val buckets = 2
+
+  implicit val amsMonoid: AMSMonoid[String] =
+    new AMSMonoid[String](depht, buckets)
+
+  implicit val amsGen = Arbitrary {
+    val item = Gen.choose(1, 1000).map { v =>
+      amsMonoid.create(v.toString)
+    }
+    val dense = Gen.listOf(item).map { it =>
+      AMSTestUtils.toInstances[String](amsMonoid.sum(it))
+    }
+    val zero = Gen.const(amsMonoid.zero)
+    Gen.frequency((4, item), (1, zero), (1, dense))
+  }
+
+  implicit def amsEquiv[K]: Equiv[AMS[K]] =
+    new Equiv[AMS[K]] {
+      def equiv(x: AMS[K], y: AMS[K]): Boolean = {
+        val r = x == y
+        r
+      }
+    }
+  property("AMSSKetch is a monoid ") {
+    commutativeMonoidLaws[AMS[String]]
+  }
+
+  property("++ is the same as plus") {
+    forAll { (a: AMS[String], b: AMS[String]) =>
+      Equiv[AMS[String]].equiv(a ++ b, amsMonoid.plus(a, b))
+    }
+  }
+
+}
+
+class AMSMonoidSimpleProperties extends WordSpec with Matchers {
+  val semi: AMSMonoid[String] = new AMSMonoid[String](2, 2)
+  "an amsMonoid simple properties checker " should {
+    "check simple associative equivalency mixing AMSItem and AMSInstance" in {
+
+      val a =
+        new AMSInstances[String](CountsTable(Vector(Vector(-8L, -2L), Vector(-3L, -7L))), semi.params, 10)
+      val b = AMSItem[String]("907", 1, semi.params)
+      val c = AMSItem[String]("868", 1, semi.params)
+
+      assert(semi.plus(semi.plus(a, b), c) == semi.plus(a, semi.plus(b, c)))
+    }
+
+    "check simple sumpropertieswork for semigroups between two AMSItem " in {
+      val head = AMSItem[String]("739", 1, semi.params)
+      val tail = List[AMS[String]](AMSItem[String]("437", 1, semi.params))
+
+      val sumOPT = semi.sumOption(head :: tail).get
+      val plus = head ++ tail.head
+
+      assert(sumOPT == plus)
+    }
+
+    "check simple sumpropertieswork for semigroups between AMSItem and AMSInstance " in {
+      val head = AMSItem[String]("591", 1, semi.params)
+      val tail = List[AMS[String]](
+        new AMSInstances[String](CountsTable(Vector(Vector(-2, -3), Vector(-3, -2))), semi.params, 5))
+
+      val sumOPT = semi.sumOption(head :: tail).get
+      val plus = head ++ tail.head
+
+      assert(sumOPT == plus)
+    }
+
+  }
+
+}
 
 class AMSSketchFunction extends WordSpec with Matchers {
 
@@ -42,6 +129,16 @@ class AMSSketchItemTest extends WordSpec with Matchers {
       val amsIt = AMSItem[String]("item-0", 1, params)
       val res = amsIt + ("item-1", 1)
       assert(res.totalCount == 2)
+      assert(res.isInstanceOf[AMSInstances[String]])
+    }
+
+    "return instance with exact count " in {
+      val params = AMSParams[String](width, buckets)
+      val amsIt = AMSItem[String]("item-0", 14, params)
+      var res = amsIt + ("item-1", 1)
+      println("count ==" + res.totalCount)
+      res = res + ("item-1", 10)
+      assert(res.totalCount == 25)
       assert(res.isInstanceOf[AMSInstances[String]])
     }
   }
