@@ -23,11 +23,17 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 case class AMSAggregator[K](amsMonoid: AMSMonoid[K]) extends MonoidAggregator[K, AMS[K], AMS[K]] {
-  val monoid = amsMonoid
+  val monoid: AMSMonoid[K] = amsMonoid
 
   def prepare(value: K): AMS[K] = monoid.create(value)
 
   def present(cms: AMS[K]): AMS[K] = cms
+}
+
+object AMSAggregator {
+
+  def apply[K: CMSHasher](depth: Int, buckets: Int): AMSAggregator[K] =
+    AMSAggregator[K](new AMSMonoid[K](depth, buckets))
 }
 
 /**

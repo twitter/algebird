@@ -20,6 +20,8 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 
+import scala.util.Random
+
 object AMSTestUtils {
 
   def toInstances[A](ams: AMS[A]): AMSInstances[A] = ams match {
@@ -223,6 +225,28 @@ class AMSSketchInstanceTest extends WordSpec with Matchers {
       })
 
       assert(ams.innerProduct(ams).estimate > 0)
+    }
+
+  }
+}
+
+class AMSSketchAggregatorTest extends WordSpec with Matchers {
+  "An AMSSketchMonoid works as an aggregator " should {
+    "with random value " in {
+
+      (0 to 10).foreach { _ =>
+        {
+          val aggregator = AMSAggregator[String](10, 10)
+          val numEntries = 5
+          val entries = (0 until numEntries).map(_ => Random.nextInt.toString)
+          val bf = aggregator(entries)
+
+          entries.foreach { i =>
+            assert(bf.frequency(i.toString).estimate > 0)
+          }
+        }
+      }
+
     }
 
   }
