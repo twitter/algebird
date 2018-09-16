@@ -5,20 +5,15 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 
 /**
- * [info] Benchmark                                (bucket)  (depth)  (size)   Mode  Cnt      Score       Error  Units
- * [info] AMSJoinBenchmark.amsJoinBenchmarkString        27       16    1000  thrpt    3  55539,549 ± 44815,541  ops/s
- * [info] AMSJoinBenchmark.amsJoinBenchmarkString       543       16    1000  thrpt    3   3036,712 ±  2487,763  ops/s
- *
- * [info] Benchmark                                  (delta)  (eps)  (size)   Mode  Cnt      Score      Error  Units
- * [info] CMSJoinBenchmark.amsJoinBenchmarkString  0.0000001    0.1    1000  thrpt    3  37416,918 ± 4578,109  ops/s
- * [info] CMSJoinBenchmark.amsJoinBenchmarkString  0.0000001  0.005    1000  thrpt    3   3194,029 ±  335,681  ops/s
- */
+  * AMS is interesting to compute inner join between two of them.
+  *
+  * */
 object AMSJoinBenchmark {
 
   @State(Scope.Benchmark)
   class AMSJoinState {
 
-    @Param(Array("27", "543"))
+    @Param(Array("27", "543", "5438"))
     var bucket = 0
 
     @Param(Array("16"))

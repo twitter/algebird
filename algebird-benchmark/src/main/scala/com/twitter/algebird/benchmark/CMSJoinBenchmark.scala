@@ -6,10 +6,7 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 
 /**
- * [info] Benchmark                                (bucket)  (depth)  (size)   Mode  Cnt       Score       Error  Units
- * [info] AMSJoinBenchmark.amsJoinBenchmarkString        18       10    1000  thrpt    3  148071,642 ± 98359,117  ops/s
- * [info] AMSJoinBenchmark.amsJoinBenchmarkString        18      200    1000  thrpt    3    5926,345 ±   332,592  ops/s
- *
+  * CMSjoin is made to compare CMS and AMS on inner product between two of them.
  * */
 object CMSJoinBenchmark {
 
@@ -19,7 +16,7 @@ object CMSJoinBenchmark {
     val Seed: Int = 1
     val MaxBits: Int = 2048
 
-    @Param(Array("0.1", "0.005"))
+    @Param(Array("0.1", "0.005", "0.0005"))
     var eps: Double = 0.0
 
     @Param(Array("0.0000001")) // 1e-8
