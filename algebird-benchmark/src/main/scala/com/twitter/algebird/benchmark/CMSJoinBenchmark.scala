@@ -6,7 +6,7 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 
 /**
-  * CMSjoin is made to compare CMS and AMS on inner product between two of them.
+ * CMSjoin is made to compare CMS and AMS on inner product between two of them.
  * */
 object CMSJoinBenchmark {
 

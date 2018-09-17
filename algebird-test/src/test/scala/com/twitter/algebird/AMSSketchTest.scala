@@ -138,7 +138,6 @@ class AMSSketchItemTest extends WordSpec with Matchers {
       val params = AMSParams[String](width, buckets)
       val amsIt = AMSItem[String]("item-0", 14, params)
       var res = amsIt + ("item-1", 1)
-      println("count ==" + res.totalCount)
       res = res + ("item-1", 10)
       assert(res.totalCount == 25)
       assert(res.isInstanceOf[AMSInstances[String]])
@@ -246,6 +245,39 @@ class AMSSketchAggregatorTest extends WordSpec with Matchers {
           }
         }
       }
+
+    }
+  }
+}
+
+class AMSSketchInnerJoinCMS extends WordSpec with Matchers {
+  val numEntries = 10000
+
+  def innerProduct(arr1: Vector[Int], arr2: Vector[Int]): Long =
+    arr1.zip(arr2).map(p => p._1 * p._2) sum
+
+  val amsMonoid = new AMSMonoid[Int](16, 543)
+  val cmsMonoid = CMS.monoid[Int](16, 543, 1)
+
+  " an AMSSketch " should {
+    " have a better approximation of it inner product than CMS " in {
+      val entries = (0 until 100).map(_ => Random.nextInt(100))
+      val entriesCompare = (0 until 100).map(_ => Random.nextInt(100).abs)
+
+      val trueInner = innerProduct(entries.toVector, entriesCompare.toVector)
+      val ams = amsMonoid.create(entries)
+      val cms = cmsMonoid.create(entries)
+
+      val amsCompare = amsMonoid.create(entriesCompare)
+      val cmsCompare = cmsMonoid.create(entriesCompare)
+
+      val innerAMS = ams.innerProduct(amsCompare)
+      val innerCMS = cms.innerProduct(cmsCompare)
+
+      val errorAMS = trueInner - innerAMS.estimate
+      val errorCMS = trueInner - innerCMS.estimate
+
+      assert(errorAMS.abs <= errorCMS.abs)
 
     }
 

@@ -5,9 +5,9 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 
 /**
-  * AMS is interesting to compute inner join between two of them.
-  *
-  * */
+ * AMS is interesting to compute inner join between two of them.
+ *
+ * */
 object AMSJoinBenchmark {
 
   @State(Scope.Benchmark)
