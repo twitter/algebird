@@ -69,6 +69,18 @@ class AMSSketchMonoidTest extends CheckProperties {
       Equiv[AMS[String]].equiv(a ++ b, amsMonoid.plus(a, b))
     }
   }
+}
+
+class AMSMonoidUse extends WordSpec with Matchers {
+
+  "An AMSSketchMonoid " should {
+    "be used like an algebird monoid " in {
+      val aMSMonoid = new AMSMonoid[String](100, 100)
+      val sketch = aMSMonoid.create(Seq("aline", "aline", "aline"))
+      assert(sketch.f2 ~ 9 )
+    }
+
+  }
 
 }
 
@@ -105,7 +117,6 @@ class AMSMonoidSimpleProperties extends WordSpec with Matchers {
 
       assert(sumOPT == plus)
     }
-
   }
 
 }
