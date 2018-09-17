@@ -77,7 +77,7 @@ class AMSMonoidUse extends WordSpec with Matchers {
     "be used like an algebird monoid " in {
       val aMSMonoid = new AMSMonoid[String](100, 100)
       val sketch = aMSMonoid.create(Seq("aline", "aline", "aline"))
-      assert(sketch.f2 ~ 9 )
+      assert(sketch.f2 ~ 9)
     }
 
   }
