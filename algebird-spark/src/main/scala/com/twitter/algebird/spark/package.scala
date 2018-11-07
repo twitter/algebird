@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-import com.twitter.algebird._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import scala.reflect.ClassTag
@@ -10,6 +9,7 @@ import scala.reflect.ClassTag
  * import com.twitter.algebird.spark._
  */
 package object spark {
+
   /**
    * spark exposes an Aggregator type, so this is here to avoid shadowing
    */
