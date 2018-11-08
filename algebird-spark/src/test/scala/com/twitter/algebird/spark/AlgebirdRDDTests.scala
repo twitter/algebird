@@ -1,6 +1,6 @@
 package com.twitter.algebird.spark
 
-import com.twitter.algebird.{ MapAlgebra, Semigroup, Monoid, Min }
+import com.twitter.algebird.{MapAlgebra, Min, Monoid, Semigroup}
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.scalatest._
@@ -14,6 +14,7 @@ package test {
     def sum[T: Monoid: ClassTag](r: RDD[T]) = r.algebird.sum
   }
 }
+
 /**
  * This test almost always times out on travis.
  * Leaving at least a compilation test of using with spark
@@ -43,8 +44,8 @@ class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
   implicit def optEq[V](implicit eq: Equiv[V]): Equiv[Option[V]] = Equiv.fromFunction[Option[V]] { (o1, o2) =>
     (o1, o2) match {
       case (Some(v1), Some(v2)) => eq.equiv(v1, v2)
-      case (None, None) => true
-      case _ => false
+      case (None, None)         => true
+      case _                    => false
     }
   }
 
@@ -55,7 +56,8 @@ class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
     assertEq(sc.makeRDD(s).algebird.aggregate(agg), agg(s))
   }
 
-  def aggregateByKey[K: ClassTag, T: ClassTag, U: ClassTag, V: Equiv](s: Seq[(K, T)], agg: AlgebirdAggregator[T, U, V]) {
+  def aggregateByKey[K: ClassTag, T: ClassTag, U: ClassTag, V: Equiv](s: Seq[(K, T)],
+                                                                      agg: AlgebirdAggregator[T, U, V]) {
     val resMap = sc.makeRDD(s).algebird.aggregateByKey[K, T, U, V](agg).collect.toMap
     implicit val sg = agg.semigroup
     val algMap = MapAlgebra.sumByKey(s.map { case (k, t) => k -> agg.prepare(t) }).mapValues(agg.present)

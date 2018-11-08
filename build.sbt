@@ -12,6 +12,7 @@ val scalaTestVersion = "3.0.1"
 val scalacheckVersion = "1.13.4"
 val utilVersion = "6.20.0"
 val utilVersion212 = "6.39.0"
+val sparkVersion = "2.4.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version startsWith "2.10" => "2.10"
@@ -28,8 +29,6 @@ def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
   * cause problems generating the documentation on scala 2.10. As the APIs for 2.10
   * and 2.11 are the same this has no effect on the resultant documentation, though
   * it does mean that the scaladocs cannot be generated when the build is in 2.10 mode.
-  *
-  * TODO: enable algebirdSpark when we turn on the algebirdSpark 2.12 build.
   */
 def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
   CrossVersion.partialVersion(sv) match {
@@ -38,15 +37,15 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
       algebirdTest,
       algebirdCore,
       algebirdUtil,
-      algebirdBijection
-      // algebirdSpark
+      algebirdBijection,
+      algebirdSpark
     ))
   }
 
 val sharedSettings = Seq(
   organization := "com.twitter",
-  scalaVersion := "2.11.11",
-  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.6"),
+  scalaVersion := "2.11.12",
+  crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.7"),
 
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
@@ -155,7 +154,7 @@ lazy val noPublishSettings = Seq(
   * This returns the previous jar we released that is compatible with
   * the current.
   */
-val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic")
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic", "spark")
 
 def previousVersion(subProj: String) =
   Some(subProj)
@@ -169,14 +168,16 @@ lazy val algebird = Project(
   .settings(noPublishSettings)
   .settings(coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*")
   .aggregate(
-  algebirdTest,
-  algebirdCore,
-  algebirdUtil,
-  algebirdBijection,
-  algebirdBenchmark,
-  algebirdGeneric
-  //algebirdSpark
-)
+    {
+      // workaround: https://github.com/sbt/sbt/issues/4181, simple workaround .settings(crossScalaVersions := List()) doesn't work
+      val projects = if (Option(sys.props("TRAVIS_SCALA_VERSION")).forall(_.startsWith("2.10.")))
+        Seq(algebirdCore, algebirdTest, algebirdUtil, algebirdBijection, algebirdBenchmark, algebirdGeneric)
+      else
+        Seq(algebirdCore, algebirdTest, algebirdUtil, algebirdBijection, algebirdBenchmark, algebirdGeneric, algebirdSpark)
+
+      projects.map(p => LocalProject(p.id))
+    }: _*
+  )
 
 def module(name: String) = {
   val id = "algebird-%s".format(name)
@@ -242,9 +243,10 @@ lazy val algebirdBijection = module("bijection").settings(
 ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdSpark = module("spark").settings(
-    libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0" % "provided",
-    crossScalaVersions := crossScalaVersions.value.filterNot(_.startsWith("2.12"))
-  ).dependsOn(algebirdCore, algebirdTest % "test->test")
+    libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+    crossScalaVersions := crossScalaVersions.value.filterNot(isScala210x),
+    scalacOptions := scalacOptions.value.filterNot(_.contains("inline")) // Disable optimizations for now: https://github.com/scala/bug/issues/11247
+).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdGeneric = module("generic").settings(
     addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
