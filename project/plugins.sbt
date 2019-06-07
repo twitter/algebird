@@ -1,7 +1,7 @@
 resolvers ++= Seq(
-  "jgit-repo" at "http://download.eclipse.org/jgit/maven",
+  "jgit-repo" at "https://download.eclipse.org/jgit/maven",
   Resolver.url("bintray-sbt-plugin-releases",
-    url("http://dl.bintray.com/content/sbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
+    url("https://dl.bintray.com/content/sbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
  )
 
 addSbtPlugin("com.47deg"          % "sbt-microsites"  % "0.7.0")
