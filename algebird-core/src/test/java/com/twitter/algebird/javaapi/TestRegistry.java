@@ -38,8 +38,8 @@ public class TestRegistry {
     assertEquals(false, semigroup(Boolean.class).plus(true, true).booleanValue());
     assertEquals(false, boolSemigroup().plus(true, true).booleanValue());
 
-    assertEquals(int2bigInt(3), semigroup(BigInt.class).plus(int2bigInt(1), int2bigInt(3)));
-    assertEquals(int2bigInt(3), bigIntSemigroup().plus(int2bigInt(1), int2bigInt(3)));
+    assertEquals(int2bigInt(4), semigroup(BigInt.class).plus(int2bigInt(1), int2bigInt(3)));
+    assertEquals(int2bigInt(4), bigIntSemigroup().plus(int2bigInt(1), int2bigInt(3)));
 
     assertEquals("ab", semigroup(String.class).plus("a", "b"));
     assertEquals("ab", stringSemigroup().plus("a", "b"));
