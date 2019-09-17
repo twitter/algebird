@@ -45,7 +45,7 @@ def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
 val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.12",
-  crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.7"),
+  crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.10"),
 
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
@@ -304,5 +304,8 @@ lazy val docs = project
   .settings(sharedSettings)
   .settings(noPublishSettings)
   .settings(docSettings)
-  .settings((scalacOptions in Tut) ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
+  .settings(
+    scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
+    sources in (ScalaUnidoc, unidoc) ~= (_ filterNot (_.absolutePath.contains("javaapi")))
+  )
   .dependsOn(algebirdCore)
