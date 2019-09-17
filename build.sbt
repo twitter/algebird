@@ -54,8 +54,6 @@ val sharedSettings = Seq(
 
   parallelExecution in Test := true,
 
-  javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
-
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -80,7 +78,10 @@ val sharedSettings = Seq(
 
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
-  libraryDependencies += "junit" % "junit" % "4.11" % "test",
+  libraryDependencies ++= Seq(
+    "junit" % "junit" % "4.11" % Test,
+    "com.novocode" % "junit-interface" % "0.11" % Test
+  ),
 
   // Publishing options:
   releaseCrossBuild := true,
@@ -207,7 +208,8 @@ lazy val algebirdCore = module("core").settings(
   addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
 
   // Scala 2.12's doc task was failing.
-  sources in (Compile, doc) ~= (_ filterNot (_.absolutePath.contains("javaapi")))
+  sources in (Compile, doc) ~= (_ filterNot (_.absolutePath.contains("javaapi"))),
+  testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
 )
 
 lazy val algebirdTest = module("test").settings(
