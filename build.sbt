@@ -144,11 +144,11 @@ val sharedSettings = Seq(
 ) ++ mimaDefaultSettings
 
 lazy val noPublishSettings = Seq(
-    publish := {},
-    publishLocal := {},
-    test := {},
-    publishArtifact := false
-  )
+  publish := {},
+  publishLocal := {},
+  test := {},
+  publishArtifact := false
+)
 
 /**
   * This returns the previous jar we released that is compatible with
@@ -158,15 +158,18 @@ val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic", "spark"
 
 def previousVersion(subProj: String) =
   Some(subProj)
-    .filterNot(noBinaryCompatCheck.contains(_))
-    .map { s => "com.twitter" %% ("algebird-" + s) % "0.13.4" }
+    .filterNot(noBinaryCompatCheck.contains)
+    .map { s => "com.twitter" %% ("algebird-" + s) % "0.13.5" }
 
 lazy val algebird = Project(
   id = "algebird",
   base = file("."))
   .settings(sharedSettings)
   .settings(noPublishSettings)
-  .settings(coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*")
+  .settings(
+    coverageExcludedPackages := "<empty>;.*\\.benchmark\\..*",
+    mimaFailOnNoPrevious := false
+  )
   .aggregate(
     {
       // workaround: https://github.com/sbt/sbt/issues/4181, simple workaround .settings(crossScalaVersions := List()) doesn't work
