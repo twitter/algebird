@@ -38,10 +38,12 @@ import scala.collection.mutable.Builder
  * @param total total ticks tracked. `total == buckets.map(_.size).sum`
  * @param time current timestamp of this instance.
  */
-case class ExpHist(conf: ExpHist.Config,
-                   buckets: Vector[ExpHist.Bucket],
-                   total: Long,
-                   time: ExpHist.Timestamp) {
+case class ExpHist(
+    conf: ExpHist.Config,
+    buckets: Vector[ExpHist.Bucket],
+    total: Long,
+    time: ExpHist.Timestamp
+) {
   import ExpHist.{Bucket, Canonical, Timestamp}
 
   /**
@@ -415,7 +417,8 @@ object ExpHist {
     def toLong: Long =
       Monoid.sum(
         rep.iterator.zipWithIndex
-          .map { case (i, exp) => i.toLong << exp })
+          .map { case (i, exp) => i.toLong << exp }
+      )
 
     /**
      * Expands out the l-canonical representation of some number s into

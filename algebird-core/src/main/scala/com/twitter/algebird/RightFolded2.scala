@@ -41,8 +41,8 @@ object RightFolded2 {
 }
 
 class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(
-    implicit grpAcc: Group[Acc])
-    extends Monoid[RightFolded2[In, Out, Acc]] {
+    implicit grpAcc: Group[Acc]
+) extends Monoid[RightFolded2[In, Out, Acc]] {
   val zero = RightFoldedZero2
 
   def init(i: Out) = RightFoldedValue2[In, Out, Acc](i, accfn(i), Nil)

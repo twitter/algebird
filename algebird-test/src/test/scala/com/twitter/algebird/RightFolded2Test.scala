@@ -16,17 +16,21 @@ class RightFolded2Test extends CheckProperties {
 
   def rightFolded2Value[In, Out, Acc](
       implicit arbout: Arbitrary[Out],
-      mon: RightFolded2Monoid[In, Out, Acc]): Gen[RightFoldedValue2[In, Out, Acc]] =
+      mon: RightFolded2Monoid[In, Out, Acc]
+  ): Gen[RightFoldedValue2[In, Out, Acc]] =
     for (v <- arbout.arbitrary) yield mon.init(v)
 
-  def rightFolded2ToFold[In, Out, Acc](implicit arbin: Arbitrary[In],
-                                       mon: RightFolded2Monoid[In, Out, Acc]): Gen[RightFoldedToFold2[In]] =
+  def rightFolded2ToFold[In, Out, Acc](
+      implicit arbin: Arbitrary[In],
+      mon: RightFolded2Monoid[In, Out, Acc]
+  ): Gen[RightFoldedToFold2[In]] =
     for (v <- arbin.arbitrary) yield mon.toFold(v)
 
   implicit def rightFolded2[In, Out, Acc](
       implicit arbin: Arbitrary[In],
       arbout: Arbitrary[Out],
-      mon: RightFolded2Monoid[In, Out, Acc]): Arbitrary[RightFolded2[In, Out, Acc]] =
+      mon: RightFolded2Monoid[In, Out, Acc]
+  ): Arbitrary[RightFolded2[In, Out, Acc]] =
     Arbitrary {
       Gen.oneOf(rightFolded2Value[In, Out, Acc], rightFolded2ToFold[In, Out, Acc])
     }
@@ -54,13 +58,15 @@ class RightFolded2Test extends CheckProperties {
         Some(
           l.dropRight(1)
             .flatMap { _.asInstanceOf[RightFoldedToFold2[In]].in }
-            .foldRight(v)(foldfn))
+            .foldRight(v)(foldfn)
+        )
       }
       case _ => None
     }
 
-  def sum[In, Out, Acc: Group](l: List[RightFolded2[In, Out, Acc]])(foldfn: (In, Out) => Out)(
-      mapfn: (Out) => Acc): Acc = {
+  def sum[In, Out, Acc: Group](
+      l: List[RightFolded2[In, Out, Acc]]
+  )(foldfn: (In, Out) => Out)(mapfn: (Out) => Acc): Acc = {
     def notIsVal(rf: RightFolded2[In, Out, Acc]) = rf match {
       case RightFoldedValue2(_, _, _) => false
       case _                          => true

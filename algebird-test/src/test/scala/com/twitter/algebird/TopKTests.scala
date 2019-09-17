@@ -79,7 +79,8 @@ class TopKTests extends CheckProperties {
             tkmonoid.build(l)
           })
           .items,
-        correct)
+        correct
+      )
     }
   }
 

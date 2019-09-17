@@ -32,11 +32,13 @@ object MonadLaws {
   }
 
   @deprecated("use leftIdentity[T]", since = "0.13.0")
-  def leftIdentityEquiv[M[_], T, U](implicit
-                                    monad: Monad[M],
-                                    arb: Arbitrary[T],
-                                    arbfn: Arbitrary[(T) => M[U]],
-                                    equiv: Equiv[M[U]]) =
+  def leftIdentityEquiv[M[_], T, U](
+      implicit
+      monad: Monad[M],
+      arb: Arbitrary[T],
+      arbfn: Arbitrary[(T) => M[U]],
+      equiv: Equiv[M[U]]
+  ) =
     leftIdentity[M, T, U]
 
   @deprecated("use rightIdentity[T]", since = "0.13.0")
@@ -44,46 +46,53 @@ object MonadLaws {
     rightIdentity[M, T]
 
   @deprecated("use associative[T]", since = "0.13.0")
-  def associativeEquiv[M[_], T, U, V](implicit monad: Monad[M],
-                                      arb: Arbitrary[M[T]],
-                                      fn1: Arbitrary[(T) => M[U]],
-                                      fn2: Arbitrary[U => M[V]],
-                                      equiv: Equiv[M[V]]) =
+  def associativeEquiv[M[_], T, U, V](
+      implicit monad: Monad[M],
+      arb: Arbitrary[M[T]],
+      fn1: Arbitrary[(T) => M[U]],
+      fn2: Arbitrary[U => M[V]],
+      equiv: Equiv[M[V]]
+  ) =
     associative[M, T, U, V]
 
   // Just generate a map and use that as a function:
-  implicit def fnArb[M[_], T, U](implicit
-                                 map: Arbitrary[Map[T, M[U]]],
-                                 arbu: Arbitrary[M[U]]): Arbitrary[T => M[U]] =
+  implicit def fnArb[M[_], T, U](
+      implicit
+      map: Arbitrary[Map[T, M[U]]],
+      arbu: Arbitrary[M[U]]
+  ): Arbitrary[T => M[U]] =
     Arbitrary {
       for {
         m <- implicitly[Arbitrary[Map[T, M[U]]]].arbitrary
         defu <- implicitly[Arbitrary[M[U]]].arbitrary
-      } yield
-        ({ (t: T) =>
-          m.getOrElse(t, defu)
-        })
+      } yield ({ (t: T) =>
+        m.getOrElse(t, defu)
+      })
     }
 
   @deprecated("use monadLaws[T]", since = "0.13.0")
-  def monadLawsEquiv[M[_], T, U, R](implicit
-                                    monad: Monad[M],
-                                    arb: Arbitrary[M[T]],
-                                    equivT: Equiv[M[T]],
-                                    equivU: Equiv[M[U]],
-                                    equivR: Equiv[M[R]],
-                                    fn1: Arbitrary[(T) => M[U]],
-                                    arbr: Arbitrary[M[R]],
-                                    fn2: Arbitrary[U => M[R]],
-                                    arbu: Arbitrary[U]) =
+  def monadLawsEquiv[M[_], T, U, R](
+      implicit
+      monad: Monad[M],
+      arb: Arbitrary[M[T]],
+      equivT: Equiv[M[T]],
+      equivU: Equiv[M[U]],
+      equivR: Equiv[M[R]],
+      fn1: Arbitrary[(T) => M[U]],
+      arbr: Arbitrary[M[R]],
+      fn2: Arbitrary[U => M[R]],
+      arbu: Arbitrary[U]
+  ) =
     monadLaws[M, T, U, R]
   // $COVERAGE-ON$
 
-  def leftIdentity[M[_], T, U](implicit
-                               monad: Monad[M],
-                               arb: Arbitrary[T],
-                               arbfn: Arbitrary[(T) => M[U]],
-                               equiv: Equiv[M[U]]) =
+  def leftIdentity[M[_], T, U](
+      implicit
+      monad: Monad[M],
+      arb: Arbitrary[T],
+      arbfn: Arbitrary[(T) => M[U]],
+      equiv: Equiv[M[U]]
+  ) =
     forAll { (t: T, fn: T => M[U]) =>
       Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t))
     }
@@ -93,26 +102,30 @@ object MonadLaws {
       Equiv[M[T]].equiv(mt.flatMap { _.pure[M] }, mt)
     }
 
-  def associative[M[_], T, U, V](implicit monad: Monad[M],
-                                 arb: Arbitrary[M[T]],
-                                 fn1: Arbitrary[(T) => M[U]],
-                                 fn2: Arbitrary[U => M[V]],
-                                 equiv: Equiv[M[V]]) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
+  def associative[M[_], T, U, V](
+      implicit monad: Monad[M],
+      arb: Arbitrary[M[T]],
+      fn1: Arbitrary[(T) => M[U]],
+      fn2: Arbitrary[U => M[V]],
+      equiv: Equiv[M[V]]
+  ) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
     Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap { t =>
       f1(t).flatMap(f2)
     })
   }
 
-  def monadLaws[M[_], T, U, R](implicit
-                               monad: Monad[M],
-                               arb: Arbitrary[M[T]],
-                               equivT: Equiv[M[T]],
-                               equivU: Equiv[M[U]],
-                               equivR: Equiv[M[R]],
-                               fn1: Arbitrary[(T) => M[U]],
-                               arbr: Arbitrary[M[R]],
-                               fn2: Arbitrary[U => M[R]],
-                               arbu: Arbitrary[U]) =
+  def monadLaws[M[_], T, U, R](
+      implicit
+      monad: Monad[M],
+      arb: Arbitrary[M[T]],
+      equivT: Equiv[M[T]],
+      equivU: Equiv[M[U]],
+      equivR: Equiv[M[R]],
+      fn1: Arbitrary[(T) => M[U]],
+      arbr: Arbitrary[M[R]],
+      fn2: Arbitrary[U => M[R]],
+      arbu: Arbitrary[U]
+  ) =
     associative[M, T, U, R] && rightIdentity[M, R] && leftIdentity[M, U, R]
 
   implicit def indexedSeqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[IndexedSeq[T]] =

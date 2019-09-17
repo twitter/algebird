@@ -38,9 +38,10 @@ case class SketchMapHash[K](hasher: CMSHash[Long], seed: Int)(implicit serializa
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrdering: Ordering[V],
-                                                            monoid: Monoid[V])
-    extends Monoid[SketchMap[K, V]]
+class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
+    implicit valueOrdering: Ordering[V],
+    monoid: Monoid[V]
+) extends Monoid[SketchMap[K, V]]
     with CommutativeMonoid[SketchMap[K, V]] {
 
   /**
@@ -56,7 +57,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
     SketchMap(
       newValuesTable,
       params.updatedHeavyHitters(newHeavyHitters.toSeq, newValuesTable),
-      Monoid.plus(left.totalValue, right.totalValue))
+      Monoid.plus(left.totalValue, right.totalValue)
+    )
   }
 
   override def sumOption(items: TraversableOnce[SketchMap[K, V]]): Option[SketchMap[K, V]] =
@@ -73,7 +75,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
         buffer += SketchMap(
           newValuesTable,
           params.updatedHeavyHitters(heavyHittersSet.toSeq, newValuesTable),
-          newtotalValue)
+          newtotalValue
+        )
       }
 
       items.foreach { sm =>
@@ -119,8 +122,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
 
   def frequencyWithHHCache(sm: SketchMap[K, V]): K => V = {
     val hhMap: Map[K, V] = heavyHitters(sm).toMap
-    (k: K) =>
-      hhMap.getOrElse(k, frequency(sm, k))
+    (k: K) => hhMap.getOrElse(k, frequency(sm, k))
   }
 
   /**
@@ -136,7 +138,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit valueOrderi
  * Convenience class for holding constant parameters of a Sketch Map.
  */
 case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)(
-    implicit serialization: K => Array[Byte]) {
+    implicit serialization: K => Array[Byte]
+) {
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
   assert(0 <= heavyHittersCount, "heavyHittersCount must be greater than 0")
@@ -148,8 +151,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     (0 to (numHashes - 1)).map { _ =>
       val smhash: SketchMapHash[K] =
         SketchMapHash(CMSHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
-      (k: K) =>
-        smhash(k)
+      (k: K) => smhash(k)
     }
   }
 
@@ -179,7 +181,8 @@ object SketchMapParams {
    * Overloaded apply method for convenience.
    */
   def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)(
-      implicit serialization: K => Array[Byte]): SketchMapParams[K] =
+      implicit serialization: K => Array[Byte]
+  ): SketchMapParams[K] =
     SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
 
   /**
@@ -216,19 +219,22 @@ object SketchMap {
    * serialization from K to Array[Byte] for hashing, an ordering for V, and a
    * monoid for V.
    */
-  def monoid[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V],
-                                               monoid: Monoid[V]): SketchMapMonoid[K, V] =
+  def monoid[K, V](
+      params: SketchMapParams[K]
+  )(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapMonoid[K, V] =
     new SketchMapMonoid(params)(valueOrdering, monoid)
 
-  def aggregator[K, V](params: SketchMapParams[K])(implicit valueOrdering: Ordering[V],
-                                                   monoid: Monoid[V]): SketchMapAggregator[K, V] =
+  def aggregator[K, V](
+      params: SketchMapParams[K]
+  )(implicit valueOrdering: Ordering[V], monoid: Monoid[V]): SketchMapAggregator[K, V] =
     SketchMapAggregator(params, SketchMap.monoid(params))
 }
 
-case class SketchMap[K, V](val valuesTable: AdaptiveMatrix[V],
-                           val heavyHitterKeys: List[K],
-                           val totalValue: V)
-    extends java.io.Serializable
+case class SketchMap[K, V](
+    val valuesTable: AdaptiveMatrix[V],
+    val heavyHitterKeys: List[K],
+    val totalValue: V
+) extends java.io.Serializable
 
 /**
  * An Aggregator for the SketchMap.
@@ -236,8 +242,8 @@ case class SketchMap[K, V](val valuesTable: AdaptiveMatrix[V],
  */
 case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid: SketchMapMonoid[K, V])(
     implicit valueOrdering: Ordering[V],
-    valueMonoid: Monoid[V])
-    extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
+    valueMonoid: Monoid[V]
+) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
   val monoid = skmMonoid
 
   def prepare(value: (K, V)) = monoid.create(value)

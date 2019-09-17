@@ -61,7 +61,9 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
           None
         }
       }
-    } else { Some(item) }
+    } else {
+      Some(item)
+    }
 
   def apply(v: V): Option[V] = put(v)
 

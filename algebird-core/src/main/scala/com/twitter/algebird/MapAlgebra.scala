@@ -48,7 +48,11 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) =
-      if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
+      if (x.size > y.size) {
+        (x, y, true)
+      } else {
+        (y, x, false)
+      }
     small match {
       // Mutable maps create new copies of the underlying data on add so don't use the
       // handleImmutable method.
@@ -149,7 +153,11 @@ trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Rng[M] with MapOperations[K
 
   override def times(x: M, y: M): M = {
     val (big, small, bigOnLeft) =
-      if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
+      if (x.size > y.size) {
+        (x, y, true)
+      } else {
+        (y, x, false)
+      }
     small.foldLeft(zero) { (oldMap, kv) =>
       val bigV = big.getOrElse(kv._1, ring.zero)
       val newV =
@@ -185,8 +193,9 @@ object MapAlgebra {
       rightContainsLeft(cleanM1, cleanM2) && rightContainsLeft(cleanM2, cleanM1)
     }
 
-  def mergeLookup[T, U, V: Monoid](keys: TraversableOnce[T])(lookup: T => Option[V])(
-      present: T => U): Map[U, V] =
+  def mergeLookup[T, U, V: Monoid](
+      keys: TraversableOnce[T]
+  )(lookup: T => Option[V])(present: T => U): Map[U, V] =
     sumByKey {
       keys.map { k =>
         present(k) -> lookup(k).getOrElse(Monoid.zero[V])
@@ -254,7 +263,10 @@ object MapAlgebra {
    */
   def invertExact[K, V](m: Map[Option[K], Set[V]]): Map[Option[V], Set[K]] = {
     def nonEmptyIter[T](i: Iterable[T]): Iterable[Option[T]] =
-      if (i.isEmpty) Iterable(None) else { i.map { Some(_) } }
+      if (i.isEmpty) Iterable(None)
+      else {
+        i.map { Some(_) }
+      }
 
     Monoid.sum {
       for {
@@ -292,8 +304,9 @@ object MapAlgebra {
   def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
     sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
 
-  def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(
-      implicit c: Cuber[K]): Map[c.K, V] =
+  def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
+      fn: T => K
+  )(implicit c: Cuber[K]): Map[c.K, V] =
     sumByKey(it.toIterator.flatMap { t =>
       c(fn(t)).map((_, agg.prepare(t)))
     })(agg.semigroup)
@@ -318,8 +331,9 @@ object MapAlgebra {
   def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
     sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
 
-  def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(fn: T => K)(
-      implicit r: Roller[K]): Map[r.K, V] =
+  def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
+      fn: T => K
+  )(implicit r: Roller[K]): Map[r.K, V] =
     sumByKey(it.toIterator.flatMap { t =>
       r(fn(t)).map((_, agg.prepare(t)))
     })(agg.semigroup)

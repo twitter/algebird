@@ -14,7 +14,7 @@ object CmsLaws {
 class CmsLaws extends CheckProperties {
   import BaseProperties._
 
-  val DELTA = 1E-8
+  val DELTA = 1e-8
   val EPS = 0.005
   val SEED = 1
 
@@ -81,7 +81,7 @@ class CmsLaws extends CheckProperties {
 class TopPctCmsLaws extends CheckProperties {
   import BaseProperties._
 
-  val DELTA = 1E-8
+  val DELTA = 1e-8
   val EPS = 0.005
   val SEED = 1
   val HEAVY_HITTERS_PCT = 0.1
@@ -148,7 +148,7 @@ class SparseCMSTest extends WordSpec with Matchers with GeneratorDrivenPropertyC
 
   import BaseProperties._
 
-  val DELTA = 1E-8
+  val DELTA = 1e-8
   val EPS = 0.005
   val SEED = 1
 
@@ -167,7 +167,7 @@ class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropert
 
   import BaseProperties._
 
-  val DELTA = 1E-8
+  val DELTA = 1e-8
   val EPS = 0.005
   val SEED = 1
 
@@ -217,7 +217,7 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
     // When we create a monoid for L
     implicit val hasherBytes = sourceHasher.contramap((d: Seq[Byte]) => f(d))
     val bytesMonoid: CMSMonoid[Seq[Byte]] = {
-      val anyDelta = 1E-10
+      val anyDelta = 1e-10
       val anyEps = 0.001
       val anySeed = 1
       CMS.monoid[Seq[Byte]](anyEps, anyDelta, anySeed)
@@ -279,13 +279,15 @@ class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenProper
       fiveKey,
       fiveKey,
       fiveKey,
-      fiveKey)
+      fiveKey
+    )
     val minWidth = data1.distinct.size
 
     forAll(
       (Gen.choose(1, 70), "depth"),
       (Gen.choose(minWidth, 1000), "width"),
-      (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+      (Gen.choose(Int.MinValue, Int.MaxValue), "seed")
+    ) { (depth: Int, width: Int, seed: Int) =>
       val cms1: TopCMS[Seq[Byte]] =
         TopPctCMS.monoid[Seq[Byte]](depth, width, seed, 0.01).create(data1)
       cms1.heavyHitters should be(Set(oneKey, twoKey, threeKey, fourKey, fiveKey))
@@ -316,7 +318,7 @@ class CMSBytesTest extends CMSTest[Bytes](CmsLaws.int2Bytes(_))
 abstract class CmsProperty[K] extends ApproximateProperty
 
 object CmsProperty {
-  val delta = 1E-10
+  val delta = 1e-10
   val eps = 0.001
   val seed = 1
 
@@ -418,7 +420,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
     with Matchers
     with GeneratorDrivenPropertyChecks {
 
-  val DELTA = 1E-10
+  val DELTA = 1e-10
   val EPS = 0.001
   val SEED = 1
 
@@ -652,7 +654,8 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
       forAll(
         (Gen.choose(minDepth, maxDepth), "depth"),
         (Gen.choose(minWidth, maxWidth), "width"),
-        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")) { (depth: Int, width: Int, seed: Int) =>
+        (Gen.choose(Int.MinValue, Int.MaxValue), "seed")
+      ) { (depth: Int, width: Int, seed: Int) =>
         val cms1 = TopPctCMS.monoid[K](depth, width, seed, 0.01).create(data1)
         cms1.heavyHitters should be(Set(1, 2, 3, 4, 5).map(toK))
 
@@ -976,7 +979,8 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
           CMSFunctions.delta(invalidDepth)
         }
         (exception.getMessage should fullyMatch).regex(
-          """requirement failed: depth must be smaller as it causes precision errors when computing delta \(\d+ led to an invalid delta of 0.0\)""")
+          """requirement failed: depth must be smaller as it causes precision errors when computing delta \(\d+ led to an invalid delta of 0.0\)"""
+        )
       }
     }
   }
@@ -996,7 +1000,7 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
 
   val AnyEps = 0.001
-  val AnyDelta = 1E-5
+  val AnyDelta = 1e-5
   val AnyHashes = {
     val AnySeed = 1
     CMSFunctions.generateHashes[Long](AnyEps, AnyDelta, AnySeed)

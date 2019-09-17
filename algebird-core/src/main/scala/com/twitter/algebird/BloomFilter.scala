@@ -101,7 +101,8 @@ object BloomFilter {
     BloomFilter.optimalWidth(numEntries, fpProb) match {
       case None =>
         throw new java.lang.IllegalArgumentException(
-          s"BloomFilter cannot guarantee the specified false positive probability for the number of entries! (numEntries: $numEntries, fpProb: $fpProb)")
+          s"BloomFilter cannot guarantee the specified false positive probability for the number of entries! (numEntries: $numEntries, fpProb: $fpProb)"
+        )
       case Some(width) =>
         val numHashes = BloomFilter.optimalNumHashes(numEntries, width)
         BloomFilterMonoid[A](numHashes, width)(hash)
@@ -137,10 +138,12 @@ object BloomFilter {
    * (min, estimate, max) =
    *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
    */
-  def sizeEstimate(numBits: Int,
-                   numHashes: Int,
-                   width: Int,
-                   approximationWidth: Double = 0.05): Approximate[Long] = {
+  def sizeEstimate(
+      numBits: Int,
+      numHashes: Int,
+      width: Int,
+      approximationWidth: Double = 0.05
+  ): Approximate[Long] = {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
     /**
@@ -636,11 +639,13 @@ case class BFHash[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) {
   }
 
   @annotation.tailrec
-  private def nextHash(valueToHash: A,
-                       hashIndex: Int,
-                       buffer: Array[Int],
-                       bidx: Int,
-                       target: Array[Int]): Array[Int] =
+  private def nextHash(
+      valueToHash: A,
+      hashIndex: Int,
+      buffer: Array[Int],
+      bidx: Int,
+      target: Array[Int]
+  ): Array[Int] =
     if (hashIndex == numHashes) target
     else {
       val thisBidx = if (bidx > 3) {

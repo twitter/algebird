@@ -160,7 +160,8 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
         ExpHist
           .empty(conf)
           .add(bucket.size, bucket.timestamp)
-          .upperBoundSum == bucket.size)
+          .upperBoundSum == bucket.size
+      )
     }
   }
 

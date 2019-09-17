@@ -21,18 +21,19 @@ import org.scalacheck.Prop._
 
 class AggregatorLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B],
-                                   sg: Semigroup[B],
-                                   present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+  implicit def aggregator[A, B, C](
+      implicit prepare: Arbitrary[A => B],
+      sg: Semigroup[B],
+      present: Arbitrary[B => C]
+  ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
-    } yield
-      new Aggregator[A, B, C] {
-        def prepare(a: A) = pp(a)
-        def semigroup = sg
-        def present(b: B) = ps(b)
-      }
+    } yield new Aggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def semigroup = sg
+      def present(b: B) = ps(b)
+    }
   }
 
   property("composing before Aggregator is correct") {
@@ -66,9 +67,11 @@ class AggregatorLaws extends CheckProperties {
 
   property("Aggregator.zip composing two Aggregators is correct") {
     forAll {
-      (in: List[(Int, String)],
-       ag1: Aggregator[Int, Int, Int],
-       ag2: Aggregator[String, Set[String], Double]) =>
+      (
+          in: List[(Int, String)],
+          ag1: Aggregator[Int, Int, Int],
+          ag2: Aggregator[String, Set[String], Double]
+      ) =>
         val c = ag1.zip(ag2)
         val (as, bs) = in.unzip
         in.isEmpty || c(in) == ((ag1(as), ag2(bs)))
@@ -98,19 +101,20 @@ class AggregatorLaws extends CheckProperties {
     checkNumericSum[Float]
   }
 
-  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B],
-                                         m: Monoid[B],
-                                         present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] =
+  implicit def monoidAggregator[A, B, C](
+      implicit prepare: Arbitrary[A => B],
+      m: Monoid[B],
+      present: Arbitrary[B => C]
+  ): Arbitrary[MonoidAggregator[A, B, C]] =
     Arbitrary {
       for {
         pp <- prepare.arbitrary
         ps <- present.arbitrary
-      } yield
-        new MonoidAggregator[A, B, C] {
-          def prepare(a: A) = pp(a)
-          def monoid = m
-          def present(b: B) = ps(b)
-        }
+      } yield new MonoidAggregator[A, B, C] {
+        def prepare(a: A) = pp(a)
+        def monoid = m
+        def present(b: B) = ps(b)
+      }
     }
 
   property("Aggregator.count is like List.count") {

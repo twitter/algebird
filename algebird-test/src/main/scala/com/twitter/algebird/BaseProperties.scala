@@ -275,10 +275,10 @@ object BaseProperties extends MetricProperties {
   def isDistributiveDifferentTypes[T: Ring: Equiv, U <: T: Arbitrary]: Prop =
     'isDistributiveDifferentTypes |:
       forAll { (a: U, b: U, c: U) =>
-      val rng = implicitly[Ring[T]]
-      Equiv[T].equiv(rng.times(a, rng.plus(b, c)), rng.plus(rng.times(a, b), rng.times(a, c))) &&
-      Equiv[T].equiv(rng.times(rng.plus(b, c), a), rng.plus(rng.times(b, a), rng.times(c, a)))
-    }
+        val rng = implicitly[Ring[T]]
+        Equiv[T].equiv(rng.times(a, rng.plus(b, c)), rng.plus(rng.times(a, b), rng.times(a, c))) &&
+        Equiv[T].equiv(rng.times(rng.plus(b, c), a), rng.plus(rng.times(b, a), rng.times(c, a)))
+      }
 
   def isDistributive[T: Ring: Arbitrary: Equiv]: Prop =
     isDistributiveDifferentTypes[T, T]

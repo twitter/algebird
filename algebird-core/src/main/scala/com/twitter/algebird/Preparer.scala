@@ -128,8 +128,9 @@ trait MapPreparer[A, T] extends Preparer[A, T] {
    *
    * We really need to generate N versions of this for 3-way, 4-way etc splits.
    */
-  def split[B1, B2, C1, C2](fn: MapPreparer[T, T] => (Aggregator[T, B1, C1], Aggregator[T, B2, C2]))
-    : Aggregator[A, (B1, B2), (C1, C2)] = {
+  def split[B1, B2, C1, C2](
+      fn: MapPreparer[T, T] => (Aggregator[T, B1, C1], Aggregator[T, B2, C2])
+  ): Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(MapPreparer.identity[T])
     aggregate(a1.join(a2))
   }
@@ -220,9 +221,11 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
    * We really need to generate N versions of this for 3-way, 4-way etc splits.
    */
   def split[B1, B2, C1, C2](
-      fn: FlatMapPreparer[TraversableOnce[T], T] => (MonoidAggregator[TraversableOnce[T], B1, C1],
-                                                     MonoidAggregator[TraversableOnce[T], B2, C2]))
-    : Aggregator[A, (B1, B2), (C1, C2)] = {
+      fn: FlatMapPreparer[TraversableOnce[T], T] => (
+          MonoidAggregator[TraversableOnce[T], B1, C1],
+          MonoidAggregator[TraversableOnce[T], B2, C2]
+      )
+  ): Aggregator[A, (B1, B2), (C1, C2)] = {
     val (a1, a2) = fn(FlatMapPreparer.identity[T])
     a1.join(a2).composePrepare(prepareFn)
   }

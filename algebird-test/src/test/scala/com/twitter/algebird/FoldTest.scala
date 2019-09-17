@@ -37,7 +37,8 @@ class FoldTest extends WordSpec {
         Zero(Seq.empty),
         One(1, Seq(1)),
         Many(Seq(1, 2, 3), Seq(1, 2, 3)),
-        Many(Seq(2, 1, 3), Seq(2, 1, 3)))
+        Many(Seq(2, 1, 3), Seq(2, 1, 3))
+      )
     }
 
     "const" in {
@@ -49,7 +50,8 @@ class FoldTest extends WordSpec {
         Fold.first,
         Zero(None),
         One("1", Some("1")),
-        Many(Seq("1", "2", "3"), Some("1")))
+        Many(Seq("1", "2", "3"), Some("1"))
+      )
     }
 
     "last" in {
@@ -57,7 +59,8 @@ class FoldTest extends WordSpec {
         Fold.last,
         Zero(None),
         One("1", Some("1")),
-        Many(Seq("1", "2", "3"), Some("3")))
+        Many(Seq("1", "2", "3"), Some("3"))
+      )
     }
 
     "max" in {
@@ -66,7 +69,8 @@ class FoldTest extends WordSpec {
         Zero(None),
         One(1, Some(1)),
         Many(Seq(1, 2, 3), Some(3)),
-        Many(Seq(1, 3, 2), Some(3)))
+        Many(Seq(1, 3, 2), Some(3))
+      )
     }
 
     "min" in {
@@ -75,7 +79,8 @@ class FoldTest extends WordSpec {
         Zero(None),
         One(1, Some(1)),
         Many(Seq(1, 2, 3), Some(1)),
-        Many(Seq(2, 1, 3), Some(1)))
+        Many(Seq(2, 1, 3), Some(1))
+      )
     }
 
     "sum" in {

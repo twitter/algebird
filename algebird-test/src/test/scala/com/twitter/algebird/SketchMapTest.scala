@@ -5,7 +5,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object SketchMapTestImplicits {
-  val DELTA = 1E-6
+  val DELTA = 1e-6
   val EPS = 0.001
   val SEED = 1
   val HEAVY_HITTERS_COUNT = 10

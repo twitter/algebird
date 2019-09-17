@@ -37,22 +37,28 @@ object IdentityMonad extends Monad[Identity] {
   override def joinWith[T, U, V](mt: Identity[T], mu: Identity[U])(fn: (T, U) => V): Identity[V] =
     Identity(fn(mt.get, mu.get))
 
-  override def join[T1, T2, T3](m1: Identity[T1],
-                                m2: Identity[T2],
-                                m3: Identity[T3]): Identity[(T1, T2, T3)] =
+  override def join[T1, T2, T3](
+      m1: Identity[T1],
+      m2: Identity[T2],
+      m3: Identity[T3]
+  ): Identity[(T1, T2, T3)] =
     Identity((m1.get, m2.get, m3.get))
 
-  override def join[T1, T2, T3, T4](m1: Identity[T1],
-                                    m2: Identity[T2],
-                                    m3: Identity[T3],
-                                    m4: Identity[T4]): Identity[(T1, T2, T3, T4)] =
+  override def join[T1, T2, T3, T4](
+      m1: Identity[T1],
+      m2: Identity[T2],
+      m3: Identity[T3],
+      m4: Identity[T4]
+  ): Identity[(T1, T2, T3, T4)] =
     Identity((m1.get, m2.get, m3.get, m4.get))
 
-  override def join[T1, T2, T3, T4, T5](m1: Identity[T1],
-                                        m2: Identity[T2],
-                                        m3: Identity[T3],
-                                        m4: Identity[T4],
-                                        m5: Identity[T5]): Identity[(T1, T2, T3, T4, T5)] =
+  override def join[T1, T2, T3, T4, T5](
+      m1: Identity[T1],
+      m2: Identity[T2],
+      m3: Identity[T3],
+      m4: Identity[T4],
+      m5: Identity[T5]
+  ): Identity[(T1, T2, T3, T4, T5)] =
     Identity((m1.get, m2.get, m3.get, m4.get, m5.get))
 }
 

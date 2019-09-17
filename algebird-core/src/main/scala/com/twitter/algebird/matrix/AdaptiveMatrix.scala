@@ -56,16 +56,20 @@ object AdaptiveMatrix {
       override def plus(a: AdaptiveMatrix[V], b: AdaptiveMatrix[V]) =
         sumOption(List(a, b)).get
 
-      private def denseInsert(rows: Int,
-                              cols: Int,
-                              buff: ArrayBuffer[V],
-                              remainder: Iterator[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] = {
+      private def denseInsert(
+          rows: Int,
+          cols: Int,
+          buff: ArrayBuffer[V],
+          remainder: Iterator[AdaptiveMatrix[V]]
+      ): Option[AdaptiveMatrix[V]] = {
         remainder.foreach(_.updateInto(buff))
         Some(DenseMatrix(rows, cols, buff))
       }
 
-      private def denseUpdate(current: AdaptiveMatrix[V],
-                              remainder: Iterator[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] = {
+      private def denseUpdate(
+          current: AdaptiveMatrix[V],
+          remainder: Iterator[AdaptiveMatrix[V]]
+      ): Option[AdaptiveMatrix[V]] = {
         val rows = current.rows
         val cols = current.cols
         val buffer = ArrayBuffer.fill(rows * cols)(innerZero)
@@ -83,10 +87,12 @@ object AdaptiveMatrix {
             }
         }
 
-      private def goDense(rows: Int,
-                          cols: Int,
-                          storage: IndexedSeq[MMap[Int, V]],
-                          remainder: Iterator[AdaptiveMatrix[V]]): Option[AdaptiveMatrix[V]] = {
+      private def goDense(
+          rows: Int,
+          cols: Int,
+          storage: IndexedSeq[MMap[Int, V]],
+          remainder: Iterator[AdaptiveMatrix[V]]
+      ): Option[AdaptiveMatrix[V]] = {
         val buffer = ArrayBuffer.fill(rows * cols)(innerZero)
         var row = 0
         val iter = storage.iterator

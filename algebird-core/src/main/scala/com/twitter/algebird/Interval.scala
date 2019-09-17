@@ -386,7 +386,8 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
    * are other cases).
    */
   def toLeftClosedRightOpen(
-      implicit s: Successible[T]): Option[Intersection[InclusiveLower, ExclusiveUpper, T]] =
+      implicit s: Successible[T]
+  ): Option[Intersection[InclusiveLower, ExclusiveUpper, T]] =
     for {
       l <- lower.least
       g <- upper.strictUpperBound if s.ordering.lt(l, g)

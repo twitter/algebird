@@ -32,9 +32,11 @@ object ApproximateProperty {
       case _        => if (trial <= 0) Nil else genListOf(n, gen, trial - 1)
     }
 
-  private def successesAndProbabilities(a: ApproximateProperty,
-                                        objectReps: Int,
-                                        inputReps: Int): List[(Int, Double, List[String])] =
+  private def successesAndProbabilities(
+      a: ApproximateProperty,
+      objectReps: Int,
+      inputReps: Int
+  ): List[(Int, Double, List[String])] =
     genListOf(objectReps, a.exactGenerator)
       .flatMap { exact =>
         val approx = a.makeApproximate(exact)
@@ -92,7 +94,9 @@ object ApproximateProperty {
             List(
               (
                 "Omitted results",
-                s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."))
+                s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."
+              )
+            )
           } else List()
 
         results ++ exampleFailures ++ testsReturnedZeroProb
@@ -112,10 +116,12 @@ object ApproximateProperty {
    * TODO use `new Prop` like the above `toProp` method so that we can
    * have useful error messages.
    */
-  def toProp(a: Seq[ApproximateProperty],
-             objectReps: Int,
-             inputReps: Int,
-             falsePositiveRate: Double): Prop = {
+  def toProp(
+      a: Seq[ApproximateProperty],
+      objectReps: Int,
+      inputReps: Int,
+      falsePositiveRate: Double
+  ): Prop = {
     require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
     val list = a.flatMap { approximateProp =>

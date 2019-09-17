@@ -65,7 +65,9 @@ trait IntervalArb {
         genExclusiveLower[T],
         genInclusiveUpper[T],
         genExclusiveUpper[T],
-        genIntersection[T]))
+        genIntersection[T]
+      )
+    )
 
   implicit def lowerIntArb[T: Arbitrary: Ordering]: Arbitrary[Lower[T]] =
     Arbitrary(genLower)

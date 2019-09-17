@@ -100,7 +100,8 @@ object AsyncSummerBenchmark {
         Counter("insertOp"),
         Counter("tuplesOut"),
         Counter("size"),
-        workPool)
+        workPool
+      )
       syncSummingQueue = new SyncSummingQueue[Long, HLL](
         bufferSize,
         flushFrequency,

@@ -101,41 +101,51 @@ class EventuallyTest extends WordSpec with Matchers {
 
     "sumOption L,L,L" in {
       assert(
-        eventuallyMonoid.sum(List(Left(short.length), Left(short.length), Left(short.length))) == Left(
-          3 * short.length))
+        eventuallyMonoid
+          .sum(List(Left(short.length), Left(short.length), Left(short.length))) == Left(3 * short.length)
+      )
       assert(
         eventuallyMonoid.sum(List(Left(long.length), Left(short.length), Left(short.length))) == Left(
-          2 * short.length + long.length))
+          2 * short.length + long.length
+        )
+      )
     }
 
     "sumOption L,R,L" in {
       assert(
-        eventuallyMonoid.sum(List(Left(short.length), Right(short), Left(short.length))) == Left(
-          3 * short.length))
+        eventuallyMonoid
+          .sum(List(Left(short.length), Right(short), Left(short.length))) == Left(3 * short.length)
+      )
       assert(
         eventuallyMonoid.sum(List(Left(long.length), Right(short), Left(short.length))) == Left(
-          2 * short.length + long.length))
+          2 * short.length + long.length
+        )
+      )
     }
 
     "sumOption R,R,R" in {
       assert(
         eventuallyMonoid
-          .sum(List(Right(short), Right(short), Right(short))) == Right(short + short + short))
+          .sum(List(Right(short), Right(short), Right(short))) == Right(short + short + short)
+      )
       assert(
         eventuallyMonoid
-          .sum(List(Right(long), Right(short), Right(short))) == Left(2 * short.length + long.length))
+          .sum(List(Right(long), Right(short), Right(short))) == Left(2 * short.length + long.length)
+      )
     }
 
     "sumOption 1010 R, L ,R" in {
       assert(
         eventuallyMonoid
-          .sum(listOfRights :+ Left(short.length) :+ Right(short)) == Left(1012 * short.length))
+          .sum(listOfRights :+ Left(short.length) :+ Right(short)) == Left(1012 * short.length)
+      )
     }
 
     "sumOption 1010 L, R ,L" in {
       assert(
         eventuallyMonoid
-          .sum(listOfLefts :+ Right(short) :+ Left(short.length)) == Left(1012 * short.length))
+          .sum(listOfLefts :+ Right(short) :+ Left(short.length)) == Left(1012 * short.length)
+      )
     }
 
   }
@@ -143,23 +153,25 @@ class EventuallyTest extends WordSpec with Matchers {
 }
 
 class EventuallyAggregatorLaws extends PropSpec with PropertyChecks with Matchers {
-  implicit def aggregator[A, B, C](implicit
-                                   prepare: Arbitrary[A => B],
-                                   sg: Semigroup[B],
-                                   present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+  implicit def aggregator[A, B, C](
+      implicit
+      prepare: Arbitrary[A => B],
+      sg: Semigroup[B],
+      present: Arbitrary[B => C]
+  ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
-    } yield
-      new Aggregator[A, B, C] {
-        def prepare(a: A) = pp(a)
-        def semigroup = sg
-        def present(b: B) = ps(b)
-      }
+    } yield new Aggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def semigroup = sg
+      def present(b: B) = ps(b)
+    }
   }
 
-  def eventuallyAggregator(rightAg: Aggregator[Int, List[Int], Int])(
-      pred: (List[Int] => Boolean)): EventuallyAggregator[Int, Double, List[Int], String] =
+  def eventuallyAggregator(
+      rightAg: Aggregator[Int, List[Int], Int]
+  )(pred: (List[Int] => Boolean)): EventuallyAggregator[Int, Double, List[Int], String] =
     new EventuallyAggregator[Int, Double, List[Int], String] {
       def presentLeft(e: Double) = "Left"
 

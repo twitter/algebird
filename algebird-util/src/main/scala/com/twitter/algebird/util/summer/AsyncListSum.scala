@@ -28,19 +28,21 @@ import com.twitter.algebird.util.UtilAlgebras._
 /**
  * @author Ian O Connell
  */
-class AsyncListSum[Key, Value](bufferSize: BufferSize,
-                               override val flushFrequency: FlushFrequency,
-                               override val softMemoryFlush: MemoryFlushPercent,
-                               override val memoryIncr: Incrementor,
-                               override val timeoutIncr: Incrementor,
-                               insertOp: Incrementor,
-                               insertFails: Incrementor,
-                               sizeIncr: Incrementor,
-                               tuplesIn: Incrementor,
-                               tuplesOut: Incrementor,
-                               workPool: FuturePool,
-                               compact: Compact,
-                               compatSize: CompactionSize)(implicit sg: Semigroup[Value])
+class AsyncListSum[Key, Value](
+    bufferSize: BufferSize,
+    override val flushFrequency: FlushFrequency,
+    override val softMemoryFlush: MemoryFlushPercent,
+    override val memoryIncr: Incrementor,
+    override val timeoutIncr: Incrementor,
+    insertOp: Incrementor,
+    insertFails: Incrementor,
+    sizeIncr: Incrementor,
+    tuplesIn: Incrementor,
+    tuplesOut: Incrementor,
+    workPool: FuturePool,
+    compact: Compact,
+    compatSize: CompactionSize
+)(implicit sg: Semigroup[Value])
     extends AsyncSummer[(Key, Value), Map[Key, Value]]
     with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 

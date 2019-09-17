@@ -19,7 +19,8 @@ object ReferenceHyperLogLog {
         .map { bi =>
           (bi._1, bi._2 * 8)
         }
-        .flatMap { byteToIndicator(_) }: _*)
+        .flatMap { byteToIndicator(_) }: _*
+    )
   def byteToIndicator(bi: (Byte, Int)): Seq[Int] =
     (0 to 7).flatMap { i =>
       if (((bi._1 >> (7 - i)) & 1) == 1) {
@@ -270,20 +271,20 @@ class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregat
 
   for (bits <- List(5, 7, 8, 10)) {
     property(
-      s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using conversion to Array[Byte]") =
-      toProp(new SmallBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+      s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using conversion to Array[Byte]"
+    ) = toProp(new SmallBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
     property(
-      s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using Hash128") =
-      toProp(new SmallSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
+      s"work as an Aggregator and return exact size when <= maxSetSize for $bits bits, using Hash128"
+    ) = toProp(new SmallSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
   }
 
   for (bits <- List(5, 7, 8, 10)) {
     property(
-      s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using conversion to Array[Byte]") =
-      toProp(new LargeBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
+      s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using conversion to Array[Byte]"
+    ) = toProp(new LargeBytesSetSizeAggregatorProperty[Int](bits), 100, 1, 0.01)
     property(
-      s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using Hash128") =
-      toProp(new LargeSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
+      s"work as an Aggregator and return approximate size when > maxSetSize for $bits bits, using Hash128"
+    ) = toProp(new LargeSetSizeHashAggregatorProperty[Int](bits), 100, 1, 0.01)
   }
 }
 

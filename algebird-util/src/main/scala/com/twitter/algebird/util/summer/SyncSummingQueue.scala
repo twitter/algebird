@@ -26,15 +26,17 @@ import scala.collection.mutable.ListBuffer
 /**
  * @author Ian O Connell
  */
-case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
-                                        override val flushFrequency: FlushFrequency,
-                                        override val softMemoryFlush: MemoryFlushPercent,
-                                        override val memoryIncr: Incrementor,
-                                        override val timeoutIncr: Incrementor,
-                                        sizeIncr: Incrementor,
-                                        insertOps: Incrementor,
-                                        tuplesIn: Incrementor,
-                                        tuplesOut: Incrementor)(implicit semigroup: Semigroup[Value])
+case class SyncSummingQueue[Key, Value](
+    bufferSize: BufferSize,
+    override val flushFrequency: FlushFrequency,
+    override val softMemoryFlush: MemoryFlushPercent,
+    override val memoryIncr: Incrementor,
+    override val timeoutIncr: Incrementor,
+    sizeIncr: Incrementor,
+    insertOps: Incrementor,
+    tuplesIn: Incrementor,
+    tuplesOut: Incrementor
+)(implicit semigroup: Semigroup[Value])
     extends AsyncSummer[(Key, Value), Map[Key, Value]]
     with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 
@@ -65,8 +67,8 @@ case class SyncSummingQueue[Key, Value](bufferSize: BufferSize,
 }
 
 class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incrementor)(
-    override implicit val semigroup: Semigroup[V])
-    extends StatefulSummer[V] {
+    override implicit val semigroup: Semigroup[V]
+) extends StatefulSummer[V] {
 
   private val queueOption: Option[ArrayBlockingQueue[V]] =
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
@@ -89,7 +91,9 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
           None
         }
       }
-    } else { Some(item) }
+    } else {
+      Some(item)
+    }
 
   def apply(v: V): Option[V] = put(v)
 

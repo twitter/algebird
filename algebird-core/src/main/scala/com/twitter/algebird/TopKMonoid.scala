@@ -23,7 +23,8 @@ object TopKMonoid extends java.io.Serializable {
   // Does a merge sort and returns the reversed list
   @tailrec
   private[algebird] def mergeSortR[T](acc: List[T], list1: List[T], list2: List[T], cnt: Int)(
-      implicit ord: Ordering[T]): List[T] =
+      implicit ord: Ordering[T]
+  ): List[T] =
     (list1, list2, cnt) match {
       case (_, _, 0) => acc
       case (x1 :: t1, x2 :: t2, _) => {
