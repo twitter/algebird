@@ -302,5 +302,8 @@ lazy val docs = project
   .settings(sharedSettings)
   .settings(noPublishSettings)
   .settings(docSettings)
-  .settings((scalacOptions in Tut) ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))))
+  .settings(
+    scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
+    sources in (ScalaUnidoc, unidoc) ~= (_ filterNot (_.absolutePath.contains("javaapi")))
+  )
   .dependsOn(algebirdCore)
