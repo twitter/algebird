@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 import algebird._
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
 
 val algebraVersion = "0.7.0"
@@ -142,13 +142,63 @@ val sharedSettings = Seq(
         <url>http://twitter.com/sritchie</url>
       </developer>
     </developers>)
-) ++ mimaDefaultSettings
+) ++ mimaSettings
 
 lazy val noPublishSettings = Seq(
   publish := {},
   publishLocal := {},
   test := {},
   publishArtifact := false
+)
+
+// https://github.com/lightbend/mima/issues/388
+lazy val mimaSettings = Def.settings(
+  mimaBinaryIssueFilters ++= Seq(
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.IdentityMonad.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.Averager.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.AveragedGroup.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MomentsGroup.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MomentsAggregator.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.NullGroup.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.BigIntRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.BitSetLite.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.BooleanRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JBoolRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.DoubleRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JDoubleRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JShortRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.ShortRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.IntRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JIntRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.FloatRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JFloatRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.LongRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.JLongRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.BigDecimalRing.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.UnitGroup.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.HLLSeries.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.SparseHLL.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.DenseHLL.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.StringMonoid.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.OrValMonoid.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.AndValMonoid.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.DecayedValueMonoid.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MinHashSignature.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.PlainCounter.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.AtomicCounter.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.GaussianDistributionMonoid.*"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.CompactionSize.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.FlushFrequency.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.MemoryFlushPercent.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.UpdateFrequency.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.RollOverFrequency.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.HeavyHittersPercent.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.BufferSize.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.Compact.apply"),
+
+    ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHashSignature.*"),
+    ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHasher.*")
+  )
 )
 
 /**
