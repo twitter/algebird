@@ -4,7 +4,7 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import pl.project13.scala.sbt.JmhPlugin
 
 val algebraVersion = "0.7.0"
-val bijectionVersion = "0.9.4"
+val bijectionVersion = "0.9.6"
 val javaEwahVersion = "1.1.4"
 val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
