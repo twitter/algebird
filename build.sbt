@@ -307,7 +307,7 @@ lazy val algebirdGeneric = module("generic").settings(
     addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.8")
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3")
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
