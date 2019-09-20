@@ -3,13 +3,13 @@ import algebird._
 import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
 
-val algebraVersion = "0.7.0"
-val bijectionVersion = "0.9.4"
-val javaEwahVersion = "1.1.4"
+val algebraVersion = "1.0.0"
+val bijectionVersion = "0.9.6"
+val javaEwahVersion = "1.1.6"
 val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
-val scalaTestVersion = "3.0.1"
-val scalacheckVersion = "1.13.4"
+val scalaTestVersion = "3.0.8"
+val scalacheckVersion = "1.13.5"
 val utilVersion = "6.20.0"
 val utilVersion212 = "6.39.0"
 val sparkVersion = "2.4.0"
@@ -79,7 +79,7 @@ val sharedSettings = Seq(
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
 
   libraryDependencies ++= Seq(
-    "junit" % "junit" % "4.11" % Test,
+    "junit" % "junit" % "4.12" % Test,
     "com.novocode" % "junit-interface" % "0.11" % Test
   ),
 
@@ -307,7 +307,7 @@ lazy val algebirdGeneric = module("generic").settings(
     addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6")
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.8")
   ).dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
