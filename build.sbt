@@ -180,16 +180,22 @@ lazy val mimaSettings = Def.settings(
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MinHashSignature.*"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.PlainCounter.*"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.AtomicCounter.*"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.GaussianDistributionMonoid.*"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.CompactionSize.apply"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.FlushFrequency.apply"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.MemoryFlushPercent.apply"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.UpdateFrequency.apply"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.RollOverFrequency.apply"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.HeavyHittersPercent.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.statistics.GaussianDistributionMonoid.*"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.CompactionSize.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.FlushFrequency.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.MemoryFlushPercent.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.UpdateFrequency.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.RollOverFrequency.apply"),
+    ProblemFilters
+      .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.HeavyHittersPercent.apply"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.BufferSize.apply"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.Compact.apply"),
-
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHashSignature.*"),
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHasher.*")
   )
