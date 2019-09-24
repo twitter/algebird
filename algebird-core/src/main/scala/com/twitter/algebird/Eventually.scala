@@ -37,8 +37,8 @@ package com.twitter.algebird
  */
 class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
     implicit eventualSemigroup: Semigroup[E],
-    originalSemigroup: Semigroup[O])
-    extends Semigroup[Either[E, O]] {
+    originalSemigroup: Semigroup[O]
+) extends Semigroup[Either[E, O]] {
 
   import scala.collection.mutable.Buffer
 
@@ -124,9 +124,10 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 /**
  * @see EventuallySemigroup
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lSemigroup: Semigroup[E],
-                                                                         rMonoid: Monoid[O])
-    extends EventuallySemigroup[E, O](convert)(mustConvert)
+class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(
+    implicit lSemigroup: Semigroup[E],
+    rMonoid: Monoid[O]
+) extends EventuallySemigroup[E, O](convert)(mustConvert)
     with Monoid[Either[E, O]] {
 
   override def zero = Right(Monoid.zero[O])
@@ -136,9 +137,10 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implici
 /**
  * @see EventuallySemigroup
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lGroup: Group[E],
-                                                                        rGroup: Group[O])
-    extends EventuallyMonoid[E, O](convert)(mustConvert)
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
+    implicit lGroup: Group[E],
+    rGroup: Group[O]
+) extends EventuallyMonoid[E, O](convert)(mustConvert)
     with Group[Either[E, O]] {
 
   override def negate(x: Either[E, O]) =
@@ -154,9 +156,10 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
 /**
  * @see EventuallySemigroup
  */
-class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit lRing: Ring[E],
-                                                                       rRing: Ring[O])
-    extends EventuallyGroup[E, O](convert)(mustConvert)
+class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(
+    implicit lRing: Ring[E],
+    rRing: Ring[O]
+) extends EventuallyGroup[E, O](convert)(mustConvert)
     with Ring[Either[E, O]] {
 
   override def one = Right(Ring.one[O])

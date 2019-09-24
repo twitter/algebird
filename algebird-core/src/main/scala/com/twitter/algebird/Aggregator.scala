@@ -69,7 +69,8 @@ object Aggregator extends java.io.Serializable {
    * Equivalent to {{{ appendSemigroup(prep, appnd, identity[T]_)(sg) }}}
    */
   def appendSemigroup[F, T](prep: F => T, appnd: (T, F) => T)(
-      implicit sg: Semigroup[T]): Aggregator[F, T, T] =
+      implicit sg: Semigroup[T]
+  ): Aggregator[F, T, T] =
     appendSemigroup(prep, appnd, identity[T] _)(sg)
 
   /**
@@ -85,7 +86,8 @@ object Aggregator extends java.io.Serializable {
    * @note The functions 'appnd' and 'prep' are expected to obey the law: {{{ appnd(t, f) == sg.plus(t, prep(f)) }}}
    */
   def appendSemigroup[F, T, P](prep: F => T, appnd: (T, F) => T, pres: T => P)(
-      implicit sg: Semigroup[T]): Aggregator[F, T, P] =
+      implicit sg: Semigroup[T]
+  ): Aggregator[F, T, P] =
     new Aggregator[F, T, P] {
       def semigroup: Semigroup[T] = sg
       def prepare(input: F): T = prep(input)
@@ -130,7 +132,8 @@ object Aggregator extends java.io.Serializable {
    * @note The function 'appnd' is expected to obey the law: {{{ appnd(t, f) == m.plus(t, appnd(m.zero, f)) }}}
    */
   def appendMonoid[F, T, P](appnd: (T, F) => T, pres: T => P)(
-      implicit m: Monoid[T]): MonoidAggregator[F, T, P] =
+      implicit m: Monoid[T]
+  ): MonoidAggregator[F, T, P] =
     new MonoidAggregator[F, T, P] {
       def monoid: Monoid[T] = m
       def prepare(input: F): T = appnd(m.zero, input)
@@ -237,8 +240,9 @@ object Aggregator extends java.io.Serializable {
    *
    * This function is like writing list.sortBy(fn).reverse.take(count).
    */
-  def sortByReverseTake[T, U: Ordering](count: Int)(
-      fn: T => U): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
+  def sortByReverseTake[T, U: Ordering](
+      count: Int
+  )(fn: T => U): MonoidAggregator[T, PriorityQueue[T], Seq[T]] =
     Aggregator.sortedReverseTake(count)(Ordering.by(fn))
 
   /**
@@ -258,8 +262,10 @@ object Aggregator extends java.io.Serializable {
    * selected. This assumes that all sampled records can fit in memory, so use this only when the
    * expected number of sampled values is small.
    */
-  def randomSample[T](prob: Double,
-                      seed: Int = DefaultSeed): MonoidAggregator[T, Option[Batched[T]], List[T]] = {
+  def randomSample[T](
+      prob: Double,
+      seed: Int = DefaultSeed
+  ): MonoidAggregator[T, Option[Batched[T]], List[T]] = {
     assert(prob >= 0 && prob <= 1, "randomSample.prob must lie in [0, 1]")
     val rng = new java.util.Random(seed)
     Preparer[T]
@@ -272,8 +278,10 @@ object Aggregator extends java.io.Serializable {
    * then 'count' total records). This assumes that all 'count' of the records can fit in memory,
    * so use this only for small values of 'count'.
    */
-  def reservoirSample[T](count: Int,
-                         seed: Int = DefaultSeed): MonoidAggregator[T, PriorityQueue[(Double, T)], Seq[T]] = {
+  def reservoirSample[T](
+      count: Int,
+      seed: Int = DefaultSeed
+  ): MonoidAggregator[T, PriorityQueue[(Double, T)], Seq[T]] = {
     val rng = new java.util.Random(seed)
     Preparer[T]
       .map(rng.nextDouble() -> _)
@@ -324,7 +332,8 @@ object Aggregator extends java.io.Serializable {
    * The items that are iterated over cannot be negative.
    */
   def approximatePercentile[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-      implicit num: Numeric[T]): QTreeAggregatorLowerBound[T] =
+      implicit num: Numeric[T]
+  ): QTreeAggregatorLowerBound[T] =
     QTreeAggregatorLowerBound[T](percentile, k)
 
   /**
@@ -332,7 +341,8 @@ object Aggregator extends java.io.Serializable {
    * The items that are iterated over cannot be negative.
    */
   def approximatePercentileBounds[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-      implicit num: Numeric[T]): QTreeAggregator[T] =
+      implicit num: Numeric[T]
+  ): QTreeAggregator[T] =
     QTreeAggregator[T](percentile, k)
 
   /**
@@ -429,8 +439,9 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    * This returns the cumulative sum of its inputs, in the same order.
    * If the inputs are empty, the result will be empty too.
    */
-  def applyCumulatively[In <: TraversableOnce[A], Out](inputs: In)(
-      implicit bf: CanBuildFrom[In, C, Out]): Out = {
+  def applyCumulatively[In <: TraversableOnce[A], Out](
+      inputs: In
+  )(implicit bf: CanBuildFrom[In, C, Out]): Out = {
     val builder = bf()
     builder ++= cumulativeIterator(inputs.toIterator)
     builder.result
@@ -509,22 +520,28 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
     Aggregator.const(v)
   override def join[T, U](mt: Aggregator[I, _, T], mu: Aggregator[I, _, U]): Aggregator[I, _, (T, U)] =
     mt.join(mu)
-  override def join[T1, T2, T3](m1: Aggregator[I, _, T1],
-                                m2: Aggregator[I, _, T2],
-                                m3: Aggregator[I, _, T3]): Aggregator[I, _, (T1, T2, T3)] =
+  override def join[T1, T2, T3](
+      m1: Aggregator[I, _, T1],
+      m2: Aggregator[I, _, T2],
+      m3: Aggregator[I, _, T3]
+  ): Aggregator[I, _, (T1, T2, T3)] =
     GeneratedTupleAggregator.from3((m1, m2, m3))
 
-  override def join[T1, T2, T3, T4](m1: Aggregator[I, _, T1],
-                                    m2: Aggregator[I, _, T2],
-                                    m3: Aggregator[I, _, T3],
-                                    m4: Aggregator[I, _, T4]): Aggregator[I, _, (T1, T2, T3, T4)] =
+  override def join[T1, T2, T3, T4](
+      m1: Aggregator[I, _, T1],
+      m2: Aggregator[I, _, T2],
+      m3: Aggregator[I, _, T3],
+      m4: Aggregator[I, _, T4]
+  ): Aggregator[I, _, (T1, T2, T3, T4)] =
     GeneratedTupleAggregator.from4((m1, m2, m3, m4))
 
-  override def join[T1, T2, T3, T4, T5](m1: Aggregator[I, _, T1],
-                                        m2: Aggregator[I, _, T2],
-                                        m3: Aggregator[I, _, T3],
-                                        m4: Aggregator[I, _, T4],
-                                        m5: Aggregator[I, _, T5]): Aggregator[I, _, (T1, T2, T3, T4, T5)] =
+  override def join[T1, T2, T3, T4, T5](
+      m1: Aggregator[I, _, T1],
+      m2: Aggregator[I, _, T2],
+      m3: Aggregator[I, _, T3],
+      m4: Aggregator[I, _, T4],
+      m5: Aggregator[I, _, T5]
+  ): Aggregator[I, _, (T1, T2, T3, T4, T5)] =
     GeneratedTupleAggregator.from5((m1, m2, m3, m4, m5))
 }
 
@@ -558,7 +575,8 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
    * and outputs the pair from both
    */
   def either[A2, B2, C2](
-      that: MonoidAggregator[A2, B2, C2]): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
+      that: MonoidAggregator[A2, B2, C2]
+  ): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
     new MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] {
       def prepare(e: Either[A, A2]) = e match {
         case Left(a)   => (self.prepare(a), that.monoid.zero)

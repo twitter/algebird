@@ -70,7 +70,8 @@ class BloomFilterLaws extends CheckProperties {
 
   property(
     "the distance between a filter and an empty filter should be the number of bits" +
-      "set in the existing filter") {
+      "set in the existing filter"
+  ) {
     forAll { (a: BF[String]) =>
       a.hammingDistance(bfMonoid.zero) == a.numBits
     }
@@ -193,7 +194,8 @@ class BFHashIndices extends CheckProperties {
     }
 
   property(
-    "Indices of the two versions of BFHashes are the same, unless the first one contains negative index") {
+    "Indices of the two versions of BFHashes are the same, unless the first one contains negative index"
+  ) {
     forAll { (pair: (BFHash[String], NegativeBFHash), v: Long) =>
       val s = v.toString
       val (hash, negativeHash) = pair

@@ -23,10 +23,12 @@ class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Match
   import AsyncSummerLaws._
   property("Summing with and without the summer should match") {
     forAll {
-      (inputs: List[List[(Int, Long)]],
-       flushFrequency: FlushFrequency,
-       bufferSize: BufferSize,
-       memoryFlushPercent: MemoryFlushPercent) =>
+      (
+          inputs: List[List[(Int, Long)]],
+          flushFrequency: FlushFrequency,
+          bufferSize: BufferSize,
+          memoryFlushPercent: MemoryFlushPercent
+      ) =>
         val timeOutCounter = Counter("timeOut")
         val sizeCounter = Counter("size")
         val memoryCounter = Counter("memory")
@@ -42,7 +44,8 @@ class SyncSummingQueueProperties extends PropSpec with PropertyChecks with Match
           sizeCounter,
           putCounter,
           tuplesIn,
-          tuplesOut)
+          tuplesOut
+        )
         assert(summingWithAndWithoutSummerShouldMatch(summer, inputs))
     }
   }

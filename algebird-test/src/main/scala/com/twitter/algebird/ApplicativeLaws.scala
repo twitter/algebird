@@ -25,27 +25,33 @@ import org.scalacheck.Prop.forAll
 object ApplicativeLaws {
   import BaseProperties.{DefaultHigherEq, HigherEq}
 
-  def applyLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
-                                                                     app: Applicative[M],
-                                                                     arb: Arbitrary[T],
-                                                                     arbFn: Arbitrary[T => U]): Prop =
+  def applyLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(
+      implicit
+      app: Applicative[M],
+      arb: Arbitrary[T],
+      arbFn: Arbitrary[T => U]
+  ): Prop =
     forAll { (t: T, fn: T => U) =>
       eq(app.map(app.apply(t))(fn), app.apply(fn(t)))
     }
 
-  def joinLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
-                                                                    app: Applicative[M],
-                                                                    arb1: Arbitrary[T],
-                                                                    arb2: Arbitrary[U]): Prop =
+  def joinLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(
+      implicit
+      app: Applicative[M],
+      arb1: Arbitrary[T],
+      arb2: Arbitrary[U]
+  ): Prop =
     forAll { (t: T, u: U) =>
       eq(app.join(app.apply(t), app.apply(u)), app.apply((t, u)))
     }
 
   // These follow from apply and join:
 
-  def sequenceLaw[M[_], T](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
-                                                                     app: Applicative[M],
-                                                                     arb: Arbitrary[Seq[T]]): Prop =
+  def sequenceLaw[M[_], T](eq: HigherEq[M] = new DefaultHigherEq[M])(
+      implicit
+      app: Applicative[M],
+      arb: Arbitrary[Seq[T]]
+  ): Prop =
     forAll { (ts: Seq[T]) =>
       eq(app.sequence(ts.map { app.apply(_) }), app.apply(ts))
     }
@@ -55,7 +61,8 @@ object ApplicativeLaws {
       app: Applicative[M],
       arbT: Arbitrary[T],
       arbU: Arbitrary[U],
-      arbJoinFn: Arbitrary[(T, U) => V]): Prop =
+      arbJoinFn: Arbitrary[(T, U) => V]
+  ): Prop =
     forAll { (t: T, u: U, fn: (T, U) => V) =>
       eq(app.joinWith(app.apply(t), app.apply(u))(fn), app.apply(fn(t, u)))
     }
@@ -67,7 +74,8 @@ object ApplicativeLaws {
       arbMts: Arbitrary[Seq[T]],
       arbMu: Arbitrary[U],
       arbFn: Arbitrary[T => U],
-      arbJoinFn: Arbitrary[(T, U) => V]): Prop =
+      arbJoinFn: Arbitrary[(T, U) => V]
+  ): Prop =
     applyLaw[M, T, U](eq) &&
       joinLaw[M, T, U](eq) &&
       sequenceLaw[M, T](eq) &&

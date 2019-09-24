@@ -56,7 +56,8 @@ class BijectedRing[T, U](implicit val ring: Ring[T], bij: ImplicitBijection[T, U
 
 trait AlgebirdBijections {
   implicit def semigroupBijection[T, U](
-      implicit bij: ImplicitBijection[T, U]): Bijection[Semigroup[T], Semigroup[U]] =
+      implicit bij: ImplicitBijection[T, U]
+  ): Bijection[Semigroup[T], Semigroup[U]] =
     new AbstractBijection[Semigroup[T], Semigroup[U]] {
       override def apply(sg: Semigroup[T]) =
         new BijectedSemigroup[T, U]()(sg, bij)

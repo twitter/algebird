@@ -92,7 +92,8 @@ object Tunnel {
         assert(
           oldV == newV,
           "Cannot set a promise multiple times with different values."
-            + " Old value: %s  New value: %s".format(oldV, newV))
+            + " Old value: %s  New value: %s".format(oldV, newV)
+        )
       }
     }
 

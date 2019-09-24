@@ -121,7 +121,7 @@ class QTreeTest extends WordSpec with Matchers {
         assert(interval.contains(truth))
       }
       "work as an aggregator for longs with a small stream" in {
-        val list = randomList(10000).map(i => (i * 1000l).toLong)
+        val list = randomList(10000).map(i => (i * 1000L).toLong)
         val agg = QTreeAggregator(quantile)(implicitly[Numeric[Long]])
         val interval = agg(list)
         val truth = trueQuantile(list, quantile)

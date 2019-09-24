@@ -72,8 +72,8 @@ object ApproximateBoolean {
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
 case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)(
-    implicit val numeric: Numeric[N])
-    extends ApproximateSet[N] {
+    implicit val numeric: Numeric[N]
+) extends ApproximateSet[N] {
   require(numeric.lteq(min, estimate) && numeric.lteq(estimate, max))
 
   /**
@@ -101,7 +101,8 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
       n.plus(min, right.min),
       n.plus(estimate, right.estimate),
       n.plus(max, right.max),
-      probWithinBounds * right.probWithinBounds)
+      probWithinBounds * right.probWithinBounds
+    )
   }
   def -(right: Approximate[N]): Approximate[N] =
     this.+(right.negate)

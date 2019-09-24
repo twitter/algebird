@@ -192,8 +192,10 @@ object Batched {
    * (e.g. when there is temporary mutable state used to make
    * summation fast).
    */
-  def monoidAggregator[A, B, C](batchSize: Int,
-                                agg: MonoidAggregator[A, B, C]): MonoidAggregator[A, Batched[B], C] =
+  def monoidAggregator[A, B, C](
+      batchSize: Int,
+      agg: MonoidAggregator[A, B, C]
+  ): MonoidAggregator[A, Batched[B], C] =
     new MonoidAggregator[A, Batched[B], C] {
       def prepare(a: A): Batched[B] = Item(agg.prepare(a))
       def monoid: Monoid[Batched[B]] = new BatchedMonoid(batchSize)(agg.monoid)

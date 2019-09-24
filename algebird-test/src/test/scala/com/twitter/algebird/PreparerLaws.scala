@@ -21,18 +21,19 @@ import org.scalacheck.Prop._
 
 class PreparerLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](implicit prepare: Arbitrary[A => B],
-                                   sg: Semigroup[B],
-                                   present: Arbitrary[B => C]): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
+  implicit def aggregator[A, B, C](
+      implicit prepare: Arbitrary[A => B],
+      sg: Semigroup[B],
+      present: Arbitrary[B => C]
+  ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
     for {
       pp <- prepare.arbitrary
       ps <- present.arbitrary
-    } yield
-      new Aggregator[A, B, C] {
-        def prepare(a: A) = pp(a)
-        def semigroup = sg
-        def present(b: B) = ps(b)
-      }
+    } yield new Aggregator[A, B, C] {
+      def prepare(a: A) = pp(a)
+      def semigroup = sg
+      def present(b: B) = ps(b)
+    }
   }
 
   property("mapping before aggregate is correct") {
@@ -51,19 +52,20 @@ class PreparerLaws extends CheckProperties {
     }
   }
 
-  implicit def monoidAggregator[A, B, C](implicit prepare: Arbitrary[A => B],
-                                         m: Monoid[B],
-                                         present: Arbitrary[B => C]): Arbitrary[MonoidAggregator[A, B, C]] =
+  implicit def monoidAggregator[A, B, C](
+      implicit prepare: Arbitrary[A => B],
+      m: Monoid[B],
+      present: Arbitrary[B => C]
+  ): Arbitrary[MonoidAggregator[A, B, C]] =
     Arbitrary {
       for {
         pp <- prepare.arbitrary
         ps <- present.arbitrary
-      } yield
-        new MonoidAggregator[A, B, C] {
-          def prepare(a: A) = pp(a)
-          def monoid = m
-          def present(b: B) = ps(b)
-        }
+      } yield new MonoidAggregator[A, B, C] {
+        def prepare(a: A) = pp(a)
+        def monoid = m
+        def present(b: B) = ps(b)
+      }
     }
 
   property("flatten before aggregate is correct") {

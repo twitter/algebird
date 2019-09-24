@@ -106,7 +106,8 @@ object AdaptiveVector {
           case _ if valueIsNonZero(left.sparseValue) =>
             fromVector(
               Vector(Semigroup.plus(toVector(left): IndexedSeq[V], toVector(right): IndexedSeq[V]): _*),
-              left.sparseValue)
+              left.sparseValue
+            )
           case _ => // sparse is zero:
             fromMap(Semigroup.plus(toMap(left), toMap(right)), left.sparseValue, maxSize)
         }

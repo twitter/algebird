@@ -13,8 +13,9 @@ package object macros {
       c.abort(c.enclosingPosition, s"${tpe.typeSymbol} is not a case class")
   }
 
-  private[macros] def getParams[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): List[c.universe.MethodSymbol] = {
+  private[macros] def getParams[T](
+      c: Context
+  )(implicit T: c.WeakTypeTag[T]): List[c.universe.MethodSymbol] = {
     import c.universe._
 
     val tpe = weakTypeOf[T]

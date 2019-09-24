@@ -24,10 +24,12 @@ class HeavyHittersCachingSummerProperties extends CheckProperties {
 
   property("Summing with and without the summer should match") {
     forAll {
-      (inputs: List[List[(Int, Long)]],
-       flushFrequency: FlushFrequency,
-       bufferSize: BufferSize,
-       memoryFlushPercent: MemoryFlushPercent) =>
+      (
+          inputs: List[List[(Int, Long)]],
+          flushFrequency: FlushFrequency,
+          bufferSize: BufferSize,
+          memoryFlushPercent: MemoryFlushPercent
+      ) =>
         val timeOutCounter = Counter("timeOut")
         val sizeCounter = Counter("size")
         val memoryCounter = Counter("memory")
@@ -60,7 +62,8 @@ class HeavyHittersCachingSummerProperties extends CheckProperties {
             tuplesOut,
             insertOp,
             sizeCounter,
-            summer)
+            summer
+          )
         (summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
     }
   }

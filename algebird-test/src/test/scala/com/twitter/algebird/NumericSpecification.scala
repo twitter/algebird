@@ -39,7 +39,8 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
       (a == mon.plus(mon.zero, a)) &&
         (a == mon.plus(a, mon.zero)) &&
         (a == grp.minus(a, grp.zero)) &&
-        (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero }))
+        (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero })
+    )
   }
 
   def zeroProps[T: Monoid: Numeric] = {
@@ -47,7 +48,8 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     val num = implicitly[Numeric[T]]
     assert(
       (num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon
-        .nonZeroOption(mon.zero) == None))
+        .nonZeroOption(mon.zero) == None)
+    )
   }
 
   property("Int zero") {
@@ -97,7 +99,8 @@ class NumericSpecification extends PropSpec with PropertyChecks with Matchers {
     val num = implicitly[Numeric[T]]
     assert(
       (num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring
-        .times(ring.one, a)))
+        .times(ring.one, a))
+    )
   }
   property("Int one") {
     oneNumericProp[Int]

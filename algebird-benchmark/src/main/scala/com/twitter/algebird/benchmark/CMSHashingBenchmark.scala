@@ -41,7 +41,9 @@ object CMSHashingBenchmark {
         "11" /* eps = 0.271 */,
         "544" /* eps = 0.005 */,
         "2719" /* eps = 1E-3 */,
-        "271829" /* eps = 1E-5 */ ))
+        "271829" /* eps = 1E-5 */
+      )
+    )
     var width: Int = 0
 
     /**

@@ -247,16 +247,19 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
  * @param maxExactCountOpt An Option parameter about how many exact counts a sparse CMS wants to keep.
  * @tparam K The type used to identify the elements to be counted.
  */
-case class CMSParams[K](hashes: Seq[CMSHash[K]],
-                        eps: Double,
-                        delta: Double,
-                        maxExactCountOpt: Option[Int] = None) {
+case class CMSParams[K](
+    hashes: Seq[CMSHash[K]],
+    eps: Double,
+    delta: Double,
+    maxExactCountOpt: Option[Int] = None
+) {
 
   require(0 < eps && eps < 1, "eps must lie in (0, 1)")
   require(0 < delta && delta < 1, "delta must lie in (0, 1)")
   require(
     hashes.size >= CMSFunctions.depth(delta),
-    s"we require at least ${CMSFunctions.depth(delta)} hash functions")
+    s"we require at least ${CMSFunctions.depth(delta)} hash functions"
+  )
 
 }
 
@@ -278,7 +281,8 @@ object CMSFunctions {
     val i = scala.math.exp(-depth)
     require(
       i > 0.0,
-      s"depth must be smaller as it causes precision errors when computing delta ($depth led to an invalid delta of $i)")
+      s"depth must be smaller as it causes precision errors when computing delta ($depth led to an invalid delta of $i)"
+    )
     i
   }
 
@@ -476,10 +480,12 @@ object CMS {
 
   def monoid[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSMonoid[K] =
     monoid(eps, delta, seed, None)
-  def monoid[K: CMSHasher](eps: Double,
-                           delta: Double,
-                           seed: Int,
-                           maxExactCountOpt: Option[Int]): CMSMonoid[K] =
+  def monoid[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      maxExactCountOpt: Option[Int]
+  ): CMSMonoid[K] =
     new CMSMonoid[K](eps, delta, seed, maxExactCountOpt)
 
   def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSMonoid[K] =
@@ -489,27 +495,33 @@ object CMS {
 
   def aggregator[K: CMSHasher](eps: Double, delta: Double, seed: Int): CMSAggregator[K] =
     aggregator(eps, delta, seed, None)
-  def aggregator[K: CMSHasher](eps: Double,
-                               delta: Double,
-                               seed: Int,
-                               maxExactCountOpt: Option[Int]): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      maxExactCountOpt: Option[Int]
+  ): CMSAggregator[K] =
     new CMSAggregator[K](monoid(eps, delta, seed, maxExactCountOpt))
 
   def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int): CMSAggregator[K] =
     aggregator(depth, width, seed, None)
-  def aggregator[K: CMSHasher](depth: Int,
-                               width: Int,
-                               seed: Int,
-                               maxExactCountOpt: Option[Int]): CMSAggregator[K] =
+  def aggregator[K: CMSHasher](
+      depth: Int,
+      width: Int,
+      seed: Int,
+      maxExactCountOpt: Option[Int]
+  ): CMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, maxExactCountOpt)
 
   /**
    * Returns a fresh, zeroed CMS instance.
    */
-  def apply[K: CMSHasher](eps: Double,
-                          delta: Double,
-                          seed: Int,
-                          maxExactCountOpt: Option[Int] = None): CMS[K] = {
+  def apply[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      maxExactCountOpt: Option[Int] = None
+  ): CMS[K] = {
     val params = {
       val hashes: Seq[CMSHash[K]] =
         CMSFunctions.generateHashes(eps, delta, seed)
@@ -610,10 +622,11 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 /**
  * A sparse Count-Min sketch structure, used for situations where the key is highly skewed.
  */
-case class SparseCMS[K](exactCountTable: Map[K, Long],
-                        override val totalCount: Long,
-                        override val params: CMSParams[K])
-    extends CMS[K](params) {
+case class SparseCMS[K](
+    exactCountTable: Map[K, Long],
+    override val totalCount: Long,
+    override val params: CMSParams[K]
+) extends CMS[K](params) {
   import SparseCMS._
 
   override def +(x: K, count: Long): CMS[K] = {
@@ -678,10 +691,11 @@ object SparseCMS {
 /**
  * The general Count-Min sketch structure, used for holding any number of elements.
  */
-case class CMSInstance[K](countsTable: CMSInstance.CountsTable[K],
-                          override val totalCount: Long,
-                          override val params: CMSParams[K])
-    extends CMS[K](params) {
+case class CMSInstance[K](
+    countsTable: CMSInstance.CountsTable[K],
+    override val totalCount: Long,
+    override val params: CMSParams[K]
+) extends CMS[K](params) {
 
   def ++(other: CMS[K]): CMS[K] =
     other match {
@@ -979,7 +993,8 @@ class TopCMSMonoid[K](emptyCms: CMS[K], logic: HeavyHittersLogic[K]) extends Mon
   def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
     require(
       left.cms.params.hashes == right.cms.params.hashes,
-      "The sketches must use the same hash functions.")
+      "The sketches must use the same hash functions."
+    )
     left ++ right
   }
 
@@ -1028,8 +1043,10 @@ class TopCMSAggregator[K](cmsMonoid: TopCMSMonoid[K]) extends MonoidAggregator[K
  */
 abstract class HeavyHittersLogic[K] extends java.io.Serializable {
 
-  def updateHeavyHitters(oldCms: CMS[K],
-                         newCms: CMS[K])(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
+  def updateHeavyHitters(
+      oldCms: CMS[K],
+      newCms: CMS[K]
+  )(hhs: HeavyHitters[K], item: K, count: Long): HeavyHitters[K] = {
     val oldItemCount = oldCms.frequency(item).estimate
     val oldHh = HeavyHitter[K](item, oldItemCount)
     val newItemCount = oldItemCount + count
@@ -1161,25 +1178,31 @@ class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01)
 
 object TopPctCMS {
 
-  def monoid[K: CMSHasher](eps: Double,
-                           delta: Double,
-                           seed: Int,
-                           heavyHittersPct: Double): TopPctCMSMonoid[K] =
+  def monoid[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      heavyHittersPct: Double
+  ): TopPctCMSMonoid[K] =
     new TopPctCMSMonoid[K](CMS(eps, delta, seed), heavyHittersPct)
 
   def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int, heavyHittersPct: Double): TopPctCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
-  def aggregator[K: CMSHasher](eps: Double,
-                               delta: Double,
-                               seed: Int,
-                               heavyHittersPct: Double): TopPctCMSAggregator[K] =
+  def aggregator[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      heavyHittersPct: Double
+  ): TopPctCMSAggregator[K] =
     new TopPctCMSAggregator[K](monoid(eps, delta, seed, heavyHittersPct))
 
-  def aggregator[K: CMSHasher](depth: Int,
-                               width: Int,
-                               seed: Int,
-                               heavyHittersPct: Double): TopPctCMSAggregator[K] =
+  def aggregator[K: CMSHasher](
+      depth: Int,
+      width: Int,
+      seed: Int,
+      heavyHittersPct: Double
+  ): TopPctCMSAggregator[K] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersPct)
 
 }
@@ -1253,10 +1276,12 @@ object TopNCMS {
   def monoid[K: CMSHasher](depth: Int, width: Int, seed: Int, heavyHittersN: Int): TopNCMSMonoid[K] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
-  def aggregator[K: CMSHasher](eps: Double,
-                               delta: Double,
-                               seed: Int,
-                               heavyHittersN: Int): TopNCMSAggregator[K] =
+  def aggregator[K: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      heavyHittersN: Int
+  ): TopNCMSAggregator[K] =
     new TopNCMSAggregator[K](monoid(eps, delta, seed, heavyHittersN))
 
   def aggregator[K: CMSHasher](depth: Int, width: Int, seed: Int, heavyHittersN: Int): TopNCMSAggregator[K] =
@@ -1277,8 +1302,9 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
 
   require(heavyHittersN > 0, "heavyHittersN must be > 0")
 
-  override def purgeHeavyHitters(cms: CMS[(K1, K2)])(
-      hitters: HeavyHitters[(K1, K2)]): HeavyHitters[(K1, K2)] = {
+  override def purgeHeavyHitters(
+      cms: CMS[(K1, K2)]
+  )(hitters: HeavyHitters[(K1, K2)]): HeavyHitters[(K1, K2)] = {
     val grouped = hitters.hhs.groupBy { hh =>
       hh.item._1
     }
@@ -1333,28 +1359,36 @@ object ScopedTopNCMS {
     }
   }
 
-  def monoid[K1: CMSHasher, K2: CMSHasher](eps: Double,
-                                           delta: Double,
-                                           seed: Int,
-                                           heavyHittersN: Int): ScopedTopNCMSMonoid[K1, K2] =
+  def monoid[K1: CMSHasher, K2: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      heavyHittersN: Int
+  ): ScopedTopNCMSMonoid[K1, K2] =
     new ScopedTopNCMSMonoid[K1, K2](CMS(eps, delta, seed)(scopedHasher[K1, K2]), heavyHittersN)
 
-  def monoid[K1: CMSHasher, K2: CMSHasher](depth: Int,
-                                           width: Int,
-                                           seed: Int,
-                                           heavyHittersN: Int): ScopedTopNCMSMonoid[K1, K2] =
+  def monoid[K1: CMSHasher, K2: CMSHasher](
+      depth: Int,
+      width: Int,
+      seed: Int,
+      heavyHittersN: Int
+  ): ScopedTopNCMSMonoid[K1, K2] =
     monoid(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
-  def aggregator[K1: CMSHasher, K2: CMSHasher](eps: Double,
-                                               delta: Double,
-                                               seed: Int,
-                                               heavyHittersN: Int): TopCMSAggregator[(K1, K2)] =
+  def aggregator[K1: CMSHasher, K2: CMSHasher](
+      eps: Double,
+      delta: Double,
+      seed: Int,
+      heavyHittersN: Int
+  ): TopCMSAggregator[(K1, K2)] =
     new TopCMSAggregator(monoid(eps, delta, seed, heavyHittersN))
 
-  def aggregator[K1: CMSHasher, K2: CMSHasher](depth: Int,
-                                               width: Int,
-                                               seed: Int,
-                                               heavyHittersN: Int): TopCMSAggregator[(K1, K2)] =
+  def aggregator[K1: CMSHasher, K2: CMSHasher](
+      depth: Int,
+      width: Int,
+      seed: Int,
+      heavyHittersN: Int
+  ): TopCMSAggregator[(K1, K2)] =
     aggregator(CMSFunctions.eps(width), CMSFunctions.delta(depth), seed, heavyHittersN)
 
 }

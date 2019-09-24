@@ -46,49 +46,100 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 7 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple7[Int, Int, Int, Int, Int, Int, Int],
-                          Tuple7[Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple7[Int, Int, Int, Int, Int, Int, Int], Tuple7[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple7(MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
       assert(agg(data) == Tuple7(0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 8 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple8[Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple8[Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple8[Int, Int, Int, Int, Int, Int, Int, Int], Tuple8[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple8(MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
       assert(agg(data) == Tuple8(0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 9 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple9[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple9(MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
       assert(agg(data) == Tuple9(0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 10 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple10[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple10(MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
       assert(agg(data) == Tuple10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 11 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple11[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple11(MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
       assert(agg(data) == Tuple11(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 12 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple12[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple12(
           MinAgg,
           MinAgg,
@@ -101,14 +152,28 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg)
+          MinAgg
+        )
       assert(agg(data) == Tuple12(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 13 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] = Tuple13(
+      val agg
+          : Aggregator[Int, Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple13[
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int
+          ]] = Tuple13(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -121,14 +186,28 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         MinAgg,
         MinAgg,
         MinAgg,
-        MinAgg)
+        MinAgg
+      )
       assert(agg(data) == Tuple13(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 14 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple14[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         Tuple14(
           MinAgg,
           MinAgg,
@@ -143,15 +222,29 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg)
+          MinAgg
+        )
       assert(agg(data) == Tuple14(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 15 aggregators" in {
-      val agg
-        : Aggregator[Int,
-                     Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                     Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple15[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         Tuple15(
           MinAgg,
           MinAgg,
@@ -167,15 +260,30 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg)
+          MinAgg
+        )
       assert(agg(data) == Tuple15(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 16 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple16[
         Int,
-        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] = Tuple16(
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] = Tuple16(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -191,15 +299,31 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         MinAgg,
         MinAgg,
         MinAgg,
-        MinAgg)
+        MinAgg
+      )
       assert(agg(data) == Tuple16(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 17 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple17[
         Int,
-        Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         Tuple17(
           MinAgg,
           MinAgg,
@@ -217,15 +341,32 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg)
+          MinAgg
+        )
       assert(agg(data) == Tuple17(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 18 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple18[
         Int,
-        Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         Tuple18(
           MinAgg,
           MinAgg,
@@ -244,50 +385,53 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg)
+          MinAgg
+        )
       assert(agg(data) == Tuple18(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 19 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple19[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple19[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = Tuple19(
+      val agg: Aggregator[Int, Tuple19[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple19[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = Tuple19(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -306,52 +450,55 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         MinAgg,
         MinAgg,
         MinAgg,
-        MinAgg)
+        MinAgg
+      )
       assert(agg(data) == Tuple19(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 20 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple20[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple20[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = Tuple20(
+      val agg: Aggregator[Int, Tuple20[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple20[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = Tuple20(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -371,54 +518,57 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         MinAgg,
         MinAgg,
         MinAgg,
-        MinAgg)
+        MinAgg
+      )
       assert(agg(data) == Tuple20(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 21 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple21[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple21[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = Tuple21(
+      val agg: Aggregator[Int, Tuple21[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple21[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = Tuple21(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -439,56 +589,59 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         MinAgg,
         MinAgg,
         MinAgg,
-        MinAgg)
+        MinAgg
+      )
       assert(agg(data) == Tuple21(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 22 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple22[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple22[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = Tuple22(
+      val agg: Aggregator[Int, Tuple22[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple22[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = Tuple22(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -550,59 +703,125 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 7 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple7[Int, Int, Int, Int, Int, Int, Int],
-                          Tuple7[Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple7[Int, Int, Int, Int, Int, Int, Int], Tuple7[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator((MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
       assert(agg(data) == Tuple7(0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 8 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple8[Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple8[Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple8[Int, Int, Int, Int, Int, Int, Int, Int], Tuple8[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator((MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
       assert(agg(data) == Tuple8(0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 9 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple9[Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple9[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator((MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
       assert(agg(data) == Tuple9(0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 10 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple10[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple10[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator((MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
       assert(agg(data) == Tuple10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 11 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple11[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple11[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator(
-          (MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
+          (MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
+        )
       assert(agg(data) == Tuple11(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 12 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple12[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple12[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator(
-          (MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg))
+          (MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg, MinAgg)
+        )
       assert(agg(data) == Tuple12(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 13 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg
+          : Aggregator[Int, Tuple13[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple13[
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int,
+            Int
+          ]] =
         MultiAggregator(
           (
             MinAgg,
@@ -617,14 +836,29 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple13(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 14 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple14[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] =
         MultiAggregator(
           (
             MinAgg,
@@ -640,15 +874,30 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple14(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 15 aggregators" in {
-      val agg
-        : Aggregator[Int,
-                     Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                     Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+      val agg: Aggregator[Int, Tuple15[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple15[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         MultiAggregator(
           (
             MinAgg,
@@ -665,15 +914,31 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple15(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 16 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple16[
         Int,
-        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         MultiAggregator(
           (
             MinAgg,
@@ -691,15 +956,32 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple16(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 17 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple17[
         Int,
-        Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple17[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         MultiAggregator(
           (
             MinAgg,
@@ -718,15 +1000,33 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple17(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 18 aggregators" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple18[
         Int,
-        Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple18[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
         MultiAggregator(
           (
             MinAgg,
@@ -746,50 +1046,54 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             MinAgg,
             MinAgg,
             MinAgg,
-            MinAgg))
+            MinAgg
+          )
+        )
       assert(agg(data) == Tuple18(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 19 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple19[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple19[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = MultiAggregator(
+      val agg: Aggregator[Int, Tuple19[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple19[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = MultiAggregator(
         (
           MinAgg,
           MinAgg,
@@ -809,52 +1113,56 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg))
+          MinAgg
+        )
+      )
       assert(agg(data) == Tuple19(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 20 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple20[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple20[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = MultiAggregator(
+      val agg: Aggregator[Int, Tuple20[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple20[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = MultiAggregator(
         (
           MinAgg,
           MinAgg,
@@ -875,54 +1183,58 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg))
+          MinAgg
+        )
+      )
       assert(agg(data) == Tuple20(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 21 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple21[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple21[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = MultiAggregator(
+      val agg: Aggregator[Int, Tuple21[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple21[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = MultiAggregator(
         (
           MinAgg,
           MinAgg,
@@ -944,56 +1256,60 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg))
+          MinAgg
+        )
+      )
       assert(agg(data) == Tuple21(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
     "Create an aggregator from a tuple of 22 aggregators" in {
-      val agg: Aggregator[Int,
-                          Tuple22[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Tuple22[Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int]] = MultiAggregator(
+      val agg: Aggregator[Int, Tuple22[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple22[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ]] = MultiAggregator(
         (
           MinAgg,
           MinAgg,
@@ -1016,7 +1332,9 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           MinAgg,
           MinAgg,
           MinAgg,
-          MinAgg))
+          MinAgg
+        )
+      )
       assert(agg(data) == Tuple22(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
     }
 
@@ -1039,67 +1357,129 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create a MonoidAggregator from a tuple of 5 MonoidAggregators" in {
-      val agg
-        : MonoidAggregator[Long, Tuple5[Long, Long, Long, Long, Long], Tuple5[Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple5[Long, Long, Long, Long, Long], Tuple5[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator((SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
       assert(agg(longData) == Tuple5(6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 6 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple6[Long, Long, Long, Long, Long, Long],
-                                Tuple6[Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple6[Long, Long, Long, Long, Long, Long], Tuple6[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator((SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
       assert(agg(longData) == Tuple6(6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 7 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple7[Long, Long, Long, Long, Long, Long, Long],
-                                Tuple7[Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple7[Long, Long, Long, Long, Long, Long, Long], Tuple7[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator((SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
       assert(agg(longData) == Tuple7(6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 8 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple8[Long, Long, Long, Long, Long, Long, Long, Long],
-                                Tuple8[Long, Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple8[Long, Long, Long, Long, Long, Long, Long, Long], Tuple8[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator((SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
       assert(agg(longData) == Tuple8(6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 9 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple9[Long, Long, Long, Long, Long, Long, Long, Long, Long],
-                                Tuple9[Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple9[Long, Long, Long, Long, Long, Long, Long, Long, Long], Tuple9[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator((SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
       assert(agg(longData) == Tuple9(6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 10 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple10[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-                                Tuple10[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple10[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long], Tuple10[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] =
         MultiAggregator(
-          (SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
+          (SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg)
+        )
       assert(agg(longData) == Tuple10(6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 11 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple11[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-                                Tuple11[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple11[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple11[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
         MultiAggregator(
-          (SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg))
+          (SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg, SizeAgg)
+        )
       assert(agg(longData) == Tuple11(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 12 MonoidAggregators" in {
-      val agg
-        : MonoidAggregator[Long,
-                           Tuple12[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-                           Tuple12[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+      val agg: MonoidAggregator[Long, Tuple12[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple12[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
         MultiAggregator(
           (
             SizeAgg,
@@ -1113,15 +1493,28 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             SizeAgg,
             SizeAgg,
             SizeAgg,
-            SizeAgg))
+            SizeAgg
+          )
+        )
       assert(agg(longData) == Tuple12(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 13 MonoidAggregators" in {
-      val agg: MonoidAggregator[
+      val agg: MonoidAggregator[Long, Tuple13[
         Long,
-        Tuple13[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-        Tuple13[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple13[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
         MultiAggregator(
           (
             SizeAgg,
@@ -1136,15 +1529,29 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             SizeAgg,
             SizeAgg,
             SizeAgg,
-            SizeAgg))
+            SizeAgg
+          )
+        )
       assert(agg(longData) == Tuple13(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 14 MonoidAggregators" in {
-      val agg: MonoidAggregator[
+      val agg: MonoidAggregator[Long, Tuple14[
         Long,
-        Tuple14[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-        Tuple14[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple14[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
         MultiAggregator(
           (
             SizeAgg,
@@ -1160,15 +1567,30 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             SizeAgg,
             SizeAgg,
             SizeAgg,
-            SizeAgg))
+            SizeAgg
+          )
+        )
       assert(agg(longData) == Tuple14(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 15 MonoidAggregators" in {
-      val agg: MonoidAggregator[
+      val agg: MonoidAggregator[Long, Tuple15[
         Long,
-        Tuple15[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long],
-        Tuple15[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple15[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long, Long]] =
         MultiAggregator(
           (
             SizeAgg,
@@ -1185,44 +1607,48 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
             SizeAgg,
             SizeAgg,
             SizeAgg,
-            SizeAgg))
+            SizeAgg
+          )
+        )
       assert(agg(longData) == Tuple15(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 16 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple16[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple16[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple16[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple16[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1239,46 +1665,50 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple16(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 17 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple17[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple17[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple17[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple17[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1296,48 +1726,52 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple17(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 18 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple18[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple18[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple18[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple18[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1356,50 +1790,54 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple18(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 19 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple19[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple19[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple19[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple19[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1419,52 +1857,56 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple19(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 20 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple20[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple20[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple20[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple20[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1485,54 +1927,58 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple20(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 21 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple21[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple21[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple21[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple21[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1554,56 +2000,60 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple21(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
 
     "Create a MonoidAggregator from a tuple of 22 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long,
-                                Tuple22[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long],
-                                Tuple22[Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long,
-                                        Long]] = MultiAggregator(
+      val agg: MonoidAggregator[Long, Tuple22[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple22[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ]] = MultiAggregator(
         (
           SizeAgg,
           SizeAgg,
@@ -1626,7 +2076,9 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           SizeAgg,
           SizeAgg,
           SizeAgg,
-          SizeAgg))
+          SizeAgg
+        )
+      )
       assert(agg(longData) == Tuple22(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6))
     }
   }
@@ -1675,7 +2127,8 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           ("key2", MinLongAgg),
           ("key3", MinLongAgg),
           ("key4", MinLongAgg),
-          ("key5", MinLongAgg))
+          ("key5", MinLongAgg)
+        )
       val expectedMap =
         Map("key1" -> 6, "key2" -> 0, "key3" -> 0, "key4" -> 0, "key5" -> 0)
       assert(agg(data) == expectedMap)
@@ -1689,7 +2142,8 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           ("key3", MinLongAgg),
           ("key4", MinLongAgg),
           ("key5", MinLongAgg),
-          ("key6", MinLongAgg))
+          ("key6", MinLongAgg)
+        )
       val expectedMap = Map("key1" -> 6, "key2" -> 0, "key3" -> 0, "key4" -> 0, "key5" -> 0, "key6" -> 0)
       assert(agg(data) == expectedMap)
     }
@@ -1703,7 +2157,8 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
           ("key4", MinLongAgg),
           ("key5", MinLongAgg),
           ("key6", MinLongAgg),
-          ("key7", MinLongAgg))
+          ("key7", MinLongAgg)
+        )
       val expectedMap =
         Map("key1" -> 6, "key2" -> 0, "key3" -> 0, "key4" -> 0, "key5" -> 0, "key6" -> 0, "key7" -> 0)
       assert(agg(data) == expectedMap)
@@ -1729,7 +2184,8 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key5" -> 0,
         "key6" -> 0,
         "key7" -> 0,
-        "key8" -> 0)
+        "key8" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
@@ -1755,13 +2211,14 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key6" -> 0,
         "key7" -> 0,
         "key8" -> 0,
-        "key9" -> 0)
+        "key9" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 10 (key, aggregator) pairs" in {
       val agg
-        : Aggregator[Int, Tuple10[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] =
+          : Aggregator[Int, Tuple10[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[String, Long]] =
         MapAggregator(
           ("key1", SizeAgg),
           ("key2", MinLongAgg),
@@ -1784,14 +2241,16 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key7" -> 0,
         "key8" -> 0,
         "key9" -> 0,
-        "key10" -> 0)
+        "key10" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 11 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple11[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple11[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[
+        String,
+        Long
+      ]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -1815,14 +2274,16 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key8" -> 0,
         "key9" -> 0,
         "key10" -> 0,
-        "key11" -> 0)
+        "key11" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 12 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple12[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple12[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[
+        String,
+        Long
+      ]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -1848,14 +2309,16 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key9" -> 0,
         "key10" -> 0,
         "key11" -> 0,
-        "key12" -> 0)
+        "key12" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 13 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple13[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple13[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[
+        String,
+        Long
+      ]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -1883,14 +2346,16 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key10" -> 0,
         "key11" -> 0,
         "key12" -> 0,
-        "key13" -> 0)
+        "key13" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 14 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple14[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple14[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[
+        String,
+        Long
+      ]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -1920,14 +2385,29 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
         "key11" -> 0,
         "key12" -> 0,
         "key13" -> 0,
-        "key14" -> 0)
+        "key14" -> 0
+      )
       assert(agg(data) == expectedMap)
     }
 
     "Create an aggregator from 15 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple15[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple15[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -1965,10 +2445,24 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 16 (key, aggregator) pairs" in {
-      val agg
-        : Aggregator[Int,
-                     Tuple16[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-                     Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple16[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2008,10 +2502,25 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 17 (key, aggregator) pairs" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple17[
+        Long,
         Int,
-        Tuple17[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Map[String, Long]] = MapAggregator(
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2053,10 +2562,26 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 18 (key, aggregator) pairs" in {
-      val agg: Aggregator[
+      val agg: Aggregator[Int, Tuple18[
+        Long,
         Int,
-        Tuple18[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int],
-        Map[String, Long]] = MapAggregator(
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2100,27 +2625,27 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 19 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple19[Long,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple19[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2166,28 +2691,28 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 20 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple20[Long,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple20[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2235,29 +2760,29 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 21 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple21[Long,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple21[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),
@@ -2307,30 +2832,30 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
     }
 
     "Create an aggregator from 22 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int,
-                          Tuple22[Long,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int,
-                                  Int],
-                          Map[String, Long]] = MapAggregator(
+      val agg: Aggregator[Int, Tuple22[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[String, Long]] = MapAggregator(
         ("key1", SizeAgg),
         ("key2", MinLongAgg),
         ("key3", MinLongAgg),

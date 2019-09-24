@@ -338,12 +338,14 @@ sealed abstract class HLL extends java.io.Serializable {
    *
    * @return  New value of rhoW
    */
-  protected def getModifiedRhoW(currentJ: Int,
-                                currentRhoW: Byte,
-                                reducedBits: Int,
-                                reducedSize: Int,
-                                bitMask: Int,
-                                buf: Array[Byte]): Byte =
+  protected def getModifiedRhoW(
+      currentJ: Int,
+      currentRhoW: Byte,
+      reducedBits: Int,
+      reducedSize: Int,
+      bitMask: Int,
+      buf: Array[Byte]
+  ): Byte =
     if (currentRhoW == 0)
       // rhoW not set, skip
       currentRhoW

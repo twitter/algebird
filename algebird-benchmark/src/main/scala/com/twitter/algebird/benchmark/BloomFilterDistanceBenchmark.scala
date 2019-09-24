@@ -41,18 +41,22 @@ object BloomFilterDistanceBenchmark {
     val sparseBF1: BF[String] =
       toSparse(
         BloomFilter[String](nbrOfElements, falsePositiveRate)
-          .create(randomElements: _*))
+          .create(randomElements: _*)
+      )
     val sparesBF2: BF[String] =
       toSparse(
         BloomFilter[String](nbrOfElements, falsePositiveRate)
-          .create(randomElements: _*))
+          .create(randomElements: _*)
+      )
 
     val denseBF1: BF[String] = toDense(
       BloomFilter[String](nbrOfElements, falsePositiveRate)
-        .create(randomElements: _*))
+        .create(randomElements: _*)
+    )
     val denseBF2: BF[String] = toDense(
       BloomFilter[String](nbrOfElements, falsePositiveRate)
-        .create(randomElements: _*))
+        .create(randomElements: _*)
+    )
 
   }
 }

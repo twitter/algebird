@@ -121,7 +121,11 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
     })
   override def plus(x: JMap[K, V], y: JMap[K, V]) = {
     val (big, small, bigOnLeft) =
-      if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
+      if (x.size > y.size) {
+        (x, y, true)
+      } else {
+        (y, x, false)
+      }
     val vsemi = implicitly[Semigroup[V]]
     val result = new java.util.HashMap[K, V](big.size + small.size)
     result.putAll(big)

@@ -59,7 +59,9 @@ class ApproximateLaws extends CheckProperties {
         trueGen,
         falseGen,
         Gen.const(ApproximateBoolean.exact(true)),
-        Gen.const(ApproximateBoolean.exact(false))))
+        Gen.const(ApproximateBoolean.exact(false))
+      )
+    )
 
   property("Boolean: &&") {
     forAll { (a: ApproximateBoolean) =>

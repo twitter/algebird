@@ -25,10 +25,12 @@ class AsyncListSumProperties extends CheckProperties {
 
   property("NonCompactingList Summing with and without the summer should match") {
     forAll {
-      (inputs: List[List[(Int, Long)]],
-       flushFrequency: FlushFrequency,
-       bufferSize: BufferSize,
-       memoryFlushPercent: MemoryFlushPercent) =>
+      (
+          inputs: List[List[(Int, Long)]],
+          flushFrequency: FlushFrequency,
+          bufferSize: BufferSize,
+          memoryFlushPercent: MemoryFlushPercent
+      ) =>
         val timeOutCounter = Counter("timeOut")
         val sizeCounter = Counter("size")
         val memoryCounter = Counter("memory")
@@ -57,11 +59,13 @@ class AsyncListSumProperties extends CheckProperties {
 
   property("CompactingList Summing with and without the summer should match") {
     forAll {
-      (inputs: List[List[(Int, Long)]],
-       flushFrequency: FlushFrequency,
-       bufferSize: BufferSize,
-       memoryFlushPercent: MemoryFlushPercent,
-       compactionSize: CompactionSize) =>
+      (
+          inputs: List[List[(Int, Long)]],
+          flushFrequency: FlushFrequency,
+          bufferSize: BufferSize,
+          memoryFlushPercent: MemoryFlushPercent,
+          compactionSize: CompactionSize
+      ) =>
         val timeOutCounter = Counter("timeOut")
         val sizeCounter = Counter("size")
         val memoryCounter = Counter("memory")

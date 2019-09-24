@@ -22,8 +22,8 @@ import com.twitter.util.Future
  * @author Ian O Connell
  */
 class NullSummer[Key, Value](tuplesIn: Incrementor, tuplesOut: Incrementor)(
-    implicit semigroup: Semigroup[Value])
-    extends AsyncSummer[(Key, Value), Map[Key, Value]] {
+    implicit semigroup: Semigroup[Value]
+) extends AsyncSummer[(Key, Value), Map[Key, Value]] {
   def flush: Future[Map[Key, Value]] = Future.value(Map.empty)
   def tick: Future[Map[Key, Value]] = Future.value(Map.empty)
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {

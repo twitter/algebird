@@ -57,12 +57,14 @@ object QTree {
     new QTree(kv._2, kv._1, 0, 1, null, null)
   }
 
-  def apply[A](offset: Long,
-               level: Int,
-               count: Long,
-               sum: A, //the sum at just this node (*not* including its children)
-               lowerChild: Option[QTree[A]],
-               upperChild: Option[QTree[A]]): QTree[A] = {
+  def apply[A](
+      offset: Long,
+      level: Int,
+      count: Long,
+      sum: A, //the sum at just this node (*not* including its children)
+      lowerChild: Option[QTree[A]],
+      upperChild: Option[QTree[A]]
+  ): QTree[A] = {
     require(offset >= 0, "QTree can not accept negative values")
 
     new QTree(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
@@ -105,7 +107,8 @@ object QTree {
     apply(v -> (()), level)
 
   private[algebird] def mergePeers[@specialized(Int, Long, Float, Double) A](left: QTree[A], right: QTree[A])(
-      implicit monoid: Monoid[A]): QTree[A] = {
+      implicit monoid: Monoid[A]
+  ): QTree[A] = {
     assert(right.lowerBound == left.lowerBound, "lowerBound " + right.lowerBound + " != " + left.lowerBound)
     assert(right.level == left.level, "level " + right.level + " != " + left.level)
 
@@ -120,7 +123,8 @@ object QTree {
   }
 
   private def mergeOptions[A](aNullable: QTree[A], bNullable: QTree[A])(
-      implicit monoid: Monoid[A]): QTree[A] =
+      implicit monoid: Monoid[A]
+  ): QTree[A] =
     if (aNullable != null) {
       if (bNullable != null) {
         mergePeers(aNullable, bNullable)
@@ -167,8 +171,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     _level: Int,
     _count: Long, //the total count for this node and all of its children
     _lowerChildNullable: QTree[A],
-    _upperChildNullable: QTree[A])
-    extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]]
+    _upperChildNullable: QTree[A]
+) extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]]
     with Serializable {
   import QTree._
 
@@ -184,12 +188,14 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   def lowerChild: Option[QTree[A]] = Option(_lowerChildNullable)
   def upperChild: Option[QTree[A]] = Option(_upperChildNullable)
 
-  def this(offset: Long,
-           level: Int,
-           count: Long,
-           sum: A,
-           lowerChild: Option[QTree[A]],
-           upperChild: Option[QTree[A]]) =
+  def this(
+      offset: Long,
+      level: Int,
+      count: Long,
+      sum: A,
+      lowerChild: Option[QTree[A]],
+      upperChild: Option[QTree[A]]
+  ) =
     this(sum, offset, level, count, lowerChild.orNull, upperChild.orNull)
 
   // Helpers to access the nullable ones from inside the QTree work
@@ -482,8 +488,8 @@ object QTreeAggregator {
  * Returns an Intersection which represents the bounded approximation.
  */
 case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-    implicit val num: Numeric[T])
-    extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
+    implicit val num: Numeric[T]
+) extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
     with QTreeAggregatorLike[T] {
 
   def present(qt: QTree[Unit]) = {
@@ -499,8 +505,8 @@ case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.Defau
  * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
  */
 case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-    implicit val num: Numeric[T])
-    extends Aggregator[T, QTree[Unit], Double]
+    implicit val num: Numeric[T]
+) extends Aggregator[T, QTree[Unit], Double]
     with QTreeAggregatorLike[T] {
 
   def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1

@@ -87,9 +87,10 @@ case class SGDPos[+Pos](val pos: List[Pos]) extends SGD[Pos]
  * before you start adding SGDPos objects. Otherwise you will
  * just be doing list concatenation.
  */
-class SGDMonoid[Pos](stepfn: (Long, IndexedSeq[Double]) => Double,
-                     gradient: (IndexedSeq[Double], Pos) => IndexedSeq[Double])
-    extends Monoid[SGD[Pos]] {
+class SGDMonoid[Pos](
+    stepfn: (Long, IndexedSeq[Double]) => Double,
+    gradient: (IndexedSeq[Double], Pos) => IndexedSeq[Double]
+) extends Monoid[SGD[Pos]] {
 
   val zero = SGDZero
 
@@ -113,6 +114,7 @@ class SGDMonoid[Pos](stepfn: (Long, IndexedSeq[Double]) => Double,
       sgdW.weights.view
         .zip(grad)
         .map { case (l: Double, r: Double) => l - step * r }
-        .toIndexedSeq)
+        .toIndexedSeq
+    )
   }
 }

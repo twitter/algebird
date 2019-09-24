@@ -24,15 +24,17 @@ import scala.collection.JavaConverters._
 /**
  * @author Ian O Connell
  */
-class AsyncMapSum[Key, Value](bufferSize: BufferSize,
-                              override val flushFrequency: FlushFrequency,
-                              override val softMemoryFlush: MemoryFlushPercent,
-                              override val memoryIncr: Incrementor,
-                              override val timeoutIncr: Incrementor,
-                              insertOp: Incrementor,
-                              tuplesOut: Incrementor,
-                              sizeIncr: Incrementor,
-                              workPool: FuturePool)(implicit semigroup: Semigroup[Value])
+class AsyncMapSum[Key, Value](
+    bufferSize: BufferSize,
+    override val flushFrequency: FlushFrequency,
+    override val softMemoryFlush: MemoryFlushPercent,
+    override val memoryIncr: Incrementor,
+    override val timeoutIncr: Incrementor,
+    insertOp: Incrementor,
+    tuplesOut: Incrementor,
+    sizeIncr: Incrementor,
+    workPool: FuturePool
+)(implicit semigroup: Semigroup[Value])
     extends AsyncSummer[(Key, Value), Map[Key, Value]]
     with WithFlushConditions[(Key, Value), Map[Key, Value]] {
 

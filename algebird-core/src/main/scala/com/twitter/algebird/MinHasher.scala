@@ -160,7 +160,8 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
   }
 
   override protected def buildArray(left: Array[Byte], right: Array[Byte])(
-      fn: (Int, Int) => Int): Array[Byte] = {
+      fn: (Int, Int) => Int
+  ): Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asIntBuffer
     val rightBuffer = ByteBuffer.wrap(right).asIntBuffer
     buildArray { fn(leftBuffer.get, rightBuffer.get) }
@@ -200,7 +201,8 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
   }
 
   override protected def buildArray(left: Array[Byte], right: Array[Byte])(
-      fn: (Char, Char) => Char): Array[Byte] = {
+      fn: (Char, Char) => Char
+  ): Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asCharBuffer
     val rightBuffer = ByteBuffer.wrap(right).asCharBuffer
     buildArray { fn(leftBuffer.get, rightBuffer.get) }

@@ -27,7 +27,8 @@ class SpaceSaverLaws extends CheckProperties {
             Arbitrary.arbitrary[SSOne[Int]],
             Gen
               .nonEmptyContainerOf[List, SSOne[Int]](Arbitrary.arbitrary[SSOne[Int]])
-              .map(_.reduce(sg.plus)))
+              .map(_.reduce(sg.plus))
+          )
         }
 
         implicit def equiv[T]: Equiv[SpaceSaver[T]] =

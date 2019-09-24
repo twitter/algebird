@@ -78,14 +78,16 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
       (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
     implicit val ring = Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
       Tuple14.apply,
-      Tuple14.unapply)
+      Tuple14.unapply
+    )
     ringLaws[T] && isCommutative[T]
   }
   property("Product15Ring is a ring") {
     type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
     implicit val ring = Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
       Tuple15.apply,
-      Tuple15.unapply)
+      Tuple15.unapply
+    )
     ringLaws[T] && isCommutative[T]
   }
   property("Product16Ring is a ring") {
@@ -93,7 +95,8 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
     implicit val ring =
       Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
         Tuple16.apply,
-        Tuple16.unapply)
+        Tuple16.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product17Ring is a ring") {
@@ -101,7 +104,8 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
     implicit val ring =
       Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
         Tuple17.apply,
-        Tuple17.unapply)
+        Tuple17.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product18Ring is a ring") {
@@ -109,7 +113,8 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
     implicit val ring =
       Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
         Tuple18.apply,
-        Tuple18.unapply)
+        Tuple18.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product19Ring is a ring") {
@@ -117,7 +122,8 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
     implicit val ring =
       Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
         Tuple19.apply,
-        Tuple19.unapply)
+        Tuple19.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product20Ring is a ring") {
@@ -144,31 +150,34 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
       Int,
       Int,
       Int,
-      Int](Tuple20.apply, Tuple20.unapply)
+      Int
+    ](Tuple20.apply, Tuple20.unapply)
     ringLaws[T] && isCommutative[T]
   }
   property("Product21Ring is a ring") {
-    type T = (Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int)
+    type T = (
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+    )
     implicit val ring = Ring[
       T,
       Int,
@@ -191,32 +200,35 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
       Int,
       Int,
       Int,
-      Int](Tuple21.apply, Tuple21.unapply)
+      Int
+    ](Tuple21.apply, Tuple21.unapply)
     ringLaws[T] && isCommutative[T]
   }
   property("Product22Ring is a ring") {
-    type T = (Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int,
-              Int)
+    type T = (
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+    )
     implicit val ring = Ring[
       T,
       Int,
@@ -240,7 +252,8 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
       Int,
       Int,
       Int,
-      Int](Tuple22.apply, Tuple22.unapply)
+      Int
+    ](Tuple22.apply, Tuple22.unapply)
     ringLaws[T] && isCommutative[T]
   }
 }

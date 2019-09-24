@@ -139,9 +139,10 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MMap[Int,Int] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[
-      ScMap[Int, Int],
-      MMap[Int, Int]]
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[
+      Int,
+      Int
+    ]]
   }
 
   property("Map[Int,Int] has -") {
@@ -165,9 +166,10 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MMap[Int,String] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[
-      ScMap[Int, Int],
-      MMap[Int, Int]]
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[
+      Int,
+      Int
+    ]]
   }
 
   // We haven't implemented ring.one yet for the Map, so skip the one property
@@ -316,9 +318,11 @@ class CollectionSpecification extends CheckProperties {
     forAll { (items: Set[Int]) =>
       (mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
-        Map((None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0))))) && mapEq.equiv(
+        Map((None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0))))
+      ) && mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Int, Int](items)(square)(identity),
-        MapAlgebra.sumByKey(items.map(x => x -> square(x).getOrElse(0)))))
+        MapAlgebra.sumByKey(items.map(x => x -> square(x).getOrElse(0)))
+      ))
     }
   }
 
@@ -329,10 +333,9 @@ class CollectionSpecification extends CheckProperties {
       } yield AdaptiveVector.fromVector(Vector(l: _*), sparse),
       for {
         m <- Arbitrary.arbitrary[Map[Int, T]]
-      } yield
-        AdaptiveVector.fromMap(m.filter {
-          case (k, _) => (k < 1000) && (k >= 0)
-        }, sparse, 1000),
+      } yield AdaptiveVector.fromMap(m.filter {
+        case (k, _) => (k < 1000) && (k >= 0)
+      }, sparse, 1000),
       for {
         size <- Gen.posNum[Int]
       } yield AdaptiveVector.fromMap(Map.empty, sparse, size)

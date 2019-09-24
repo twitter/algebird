@@ -25,14 +25,17 @@ import com.twitter.algebird.{Monad, Semigroup}
  * to compose carefully.
  */
 sealed trait StateWithError[S, +F, +T] {
-  def join[F1 >: F, U](that: StateWithError[S, F1, U],
-                       mergeErr: (F1, F1) => F1,
-                       mergeState: (S, S) => S): StateWithError[S, F1, (T, U)] =
+  def join[F1 >: F, U](
+      that: StateWithError[S, F1, U],
+      mergeErr: (F1, F1) => F1,
+      mergeState: (S, S) => S
+  ): StateWithError[S, F1, (T, U)] =
     join(that)(Semigroup.from(mergeErr), Semigroup.from(mergeState))
 
   def join[F1 >: F, U](that: StateWithError[S, F1, U])(
       implicit sgf: Semigroup[F1],
-      sgs: Semigroup[S]): // TODO: deep joins could blow the stack, not yet using trampoline here
+      sgs: Semigroup[S]
+  ): // TODO: deep joins could blow the stack, not yet using trampoline here
   StateWithError[S, F1, (T, U)] =
     StateFn({ (requested: S) =>
       (run(requested), that.run(requested)) match {

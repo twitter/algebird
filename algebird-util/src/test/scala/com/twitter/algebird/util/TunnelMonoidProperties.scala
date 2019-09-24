@@ -21,12 +21,15 @@ import com.twitter.util.{Await, Future}
 import scala.util.Random
 
 object TunnelMonoidProperties {
-  def testTunnelMonoid[I, V](makeRandomInput: Int => I,
-                             makeTunnel: I => V,
-                             collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]])(
+  def testTunnelMonoid[I, V](
+      makeRandomInput: Int => I,
+      makeTunnel: I => V,
+      collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]]
+  )(
       implicit
       monoid: Monoid[I],
-      superMonoid: Monoid[V]) = {
+      superMonoid: Monoid[V]
+  ) = {
     val r = new Random
     val numbers = (1 to 40).map { _ =>
       makeRandomInput(r.nextInt)
