@@ -1,10 +1,10 @@
 package com.twitter.algebird.macros
 
-import scala.reflect.macros.{Context => ScalaConxtext}
+import scala.reflect.macros.{Context => WhiteBoxContext}
 
 private[algebird] object MacroCompat {
 
-  type Context = ScalaConxtext
+  type Context = WhiteBoxContext
 
   def normalize(c: Context)(tpe: c.universe.Type) = tpe.normalize
 
