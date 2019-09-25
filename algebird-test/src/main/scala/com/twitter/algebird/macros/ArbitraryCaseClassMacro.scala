@@ -1,9 +1,9 @@
 package com.twitter.algebird.macros
 
 import scala.language.experimental.macros
-import scala.reflect.macros.Context
 
 import com.twitter.algebird._
+import com.twitter.algebird.macros.MacroCompat._
 
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -27,7 +27,7 @@ object ArbitraryCaseClassMacro {
 
     val paramsList =
       params.map(param => q"${param.name.asInstanceOf[TermName]}")
-    val companion = tpe.typeSymbol.companionSymbol
+    val companion = companionSymbol(c)(tpe.typeSymbol)
 
     val res = q"""
     for ( ..$getsList ) yield $companion.apply(..$paramsList)

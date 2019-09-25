@@ -1,8 +1,7 @@
 package com.twitter.algebird.macros
 
-import scala.reflect.macros.Context
-
 import com.twitter.algebird._
+import com.twitter.algebird.macros.MacroCompat._
 
 object MonoidMacro {
   def caseClassMonoid[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.Expr[Monoid[T]] = {

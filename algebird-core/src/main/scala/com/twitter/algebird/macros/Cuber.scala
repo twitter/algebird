@@ -1,7 +1,7 @@
 package com.twitter.algebird.macros
 
 import scala.language.experimental.{macros => sMacros}
-import scala.reflect.macros.Context
+import com.twitter.algebird.macros.MacroCompat._
 
 /**
  * "Cubes" a case class or tuple, i.e. for a tuple of type
@@ -50,18 +50,18 @@ object Cuber {
       val optionTypes = types.map { t =>
         tq"_root_.scala.Option[$t]"
       }
-      val tupleType = newTypeName(s"Tuple${arity}")
+      val tupleType = typeName(c)(s"Tuple${arity}")
       tq"_root_.scala.$tupleType[..$optionTypes]"
     }
 
     val somes = params.zip(Stream.from(1)).map {
       case (param, index) =>
-        val name = newTermName(s"some$index")
+        val name = termName(c)(s"some$index")
         q"val $name = _root_.scala.Some(in.$param)"
     }
 
     val options = (1 to arity).map { index =>
-      val some = newTermName(s"some$index")
+      val some = termName(c)(s"some$index")
       q"if (((1 << ${index - 1}) & i) == 0) _root_.scala.None else $some"
     }
 

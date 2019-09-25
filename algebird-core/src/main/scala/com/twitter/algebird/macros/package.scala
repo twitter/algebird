@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import scala.reflect.macros.Context
+import com.twitter.algebird.macros.MacroCompat._
 
 package object macros {
   private[macros] def ensureCaseClass[T](c: Context)(implicit T: c.WeakTypeTag[T]): Unit = {
@@ -19,14 +19,14 @@ package object macros {
     import c.universe._
 
     val tpe = weakTypeOf[T]
-    tpe.declarations.collect {
+    declarations(c)(tpe).collect {
       case m: MethodSymbol if m.isCaseAccessor => m
     }.toList
   }
 
   private[macros] def getCompanionObject[T](c: Context)(implicit T: c.WeakTypeTag[T]): c.universe.Symbol = {
     import c.universe._
-    weakTypeOf[T].typeSymbol.companionSymbol
+    companionSymbol(c)(weakTypeOf[T].typeSymbol)
   }
 
   private[macros] def getParamTypes[T](c: Context)(implicit T: c.WeakTypeTag[T]): List[c.universe.Type] = {
@@ -34,7 +34,7 @@ package object macros {
 
     @annotation.tailrec
     def normalized(tpe: c.universe.Type): c.universe.Type = {
-      val norm = tpe.normalize
+      val norm = normalize(c)(tpe)
       if (!(norm =:= tpe))
         normalized(norm)
       else
@@ -42,7 +42,7 @@ package object macros {
     }
 
     val tpe = weakTypeOf[T]
-    tpe.declarations.collect {
+    declarations(c)(tpe).collect {
       case m: MethodSymbol if m.isCaseAccessor =>
         normalized(m.returnType.asSeenFrom(tpe, tpe.typeSymbol.asClass))
     }.toList
