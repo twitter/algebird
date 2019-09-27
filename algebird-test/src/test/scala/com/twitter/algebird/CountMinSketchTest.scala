@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec, WordSpec}
 import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks, ScalaCheckPropertyChecks}
-import org.scalacheck.{Arbitrary, Gen, Properties}
+import org.scalacheck.{Arbitrary, Gen}
 
 import scala.util.Random
 import CMSHasherImplicits.CMSHasherBigInt
@@ -146,8 +146,6 @@ class TopPctCmsLaws extends CheckProperties {
 
 class SparseCMSTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
-  import BaseProperties._
-
   val DELTA = 1e-8
   val EPS = 0.005
   val SEED = 1
@@ -164,8 +162,6 @@ class SparseCMSTest extends WordSpec with Matchers with ScalaCheckDrivenProperty
 }
 
 class CMSInstanceTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
-  import BaseProperties._
 
   val DELTA = 1e-8
   val EPS = 0.005

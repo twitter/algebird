@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Gen.choose

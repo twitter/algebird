@@ -19,12 +19,8 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.choose
-import org.scalacheck.Properties
-import org.scalatest.{Matchers, PropSpec}
-
-import java.util.Arrays
+import org.scalatest.Matchers
 
 class QTreeLaws extends CheckProperties {
   import BaseProperties._

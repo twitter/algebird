@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird.bijection
 
 import com.twitter.algebird.{Group, InvariantSemigroup, Monoid, Ring, Semigroup}
-import com.twitter.bijection.{AbstractBijection, Bijection, Conversion, ImplicitBijection, Reverse}
+import com.twitter.bijection.{AbstractBijection, Bijection, ImplicitBijection, Reverse}
 
 /**
  * Bijections on Algebird's abstract algebra datatypes.

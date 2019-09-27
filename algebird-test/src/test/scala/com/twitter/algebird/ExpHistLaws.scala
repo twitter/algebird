@@ -4,8 +4,6 @@ import com.twitter.algebird.scalacheck.{NonEmptyVector, PosNum}
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.PropSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary.arbitrary
 
 class ExpHistLaws extends PropSpec with ScalaCheckPropertyChecks {
   import ExpHist.{Bucket, Canonical, Config, Timestamp}

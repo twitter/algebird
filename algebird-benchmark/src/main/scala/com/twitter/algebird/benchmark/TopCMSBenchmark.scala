@@ -1,7 +1,6 @@
 package com.twitter.algebird
 package benchmark
 
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.util.Random.nextString
 

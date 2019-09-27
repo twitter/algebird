@@ -31,7 +31,6 @@ import java.lang.{
 }
 import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
 
 /**

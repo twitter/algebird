@@ -4,14 +4,12 @@ package benchmark
 import scala.util.Random
 import com.twitter.bijection._
 
-import com.twitter.algebird.util._
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 import scala.math._
 
 class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
-  import HyperLogLog._
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
     if (items.isEmpty) None

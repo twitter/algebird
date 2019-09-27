@@ -670,7 +670,6 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
   }
 
   "MultiAggregator" should {
-    import MultiAggregator._
 
     "Create an aggregator from a tuple of 2 aggregators" in {
       val agg: Aggregator[Int, Tuple2[Int, Int], Tuple2[Int, Int]] =
@@ -2084,7 +2083,6 @@ class TupleAggregatorsTest extends WordSpec with Matchers {
   }
 
   "MapAggregator" should {
-    import MapAggregator._
 
     val MinLongAgg = Aggregator.min[Int].andThenPresent { _.toLong }
 

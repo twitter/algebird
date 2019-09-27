@@ -3,7 +3,6 @@ package com.twitter.algebird
 import scala.collection.immutable.Queue
 
 import com.twitter.algebird.BaseProperties._
-import com.twitter.algebird.scalacheck.arbitrary._
 import com.twitter.algebird.scalacheck.PosNum
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen

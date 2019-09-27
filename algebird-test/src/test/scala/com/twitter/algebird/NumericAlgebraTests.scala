@@ -1,9 +1,5 @@
 package com.twitter.algebird
 
-import org.scalatest._
-
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
-
 class NumericAlgebraTests extends CheckProperties {
   import BaseProperties._
   implicit val arbitraryBigDecimalsHere =

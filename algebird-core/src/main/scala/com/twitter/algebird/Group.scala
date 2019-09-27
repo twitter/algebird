@@ -25,7 +25,6 @@ import java.lang.{
   Double => JDouble,
   Boolean => JBool
 }
-import java.util.{List => JList, Map => JMap}
 
 import scala.reflect.ClassTag
 

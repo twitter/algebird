@@ -17,8 +17,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop._
 
 class MetricLaws extends CheckProperties {
   property("double metric") {

@@ -1,6 +1,5 @@
 package com.twitter.algebird.benchmark
 
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 
 /**
