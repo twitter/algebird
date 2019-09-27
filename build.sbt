@@ -70,8 +70,14 @@ val sharedSettings = Seq(
       Seq()
   },
   scalacOptions ++= {
+    if (scalaVersion.value.startsWith("2.11"))
+      Seq("-Ywarn-unused", "-Ywarn-unused-import")
+    else
+      Seq()
+  },
+  scalacOptions ++= {
     if (scalaVersion.value.startsWith("2.12"))
-      Seq("-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
+      Seq("-Ywarn-unused", "-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
     else
       Seq("-optimize")
   },
