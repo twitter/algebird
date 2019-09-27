@@ -4,7 +4,6 @@ import java.lang.Math._
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
 
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import com.twitter.algebird.{HyperLogLogMonoid, _}
 import com.twitter.algebird.util.summer._

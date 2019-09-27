@@ -1,8 +1,6 @@
 package com.twitter.algebird
 
-import org.scalatest._
-
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck.{Arbitrary, Gen, Prop}
 import Arbitrary.arbitrary
 
 import HyperLogLog.{int2Bytes, long2Bytes}

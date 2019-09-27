@@ -87,7 +87,7 @@ class MonadInstanceLaws extends CheckProperties {
           } // just sequence them
         }
       // apply:
-      val result = bigReader(m1)
+      bigReader(m1)
 
       // This should be the same as this loop:
       fns.foreach { fn =>

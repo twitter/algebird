@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
-import org.scalacheck.{Arbitrary, Gen, Properties}
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
 
@@ -421,7 +421,7 @@ class BloomFilterTest extends WordSpec with Matchers {
           val numEntries = 5
           val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
           val bf = bfMonoid.create(entries: _*)
-          val bfWithCheckAndAdd = entries
+          entries
             .map { entry =>
               (entry, bfMonoid.create(entry))
             }

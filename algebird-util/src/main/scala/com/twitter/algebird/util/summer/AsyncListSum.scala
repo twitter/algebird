@@ -91,7 +91,7 @@ class AsyncListSum[Key, Value](
         val retV = queueMap.remove(k)
 
         if (retV != null) {
-          val newRemaining = elementsInCache.addAndGet(retV.size * -1)
+          elementsInCache.addAndGet(retV.size * -1)
           fSg.sumOption(retV.toSeq).map(v => v.map((k, _)))
         } else None
       }.toSeq)

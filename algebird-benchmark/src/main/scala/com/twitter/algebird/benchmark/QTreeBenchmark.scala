@@ -1,7 +1,6 @@
 package com.twitter.algebird.benchmark
 
 import com.twitter.algebird._
-import com.twitter.bijection._
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.util.Random

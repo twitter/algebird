@@ -3,12 +3,11 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck.{Arbitrary, Gen, Prop}
 
 import scala.collection.BitSet
 
 import java.lang.AssertionError
-import java.util.Arrays
 
 object ReferenceHyperLogLog {
 
@@ -234,7 +233,6 @@ class LargeSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int)
 
 class HLLProperties extends ApproximateProperties("HyperLogLog") {
   import ApproximateProperty.toProp
-  import HyperLogLog.{int2Bytes, long2Bytes}
 
   implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
   implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
@@ -264,7 +262,7 @@ class HLLProperties extends ApproximateProperties("HyperLogLog") {
 
 class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregator") {
   import ApproximateProperty.toProp
-  import HyperLogLog.{int2Bytes, long2Bytes}
+  import HyperLogLog.int2Bytes
 
   implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
   implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)

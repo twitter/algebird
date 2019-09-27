@@ -1,13 +1,6 @@
 package com.twitter.algebird
 
-import java.lang.{
-  Boolean => JBool,
-  Double => JDouble,
-  Float => JFloat,
-  Integer => JInt,
-  Long => JLong,
-  Short => JShort
-}
+import java.lang.{Boolean => JBool, Integer => JInt, Long => JLong, Short => JShort}
 import java.util.{List => JList, Map => JMap}
 
 import org.scalacheck.{Arbitrary, Gen}

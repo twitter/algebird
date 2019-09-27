@@ -1,6 +1,5 @@
 package com.twitter.algebird.benchmark
 
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import com.twitter.algebird.HyperLogLogMonoid
 import com.twitter.bijection._

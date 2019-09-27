@@ -199,7 +199,7 @@ class EventuallyAggregatorLaws extends PropSpec with ScalaCheckPropertyChecks wi
         x.lengthCompare(thresh) > 0
       }
       val eventuallyAg = eventuallyAggregator(rightAg)(pred)
-      val semi = eventuallyAg.semigroup
+      eventuallyAg.semigroup
 
       /**
        * Here we just manually implement the eventually logic

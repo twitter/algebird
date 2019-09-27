@@ -7,10 +7,12 @@ matrix:
       script: sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
       #script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
-    - name: scalafix check
+    - name: checks
       scala: 2.11.12
       jdk: openjdk8
-      script: sbt ++$TRAVIS_SCALA_VERSION "; scalafixEnable; scalafix --check; test:scalafix --check"
+      script: sbt ++$TRAVIS_SCALA_VERSION \
+        "; scalafmtCheckAll; scalafmtSbtCheck" \
+        "; scalafixEnable; scalafix --check; test:scalafix --check"
 
     - scala: 2.11.12
       jdk: openjdk8
@@ -20,7 +22,7 @@ matrix:
 
     - scala: 2.12.9
       jdk: openjdk8
-      script: sbt "++$TRAVIS_SCALA_VERSION clean" "++$TRAVIS_SCALA_VERSION test" "scalafmtCheckAll" "scalafmtSbtCheck" "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      script: sbt "++$TRAVIS_SCALA_VERSION clean" "++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
       #script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
 
 before_install:

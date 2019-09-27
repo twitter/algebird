@@ -18,7 +18,7 @@ package com.twitter.algebird
 package util
 
 import com.twitter.algebird.BaseProperties._
-import com.twitter.algebird.MonadLaws.{monadLaws, monadLawsEquiv}
+import com.twitter.algebird.MonadLaws.monadLaws
 import com.twitter.util.{Await, Future, Return, Throw, Try}
 import org.scalacheck.{Arbitrary, Gen}
 import scala.util.control.NonFatal

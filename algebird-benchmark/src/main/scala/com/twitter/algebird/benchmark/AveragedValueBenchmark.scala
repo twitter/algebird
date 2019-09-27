@@ -5,8 +5,6 @@ import scala.util.Random
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
-import scala.math._
-
 object AveragedValueBenchmark {
   @State(Scope.Benchmark)
   class AVState {

@@ -2,8 +2,6 @@ package com.twitter.algebird.benchmark
 
 import com.twitter.algebird.{DenseHLL, HLL, HyperLogLogMonoid, SparseHLL}
 import com.twitter.bijection._
-import java.nio.ByteBuffer
-import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 

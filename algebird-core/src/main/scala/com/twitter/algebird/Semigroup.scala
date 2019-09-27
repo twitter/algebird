@@ -27,11 +27,8 @@ import java.lang.{
 }
 import java.util.{List => JList, Map => JMap}
 
-import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
 import scala.annotation.{implicitNotFound, tailrec}
-
-import macros.caseclass._
 
 /**
  * A semigroup is any type `T` with an associative operation (`plus`):

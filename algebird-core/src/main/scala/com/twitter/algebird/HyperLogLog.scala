@@ -300,7 +300,6 @@ object HyperLogLog {
 }
 
 sealed abstract class HLL extends java.io.Serializable {
-  import HyperLogLog._
 
   def bits: Int
   def size: Int
@@ -424,9 +423,8 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
       case DenseHLL(bits, oldV) =>
         assert(oldV.size == size, "Incompatible HLL size: " + oldV.size + " != " + size)
         val newContents: Array[Byte] = oldV.array.clone
-        val siz = newContents.size
-
         val iter: Iterator[(Int, Max[Byte])] = maxRhow.iterator
+
         while (iter.hasNext) {
           val (idx, maxB) = iter.next
           val existing: Byte = newContents(idx)

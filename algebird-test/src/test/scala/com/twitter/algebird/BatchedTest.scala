@@ -3,13 +3,8 @@ package com.twitter.algebird
 import org.scalatest._
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
-
-import scala.collection.BitSet
-
-import java.lang.AssertionError
-import java.util.Arrays
 
 object Helpers {
   implicit def arbitraryBatched[A: Arbitrary]: Arbitrary[Batched[A]] = {
