@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen, Prop}
 
 class EventuallyRingLaws extends CheckProperties {
@@ -152,7 +152,7 @@ class EventuallyTest extends WordSpec with Matchers {
 
 }
 
-class EventuallyAggregatorLaws extends PropSpec with PropertyChecks with Matchers {
+class EventuallyAggregatorLaws extends PropSpec with ScalaCheckPropertyChecks with Matchers {
   implicit def aggregator[A, B, C](
       implicit
       prepare: Arbitrary[A => B],

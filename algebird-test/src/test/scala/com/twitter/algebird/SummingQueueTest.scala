@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
 

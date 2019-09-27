@@ -3,11 +3,11 @@ package com.twitter.algebird
 import com.twitter.algebird.scalacheck.{NonEmptyVector, PosNum}
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.PropSpec
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
 
-class ExpHistLaws extends PropSpec with PropertyChecks {
+class ExpHistLaws extends PropSpec with ScalaCheckPropertyChecks {
   import ExpHist.{Bucket, Canonical, Config, Timestamp}
 
   property("Increment example from DGIM paper") {
@@ -254,7 +254,7 @@ class ExpHistLaws extends PropSpec with PropertyChecks {
   }
 }
 
-class CanonicalLaws extends PropSpec with PropertyChecks {
+class CanonicalLaws extends PropSpec with ScalaCheckPropertyChecks {
   import ExpHist.Canonical._
 
   property("l-canonical representation is all l or l+1s except for last") {

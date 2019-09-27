@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 
 import scala.collection.BitSet
@@ -91,7 +91,7 @@ class HyperLogLogLaws extends CheckProperties {
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
-class jRhoWMatchTest extends PropSpec with PropertyChecks with Matchers {
+class jRhoWMatchTest extends PropSpec with ScalaCheckPropertyChecks with Matchers {
   import HyperLogLog._
 
   implicit val hashGen = Arbitrary {

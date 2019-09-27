@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object SketchMapTestImplicits {
