@@ -22,7 +22,6 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.choose
 import org.scalacheck.Properties
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{Matchers, PropSpec}
 
 import java.util.Arrays

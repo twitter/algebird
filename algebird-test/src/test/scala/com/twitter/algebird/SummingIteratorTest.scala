@@ -17,7 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object SummingIteratorTest {
@@ -38,7 +38,7 @@ object SummingIteratorTest {
     }
 }
 
-class SummingIteratorTest extends PropSpec with PropertyChecks with Matchers {
+class SummingIteratorTest extends PropSpec with ScalaCheckPropertyChecks with Matchers {
   import SummingIteratorTest._
   def sumEquiv[V: Semigroup: Equiv](it0: Iterator[V], it1: Iterator[V]): Boolean =
     StatefulSummerLaws.zeroEquiv(Semigroup.sumOption(it0), Semigroup.sumOption(it1))

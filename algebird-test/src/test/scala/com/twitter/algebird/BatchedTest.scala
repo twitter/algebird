@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Arbitrary.arbitrary
 
@@ -55,7 +55,7 @@ class BatchedLaws extends CheckProperties {
   testBatchedMonoid[String]("String", 1000000)
 }
 
-class BatchedTests extends PropSpec with Matchers with PropertyChecks {
+class BatchedTests extends PropSpec with Matchers with ScalaCheckPropertyChecks {
   property(".iterator works") {
     forAll { (x: Int, xs: List[Int]) =>
       Batched(x).append(xs).iterator.toList shouldBe (x :: xs)

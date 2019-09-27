@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec, WordSpec}
-import org.scalatest.prop.{GeneratorDrivenPropertyChecks, PropertyChecks}
+import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks, ScalaCheckPropertyChecks}
 import org.scalacheck.{Arbitrary, Gen, Properties}
 
 import scala.util.Random
@@ -144,7 +144,7 @@ class TopPctCmsLaws extends CheckProperties {
   }
 }
 
-class SparseCMSTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+class SparseCMSTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import BaseProperties._
 
@@ -163,7 +163,7 @@ class SparseCMSTest extends WordSpec with Matchers with GeneratorDrivenPropertyC
   }
 }
 
-class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+class CMSInstanceTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import BaseProperties._
 
@@ -183,7 +183,7 @@ class CMSInstanceTest extends WordSpec with Matchers with GeneratorDrivenPropert
 /**
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
  */
-class CMSContraMapSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+class CMSContraMapSpec extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
     // Given a "source" CMSHasher[K]
@@ -418,7 +418,7 @@ abstract class CMSRingTest[K: CMSHasher: Ring] extends CMSTest[K]((x: Int) => im
 abstract class CMSTest[K: CMSHasher](toK: Int => K)
     extends WordSpec
     with Matchers
-    with GeneratorDrivenPropertyChecks {
+    with ScalaCheckDrivenPropertyChecks {
 
   val DELTA = 1e-10
   val EPS = 0.001
@@ -948,7 +948,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   }
 }
 
-class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
+class CMSFunctionsSpec extends PropSpec with ScalaCheckPropertyChecks with Matchers {
   property("roundtrips width->eps->width") {
     forAll { (i: Int) =>
       whenever(i > 0) {
@@ -997,7 +997,7 @@ class CMSFunctionsSpec extends PropSpec with PropertyChecks with Matchers {
 
 }
 
-class CMSParamsSpec extends PropSpec with PropertyChecks with Matchers {
+class CMSParamsSpec extends PropSpec with ScalaCheckPropertyChecks with Matchers {
 
   val AnyEps = 0.001
   val AnyDelta = 1e-5
@@ -1047,7 +1047,10 @@ class CMSHasherBytesSpec extends CMSHasherSpec[Bytes](CmsLaws.int2Bytes(_))
 
 abstract class CMSHasherRingSpec[K: CMSHasher: Ring] extends CMSHasherSpec[K](implicitly[Ring[K]].fromInt(_))
 
-abstract class CMSHasherSpec[K: CMSHasher](toK: Int => K) extends PropSpec with PropertyChecks with Matchers {
+abstract class CMSHasherSpec[K: CMSHasher](toK: Int => K)
+    extends PropSpec
+    with ScalaCheckPropertyChecks
+    with Matchers {
 
   property("returns hashes (i.e. slots) in the range [0, width)") {
     forAll { (a: Int, b: Int, width: Int, x: Int) =>

@@ -1,9 +1,9 @@
 package com.twitter.algebird
 
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class SemigroupTest extends FunSuite with PropertyChecks {
+class SemigroupTest extends FunSuite with ScalaCheckPropertyChecks {
   test("Semigroup.maybePlus works") {
     forAll { s: String =>
       assert(Semigroup.maybePlus(None, s) == s)

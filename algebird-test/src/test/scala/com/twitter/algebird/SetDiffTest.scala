@@ -3,7 +3,7 @@ package com.twitter.algebird
 import org.scalacheck._
 import org.scalacheck.Prop._
 import org.scalatest.{Matchers, WordSpec}
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 
 import Arbitrary.arbitrary
 

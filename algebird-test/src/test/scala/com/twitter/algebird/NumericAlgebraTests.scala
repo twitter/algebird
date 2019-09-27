@@ -2,7 +2,6 @@ package com.twitter.algebird
 
 import org.scalatest._
 
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 
 class NumericAlgebraTests extends CheckProperties {

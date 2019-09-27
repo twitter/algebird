@@ -1,10 +1,10 @@
 package com.twitter.algebird
 
 import org.scalacheck.Gen
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.{Matchers, WordSpec}
 
-class BytesSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks {
+class BytesSpec extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   "requires non-null arrays" in {
     an[IllegalArgumentException] should be thrownBy Bytes(null)

@@ -1,7 +1,6 @@
 package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary
 
 class TupleRingSpecification extends CheckProperties {

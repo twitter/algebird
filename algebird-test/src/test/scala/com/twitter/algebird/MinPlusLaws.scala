@@ -17,16 +17,9 @@ limitations under the License.
 package com.twitter.algebird
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.Arbitrary
-import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Properties
-import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Gen.choose
 
 class MinPlusLaws extends CheckProperties {
