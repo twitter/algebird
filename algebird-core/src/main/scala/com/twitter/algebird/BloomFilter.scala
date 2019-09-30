@@ -455,8 +455,8 @@ case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
 
   def ++(other: BF[A]): BF[A] =
     other match {
-      case _ @BFZero(_, _)            => this
-      case _ @BFItem(otherItem, _, _) => toSparse + otherItem
+      case BFZero(_, _)            => this
+      case BFItem(otherItem, _, _) => toSparse + otherItem
       case _                          => other + item
     }
 
@@ -504,8 +504,8 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
     require(this.numHashes == other.numHashes)
 
     other match {
-      case _ @BFZero(_, _)       => this
-      case _ @BFItem(item, _, _) => this + item
+      case BFZero(_, _)       => this
+      case BFItem(item, _, _) => this + item
       case bf @ BFSparse(_, otherBits, _) => {
         // assume same hashes used
 
@@ -576,7 +576,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
       case BFSparse(_, otherBits, _) =>
         // assume same hashes used
         BFInstance(hashes, bits | (new RichCBitSet(otherBits)).toBitSet(width), width)
-      case _ @BFInstance(_, otherBits, _) => {
+      case BFInstance(_, otherBits, _) => {
         // assume same hashes used
         BFInstance(hashes, bits ++ otherBits, width)
       }
