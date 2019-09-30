@@ -113,7 +113,7 @@ object AsyncSummerBenchmark {
         Counter("tuplesOut")
       )
 
-      val inputData: IndexedSeq[(Long, HLL)] = (0L until numInputItems).map { inputKey =>
+      val inputData: IndexedSeq[(Long, HLL)] = (0L until numInputItems).map { _ =>
         val pos = rnd.nextInt(10)
         val k = if (pos < 8) { // 80% chance of hitting a heavy hitter
           heavyKeysIndexedSeq(rnd.nextInt(heavyKeysIndexedSeq.size))

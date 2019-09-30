@@ -1,6 +1,7 @@
 package com.twitter.algebird.benchmark
 
 import org.openjdk.jmh.annotations._
+import com.twitter.algebird.CMSHasher
 
 /**
  * Benchmarks the hashing algorithms used by Count-Min sketch for CMS[BigInt].
@@ -75,13 +76,7 @@ class CMSHashingBenchmark {
   import CMSHashingBenchmark._
 
   private def murmurHashScala(a: Int, b: Int, width: Int)(x: BigInt) = {
-    val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x.toByteArray, a)
-    val h = {
-      // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
-      // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.
-      val positiveHash = hash & Int.MaxValue
-      positiveHash % width
-    }
+    val h = CMSHasher.hashBytes(a, b, width)(x.toByteArray)
     assert(h >= 0, "hash must not be negative")
     h
   }

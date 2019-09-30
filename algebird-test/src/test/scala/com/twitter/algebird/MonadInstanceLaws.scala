@@ -48,18 +48,16 @@ class MonadInstanceLaws extends CheckProperties {
 
   property("State behaves correctly") {
     forAll { (in: Int, head: Long, fns: List[(Int) => Either[String, (Int, Long)]]) =>
-      val mons = fns.map { StateWithError(_) }
+      val mons = fns.map(StateWithError(_))
       val init =
         StateWithError.const[Int, Long](head): StateWithError[Int, String, Long]
       val comp = mons.foldLeft(init) { (old, fn) =>
-        old.flatMap { x =>
-          fn
-        } // just bind
+        old.flatMap(_ => fn) // just bind
       }
-      comp(in) == (fns
+      comp(in) == fns
         .foldLeft(Right((in, head)): Either[String, (Int, Long)]) { (oldState, fn) =>
-          oldState.right.flatMap { case (s, v) => fn(s) }
-        })
+          oldState.right.flatMap { case (s, _) => fn(s) }
+        }
     }
   }
 
@@ -82,9 +80,7 @@ class MonadInstanceLaws extends CheckProperties {
       // Now apply them all:
       val bigReader =
         readers.foldLeft(Reader.const(()): Reader[MutableBox, Unit]) { (oldr, thisR) =>
-          oldr.flatMap { x =>
-            thisR
-          } // just sequence them
+          oldr.flatMap(_ => thisR) // just sequence them
         }
       // apply:
       bigReader(m1)

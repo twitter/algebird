@@ -100,7 +100,7 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
 
   // arbitrary timestamp
   def inputGenerator(timestampedData: Exact): Gen[Long] =
-    Gen.oneOf(timestampedData).map { case (value, timestamp) => timestamp }
+    Gen.oneOf(timestampedData).map { case (_, timestamp) => timestamp }
 
   def approximateResult(series: HLLSeries, timestamp: Long) =
     series.since(timestamp).toHLL.approximateSize

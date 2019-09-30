@@ -240,9 +240,9 @@ case class SketchMap[K, V](
  * An Aggregator for the SketchMap.
  * Can be created using SketchMap.aggregator
  */
-case class SketchMapAggregator[K, V](params: SketchMapParams[K], skmMonoid: SketchMapMonoid[K, V])(
-    implicit valueOrdering: Ordering[V],
-    valueMonoid: Monoid[V]
+case class SketchMapAggregator[K, V: Ordering: Monoid](
+    params: SketchMapParams[K],
+    skmMonoid: SketchMapMonoid[K, V]
 ) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
   val monoid = skmMonoid
 

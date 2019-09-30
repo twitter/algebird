@@ -400,9 +400,9 @@ sealed abstract class BF[A] extends java.io.Serializable {
     (this, that) match {
       // Comparing with empty filter should give number
       // of bits in other set
-      case (x: BFZero[A], y: BFZero[A]) => 0
-      case (x: BFZero[A], y: BF[A])     => y.numBits
-      case (x: BF[A], y: BFZero[A])     => x.numBits
+      case (_: BFZero[A], _: BFZero[A]) => 0
+      case (_: BFZero[A], y: BF[A])     => y.numBits
+      case (x: BF[A], _: BFZero[A])     => x.numBits
 
       // Special case for Sparse vs. Sparse
       case (x: BFSparse[A], y: BFSparse[A]) => x.bits.xorCardinality(y.bits)
@@ -455,9 +455,9 @@ case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
 
   def ++(other: BF[A]): BF[A] =
     other match {
-      case bf @ BFZero(_, _)            => this
-      case bf @ BFItem(otherItem, _, _) => toSparse + otherItem
-      case _                            => other + item
+      case BFZero(_, _)            => this
+      case BFItem(otherItem, _, _) => toSparse + otherItem
+      case _                       => other + item
     }
 
   def +(other: A) = this ++ BFItem(other, hashes, width)
@@ -504,8 +504,8 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
     require(this.numHashes == other.numHashes)
 
     other match {
-      case bf @ BFZero(_, _)       => this
-      case bf @ BFItem(item, _, _) => this + item
+      case BFZero(_, _)       => this
+      case BFItem(item, _, _) => this + item
       case bf @ BFSparse(_, otherBits, _) => {
         // assume same hashes used
 
@@ -576,7 +576,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
       case BFSparse(_, otherBits, _) =>
         // assume same hashes used
         BFInstance(hashes, bits | (new RichCBitSet(otherBits)).toBitSet(width), width)
-      case bf @ BFInstance(_, otherBits, _) => {
+      case BFInstance(_, otherBits, _) => {
         // assume same hashes used
         BFInstance(hashes, bits ++ otherBits, width)
       }

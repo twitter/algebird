@@ -50,7 +50,7 @@ object CMSBenchmark {
       stringMonoid = CMS.monoid[String](eps, delta, Seed)
 
       val bitsPerChar = 16
-      largeStrings = (1 to size).map(i => nextString(MaxBits / bitsPerChar)).toVector
+      largeStrings = (1 to size).map(_ => nextString(MaxBits / bitsPerChar)).toVector
       largeBigInts = largeStrings.map(s => BigInt(s.getBytes))
       largeBigDecimals = largeStrings.map(s => {
         val md = (s.head % 256) - 128

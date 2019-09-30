@@ -22,8 +22,8 @@ object BloomFilterTestUtils {
       val bs = LongBitSet.empty(width)
       bs += hashes(item)
       BFInstance(hashes, bs.toBitSetNoCopy, width)
-    case bfs @ BFSparse(hashes, bitset, width)   => bfs.dense
-    case bfi @ BFInstance(hashes, bitset, width) => bfi
+    case bfs @ BFSparse(_, _, _)   => bfs.dense
+    case bfi @ BFInstance(_, _, _) => bfi
   }
 }
 
@@ -426,7 +426,7 @@ class BloomFilterTest extends WordSpec with Matchers {
               (entry, bfMonoid.create(entry))
             }
             .foldLeft((bfMonoid.zero, bfMonoid.zero)) {
-              case ((left, leftAlt), (entry, right)) =>
+              case ((left, leftAlt), (entry, _)) =>
                 val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
                 left.contains(entry) shouldBe contained
                 (left + entry, newLeftAlt)

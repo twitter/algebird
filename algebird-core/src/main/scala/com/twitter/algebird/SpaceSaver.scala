@@ -22,7 +22,7 @@ object SpaceSaver {
 
   private[algebird] val ordering =
     Ordering.by[(_, (Long, Long)), (Long, Long)] {
-      case (item, (count, err)) => (-count, err)
+      case (_, (count, err)) => (-count, err)
     }
 
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] =
@@ -161,7 +161,7 @@ sealed abstract class SpaceSaver[T] {
    */
   def mostFrequent(thres: Int): Seq[(T, Approximate[Long], Boolean)] =
     counters.iterator
-      .filter { case (item, (count, err)) => count >= thres }
+      .filter { case (_, (count, _)) => count >= thres }
       .toList
       .sorted(ordering)
       .map {

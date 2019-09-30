@@ -180,7 +180,7 @@ class CMSSummation[K](params: CMSParams[K]) {
         ()
       case CMSItem(item, count, _) =>
         insert(item, count)
-      case SparseCMS(table, count, _) =>
+      case SparseCMS(table, _, _) =>
         table.foreach {
           case (item, c) =>
             insert(item, c)
@@ -605,7 +605,7 @@ case class CMSItem[K](item: K, override val totalCount: Long, override val param
 
   override def ++(other: CMS[K]): CMS[K] =
     other match {
-      case other: CMSZero[_] => this
+      case _: CMSZero[_] => this
       case other: CMSItem[K] =>
         CMSInstance[K](params) + (item, totalCount) + (other.item, other.totalCount)
       case _ => other + item
@@ -642,7 +642,7 @@ case class SparseCMS[K](
 
   override def ++(other: CMS[K]): CMS[K] =
     other match {
-      case other: CMSZero[_]   => this
+      case _: CMSZero[_]       => this
       case other: CMSItem[K]   => this + (other.item, other.totalCount)
       case other: SparseCMS[K] =>
         // This SparseCMS's maxExactCount is used, so ++ is not communitive
@@ -699,7 +699,7 @@ case class CMSInstance[K](
 
   def ++(other: CMS[K]): CMS[K] =
     other match {
-      case other: CMSZero[_] => this
+      case _: CMSZero[_]     => this
       case other: CMSItem[K] => this + other.item
       case other: SparseCMS[K] =>
         other.exactCountTable.foldLeft(this) {
@@ -934,7 +934,7 @@ case class TopCMSItem[K](item: K, override val cms: CMS[K], params: TopCMSParams
   override def +(x: K, count: Long): TopCMS[K] = toCMSInstance + (x, count)
 
   override def ++(other: TopCMS[K]): TopCMS[K] = other match {
-    case other: TopCMSZero[_]     => this
+    case _: TopCMSZero[_]         => this
     case other: TopCMSItem[K]     => toCMSInstance + other.item
     case other: TopCMSInstance[K] => other + item
   }
@@ -969,7 +969,7 @@ case class TopCMSInstance[K](override val cms: CMS[K], hhs: HeavyHitters[K], par
   }
 
   override def ++(other: TopCMS[K]): TopCMS[K] = other match {
-    case other: TopCMSZero[_] => this
+    case _: TopCMSZero[_]     => this
     case other: TopCMSItem[K] => this + other.item
     case other: TopCMSInstance[K] =>
       val newCms = cms ++ other.cms

@@ -116,6 +116,7 @@ object CMSHasher {
    * @return Slot assigned to item `x` in the vector of size `width`, where `x in [0, width)`.
    */
   private[algebird] def hashBytes(a: Int, b: Int, width: Int)(x: Array[Byte]): Int = {
+    val _ = b // suppressing unused `b`
     val hash: Int = scala.util.hashing.MurmurHash3.arrayHash(x, a)
     // We only want positive integers for the subsequent modulo.  This method mimics Java's Hashtable
     // implementation.  The Java code uses `0x7FFFFFFF` for the bit-wise AND, which is equal to Int.MaxValue.

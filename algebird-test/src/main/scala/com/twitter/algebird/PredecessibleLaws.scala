@@ -41,7 +41,7 @@ object PredecessibleLaws {
   def iteratePrevDecreases[T: Predecessible](t: T, size: Short): Boolean =
     Predecessible.iteratePrev(t).take(size.toInt).sliding(2).forall {
       case a :: b :: Nil => implicitly[Predecessible[T]].ordering.lt(b, a)
-      case a :: Nil      => true
+      case _ :: Nil      => true
       case s             => sys.error("should never happen: " + s)
     }
 

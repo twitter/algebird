@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-import com.twitter.algebird._
 import org.apache.spark.rdd.{PairRDDFunctions, RDD}
 import org.apache.spark.Partitioner
 import scala.reflect.ClassTag

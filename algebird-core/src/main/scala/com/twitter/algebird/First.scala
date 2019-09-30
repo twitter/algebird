@@ -30,7 +30,10 @@ case class First[@specialized(Int, Long, Float, Double) +T](get: T) {
    *
    * @param r ignored instance of `First[U]`
    */
-  def +[U >: T](r: First[U]): First[T] = this
+  def +[U >: T](r: First[U]): First[T] = {
+    val _ = r //suppressing unused `r`
+    this
+  }
 }
 
 /**

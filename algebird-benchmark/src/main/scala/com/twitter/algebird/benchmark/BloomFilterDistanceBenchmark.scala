@@ -20,8 +20,8 @@ object BloomFilterDistanceBenchmark {
       val bs = LongBitSet.empty(width)
       bs += hashes(item)
       BFInstance(hashes, bs.toBitSetNoCopy, width)
-    case bfs @ BFSparse(hashes, bitset, width)   => bfs.dense
-    case bfi @ BFInstance(hashes, bitset, width) => bfi
+    case bfs @ BFSparse(_, _, _)   => bfs.dense
+    case bfi @ BFInstance(_, _, _) => bfi
   }
 
   @State(Scope.Benchmark)

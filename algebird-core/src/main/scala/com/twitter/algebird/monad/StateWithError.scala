@@ -113,9 +113,7 @@ object StateWithError {
       Right((state, t))
     })
   def failure[S, F](f: F): StateWithError[S, F, Nothing] =
-    StateFn({ (state: S) =>
-      Left(f)
-    })
+    StateFn(_ => Left(f))
 
   /**
    * Use like fromEither[Int](Right("good"))

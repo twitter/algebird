@@ -73,7 +73,7 @@ object AdaptiveVector {
 
   def toVector[V](v: AdaptiveVector[V]): Vector[V] =
     v match {
-      case DenseVector(is, sv, _) => is
+      case DenseVector(is, _, _)  => is
       case SparseVector(m, v, sz) => toVector(m, v, sz)
     }
 
@@ -96,7 +96,7 @@ object AdaptiveVector {
         // they have the same sparse value
         val maxSize = Ordering[Int].max(left.size, right.size)
         (left, right) match {
-          case (DenseVector(lv, ls, ld), DenseVector(rv, rs, rd)) =>
+          case (DenseVector(lv, ls, _), DenseVector(rv, _, _)) =>
             val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
               case v: Vector[_] => v.asInstanceOf[Vector[V]]
               case notV         => Vector(notV: _*)

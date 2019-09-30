@@ -25,7 +25,7 @@ class StatisticsTest extends WordSpec with Matchers {
   // the test framework garbles the exceptions :/
   lazy val statsMonoid = new StatisticsMonoid[Int]
   try {
-    for (i <- 1 to 2) statsMonoid.zero
+    for (_ <- 1 to 2) statsMonoid.zero
     for (i <- 1 to 3) statsMonoid.plus(i, i)
     for (i <- 1 to 3000) statsMonoid.sum(for (v <- 1 to i) yield v)
     for (i <- 1 to 2000) statsMonoid.sumOption(for (v <- 1 to i) yield v)

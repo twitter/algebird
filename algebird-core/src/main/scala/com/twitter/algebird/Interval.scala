@@ -133,8 +133,8 @@ object Interval extends java.io.Serializable {
         !succ.next(l).exists(succ.ordering.lt(_, u))
       case Intersection(ExclusiveLower(l), InclusiveUpper(u)) =>
         !succ.next(l).exists(succ.ordering.lteq(_, u))
-      case InclusiveLower(l) => false // we at least have l
-      case InclusiveUpper(u) => false //false // we at least have u
+      case InclusiveLower(_) => false // we at least have l
+      case InclusiveUpper(_) => false //false // we at least have u
       case ExclusiveLower(l) =>
         succ.next(l).isEmpty
       case ExclusiveUpper(u) =>
@@ -150,7 +150,7 @@ object Interval extends java.io.Serializable {
     def boundedLeast(implicit succ: Successible[T]): Option[T] = intr match {
       case Empty()                => None
       case Universe()             => None
-      case u: Upper[_]            => None
+      case _: Upper[_]            => None
       case i @ Intersection(_, _) => i.least
       case l: Lower[_]            => l.least
     }
@@ -165,7 +165,7 @@ object Interval extends java.io.Serializable {
       intr match {
         case Empty()                => None
         case Universe()             => None
-        case l: Lower[_]            => None
+        case _: Lower[_]            => None
         case i @ Intersection(_, _) => i.greatest
         case u: Upper[_]            => u.greatest
       }
@@ -229,9 +229,9 @@ case class InclusiveLower[T](lower: T) extends Interval[T] with Lower[T] {
   def intersect(that: Interval[T])(implicit ordering: Ordering[T]): Interval[T] = that match {
     case Universe() => this
     case Empty()    => that
-    case ub @ InclusiveUpper(upper) =>
+    case ub @ InclusiveUpper(_) =>
       if (intersects(ub)) Intersection(this, ub) else Empty()
-    case ub @ ExclusiveUpper(upper) =>
+    case ub @ ExclusiveUpper(_) =>
       if (intersects(ub)) Intersection(this, ub) else Empty()
     case InclusiveLower(thatlb) =>
       if (ordering.gt(lower, thatlb)) this else that
@@ -254,9 +254,9 @@ case class ExclusiveLower[T](lower: T) extends Interval[T] with Lower[T] {
   def intersect(that: Interval[T])(implicit ordering: Ordering[T]): Interval[T] = that match {
     case Universe() => this
     case Empty()    => that
-    case ub @ InclusiveUpper(upper) =>
+    case ub @ InclusiveUpper(_) =>
       if (intersects(ub)) Intersection(this, ub) else Empty()
-    case ub @ ExclusiveUpper(upper) =>
+    case ub @ ExclusiveUpper(_) =>
       if (intersects(ub)) Intersection(this, ub) else Empty()
     case InclusiveLower(thatlb) =>
       if (ordering.gteq(lower, thatlb)) this else that
@@ -283,9 +283,9 @@ case class InclusiveUpper[T](upper: T) extends Interval[T] with Upper[T] {
   def intersect(that: Interval[T])(implicit ordering: Ordering[T]): Interval[T] = that match {
     case Universe() => this
     case Empty()    => that
-    case lb @ InclusiveLower(lower) =>
+    case lb @ InclusiveLower(_) =>
       if (lb.intersects(this)) Intersection(lb, this) else Empty()
-    case lb @ ExclusiveLower(lower) =>
+    case lb @ ExclusiveLower(_) =>
       if (lb.intersects(this)) Intersection(lb, this) else Empty()
     case InclusiveUpper(thatub) =>
       if (ordering.lt(upper, thatub)) this else that
@@ -304,9 +304,9 @@ case class ExclusiveUpper[T](upper: T) extends Interval[T] with Upper[T] {
   def intersect(that: Interval[T])(implicit ordering: Ordering[T]): Interval[T] = that match {
     case Universe() => this
     case Empty()    => that
-    case lb @ InclusiveLower(lower) =>
+    case lb @ InclusiveLower(_) =>
       if (lb.intersects(this)) Intersection(lb, this) else Empty()
-    case lb @ ExclusiveLower(lower) =>
+    case lb @ ExclusiveLower(_) =>
       if (lb.intersects(this)) Intersection(lb, this) else Empty()
     case InclusiveUpper(thatub) =>
       if (ordering.lteq(upper, thatub)) this else that

@@ -28,13 +28,13 @@ trait AsyncSummer[T, +M <: Iterable[T]] { self =>
 
   def isFlushed: Boolean
   def cleanup: Future[Unit] = Future.Unit
-  def withCleanup(cleanup: () => Future[Unit]): AsyncSummer[T, M] = {
+  def withCleanup(cleanupFn: () => Future[Unit]): AsyncSummer[T, M] = {
     val oldSelf = self
     new AsyncSummerProxy[T, M] {
       override val self = oldSelf
       override def cleanup =
         oldSelf.cleanup.flatMap { _ =>
-          cleanup
+          cleanupFn()
         }
     }
   }

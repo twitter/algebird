@@ -41,7 +41,7 @@ object SuccessibleLaws {
   def iterateNextIncreases[T: Successible](t: T, size: Short): Boolean =
     Successible.iterateNext(t).take(size.toInt).sliding(2).forall {
       case a :: b :: Nil => implicitly[Successible[T]].ordering.lt(a, b)
-      case a :: Nil      => true
+      case _ :: Nil      => true
       case s             => sys.error("should never happen: " + s)
     }
 

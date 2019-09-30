@@ -84,7 +84,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
    * @return New HLLSeries only including RhoWs for values seen at or after the given timestamp
    */
   def since(threshold: Long): HLLSeries =
-    HLLSeries(bits, rows.map { _.filter { case (j, ts) => ts >= threshold } })
+    HLLSeries(bits, rows.map { _.filter { case (_, ts) => ts >= threshold } })
 
   def toHLL: HLL = {
     val monoid = new HyperLogLogMonoid(bits)
@@ -92,7 +92,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     else {
       monoid.sum(rows.iterator.zipWithIndex.map {
         case (map, i) =>
-          SparseHLL(bits, map.mapValues { ts =>
+          SparseHLL(bits, map.mapValues { _ =>
             Max((i + 1).toByte)
           })
       })
