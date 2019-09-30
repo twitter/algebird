@@ -457,7 +457,7 @@ case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
     other match {
       case BFZero(_, _)            => this
       case BFItem(otherItem, _, _) => toSparse + otherItem
-      case _                          => other + item
+      case _                       => other + item
     }
 
   def +(other: A) = this ++ BFItem(other, hashes, width)
