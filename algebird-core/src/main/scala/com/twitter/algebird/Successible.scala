@@ -82,8 +82,8 @@ object Successible {
       def compare(left: Option[T], right: Option[T]) =
         (left, right) match {
           case (Some(l), Some(r)) => ord.compare(l, r)
-          case (Some(l), None)    => -1
-          case (None, Some(r))    => 1
+          case (Some(_), None)    => -1
+          case (None, Some(_))    => 1
           case (None, None)       => 0
         }
     }

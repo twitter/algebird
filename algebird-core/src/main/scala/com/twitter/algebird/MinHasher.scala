@@ -73,7 +73,7 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map { i =>
+    (1 to numHashFunctions).map { _ =>
       MurmurHash128(r.nextLong)
     }
   }
@@ -153,9 +153,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
   override protected def buildArray(fn: => Int): Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asIntBuffer
-    1.to(numHashes).foreach { i =>
-      writeBuffer.put(fn)
-    }
+    1.to(numHashes).foreach(_ => writeBuffer.put(fn))
     byteBuffer.array
   }
 
@@ -172,9 +170,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
     val buffer = ByteBuffer.wrap(sig).asIntBuffer
     val mean = 1
       .to(numHashes)
-      .map { i =>
-        buffer.get.toLong
-      }
+      .map(_ => buffer.get.toLong)
       .sum / numHashes
     (2L << 31) / (mean.toLong + (2L << 30))
   }
@@ -194,9 +190,7 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
   override protected def buildArray(fn: => Char): Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)
     val writeBuffer = byteBuffer.asCharBuffer
-    1.to(numHashes).foreach { i =>
-      writeBuffer.put(fn)
-    }
+    1.to(numHashes).foreach(_ => writeBuffer.put(fn))
     byteBuffer.array
   }
 

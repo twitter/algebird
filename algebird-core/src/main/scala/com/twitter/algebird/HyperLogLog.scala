@@ -426,7 +426,7 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
         val iter: Iterator[(Int, Max[Byte])] = maxRhow.iterator
 
         while (iter.hasNext) {
-          val (idx, maxB) = iter.next
+          val (idx, _) = iter.next
           val existing: Byte = newContents(idx)
           val other: Byte = maxRhow(idx).get
 
@@ -614,7 +614,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
       .map { x =>
         jRhoW(hash(x), bits)
       }
-      .groupBy { case (j, rhow) => j }
+      .groupBy { case (j, _) => j }
       .map { case (j, iter) => (j, Max(iter.maxBy(_._2)._2)) }
     if (allMaxRhow.size * 16 <= size) {
       SparseHLL(bits, allMaxRhow)

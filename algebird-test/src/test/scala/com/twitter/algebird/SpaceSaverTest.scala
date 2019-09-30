@@ -58,7 +58,7 @@ class SpaceSaverLaws extends CheckProperties {
         //We check that `fromBytes` doesn't yield exceptions
         fromBytes.isFailure || fromBytes.isSuccess
       } catch {
-        case oom: OutOfMemoryError =>
+        case _: OutOfMemoryError =>
           true // this happens if random data has a giant number in it
       }
     }
@@ -72,9 +72,7 @@ class SpaceSaverTest extends WordSpec with Matchers {
       val gen = Gen.frequency((1 to 100).map { x =>
         (x * x, x: Gen[Int])
       }: _*)
-      val items = (1 to 1000).map { x =>
-        gen.sample.get
-      }
+      val items = (1 to 1000).map(_ => gen.sample.get)
       val exactCounts = items.groupBy(identity).mapValues(_.size)
 
       // simulate a distributed system with 10 mappers and 1 reducer

@@ -430,7 +430,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * A debug method that prints the QTree to standard out using print/println
    */
   def dump() {
-    for (i <- (20 to _level by -1))
+    for (_ <- (20 to _level by -1))
       print(" ")
     print(lowerBound + " - " + upperBound + ": " + _count)
     if (lowerChild.isDefined || upperChild.isDefined) {

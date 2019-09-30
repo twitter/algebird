@@ -66,7 +66,7 @@ class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) =>
             val newAcc = grpAcc.plus(leftAcc, rightAcc)
             RightFoldedValue2(leftV, newAcc, rightRvals)
           } else {
-            val (newV, newRightAcc) = doFold(leftRvals, rightV, rightAcc)
+            val (_, newRightAcc) = doFold(leftRvals, rightV, rightAcc)
             // Now actually add the left value, with the right:
             val newAcc = grpAcc.plus(leftAcc, newRightAcc)
             RightFoldedValue2(leftV, newAcc, rightRvals)

@@ -301,7 +301,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
 
   def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
-    val data = (0 until dataSize).map { i =>
+    val data = (0 until dataSize).map { _ =>
       r.nextLong
     }
     val exact = exactCount(data).toDouble
@@ -387,7 +387,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
     "work as an Aggregator and return a HLL" in {
       List(5, 7, 8, 10).foreach(bits => {
         val aggregator = HyperLogLogAggregator(bits)
-        val data = (0 to 10000).map { i =>
+        val data = (0 to 10000).map { _ =>
           r.nextInt(1000)
         }
         val exact = exactCount(data).toDouble
@@ -401,7 +401,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
     "work as an Aggregator and return size" in {
       List(5, 7, 8, 10).foreach(bits => {
         val aggregator = HyperLogLogAggregator.sizeAggregator(bits)
-        val data = (0 to 10000).map { i =>
+        val data = (0 to 10000).map { _ =>
           r.nextInt(1000)
         }
         val exact = exactCount(data).toDouble

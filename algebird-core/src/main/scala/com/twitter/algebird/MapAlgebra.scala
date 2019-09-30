@@ -57,8 +57,8 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
       // Mutable maps create new copies of the underlying data on add so don't use the
       // handleImmutable method.
       // Cannot have a None so 'get' is safe here.
-      case mmap: MMap[_, _] => sumOption(Seq(big, small)).get
-      case _                => handleImmutable(big, small, bigOnLeft)
+      case _: MMap[_, _] => sumOption(Seq(big, small)).get
+      case _             => handleImmutable(big, small, bigOnLeft)
     }
   }
 

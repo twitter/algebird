@@ -98,7 +98,7 @@ class SGDMonoid[Pos](
     (left, right) match {
       case (_, SGDZero)                 => left
       case (SGDPos(llps), SGDPos(rlps)) => SGDPos(llps ::: rlps)
-      case (rsw @ SGDWeights(c, w), SGDPos(p)) =>
+      case (rsw @ SGDWeights(_, _), SGDPos(p)) =>
         p.foldLeft(rsw) { (cntWeight, pos) =>
           newWeights(cntWeight, pos)
         }

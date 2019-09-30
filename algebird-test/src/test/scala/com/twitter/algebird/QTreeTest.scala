@@ -37,9 +37,7 @@ class QTreeLaws extends CheckProperties {
 
 class QTreeTest extends WordSpec with Matchers {
   def randomList(n: Long) =
-    (1L to n).map { i =>
-      math.random
-    }
+    (1L to n).map(_ => math.random)
 
   def buildQTree(k: Int, list: Seq[Double]) = {
     val qtSemigroup = new QTreeSemigroup[Double](k)

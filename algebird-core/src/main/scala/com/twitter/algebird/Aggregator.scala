@@ -178,14 +178,14 @@ object Aggregator extends java.io.Serializable {
   /**
    * Take the first (left most in reduce order) item found
    */
-  def head[T]: Aggregator[T, T, T] = fromReduce[T] { (l, r) =>
+  def head[T]: Aggregator[T, T, T] = fromReduce[T] { (l, _) =>
     l
   }
 
   /**
    * Take the last (right most in reduce order) item found
    */
-  def last[T]: Aggregator[T, T, T] = fromReduce[T] { (l, r) =>
+  def last[T]: Aggregator[T, T, T] = fromReduce[T] { (_, r) =>
     r
   }
 

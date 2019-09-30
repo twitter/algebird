@@ -15,7 +15,7 @@ class AlgebraResolutionTest extends FunSuite {
   }
   test("algebra.ring.AdditiveSemigroup") {
     implicit def fakeAdditiveSemigroup[T]: algebra.ring.AdditiveSemigroup[T] =
-      Semigroup.from[T] { (a, b) =>
+      Semigroup.from[T] { (a, _) =>
         a
       }
 
@@ -27,7 +27,7 @@ class AlgebraResolutionTest extends FunSuite {
   }
   test("algebra.ring.AdditiveMonoid") {
     implicit def fakeAdditiveMonoid[T]: algebra.ring.AdditiveMonoid[T] =
-      Monoid.from[T](null.asInstanceOf[T]) { (a, b) =>
+      Monoid.from[T](null.asInstanceOf[T]) { (a, _) =>
         a
       }
 
