@@ -106,15 +106,10 @@ val sharedSettings = Seq(
     releaseStepCommandAndRemaining("+publishSigned"), // formerly publishArtifacts, here to deal with algebird-spark
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = releaseStepCommand("sonatypeReleaseAll")),
+    ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
     pushChanges
   ),
-  publishTo := Some(
-    if (version.value.trim.endsWith("SNAPSHOT"))
-      Opts.resolver.sonatypeSnapshots
-    else
-      Opts.resolver.sonatypeStaging
-  ),
+  publishTo := sonatypePublishToBundle.value,
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/twitter/algebird"),
