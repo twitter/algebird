@@ -12,7 +12,7 @@ class AppendAggregatorTest extends WordSpec with Matchers {
       agg2: Aggregator[E, M, P],
       data: Seq[E],
       empty: Seq[E]
-  ) {
+  ): Unit = {
 
     val n = data.length
     val (half1, half2) = data.splitAt(n / 2)
@@ -42,7 +42,7 @@ class AppendAggregatorTest extends WordSpec with Matchers {
       agg2: MonoidAggregator[E, M, P],
       data: Seq[E],
       empty: Seq[E]
-  ) {
+  ): Unit = {
 
     testMethodsSemigroup(agg1, agg2, data, empty)
 

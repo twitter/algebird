@@ -300,7 +300,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
 
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
 
-  def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int) {
+  def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int): Unit = {
     val data = (0 until dataSize).map { _ =>
       r.nextLong
     }
@@ -429,7 +429,7 @@ class HyperLogLogTest extends WordSpec with Matchers {
       }
     }
 
-    def verifySerialization(h: HLL) {
+    def verifySerialization(h: HLL): Unit = {
       assert(fromBytes(toBytes(h)) == h)
       fromByteBuffer(java.nio.ByteBuffer.wrap(toBytes(h))) shouldEqual h
     }

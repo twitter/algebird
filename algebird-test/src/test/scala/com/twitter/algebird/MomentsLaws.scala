@@ -21,9 +21,8 @@ class MomentsLaws extends CheckProperties {
 }
 
 class MomentsTest extends WordSpec with Matchers {
-  def testApproxEq(f1: Double, f2: Double) {
+  def testApproxEq(f1: Double, f2: Double): Unit =
     assert(approxEq(1e-10)(f1, f2))
-  }
 
   /**
    * Given a list of doubles, create a Moments object to hold

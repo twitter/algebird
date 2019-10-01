@@ -32,7 +32,7 @@ case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSe
   override def updated(position: (Int, Int), value: V): DenseMatrix[V] =
     DenseMatrix[V](rows, cols, rowsByColumns.updated(tupToIndex(position), value))
 
-  override def updateInto(buffer: ArrayBuffer[V]) {
+  override def updateInto(buffer: ArrayBuffer[V]): Unit = {
     var indx = 0
     val lsize = size
     while (indx < lsize) {

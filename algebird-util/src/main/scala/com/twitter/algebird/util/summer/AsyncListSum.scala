@@ -103,7 +103,7 @@ class AsyncListSum[Key, Value](
     }.flatten
 
   @annotation.tailrec
-  private[this] final def doInsert(key: Key, value: Value) {
+  private[this] final def doInsert(key: Key, value: Value): Unit = {
     tuplesIn.incr
     val (success, countChange) = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)

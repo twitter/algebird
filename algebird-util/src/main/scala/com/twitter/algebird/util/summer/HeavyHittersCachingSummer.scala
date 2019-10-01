@@ -73,7 +73,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   // a synchronized guard should be used around these
   // to ensure consistent updates to backing data structures
   @inline
-  private[this] final def updateItem(item: Int) {
+  private[this] final def updateItem(item: Int): Unit = {
     totalCount += 1L
     hhMinReq = (hhPercent * totalCount).toLong
     var indx = 0
@@ -87,7 +87,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   }
 
   @inline
-  private[this] final def updateHH(item: Int) {
+  private[this] final def updateHH(item: Int): Unit = {
     @inline
     def pruneHH(): Unit = {
       val iter = hh.values.iterator

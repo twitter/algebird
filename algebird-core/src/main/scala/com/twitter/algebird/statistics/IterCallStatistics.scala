@@ -31,7 +31,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
     val distribution = IndexedSeq.fill(maxBucket + 1) { Counter(threadSafe) }
     val total = Counter(threadSafe)
 
-    def put(v: Long) {
+    def put(v: Long): Unit = {
       total.add(v)
       // log2(v + 1) for v up to 2^maxBucket
       val bucket = min(64 - numberOfLeadingZeros(v), maxBucket)
