@@ -204,7 +204,7 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
  * [[Aggregator]] that selects the maximum instance of `T` in the
  * aggregated stream.
  */
-case class MaxAggregator[T](implicit ord: Ordering[T]) extends Aggregator[T, T, T] {
+case class MaxAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
   val semigroup = Max.maxSemigroup[T]
   def present(v: T) = v
