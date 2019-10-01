@@ -30,7 +30,7 @@ trait Buffered[I, O] extends java.io.Serializable {
 }
 
 abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
-  def operate(nonEmpty: Seq[I]): O
+  def operate(nonEmpty: scala.collection.Seq[I]): O
 
   require(size > 0, "buffer <= 0 not allowed")
 

@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import java.util.PriorityQueue
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 
 /**
  * Aggregators compose well.
@@ -152,7 +152,7 @@ object Aggregator extends java.io.Serializable {
       override def appendAll(items: TraversableOnce[F]): T = agg(items)
 
       private def agg(inputs: TraversableOnce[F]): T =
-        inputs.aggregate(m.zero)(appnd, m.plus)
+        inputs.foldLeft(m.zero)(append)
     }
 
   /**
@@ -441,11 +441,8 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    */
   def applyCumulatively[In <: TraversableOnce[A], Out](
       inputs: In
-  )(implicit bf: CanBuildFrom[In, C, Out]): Out = {
-    val builder = bf()
-    builder ++= cumulativeIterator(inputs.toIterator)
-    builder.result
-  }
+  )(implicit bf: BuildFrom[In, C, Out]): Out =
+    bf.fromSpecific(inputs)(cumulativeIterator(inputs.toIterator))
 
   def append(l: B, r: A): B = reduce(l, prepare(r))
 

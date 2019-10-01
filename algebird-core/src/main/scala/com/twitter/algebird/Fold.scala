@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.io.Serializable
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import scala.collection.mutable.Builder
 
 /**
@@ -248,9 +248,9 @@ object Fold {
   /**
    * Simple Fold that collects elements into a container.
    */
-  def container[I, C[_]](implicit cbf: CanBuildFrom[C[I], I, C[I]]): Fold[I, C[I]] =
+  def container[I, C[_]](implicit cbf: Factory[I, C[I]]): Fold[I, C[I]] =
     Fold.foldMutable[Builder[I, C[I]], I, C[I]]({ case (b, i) => b += i }, { _ =>
-      cbf.apply
+      cbf.newBuilder
     }, { _.result })
 
   /**

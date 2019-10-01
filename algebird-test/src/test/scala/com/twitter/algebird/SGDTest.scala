@@ -16,7 +16,7 @@ class SGDLaws extends CheckProperties {
   val sgdPosGen = for {
     x <- Gen.choose(0.0, 1.0)
     n <- Gen.choose(0.0, 0.001)
-  } yield SGDPos((m * x + b + n, IndexedSeq(x)))
+  } yield SGDPos((m * x + b + n, Vector(x)))
 
   val sgdWGen = for {
     cnt <- Gen.choose(0L, 100000L)
@@ -58,7 +58,7 @@ class SGDLaws extends CheckProperties {
   }
 
   property("Zero-step leaves Weights unchanged") {
-    forAll { (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
+    forAll { (w: SGDWeights, pos: SGDPos[(Double, Vector[Double])]) =>
       val next = zeroStepMonoid.newWeights(w, pos.pos.head)
       (next.weights == w.weights && next.count == (w.count + 1L))
     }
@@ -70,7 +70,7 @@ class SGDLaws extends CheckProperties {
   val oneStepMonoid = new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
 
   property("unit step can be undone by adding gradient") {
-    forAll { (w: SGDWeights, pos: SGDPos[(Double, IndexedSeq[Double])]) =>
+    forAll { (w: SGDWeights, pos: SGDPos[(Double, Vector[Double])]) =>
       val next = oneStepMonoid.newWeights(w, pos.pos.head)
       next.weights == minus(w.weights, SGD.linearGradient(w.weights, pos.pos.head))
     }

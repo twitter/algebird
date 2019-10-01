@@ -94,7 +94,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
         case (map, i) =>
           SparseHLL(bits, map.mapValues { _ =>
             Max((i + 1).toByte)
-          })
+          }.toMap)
       })
     }
   }

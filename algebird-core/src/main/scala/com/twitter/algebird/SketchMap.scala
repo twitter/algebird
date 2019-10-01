@@ -18,7 +18,6 @@ package com.twitter.algebird
 
 import algebra.CommutativeMonoid
 import com.twitter.algebird.matrix.AdaptiveMatrix
-import scala.collection.breakOut
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an
@@ -169,7 +168,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
    */
   def updatedHeavyHitters[V: Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping: Map[K, V] =
-      hitters.map(item => (item, frequency(item, table)))(breakOut)
+      hitters.map(item => (item, frequency(item, table))).toMap
     val specificOrdering = Ordering.by[K, V] { mapping(_) }.reverse
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
   }

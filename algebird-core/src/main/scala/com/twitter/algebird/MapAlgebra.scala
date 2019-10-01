@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import com.twitter.algebird.macros.{Cuber, Roller}
+import com.twitter.algebird.collections.MutableBackedMap
 import scala.collection.mutable.{Builder, Map => MMap}
 import scala.collection.{Map => ScMap}
 import algebra.ring.Rng
@@ -115,33 +116,23 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
     new MutableBackedMap(mut)
 }
 
-private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V])
-    extends Map[K, V]
-    with java.io.Serializable {
-  override def get(key: K): Option[V] = backingMap.get(key)
-
-  override def iterator: Iterator[(K, V)] = backingMap.iterator
-
-  override def +[B1 >: V](kv: (K, B1)): Map[K, B1] = backingMap.toMap + kv
-
-  override def -(key: K): Map[K, V] = backingMap.toMap - key
-}
-
 /**
  * You can think of this as a Sparse vector group
  */
 class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group) with Group[Map[K, V]] {
-  override def negate(kv: Map[K, V]): Map[K, V] = kv.mapValues { v =>
-    group.negate(v)
-  }
+  override def negate(kv: Map[K, V]): Map[K, V] =
+    kv.mapValues { v =>
+      group.negate(v)
+    }.toMap
 }
 
 class ScMapGroup[K, V](implicit val group: Group[V])
     extends ScMapMonoid[K, V]()(group)
     with Group[ScMap[K, V]] {
-  override def negate(kv: ScMap[K, V]): ScMap[K, V] = kv.mapValues { v =>
-    group.negate(v)
-  }
+  override def negate(kv: ScMap[K, V]): ScMap[K, V] =
+    kv.mapValues { v =>
+      group.negate(v)
+    }.toMap
 }
 
 /**
@@ -252,10 +243,11 @@ object MapAlgebra {
     Monoid
       .plus(map1.mapValues { v =>
         (List(v), List[W]())
-      }, map2.mapValues { w =>
+      }.toMap, map2.mapValues { w =>
         (List[V](), List(w))
-      })
+      }.toMap)
       .mapValues { case (v, w) => (v.headOption, w.headOption) }
+      .toMap
 
   /**
    * Reverses a graph losslessly
@@ -286,8 +278,7 @@ object MapAlgebra {
     Monoid.sum(mring.times(left, right).values)
 
   def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
-    val map: collection.mutable.Map[c.K, List[V]] =
-      collection.mutable.Map[c.K, List[V]]()
+    val map: MMap[c.K, List[V]] = MMap[c.K, List[V]]()
     it.toIterator.foreach {
       case (k, v) =>
         c(k).foreach { ik =>
@@ -313,8 +304,7 @@ object MapAlgebra {
       .map { case (k, v) => (k, agg.present(v)) }
 
   def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
-    val map: collection.mutable.Map[r.K, List[V]] =
-      collection.mutable.Map[r.K, List[V]]()
+    val map: MMap[r.K, List[V]] = MMap[r.K, List[V]]()
     it.toIterator.foreach {
       case (k, v) =>
         r(k).foreach { ik =>

@@ -3,23 +3,26 @@ import algebird._
 import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
 
-val algebraVersion = "1.0.0"
+val algebraVersion = "2.0.0-M2"
 val bijectionVersion = "0.9.6"
 val javaEwahVersion = "1.1.6"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.0.8"
 val scalacheckVersion = "1.14.2"
+val scalaCollectionCompat = "2.1.2"
 val utilVersion = "19.10.0"
 val sparkVersion = "2.4.4"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version.startsWith("2.11") => "2.11"
   case version if version.startsWith("2.12") => "2.12"
-  case _                                     => sys.error("unknown error")
+  case version if version.startsWith("2.13") => "2.13"
+  case version                               => sys.error(s"unsupported scala version $version")
 }
 
 def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.12"
+def isScala213x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.13"
 
 val sharedSettings = Seq(
   organization := "com.twitter",
@@ -49,6 +52,13 @@ val sharedSettings = Seq(
       Seq("-Ywarn-unused", "-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
     else
       Seq("-optimize")
+  },
+  scalacOptions ++= {
+    if (isScala213x(scalaVersion.value)) {
+      Seq("-Ymacro-annotations", "-Ywarn-unused")
+    } else {
+      Seq()
+    }
   },
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
   libraryDependencies ++= Seq(
@@ -208,6 +218,7 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
+  crossScalaVersions += "2.13.1",
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -216,12 +227,18 @@ lazy val algebirdCore = module("core").settings(
       "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
       "org.typelevel" %% "algebra" % algebraVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-    ),
+      "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
+      "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompat
+    ) ++ {
+      if (isScala213x(scalaVersion.value)) {
+        Seq()
+      } else {
+        Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
+      }
+    },
   sourceGenerators in Compile += Def.task {
     GenTupleAggregators.gen((sourceManaged in Compile).value)
   }.taskValue,
-  addCompilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)),
   // Scala 2.12's doc task was failing.
   sources in (Compile, doc) ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
   testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
@@ -230,12 +247,18 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test")
   .settings(
     testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
+    crossScalaVersions += "2.13.1",
     libraryDependencies ++=
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion
-      ),
-    addCompilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full))
+      ) ++ {
+        if (isScala213x(scalaVersion.value)) {
+          Seq()
+        } else {
+          Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
+        }
+      }
   )
   .dependsOn(algebirdCore)
 

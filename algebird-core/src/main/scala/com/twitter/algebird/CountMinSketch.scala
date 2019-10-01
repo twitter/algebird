@@ -1315,10 +1315,10 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
       hhs.toSeq.sortBy { hh =>
         hh.count
       }
-    }
+    }.toMap
     val purged = sorted.mapValues { hhs =>
       hhs.takeRight(heavyHittersN)
-    }
+    }.toMap
     HeavyHitters[(K1, K2)](purged.values.flatten.toSet ++ underLimit.values.flatten.toSet)
   }
 

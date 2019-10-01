@@ -325,7 +325,7 @@ class BloomFilterTest extends WordSpec with Matchers {
 
       Seq(0.1, 0.01, 0.001).foreach { fpProb =>
         {
-          val fps = (0 until iter).par.map { _ =>
+          val fps = (0 until iter).map { _ =>
             {
               val numEntries = RAND.nextInt(10) + 1
 
@@ -448,7 +448,7 @@ class BloomFilterTest extends WordSpec with Matchers {
         val numOfHashes = 3
         val width = 64
         val bfMonoid = new BloomFilterMonoid[String](numOfHashes, width)
-        bfMonoid.create(entries: _*)
+        bfMonoid.create(entries.iterator)
       }
 
       val firstBloomFilter = createBFWithItems(Seq("A"))

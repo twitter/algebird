@@ -55,7 +55,7 @@ object SemigroupMacro {
       if (to.isEmpty) None
       else {
         val buf = new _root_.com.twitter.algebird.ArrayBufferedOperation[$T,$T](1000) with _root_.com.twitter.algebird.BufferedReduce[$T] {
-          def operate(items: _root_.scala.Seq[$T]): $T = {
+          def operate(items: _root_.scala.collection.Seq[$T]): $T = {
             $getBlock
           }
         }

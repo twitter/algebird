@@ -75,7 +75,7 @@ class CombinatorTest extends CheckProperties {
                s
              }
              .mapValues { _.size })
-        yield monTopK.plus(monTopK.zero, (m, smallvals.toSet))
+        yield monTopK.plus(monTopK.zero, (m.toMap, smallvals.toSet))
     }
   property("MonoidCombinator with top-K forms a Monoid") {
     monoidLaws[(Map[Int, Int], Set[Int])]

@@ -56,7 +56,11 @@ object DecayedVector {
 
   // This is the default monoid that never thresholds.
   // If you want to set a specific accuracy you need to implicitly override this
-  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]], ord: Ordering[F]) =
+  implicit def monoid[C[_]](
+      implicit vs: VectorSpace[Double, C],
+      metric: Metric[C[Double]],
+      ord: Ordering[Double]
+  ) =
     monoidWithEpsilon(-1.0)
   implicit def mapMonoid[K](
       implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],

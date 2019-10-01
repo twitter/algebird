@@ -463,7 +463,7 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
         val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
         reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
     }
-    SparseHLL(reducedBits, reducedMaxRhoW.toMap.mapValues(Max(_)))
+    SparseHLL(reducedBits, reducedMaxRhoW.toMap.mapValues(Max(_)).toMap)
   }
 }
 

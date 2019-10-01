@@ -63,7 +63,7 @@ object AdaptiveMatrix {
           remainder: Iterator[AdaptiveMatrix[V]]
       ): Option[AdaptiveMatrix[V]] = {
         remainder.foreach(_.updateInto(buff))
-        Some(DenseMatrix(rows, cols, buff))
+        Some(DenseMatrix(rows, cols, buff.toIndexedSeq))
       }
 
       private def denseUpdate(

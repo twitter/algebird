@@ -43,7 +43,7 @@ object VectorSpace {
 
   implicit def mapSpace[K, T: Ring] =
     from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
-      m.mapValues(Ring.times(s, _))
+      m.mapValues(Ring.times(s, _)).toMap
     }
 
   // TODO: add implicits for java lists, arrays, and options
