@@ -197,6 +197,8 @@ lazy val mimaSettings = Def.settings(
       .exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.HeavyHittersPercent.apply"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.BufferSize.apply"),
     ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.util.summer.Compact.apply"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MinAggregator.ord"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("com.twitter.algebird.MaxAggregator.ord"),
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHashSignature.*"),
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHasher.*")
   )
