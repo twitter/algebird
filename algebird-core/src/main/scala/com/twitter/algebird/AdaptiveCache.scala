@@ -37,7 +37,7 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
 
   def stopGrowing(): Unit = map.clear
 
-  def put(in: Map[K, V]) {
+  def put(in: Map[K, V]): Unit =
     if (map.get.isDefined) {
       in.foreach {
         case (k, v) =>
@@ -52,7 +52,6 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
           map.get.foreach { _.put(k, newValue) }
       }
     }
-  }
 }
 
 /**

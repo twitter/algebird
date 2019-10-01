@@ -33,7 +33,7 @@ class ExpHistLaws extends PropSpec with ScalaCheckPropertyChecks {
    * - The relative error of the count is at most epsilon
    * - the relative error is always between 0 and 0.5.
    */
-  def checkCoreProperties(eh: ExpHist, actualSum: Long) {
+  def checkCoreProperties(eh: ExpHist, actualSum: Long): Unit = {
     assert(eh.lowerBoundSum <= actualSum)
     assert(eh.upperBoundSum >= actualSum)
 

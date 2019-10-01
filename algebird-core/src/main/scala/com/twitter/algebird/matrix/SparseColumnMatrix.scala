@@ -45,7 +45,7 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
     SparseColumnMatrix[V](rowsByColumns.updated(row, rowsByColumns(row).updated(col, value)))
   }
 
-  override def updateInto(buffer: ArrayBuffer[V]) {
+  override def updateInto(buffer: ArrayBuffer[V]): Unit = {
     val lcols = cols
     var row = 0
     while (row < rows) {
