@@ -129,7 +129,7 @@ private[algebird] sealed abstract class MinInstances {
  * [[Aggregator]] that selects the minimum instance of `T` in the
  * aggregated stream.
  */
-case class MinAggregator[T: Ordering]() extends Aggregator[T, T, T] {
+case class MinAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
   def prepare(v: T) = v
   val semigroup = Min.minSemigroup[T]
   def present(v: T) = v
