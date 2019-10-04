@@ -75,7 +75,7 @@ public class CassandraMurmurHash
             }
             if (left >= 1)
             {
-                h ^= data.get(offset + length - 1);
+                h ^= (int) data.get(offset + length - 1);
             }
 
             h *= m;
@@ -133,7 +133,7 @@ public class CassandraMurmurHash
         case 2:
             h64 ^= (long) key.get(offset + length - rem + 1) << 8;
         case 1:
-            h64 ^= key.get(offset + length - rem);
+            h64 ^= (long) key.get(offset + length - rem);
             h64 *= m64;
         }
 
@@ -223,11 +223,11 @@ public class CassandraMurmurHash
             case  4: k1 ^= ((long) key.get(offset+3)) << 24;
             case  3: k1 ^= ((long) key.get(offset+2)) << 16;
             case  2: k1 ^= ((long) key.get(offset+1)) << 8;
-            case  1: k1 ^= key.get(offset);
+            case  1: k1 ^= ((long) key.get(offset));
                 k1 *= c1; k1  = rotl64(k1,31); k1 *= c2; h1 ^= k1;
-        }
+        };
 
-      //----------
+        //----------
         // finalization
 
         h1 ^= length; h2 ^= length;
