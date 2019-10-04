@@ -118,7 +118,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
 class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
   import HyperLogLog._
 
-  val zero: HLLSeries = HLLSeries(bits, Vector.empty)
+  override val zero: HLLSeries = HLLSeries(bits, Vector.empty)
 
   def create(example: Array[Byte], timestamp: Long): HLLSeries = {
     val hashed = hash(example)
@@ -131,7 +131,7 @@ class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
     HLLSeries(bits, bldr.result())
   }
 
-  def plus(left: HLLSeries, right: HLLSeries): HLLSeries = {
+  override def plus(left: HLLSeries, right: HLLSeries): HLLSeries = {
     val ln = left.rows.size
     val rn = right.rows.size
     if (ln > rn) {

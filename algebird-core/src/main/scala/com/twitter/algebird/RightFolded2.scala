@@ -43,10 +43,10 @@ object RightFolded2 {
 class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(
     implicit grpAcc: Group[Acc]
 ) extends Monoid[RightFolded2[In, Out, Acc]] {
-  val zero = RightFoldedZero2
+  override val zero: RightFoldedZero2.type = RightFoldedZero2
 
-  def init(i: Out) = RightFoldedValue2[In, Out, Acc](i, accfn(i), Nil)
-  def toFold(v: In) = RightFoldedToFold2(List(v))
+  def init(i: Out): RightFoldedValue2[In, Out, Acc] = RightFoldedValue2[In, Out, Acc](i, accfn(i), Nil)
+  def toFold(v: In): RightFoldedToFold2[In] = RightFoldedToFold2(List(v))
 
   protected def doFold(vals: List[In], init: Out, acc: Acc): (Out, Acc) = {
     val newV = vals.foldRight(init)(foldfn)
@@ -54,7 +54,10 @@ class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) =>
     (newV, grpAcc.plus(delta, acc))
   }
 
-  def plus(left: RightFolded2[In, Out, Acc], right: RightFolded2[In, Out, Acc]) = left match {
+  override def plus(
+      left: RightFolded2[In, Out, Acc],
+      right: RightFolded2[In, Out, Acc]
+  ): RightFolded2[In, Out, Acc] = left match {
     case RightFoldedValue2(leftV, leftAcc, leftRvals) => {
       right match {
         case RightFoldedZero2 => left

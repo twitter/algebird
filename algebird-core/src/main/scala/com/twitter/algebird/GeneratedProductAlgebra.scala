@@ -10,11 +10,11 @@ class Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)
     implicit asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(asemigroup.plus(lTuple._1, rTuple._1), bsemigroup.plus(lTuple._2, rTuple._2))
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -35,7 +35,7 @@ class Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
     bmonoid: Monoid[B]
 ) extends Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Monoid[X] {
-  override def zero = apply(amonoid.zero, bmonoid.zero)
+  override def zero: X = apply(amonoid.zero, bmonoid.zero)
 }
 
 /**
@@ -46,11 +46,11 @@ class Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
     bgroup: Group[B]
 ) extends Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(agroup.negate(tuple._1), bgroup.negate(tuple._2))
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(agroup.minus(lTuple._1, rTuple._1), bgroup.minus(lTuple._2, rTuple._2))
   }
@@ -64,8 +64,8 @@ class Product2Ring[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
     bring: Ring[B]
 ) extends Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Ring[X] {
-  override def one = apply(aring.one, bring.one)
-  override def times(l: X, r: X) = {
+  override def one: X = apply(aring.one, bring.one)
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(aring.times(lTuple._1, rTuple._1), bring.times(lTuple._2, rTuple._2))
   }
@@ -79,7 +79,7 @@ class Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -87,7 +87,7 @@ class Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[
       csemigroup.plus(lTuple._3, rTuple._3)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -110,7 +110,7 @@ class Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A,
     cmonoid: Monoid[C]
 ) extends Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
     with Monoid[X] {
-  override def zero = apply(amonoid.zero, bmonoid.zero, cmonoid.zero)
+  override def zero: X = apply(amonoid.zero, bmonoid.zero, cmonoid.zero)
 }
 
 /**
@@ -122,11 +122,11 @@ class Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, 
     cgroup: Group[C]
 ) extends Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(agroup.negate(tuple._1), bgroup.negate(tuple._2), cgroup.negate(tuple._3))
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -145,8 +145,8 @@ class Product3Ring[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B
     cring: Ring[C]
 ) extends Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
     with Ring[X] {
-  override def one = apply(aring.one, bring.one, cring.one)
-  override def times(l: X, r: X) = {
+  override def one: X = apply(aring.one, bring.one, cring.one)
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -165,7 +165,7 @@ class Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => O
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -174,7 +174,7 @@ class Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => O
       dsemigroup.plus(lTuple._4, rTuple._4)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -200,7 +200,7 @@ class Product4Monoid[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Opti
     dmonoid: Monoid[D]
 ) extends Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero)
 }
 
@@ -214,11 +214,11 @@ class Product4Group[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Optio
     dgroup: Group[D]
 ) extends Product4Monoid[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(agroup.negate(tuple._1), bgroup.negate(tuple._2), cgroup.negate(tuple._3), dgroup.negate(tuple._4))
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -239,8 +239,8 @@ class Product4Ring[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option
     dring: Ring[D]
 ) extends Product4Group[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])
     with Ring[X] {
-  override def one = apply(aring.one, bring.one, cring.one, dring.one)
-  override def times(l: X, r: X) = {
+  override def one: X = apply(aring.one, bring.one, cring.one, dring.one)
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -261,7 +261,7 @@ class Product5Semigroup[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: 
     dsemigroup: Semigroup[D],
     esemigroup: Semigroup[E]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -271,7 +271,7 @@ class Product5Semigroup[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: 
       esemigroup.plus(lTuple._5, rTuple._5)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -302,7 +302,7 @@ class Product5Monoid[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X =
       unapply: X => Option[(A, B, C, D, E)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero)
 }
 
@@ -320,7 +320,7 @@ class Product5Group[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X =>
       unapply: X => Option[(A, B, C, D, E)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -330,7 +330,7 @@ class Product5Group[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X =>
       egroup.negate(tuple._5)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -356,9 +356,9 @@ class Product5Ring[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => 
       unapply: X => Option[(A, B, C, D, E)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(aring.one, bring.one, cring.one, dring.one, ering.one)
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -384,7 +384,7 @@ class Product6Semigroup[X, A, B, C, D, E, F](
     esemigroup: Semigroup[E],
     fsemigroup: Semigroup[F]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -395,7 +395,7 @@ class Product6Semigroup[X, A, B, C, D, E, F](
       fsemigroup.plus(lTuple._6, rTuple._6)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -433,7 +433,7 @@ class Product6Monoid[X, A, B, C, D, E, F](
       unapply: X => Option[(A, B, C, D, E, F)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero)
 }
 
@@ -455,7 +455,7 @@ class Product6Group[X, A, B, C, D, E, F](
       unapply: X => Option[(A, B, C, D, E, F)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -466,7 +466,7 @@ class Product6Group[X, A, B, C, D, E, F](
       fgroup.negate(tuple._6)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -491,9 +491,9 @@ class Product6Ring[X, A, B, C, D, E, F](
       unapply: X => Option[(A, B, C, D, E, F)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(aring.one, bring.one, cring.one, dring.one, ering.one, fring.one)
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -521,7 +521,7 @@ class Product7Semigroup[X, A, B, C, D, E, F, G](
     fsemigroup: Semigroup[F],
     gsemigroup: Semigroup[G]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -533,7 +533,7 @@ class Product7Semigroup[X, A, B, C, D, E, F, G](
       gsemigroup.plus(lTuple._7, rTuple._7)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -582,7 +582,7 @@ class Product7Monoid[X, A, B, C, D, E, F, G](
       unapply: X => Option[(A, B, C, D, E, F, G)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero)
 }
 
@@ -605,7 +605,7 @@ class Product7Group[X, A, B, C, D, E, F, G](
       unapply: X => Option[(A, B, C, D, E, F, G)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -617,7 +617,7 @@ class Product7Group[X, A, B, C, D, E, F, G](
       ggroup.negate(tuple._7)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -650,9 +650,9 @@ class Product7Ring[X, A, B, C, D, E, F, G](
       unapply: X => Option[(A, B, C, D, E, F, G)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one)
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -682,7 +682,7 @@ class Product8Semigroup[X, A, B, C, D, E, F, G, H](
     gsemigroup: Semigroup[G],
     hsemigroup: Semigroup[H]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -695,7 +695,7 @@ class Product8Semigroup[X, A, B, C, D, E, F, G, H](
       hsemigroup.plus(lTuple._8, rTuple._8)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -747,7 +747,7 @@ class Product8Monoid[X, A, B, C, D, E, F, G, H](
       unapply: X => Option[(A, B, C, D, E, F, G, H)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -780,7 +780,7 @@ class Product8Group[X, A, B, C, D, E, F, G, H](
       unapply: X => Option[(A, B, C, D, E, F, G, H)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -793,7 +793,7 @@ class Product8Group[X, A, B, C, D, E, F, G, H](
       hgroup.negate(tuple._8)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -828,9 +828,9 @@ class Product8Ring[X, A, B, C, D, E, F, G, H](
       unapply: X => Option[(A, B, C, D, E, F, G, H)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one)
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -862,7 +862,7 @@ class Product9Semigroup[X, A, B, C, D, E, F, G, H, I](
     hsemigroup: Semigroup[H],
     isemigroup: Semigroup[I]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -876,7 +876,7 @@ class Product9Semigroup[X, A, B, C, D, E, F, G, H, I](
       isemigroup.plus(lTuple._9, rTuple._9)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -931,7 +931,7 @@ class Product9Monoid[X, A, B, C, D, E, F, G, H, I](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -966,7 +966,7 @@ class Product9Group[X, A, B, C, D, E, F, G, H, I](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -980,7 +980,7 @@ class Product9Group[X, A, B, C, D, E, F, G, H, I](
       igroup.negate(tuple._9)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -1017,9 +1017,9 @@ class Product9Ring[X, A, B, C, D, E, F, G, H, I](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one)
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -1053,7 +1053,7 @@ class Product10Semigroup[X, A, B, C, D, E, F, G, H, I, J](
     isemigroup: Semigroup[I],
     jsemigroup: Semigroup[J]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -1068,7 +1068,7 @@ class Product10Semigroup[X, A, B, C, D, E, F, G, H, I, J](
       jsemigroup.plus(lTuple._10, rTuple._10)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1127,7 +1127,7 @@ class Product10Monoid[X, A, B, C, D, E, F, G, H, I, J](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -1164,7 +1164,7 @@ class Product10Group[X, A, B, C, D, E, F, G, H, I, J](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -1179,7 +1179,7 @@ class Product10Group[X, A, B, C, D, E, F, G, H, I, J](
       jgroup.negate(tuple._10)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -1218,7 +1218,7 @@ class Product10Ring[X, A, B, C, D, E, F, G, H, I, J](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -1231,7 +1231,7 @@ class Product10Ring[X, A, B, C, D, E, F, G, H, I, J](
       iring.one,
       jring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -1267,7 +1267,7 @@ class Product11Semigroup[X, A, B, C, D, E, F, G, H, I, J, K](
     jsemigroup: Semigroup[J],
     ksemigroup: Semigroup[K]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -1283,7 +1283,7 @@ class Product11Semigroup[X, A, B, C, D, E, F, G, H, I, J, K](
       ksemigroup.plus(lTuple._11, rTuple._11)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1345,7 +1345,7 @@ class Product11Monoid[X, A, B, C, D, E, F, G, H, I, J, K](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -1384,7 +1384,7 @@ class Product11Group[X, A, B, C, D, E, F, G, H, I, J, K](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -1400,7 +1400,7 @@ class Product11Group[X, A, B, C, D, E, F, G, H, I, J, K](
       kgroup.negate(tuple._11)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -1441,7 +1441,7 @@ class Product11Ring[X, A, B, C, D, E, F, G, H, I, J, K](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -1455,7 +1455,7 @@ class Product11Ring[X, A, B, C, D, E, F, G, H, I, J, K](
       jring.one,
       kring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -1493,7 +1493,7 @@ class Product12Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L](
     ksemigroup: Semigroup[K],
     lsemigroup: Semigroup[L]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -1510,7 +1510,7 @@ class Product12Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L](
       lsemigroup.plus(lTuple._12, rTuple._12)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1575,7 +1575,7 @@ class Product12Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -1616,7 +1616,7 @@ class Product12Group[X, A, B, C, D, E, F, G, H, I, J, K, L](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -1633,7 +1633,7 @@ class Product12Group[X, A, B, C, D, E, F, G, H, I, J, K, L](
       lgroup.negate(tuple._12)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -1676,7 +1676,7 @@ class Product12Ring[X, A, B, C, D, E, F, G, H, I, J, K, L](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -1691,7 +1691,7 @@ class Product12Ring[X, A, B, C, D, E, F, G, H, I, J, K, L](
       kring.one,
       lring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -1731,7 +1731,7 @@ class Product13Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
     lsemigroup: Semigroup[L],
     msemigroup: Semigroup[M]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -1749,7 +1749,7 @@ class Product13Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       msemigroup.plus(lTuple._13, rTuple._13)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1818,7 +1818,7 @@ class Product13Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -1861,7 +1861,7 @@ class Product13Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -1879,7 +1879,7 @@ class Product13Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       mgroup.negate(tuple._13)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -1924,7 +1924,7 @@ class Product13Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -1940,7 +1940,7 @@ class Product13Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       lring.one,
       mring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -1982,7 +1982,7 @@ class Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     msemigroup: Semigroup[M],
     nsemigroup: Semigroup[N]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -2001,7 +2001,7 @@ class Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       nsemigroup.plus(lTuple._14, rTuple._14)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2073,7 +2073,7 @@ class Product14Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -2118,7 +2118,7 @@ class Product14Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -2137,7 +2137,7 @@ class Product14Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       ngroup.negate(tuple._14)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -2184,7 +2184,7 @@ class Product14Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -2201,7 +2201,7 @@ class Product14Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       mring.one,
       nring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -2245,7 +2245,7 @@ class Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     nsemigroup: Semigroup[N],
     osemigroup: Semigroup[O]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -2265,7 +2265,7 @@ class Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       osemigroup.plus(lTuple._15, rTuple._15)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2340,7 +2340,7 @@ class Product15Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -2387,7 +2387,7 @@ class Product15Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -2407,7 +2407,7 @@ class Product15Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       ogroup.negate(tuple._15)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -2456,7 +2456,7 @@ class Product15Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -2474,7 +2474,7 @@ class Product15Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nring.one,
       oring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -2520,7 +2520,7 @@ class Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     osemigroup: Semigroup[O],
     psemigroup: Semigroup[P]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -2541,7 +2541,7 @@ class Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       psemigroup.plus(lTuple._16, rTuple._16)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2620,7 +2620,7 @@ class Product16Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -2669,7 +2669,7 @@ class Product16Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -2690,7 +2690,7 @@ class Product16Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       pgroup.negate(tuple._16)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -2741,7 +2741,7 @@ class Product16Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -2760,7 +2760,7 @@ class Product16Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       oring.one,
       pring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -2808,7 +2808,7 @@ class Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     psemigroup: Semigroup[P],
     qsemigroup: Semigroup[Q]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -2830,7 +2830,7 @@ class Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       qsemigroup.plus(lTuple._17, rTuple._17)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2912,7 +2912,7 @@ class Product17Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -2963,7 +2963,7 @@ class Product17Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -2985,7 +2985,7 @@ class Product17Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       qgroup.negate(tuple._17)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -3038,7 +3038,7 @@ class Product17Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -3058,7 +3058,7 @@ class Product17Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       pring.one,
       qring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -3108,7 +3108,7 @@ class Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
     qsemigroup: Semigroup[Q],
     rsemigroup: Semigroup[R]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -3131,7 +3131,7 @@ class Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
       rsemigroup.plus(lTuple._18, rTuple._18)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3216,7 +3216,7 @@ class Product18Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -3269,7 +3269,7 @@ class Product18Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -3292,7 +3292,7 @@ class Product18Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       rgroup.negate(tuple._18)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -3347,7 +3347,7 @@ class Product18Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -3368,7 +3368,7 @@ class Product18Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       qring.one,
       rring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -3420,7 +3420,7 @@ class Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
     rsemigroup: Semigroup[R],
     ssemigroup: Semigroup[S]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -3444,7 +3444,7 @@ class Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
       ssemigroup.plus(lTuple._19, rTuple._19)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3533,7 +3533,7 @@ class Product19Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -3588,7 +3588,7 @@ class Product19Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -3612,7 +3612,7 @@ class Product19Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
       sgroup.negate(tuple._19)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -3669,7 +3669,7 @@ class Product19Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -3691,7 +3691,7 @@ class Product19Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       rring.one,
       sring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -3745,7 +3745,7 @@ class Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
     ssemigroup: Semigroup[S],
     tsemigroup: Semigroup[T]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -3770,7 +3770,7 @@ class Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
       tsemigroup.plus(lTuple._20, rTuple._20)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3862,7 +3862,7 @@ class Product20Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -3919,7 +3919,7 @@ class Product20Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -3944,7 +3944,7 @@ class Product20Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       tgroup.negate(tuple._20)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -4003,7 +4003,7 @@ class Product20Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -4026,7 +4026,7 @@ class Product20Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       sring.one,
       tring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -4082,7 +4082,7 @@ class Product21Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
     tsemigroup: Semigroup[T],
     usemigroup: Semigroup[U]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -4108,7 +4108,7 @@ class Product21Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
       usemigroup.plus(lTuple._21, rTuple._21)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -4203,7 +4203,7 @@ class Product21Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -4262,7 +4262,7 @@ class Product21Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -4288,7 +4288,7 @@ class Product21Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       ugroup.negate(tuple._21)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -4349,7 +4349,7 @@ class Product21Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -4373,7 +4373,7 @@ class Product21Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       tring.one,
       uring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),
@@ -4431,7 +4431,7 @@ class Product22Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
     usemigroup: Semigroup[U],
     vsemigroup: Semigroup[V]
 ) extends Semigroup[X] {
-  override def plus(l: X, r: X) = {
+  override def plus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       asemigroup.plus(lTuple._1, rTuple._1),
@@ -4458,7 +4458,7 @@ class Product22Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
       vsemigroup.plus(lTuple._22, rTuple._22)
     )
   }
-  override def sumOption(to: TraversableOnce[X]) =
+  override def sumOption(to: TraversableOnce[X]): Option[X] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -4557,7 +4557,7 @@ class Product22Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
     )
     with Monoid[X] {
-  override def zero =
+  override def zero: X =
     apply(
       amonoid.zero,
       bmonoid.zero,
@@ -4618,7 +4618,7 @@ class Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
     )
     with Group[X] {
-  override def negate(v: X) = {
+  override def negate(v: X): X = {
     val tuple = unapply(v).get;
     apply(
       agroup.negate(tuple._1),
@@ -4645,7 +4645,7 @@ class Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
       vgroup.negate(tuple._22)
     )
   }
-  override def minus(l: X, r: X) = {
+  override def minus(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       agroup.minus(lTuple._1, rTuple._1),
@@ -4708,7 +4708,7 @@ class Product22Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
     )
     with Ring[X] {
-  override def one =
+  override def one: X =
     apply(
       aring.one,
       bring.one,
@@ -4733,7 +4733,7 @@ class Product22Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       uring.one,
       vring.one
     )
-  override def times(l: X, r: X) = {
+  override def times(l: X, r: X): X = {
     val lTuple = unapply(l).get; val rTuple = unapply(r).get;
     apply(
       aring.times(lTuple._1, rTuple._1),

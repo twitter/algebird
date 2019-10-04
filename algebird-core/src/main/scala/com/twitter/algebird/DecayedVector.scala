@@ -22,13 +22,15 @@ package com.twitter.algebird
  * the newer one.
  */
 object DecayedVector {
-  def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double) =
+  def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
 
-  def monoidWithEpsilon[C[_]](eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) =
+  def monoidWithEpsilon[C[_]](
+      eps: Double
+  )(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]): Monoid[DecayedVector[C]] =
     new Monoid[DecayedVector[C]] {
-      override val zero = DecayedVector(vs.group.zero, Double.NegativeInfinity)
-      override def plus(left: DecayedVector[C], right: DecayedVector[C]) =
+      override val zero: DecayedVector[C] = DecayedVector(vs.group.zero, Double.NegativeInfinity)
+      override def plus(left: DecayedVector[C], right: DecayedVector[C]): DecayedVector[C] =
         if (left.scaledTime <= right.scaledTime) {
           scaledPlus(right, left, eps)
         } else {
@@ -36,24 +38,47 @@ object DecayedVector {
         }
     }
 
-  def forMap[K](m: Map[K, Double], scaledTime: Double) =
+  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ] =
     DecayedVector[({ type x[a] = Map[K, a] })#x](m, scaledTime)
-  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double) =
+  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ] =
     forMap(m, time * scala.math.log(2.0) / halfLife)
 
   def mapMonoidWithEpsilon[K](
       eps: Double
-  )(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
+  )(
+      implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+      metric: Metric[Map[K, Double]]
+  ): Monoid[DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ]] =
     monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
 
   // This is the default monoid that never thresholds.
   // If you want to set a specific accuracy you need to implicitly override this
-  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]], ord: Ordering[F]) =
+  implicit def monoid[F, C[_]](
+      implicit vs: VectorSpace[F, C],
+      metric: Metric[C[F]],
+      ord: Ordering[F]
+  ): Monoid[DecayedVector[IndexedSeq]] =
     monoidWithEpsilon(-1.0)
   implicit def mapMonoid[K](
       implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
       metric: Metric[Map[K, Double]]
-  ) =
+  ): Monoid[DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ]] =
     mapMonoidWithEpsilon(-1.0)
 
   def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(

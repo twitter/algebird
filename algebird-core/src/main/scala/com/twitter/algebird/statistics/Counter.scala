@@ -31,22 +31,22 @@ private sealed trait Counter {
   def increment(): Unit
   def add(v: Long): Unit
   def get: Long
-  def toDouble = get.toDouble
-  override def toString = get.toString
+  def toDouble: Double = get.toDouble
+  override def toString: String = get.toString
 }
 
 /** thread safe */
 private case class AtomicCounter() extends Counter {
   private[this] final val counter = new AtomicLong(0)
-  override def increment() = counter.incrementAndGet
-  override def add(v: Long) = counter.addAndGet(v)
-  override def get = counter.get
+  override def increment(): Unit = counter.incrementAndGet
+  override def add(v: Long): Unit = counter.addAndGet(v)
+  override def get: Long = counter.get
 }
 
 /** not thread safe */
 private case class PlainCounter() extends Counter {
   private[this] final var counter: Long = 0
-  override def increment() = counter += 1
-  override def add(v: Long) = counter += v
-  override def get = counter
+  override def increment(): Unit = counter += 1
+  override def add(v: Long): Unit = counter += v
+  override def get: Long = counter
 }

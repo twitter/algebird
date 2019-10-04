@@ -102,19 +102,19 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
     extends Monoid[CMS[K]]
     with CommutativeMonoid[CMS[K]] {
 
-  val params = {
+  val params: CMSParams[K] = {
     val hashes: Seq[CMSHash[K]] = CMSFunctions.generateHashes(eps, delta, seed)
     CMSParams(hashes, eps, delta, maxExactCountOpt)
   }
 
-  val zero: CMS[K] = CMSZero[K](params)
+  override val zero: CMS[K] = CMSZero[K](params)
 
   /**
    * Combines the two sketches.
    *
    * The sketches must use the same hash functions.
    */
-  def plus(left: CMS[K], right: CMS[K]): CMS[K] = {
+  override def plus(left: CMS[K], right: CMS[K]): CMS[K] = {
     require(left.params.hashes == right.params.hashes, "The sketches must use the same hash functions.")
     left ++ right
   }
@@ -228,11 +228,11 @@ class CMSSummation[K](params: CMSParams[K]) {
  * An Aggregator for [[CMS]].  Can be created using [[CMS.aggregator]].
  */
 case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
-  val monoid = cmsMonoid
+  override val monoid: CMSMonoid[K] = cmsMonoid
 
-  def prepare(value: K): CMS[K] = monoid.create(value)
+  override def prepare(value: K): CMS[K] = monoid.create(value)
 
-  def present(cms: CMS[K]): CMS[K] = cms
+  override def present(cms: CMS[K]): CMS[K] = cms
 
 }
 
@@ -697,7 +697,7 @@ case class CMSInstance[K](
     override val params: CMSParams[K]
 ) extends CMS[K](params) {
 
-  def ++(other: CMS[K]): CMS[K] =
+  override def ++(other: CMS[K]): CMS[K] =
     other match {
       case _: CMSZero[_]     => this
       case other: CMSItem[K] => this + other.item
@@ -719,7 +719,7 @@ case class CMSInstance[K](
       Approximate(lower, est, est, 1 - delta)
     }
 
-  def frequency(item: K): Approximate[Long] = {
+  override def frequency(item: K): Approximate[Long] = {
     var freq = Long.MaxValue
     val hs = params.hashes
     val it = countsTable.counts.iterator
@@ -739,7 +739,7 @@ case class CMSInstance[K](
    * rows:
    * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k]|)
    */
-  def innerProduct(other: CMS[K]): Approximate[Long] =
+  override def innerProduct(other: CMS[K]): Approximate[Long] =
     other match {
       case other: CMSInstance[_] =>
         require(other.depth == depth && other.width == width, "Tables must have the same dimensions.")
@@ -900,7 +900,7 @@ sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
   override def innerProduct(other: TopCMS[K]): Approximate[Long] =
     cms.innerProduct(other.cms)
 
-  def f2: Approximate[Long] = innerProduct(this)
+  override def f2: Approximate[Long] = innerProduct(this)
 
   /**
    * The pluggable logic with which heavy hitters are being tracked.
@@ -983,14 +983,14 @@ class TopCMSMonoid[K](emptyCms: CMS[K], logic: HeavyHittersLogic[K]) extends Mon
 
   val params: TopCMSParams[K] = TopCMSParams(logic)
 
-  val zero: TopCMS[K] = TopCMSZero[K](emptyCms, params)
+  override val zero: TopCMS[K] = TopCMSZero[K](emptyCms, params)
 
   /**
    * Combines the two sketches.
    *
    * The sketches must use the same hash functions.
    */
-  def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
+  override def plus(left: TopCMS[K], right: TopCMS[K]): TopCMS[K] = {
     require(
       left.cms.params.hashes == right.cms.params.hashes,
       "The sketches must use the same hash functions."
@@ -1030,11 +1030,11 @@ class TopCMSMonoid[K](emptyCms: CMS[K], logic: HeavyHittersLogic[K]) extends Mon
 
 class TopCMSAggregator[K](cmsMonoid: TopCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
 
-  def monoid = cmsMonoid
+  override def monoid: TopCMSMonoid[K] = cmsMonoid
 
-  def prepare(value: K): TopCMS[K] = monoid.create(value)
+  override def prepare(value: K): TopCMS[K] = monoid.create(value)
 
-  def present(cms: TopCMS[K]): TopCMS[K] = cms
+  override def present(cms: TopCMS[K]): TopCMS[K] = cms
 
 }
 
@@ -1054,7 +1054,7 @@ abstract class HeavyHittersLogic[K] extends java.io.Serializable {
     purgeHeavyHitters(newCms)(hhs - oldHh + newHh)
   }
 
-  def updateHeavyHitters(cms: CMS[K])(left: HeavyHitters[K], right: HeavyHitters[K]) = {
+  def updateHeavyHitters(cms: CMS[K])(left: HeavyHitters[K], right: HeavyHitters[K]): HeavyHitters[K] = {
     val candidates = (left.items ++ right.items).map {
       case i => HeavyHitter[K](i, cms.frequency(i).estimate)
     }
@@ -1348,11 +1348,11 @@ class ScopedTopNCMSMonoid[K1, K2](cms: CMS[(K1, K2)], heavyHittersN: Int = 100)
 
 object ScopedTopNCMS {
 
-  def scopedHasher[K1: CMSHasher, K2: CMSHasher] = new CMSHasher[(K1, K2)] {
+  def scopedHasher[K1: CMSHasher, K2: CMSHasher]: CMSHasher[(K1, K2)] = new CMSHasher[(K1, K2)] {
     private val k1Hasher = implicitly[CMSHasher[K1]]
     private val k2Hasher = implicitly[CMSHasher[K2]]
 
-    def hash(a: Int, b: Int, width: Int)(x: (K1, K2)): Int = {
+    override def hash(a: Int, b: Int, width: Int)(x: (K1, K2)): Int = {
       val (k1, k2) = x
       val xs = Seq(k1Hasher.hash(a, b, width)(k1), k2Hasher.hash(a, b, width)(k2), a, b)
       (scala.util.hashing.MurmurHash3.seqHash(xs) & Int.MaxValue) % width

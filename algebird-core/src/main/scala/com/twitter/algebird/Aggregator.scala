@@ -31,9 +31,9 @@ object Aggregator extends java.io.Serializable {
     fromSemigroup(Semigroup.from(red))
   def fromSemigroup[T](implicit sg: Semigroup[T]): Aggregator[T, T, T] =
     new Aggregator[T, T, T] {
-      def prepare(input: T) = input
-      def semigroup = sg
-      def present(reduction: T) = reduction
+      override def prepare(input: T): T = input
+      override def semigroup: Semigroup[T] = sg
+      override def present(reduction: T): T = reduction
     }
   def fromMonoid[T](implicit mon: Monoid[T]): MonoidAggregator[T, T, T] =
     prepareMonoid(identity[T])
@@ -46,22 +46,22 @@ object Aggregator extends java.io.Serializable {
 
   def prepareSemigroup[F, T](prep: F => T)(implicit sg: Semigroup[T]): Aggregator[F, T, T] =
     new Aggregator[F, T, T] {
-      def prepare(input: F) = prep(input)
-      def semigroup = sg
-      def present(reduction: T) = reduction
+      override def prepare(input: F): T = prep(input)
+      override def semigroup: Semigroup[T] = sg
+      override def present(reduction: T): T = reduction
     }
   def prepareMonoid[F, T](prep: F => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] =
     new MonoidAggregator[F, T, T] {
-      def prepare(input: F) = prep(input)
-      def monoid = m
-      def present(reduction: T) = reduction
+      override def prepare(input: F): T = prep(input)
+      override def monoid: Monoid[T] = m
+      override def present(reduction: T): T = reduction
     }
   // Uses the product from the ring
   def fromRing[F, T](implicit rng: Ring[T], prep: F => T): RingAggregator[F, T, T] =
     new RingAggregator[F, T, T] {
-      def prepare(input: F) = prep(input)
-      def ring = rng
-      def present(reduction: T) = reduction
+      override def prepare(input: F): T = prep(input)
+      override def ring: Ring[T] = rng
+      override def present(reduction: T): T = reduction
     }
 
   /**
@@ -71,7 +71,7 @@ object Aggregator extends java.io.Serializable {
   def appendSemigroup[F, T](prep: F => T, appnd: (T, F) => T)(
       implicit sg: Semigroup[T]
   ): Aggregator[F, T, T] =
-    appendSemigroup(prep, appnd, identity[T] _)(sg)
+    appendSemigroup(prep, appnd, identity[T])(sg)
 
   /**
    * Obtain an [[Aggregator]] that uses an efficient append operation for faster aggregation
@@ -89,9 +89,9 @@ object Aggregator extends java.io.Serializable {
       implicit sg: Semigroup[T]
   ): Aggregator[F, T, P] =
     new Aggregator[F, T, P] {
-      def semigroup: Semigroup[T] = sg
-      def prepare(input: F): T = prep(input)
-      def present(reduction: T): P = pres(reduction)
+      override def semigroup: Semigroup[T] = sg
+      override def prepare(input: F): T = prep(input)
+      override def present(reduction: T): P = pres(reduction)
 
       override def apply(inputs: TraversableOnce[F]): P =
         applyOption(inputs).get
@@ -118,7 +118,7 @@ object Aggregator extends java.io.Serializable {
    * Equivalent to {{{ appendMonoid(appnd, identity[T]_)(m) }}}
    */
   def appendMonoid[F, T](appnd: (T, F) => T)(implicit m: Monoid[T]): MonoidAggregator[F, T, T] =
-    appendMonoid(appnd, identity[T] _)(m)
+    appendMonoid(appnd, identity[T])(m)
 
   /**
    * Obtain a [[MonoidAggregator]] that uses an efficient append operation for faster aggregation
@@ -135,9 +135,9 @@ object Aggregator extends java.io.Serializable {
       implicit m: Monoid[T]
   ): MonoidAggregator[F, T, P] =
     new MonoidAggregator[F, T, P] {
-      def monoid: Monoid[T] = m
-      def prepare(input: F): T = appnd(m.zero, input)
-      def present(reduction: T): P = pres(reduction)
+      override def monoid: Monoid[T] = m
+      override def prepare(input: F): T = appnd(m.zero, input)
+      override def present(reduction: T): P = pres(reduction)
 
       override def apply(inputs: TraversableOnce[F]): P = present(agg(inputs))
 
@@ -194,7 +194,7 @@ object Aggregator extends java.io.Serializable {
    */
   def max[T: Ordering]: Aggregator[T, T, T] = new MaxAggregator[T]
   def maxBy[U, T: Ordering](fn: U => T): Aggregator[U, U, U] = {
-    implicit val ordU = Ordering.by(fn)
+    implicit val ordU: Ordering[U] = Ordering.by(fn)
     max[U]
   }
 
@@ -203,7 +203,7 @@ object Aggregator extends java.io.Serializable {
    */
   def min[T: Ordering]: Aggregator[T, T, T] = new MinAggregator[T]
   def minBy[U, T: Ordering](fn: U => T): Aggregator[U, U, U] = {
-    implicit val ordU = Ordering.by(fn)
+    implicit val ordU: Ordering[U] = Ordering.by(fn)
     min[U]
   }
 
@@ -294,10 +294,10 @@ object Aggregator extends java.io.Serializable {
    */
   def toList[T]: MonoidAggregator[T, Option[Batched[T]], List[T]] =
     new MonoidAggregator[T, Option[Batched[T]], List[T]] {
-      def prepare(t: T): Option[Batched[T]] = Some(Batched(t))
-      def monoid: Monoid[Option[Batched[T]]] =
+      override def prepare(t: T): Option[Batched[T]] = Some(Batched(t))
+      override def monoid: Monoid[Option[Batched[T]]] =
         Monoid.optionMonoid(Batched.semigroup)
-      def present(o: Option[Batched[T]]): List[T] =
+      override def present(o: Option[Batched[T]]): List[T] =
         o.map(_.toList).getOrElse(Nil)
     }
 
@@ -455,17 +455,17 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
   /** Like calling andThen on the present function */
   def andThenPresent[D](present2: C => D): Aggregator[A, B, D] =
     new Aggregator[A, B, D] {
-      def prepare(input: A) = self.prepare(input)
-      def semigroup = self.semigroup
-      def present(reduction: B) = present2(self.present(reduction))
+      override def prepare(input: A): B = self.prepare(input)
+      override def semigroup: Semigroup[B] = self.semigroup
+      override def present(reduction: B): D = present2(self.present(reduction))
     }
 
   /** Like calling compose on the prepare function */
   def composePrepare[A1](prepare2: A1 => A): Aggregator[A1, B, C] =
     new Aggregator[A1, B, C] {
-      def prepare(input: A1) = self.prepare(prepare2(input))
-      def semigroup = self.semigroup
-      def present(reduction: B) = self.present(reduction)
+      override def prepare(input: A1): B = self.prepare(prepare2(input))
+      override def semigroup: Semigroup[B] = self.semigroup
+      override def present(reduction: B): C = self.present(reduction)
     }
 
   /**
@@ -484,9 +484,9 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
   def zip[A2, B2, C2](ag2: Aggregator[A2, B2, C2]): Aggregator[(A, A2), (B, B2), (C, C2)] = {
     val ag1 = this
     new Aggregator[(A, A2), (B, B2), (C, C2)] {
-      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
-      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+      override def prepare(a: (A, A2)): (B, B2) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      override val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      override def present(b: (B, B2)): (C, C2) = (ag1.present(b._1), ag2.present(b._2))
     }
   }
 
@@ -499,13 +499,13 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     Fold.fold[Option[B], A, Option[C]]({
       case (None, a)    => Some(self.prepare(a))
       case (Some(b), a) => Some(self.append(b, a))
-    }, None, { _.map(self.present(_)) })
+    }, None, { _.map(self.present) })
 
   def lift: MonoidAggregator[A, Option[B], Option[C]] =
     new MonoidAggregator[A, Option[B], Option[C]] {
-      def prepare(input: A): Option[B] = Some(self.prepare(input))
-      def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
-      def monoid = new OptionMonoid[B]()(self.semigroup)
+      override def prepare(input: A): Option[B] = Some(self.prepare(input))
+      override def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
+      override def monoid = new OptionMonoid[B]()(self.semigroup)
     }
 }
 
@@ -547,7 +547,7 @@ class AggregatorApplicative[I] extends Applicative[({ type L[O] = Aggregator[I, 
 
 trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   def monoid: Monoid[B]
-  def semigroup = monoid
+  override def semigroup: Monoid[B] = monoid
   final override def reduce(items: TraversableOnce[B]): B =
     monoid.sum(items)
 
@@ -556,17 +556,17 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   override def andThenPresent[D](present2: C => D): MonoidAggregator[A, B, D] = {
     val self = this
     new MonoidAggregator[A, B, D] {
-      def prepare(a: A) = self.prepare(a)
-      def monoid = self.monoid
-      def present(b: B) = present2(self.present(b))
+      override def prepare(a: A): B = self.prepare(a)
+      override def monoid: Monoid[B] = self.monoid
+      override def present(b: B): D = present2(self.present(b))
     }
   }
   override def composePrepare[A2](prepare2: A2 => A): MonoidAggregator[A2, B, C] = {
     val self = this
     new MonoidAggregator[A2, B, C] {
-      def prepare(a: A2) = self.prepare(prepare2(a))
-      def monoid = self.monoid
-      def present(b: B) = self.present(b)
+      override def prepare(a: A2): B = self.prepare(prepare2(a))
+      override def monoid: Monoid[B] = self.monoid
+      override def present(b: B): C = self.present(b)
     }
   }
 
@@ -578,12 +578,12 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
       that: MonoidAggregator[A2, B2, C2]
   ): MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] =
     new MonoidAggregator[Either[A, A2], (B, B2), (C, C2)] {
-      def prepare(e: Either[A, A2]) = e match {
+      override def prepare(e: Either[A, A2]): (B, B2) = e match {
         case Left(a)   => (self.prepare(a), that.monoid.zero)
         case Right(a2) => (self.monoid.zero, that.prepare(a2))
       }
-      val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
-      def present(bs: (B, B2)) = (self.present(bs._1), that.present(bs._2))
+      override val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
+      override def present(bs: (B, B2)): (C, C2) = (self.present(bs._1), that.present(bs._2))
     }
 
   /**
@@ -591,10 +591,10 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
    */
   def collectBefore[A2](fn: PartialFunction[A2, A]): MonoidAggregator[A2, B, C] =
     new MonoidAggregator[A2, B, C] {
-      def prepare(a: A2) =
+      override def prepare(a: A2): B =
         if (fn.isDefinedAt(a)) self.prepare(fn(a)) else self.monoid.zero
-      def monoid = self.monoid
-      def present(b: B) = self.present(b)
+      override def monoid: Monoid[B] = self.monoid
+      override def present(b: B): C = self.present(b)
     }
 
   /**
@@ -602,9 +602,9 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
    */
   def filterBefore[A1 <: A](pred: A1 => Boolean): MonoidAggregator[A1, B, C] =
     new MonoidAggregator[A1, B, C] {
-      def prepare(a: A1) = if (pred(a)) self.prepare(a) else self.monoid.zero
-      def monoid = self.monoid
-      def present(b: B) = self.present(b)
+      override def prepare(a: A1): B = if (pred(a)) self.prepare(a) else self.monoid.zero
+      override def monoid: Monoid[B] = self.monoid
+      override def present(b: B): C = self.present(b)
     }
 
   /**
@@ -613,10 +613,10 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
    */
   def sumBefore: MonoidAggregator[TraversableOnce[A], B, C] =
     new MonoidAggregator[TraversableOnce[A], B, C] {
-      def monoid: Monoid[B] = self.monoid
-      def prepare(input: TraversableOnce[A]): B =
+      override def monoid: Monoid[B] = self.monoid
+      override def prepare(input: TraversableOnce[A]): B =
         monoid.sum(input.map(self.prepare))
-      def present(reduction: B): C = self.present(reduction)
+      override def present(reduction: B): C = self.present(reduction)
     }
 
   /**
@@ -629,14 +629,14 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   def zip[A2, B2, C2](ag2: MonoidAggregator[A2, B2, C2]): MonoidAggregator[(A, A2), (B, B2), (C, C2)] = {
     val ag1 = self
     new MonoidAggregator[(A, A2), (B, B2), (C, C2)] {
-      def prepare(a: (A, A2)) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
-      def present(b: (B, B2)) = (ag1.present(b._1), ag2.present(b._2))
+      override def prepare(a: (A, A2)): (B, B2) = (ag1.prepare(a._1), ag2.prepare(a._2))
+      override val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
+      override def present(b: (B, B2)): (C, C2) = (ag1.present(b._1), ag2.present(b._2))
     }
   }
 }
 
 trait RingAggregator[-A, B, +C] extends MonoidAggregator[A, B, C] {
   def ring: Ring[B]
-  def monoid = Ring.asTimesMonoid(ring)
+  override def monoid: Monoid[B] = Ring.asTimesMonoid(ring)
 }

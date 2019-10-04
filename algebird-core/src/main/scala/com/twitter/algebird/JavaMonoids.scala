@@ -16,70 +16,71 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
-import java.util.{Map => JMap, List => JList}
+import java.util
+import java.util.{List => JList, Map => JMap}
 
 import scala.collection.JavaConverters._
 
 object JIntRing extends Ring[JInt] {
-  override val zero = JInt.valueOf(0)
-  override val one = JInt.valueOf(1)
-  override def plus(x: JInt, y: JInt) = x + y
+  override val zero: JInt = JInt.valueOf(0)
+  override val one: JInt = JInt.valueOf(1)
+  override def plus(x: JInt, y: JInt): JInt = x + y
   override def negate(x: JInt): JInt = -x
-  override def minus(x: JInt, y: JInt) = x - y
-  override def times(x: JInt, y: JInt) = x * y
+  override def minus(x: JInt, y: JInt): JInt = x - y
+  override def times(x: JInt, y: JInt): JInt = x * y
 }
 
 object JShortRing extends Ring[JShort] {
-  override val zero = Short.box(0)
-  override val one = Short.box(1)
-  override def plus(x: JShort, y: JShort) = (x + y).toShort
-  override def negate(x: JShort) = (-x).toShort
-  override def minus(x: JShort, y: JShort) = (x - y).toShort
-  override def times(x: JShort, y: JShort) = (x * y).toShort
+  override val zero: JShort = Short.box(0)
+  override val one: JShort = Short.box(1)
+  override def plus(x: JShort, y: JShort): JShort = (x + y).toShort
+  override def negate(x: JShort): JShort = (-x).toShort
+  override def minus(x: JShort, y: JShort): JShort = (x - y).toShort
+  override def times(x: JShort, y: JShort): JShort = (x * y).toShort
 }
 
 object JLongRing extends Ring[JLong] {
-  override val zero = JLong.valueOf(0L)
-  override val one = JLong.valueOf(1L)
-  override def plus(x: JLong, y: JLong) = x + y
+  override val zero: JLong = JLong.valueOf(0L)
+  override val one: JLong = JLong.valueOf(1L)
+  override def plus(x: JLong, y: JLong): JLong = x + y
   override def negate(x: JLong): JLong = -x
-  override def minus(x: JLong, y: JLong) = x - y
-  override def times(x: JLong, y: JLong) = x * y
+  override def minus(x: JLong, y: JLong): JLong = x - y
+  override def times(x: JLong, y: JLong): JLong = x * y
 }
 
 object JFloatRing extends Ring[JFloat] {
-  override val zero = JFloat.valueOf(0.0f)
-  override val one = JFloat.valueOf(1.0f)
-  override def plus(x: JFloat, y: JFloat) = x + y
+  override val zero: JFloat = JFloat.valueOf(0.0f)
+  override val one: JFloat = JFloat.valueOf(1.0f)
+  override def plus(x: JFloat, y: JFloat): JFloat = x + y
   override def negate(x: JFloat): JFloat = -x
-  override def minus(x: JFloat, y: JFloat) = x - y
-  override def times(x: JFloat, y: JFloat) = x * y
+  override def minus(x: JFloat, y: JFloat): JFloat = x - y
+  override def times(x: JFloat, y: JFloat): JFloat = x * y
 }
 
 object JDoubleRing extends Ring[JDouble] {
-  override val zero = JDouble.valueOf(0.0)
-  override val one = JDouble.valueOf(1.0)
-  override def plus(x: JDouble, y: JDouble) = x + y
+  override val zero: JDouble = JDouble.valueOf(0.0)
+  override val one: JDouble = JDouble.valueOf(1.0)
+  override def plus(x: JDouble, y: JDouble): JDouble = x + y
   override def negate(x: JDouble): JDouble = -x
-  override def minus(x: JDouble, y: JDouble) = x - y
-  override def times(x: JDouble, y: JDouble) = x * y
+  override def minus(x: JDouble, y: JDouble): JDouble = x - y
+  override def times(x: JDouble, y: JDouble): JDouble = x * y
 }
 
 object JBoolRing extends Ring[JBool] {
-  override val zero = JBool.FALSE
-  override val one = JBool.TRUE
-  override def plus(x: JBool, y: JBool) =
+  override val zero: JBool = JBool.FALSE
+  override val one: JBool = JBool.TRUE
+  override def plus(x: JBool, y: JBool): JBool =
     JBool.valueOf(x.booleanValue ^ y.booleanValue)
-  override def negate(x: JBool) = x
-  override def minus(x: JBool, y: JBool) = plus(x, y)
-  override def times(x: JBool, y: JBool) =
+  override def negate(x: JBool): JBool = x
+  override def minus(x: JBool, y: JBool): JBool = plus(x, y)
+  override def times(x: JBool, y: JBool): JBool =
     JBool.valueOf(x.booleanValue & y.booleanValue)
 }
 
@@ -88,9 +89,9 @@ object JBoolRing extends Ring[JBool] {
  * if you use scala immutable lists, the tail of the result of plus is always the right argument
  */
 class JListMonoid[T] extends Monoid[JList[T]] {
-  override def isNonZero(x: JList[T]) = !x.isEmpty
+  override def isNonZero(x: JList[T]): Boolean = !x.isEmpty
   override lazy val zero = new java.util.ArrayList[T](0)
-  override def plus(x: JList[T], y: JList[T]) = {
+  override def plus(x: JList[T], y: JList[T]): util.ArrayList[T] = {
     val res = new java.util.ArrayList[T](x.size + y.size)
     res.addAll(x)
     res.addAll(y)
@@ -111,7 +112,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
     case _              => (_ => true)
   }
 
-  override def isNonZero(x: JMap[K, V]) =
+  override def isNonZero(x: JMap[K, V]): Boolean =
     !x.isEmpty && (implicitly[Semigroup[V]] match {
       case mon: Monoid[_] =>
         x.values.asScala.exists { v =>
@@ -119,7 +120,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
         }
       case _ => true
     })
-  override def plus(x: JMap[K, V], y: JMap[K, V]) = {
+  override def plus(x: JMap[K, V], y: JMap[K, V]): util.HashMap[K, V] = {
     val (big, small, bigOnLeft) =
       if (x.size > y.size) {
         (x, y, true)

@@ -53,8 +53,8 @@ import scala.annotation.implicitNotFound
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
 trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with CommutativeGroup[T] with ARing[T] {
-  def one: T
-  def times(a: T, b: T): T
+  override def one: T
+  override def times(a: T, b: T): T
   override def product(iter: TraversableOnce[T]): T =
     if (iter.isEmpty) one // avoid hitting one as some have abused Ring for Rng
     else iter.reduce(times)
@@ -64,26 +64,26 @@ trait Ring[@specialized(Int, Long, Float, Double) T] extends Group[T] with Commu
 abstract class AbstractRing[T] extends Ring[T]
 
 class ConstantRing[T](constant: T) extends ConstantGroup[T](constant) with Ring[T] {
-  def one = constant
-  def times(a: T, b: T) = constant
+  override def one: T = constant
+  override def times(a: T, b: T): T = constant
 }
 
 class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
-  override def zero = num.zero
-  override def one = num.one
-  override def negate(t: T) = num.negate(t)
-  override def plus(l: T, r: T) = num.plus(l, r)
-  override def minus(l: T, r: T) = num.minus(l, r)
-  override def times(l: T, r: T) = num.times(l, r)
+  override def zero: T = num.zero
+  override def one: T = num.one
+  override def negate(t: T): T = num.negate(t)
+  override def plus(l: T, r: T): T = num.plus(l, r)
+  override def minus(l: T, r: T): T = num.minus(l, r)
+  override def times(l: T, r: T): T = num.times(l, r)
 }
 
 object IntRing extends Ring[Int] {
   override def zero = 0
   override def one = 1
-  override def negate(v: Int) = -v
-  override def plus(l: Int, r: Int) = l + r
-  override def minus(l: Int, r: Int) = l - r
-  override def times(l: Int, r: Int) = l * r
+  override def negate(v: Int): Int = -v
+  override def plus(l: Int, r: Int): Int = l + r
+  override def minus(l: Int, r: Int): Int = l - r
+  override def times(l: Int, r: Int): Int = l * r
   override def sum(t: TraversableOnce[Int]): Int = {
     var sum = 0
     t.foreach(sum += _)
@@ -95,12 +95,12 @@ object IntRing extends Ring[Int] {
 }
 
 object ShortRing extends Ring[Short] {
-  override def zero = 0.toShort
-  override def one = 1.toShort
-  override def negate(v: Short) = (-v).toShort
-  override def plus(l: Short, r: Short) = (l + r).toShort
-  override def minus(l: Short, r: Short) = (l - r).toShort
-  override def times(l: Short, r: Short) = (l * r).toShort
+  override def zero: Short = 0.toShort
+  override def one: Short = 1.toShort
+  override def negate(v: Short): Short = (-v).toShort
+  override def plus(l: Short, r: Short): Short = (l + r).toShort
+  override def minus(l: Short, r: Short): Short = (l - r).toShort
+  override def times(l: Short, r: Short): Short = (l * r).toShort
   override def sum(t: TraversableOnce[Short]): Short = {
     var sum = 0
     t.foreach(sum += _)
@@ -114,10 +114,10 @@ object ShortRing extends Ring[Short] {
 object LongRing extends Ring[Long] {
   override def zero = 0L
   override def one = 1L
-  override def negate(v: Long) = -v
-  override def plus(l: Long, r: Long) = l + r
-  override def minus(l: Long, r: Long) = l - r
-  override def times(l: Long, r: Long) = l * r
+  override def negate(v: Long): Long = -v
+  override def plus(l: Long, r: Long): Long = l + r
+  override def minus(l: Long, r: Long): Long = l - r
+  override def times(l: Long, r: Long): Long = l * r
   override def sum(t: TraversableOnce[Long]): Long = {
     var sum = 0L
     t.foreach(sum += _)
@@ -131,28 +131,28 @@ object LongRing extends Ring[Long] {
 object FloatRing extends Ring[Float] {
   override def one = 1.0f
   override def zero = 0.0f
-  override def negate(v: Float) = -v
-  override def plus(l: Float, r: Float) = l + r
-  override def minus(l: Float, r: Float) = l - r
-  override def times(l: Float, r: Float) = l * r
+  override def negate(v: Float): Float = -v
+  override def plus(l: Float, r: Float): Float = l + r
+  override def minus(l: Float, r: Float): Float = l - r
+  override def times(l: Float, r: Float): Float = l * r
 }
 
 object DoubleRing extends Ring[Double] {
   override def one = 1.0
   override def zero = 0.0
-  override def negate(v: Double) = -v
-  override def plus(l: Double, r: Double) = l + r
-  override def minus(l: Double, r: Double) = l - r
-  override def times(l: Double, r: Double) = l * r
+  override def negate(v: Double): Double = -v
+  override def plus(l: Double, r: Double): Double = l + r
+  override def minus(l: Double, r: Double): Double = l - r
+  override def times(l: Double, r: Double): Double = l * r
 }
 
 object BooleanRing extends Ring[Boolean] {
   override def one = true
   override def zero = false
-  override def negate(v: Boolean) = v
-  override def plus(l: Boolean, r: Boolean) = l ^ r
-  override def minus(l: Boolean, r: Boolean) = l ^ r
-  override def times(l: Boolean, r: Boolean) = l && r
+  override def negate(v: Boolean): Boolean = v
+  override def plus(l: Boolean, r: Boolean): Boolean = l ^ r
+  override def minus(l: Boolean, r: Boolean): Boolean = l ^ r
+  override def times(l: Boolean, r: Boolean): Boolean = l && r
 }
 
 object BigIntRing extends NumericRing[BigInt]
@@ -222,11 +222,11 @@ private[algebird] trait RingImplicits0 extends NumericRingProvider {
 
 object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0 {
   // This pattern is really useful for typeclasses
-  def one[T](implicit rng: Ring[T]) = rng.one
-  def times[T](l: T, r: T)(implicit rng: Ring[T]) = rng.times(l, r)
+  def one[T](implicit rng: Ring[T]): T = rng.one
+  def times[T](l: T, r: T)(implicit rng: Ring[T]): T = rng.times(l, r)
   def asTimesMonoid[T](implicit ring: Ring[T]): Monoid[T] = new Monoid[T] {
-    def zero = ring.one
-    def plus(a: T, b: T): T = ring.times(a, b)
+    override def zero: T = ring.one
+    override def plus(a: T, b: T): T = ring.times(a, b)
     override def sumOption(ts: TraversableOnce[T]): Option[T] =
       if (ts.isEmpty) None
       else Some(ring.product(ts))
@@ -234,7 +234,7 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
       ring.product(ts)
   }
   // Left product: (((a * b) * c) * d)
-  def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]) =
+  def product[T](iter: TraversableOnce[T])(implicit ring: Ring[T]): T =
     ring.product(iter)
 
   // If the ring doesn't have a one, or you want to distinguish empty cases:
@@ -243,19 +243,19 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
     else Some(rng.product(it))
 
   implicit val unitRing: Ring[Unit] = new ConstantRing(())
-  implicit def boolRing: Ring[Boolean] = BooleanRing
-  implicit def jboolRing: Ring[JBool] = JBoolRing
-  implicit def intRing: Ring[Int] = IntRing
-  implicit def jintRing: Ring[JInt] = JIntRing
-  implicit def shortRing: Ring[Short] = ShortRing
-  implicit def jshortRing: Ring[JShort] = JShortRing
-  implicit def longRing: Ring[Long] = LongRing
-  implicit def bigIntRing: Ring[BigInt] = BigIntRing
-  implicit def jlongRing: Ring[JLong] = JLongRing
-  implicit def floatRing: Ring[Float] = FloatRing
-  implicit def jfloatRing: Ring[JFloat] = JFloatRing
-  implicit def doubleRing: Ring[Double] = DoubleRing
-  implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
+  implicit val boolRing: Ring[Boolean] = BooleanRing
+  implicit val jboolRing: Ring[JBool] = JBoolRing
+  implicit val intRing: Ring[Int] = IntRing
+  implicit val jintRing: Ring[JInt] = JIntRing
+  implicit val shortRing: Ring[Short] = ShortRing
+  implicit val jshortRing: Ring[JShort] = JShortRing
+  implicit val longRing: Ring[Long] = LongRing
+  implicit val bigIntRing: Ring[BigInt] = BigIntRing
+  implicit val jlongRing: Ring[JLong] = JLongRing
+  implicit val floatRing: Ring[Float] = FloatRing
+  implicit val jfloatRing: Ring[JFloat] = JFloatRing
+  implicit val doubleRing: Ring[Double] = DoubleRing
+  implicit val jdoubleRing: Ring[JDouble] = JDoubleRing
   implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] =
     new IndexedSeqRing[T]
 

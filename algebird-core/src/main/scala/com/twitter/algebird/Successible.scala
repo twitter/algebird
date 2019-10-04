@@ -33,7 +33,7 @@ trait Successible[T] extends Serializable {
     // to reduce generated class size due to all the methods in Iterable.
     // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
-      def iterator =
+      override def iterator: Iterator[T] =
         Iterator
           .iterate[Option[T]](Some(old)) { self.next(_) }
           .takeWhile(_.isDefined)
@@ -60,8 +60,8 @@ object Successible {
    * Note, your function must respect the ordering
    */
   def fromNextOrd[T](nextFn: T => Option[T])(implicit ord: Ordering[T]): Successible[T] = new Successible[T] {
-    def next(t: T) = nextFn(t)
-    def ordering = ord
+    override def next(t: T): Option[T] = nextFn(t)
+    override def ordering: Ordering[T] = ord
   }
   // enables: Successible.next(2) == Some(3)
   def next[T](t: T)(implicit succ: Successible[T]): Option[T] = succ.next(t)
@@ -79,7 +79,7 @@ object Successible {
    */
   def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] =
     new Ordering[Option[T]] {
-      def compare(left: Option[T], right: Option[T]) =
+      override def compare(left: Option[T], right: Option[T]): Int =
         (left, right) match {
           case (Some(l), Some(r)) => ord.compare(l, r)
           case (Some(_), None)    => -1
@@ -103,7 +103,7 @@ object IntegralSuccessible {
 class IntegralSuccessible[T: Integral] extends Successible[T] {
   private[this] val integral = implicitly[Integral[T]]
 
-  def next(old: T) = IntegralSuccessible.next(old)
+  override def next(old: T): Option[T] = IntegralSuccessible.next(old)
 
-  def ordering = integral
+  override def ordering: Integral[T] = integral
 }

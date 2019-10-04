@@ -30,15 +30,15 @@ sealed trait Trampoline[+A] {
 }
 
 final case class Done[A](override val get: A) extends Trampoline[A] {
-  def map[B](fn: A => B) = Done(fn(get))
+  override def map[B](fn: A => B): Done[B] = Done(fn(get))
 }
 
 final case class FlatMapped[C, A](start: Trampoline[C], fn: C => Trampoline[A]) extends Trampoline[A] {
-  def map[B](fn: A => B) =
+  override def map[B](fn: A => B): FlatMapped[A, B] =
     FlatMapped(this, { (a: A) =>
       Done(fn(a))
     })
-  lazy val get = Trampoline.run(this)
+  override lazy val get: A = Trampoline.run(this)
 }
 
 object Trampoline {
@@ -55,8 +55,8 @@ object Trampoline {
   def call[A](layzee: => Trampoline[A]): Trampoline[A] =
     FlatMapped(unit, (_: Unit) => layzee)
   implicit val Monad: Monad[Trampoline] = new Monad[Trampoline] {
-    def apply[A](a: A) = Done(a)
-    def flatMap[A, B](start: Trampoline[A])(fn: A => Trampoline[B]) =
+    override def apply[A](a: A): Done[A] = Done(a)
+    override def flatMap[A, B](start: Trampoline[A])(fn: A => Trampoline[B]): Trampoline[B] =
       start.flatMap(fn)
   }
   // This triggers evaluation. Will reevaluate every time. Prefer .get

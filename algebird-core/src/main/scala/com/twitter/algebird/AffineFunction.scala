@@ -24,7 +24,7 @@ case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializabl
   def toFn(implicit ring: Ring[R]): Function1[R, R] = { x =>
     this.apply(x)(ring)
   }
-  def apply(x: R)(implicit ring: Ring[R]) =
+  def apply(x: R)(implicit ring: Ring[R]): R =
     ring.plus(ring.times(slope, x), intercept)
 }
 
@@ -38,8 +38,8 @@ case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializabl
  * listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
  */
 class AffineFunctionMonoid[R](implicit ring: Ring[R]) extends Monoid[AffineFunction[R]] {
-  lazy val zero = AffineFunction[R](ring.one, ring.zero)
-  def plus(f: AffineFunction[R], g: AffineFunction[R]) = {
+  override lazy val zero: AffineFunction[R] = AffineFunction[R](ring.one, ring.zero)
+  override def plus(f: AffineFunction[R], g: AffineFunction[R]): AffineFunction[R] = {
     // (f+g)(x) = g(f(x))
     // g(f(x)) = g(a*x+b) = c*(a*x+b) + d = (c*a)*x + (c*b + d)
     val newSlope = ring.times(g.slope, f.slope)

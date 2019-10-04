@@ -32,8 +32,8 @@ abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A
   def present(q: PriorityQueue[A]): B
    */
 
-  val monoid = new PriorityQueueMonoid[A](max)
-  final def prepare(a: A) = monoid.build(a)
+  override val monoid = new PriorityQueueMonoid[A](max)
+  override final def prepare(a: A): PriorityQueue[A] = monoid.build(a)
 }
 
 /**
@@ -41,5 +41,5 @@ abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A
  */
 class PriorityQueueToListAggregator[A](max: Int)(implicit ord: Ordering[A])
     extends PriorityQueueAggregator[A, List[A]](max) {
-  def present(q: PriorityQueue[A]) = q.iterator.asScala.toList.sorted
+  override def present(q: PriorityQueue[A]): List[A] = q.iterator.asScala.toList.sorted
 }

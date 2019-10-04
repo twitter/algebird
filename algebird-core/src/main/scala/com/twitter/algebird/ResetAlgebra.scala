@@ -23,8 +23,8 @@ package com.twitter.algebird
  * |a + |b = |b
  */
 sealed trait ResetState[+A] { def get: A }
-case class SetValue[+A](get: A) extends ResetState[A]
-case class ResetValue[+A](get: A) extends ResetState[A]
+case class SetValue[+A](override val get: A) extends ResetState[A]
+case class ResetValue[+A](override val get: A) extends ResetState[A]
 
 object ResetState {
   implicit def monoid[A: Monoid]: Monoid[ResetState[A]] =
@@ -32,8 +32,8 @@ object ResetState {
 }
 
 class ResetStateMonoid[A](implicit monoid: Monoid[A]) extends Monoid[ResetState[A]] {
-  def zero = SetValue(monoid.zero)
-  def plus(left: ResetState[A], right: ResetState[A]) =
+  override def zero: SetValue[A] = SetValue(monoid.zero)
+  override def plus(left: ResetState[A], right: ResetState[A]): ResetState[A] =
     (left, right) match {
       case (SetValue(l), SetValue(r))   => SetValue(monoid.plus(l, r))
       case (ResetValue(l), SetValue(r)) => ResetValue(monoid.plus(l, r))

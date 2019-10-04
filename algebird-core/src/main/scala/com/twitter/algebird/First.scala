@@ -61,7 +61,7 @@ private[algebird] sealed abstract class FirstInstances {
    */
   def firstSemigroup[T]: Semigroup[T] with Band[T] =
     new Semigroup[T] with Band[T] {
-      def plus(l: T, r: T): T = l
+      override def plus(l: T, r: T): T = l
 
       override def sumOption(iter: TraversableOnce[T]): Option[T] =
         if (iter.isEmpty) None else Some(iter.toIterator.next)
@@ -81,7 +81,7 @@ private[algebird] sealed abstract class FirstInstances {
  * aggregated stream.
  */
 case class FirstAggregator[T]() extends Aggregator[T, T, T] {
-  def prepare(v: T) = v
-  val semigroup: Semigroup[T] = First.firstSemigroup[T]
-  def present(v: T) = v
+  override def prepare(v: T): T = v
+  override val semigroup: Semigroup[T] = First.firstSemigroup[T]
+  override def present(v: T): T = v
 }

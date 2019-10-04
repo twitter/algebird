@@ -41,10 +41,10 @@ object Functor {
 
   /** Get the Functor for a type, e.g: Functor[List] */
   def apply[M[_]](implicit functor: Functor[M]): Functor[M] = functor
-  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit functor: Functor[M]) =
+  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit functor: Functor[M]): M[U] =
     functor.map(m)(fn)
 
-  implicit def operators[A, M[_]](m: M[A])(implicit functor: Functor[M]) =
+  implicit def operators[A, M[_]](m: M[A])(implicit functor: Functor[M]): FunctorOperators[A, M] =
     new FunctorOperators(m)(functor)
 }
 

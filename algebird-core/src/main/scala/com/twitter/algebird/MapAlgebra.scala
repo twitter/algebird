@@ -35,7 +35,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     case _              => (_ => true)
   }
 
-  override def isNonZero(x: M) =
+  override def isNonZero(x: M): Boolean =
     !x.isEmpty && (semigroup match {
       case mon: Monoid[_] =>
         x.valuesIterator.exists { v =>
@@ -44,7 +44,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
       case _ => true
     })
 
-  override def plus(x: M, y: M) = {
+  override def plus(x: M, y: M): M = {
     // Scala maps can reuse internal structure, so don't copy just add into the bigger one:
     // This really saves computation when adding lots of small maps into big ones (common)
     val (big, small, bigOnLeft) =
@@ -100,17 +100,17 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
 }
 
 class MapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, Map[K, V]] {
-  override lazy val zero = Map[K, V]()
-  override def add(oldMap: Map[K, V], kv: (K, V)) = oldMap + kv
-  override def remove(oldMap: Map[K, V], k: K) = oldMap - k
+  override lazy val zero: Map[K, V] = Map[K, V]()
+  override def add(oldMap: Map[K, V], kv: (K, V)): Map[K, V] = oldMap + kv
+  override def remove(oldMap: Map[K, V], k: K): Map[K, V] = oldMap - k
   override def fromMutable(mut: MMap[K, V]): Map[K, V] =
     new MutableBackedMap(mut)
 }
 
 class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMonoid[K, V, ScMap[K, V]] {
-  override lazy val zero = ScMap[K, V]()
-  override def add(oldMap: ScMap[K, V], kv: (K, V)) = oldMap + kv
-  override def remove(oldMap: ScMap[K, V], k: K) = oldMap - k
+  override lazy val zero: ScMap[K, V] = ScMap[K, V]()
+  override def add(oldMap: ScMap[K, V], kv: (K, V)): ScMap[K, V] = oldMap + kv
+  override def remove(oldMap: ScMap[K, V], k: K): ScMap[K, V] = oldMap - k
   override def fromMutable(mut: MMap[K, V]): ScMap[K, V] =
     new MutableBackedMap(mut)
 }
@@ -118,20 +118,20 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
 private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V])
     extends Map[K, V]
     with java.io.Serializable {
-  def get(key: K) = backingMap.get(key)
+  override def get(key: K): Option[V] = backingMap.get(key)
 
-  def iterator = backingMap.iterator
+  override def iterator: Iterator[(K, V)] = backingMap.iterator
 
-  def +[B1 >: V](kv: (K, B1)) = backingMap.toMap + kv
+  override def +[B1 >: V](kv: (K, B1)): Map[K, B1] = backingMap.toMap + kv
 
-  def -(key: K) = backingMap.toMap - key
+  override def -(key: K): Map[K, V] = backingMap.toMap - key
 }
 
 /**
  * You can think of this as a Sparse vector group
  */
 class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group) with Group[Map[K, V]] {
-  override def negate(kv: Map[K, V]) = kv.mapValues { v =>
+  override def negate(kv: Map[K, V]): Map[K, V] = kv.mapValues { v =>
     group.negate(v)
   }
 }
@@ -139,7 +139,7 @@ class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(gro
 class ScMapGroup[K, V](implicit val group: Group[V])
     extends ScMapMonoid[K, V]()(group)
     with Group[ScMap[K, V]] {
-  override def negate(kv: ScMap[K, V]) = kv.mapValues { v =>
+  override def negate(kv: ScMap[K, V]): ScMap[K, V] = kv.mapValues { v =>
     group.negate(v)
   }
 }
@@ -171,11 +171,11 @@ trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Rng[M] with MapOperations[K
   }
 }
 
-class MapRing[K, V](implicit val ring: Ring[V])
+class MapRing[K, V](implicit override val ring: Ring[V])
     extends MapGroup[K, V]()(ring)
     with GenericMapRing[K, V, Map[K, V]]
 
-class ScMapRing[K, V](implicit val ring: Ring[V])
+class ScMapRing[K, V](implicit override val ring: Ring[V])
     extends ScMapGroup[K, V]()(ring)
     with GenericMapRing[K, V, ScMap[K, V]]
 

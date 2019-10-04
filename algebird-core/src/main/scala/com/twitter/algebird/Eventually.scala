@@ -42,7 +42,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 
   import scala.collection.mutable.Buffer
 
-  override def plus(x: Either[E, O], y: Either[E, O]) =
+  override def plus(x: Either[E, O], y: Either[E, O]): Either[E, O] =
     x match {
       case Left(xe) =>
         y match {
@@ -143,13 +143,13 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 ) extends EventuallyMonoid[E, O](convert)(mustConvert)
     with Group[Either[E, O]] {
 
-  override def negate(x: Either[E, O]) =
+  override def negate(x: Either[E, O]): Either[E, O] =
     x match {
       case Left(xe)  => left(Group.negate(xe))
       case Right(xo) => Right(Group.negate(xo))
     }
 
-  override def left(e: E) = if (Monoid.isNonZero(e)) Left(e) else zero
+  override def left(e: E): Either[E, O] = if (Monoid.isNonZero(e)) Left(e) else zero
 
 }
 
@@ -164,7 +164,7 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(
 
   override def one = Right(Ring.one[O])
 
-  override def times(x: Either[E, O], y: Either[E, O]) =
+  override def times(x: Either[E, O], y: Either[E, O]): Either[E, O] =
     x match {
       case Left(xe) =>
         y match {
@@ -181,8 +181,8 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(
 }
 
 trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O], C] {
-  def prepare(a: A) = Right(rightAggregator.prepare(a))
-  def present(b: Either[E, O]) = b match {
+  override def prepare(a: A) = Right(rightAggregator.prepare(a))
+  override def present(b: Either[E, O]): C = b match {
     case Right(o) => rightAggregator.present(o)
     case Left(e)  => presentLeft(e)
   }
@@ -199,7 +199,7 @@ trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O
 trait EventuallyAggregator[A, E, O, C] extends AbstractEventuallyAggregator[A, E, O, C] {
 
   //avoid init order issues and cyclical references
-  @transient lazy val semigroup =
+  @transient override lazy val semigroup =
     new EventuallySemigroup[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.semigroup)
 }
 
@@ -207,8 +207,8 @@ trait EventuallyMonoidAggregator[A, E, O, C]
     extends AbstractEventuallyAggregator[A, E, O, C]
     with MonoidAggregator[A, Either[E, O], C] {
 
-  def rightAggregator: MonoidAggregator[A, O, C]
+  override def rightAggregator: MonoidAggregator[A, O, C]
 
-  @transient lazy val monoid =
+  @transient override lazy val monoid =
     new EventuallyMonoid[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.monoid)
 }

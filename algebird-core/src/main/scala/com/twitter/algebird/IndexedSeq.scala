@@ -26,7 +26,7 @@ package com.twitter.algebird
  */
 class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[IndexedSeq[T]] {
 
-  def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
+  override def plus(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] = {
     // We need summands to be the same length
     val (leftSummand, rightSummand, remainder) = if (left.size > right.size) {
       (left.view(0, right.size), right, left.view(right.size, left.size))
@@ -47,8 +47,8 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
 class IndexedSeqMonoid[T](implicit mont: Monoid[T])
     extends IndexedSeqSemigroup[T]
     with Monoid[IndexedSeq[T]] {
-  def zero = IndexedSeq.empty[T]
-  override def isNonZero(v: IndexedSeq[T]) =
+  override def zero: IndexedSeq[T] = IndexedSeq.empty[T]
+  override def isNonZero(v: IndexedSeq[T]): Boolean =
     v.exists { t =>
       mont.isNonZero(t)
     }
@@ -63,10 +63,10 @@ class IndexedSeqGroup[T](implicit grp: Group[T])
 class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng) with Ring[IndexedSeq[T]] {
 
   // TODO
-  def one =
+  override def one: IndexedSeq[T] =
     sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
 
-  def times(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] =
+  override def times(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] =
     // We don't need to pad, because 0 * x = 0
     left.view
       .zip(right)

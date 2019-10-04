@@ -19,7 +19,7 @@ import scala.collection.mutable.{ArrayBuffer, Map => MMap}
 import com.twitter.algebird.{AdaptiveVector, Monoid}
 
 object SparseColumnMatrix {
-  def fromSeqMap[V: Monoid](cols: Int, data: IndexedSeq[MMap[Int, V]]) = {
+  def fromSeqMap[V: Monoid](cols: Int, data: IndexedSeq[MMap[Int, V]]): SparseColumnMatrix[V] = {
     val monoidZero = implicitly[Monoid[V]].zero
     SparseColumnMatrix(data.map { mm =>
       AdaptiveVector.fromMap(mm.toMap, monoidZero, cols)
@@ -31,16 +31,16 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
     extends AdaptiveMatrix[V] {
 
   /** Row is the outer Seq, the columns are the inner vectors. */
-  val valueMonoid = implicitly[Monoid[V]]
+  val valueMonoid: Monoid[V] = implicitly[Monoid[V]]
 
   override def rows: Int = rowsByColumns.size
 
   override def cols: Int = rowsByColumns(0).size
 
-  def getValue(position: (Int, Int)): V =
+  override def getValue(position: (Int, Int)): V =
     rowsByColumns(position._1)(position._2)
 
-  def updated(position: (Int, Int), value: V): SparseColumnMatrix[V] = {
+  override def updated(position: (Int, Int), value: V): SparseColumnMatrix[V] = {
     val (row, col) = position
     SparseColumnMatrix[V](rowsByColumns.updated(row, rowsByColumns(row).updated(col, value)))
   }

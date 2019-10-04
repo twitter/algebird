@@ -59,7 +59,7 @@ public class Monoids {
   public static <T> Monoid<java.util.List<T>> jlistMonoid() { return MODULE.jlistMonoid(); }
   public static <T> Monoid<scala.collection.immutable.Set<T>> setMonoid() { return MODULE.setMonoid(); }
   public static <K, V> Monoid<scala.collection.immutable.Map<K,V>> mapMonoid(Semigroup<V> componentSemigroup) { return MODULE.mapMonoid(componentSemigroup); }
-  public static <K, V> Monoid<scala.collection.Map<K,V>> scMapMonoid(Semigroup<V> componentSemigroup) { return MODULE.<K,V>scMapMonoid(componentSemigroup); }
+  public static <K, V> Monoid<scala.collection.Map<K,V>> scMapMonoid(Semigroup<V> componentSemigroup) { return MODULE.scMapMonoid(componentSemigroup); }
   public static <K, V> Monoid<java.util.Map<K,V>> jmapMonoid(Semigroup<V> componentSemigroup) { return MODULE.jmapMonoid(componentSemigroup); }
   public static <T> Monoid<scala.Function1<T,T>> function1Monoid() { return MODULE.function1Monoid(); }
 }

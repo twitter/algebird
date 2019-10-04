@@ -145,7 +145,7 @@ class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extend
 
   /** Override this if you want to change how frequently sumOption calls compress */
   def compressBatchSize: Int = 50
-  def plus(left: QTree[A], right: QTree[A]) = left.merge(right).compress(k)
+  override def plus(left: QTree[A], right: QTree[A]): QTree[A] = left.merge(right).compress(k)
   override def sumOption(items: TraversableOnce[QTree[A]]): Option[QTree[A]] =
     if (items.isEmpty) None
     else {
@@ -209,12 +209,12 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   @inline def count: Long = _count
   @inline def sum: A = _sum
 
-  @inline def _1: Long = _offset
-  @inline def _2: Int = _level
-  @inline def _3: Long = _count
-  @inline def _4: A = _sum
-  @inline def _5: Option[QTree[A]] = lowerChild
-  @inline def _6: Option[QTree[A]] = upperChild
+  @inline override def _1: Long = _offset
+  @inline override def _2: Int = _level
+  @inline override def _3: Long = _count
+  @inline override def _4: A = _sum
+  @inline override def _5: Option[QTree[A]] = lowerChild
+  @inline override def _6: Option[QTree[A]] = upperChild
 
   override lazy val hashCode: Int = MurmurHash3.productHash(this)
 
@@ -474,7 +474,7 @@ trait QTreeAggregatorLike[T] {
    */
   def level: Int = QTree.DefaultLevel
   implicit def num: Numeric[T]
-  def prepare(input: T) = QTree.value(num.toDouble(input), level)
+  def prepare(input: T): QTree[Unit] = QTree.value(num.toDouble(input), level)
   def semigroup = new QTreeSemigroup[Unit](k)
 }
 
@@ -487,12 +487,12 @@ object QTreeAggregator {
  * The items that are iterated over to produce this approximation cannot be negative.
  * Returns an Intersection which represents the bounded approximation.
  */
-case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-    implicit val num: Numeric[T]
+case class QTreeAggregator[T](override val percentile: Double, override val k: Int = QTreeAggregator.DefaultK)(
+    implicit override val num: Numeric[T]
 ) extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
     with QTreeAggregatorLike[T] {
 
-  def present(qt: QTree[Unit]) = {
+  override def present(qt: QTree[Unit]): Intersection[InclusiveLower, InclusiveUpper, Double] = {
     val (lower, upper) = qt.quantileBounds(percentile)
     Intersection(InclusiveLower(lower), InclusiveUpper(upper))
   }
@@ -504,10 +504,13 @@ case class QTreeAggregator[T](percentile: Double, k: Int = QTreeAggregator.Defau
  * it instead returns the lower bound of the percentile.
  * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
  */
-case class QTreeAggregatorLowerBound[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-    implicit val num: Numeric[T]
+case class QTreeAggregatorLowerBound[T](
+    override val percentile: Double,
+    override val k: Int = QTreeAggregator.DefaultK
+)(
+    implicit override val num: Numeric[T]
 ) extends Aggregator[T, QTree[Unit], Double]
     with QTreeAggregatorLike[T] {
 
-  def present(qt: QTree[Unit]) = qt.quantileBounds(percentile)._1
+  override def present(qt: QTree[Unit]): Double = qt.quantileBounds(percentile)._1
 }

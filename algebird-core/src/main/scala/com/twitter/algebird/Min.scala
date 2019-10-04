@@ -64,7 +64,7 @@ object Min extends MinInstances {
    */
   def minSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
     new Semigroup[T] with Semilattice[T] {
-      def plus(l: T, r: T) = ord.min(l, r)
+      override def plus(l: T, r: T): T = ord.min(l, r)
     }
 }
 
@@ -82,9 +82,9 @@ private[algebird] sealed abstract class MinInstances {
   def monoid[T: Ordering](zero: => T): Monoid[Min[T]] with BoundedSemilattice[Min[T]] = {
     val z = zero // avoid confusion below when overriding zero
     new Monoid[Min[T]] with BoundedSemilattice[Min[T]] {
-      val zero = Min(z)
-      val ord = implicitly[Ordering[T]]
-      def plus(l: Min[T], r: Min[T]): Min[T] =
+      override val zero: Min[T] = Min(z)
+      val ord: Ordering[T] = implicitly[Ordering[T]]
+      override def plus(l: Min[T], r: Min[T]): Min[T] =
         if (ord.lteq(l.get, r.get)) l else r
     }
   }
@@ -95,8 +95,8 @@ private[algebird] sealed abstract class MinInstances {
    */
   implicit def semigroup[T: Ordering]: Semigroup[Min[T]] with Semilattice[Min[T]] =
     new Semigroup[Min[T]] with Semilattice[Min[T]] {
-      val ord = implicitly[Ordering[T]]
-      def plus(l: Min[T], r: Min[T]): Min[T] =
+      val ord: Ordering[T] = implicitly[Ordering[T]]
+      override def plus(l: Min[T], r: Min[T]): Min[T] =
         if (ord.lteq(l.get, r.get)) l else r
     }
 
@@ -130,7 +130,7 @@ private[algebird] sealed abstract class MinInstances {
  * aggregated stream.
  */
 case class MinAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
-  def prepare(v: T) = v
-  val semigroup = Min.minSemigroup[T]
-  def present(v: T) = v
+  override def prepare(v: T): T = v
+  override val semigroup: Semigroup[T] with Semilattice[T] = Min.minSemigroup[T]
+  override def present(v: T): T = v
 }

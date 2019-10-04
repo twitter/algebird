@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.{Monoid => AMonoid}
-import algebra.ring.{AdditiveMonoid}
+import algebra.ring.AdditiveMonoid
 import scala.annotation.implicitNotFound
 import scala.math.Equiv
 import scala.reflect.ClassTag
@@ -72,8 +72,8 @@ abstract class AbstractMonoid[T] extends Monoid[T]
  * Some(5) + None == Some(5)
  */
 class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
-  def zero = None
-  def plus(left: Option[T], right: Option[T]): Option[T] =
+  override def zero: None.type = None
+  override def plus(left: Option[T], right: Option[T]): Option[T] =
     if (left.isEmpty) {
       right
     } else if (right.isEmpty) {
@@ -94,7 +94,7 @@ class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R])
 
 object StringMonoid extends Monoid[String] {
   override val zero = ""
-  override def plus(left: String, right: String) = left + right
+  override def plus(left: String, right: String): String = left + right
   override def sumOption(items: TraversableOnce[String]): Option[String] =
     if (items.isEmpty) None
     else Some(items.mkString(""))
@@ -105,8 +105,8 @@ object StringMonoid extends Monoid[String] {
  * plus means concatenation, zero is empty list
  */
 class ListMonoid[T] extends Monoid[List[T]] {
-  override def zero = List[T]()
-  override def plus(left: List[T], right: List[T]) = left ++ right
+  override def zero: List[T] = List[T]()
+  override def plus(left: List[T], right: List[T]): List[T] = left ++ right
   override def sumOption(items: TraversableOnce[List[T]]): Option[List[T]] =
     if (items.isEmpty) None
     else {
@@ -120,8 +120,8 @@ class ListMonoid[T] extends Monoid[List[T]] {
 
 // equivalent to ListMonoid
 class SeqMonoid[T] extends Monoid[Seq[T]] {
-  override def zero = Seq[T]()
-  override def plus(left: Seq[T], right: Seq[T]) = left ++ right
+  override def zero: Seq[T] = Seq[T]()
+  override def plus(left: Seq[T], right: Seq[T]): Seq[T] = left ++ right
   override def sumOption(items: TraversableOnce[Seq[T]]): Option[Seq[T]] =
     if (items.isEmpty) None
     else {
@@ -143,8 +143,8 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
   //additive identity
   override def isNonZero(v: Array[T]): Boolean = v.nonEmpty
 
-  override def zero = Array[T]()
-  override def plus(left: Array[T], right: Array[T]) = {
+  override def zero: Array[T] = Array[T]()
+  override def plus(left: Array[T], right: Array[T]): Array[T] = {
     val (longer, shorter) =
       if (left.length > right.length) (left, right) else (right, left)
     val sum = longer.clone
@@ -160,8 +160,8 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
  * plus means union, zero is empty set
  */
 class SetMonoid[T] extends Monoid[Set[T]] {
-  override def zero = Set[T]()
-  override def plus(left: Set[T], right: Set[T]) =
+  override def zero: Set[T] = Set[T]()
+  override def plus(left: Set[T], right: Set[T]): Set[T] =
     if (left.size > right.size) {
       left ++ right
     } else {
@@ -183,11 +183,11 @@ class SetMonoid[T] extends Monoid[Set[T]] {
  * plus means function composition, zero is the identity function
  */
 class Function1Monoid[T] extends Monoid[Function1[T, T]] {
-  override def zero = identity[T]
+  override def zero: T => T = identity[T]
 
   // (f1 + f2)(x) = f2(f1(x)) so that:
   // listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
-  override def plus(f1: Function1[T, T], f2: Function1[T, T]) = { (t: T) =>
+  override def plus(f1: Function1[T, T], f2: Function1[T, T]): T => T = { (t: T) =>
     f2(f1(t))
   }
 }
@@ -198,9 +198,9 @@ case class OrVal(get: Boolean) extends AnyVal
 object OrVal {
   implicit def monoid: Monoid[OrVal] = OrValMonoid
   def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
-    def zero = false
-    def plus(l: Boolean, r: Boolean) = l || r
-    override def sumOption(its: TraversableOnce[Boolean]) =
+    override def zero = false
+    override def plus(l: Boolean, r: Boolean): Boolean = l || r
+    override def sumOption(its: TraversableOnce[Boolean]): Option[Boolean] =
       if (its.isEmpty) None
       else Some(its.exists(identity))
   }
@@ -211,9 +211,9 @@ object OrVal {
  * plus means logical OR, zero is false.
  */
 object OrValMonoid extends Monoid[OrVal] {
-  override def zero = OrVal(false)
-  override def plus(l: OrVal, r: OrVal) = if (l.get) l else r
-  override def sumOption(its: TraversableOnce[OrVal]) =
+  override def zero: OrVal = OrVal(false)
+  override def plus(l: OrVal, r: OrVal): OrVal = if (l.get) l else r
+  override def sumOption(its: TraversableOnce[OrVal]): Option[OrVal] =
     if (its.isEmpty) None
     else Some(OrVal(its.exists(_.get)))
 }
@@ -224,9 +224,9 @@ case class AndVal(get: Boolean) extends AnyVal
 object AndVal {
   implicit def monoid: Monoid[AndVal] = AndValMonoid
   def unboxedMonoid: Monoid[Boolean] = new Monoid[Boolean] {
-    def zero = true
-    def plus(l: Boolean, r: Boolean) = l && r
-    override def sumOption(its: TraversableOnce[Boolean]) =
+    override def zero = true
+    override def plus(l: Boolean, r: Boolean): Boolean = l && r
+    override def sumOption(its: TraversableOnce[Boolean]): Option[Boolean] =
       if (its.isEmpty) None
       else Some(its.forall(identity))
   }
@@ -237,9 +237,9 @@ object AndVal {
  * plus means logical AND, zero is true.
  */
 object AndValMonoid extends Monoid[AndVal] {
-  override def zero = AndVal(true)
-  override def plus(l: AndVal, r: AndVal) = if (l.get) r else l
-  override def sumOption(its: TraversableOnce[AndVal]) =
+  override def zero: AndVal = AndVal(true)
+  override def plus(l: AndVal, r: AndVal): AndVal = if (l.get) r else l
+  override def sumOption(its: TraversableOnce[AndVal]): Option[AndVal] =
     if (its.isEmpty) None
     else Some(AndVal(its.forall(_.get)))
 }
@@ -261,22 +261,22 @@ private[algebird] trait FromAlgebraMonoidImplicit0 extends FromAlgebraMonoidImpl
 
 object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlgebraMonoidImplicit0 {
   // This pattern is really useful for typeclasses
-  def zero[T](implicit mon: Monoid[T]) = mon.zero
+  def zero[T](implicit mon: Monoid[T]): T = mon.zero
   // strictly speaking, same as Semigroup, but most interesting examples
   // are monoids, and code already depends on this:
   def plus[T](l: T, r: T)(implicit monoid: Monoid[T]): T = monoid.plus(l, r)
-  def assertNotZero[T](v: T)(implicit monoid: Monoid[T]) =
+  def assertNotZero[T](v: T)(implicit monoid: Monoid[T]): Unit =
     monoid.assertNotZero(v)
-  def isNonZero[T](v: T)(implicit monoid: Monoid[T]) = monoid.isNonZero(v)
-  def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]) =
+  def isNonZero[T](v: T)(implicit monoid: Monoid[T]): Boolean = monoid.isNonZero(v)
+  def nonZeroOption[T](v: T)(implicit monoid: Monoid[T]): Option[T] =
     monoid.nonZeroOption(v)
   // Left sum: (((a + b) + c) + d)
   def sum[T](iter: TraversableOnce[T])(implicit monoid: Monoid[T]): T =
     monoid.sum(iter)
 
   def from[T](z: => T)(associativeFn: (T, T) => T): Monoid[T] = new Monoid[T] {
-    lazy val zero = z
-    def plus(l: T, r: T) = associativeFn(l, r)
+    override lazy val zero: T = z
+    override def plus(l: T, r: T): T = associativeFn(l, r)
   }
 
   /**
@@ -322,7 +322,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlge
     new OptionMonoid[T]
   implicit def listMonoid[T]: Monoid[List[T]] = new ListMonoid[T]
   implicit def seqMonoid[T]: Monoid[Seq[T]] = new SeqMonoid[T]
-  implicit def arrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) =
+  implicit def arrayMonoid[T: ClassTag](implicit semi: Semigroup[T]): ArrayMonoid[T] =
     new ArrayMonoid[T]
   implicit def indexedSeqMonoid[T: Monoid]: Monoid[IndexedSeq[T]] =
     new IndexedSeqMonoid[T]

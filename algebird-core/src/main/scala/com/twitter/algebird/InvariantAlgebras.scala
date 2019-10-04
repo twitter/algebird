@@ -11,7 +11,7 @@ class InvariantSemigroup[T, U](val forward: T => U, val reverse: U => T)(implici
    * Note these work for the subclasses since in those cases semigroup
    * will be the appropriate algebra.
    */
-  override val hashCode = (forward, reverse, semigroup).hashCode
+  override val hashCode: Int = (forward, reverse, semigroup).hashCode
   override def equals(that: Any): Boolean =
     that match {
       case r: InvariantSemigroup[_, _] =>

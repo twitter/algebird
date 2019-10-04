@@ -63,7 +63,7 @@ sealed trait StateWithError[S, +F, +T] {
 
 /** Simple wrapper of a function in the Monad */
 final case class StateFn[S, F, T](fn: S => Either[F, (S, T)]) extends StateWithError[S, F, T] {
-  def run(state: S) = fn(state)
+  override def run(state: S): Either[F, (S, T)] = fn(state)
 }
 
 /**
@@ -71,7 +71,7 @@ final case class StateFn[S, F, T](fn: S => Either[F, (S, T)]) extends StateWithE
  */
 final case class FlatMappedState[S, F, T, U](start: StateWithError[S, F, T], fn: T => StateWithError[S, F, U])
     extends StateWithError[S, F, U] {
-  def run(state: S): Either[F, (S, U)] = {
+  override def run(state: S): Either[F, (S, U)] = {
     @annotation.tailrec
     def loop(inState: S, st: StateWithError[S, F, Any], stack: List[Any => StateWithError[S, F, Any]]): Any =
       st match {
@@ -141,10 +141,12 @@ object StateWithError {
     new StateFMonad[F, S]
 
   class StateFMonad[F, S] extends Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] {
-    def apply[T](const: T) = { (s: S) =>
+    override def apply[T](const: T): StateWithError[S, F, T] = { (s: S) =>
       Right((s, const))
     }
-    def flatMap[T, U](earlier: StateWithError[S, F, T])(next: T => StateWithError[S, F, U]) =
+    override def flatMap[T, U](
+        earlier: StateWithError[S, F, T]
+    )(next: T => StateWithError[S, F, U]): StateWithError[S, F, U] =
       earlier.flatMap(next)
   }
 }

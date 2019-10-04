@@ -50,7 +50,7 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
    * This never blocks interally. It uses offer. If the queue is full, we drain,
    * sum the queue.
    */
-  final def put(item: V): Option[V] =
+  override final def put(item: V): Option[V] =
     if (queueOption.isDefined) {
       queueOption.flatMap { queue =>
         if (!queue.offer(item)) {
@@ -70,11 +70,11 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
   /**
    * drain the queue and return the sum. If empty, return None
    */
-  def flush: Option[V] =
+  override def flush: Option[V] =
     queueOption.flatMap { queue =>
       val toSum = ListBuffer[V]()
       queue.drainTo(toSum.asJava)
       Semigroup.sumOption(toSum)
     }
-  def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
+  override def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
 }

@@ -52,7 +52,7 @@ class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
 
   require(k > 0, "TopK requires at least K>0")
 
-  override lazy val zero = TopK[T](0, List[T](), None)
+  override lazy val zero: TopK[T] = TopK[T](0, List[T](), None)
 
   def build(t: T): TopK[T] = TopK(1, List(t), Some(t))
   def build(ts: Iterable[T]): TopK[T] = ts.foldLeft(zero) { (acc, t) =>
@@ -96,7 +96,7 @@ class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
 
 class TopKToListAggregator[A](max: Int)(implicit ord: Ordering[A])
     extends MonoidAggregator[A, TopK[A], List[A]] {
-  val monoid: Monoid[TopK[A]] = new TopKMonoid[A](max)(ord)
+  override val monoid: Monoid[TopK[A]] = new TopKMonoid[A](max)(ord)
   override def present(a: TopK[A]): List[A] = a.items
   override def prepare(a: A): TopK[A] = TopK(1, List(a), Some(a))
 }

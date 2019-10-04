@@ -47,7 +47,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
   /**
    * A zero Sketch Map is one with zero elements.
    */
-  val zero: SketchMap[K, V] =
+  override val zero: SketchMap[K, V] =
     SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
@@ -244,8 +244,8 @@ case class SketchMapAggregator[K, V: Ordering: Monoid](
     params: SketchMapParams[K],
     skmMonoid: SketchMapMonoid[K, V]
 ) extends MonoidAggregator[(K, V), SketchMap[K, V], SketchMap[K, V]] {
-  val monoid = skmMonoid
+  override val monoid: SketchMapMonoid[K, V] = skmMonoid
 
-  def prepare(value: (K, V)) = monoid.create(value)
-  def present(skm: SketchMap[K, V]) = skm
+  override def prepare(value: (K, V)): SketchMap[K, V] = monoid.create(value)
+  override def present(skm: SketchMap[K, V]): SketchMap[K, V] = skm
 }

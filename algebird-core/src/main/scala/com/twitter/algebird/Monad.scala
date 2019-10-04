@@ -57,9 +57,9 @@ object Monad {
 
   /** Get the Monad for a type, e.g: Monad[List] */
   def apply[M[_]](implicit monad: Monad[M]): Monad[M] = monad
-  def flatMap[M[_], T, U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]) =
+  def flatMap[M[_], T, U](m: M[T])(fn: (T) => M[U])(implicit monad: Monad[M]): M[U] =
     monad.flatMap(m)(fn)
-  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]) =
+  def map[M[_], T, U](m: M[T])(fn: (T) => U)(implicit monad: Monad[M]): M[U] =
     monad.map(m)(fn)
   def foldM[M[_], T, U](acc: T, xs: GenTraversable[U])(fn: (T, U) => M[T])(implicit monad: Monad[M]): M[T] =
     if (xs.isEmpty)
@@ -71,37 +71,37 @@ object Monad {
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {
-    def apply[T](v: T) = List(v);
-    def flatMap[T, U](m: List[T])(fn: (T) => List[U]) = m.flatMap(fn)
+    override def apply[T](v: T) = List(v);
+    override def flatMap[T, U](m: List[T])(fn: (T) => List[U]): List[U] = m.flatMap(fn)
   }
   implicit val option: Monad[Option] = new Monad[Option] {
-    def apply[T](v: T) = Option(v);
-    def flatMap[T, U](m: Option[T])(fn: (T) => Option[U]) = m.flatMap(fn)
+    override def apply[T](v: T): Option[T] = Option(v);
+    override def flatMap[T, U](m: Option[T])(fn: (T) => Option[U]): Option[U] = m.flatMap(fn)
   }
   implicit val some: Monad[Some] = new Monad[Some] {
-    def apply[T](v: T) = Some(v);
-    def flatMap[T, U](m: Some[T])(fn: (T) => Some[U]) = fn(m.get)
+    override def apply[T](v: T): Some[T] = Some(v);
+    override def flatMap[T, U](m: Some[T])(fn: (T) => Some[U]): Some[U] = fn(m.get)
   }
   implicit val vector: Monad[Vector] = new Monad[Vector] {
-    def apply[T](v: T) = Vector(v);
-    def flatMap[T, U](m: Vector[T])(fn: (T) => Vector[U]) = m.flatMap(fn)
+    override def apply[T](v: T) = Vector(v);
+    override def flatMap[T, U](m: Vector[T])(fn: (T) => Vector[U]): Vector[U] = m.flatMap(fn)
   }
   implicit val set: Monad[Set] = new Monad[Set] {
-    def apply[T](v: T) = Set(v);
-    def flatMap[T, U](m: Set[T])(fn: (T) => Set[U]) = m.flatMap(fn)
+    override def apply[T](v: T) = Set(v);
+    override def flatMap[T, U](m: Set[T])(fn: (T) => Set[U]): Set[U] = m.flatMap(fn)
   }
   implicit val seq: Monad[Seq] = new Monad[Seq] {
-    def apply[T](v: T) = Seq(v);
-    def flatMap[T, U](m: Seq[T])(fn: (T) => Seq[U]) = m.flatMap(fn)
+    override def apply[T](v: T) = Seq(v);
+    override def flatMap[T, U](m: Seq[T])(fn: (T) => Seq[U]): Seq[U] = m.flatMap(fn)
   }
   implicit val indexedseq: Monad[IndexedSeq] = new Monad[IndexedSeq] {
-    def apply[T](v: T) = IndexedSeq(v);
-    def flatMap[T, U](m: IndexedSeq[T])(fn: (T) => IndexedSeq[U]) =
+    override def apply[T](v: T) = IndexedSeq(v);
+    override def flatMap[T, U](m: IndexedSeq[T])(fn: (T) => IndexedSeq[U]): IndexedSeq[U] =
       m.flatMap(fn)
   }
   implicit val scalaTry: Monad[Try] = new Monad[Try] {
-    def apply[T](t: T): Try[T] = Success(t)
-    def flatMap[T, U](t: Try[T])(fn: T => Try[U]): Try[U] = t.flatMap(fn)
+    override def apply[T](t: T): Try[T] = Success(t)
+    override def flatMap[T, U](t: Try[T])(fn: T => Try[U]): Try[U] = t.flatMap(fn)
     override def map[T, U](t: Try[T])(fn: T => U): Try[U] = t.map(fn)
     override def join[T, U](t: Try[T], u: Try[U]): Try[(T, U)] =
       // make the common case fast:
@@ -117,8 +117,8 @@ object Monad {
   }
   implicit def scalaFuture(implicit ec: ExecutionContext): Monad[Future] =
     new Monad[Future] {
-      def apply[T](t: T): Future[T] = Future.successful(t)
-      def flatMap[T, U](t: Future[T])(fn: T => Future[U]): Future[U] =
+      override def apply[T](t: T): Future[T] = Future.successful(t)
+      override def flatMap[T, U](t: Future[T])(fn: T => Future[U]): Future[U] =
         t.flatMap(fn)
       override def map[T, U](t: Future[T])(fn: T => U): Future[U] = t.map(fn)
       override def join[T, U](t: Future[T], u: Future[U]): Future[(T, U)] =
@@ -129,8 +129,8 @@ object Monad {
 
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
   // import Monad.{pureOp, operators} to get
-  implicit def pureOp[A](a: A) = new PureOp(a)
-  implicit def operators[A, M[_]](m: M[A])(implicit monad: Monad[M]) =
+  implicit def pureOp[A](a: A): PureOp[A] = new PureOp(a)
+  implicit def operators[A, M[_]](m: M[A])(implicit monad: Monad[M]): MonadOperators[A, M] =
     new MonadOperators(m)(monad)
 }
 

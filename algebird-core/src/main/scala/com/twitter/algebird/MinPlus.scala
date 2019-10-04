@@ -33,10 +33,10 @@ case object MinPlusZero extends MinPlus[Nothing]
 case class MinPlusValue[V](get: V) extends AnyVal with MinPlus[V]
 
 class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends Rig[MinPlus[V]] {
-  override def zero = MinPlusZero
+  override def zero: MinPlusZero.type = MinPlusZero
   override def one: MinPlus[V] = MinPlusValue(monoid.zero)
   // a+b = min(a,b)
-  override def plus(left: MinPlus[V], right: MinPlus[V]) =
+  override def plus(left: MinPlus[V], right: MinPlus[V]): MinPlus[V] =
     // We are doing the if to avoid an allocation:
     (left, right) match {
       case (MinPlusZero, _) => right
@@ -46,7 +46,7 @@ class MinPlusSemiring[V](implicit monoid: Monoid[V], ord: Ordering[V]) extends R
     }
 
   // a*b = a+b
-  override def times(left: MinPlus[V], right: MinPlus[V]) =
+  override def times(left: MinPlus[V], right: MinPlus[V]): MinPlus[V] =
     (left, right) match {
       case (MinPlusZero, _) => MinPlusZero
       case (_, MinPlusZero) => MinPlusZero
