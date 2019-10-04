@@ -315,7 +315,7 @@ object BF {
             case BFZero(_, _) =>
               new IntIterator {
                 override def hasNext = false
-                override def next: Int = sys.error("BFZero has no hashes set")
+                override def next: Nothing = sys.error("BFZero has no hashes set")
               }
           }
 
@@ -566,7 +566,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, override val width: In
 
   override def toBitSet: BitSet = bits
 
-  override def ++(other: BF[A]): BFInstance[A] = {
+  override def ++(other: BF[A]): BF[A] = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 

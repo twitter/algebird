@@ -141,7 +141,7 @@ object StateWithError {
     new StateFMonad[F, S]
 
   class StateFMonad[F, S] extends Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] {
-    override def apply[T](const: T): StateWithError[S, F, T] = { (s: S) =>
+    override def apply[T](const: T): StateWithError[S, Nothing, T] = { (s: S) =>
       Right((s, const))
     }
     override def flatMap[T, U](

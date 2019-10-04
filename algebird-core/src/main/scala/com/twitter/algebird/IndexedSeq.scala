@@ -63,7 +63,7 @@ class IndexedSeqGroup[T](implicit grp: Group[T])
 class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng) with Ring[IndexedSeq[T]] {
 
   // TODO
-  override def one: IndexedSeq[T] =
+  override def one: Nothing =
     sys.error("IndexedSeqRing.one is unimplemented. It's a lot of work, and almost never used")
 
   override def times(left: IndexedSeq[T], right: IndexedSeq[T]): IndexedSeq[T] =
