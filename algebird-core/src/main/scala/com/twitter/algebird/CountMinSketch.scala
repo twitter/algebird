@@ -1348,7 +1348,7 @@ class ScopedTopNCMSMonoid[K1, K2](cms: CMS[(K1, K2)], heavyHittersN: Int = 100)
 
 object ScopedTopNCMS {
 
-  def scopedHasher[K1: CMSHasher, K2: CMSHasher]: CMSHasher[(K1, K2)] = new CMSHasher[(K1, K2)] {
+  def scopedHasher[K1: CMSHasher, K2: CMSHasher] = new CMSHasher[(K1, K2)] {
     private val k1Hasher = implicitly[CMSHasher[K1]]
     private val k2Hasher = implicitly[CMSHasher[K2]]
 

@@ -42,7 +42,7 @@ object Metric {
   def apply[V: Metric](v1: V, v2: V): Double =
     implicitly[Metric[V]].apply(v1, v2)
   def norm[V: Metric: Monoid](v: V): Double = apply(v, Monoid.zero[V])
-  def from[V](f: (V, V) => Double): Metric[V] = new Metric[V] {
+  def from[V](f: (V, V) => Double) = new Metric[V] {
     override def apply(v1: V, v2: V): Double = f(v1, v2)
   }
 
@@ -89,34 +89,34 @@ object Metric {
   def L2Map[K, V: Monoid: Metric]: Metric[Map[K, V]] = minkowskiMap[K, V](2.0)
 
   // Implicit values
-  implicit val doubleMetric: Metric[Double] =
+  implicit val doubleMetric =
     Metric.from((a: Double, b: Double) => math.abs(a - b))
-  implicit val intMetric: Metric[Int] =
+  implicit val intMetric =
     Metric.from((a: Int, b: Int) => math.abs((a - b).toDouble))
-  implicit val longMetric: Metric[Long] =
+  implicit val longMetric =
     Metric.from((a: Long, b: Long) => math.abs((a - b).toDouble))
-  implicit val floatMetric: Metric[Float] =
+  implicit val floatMetric =
     Metric.from((a: Float, b: Float) => math.abs((a.toDouble - b.toDouble)))
-  implicit val shortMetric: Metric[Short] =
+  implicit val shortMetric =
     Metric.from((a: Short, b: Short) => math.abs((a - b).toDouble))
-  implicit val boolMetric: Metric[Boolean] =
+  implicit val boolMetric =
     Metric.from((x: Boolean, y: Boolean) => if (x ^ y) 1.0 else 0.0)
-  implicit val jDoubleMetric: Metric[JDouble] =
+  implicit val jDoubleMetric =
     Metric.from((a: JDouble, b: JDouble) => math.abs(a - b))
-  implicit val jIntMetric: Metric[JInt] =
+  implicit val jIntMetric =
     Metric.from((a: JInt, b: JInt) => math.abs((a - b).toDouble))
-  implicit val jLongMetric: Metric[JLong] =
+  implicit val jLongMetric =
     Metric.from((a: JLong, b: JLong) => math.abs((a - b).toDouble))
-  implicit val jFloatMetric: Metric[JFloat] =
+  implicit val jFloatMetric =
     Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
-  implicit val jShortMetric: Metric[JShort] =
+  implicit val jShortMetric =
     Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
-  implicit val jBoolMetric: Metric[JBool] =
+  implicit val jBoolMetric =
     Metric.from((x: JBool, y: JBool) => if (x ^ y) 1.0 else 0.0)
 
   // If you don't want to use L2 as your default metrics, you need to override these
-  implicit def iterableMetric[V: Monoid: Metric]: Metric[Iterable[V]] = L2Iterable[V]
-  implicit def mapMetric[K, V: Monoid: Metric]: Metric[Map[K, V]] = L2Map[K, V]
+  implicit def iterableMetric[V: Monoid: Metric] = L2Iterable[V]
+  implicit def mapMetric[K, V: Monoid: Metric] = L2Map[K, V]
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")

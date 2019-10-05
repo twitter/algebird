@@ -31,7 +31,7 @@ trait CMSHasher[K] extends java.io.Serializable {
    * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
    * }}}
    */
-  def on[L](f: L => K): CMSHasher[L] = new CMSHasher[L] {
+  def on[L](f: L => K) = new CMSHasher[L] {
     override def hash(a: Int, b: Int, width: Int)(x: L): Int =
       self.hash(a, b, width)(f(x))
   }
@@ -59,7 +59,7 @@ trait CMSHasher[K] extends java.io.Serializable {
    * implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => f(d))
    * }}}
    */
-  def contramap[L](f: L => K): CMSHasher[L] = on(f)
+  def contramap[L](f: L => K) = on(f)
 
 }
 

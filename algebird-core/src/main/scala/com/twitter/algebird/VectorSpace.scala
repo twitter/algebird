@@ -27,7 +27,7 @@ import scala.annotation.implicitNotFound
 object VectorSpace {
   def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] =
     vs.scale(v, c)
-  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]): VectorSpace[F, C] =
+  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) =
     new VectorSpace[F, C] {
       override def ring: Ring[F] = r
       override def group: Group[C[F]] = cGroup
@@ -36,17 +36,12 @@ object VectorSpace {
     }
 
   // Implicits
-  implicit def indexedSeqSpace[T: Ring]: VectorSpace[T, IndexedSeq] =
+  implicit def indexedSeqSpace[T: Ring] =
     from[T, IndexedSeq] { (s, seq) =>
       seq.map(Ring.times(s, _))
     }
 
-  implicit def mapSpace[K, T: Ring]: VectorSpace[
-    T,
-    ({
-      type x[a] = Map[K, a]
-    })#x
-  ] =
+  implicit def mapSpace[K, T: Ring] =
     from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
       m.mapValues(Ring.times(s, _))
     }

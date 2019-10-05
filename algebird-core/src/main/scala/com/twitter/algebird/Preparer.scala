@@ -1,4 +1,5 @@
 package com.twitter.algebird
+
 import java.util.PriorityQueue
 
 /**
@@ -101,7 +102,7 @@ object Preparer {
   /**
    * This is the expected entry point for creating a new Preparer.
    */
-  def apply[A]: MapPreparer[A, A] = MapPreparer.identity[A]
+  def apply[A] = MapPreparer.identity[A]
 }
 
 /**
@@ -169,15 +170,13 @@ object MapPreparer {
   /**
    * Create a concrete MapPreparer.
    */
-  def apply[A, T](fn: A => T): MapPreparer[A, T] = new MapPreparer[A, T] {
-    override val prepareFn: A => T = fn
-  }
+  def apply[A, T](fn: A => T) = new MapPreparer[A, T] { val prepareFn: A => T = fn }
 
   /**
    * This is purely an optimization for the case of mapping by identity.
    * It overrides the key methods to not actually use the identity function.
    */
-  def identity[A]: MapPreparer[A, A] = new MapPreparer[A, A] {
+  def identity[A] = new MapPreparer[A, A] {
     override val prepareFn: A => A = (a: A) => a
     override def map[U](fn: A => U): MapPreparer[A, U] = MapPreparer(fn)
     override def flatMap[U](fn: A => TraversableOnce[U]): FlatMapPreparer[A, U] = FlatMapPreparer(fn)
@@ -245,7 +244,7 @@ object FlatMapPreparer {
   /**
    * Create a concrete FlatMapPreparer.
    */
-  def apply[A, T](fn: A => TraversableOnce[T]): FlatMapPreparer[A, T] = new FlatMapPreparer[A, T] {
+  def apply[A, T](fn: A => TraversableOnce[T]) = new FlatMapPreparer[A, T] {
     override val prepareFn: A => TraversableOnce[T] = fn
   }
 
@@ -253,7 +252,7 @@ object FlatMapPreparer {
    * This is purely an optimization for the case of flatMapping by identity.
    * It overrides the key methods to not actually use the identity function.
    */
-  def identity[A]: FlatMapPreparer[TraversableOnce[A], A] = new FlatMapPreparer[TraversableOnce[A], A] {
+  def identity[A] = new FlatMapPreparer[TraversableOnce[A], A] {
     override val prepareFn: TraversableOnce[A] => TraversableOnce[A] = (a: TraversableOnce[A]) => a
 
     override def map[U](fn: A => U): FlatMapPreparer[TraversableOnce[A], U] =
