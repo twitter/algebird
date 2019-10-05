@@ -242,20 +242,20 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
     if (it.isEmpty) None
     else Some(rng.product(it))
 
-  implicit val unitRing: Ring[Unit] = new ConstantRing(())
-  implicit val boolRing: Ring[Boolean] = BooleanRing
-  implicit val jboolRing: Ring[JBool] = JBoolRing
-  implicit val intRing: Ring[Int] = IntRing
-  implicit val jintRing: Ring[JInt] = JIntRing
-  implicit val shortRing: Ring[Short] = ShortRing
-  implicit val jshortRing: Ring[JShort] = JShortRing
-  implicit val longRing: Ring[Long] = LongRing
-  implicit val bigIntRing: Ring[BigInt] = BigIntRing
-  implicit val jlongRing: Ring[JLong] = JLongRing
-  implicit val floatRing: Ring[Float] = FloatRing
-  implicit val jfloatRing: Ring[JFloat] = JFloatRing
-  implicit val doubleRing: Ring[Double] = DoubleRing
-  implicit val jdoubleRing: Ring[JDouble] = JDoubleRing
+  implicit def unitRing: Ring[Unit] = new ConstantRing(())
+  implicit def boolRing: Ring[Boolean] = BooleanRing
+  implicit def jboolRing: Ring[JBool] = JBoolRing
+  implicit def intRing: Ring[Int] = IntRing
+  implicit def jintRing: Ring[JInt] = JIntRing
+  implicit def shortRing: Ring[Short] = ShortRing
+  implicit def jshortRing: Ring[JShort] = JShortRing
+  implicit def longRing: Ring[Long] = LongRing
+  implicit def bigIntRing: Ring[BigInt] = BigIntRing
+  implicit def jlongRing: Ring[JLong] = JLongRing
+  implicit def floatRing: Ring[Float] = FloatRing
+  implicit def jfloatRing: Ring[JFloat] = JFloatRing
+  implicit def doubleRing: Ring[Double] = DoubleRing
+  implicit def jdoubleRing: Ring[JDouble] = JDoubleRing
   implicit def indexedSeqRing[T: Ring]: Ring[IndexedSeq[T]] =
     new IndexedSeqRing[T]
 
