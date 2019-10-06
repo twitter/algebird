@@ -23,8 +23,7 @@ import java.lang.{
   Long => JLong,
   Short => JShort
 }
-import java.util
-import java.util.{List => JList, Map => JMap}
+import java.util.{List => JList, Map => JMap, ArrayList => JArrayList, HashMap => JHashMap}
 
 import scala.collection.JavaConverters._
 
@@ -90,9 +89,9 @@ object JBoolRing extends Ring[JBool] {
  */
 class JListMonoid[T] extends Monoid[JList[T]] {
   override def isNonZero(x: JList[T]): Boolean = !x.isEmpty
-  override lazy val zero = new java.util.ArrayList[T](0)
-  override def plus(x: JList[T], y: JList[T]): util.ArrayList[T] = {
-    val res = new java.util.ArrayList[T](x.size + y.size)
+  override lazy val zero = new JArrayList[T](0)
+  override def plus(x: JList[T], y: JList[T]): JArrayList[T] = {
+    val res = new JArrayList[T](x.size + y.size)
     res.addAll(x)
     res.addAll(y)
     res
@@ -105,7 +104,7 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  * TODO extend this to Group, Ring
  */
 class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
-  override lazy val zero = new java.util.HashMap[K, V](0)
+  override lazy val zero = new JHashMap[K, V](0)
 
   val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(_)
@@ -120,7 +119,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
         }
       case _ => true
     })
-  override def plus(x: JMap[K, V], y: JMap[K, V]): util.HashMap[K, V] = {
+  override def plus(x: JMap[K, V], y: JMap[K, V]): JHashMap[K, V] = {
     val (big, small, bigOnLeft) =
       if (x.size > y.size) {
         (x, y, true)
@@ -128,7 +127,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
         (y, x, false)
       }
     val vsemi = implicitly[Semigroup[V]]
-    val result = new java.util.HashMap[K, V](big.size + small.size)
+    val result = new JHashMap[K, V](big.size + small.size)
     result.putAll(big)
     small.entrySet.asScala.foreach { kv =>
       val smallK = kv.getKey
