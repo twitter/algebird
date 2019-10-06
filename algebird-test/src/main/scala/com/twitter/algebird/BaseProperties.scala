@@ -175,7 +175,7 @@ object BaseProperties extends MetricProperties {
     }
 
   def isAssociativeDifferentTypes[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
-    'isAssociativeEq |: forAll { (a: U, b: U, c: U) =>
+    Symbol("isAssociativeEq") |: forAll { (a: U, b: U, c: U) =>
       val semi = implicitly[Semigroup[T]]
       Equiv[T].equiv(semi.plus(a, semi.plus(b, c)), semi.plus(semi.plus(a, b), c))
     }
@@ -185,14 +185,14 @@ object BaseProperties extends MetricProperties {
 
   // Commutative
   def isCommutative[T: Semigroup: Arbitrary: Equiv]: Prop =
-    'isCommutativeEq |: forAll { (a: T, b: T) =>
+    Symbol("isCommutativeEq") |: forAll { (a: T, b: T) =>
       val semi = implicitly[Semigroup[T]]
       Equiv[T].equiv(semi.plus(a, b), semi.plus(b, a))
     }
 
   // Semigroup Laws
   def semigroupSumWorks[T: Semigroup: Arbitrary: Equiv]: Prop =
-    'semigroupSumWorks |: forAll { (head: T, tail: List[T]) =>
+    Symbol("semigroupSumWorks") |: forAll { (head: T, tail: List[T]) =>
       Equiv[T].equiv(Semigroup.sumOption(head :: tail).get, tail.foldLeft(head)(Semigroup.plus(_, _)))
     }
 
@@ -204,20 +204,20 @@ object BaseProperties extends MetricProperties {
     semigroupLaws[T] && isCommutative[T]
 
   def isNonZeroWorksMonoid[T: Monoid: Arbitrary: Equiv]: Prop =
-    'isNonZeroWorksMonoid |: forAll { (a: T, b: T) =>
+    Symbol("isNonZeroWorksMonoid") |: forAll { (a: T, b: T) =>
       val aIsLikeZero = Monoid.zeroEquiv[T].equiv(Monoid.plus(a, b), b)
       Monoid.isNonZero(a) || aIsLikeZero
     }
 
   def isNonZeroWorksRing[T: Ring: Arbitrary]: Prop =
-    'isNonZeroWorksRing |: forAll { (a: T, b: T) =>
+    Symbol("isNonZeroWorksRing") |: forAll { (a: T, b: T) =>
       implicit val monT: Monoid[T] = implicitly[Ring[T]]
       val prodZero = !monT.isNonZero(Ring.times(a, b))
       (Monoid.isNonZero(a) && Monoid.isNonZero(b)) || prodZero
     }
 
   def weakZeroDifferentTypes[T: Monoid: Equiv, U <: T: Arbitrary]: Prop =
-    'weakZeroDifferentTypes |: forAll { (a: U) =>
+    Symbol("weakZeroDifferentTypes") |: forAll { (a: U) =>
       val mon = implicitly[Monoid[T]]
       val zero = mon.zero
       // Some types, e.g. Maps, are not totally equal for all inputs
@@ -229,7 +229,7 @@ object BaseProperties extends MetricProperties {
     weakZeroDifferentTypes[T, T]
 
   def validZero[T: Monoid: Arbitrary: Equiv]: Prop =
-    'validZeroEq |: forAll { (a: T) =>
+    Symbol("validZeroEq") |: forAll { (a: T) =>
       val mon = implicitly[Monoid[T]]
       val zero = mon.zero
       Equiv[T].equiv(a, mon.plus(a, zero)) &&
@@ -259,21 +259,21 @@ object BaseProperties extends MetricProperties {
 
   // Here are multiplicative properties:
   def validOne[T: Ring: Arbitrary: Equiv]: Prop =
-    'validOne |: forAll { (a: T) =>
+    Symbol("validOne") |: forAll { (a: T) =>
       val rng = implicitly[Ring[T]]
       Equiv[T].equiv(rng.times(rng.one, a), rng.times(a, rng.one)) &&
       Equiv[T].equiv(a, rng.times(a, rng.one))
     }
 
   def zeroAnnihilates[T: Ring: Arbitrary]: Prop =
-    'zeroAnnihilates |: forAll { (a: T) =>
+    Symbol("zeroAnnihilates") |: forAll { (a: T) =>
       val ring = implicitly[Ring[T]]
       (!ring.isNonZero(ring.times(a, ring.zero))) &&
       (!ring.isNonZero(ring.times(ring.zero, a)))
     }
 
   def isDistributiveDifferentTypes[T: Ring: Equiv, U <: T: Arbitrary]: Prop =
-    'isDistributiveDifferentTypes |:
+    Symbol("isDistributiveDifferentTypes") |:
       forAll { (a: U, b: U, c: U) =>
         val rng = implicitly[Ring[T]]
         Equiv[T].equiv(rng.times(a, rng.plus(b, c)), rng.plus(rng.times(a, b), rng.times(a, c))) &&
@@ -284,7 +284,7 @@ object BaseProperties extends MetricProperties {
     isDistributiveDifferentTypes[T, T]
 
   def timesIsAssociative[T: Ring: Arbitrary: Equiv]: Prop =
-    'timesIsAssociative |: forAll { (a: T, b: T, c: T) =>
+    Symbol("timesIsAssociative") |: forAll { (a: T, b: T, c: T) =>
       val rng = implicitly[Ring[T]]
       Equiv[T].equiv(rng.times(a, rng.times(b, c)), rng.times(rng.times(a, b), c))
     }
