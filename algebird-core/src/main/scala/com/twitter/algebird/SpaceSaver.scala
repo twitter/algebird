@@ -195,14 +195,14 @@ sealed abstract class SpaceSaver[T] {
     }
 }
 
-case class SSOne[T] private[algebird] (capacity: Int, item: T) extends SpaceSaver[T] {
+case class SSOne[T] private[algebird] (override val capacity: Int, item: T) extends SpaceSaver[T] {
   require(capacity > 1)
 
-  def min: Long = 0L
+  override def min: Long = 0L
 
-  def counters: Map[T, (Long, Long)] = Map(item -> ((1L, 1L)))
+  override def counters: Map[T, (Long, Long)] = Map(item -> ((1L, 1L)))
 
-  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
+  override def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSOne[_]  => SSMany(this).add(other)
     case other: SSMany[_] => other.add(this)
   }
@@ -219,11 +219,14 @@ object SSMany {
     SSMany(one.capacity, Map(one.item -> ((1L, 0L))), SortedMap(1L -> Set(one.item)))
 }
 
-case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buckets: SortedMap[Long, Set[T]])
-    extends SpaceSaver[T] {
+case class SSMany[T] private (
+    override val capacity: Int,
+    override val counters: Map[T, (Long, Long)],
+    buckets: SortedMap[Long, Set[T]]
+) extends SpaceSaver[T] {
   private val exact: Boolean = counters.size < capacity
 
-  val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
+  override val min: Long = if (counters.size < capacity) 0L else buckets.firstKey
 
   // item is already present and just needs to be bumped up one
   private def bump(item: T) = {
@@ -283,7 +286,7 @@ case class SSMany[T] private (capacity: Int, counters: Map[T, (Long, Long)], buc
     SSMany(capacity, counters1)
   }
 
-  def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
+  override def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
     case other: SSOne[_]  => add(other)
     case other: SSMany[_] => merge(other)
   }

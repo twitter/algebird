@@ -31,7 +31,7 @@ import ref.SoftReference
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
   private val map = new SoftReference(new HashMap[K, V]())
 
-  def size = map.get.map { _.size }.getOrElse(0)
+  def size: Int = map.get.map { _.size }.getOrElse(0)
 
   def clear(): Unit = map.get.foreach { _.clear }
 
@@ -99,7 +99,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
     ret
   }
 
-  override def semigroup = summingCache.semigroup
+  override def semigroup: MapMonoid[K, V] = summingCache.semigroup
 
   override def put(m: Map[K, V]): Option[Map[K, V]] =
     update(summingCache.put(m))
@@ -110,7 +110,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
     ret
   }
 
-  def isFlushed = summingCache.isFlushed
+  override def isFlushed: Boolean = summingCache.isFlushed
 
   private var maxReportedSentinelSize = 0
   case class CacheStats(hits: Int, cacheGrowth: Int, sentinelGrowth: Int)

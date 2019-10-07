@@ -53,9 +53,9 @@ abstract class AbstractGroup[T] extends Group[T]
 // The contract is that T be a singleton type (that is, t1 == t2 returns true
 // for all instances t1,t2 of type T).
 class ConstantGroup[T](constant: T) extends Group[T] {
-  override def zero = constant
-  override def negate(u: T) = constant
-  override def plus(l: T, r: T) = constant
+  override def zero: T = constant
+  override def negate(u: T): T = constant
+  override def plus(l: T, r: T): T = constant
   override def sumOption(iter: TraversableOnce[T]): Option[T] =
     if (iter.isEmpty) None
     else Some(constant)
@@ -78,7 +78,7 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Grou
   override def isNonZero(opt: Option[T]): Boolean =
     opt.exists { group.isNonZero(_) }
 
-  override def negate(opt: Option[T]) =
+  override def negate(opt: Option[T]): Option[T] =
     opt.map { v =>
       group.negate(v)
     }
@@ -111,8 +111,8 @@ private[algebird] trait FromAlgebraGroupImplicit0 extends FromAlgebraGroupImplic
 
 object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebraGroupImplicit0 {
   // This pattern is really useful for typeclasses
-  def negate[T](x: T)(implicit grp: Group[T]) = grp.negate(x)
-  def minus[T](l: T, r: T)(implicit grp: Group[T]) = grp.minus(l, r)
+  def negate[T](x: T)(implicit grp: Group[T]): T = grp.negate(x)
+  def minus[T](l: T, r: T)(implicit grp: Group[T]): T = grp.minus(l, r)
   // nonZero and subtraction give an equiv, useful for Map[K,V]
   def equiv[T](implicit grp: Group[T]): Equiv[T] = Equiv.fromFunction[T] { (a, b) =>
     !grp.isNonZero(grp.minus(a, b))
@@ -142,7 +142,7 @@ object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebra
   implicit def jfloatGroup: Group[JFloat] = JFloatRing
   implicit def doubleGroup: Group[Double] = DoubleRing
   implicit def jdoubleGroup: Group[JDouble] = JDoubleRing
-  implicit def optionGroup[T: Group] = new OptionGroup[T]
+  implicit def optionGroup[T: Group]: OptionGroup[T] = new OptionGroup[T]
   implicit def indexedSeqGroup[T: Group]: Group[IndexedSeq[T]] =
     new IndexedSeqGroup[T]
   implicit def mapGroup[K, V](implicit group: Group[V]): Group[Map[K, V]] =

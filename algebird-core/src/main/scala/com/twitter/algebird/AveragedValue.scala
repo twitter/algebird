@@ -135,11 +135,11 @@ object AveragedValue {
 object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[AveragedValue] {
   import MomentsGroup.getCombinedMean
 
-  val zero = AveragedValue(0L, 0.0)
+  override val zero: AveragedValue = AveragedValue(0L, 0.0)
 
-  override def isNonZero(av: AveragedValue) = (av.count != 0L)
+  override def isNonZero(av: AveragedValue): Boolean = (av.count != 0L)
 
-  override def negate(av: AveragedValue) = -av
+  override def negate(av: AveragedValue): AveragedValue = -av
 
   /**
    * Optimized implementation of [[plus]]. Uses internal mutation to
@@ -163,7 +163,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
    * @inheritdoc
    * @see [[AveragedValue.+]] for the implementation
    */
-  def plus(l: AveragedValue, r: AveragedValue): AveragedValue = {
+  override def plus(l: AveragedValue, r: AveragedValue): AveragedValue = {
     val n = l.count
     val k = r.count
     val newAve = getCombinedMean(n, l.value, k, r.value)
@@ -177,7 +177,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
  * count of 1 during aggregation.
  */
 object Averager extends MonoidAggregator[Double, AveragedValue, Double] {
-  val monoid = AveragedGroup
-  def prepare(value: Double) = AveragedValue(value)
-  def present(average: AveragedValue) = average.value
+  override val monoid: AveragedGroup.type = AveragedGroup
+  override def prepare(value: Double): AveragedValue = AveragedValue(value)
+  override def present(average: AveragedValue): Double = average.value
 }

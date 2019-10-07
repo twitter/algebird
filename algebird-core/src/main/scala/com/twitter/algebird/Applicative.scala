@@ -120,8 +120,8 @@ object Applicative {
 
   // Set up the syntax magic (allow .pure[Int] syntax and flatMap in for):
   // import Applicative.{pureOp, operators} to get
-  implicit def pureOp[A](a: A) = new PureOp(a)
-  implicit def operators[A, M[_]](m: M[A])(implicit app: Applicative[M]) =
+  implicit def pureOp[A](a: A): PureOp[A] = new PureOp(a)
+  implicit def operators[A, M[_]](m: M[A])(implicit app: Applicative[M]): ApplicativeOperators[A, M] =
     new ApplicativeOperators(m)(app)
 }
 
@@ -129,7 +129,7 @@ object Applicative {
 // if we put a pure method in Applicative, it would take two type parameters, only one
 // of which could be inferred, and it's annoying to write Applicative.pure[Int,List](1)
 class PureOp[A](val a: A) extends AnyVal {
-  def pure[M[_]](implicit app: Applicative[M]) = app(a)
+  def pure[M[_]](implicit app: Applicative[M]): M[A] = app(a)
 }
 
 /**
@@ -145,7 +145,7 @@ class ApplicativeOperators[A, M[_]](m: M[A])(implicit app: Applicative[M]) exten
  * This is a Semigroup, for all Applicatives.
  */
 class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T]) extends Semigroup[M[T]] {
-  def plus(l: M[T], r: M[T]) = ap.joinWith(l, r)(sg.plus)
+  override def plus(l: M[T], r: M[T]): M[T] = ap.joinWith(l, r)(sg.plus)
 }
 
 /**
@@ -154,7 +154,7 @@ class ApplicativeSemigroup[T, M[_]](implicit ap: Applicative[M], sg: Semigroup[T
 class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
     extends ApplicativeSemigroup[T, M]
     with Monoid[M[T]] {
-  lazy val zero = app(mon.zero)
+  override lazy val zero: M[T] = app(mon.zero)
 }
 
 /**
@@ -165,8 +165,8 @@ class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
 class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
     extends ApplicativeMonoid[T, M]
     with Group[M[T]] {
-  override def negate(v: M[T]) = app.map(v)(grp.negate)
-  override def minus(l: M[T], r: M[T]) = app.joinWith(l, r)(grp.minus)
+  override def negate(v: M[T]): M[T] = app.map(v)(grp.negate)
+  override def minus(l: M[T], r: M[T]): M[T] = app.joinWith(l, r)(grp.minus)
 }
 
 /**
@@ -177,6 +177,6 @@ class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
 class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
     extends ApplicativeGroup[T, M]
     with Ring[M[T]] {
-  lazy val one = app(ring.one)
-  def times(l: M[T], r: M[T]) = app.joinWith(l, r)(ring.times)
+  override lazy val one: M[T] = app(ring.one)
+  override def times(l: M[T], r: M[T]): M[T] = app.joinWith(l, r)(ring.times)
 }

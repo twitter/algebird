@@ -41,9 +41,9 @@ import scala.annotation.implicitNotFound
 object Metric {
   def apply[V: Metric](v1: V, v2: V): Double =
     implicitly[Metric[V]].apply(v1, v2)
-  def norm[V: Metric: Monoid](v: V) = apply(v, Monoid.zero[V])
+  def norm[V: Metric: Monoid](v: V): Double = apply(v, Monoid.zero[V])
   def from[V](f: (V, V) => Double) = new Metric[V] {
-    def apply(v1: V, v2: V) = f(v1, v2)
+    override def apply(v1: V, v2: V): Double = f(v1, v2)
   }
 
   // See http://en.wikipedia.org/wiki/Minkowski_distance
@@ -71,8 +71,8 @@ object Metric {
       math.pow(outP, 1.0 / p)
     }
 
-  def L1Iterable[V: Monoid: Metric] = minkowskiIterable[V](1.0)
-  def L2Iterable[V: Monoid: Metric] = minkowskiIterable[V](2.0)
+  def L1Iterable[V: Monoid: Metric]: Metric[Iterable[V]] = minkowskiIterable[V](1.0)
+  def L2Iterable[V: Monoid: Metric]: Metric[Iterable[V]] = minkowskiIterable[V](2.0)
   // TODO: Implement Linf, using an ordering on V
 
   def minkowskiMap[K, V: Monoid: Metric](p: Double): Metric[Map[K, V]] =
@@ -85,8 +85,8 @@ object Metric {
       math.pow(outP, 1.0 / p)
     }
 
-  def L1Map[K, V: Monoid: Metric] = minkowskiMap[K, V](1.0)
-  def L2Map[K, V: Monoid: Metric] = minkowskiMap[K, V](2.0)
+  def L1Map[K, V: Monoid: Metric]: Metric[Map[K, V]] = minkowskiMap[K, V](1.0)
+  def L2Map[K, V: Monoid: Metric]: Metric[Map[K, V]] = minkowskiMap[K, V](2.0)
 
   // Implicit values
   implicit val doubleMetric =

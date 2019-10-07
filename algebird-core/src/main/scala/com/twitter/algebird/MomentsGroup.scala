@@ -26,12 +26,12 @@ import algebra.CommutativeGroup
  * m{i} denotes the ith central moment.
  */
 case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
-  def count = m0
+  def count: Long = m0
 
-  def mean = m1
+  def mean: Double = m1
 
   // Population variance, not sample variance.
-  def variance =
+  def variance: Double =
     if (count > 1)
       m2 / count
     else
@@ -39,16 +39,16 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
       Double.NaN
 
   // Population standard deviation, not sample standard deviation.
-  def stddev = math.sqrt(variance)
+  def stddev: Double = math.sqrt(variance)
 
-  def skewness =
+  def skewness: Double =
     if (count > 2)
       math.sqrt(count) * m3 / math.pow(m2, 1.5)
     else
       /* don't return junk when the moment is not defined */
       Double.NaN
 
-  def kurtosis =
+  def kurtosis: Double =
     if (count > 3)
       count * m4 / math.pow(m2, 2) - 3
     else
@@ -59,7 +59,7 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
 object Moments {
   implicit val group: Group[Moments] with CommutativeGroup[Moments] =
     MomentsGroup
-  val aggregator = MomentsAggregator
+  val aggregator: MomentsAggregator.type = MomentsAggregator
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
     Aggregator.prepareMonoid { n: N =>
@@ -108,7 +108,7 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
           else (n * an + k * ak) / newCount
       }
 
-  val zero = Moments(0L, 0.0, 0.0, 0.0, 0.0)
+  override val zero: Moments = Moments(0L, 0.0, 0.0, 0.0, 0.0)
 
   override def negate(a: Moments): Moments =
     Moments(-a.count, a.m1, -a.m2, -a.m3, -a.m4)
@@ -116,7 +116,7 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
   // Combines the moment calculations from two streams.
   // See http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Higher-order_statistics
   // for more information on the formulas used to update the moments.
-  def plus(a: Moments, b: Moments): Moments = {
+  override def plus(a: Moments, b: Moments): Moments = {
     val delta = b.mean - a.mean
     val countCombined = a.count + b.count
     if (countCombined == 0)
@@ -142,8 +142,8 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
 }
 
 object MomentsAggregator extends MonoidAggregator[Double, Moments, Moments] {
-  val monoid = MomentsGroup
+  override val monoid: MomentsGroup.type = MomentsGroup
 
-  def prepare(input: Double): Moments = Moments(input)
-  def present(m: Moments) = m
+  override def prepare(input: Double): Moments = Moments(input)
+  override def present(m: Moments): Moments = m
 }

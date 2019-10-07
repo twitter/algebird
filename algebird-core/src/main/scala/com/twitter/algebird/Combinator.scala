@@ -33,7 +33,7 @@ package com.twitter.algebird
  * Seems like an open topic here.... you are obliged to think on your own about this.
  */
 class SemigroupCombinator[A: Semigroup, B: Semigroup](fold: (A, B) => B) extends Semigroup[(A, B)] {
-  def plus(left: (A, B), right: (A, B)) = {
+  override def plus(left: (A, B), right: (A, B)): (A, B) = {
     val first = Semigroup.plus(left._1, right._1)
     (first, fold(first, Semigroup.plus(left._2, right._2)))
   }
@@ -42,5 +42,5 @@ class SemigroupCombinator[A: Semigroup, B: Semigroup](fold: (A, B) => B) extends
 class MonoidCombinator[A: Monoid, B: Monoid](fold: (A, B) => B)
     extends SemigroupCombinator[A, B](fold)
     with Monoid[(A, B)] {
-  def zero = (Monoid.zero[A], Monoid.zero[B])
+  override def zero: (A, B) = (Monoid.zero[A], Monoid.zero[B])
 }

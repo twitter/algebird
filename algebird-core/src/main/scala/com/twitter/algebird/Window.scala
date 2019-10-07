@@ -62,7 +62,7 @@ case class Window[T](total: T, items: Queue[T]) {
 
 object Window extends Serializable {
   def apply[T](v: T): Window[T] = Window[T](v, Queue[T](v))
-  def fromIterable[T](ts: Iterable[T])(implicit m: WindowMonoid[T]) =
+  def fromIterable[T](ts: Iterable[T])(implicit m: WindowMonoid[T]): Window[T] =
     m.fromIterable(ts)
 
   /**
@@ -133,7 +133,7 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
   require(windowSize >= 1, s"Windows must have positive sizes, found $windowSize")
 
   def monoid: Monoid[T]
-  val zero = Window(monoid.zero, Queue.empty)
+  override val zero: Window[T] = Window(monoid.zero, Queue.empty)
 
   override def sumOption(ws: TraversableOnce[Window[T]]): Option[Window[T]] =
     if (ws.isEmpty) None
@@ -169,7 +169,7 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
 
 final case class WindowMonoidFromMonoid[T](windowSize: Int)(implicit m: Monoid[T])
     extends WindowMonoid[T](windowSize) {
-  def monoid: Monoid[T] = m
+  override def monoid: Monoid[T] = m
 
   override def plus(a: Window[T], b: Window[T]): Window[T] =
     Window.combineWithMonoid(windowSize, a, b)
@@ -177,8 +177,8 @@ final case class WindowMonoidFromMonoid[T](windowSize: Int)(implicit m: Monoid[T
 
 final case class WindowMonoidFromGroup[T](windowSize: Int)(implicit val group: Group[T])
     extends WindowMonoid[T](windowSize) {
-  def monoid: Monoid[T] = group
+  override def monoid: Monoid[T] = group
 
-  def plus(a: Window[T], b: Window[T]): Window[T] =
+  override def plus(a: Window[T], b: Window[T]): Window[T] =
     Window.combineWithGroup(windowSize, a, b)
 }

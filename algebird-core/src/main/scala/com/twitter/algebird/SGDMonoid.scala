@@ -92,9 +92,9 @@ class SGDMonoid[Pos](
     gradient: (IndexedSeq[Double], Pos) => IndexedSeq[Double]
 ) extends Monoid[SGD[Pos]] {
 
-  val zero = SGDZero
+  override val zero: SGDZero.type = SGDZero
 
-  def plus(left: SGD[Pos], right: SGD[Pos]): SGD[Pos] =
+  override def plus(left: SGD[Pos], right: SGD[Pos]): SGD[Pos] =
     (left, right) match {
       case (_, SGDZero)                 => left
       case (SGDPos(llps), SGDPos(rlps)) => SGDPos(llps ::: rlps)

@@ -196,13 +196,13 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
     with BoundedSemilattice[BF[A]] {
   val hashes: BFHash[A] = BFHash[A](numHashes, width)(hash)
 
-  val zero: BF[A] = BFZero[A](hashes, width)
+  override val zero: BF[A] = BFZero[A](hashes, width)
 
   /**
    * Assume the bloom filters are compatible (same width and same hashing functions).  This
    * is the union of the 2 bloom filters.
    */
-  def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
+  override def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
 
   override def sumOption(as: TraversableOnce[BF[A]]): Option[BF[A]] =
     if (as.isEmpty) None
@@ -267,14 +267,14 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
 object BF {
   implicit def equiv[A]: Equiv[BF[A]] =
     new Equiv[BF[A]] {
-      def equiv(a: BF[A], b: BF[A]): Boolean = {
+      override def equiv(a: BF[A], b: BF[A]): Boolean = {
         def toIntIt(b: BF[A]): IntIterator =
           b match {
             case BFItem(it, hashes, _) =>
               new IntIterator {
                 // the hashes can have collisions so we need
                 // to remove duplicates
-                val hashvalues = hashes(it)
+                val hashvalues: Array[Int] = hashes(it)
                 java.util.Arrays.sort(hashvalues)
 
                 @annotation.tailrec
@@ -294,12 +294,12 @@ object BF {
                     }
                   }
                 val uniqVs = new Array[Int](hashvalues.length)
-                val len = uniq(hashvalues, uniqVs, -1, 0, 0)
+                val len: Int = uniq(hashvalues, uniqVs, -1, 0, 0)
 
                 var pos = 0
 
-                def hasNext: Boolean = (pos < len)
-                def next = {
+                override def hasNext: Boolean = (pos < len)
+                override def next: Int = {
                   val n = uniqVs(pos)
                   pos += 1
                   n
@@ -308,14 +308,14 @@ object BF {
             case BFSparse(_, cbitset, _) => cbitset.intIterator
             case BFInstance(_, bitset, _) =>
               new IntIterator {
-                val boxedIter = bitset.iterator
-                def hasNext = boxedIter.hasNext
-                def next = boxedIter.next
+                val boxedIter: Iterator[Int] = bitset.iterator
+                override def hasNext: Boolean = boxedIter.hasNext
+                override def next: Int = boxedIter.next
               }
             case BFZero(_, _) =>
               new IntIterator {
-                def hasNext = false
-                def next = sys.error("BFZero has no hashes set")
+                override def hasNext = false
+                override def next: Nothing = sys.error("BFZero has no hashes set")
               }
           }
 
@@ -348,7 +348,7 @@ sealed abstract class BF[A] extends java.io.Serializable {
   /**
    * Proportion of bits that are set to true.
    */
-  def density = numBits.toDouble / width
+  def density: Double = numBits.toDouble / width
 
   def ++(other: BF[A]): BF[A]
 
@@ -416,36 +416,36 @@ sealed abstract class BF[A] extends java.io.Serializable {
 /**
  * Empty bloom filter.
  */
-case class BFZero[A](hashes: BFHash[A], width: Int) extends BF[A] {
+case class BFZero[A](hashes: BFHash[A], override val width: Int) extends BF[A] {
 
-  def toBitSet: BitSet = BitSet()
+  override def toBitSet: BitSet = BitSet()
 
-  def numHashes: Int = hashes.size
+  override def numHashes: Int = hashes.size
 
-  def numBits = 0
+  override def numBits = 0
 
-  def ++(other: BF[A]) = other
+  override def ++(other: BF[A]): BF[A] = other
 
-  def +(other: A) = BFItem[A](other, hashes, width)
+  override def +(other: A): BFItem[A] = BFItem[A](other, hashes, width)
 
-  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+  override def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
     (this + other, ApproximateBoolean.exactFalse)
 
-  override def contains(item: A) = ApproximateBoolean.exactFalse
+  override def contains(item: A): ApproximateBoolean = ApproximateBoolean.exactFalse
 
-  def maybeContains(item: A): Boolean = false
+  override def maybeContains(item: A): Boolean = false
 
-  def size = Approximate.exact[Long](0)
+  override def size: Approximate[Long] = Approximate.exact[Long](0)
 }
 
 /**
  * Bloom Filter with 1 value.
  */
-case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
-  def numHashes: Int = hashes.size
-  def numBits = numHashes
+case class BFItem[A](item: A, hashes: BFHash[A], override val width: Int) extends BF[A] {
+  override def numHashes: Int = hashes.size
+  override def numBits: Int = numHashes
 
-  def toBitSet: BitSet = {
+  override def toBitSet: BitSet = {
     val hashvalues = hashes(item)
     BitSet(hashvalues: _*)
   }
@@ -453,38 +453,38 @@ case class BFItem[A](item: A, hashes: BFHash[A], width: Int) extends BF[A] {
   private[algebird] def toSparse: BFSparse[A] =
     BFSparse[A](hashes, RichCBitSet.fromArray(hashes(item)), width)
 
-  def ++(other: BF[A]): BF[A] =
+  override def ++(other: BF[A]): BF[A] =
     other match {
       case BFZero(_, _)            => this
       case BFItem(otherItem, _, _) => toSparse + otherItem
       case _                       => other + item
     }
 
-  def +(other: A) = this ++ BFItem(other, hashes, width)
+  override def +(other: A): BF[A] = this ++ BFItem(other, hashes, width)
 
-  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+  override def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
     if (other == item) {
       (this, ApproximateBoolean.exactTrue)
     } else {
       (this + other, ApproximateBoolean.exactFalse)
     }
 
-  override def contains(x: A) = ApproximateBoolean.exact(item == x)
+  override def contains(x: A): ApproximateBoolean = ApproximateBoolean.exact(item == x)
 
-  def maybeContains(x: A): Boolean =
+  override def maybeContains(x: A): Boolean =
     item == x
 
-  def size = Approximate.exact[Long](1)
+  override def size: Approximate[Long] = Approximate.exact[Long](1)
 }
 
-case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[A] {
+case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, override val width: Int) extends BF[A] {
   import RichCBitSet._
 
-  def numHashes: Int = hashes.size
+  override def numHashes: Int = hashes.size
 
-  def toBitSet: BitSet = bits.toBitSet(width)
+  override def toBitSet: BitSet = bits.toBitSet(width)
 
-  def numBits: Int = {
+  override def numBits: Int = {
     val it = bits.intIterator
     var count = 0
     while (it.hasNext) {
@@ -499,7 +499,7 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
    */
   def dense: BFInstance[A] = BFInstance[A](hashes, bits.toBitSet(width), width)
 
-  def ++(other: BF[A]): BF[A] = {
+  override def ++(other: BF[A]): BF[A] = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 
@@ -527,17 +527,17 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
     }
   }
 
-  def +(item: A): BF[A] = {
+  override def +(item: A): BF[A] = {
     val bitsToActivate = bits.clone
     bitsToActivate += hashes(item)
 
     BFSparse(hashes, bitsToActivate, width)
   }
 
-  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+  override def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
     (this + other, contains(other))
 
-  def maybeContains(item: A): Boolean = {
+  override def maybeContains(item: A): Boolean = {
     val il = hashes(item)
     var idx = 0
     while (idx < il.length) {
@@ -548,25 +548,25 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, width: Int) extends BF[
     true
   }
 
-  def size: Approximate[Long] =
+  override def size: Approximate[Long] =
     BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
 }
 
 /*
  * Bloom filter with multiple values
  */
-case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF[A] {
+case class BFInstance[A](hashes: BFHash[A], bits: BitSet, override val width: Int) extends BF[A] {
 
-  def numHashes: Int = hashes.size
+  override def numHashes: Int = hashes.size
 
   /**
    * The number of bits set to true
    */
-  def numBits: Int = bits.size
+  override def numBits: Int = bits.size
 
-  def toBitSet: BitSet = bits
+  override def toBitSet: BitSet = bits
 
-  def ++(other: BF[A]) = {
+  override def ++(other: BF[A]): BF[A] = {
     require(this.width == other.width)
     require(this.numHashes == other.numHashes)
 
@@ -583,7 +583,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
     }
   }
 
-  def +(item: A): BFInstance[A] = {
+  override def +(item: A): BFInstance[A] = {
     val itemHashes = hashes(item)
     val thisBS = LongBitSet.empty(width)
     thisBS += itemHashes
@@ -591,10 +591,10 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
     BFInstance[A](hashes, bits | (thisBS.toBitSetNoCopy), width)
   }
 
-  def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
+  override def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
     (this + other, contains(other))
 
-  def maybeContains(item: A): Boolean = {
+  override def maybeContains(item: A): Boolean = {
     val il = hashes(item)
     var idx = 0
     while (idx < il.length) {
@@ -606,7 +606,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, width: Int) extends BF
   }
 
   // use an approximation width of 0.05
-  def size: Approximate[Long] =
+  override def size: Approximate[Long] =
     BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
 }
 
@@ -619,7 +619,7 @@ object BFInstance {
 }
 
 case class BFHash[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) {
-  def size = numHashes
+  def size: Int = numHashes
 
   def apply(s: A): Array[Int] =
     nextHash(s, 0, new Array[Int](4), 4, new Array[Int](numHashes))
@@ -663,10 +663,10 @@ case class BFHash[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) {
 
 case class BloomFilterAggregator[A](bfMonoid: BloomFilterMonoid[A])
     extends MonoidAggregator[A, BF[A], BF[A]] {
-  val monoid = bfMonoid
+  override val monoid: BloomFilterMonoid[A] = bfMonoid
 
-  def prepare(value: A) = monoid.create(value)
-  def present(bf: BF[A]) = bf
+  override def prepare(value: A): BF[A] = monoid.create(value)
+  override def present(bf: BF[A]): BF[A] = bf
 }
 
 object BloomFilterAggregator {

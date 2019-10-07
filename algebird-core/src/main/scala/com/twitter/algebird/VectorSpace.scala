@@ -29,9 +29,9 @@ object VectorSpace {
     vs.scale(v, c)
   def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) =
     new VectorSpace[F, C] {
-      def ring = r
-      def group = cGroup
-      def scale(v: F, c: C[F]) =
+      override def ring: Ring[F] = r
+      override def group: Group[C[F]] = cGroup
+      override def scale(v: F, c: C[F]): C[F] =
         if (r.isNonZero(v)) scaleFn(v, c) else cGroup.zero
     }
 

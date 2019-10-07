@@ -61,13 +61,13 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
       ApproximateBoolean(false, newP)
     }
 
-  def contains(b: Boolean): ApproximateBoolean = if (isTrue) this else not
+  override def contains(b: Boolean): ApproximateBoolean = if (isTrue) this else not
 }
 
 object ApproximateBoolean {
-  def exact(b: Boolean) = ApproximateBoolean(b, 1.0)
-  val exactFalse = exact(false)
-  val exactTrue = exact(true)
+  def exact(b: Boolean): ApproximateBoolean = ApproximateBoolean(b, 1.0)
+  val exactFalse: ApproximateBoolean = exact(false)
+  val exactTrue: ApproximateBoolean = exact(true)
 }
 
 // Note the probWithinBounds is a LOWER BOUND (at least this probability)
@@ -84,7 +84,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
   def boundsContain(v: N): Boolean =
     numeric.lteq(min, v) && numeric.lteq(v, max)
 
-  def contains(v: N): ApproximateBoolean =
+  override def contains(v: N): ApproximateBoolean =
     ApproximateBoolean(boundsContain(v), probWithinBounds)
 
   /**
@@ -161,9 +161,9 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
 }
 
 object Approximate {
-  def exact[N: Numeric](v: N) = Approximate(v, v, v, 1.0)
-  def zero[N](implicit n: Numeric[N]) = exact(n.zero)
-  def one[N](implicit n: Numeric[N]) = exact(n.one)
+  def exact[N: Numeric](v: N): Approximate[N] = Approximate(v, v, v, 1.0)
+  def zero[N](implicit n: Numeric[N]): Approximate[N] = exact(n.zero)
+  def one[N](implicit n: Numeric[N]): Approximate[N] = exact(n.one)
   // Not a group/ring:
   // negate fails: x - x != 0, because with some probability the bound is bad.
   // distributive fails because a*b + a*c ignores that a is either in or out
@@ -172,9 +172,9 @@ object Approximate {
     // avoid capturing the Numeric:
     val z = Approximate.zero[N]
     new Monoid[Approximate[N]] {
-      val zero = z
-      override def isNonZero(v: Approximate[N]) = !v.isZero
-      def plus(left: Approximate[N], right: Approximate[N]) = left + right
+      override val zero: Approximate[N] = z
+      override def isNonZero(v: Approximate[N]): Boolean = !v.isZero
+      override def plus(left: Approximate[N], right: Approximate[N]): Approximate[N] = left + right
     }
   }
 }

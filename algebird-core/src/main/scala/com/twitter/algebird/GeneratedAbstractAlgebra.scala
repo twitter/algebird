@@ -8,9 +8,9 @@ import ArrayBufferedOperation.fromSumOption
  */
 class Tuple2Semigroup[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B])
     extends Semigroup[(A, B)] {
-  override def plus(l: (A, B), r: (A, B)) =
+  override def plus(l: (A, B), r: (A, B)): (A, B) =
     (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2))
-  override def sumOption(to: TraversableOnce[(A, B)]) =
+  override def sumOption(to: TraversableOnce[(A, B)]): Option[(A, B)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -28,7 +28,7 @@ class Tuple2Semigroup[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semig
 class Tuple2Monoid[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B])
     extends Tuple2Semigroup[A, B]
     with Monoid[(A, B)] {
-  override def zero = (amonoid.zero, bmonoid.zero)
+  override def zero: (A, B) = (amonoid.zero, bmonoid.zero)
 }
 
 /**
@@ -37,8 +37,8 @@ class Tuple2Monoid[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B])
 class Tuple2Group[A, B](implicit agroup: Group[A], bgroup: Group[B])
     extends Tuple2Monoid[A, B]
     with Group[(A, B)] {
-  override def negate(v: (A, B)) = (agroup.negate(v._1), bgroup.negate(v._2))
-  override def minus(l: (A, B), r: (A, B)) =
+  override def negate(v: (A, B)): (A, B) = (agroup.negate(v._1), bgroup.negate(v._2))
+  override def minus(l: (A, B), r: (A, B)): (A, B) =
     (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2))
 }
 
@@ -46,8 +46,8 @@ class Tuple2Group[A, B](implicit agroup: Group[A], bgroup: Group[B])
  * Combine 2 rings into a product ring
  */
 class Tuple2Ring[A, B](implicit aring: Ring[A], bring: Ring[B]) extends Tuple2Group[A, B] with Ring[(A, B)] {
-  override def one = (aring.one, bring.one)
-  override def times(l: (A, B), r: (A, B)) =
+  override def one: (A, B) = (aring.one, bring.one)
+  override def times(l: (A, B), r: (A, B)): (A, B) =
     (aring.times(l._1, r._1), bring.times(l._2, r._2))
 }
 
@@ -59,9 +59,9 @@ class Tuple3Semigroup[A, B, C](
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C]
 ) extends Semigroup[(A, B, C)] {
-  override def plus(l: (A, B, C), r: (A, B, C)) =
+  override def plus(l: (A, B, C), r: (A, B, C)): (A, B, C) =
     (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2), csemigroup.plus(l._3, r._3))
-  override def sumOption(to: TraversableOnce[(A, B, C)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C)]): Option[(A, B, C)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -80,7 +80,7 @@ class Tuple3Semigroup[A, B, C](
 class Tuple3Monoid[A, B, C](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C])
     extends Tuple3Semigroup[A, B, C]
     with Monoid[(A, B, C)] {
-  override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero)
+  override def zero: (A, B, C) = (amonoid.zero, bmonoid.zero, cmonoid.zero)
 }
 
 /**
@@ -89,9 +89,9 @@ class Tuple3Monoid[A, B, C](implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmo
 class Tuple3Group[A, B, C](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C])
     extends Tuple3Monoid[A, B, C]
     with Group[(A, B, C)] {
-  override def negate(v: (A, B, C)) =
+  override def negate(v: (A, B, C)): (A, B, C) =
     (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3))
-  override def minus(l: (A, B, C), r: (A, B, C)) =
+  override def minus(l: (A, B, C), r: (A, B, C)): (A, B, C) =
     (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3))
 }
 
@@ -101,8 +101,8 @@ class Tuple3Group[A, B, C](implicit agroup: Group[A], bgroup: Group[B], cgroup: 
 class Tuple3Ring[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C])
     extends Tuple3Group[A, B, C]
     with Ring[(A, B, C)] {
-  override def one = (aring.one, bring.one, cring.one)
-  override def times(l: (A, B, C), r: (A, B, C)) =
+  override def one: (A, B, C) = (aring.one, bring.one, cring.one)
+  override def times(l: (A, B, C), r: (A, B, C)): (A, B, C) =
     (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3))
 }
 
@@ -115,14 +115,14 @@ class Tuple4Semigroup[A, B, C, D](
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D]
 ) extends Semigroup[(A, B, C, D)] {
-  override def plus(l: (A, B, C, D), r: (A, B, C, D)) =
+  override def plus(l: (A, B, C, D), r: (A, B, C, D)): (A, B, C, D) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
       csemigroup.plus(l._3, r._3),
       dsemigroup.plus(l._4, r._4)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C, D)]): Option[(A, B, C, D)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -147,7 +147,7 @@ class Tuple4Monoid[A, B, C, D](
     dmonoid: Monoid[D]
 ) extends Tuple4Semigroup[A, B, C, D]
     with Monoid[(A, B, C, D)] {
-  override def zero = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero)
+  override def zero: (A, B, C, D) = (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero)
 }
 
 /**
@@ -156,9 +156,9 @@ class Tuple4Monoid[A, B, C, D](
 class Tuple4Group[A, B, C, D](implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D])
     extends Tuple4Monoid[A, B, C, D]
     with Group[(A, B, C, D)] {
-  override def negate(v: (A, B, C, D)) =
+  override def negate(v: (A, B, C, D)): (A, B, C, D) =
     (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4))
-  override def minus(l: (A, B, C, D), r: (A, B, C, D)) =
+  override def minus(l: (A, B, C, D), r: (A, B, C, D)): (A, B, C, D) =
     (agroup.minus(l._1, r._1), bgroup.minus(l._2, r._2), cgroup.minus(l._3, r._3), dgroup.minus(l._4, r._4))
 }
 
@@ -168,8 +168,8 @@ class Tuple4Group[A, B, C, D](implicit agroup: Group[A], bgroup: Group[B], cgrou
 class Tuple4Ring[A, B, C, D](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D])
     extends Tuple4Group[A, B, C, D]
     with Ring[(A, B, C, D)] {
-  override def one = (aring.one, bring.one, cring.one, dring.one)
-  override def times(l: (A, B, C, D), r: (A, B, C, D)) =
+  override def one: (A, B, C, D) = (aring.one, bring.one, cring.one, dring.one)
+  override def times(l: (A, B, C, D), r: (A, B, C, D)): (A, B, C, D) =
     (aring.times(l._1, r._1), bring.times(l._2, r._2), cring.times(l._3, r._3), dring.times(l._4, r._4))
 }
 
@@ -183,7 +183,7 @@ class Tuple5Semigroup[A, B, C, D, E](
     dsemigroup: Semigroup[D],
     esemigroup: Semigroup[E]
 ) extends Semigroup[(A, B, C, D, E)] {
-  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)) =
+  override def plus(l: (A, B, C, D, E), r: (A, B, C, D, E)): (A, B, C, D, E) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -191,7 +191,7 @@ class Tuple5Semigroup[A, B, C, D, E](
       dsemigroup.plus(l._4, r._4),
       esemigroup.plus(l._5, r._5)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E)]): Option[(A, B, C, D, E)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -218,7 +218,7 @@ class Tuple5Monoid[A, B, C, D, E](
     emonoid: Monoid[E]
 ) extends Tuple5Semigroup[A, B, C, D, E]
     with Monoid[(A, B, C, D, E)] {
-  override def zero =
+  override def zero: (A, B, C, D, E) =
     (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero)
 }
 
@@ -233,9 +233,9 @@ class Tuple5Group[A, B, C, D, E](
     egroup: Group[E]
 ) extends Tuple5Monoid[A, B, C, D, E]
     with Group[(A, B, C, D, E)] {
-  override def negate(v: (A, B, C, D, E)) =
+  override def negate(v: (A, B, C, D, E)): (A, B, C, D, E) =
     (agroup.negate(v._1), bgroup.negate(v._2), cgroup.negate(v._3), dgroup.negate(v._4), egroup.negate(v._5))
-  override def minus(l: (A, B, C, D, E), r: (A, B, C, D, E)) =
+  override def minus(l: (A, B, C, D, E), r: (A, B, C, D, E)): (A, B, C, D, E) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -256,8 +256,8 @@ class Tuple5Ring[A, B, C, D, E](
     ering: Ring[E]
 ) extends Tuple5Group[A, B, C, D, E]
     with Ring[(A, B, C, D, E)] {
-  override def one = (aring.one, bring.one, cring.one, dring.one, ering.one)
-  override def times(l: (A, B, C, D, E), r: (A, B, C, D, E)) =
+  override def one: (A, B, C, D, E) = (aring.one, bring.one, cring.one, dring.one, ering.one)
+  override def times(l: (A, B, C, D, E), r: (A, B, C, D, E)): (A, B, C, D, E) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -278,7 +278,7 @@ class Tuple6Semigroup[A, B, C, D, E, F](
     esemigroup: Semigroup[E],
     fsemigroup: Semigroup[F]
 ) extends Semigroup[(A, B, C, D, E, F)] {
-  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) =
+  override def plus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)): (A, B, C, D, E, F) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -287,7 +287,7 @@ class Tuple6Semigroup[A, B, C, D, E, F](
       esemigroup.plus(l._5, r._5),
       fsemigroup.plus(l._6, r._6)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F)]): Option[(A, B, C, D, E, F)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -316,7 +316,7 @@ class Tuple6Monoid[A, B, C, D, E, F](
     fmonoid: Monoid[F]
 ) extends Tuple6Semigroup[A, B, C, D, E, F]
     with Monoid[(A, B, C, D, E, F)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F) =
     (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero)
 }
 
@@ -332,7 +332,7 @@ class Tuple6Group[A, B, C, D, E, F](
     fgroup: Group[F]
 ) extends Tuple6Monoid[A, B, C, D, E, F]
     with Group[(A, B, C, D, E, F)] {
-  override def negate(v: (A, B, C, D, E, F)) =
+  override def negate(v: (A, B, C, D, E, F)): (A, B, C, D, E, F) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -341,7 +341,7 @@ class Tuple6Group[A, B, C, D, E, F](
       egroup.negate(v._5),
       fgroup.negate(v._6)
     )
-  override def minus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) =
+  override def minus(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)): (A, B, C, D, E, F) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -364,9 +364,9 @@ class Tuple6Ring[A, B, C, D, E, F](
     fring: Ring[F]
 ) extends Tuple6Group[A, B, C, D, E, F]
     with Ring[(A, B, C, D, E, F)] {
-  override def one =
+  override def one: (A, B, C, D, E, F) =
     (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one)
-  override def times(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)) =
+  override def times(l: (A, B, C, D, E, F), r: (A, B, C, D, E, F)): (A, B, C, D, E, F) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -389,7 +389,7 @@ class Tuple7Semigroup[A, B, C, D, E, F, G](
     fsemigroup: Semigroup[F],
     gsemigroup: Semigroup[G]
 ) extends Semigroup[(A, B, C, D, E, F, G)] {
-  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) =
+  override def plus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)): (A, B, C, D, E, F, G) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -399,7 +399,7 @@ class Tuple7Semigroup[A, B, C, D, E, F, G](
       fsemigroup.plus(l._6, r._6),
       gsemigroup.plus(l._7, r._7)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G)]): Option[(A, B, C, D, E, F, G)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -441,7 +441,7 @@ class Tuple7Monoid[A, B, C, D, E, F, G](
     gmonoid: Monoid[G]
 ) extends Tuple7Semigroup[A, B, C, D, E, F, G]
     with Monoid[(A, B, C, D, E, F, G)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G) =
     (amonoid.zero, bmonoid.zero, cmonoid.zero, dmonoid.zero, emonoid.zero, fmonoid.zero, gmonoid.zero)
 }
 
@@ -458,7 +458,7 @@ class Tuple7Group[A, B, C, D, E, F, G](
     ggroup: Group[G]
 ) extends Tuple7Monoid[A, B, C, D, E, F, G]
     with Group[(A, B, C, D, E, F, G)] {
-  override def negate(v: (A, B, C, D, E, F, G)) =
+  override def negate(v: (A, B, C, D, E, F, G)): (A, B, C, D, E, F, G) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -468,7 +468,7 @@ class Tuple7Group[A, B, C, D, E, F, G](
       fgroup.negate(v._6),
       ggroup.negate(v._7)
     )
-  override def minus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) =
+  override def minus(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)): (A, B, C, D, E, F, G) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -493,9 +493,9 @@ class Tuple7Ring[A, B, C, D, E, F, G](
     gring: Ring[G]
 ) extends Tuple7Group[A, B, C, D, E, F, G]
     with Ring[(A, B, C, D, E, F, G)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G) =
     (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one)
-  override def times(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)) =
+  override def times(l: (A, B, C, D, E, F, G), r: (A, B, C, D, E, F, G)): (A, B, C, D, E, F, G) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -520,7 +520,7 @@ class Tuple8Semigroup[A, B, C, D, E, F, G, H](
     gsemigroup: Semigroup[G],
     hsemigroup: Semigroup[H]
 ) extends Semigroup[(A, B, C, D, E, F, G, H)] {
-  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) =
+  override def plus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)): (A, B, C, D, E, F, G, H) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -531,7 +531,7 @@ class Tuple8Semigroup[A, B, C, D, E, F, G, H](
       gsemigroup.plus(l._7, r._7),
       hsemigroup.plus(l._8, r._8)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H)]) =
+  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H)]): Option[(A, B, C, D, E, F, G, H)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -576,7 +576,7 @@ class Tuple8Monoid[A, B, C, D, E, F, G, H](
     hmonoid: Monoid[H]
 ) extends Tuple8Semigroup[A, B, C, D, E, F, G, H]
     with Monoid[(A, B, C, D, E, F, G, H)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -603,7 +603,7 @@ class Tuple8Group[A, B, C, D, E, F, G, H](
     hgroup: Group[H]
 ) extends Tuple8Monoid[A, B, C, D, E, F, G, H]
     with Group[(A, B, C, D, E, F, G, H)] {
-  override def negate(v: (A, B, C, D, E, F, G, H)) =
+  override def negate(v: (A, B, C, D, E, F, G, H)): (A, B, C, D, E, F, G, H) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -614,7 +614,7 @@ class Tuple8Group[A, B, C, D, E, F, G, H](
       ggroup.negate(v._7),
       hgroup.negate(v._8)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) =
+  override def minus(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)): (A, B, C, D, E, F, G, H) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -641,9 +641,9 @@ class Tuple8Ring[A, B, C, D, E, F, G, H](
     hring: Ring[H]
 ) extends Tuple8Group[A, B, C, D, E, F, G, H]
     with Ring[(A, B, C, D, E, F, G, H)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H) =
     (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one)
-  override def times(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)) =
+  override def times(l: (A, B, C, D, E, F, G, H), r: (A, B, C, D, E, F, G, H)): (A, B, C, D, E, F, G, H) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -670,7 +670,10 @@ class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](
     hsemigroup: Semigroup[H],
     isemigroup: Semigroup[I]
 ) extends Semigroup[(A, B, C, D, E, F, G, H, I)] {
-  override def plus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) =
+  override def plus(
+      l: (A, B, C, D, E, F, G, H, I),
+      r: (A, B, C, D, E, F, G, H, I)
+  ): (A, B, C, D, E, F, G, H, I) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -682,7 +685,9 @@ class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](
       hsemigroup.plus(l._8, r._8),
       isemigroup.plus(l._9, r._9)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I)]
+  ): Option[(A, B, C, D, E, F, G, H, I)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -730,7 +735,7 @@ class Tuple9Monoid[A, B, C, D, E, F, G, H, I](
     imonoid: Monoid[I]
 ) extends Tuple9Semigroup[A, B, C, D, E, F, G, H, I]
     with Monoid[(A, B, C, D, E, F, G, H, I)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -759,7 +764,7 @@ class Tuple9Group[A, B, C, D, E, F, G, H, I](
     igroup: Group[I]
 ) extends Tuple9Monoid[A, B, C, D, E, F, G, H, I]
     with Group[(A, B, C, D, E, F, G, H, I)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I)) =
+  override def negate(v: (A, B, C, D, E, F, G, H, I)): (A, B, C, D, E, F, G, H, I) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -771,7 +776,10 @@ class Tuple9Group[A, B, C, D, E, F, G, H, I](
       hgroup.negate(v._8),
       igroup.negate(v._9)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) =
+  override def minus(
+      l: (A, B, C, D, E, F, G, H, I),
+      r: (A, B, C, D, E, F, G, H, I)
+  ): (A, B, C, D, E, F, G, H, I) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -800,9 +808,12 @@ class Tuple9Ring[A, B, C, D, E, F, G, H, I](
     iring: Ring[I]
 ) extends Tuple9Group[A, B, C, D, E, F, G, H, I]
     with Ring[(A, B, C, D, E, F, G, H, I)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I) =
     (aring.one, bring.one, cring.one, dring.one, ering.one, fring.one, gring.one, hring.one, iring.one)
-  override def times(l: (A, B, C, D, E, F, G, H, I), r: (A, B, C, D, E, F, G, H, I)) =
+  override def times(
+      l: (A, B, C, D, E, F, G, H, I),
+      r: (A, B, C, D, E, F, G, H, I)
+  ): (A, B, C, D, E, F, G, H, I) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -831,7 +842,10 @@ class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](
     isemigroup: Semigroup[I],
     jsemigroup: Semigroup[J]
 ) extends Semigroup[(A, B, C, D, E, F, G, H, I, J)] {
-  override def plus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) =
+  override def plus(
+      l: (A, B, C, D, E, F, G, H, I, J),
+      r: (A, B, C, D, E, F, G, H, I, J)
+  ): (A, B, C, D, E, F, G, H, I, J) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -844,7 +858,9 @@ class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](
       isemigroup.plus(l._9, r._9),
       jsemigroup.plus(l._10, r._10)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -896,7 +912,7 @@ class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](
     jmonoid: Monoid[J]
 ) extends Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J]
     with Monoid[(A, B, C, D, E, F, G, H, I, J)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -927,7 +943,7 @@ class Tuple10Group[A, B, C, D, E, F, G, H, I, J](
     jgroup: Group[J]
 ) extends Tuple10Monoid[A, B, C, D, E, F, G, H, I, J]
     with Group[(A, B, C, D, E, F, G, H, I, J)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J)) =
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J)): (A, B, C, D, E, F, G, H, I, J) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -940,7 +956,10 @@ class Tuple10Group[A, B, C, D, E, F, G, H, I, J](
       igroup.negate(v._9),
       jgroup.negate(v._10)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) =
+  override def minus(
+      l: (A, B, C, D, E, F, G, H, I, J),
+      r: (A, B, C, D, E, F, G, H, I, J)
+  ): (A, B, C, D, E, F, G, H, I, J) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -971,7 +990,7 @@ class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](
     jring: Ring[J]
 ) extends Tuple10Group[A, B, C, D, E, F, G, H, I, J]
     with Ring[(A, B, C, D, E, F, G, H, I, J)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J) =
     (
       aring.one,
       bring.one,
@@ -984,7 +1003,10 @@ class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](
       iring.one,
       jring.one
     )
-  override def times(l: (A, B, C, D, E, F, G, H, I, J), r: (A, B, C, D, E, F, G, H, I, J)) =
+  override def times(
+      l: (A, B, C, D, E, F, G, H, I, J),
+      r: (A, B, C, D, E, F, G, H, I, J)
+  ): (A, B, C, D, E, F, G, H, I, J) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -1015,7 +1037,10 @@ class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](
     jsemigroup: Semigroup[J],
     ksemigroup: Semigroup[K]
 ) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] {
-  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) =
+  override def plus(
+      l: (A, B, C, D, E, F, G, H, I, J, K),
+      r: (A, B, C, D, E, F, G, H, I, J, K)
+  ): (A, B, C, D, E, F, G, H, I, J, K) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -1029,7 +1054,9 @@ class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](
       jsemigroup.plus(l._10, r._10),
       ksemigroup.plus(l._11, r._11)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1084,7 +1111,7 @@ class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](
     kmonoid: Monoid[K]
 ) extends Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -1117,7 +1144,7 @@ class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](
     kgroup: Group[K]
 ) extends Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K]
     with Group[(A, B, C, D, E, F, G, H, I, J, K)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K)) =
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K)): (A, B, C, D, E, F, G, H, I, J, K) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -1131,7 +1158,10 @@ class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](
       jgroup.negate(v._10),
       kgroup.negate(v._11)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) =
+  override def minus(
+      l: (A, B, C, D, E, F, G, H, I, J, K),
+      r: (A, B, C, D, E, F, G, H, I, J, K)
+  ): (A, B, C, D, E, F, G, H, I, J, K) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -1164,7 +1194,7 @@ class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](
     kring: Ring[K]
 ) extends Tuple11Group[A, B, C, D, E, F, G, H, I, J, K]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K) =
     (
       aring.one,
       bring.one,
@@ -1178,7 +1208,10 @@ class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](
       jring.one,
       kring.one
     )
-  override def times(l: (A, B, C, D, E, F, G, H, I, J, K), r: (A, B, C, D, E, F, G, H, I, J, K)) =
+  override def times(
+      l: (A, B, C, D, E, F, G, H, I, J, K),
+      r: (A, B, C, D, E, F, G, H, I, J, K)
+  ): (A, B, C, D, E, F, G, H, I, J, K) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -1211,7 +1244,10 @@ class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](
     ksemigroup: Semigroup[K],
     lsemigroup: Semigroup[L]
 ) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] {
-  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) =
+  override def plus(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -1226,7 +1262,9 @@ class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](
       ksemigroup.plus(l._11, r._11),
       lsemigroup.plus(l._12, r._12)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1284,7 +1322,7 @@ class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](
     lmonoid: Monoid[L]
 ) extends Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -1319,7 +1357,7 @@ class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](
     lgroup: Group[L]
 ) extends Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L)) =
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L)): (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -1334,7 +1372,10 @@ class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](
       kgroup.negate(v._11),
       lgroup.negate(v._12)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) =
+  override def minus(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -1369,7 +1410,7 @@ class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](
     lring: Ring[L]
 ) extends Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       aring.one,
       bring.one,
@@ -1384,7 +1425,10 @@ class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](
       kring.one,
       lring.one
     )
-  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L), r: (A, B, C, D, E, F, G, H, I, J, K, L)) =
+  override def times(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -1419,7 +1463,10 @@ class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](
     lsemigroup: Semigroup[L],
     msemigroup: Semigroup[M]
 ) extends Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
-  override def plus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) =
+  override def plus(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L, M),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L, M)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -1435,7 +1482,9 @@ class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](
       lsemigroup.plus(l._12, r._12),
       msemigroup.plus(l._13, r._13)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1497,7 +1546,7 @@ class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](
     mmonoid: Monoid[M]
 ) extends Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -1534,7 +1583,7 @@ class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](
     mgroup: Group[M]
 ) extends Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M)) =
+  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M)): (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -1550,7 +1599,10 @@ class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](
       lgroup.negate(v._12),
       mgroup.negate(v._13)
     )
-  override def minus(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) =
+  override def minus(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L, M),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L, M)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -1587,7 +1639,7 @@ class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](
     mring: Ring[M]
 ) extends Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       aring.one,
       bring.one,
@@ -1603,7 +1655,10 @@ class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](
       lring.one,
       mring.one
     )
-  override def times(l: (A, B, C, D, E, F, G, H, I, J, K, L, M), r: (A, B, C, D, E, F, G, H, I, J, K, L, M)) =
+  override def times(
+      l: (A, B, C, D, E, F, G, H, I, J, K, L, M),
+      r: (A, B, C, D, E, F, G, H, I, J, K, L, M)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -1643,7 +1698,7 @@ class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -1660,7 +1715,9 @@ class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       msemigroup.plus(l._13, r._13),
       nsemigroup.plus(l._14, r._14)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1725,7 +1782,7 @@ class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     nmonoid: Monoid[N]
 ) extends Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -1764,7 +1821,9 @@ class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     ngroup: Group[N]
 ) extends Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -1784,7 +1843,7 @@ class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -1823,7 +1882,7 @@ class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     nring: Ring[N]
 ) extends Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       aring.one,
       bring.one,
@@ -1843,7 +1902,7 @@ class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -1885,7 +1944,7 @@ class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -1903,7 +1962,9 @@ class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nsemigroup.plus(l._14, r._14),
       osemigroup.plus(l._15, r._15)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -1971,7 +2032,7 @@ class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     omonoid: Monoid[O]
 ) extends Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -2012,7 +2073,9 @@ class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     ogroup: Group[O]
 ) extends Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -2033,7 +2096,7 @@ class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -2074,7 +2137,7 @@ class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     oring: Ring[O]
 ) extends Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       aring.one,
       bring.one,
@@ -2095,7 +2158,7 @@ class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -2139,7 +2202,7 @@ class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -2158,7 +2221,9 @@ class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       osemigroup.plus(l._15, r._15),
       psemigroup.plus(l._16, r._16)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2230,7 +2295,7 @@ class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     pmonoid: Monoid[P]
 ) extends Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -2273,7 +2338,9 @@ class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     pgroup: Group[P]
 ) extends Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -2295,7 +2362,7 @@ class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -2338,7 +2405,7 @@ class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     pring: Ring[P]
 ) extends Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       aring.one,
       bring.one,
@@ -2360,7 +2427,7 @@ class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -2406,7 +2473,7 @@ class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -2426,7 +2493,9 @@ class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       psemigroup.plus(l._16, r._16),
       qsemigroup.plus(l._17, r._17)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2501,7 +2570,7 @@ class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     qmonoid: Monoid[Q]
 ) extends Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -2546,7 +2615,9 @@ class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     qgroup: Group[Q]
 ) extends Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -2569,7 +2640,7 @@ class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -2614,7 +2685,7 @@ class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     qring: Ring[Q]
 ) extends Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       aring.one,
       bring.one,
@@ -2637,7 +2708,7 @@ class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -2685,7 +2756,7 @@ class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -2706,7 +2777,9 @@ class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       qsemigroup.plus(l._17, r._17),
       rsemigroup.plus(l._18, r._18)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -2784,7 +2857,7 @@ class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     rmonoid: Monoid[R]
 ) extends Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -2831,7 +2904,9 @@ class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     rgroup: Group[R]
 ) extends Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -2855,7 +2930,7 @@ class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -2902,7 +2977,7 @@ class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     rring: Ring[R]
 ) extends Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       aring.one,
       bring.one,
@@ -2926,7 +3001,7 @@ class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -2976,7 +3051,7 @@ class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -2998,7 +3073,9 @@ class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       rsemigroup.plus(l._18, r._18),
       ssemigroup.plus(l._19, r._19)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3080,7 +3157,7 @@ class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     smonoid: Monoid[S]
 ) extends Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -3129,7 +3206,9 @@ class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     sgroup: Group[S]
 ) extends Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -3154,7 +3233,7 @@ class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -3203,7 +3282,7 @@ class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     sring: Ring[S]
 ) extends Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       aring.one,
       bring.one,
@@ -3228,7 +3307,7 @@ class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -3280,7 +3359,7 @@ class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -3303,7 +3382,9 @@ class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
       ssemigroup.plus(l._19, r._19),
       tsemigroup.plus(l._20, r._20)
     )
-  override def sumOption(to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]) =
+  override def sumOption(
+      to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3388,7 +3469,7 @@ class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     tmonoid: Monoid[T]
 ) extends Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -3439,7 +3520,9 @@ class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     tgroup: Group[T]
 ) extends Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -3465,7 +3548,7 @@ class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -3516,7 +3599,7 @@ class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     tring: Ring[T]
 ) extends Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       aring.one,
       bring.one,
@@ -3542,7 +3625,7 @@ class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -3596,7 +3679,7 @@ class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -3622,7 +3705,7 @@ class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
     )
   override def sumOption(
       to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-  ) =
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -3710,7 +3793,7 @@ class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, 
     umonoid: Monoid[U]
 ) extends Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -3763,7 +3846,9 @@ class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
     ugroup: Group[U]
 ) extends Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -3790,7 +3875,7 @@ class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -3843,7 +3928,7 @@ class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     uring: Ring[U]
 ) extends Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       aring.one,
       bring.one,
@@ -3870,7 +3955,7 @@ class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),
@@ -3926,7 +4011,7 @@ class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
   override def plus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       asemigroup.plus(l._1, r._1),
       bsemigroup.plus(l._2, r._2),
@@ -3953,7 +4038,7 @@ class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
     )
   override def sumOption(
       to: TraversableOnce[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-  ) =
+  ): Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
     if (to.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
@@ -4045,7 +4130,7 @@ class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, 
     vmonoid: Monoid[V]
 ) extends Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
     with Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
-  override def zero =
+  override def zero: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       amonoid.zero,
       bmonoid.zero,
@@ -4100,7 +4185,9 @@ class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
     vgroup: Group[V]
 ) extends Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
     with Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
-  override def negate(v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)) =
+  override def negate(
+      v: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       agroup.negate(v._1),
       bgroup.negate(v._2),
@@ -4128,7 +4215,7 @@ class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
   override def minus(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       agroup.minus(l._1, r._1),
       bgroup.minus(l._2, r._2),
@@ -4183,7 +4270,7 @@ class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
     vring: Ring[V]
 ) extends Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
     with Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] {
-  override def one =
+  override def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       aring.one,
       bring.one,
@@ -4211,7 +4298,7 @@ class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
   override def times(
       l: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V),
       r: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)
-  ) =
+  ): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     (
       aring.times(l._1, r._1),
       bring.times(l._2, r._2),

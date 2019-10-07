@@ -31,8 +31,8 @@ trait Hash128[-K] extends java.io.Serializable {
   def contramap[L](fn: L => K): Hash128[L] = {
     val self = this
     new Hash128[L] {
-      val DefaultSeed = self.DefaultSeed
-      def hashWithSeed(seed: Long, l: L) = self.hashWithSeed(seed, fn(l))
+      override val DefaultSeed: Long = self.DefaultSeed
+      override def hashWithSeed(seed: Long, l: L): (Long, Long) = self.hashWithSeed(seed, fn(l))
     }
   }
 }
@@ -49,18 +49,18 @@ object Hash128 extends java.io.Serializable {
 
   def murmur128ArrayByte(seed: Long): Hash128[Array[Byte]] =
     new Hash128[Array[Byte]] {
-      val DefaultSeed = seed
-      def hashWithSeed(seed: Long, k: Array[Byte]) = MurmurHash128(seed)(k)
+      override val DefaultSeed: Long = seed
+      override def hashWithSeed(seed: Long, k: Array[Byte]): (Long, Long) = MurmurHash128(seed)(k)
     }
   def murmur128ArrayInt(seed: Long): Hash128[Array[Int]] =
     new Hash128[Array[Int]] {
-      val DefaultSeed = seed
-      def hashWithSeed(seed: Long, k: Array[Int]) = MurmurHash128(seed)(k)
+      override val DefaultSeed: Long = seed
+      override def hashWithSeed(seed: Long, k: Array[Int]): (Long, Long) = MurmurHash128(seed)(k)
     }
   def murmur128ArrayLong(seed: Long): Hash128[Array[Long]] =
     new Hash128[Array[Long]] {
-      val DefaultSeed = seed
-      def hashWithSeed(seed: Long, k: Array[Long]) = MurmurHash128(seed)(k)
+      override val DefaultSeed: Long = seed
+      override def hashWithSeed(seed: Long, k: Array[Long]): (Long, Long) = MurmurHash128(seed)(k)
     }
 
   /**
@@ -72,12 +72,12 @@ object Hash128 extends java.io.Serializable {
     murmur128ArrayByte(defaultSeed).contramap(_.getBytes("UTF-8"))
 
   def murmur128Int(defaultSeed: Long): Hash128[Int] = new Hash128[Int] {
-    val DefaultSeed = defaultSeed
-    def hashWithSeed(seed: Long, k: Int) = MurmurHash128(seed)(k)
+    override val DefaultSeed: Long = defaultSeed
+    override def hashWithSeed(seed: Long, k: Int): (Long, Long) = MurmurHash128(seed)(k)
   }
   def murmur128Long(defaultSeed: Long): Hash128[Long] = new Hash128[Long] {
-    val DefaultSeed = defaultSeed
-    def hashWithSeed(seed: Long, k: Long) = MurmurHash128(seed)(k)
+    override val DefaultSeed: Long = defaultSeed
+    override def hashWithSeed(seed: Long, k: Long): (Long, Long) = MurmurHash128(seed)(k)
   }
 
   implicit lazy val arrayByteHash: Hash128[Array[Byte]] = murmur128ArrayByte(DefaultSeed)

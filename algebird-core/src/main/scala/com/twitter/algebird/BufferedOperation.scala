@@ -36,13 +36,13 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
 
   private val buffer = new ArrayBuffer[I](size)
 
-  def put(item: I): Option[O] = {
+  override def put(item: I): Option[O] = {
     buffer += item
     if (buffer.size >= size) flush
     else None
   }
 
-  def flush: Option[O] =
+  override def flush: Option[O] =
     if (buffer.isEmpty) None
     else {
       val res = operate(buffer)
@@ -50,7 +50,7 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
       Some(res)
     }
 
-  def isFlushed = buffer.isEmpty
+  override def isFlushed: Boolean = buffer.isEmpty
 }
 
 object ArrayBufferedOperation {
@@ -63,7 +63,7 @@ object ArrayBufferedOperation {
     new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
       // calling `.get is okay because the interface guarantees a
       // non-empty sequence.
-      def operate(items: Seq[T]) = sg.sumOption(items.iterator).get
+      override def operate(items: Seq[T]): T = sg.sumOption(items.iterator).get
     }
 }
 
@@ -72,7 +72,7 @@ object ArrayBufferedOperation {
  * designed to be use in the stackable pattern with ArrayBufferedOperation
  */
 trait BufferedReduce[V] extends Buffered[V, V] {
-  abstract override def put(item: V) = {
+  abstract override def put(item: V): Option[V] = {
     val res = super.put(item)
     // avoiding closures for performance critical code:
     if (res.isDefined) put(res.get)

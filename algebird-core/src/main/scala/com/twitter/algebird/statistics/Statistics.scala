@@ -35,7 +35,7 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
   def getSumOptionCallCount: Long = sumOptionCallsStats.getCallCount
   def getSumOptionCallTime: Long = sumOptionCallsStats.getTotalCallTime
 
-  override def plus(x: T, y: T) = {
+  override def plus(x: T, y: T): T = {
     plusCallsCount.increment
     Semigroup.plus(x, y)
   }
@@ -43,7 +43,7 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
   override def sumOption(iter: TraversableOnce[T]): Option[T] =
     sumOptionCallsStats.measure(iter) { Semigroup.sumOption(_) }
 
-  override def toString =
+  override def toString: String =
     "plus calls: " + plusCallsCount + "\n" +
       "sumOption calls: " + sumOptionCallsStats
 }
@@ -63,7 +63,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
   def getSumCallCount: Long = sumCallsStats.getCallCount
   def getSumCallTime: Long = sumCallsStats.getTotalCallTime
 
-  override def zero = {
+  override def zero: T = {
     zeroCallsCount.increment
     Monoid.zero
   }
@@ -71,7 +71,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
   override def sum(vs: TraversableOnce[T]): T =
     sumCallsStats.measure(vs) { Monoid.sum(_) }
 
-  override def toString =
+  override def toString: String =
     super.toString + "\n" +
       "zero calls: " + zeroCallsCount + "\n" +
       "sum calls: " + sumCallsStats
@@ -91,17 +91,17 @@ class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
   def getNegateCallCount: Long = negateCallsCount.get
   def getMinusCallCount: Long = minusCallsCount.get
 
-  override def negate(x: T) = {
+  override def negate(x: T): T = {
     negateCallsCount.increment
     Group.negate(x)
   }
 
-  override def minus(l: T, r: T) = {
+  override def minus(l: T, r: T): T = {
     minusCallsCount.increment
     Group.minus(l, r)
   }
 
-  override def toString =
+  override def toString: String =
     super.toString + "\n" +
       "negate calls: " + negateCallsCount + "\n" +
       "minus calls: " + minusCallsCount
@@ -124,12 +124,12 @@ class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
   def getProductCallCount: Long = productCallsStats.getCallCount
   def getProductCallTime: Long = productCallsStats.getTotalCallTime
 
-  override def one = {
+  override def one: T = {
     oneCallsCount.increment
     Ring.one
   }
 
-  override def times(x: T, y: T) = {
+  override def times(x: T, y: T): T = {
     timesCallsCount.increment
     Ring.times(x, y)
   }
@@ -137,7 +137,7 @@ class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
   override def product(iter: TraversableOnce[T]): T =
     productCallsStats.measure(iter) { Ring.product(_) }
 
-  override def toString =
+  override def toString: String =
     super.toString + "\n" +
       "one calls: " + oneCallsCount + "\n" +
       "time calls: " + timesCallsCount + "\n" +

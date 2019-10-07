@@ -12,14 +12,14 @@ case class MinHashSignature(bytes: Array[Byte]) extends AnyVal
 object MinHasher {
 
   /** Numerically solve the inverse of estimatedThreshold, given numBands*numRows */
-  def pickBands(threshold: Double, hashes: Int) = {
+  def pickBands(threshold: Double, hashes: Int): Int = {
     val target = hashes * -1 * math.log(threshold)
     var bands = 1
     while (bands * math.log(bands) < target) bands += 1
     bands
   }
 
-  def pickHashesAndBands(threshold: Double, maxHashes: Int) = {
+  def pickHashesAndBands(threshold: Double, maxHashes: Int): (Int, Int) = {
     val bands = pickBands(threshold, maxHashes)
     val hashes = (maxHashes / bands) * bands
     (hashes, bands)
@@ -60,8 +60,8 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   def hashSize: Int
 
   /** For explanation of the "bands" and "rows" see Ullman and Rajaraman */
-  val numBytes = numHashes * hashSize
-  val numRows = numHashes / numBands
+  val numBytes: Int = numHashes * hashSize
+  val numRows: Int = numHashes / numBands
 
   /** This seed could be anything */
   private val seed = 123456789
@@ -79,10 +79,10 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
-  val zero: MinHashSignature = MinHashSignature(buildArray { maxHash })
+  override val zero: MinHashSignature = MinHashSignature(buildArray { maxHash })
 
   /** Set union */
-  def plus(left: MinHashSignature, right: MinHashSignature): MinHashSignature =
+  override def plus(left: MinHashSignature, right: MinHashSignature): MinHashSignature =
     MinHashSignature(buildArray(left.bytes, right.bytes) { (l, r) =>
       n.min(l, r)
     })
@@ -123,10 +123,10 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   }
 
   /** Useful for understanding the effects of numBands and numRows */
-  val estimatedThreshold = math.pow(1.0 / numBands, 1.0 / numRows)
+  val estimatedThreshold: Double = math.pow(1.0 / numBands, 1.0 / numRows)
 
   /** Useful for understanding the effects of numBands and numRows */
-  def probabilityOfInclusion(sim: Double) =
+  def probabilityOfInclusion(sim: Double): Double =
     1.0 - math.pow(1.0 - math.pow(sim, numRows), numBands)
 
   /** Maximum value the hash can take on (not 2*hashSize because of signed types) */
@@ -148,7 +148,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
 
   override def hashSize = 4
 
-  override def maxHash = Int.MaxValue
+  override def maxHash: Int = Int.MaxValue
 
   override protected def buildArray(fn: => Int): Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)
@@ -166,7 +166,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
   }
 
   /** Seems to work, but experimental and not generic yet */
-  def approxCount(sig: Array[Byte]) = {
+  def approxCount(sig: Array[Byte]): Long = {
     val buffer = ByteBuffer.wrap(sig).asIntBuffer
     val mean = 1
       .to(numHashes)
@@ -185,7 +185,7 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
 
   override def hashSize = 2
 
-  override def maxHash = Char.MaxValue
+  override def maxHash: Char = Char.MaxValue
 
   override protected def buildArray(fn: => Char): Array[Byte] = {
     val byteBuffer = ByteBuffer.allocate(numBytes)

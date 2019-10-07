@@ -16,9 +16,9 @@ limitations under the License.
 package com.twitter.algebird
 
 object Operators {
-  implicit def toPlus[T: Semigroup](t: T) = new PlusOp(t)
-  implicit def toMinus[T: Group](t: T) = new MinusOp(t)
-  implicit def toTimes[T: Ring](t: T) = new TimesOp(t)
+  implicit def toPlus[T: Semigroup](t: T): PlusOp[T] = new PlusOp(t)
+  implicit def toMinus[T: Group](t: T): MinusOp[T] = new MinusOp(t)
+  implicit def toTimes[T: Ring](t: T): TimesOp[T] = new TimesOp(t)
   implicit def toRichTraversableFromIterator[T](t: Iterator[T]): RichTraversable[T] =
     new RichTraversable(t)
   implicit def toRichTraversable[T](t: Traversable[T]): RichTraversable[T] =
@@ -26,15 +26,15 @@ object Operators {
 }
 
 class PlusOp[T: Semigroup](t: T) {
-  def +(other: T) = implicitly[Semigroup[T]].plus(t, other)
+  def +(other: T): T = implicitly[Semigroup[T]].plus(t, other)
 }
 
 class MinusOp[T: Group](t: T) {
-  def -(other: T) = implicitly[Group[T]].minus(t, other)
+  def -(other: T): T = implicitly[Group[T]].minus(t, other)
 }
 
 class TimesOp[T: Ring](t: T) {
-  def *(other: T) = implicitly[Ring[T]].times(t, other)
+  def *(other: T): T = implicitly[Ring[T]].times(t, other)
 }
 
 class RichTraversable[T](t: TraversableOnce[T]) {
@@ -44,7 +44,7 @@ class RichTraversable[T](t: TraversableOnce[T]) {
   def group[K, V](implicit ev: <:<[T, (K, V)]): Map[K, List[V]] =
     MapAlgebra.group(t.asInstanceOf[TraversableOnce[(K, V)]])
 
-  def monoidSum(implicit monoid: Monoid[T]) = monoid.sum(t)
-  def sumOption(implicit sg: Semigroup[T]) = sg.sumOption(t)
-  def ringProduct(implicit ring: Ring[T]) = ring.product(t)
+  def monoidSum(implicit monoid: Monoid[T]): T = monoid.sum(t)
+  def sumOption(implicit sg: Semigroup[T]): Option[T] = sg.sumOption(t)
+  def ringProduct(implicit ring: Ring[T]): T = ring.product(t)
 }

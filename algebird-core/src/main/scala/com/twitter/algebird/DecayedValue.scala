@@ -26,9 +26,9 @@ object DecayedValue extends java.io.Serializable {
   def build[V](value: V, time: Double, halfLife: Double)(implicit num: Numeric[V]): DecayedValue =
     DecayedValue(num.toDouble(value), time * math.log(2.0) / halfLife)
 
-  val zero = DecayedValue(0.0, Double.NegativeInfinity)
+  val zero: DecayedValue = DecayedValue(0.0, Double.NegativeInfinity)
 
-  def scale(newv: DecayedValue, oldv: DecayedValue, eps: Double) = {
+  def scale(newv: DecayedValue, oldv: DecayedValue, eps: Double): DecayedValue = {
     val newValue = newv.value +
       math.exp(oldv.scaledTime - newv.scaledTime) * oldv.value
     if (math.abs(newValue) > eps) {
@@ -43,8 +43,8 @@ object DecayedValue extends java.io.Serializable {
 }
 
 case class DecayedValueMonoid(eps: Double) extends Monoid[DecayedValue] {
-  override val zero = DecayedValue(0.0, Double.NegativeInfinity)
-  override def plus(left: DecayedValue, right: DecayedValue) =
+  override val zero: DecayedValue = DecayedValue(0.0, Double.NegativeInfinity)
+  override def plus(left: DecayedValue, right: DecayedValue): DecayedValue =
     if (left < right) {
       // left is older:
       DecayedValue.scale(right, left, eps)
@@ -59,7 +59,7 @@ case class DecayedValueMonoid(eps: Double) extends Monoid[DecayedValue] {
 }
 
 case class DecayedValue(value: Double, scaledTime: Double) extends Ordered[DecayedValue] {
-  def compare(that: DecayedValue): Int =
+  override def compare(that: DecayedValue): Int =
     scaledTime.compareTo(that.scaledTime)
 
   // A DecayedValue can be translated to a moving average with the window size of its half-life.
@@ -68,7 +68,7 @@ case class DecayedValue(value: Double, scaledTime: Double) extends Ordered[Decay
   //   which is the integral of exp(-t(ln(2))/halflife) from 0 to infinity.
   //
   //   See: https://github.com/twitter/algebird/wiki/Using-DecayedValue-as-moving-average
-  def average(halfLife: Double) = {
+  def average(halfLife: Double): Double = {
     val normalization = halfLife / math.log(2)
     value / normalization
   }
@@ -77,7 +77,7 @@ case class DecayedValue(value: Double, scaledTime: Double) extends Ordered[Decay
    * Moving average assuming the signal started at zero a fixed point in the past.
    * This normalizes by the integral of exp(-t(ln(2))/halflife) from 0 to (endTime - startTime).
    */
-  def averageFrom(halfLife: Double, startTime: Double, endTime: Double) =
+  def averageFrom(halfLife: Double, startTime: Double, endTime: Double): Double =
     if (endTime > startTime) {
       val asOfEndTime =
         DecayedValue.scale(DecayedValue.build(0, endTime, halfLife), this, 0.0)
@@ -95,7 +95,7 @@ case class DecayedValue(value: Double, scaledTime: Double) extends Ordered[Decay
    * Works best when the timestamp resolution is 1.0
    */
 
-  def discreteAverage(halfLife: Double) = {
+  def discreteAverage(halfLife: Double): Double = {
     val normalization = 1.0 - math.pow(2, -1.0 / halfLife)
     value * normalization
   }

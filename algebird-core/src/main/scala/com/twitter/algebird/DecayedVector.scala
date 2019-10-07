@@ -22,7 +22,7 @@ package com.twitter.algebird
  * the newer one.
  */
 object DecayedVector {
-  def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double) =
+  def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
 
   def monoidWithEpsilon[C[_]](eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) =
@@ -36,9 +36,17 @@ object DecayedVector {
         }
     }
 
-  def forMap[K](m: Map[K, Double], scaledTime: Double) =
+  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ] =
     DecayedVector[({ type x[a] = Map[K, a] })#x](m, scaledTime)
-  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double) =
+  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[
+    ({
+      type x[a] = Map[K, a]
+    })#x
+  ] =
     forMap(m, time * scala.math.log(2.0) / halfLife)
 
   def mapMonoidWithEpsilon[K](

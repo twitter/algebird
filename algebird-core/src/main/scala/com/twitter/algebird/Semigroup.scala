@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.{Semigroup => ASemigroup}
-import algebra.ring.{AdditiveSemigroup}
+import algebra.ring.AdditiveSemigroup
 import java.lang.{
   Integer => JInt,
   Short => JShort,
@@ -85,7 +85,7 @@ abstract class AbstractSemigroup[T] extends Semigroup[T]
 class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R])
     extends Semigroup[Either[L, R]] {
 
-  override def plus(l: Either[L, R], r: Either[L, R]) =
+  override def plus(l: Either[L, R], r: Either[L, R]): Either[L, R] =
     if (l.isLeft) {
       // l is Left, r may or may not be:
       if (r.isRight) {
@@ -138,13 +138,13 @@ object Semigroup
       case Some(u) => sg.plus(t, u)
     }
   // This pattern is really useful for typeclasses
-  def plus[T](l: T, r: T)(implicit semi: Semigroup[T]) = semi.plus(l, r)
+  def plus[T](l: T, r: T)(implicit semi: Semigroup[T]): T = semi.plus(l, r)
   // Left sum: (((a + b) + c) + d)
   def sumOption[T](iter: TraversableOnce[T])(implicit sg: Semigroup[T]): Option[T] =
     sg.sumOption(iter)
 
   def from[T](associativeFn: (T, T) => T): Semigroup[T] =
-    new Semigroup[T] { def plus(l: T, r: T) = associativeFn(l, r) }
+    new Semigroup[T] { override def plus(l: T, r: T): T = associativeFn(l, r) }
 
   /**
    * Same as v + v + v .. + v (i times in total)

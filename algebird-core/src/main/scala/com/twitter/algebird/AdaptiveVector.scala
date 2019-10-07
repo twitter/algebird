@@ -87,7 +87,7 @@ object AdaptiveVector {
       case _            => true
     }
 
-    def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]) =
+    override def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]): AdaptiveVector[V] =
       if (left.sparseValue != right.sparseValue) {
         if (left.denseCount > right.denseCount)
           plus(withSparse(left, right.sparseValue), right)
@@ -114,10 +114,10 @@ object AdaptiveVector {
       }
   }
   private class AVMonoid[V: Monoid] extends AVSemigroup[V] with Monoid[AdaptiveVector[V]] {
-    val zero = AdaptiveVector.fill[V](0)(Monoid.zero[V])
-    override def isNonZero(v: AdaptiveVector[V]) = !isZero(v)
+    override val zero: AdaptiveVector[V] = AdaptiveVector.fill[V](0)(Monoid.zero[V])
+    override def isNonZero(v: AdaptiveVector[V]): Boolean = !isZero(v)
 
-    def isZero(v: AdaptiveVector[V]) = (v.size == 0) || {
+    def isZero(v: AdaptiveVector[V]): Boolean = (v.size == 0) || {
       val sparseAreZero =
         if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
       sparseAreZero &&
@@ -127,7 +127,7 @@ object AdaptiveVector {
     }
   }
   private class AVGroup[V: Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
-    override def negate(v: AdaptiveVector[V]) =
+    override def negate(v: AdaptiveVector[V]): AdaptiveVector[V] =
       fromVector(toVector(v).map(Group.negate(_)), Group.negate(v.sparseValue))
   }
 
@@ -172,13 +172,13 @@ object AdaptiveVector {
  * immutable algebras based on the sparsity of the vectors.
  */
 sealed trait AdaptiveVector[V] extends IndexedSeq[V] {
-  def length = size
+  override def length: Int = size
   def sparseValue: V
 
   /** How many items are not sparse */
   def denseCount: Int
   def size: Int
-  def apply(idx: Int): V
+  override def apply(idx: Int): V
   def updated(idx: Int, v: V): AdaptiveVector[V]
 
   /** Grow by adding count sparse values to the end */
@@ -195,9 +195,9 @@ sealed trait AdaptiveVector[V] extends IndexedSeq[V] {
 case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override val denseCount: Int)
     extends AdaptiveVector[V] {
 
-  override def size = iseq.size
-  def apply(idx: Int) = iseq(idx)
-  def updated(idx: Int, v: V): AdaptiveVector[V] = {
+  override def size: Int = iseq.size
+  override def apply(idx: Int): V = iseq(idx)
+  override def updated(idx: Int, v: V): AdaptiveVector[V] = {
     val oldIsSparse = if (iseq(idx) == sparseValue) 1 else 0
     val newIsSparse = if (v == sparseValue) 1 else 0
     val newCount = denseCount - newIsSparse + oldIsSparse
@@ -208,7 +208,7 @@ case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override
       DenseVector(iseq.updated(idx, v), sparseValue, newCount)
     }
   }
-  def extend(cnt: Int) = {
+  override def extend(cnt: Int): AdaptiveVector[V] = {
     val newSize = size + cnt
     if (denseCount < newSize * AdaptiveVector.THRESHOLD) {
       // Go sparse
@@ -219,7 +219,7 @@ case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override
     }
   }
 
-  def denseIterator =
+  override def denseIterator: Iterator[(Int, V)] =
     iseq.view.zipWithIndex
       .filter { _._1 != sparseValue }
       .map { _.swap }
@@ -229,12 +229,12 @@ case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override
 case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, override val size: Int)
     extends AdaptiveVector[V] {
 
-  def denseCount: Int = map.size
-  def apply(idx: Int) = {
+  override def denseCount: Int = map.size
+  override def apply(idx: Int): V = {
     require(idx >= 0 && idx < size, "Index out of range")
     map.getOrElse(idx, sparseValue)
   }
-  def updated(idx: Int, v: V): AdaptiveVector[V] =
+  override def updated(idx: Int, v: V): AdaptiveVector[V] =
     if (v == sparseValue) {
       SparseVector(map - idx, sparseValue, size)
     } else {
@@ -246,8 +246,8 @@ case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, overri
         SparseVector(newM, sparseValue, size)
       }
     }
-  def extend(cnt: Int) = SparseVector(map, sparseValue, size + cnt)
+  override def extend(cnt: Int): SparseVector[V] = SparseVector(map, sparseValue, size + cnt)
 
   private lazy val sortedList = map.toList.sortBy { _._1 }
-  def denseIterator = sortedList.iterator
+  override def denseIterator: Iterator[(Int, V)] = sortedList.iterator
 }

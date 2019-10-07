@@ -35,16 +35,16 @@ trait StatefulSummer[V] extends Buffered[V, V] {
  */
 class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
   var summed: Option[V] = None
-  def put(item: V) = {
+  override def put(item: V): None.type = {
     summed = Semigroup.plus(summed, Some(item))
     None
   }
-  def flush = {
+  override def flush: Option[V] = {
     val res = summed
     summed = None
     res
   }
-  def isFlushed = summed.isEmpty
+  override def isFlushed: Boolean = summed.isEmpty
 }
 
 class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V])
@@ -52,5 +52,5 @@ class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V]
     with StatefulSummer[V]
     with BufferedReduce[V] {
 
-  def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
+  override def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
 }

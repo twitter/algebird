@@ -54,7 +54,7 @@ private[algebird] sealed abstract class LastInstances {
    */
   def lastSemigroup[T]: Semigroup[T] with Band[T] =
     new Semigroup[T] with Band[T] {
-      def plus(l: T, r: T): T = r
+      override def plus(l: T, r: T): T = r
       override def sumOption(ts: TraversableOnce[T]): Option[T] = {
         var res: Option[T] = None
         ts.foreach { t =>
@@ -78,7 +78,7 @@ private[algebird] sealed abstract class LastInstances {
  * aggregated stream.
  */
 case class LastAggregator[T]() extends Aggregator[T, T, T] {
-  def prepare(v: T) = v
-  val semigroup: Semigroup[T] = Last.lastSemigroup[T]
-  def present(v: T) = v
+  override def prepare(v: T): T = v
+  override val semigroup: Semigroup[T] = Last.lastSemigroup[T]
+  override def present(v: T): T = v
 }

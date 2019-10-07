@@ -129,7 +129,7 @@ object Batched {
    */
   implicit def equiv[A](implicit e: Equiv[A], s: Semigroup[A]): Equiv[Batched[A]] =
     new Equiv[Batched[A]] {
-      def equiv(x: Batched[A], y: Batched[A]): Boolean =
+      override def equiv(x: Batched[A], y: Batched[A]): Boolean =
         e.equiv(x.sum(s), y.sum(s))
     }
 
@@ -141,7 +141,7 @@ object Batched {
    */
   implicit def semigroup[A]: Semigroup[Batched[A]] =
     new Semigroup[Batched[A]] {
-      def plus(x: Batched[A], y: Batched[A]): Batched[A] = x.combine(y)
+      override def plus(x: Batched[A], y: Batched[A]): Batched[A] = x.combine(y)
     }
 
   /**
@@ -178,10 +178,10 @@ object Batched {
    */
   def aggregator[A, B, C](batchSize: Int, agg: Aggregator[A, B, C]): Aggregator[A, Batched[B], C] =
     new Aggregator[A, Batched[B], C] {
-      def prepare(a: A): Batched[B] = Item(agg.prepare(a))
-      def semigroup: Semigroup[Batched[B]] =
+      override def prepare(a: A): Batched[B] = Item(agg.prepare(a))
+      override def semigroup: Semigroup[Batched[B]] =
         new BatchedSemigroup(batchSize)(agg.semigroup)
-      def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
+      override def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
     }
 
   /**
@@ -197,9 +197,9 @@ object Batched {
       agg: MonoidAggregator[A, B, C]
   ): MonoidAggregator[A, Batched[B], C] =
     new MonoidAggregator[A, Batched[B], C] {
-      def prepare(a: A): Batched[B] = Item(agg.prepare(a))
-      def monoid: Monoid[Batched[B]] = new BatchedMonoid(batchSize)(agg.monoid)
-      def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
+      override def prepare(a: A): Batched[B] = Item(agg.prepare(a))
+      override def monoid: Monoid[Batched[B]] = new BatchedMonoid(batchSize)(agg.monoid)
+      override def present(b: Batched[B]): C = agg.present(b.sum(agg.semigroup))
     }
 
   def foldOption[T: Semigroup](batchSize: Int): Fold[T, Option[T]] =
@@ -221,8 +221,8 @@ object Batched {
    * This represents a single (unbatched) value.
    */
   private[algebird] case class Item[T](t: T) extends Batched[T] {
-    def size: Int = 1
-    def sum(implicit sg: Semigroup[T]): T = t
+    override def size: Int = 1
+    override def sum(implicit sg: Semigroup[T]): T = t
   }
 
   /**
@@ -232,9 +232,9 @@ object Batched {
    */
   private[algebird] case class Items[T](left: Batched[T], right: Batched[T]) extends Batched[T] {
     // Items#size will always be >= 2.
-    val size: Int = left.size + right.size
+    override val size: Int = left.size + right.size
 
-    def sum(implicit sg: Semigroup[T]): T =
+    override def sum(implicit sg: Semigroup[T]): T =
       sg.sumOption(new ForwardItemsIterator(this)).get
   }
 
@@ -261,10 +261,10 @@ object Batched {
 
     def descend(v: Batched[A]): A
 
-    def hasNext: Boolean =
+    override def hasNext: Boolean =
       running
 
-    def next(): A =
+    override def next(): A =
       if (running) {
         val result = ready
         ascend()
@@ -278,7 +278,7 @@ object Batched {
    * Left-to-right iterator through a batch's tree.
    */
   private[algebird] class ForwardItemsIterator[A](root: Batched[A]) extends ItemsIterator[A](root) {
-    def descend(v: Batched[A]): A = {
+    override def descend(v: Batched[A]): A = {
       @inline @tailrec def descend0(v: Batched[A]): A =
         v match {
           case Items(lhs, rhs) =>
@@ -295,7 +295,7 @@ object Batched {
    * Right-to-left iterator through a batch's tree.
    */
   private[algebird] class ReverseItemsIterator[A](root: Batched[A]) extends ItemsIterator[A](root) {
-    def descend(v: Batched[A]): A = {
+    override def descend(v: Batched[A]): A = {
       @inline @tailrec def descend0(v: Batched[A]): A =
         v match {
           case Items(lhs, rhs) =>
@@ -320,7 +320,7 @@ class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T
 
   require(batchSize > 0, s"Batch size must be > 0, found: $batchSize")
 
-  def plus(a: Batched[T], b: Batched[T]): Batched[T] =
+  override def plus(a: Batched[T], b: Batched[T]): Batched[T] =
     a.combine(b).compact(batchSize)
 }
 
@@ -334,7 +334,7 @@ class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T
 class BatchedMonoid[T: Monoid](batchSize: Int)
     extends BatchedSemigroup[T](batchSize)
     with Monoid[Batched[T]] {
-  val zero: Batched[T] = Batched(Monoid.zero)
+  override val zero: Batched[T] = Batched(Monoid.zero)
 
   // if we knew that (a+b=0) only for (a=0, b=0), we could instead do:
   //   new Batched.ItemsIterator(b).exists(monoid.isNonZero)

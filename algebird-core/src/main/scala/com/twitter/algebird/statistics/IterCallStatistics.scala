@@ -28,8 +28,8 @@ private class IterCallStatistics(threadSafe: Boolean) {
     import scala.math.min
     import java.lang.Long.numberOfLeadingZeros
     val maxBucket = 10
-    val distribution = IndexedSeq.fill(maxBucket + 1) { Counter(threadSafe) }
-    val total = Counter(threadSafe)
+    val distribution: IndexedSeq[Counter] = IndexedSeq.fill(maxBucket + 1) { Counter(threadSafe) }
+    val total: Counter = Counter(threadSafe)
 
     def put(v: Long): Unit = {
       total.add(v)
@@ -38,11 +38,11 @@ private class IterCallStatistics(threadSafe: Boolean) {
       distribution(bucket).increment
     }
 
-    def count = distribution.foldLeft(0L) { _ + _.get } // sum
+    def count: Long = distribution.foldLeft(0L) { _ + _.get } // sum
 
     def pow2(i: Int): Int = 1 << i
 
-    override def toString =
+    override def toString: String =
       distribution.zipWithIndex
         .map {
           case (v, i) =>
@@ -58,13 +58,13 @@ private class IterCallStatistics(threadSafe: Boolean) {
   /** used to count how many values are pulled from the Iterator without iterating twice */
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
     private[this] final var nextCount: Long = 0
-    override def hasNext = i.hasNext
-    override def next = {
+    override def hasNext: Boolean = i.hasNext
+    override def next: T = {
       val n = i.next
       nextCount += 1
       n
     }
-    def getNextCount = nextCount
+    def getNextCount: Long = nextCount
   }
 
   /** measures the time spent calling f on iter and the size of iter */
@@ -78,10 +78,10 @@ private class IterCallStatistics(threadSafe: Boolean) {
     r
   }
 
-  def getCallCount = countStats.count
-  def getTotalCallTime = totalCallTime.get
+  def getCallCount: Long = countStats.count
+  def getTotalCallTime: Long = totalCallTime.get
 
-  override def toString =
+  override def toString: String =
     countStats.toString + ", " +
       "total time: " + totalCallTime + "ms, " +
       "avg time: " + (totalCallTime.toDouble / countStats.count)

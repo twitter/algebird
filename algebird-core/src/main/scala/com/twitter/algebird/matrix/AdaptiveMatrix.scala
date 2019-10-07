@@ -26,7 +26,7 @@ import com.twitter.algebird.{AdaptiveVector, Monoid}
 abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
   def rows: Int
   def cols: Int
-  def size = rows * cols
+  def size: Int = rows * cols
 
   def getValue(position: (Int, Int)): V
 
@@ -36,7 +36,7 @@ abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
 }
 
 object AdaptiveMatrix {
-  def zero[V: Monoid](rows: Int, cols: Int) =
+  def zero[V: Monoid](rows: Int, cols: Int): AdaptiveMatrix[V] =
     fill(rows, cols)(implicitly[Monoid[V]].zero)
 
   def fill[V: Monoid](rows: Int, cols: Int)(fill: V): AdaptiveMatrix[V] =
@@ -53,7 +53,7 @@ object AdaptiveMatrix {
       override def zero: AdaptiveMatrix[V] =
         SparseColumnMatrix[V](IndexedSeq[AdaptiveVector[V]]())
 
-      override def plus(a: AdaptiveMatrix[V], b: AdaptiveMatrix[V]) =
+      override def plus(a: AdaptiveMatrix[V], b: AdaptiveMatrix[V]): AdaptiveMatrix[V] =
         sumOption(List(a, b)).get
 
       private def denseInsert(
@@ -77,7 +77,7 @@ object AdaptiveMatrix {
         denseInsert(rows, cols, buffer, remainder)
       }
 
-      private def sparseUpdate(storage: IndexedSeq[MMap[Int, V]], other: SparseColumnMatrix[V]) =
+      private def sparseUpdate(storage: IndexedSeq[MMap[Int, V]], other: SparseColumnMatrix[V]): Unit =
         other.rowsByColumns.zipWithIndex.foreach {
           case (contents, indx) =>
             val curMap: MMap[Int, V] = storage(indx)

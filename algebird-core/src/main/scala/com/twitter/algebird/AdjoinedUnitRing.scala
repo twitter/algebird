@@ -32,24 +32,24 @@ object AdjoinedUnit {
 }
 
 class AdjoinedUnitRing[T](implicit rng: Rng[T]) extends Ring[AdjoinedUnit[T]] {
-  val one = AdjoinedUnit[T](BigInt(1), rng.zero)
-  val zero = AdjoinedUnit[T](rng.zero)
+  override val one: AdjoinedUnit[T] = AdjoinedUnit[T](BigInt(1), rng.zero)
+  override val zero: AdjoinedUnit[T] = AdjoinedUnit[T](rng.zero)
 
   private[this] val group: Group[T] =
     new FromAlgebraGroup(rng.additive)
 
-  override def isNonZero(it: AdjoinedUnit[T]) =
+  override def isNonZero(it: AdjoinedUnit[T]): Boolean =
     (it.ones != 0) || group.isNonZero(it.get)
 
-  def plus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) =
+  override def plus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]): AdjoinedUnit[T] =
     AdjoinedUnit(left.ones + right.ones, rng.plus(left.get, right.get))
 
-  override def negate(it: AdjoinedUnit[T]) =
+  override def negate(it: AdjoinedUnit[T]): AdjoinedUnit[T] =
     AdjoinedUnit(-it.ones, rng.negate(it.get))
-  override def minus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) =
+  override def minus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]): AdjoinedUnit[T] =
     AdjoinedUnit(left.ones - right.ones, rng.minus(left.get, right.get))
 
-  def times(left: AdjoinedUnit[T], right: AdjoinedUnit[T]) = {
+  override def times(left: AdjoinedUnit[T], right: AdjoinedUnit[T]): AdjoinedUnit[T] = {
     // (n1, g1) * (n2, g2) = (n1*n2, (n1*g1) + (n2*g1) + (g1*g2))
     import Group.intTimes
 

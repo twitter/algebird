@@ -49,9 +49,9 @@ final case class Bytes(array: Array[Byte]) extends java.io.Serializable {
   override def toString: String =
     array.map(_.toString).mkString("Bytes(", ",", ")")
 
-  def apply(idx: Int) = array.apply(idx)
+  def apply(idx: Int): Byte = array.apply(idx)
 
-  def size = array.size
+  def size: Int = array.size
 }
 
 object Bytes {
@@ -59,7 +59,7 @@ object Bytes {
   private val HashSeed = 0
 
   implicit val ordering: Ordering[Bytes] = new Ordering[Bytes] {
-    def compare(a: Bytes, b: Bytes): Int =
+    override def compare(a: Bytes, b: Bytes): Int =
       ByteBuffer.wrap(a.array).compareTo(ByteBuffer.wrap(b.array))
   }
 

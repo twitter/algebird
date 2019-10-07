@@ -19,9 +19,12 @@ import scala.collection.mutable.ArrayBuffer
 
 import com.twitter.algebird.Monoid
 
-case class DenseMatrix[V: Monoid](rows: Int, cols: Int, rowsByColumns: IndexedSeq[V])
-    extends AdaptiveMatrix[V] {
-  val valueMonoid = implicitly[Monoid[V]]
+case class DenseMatrix[V: Monoid](
+    override val rows: Int,
+    override val cols: Int,
+    rowsByColumns: IndexedSeq[V]
+) extends AdaptiveMatrix[V] {
+  val valueMonoid: Monoid[V] = implicitly[Monoid[V]]
 
   private[this] def tupToIndex(position: (Int, Int)) =
     position._1 * cols + position._2

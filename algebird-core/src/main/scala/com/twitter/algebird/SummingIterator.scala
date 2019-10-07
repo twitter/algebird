@@ -47,9 +47,9 @@ class SummingIterator[V](summer: StatefulSummer[V], it: Iterator[V])
     with Iterator[V] {
 
   // This has to be lazy because it shouldn't be touched until the val it is exhausted
-  protected lazy val tailIter = summer.flush.iterator
-  def hasNext: Boolean = it.hasNext || tailIter.hasNext
-  def next = nextInternal
+  protected lazy val tailIter: Iterator[V] = summer.flush.iterator
+  override def hasNext: Boolean = it.hasNext || tailIter.hasNext
+  override def next: V = nextInternal
 
   @tailrec
   private def nextInternal: V =

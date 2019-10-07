@@ -36,7 +36,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
   require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
 
   override val semigroup = new MapMonoid[K, V]
-  protected def optNonEmpty(m: Map[K, V]) = if (m.isEmpty) None else Some(m)
+  protected def optNonEmpty(m: Map[K, V]): Option[Map[K, V]] = if (m.isEmpty) None else Some(m)
 
   override def put(m: Map[K, V]): Option[Map[K, V]] = {
     val replaced = m.map {
@@ -62,13 +62,13 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
     cache.clear
     res
   }
-  def isFlushed = cache.isEmpty
+  override def isFlushed: Boolean = cache.isEmpty
 
   protected var lastEvicted: Map[K, V] = Map.empty[K, V]
   // TODO fancier caches will give better performance:
   protected lazy val cache: MMap[K, V] =
     (new JLinkedHashMap[K, V](capacity + 1, 0.75f, true) {
-      override protected def removeEldestEntry(eldest: JMap.Entry[K, V]) =
+      override protected def removeEldestEntry(eldest: JMap.Entry[K, V]): Boolean =
         if (super.size > capacity) {
           lastEvicted += (eldest.getKey -> eldest.getValue)
           true

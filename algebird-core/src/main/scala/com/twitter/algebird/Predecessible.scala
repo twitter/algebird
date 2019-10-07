@@ -30,7 +30,7 @@ trait Predecessible[T] extends java.io.Serializable {
     // to reduce generated class size due to all the methods in Iterable.
     // https://github.com/twitter/algebird/issues/263
     new AbstractIterable[T] {
-      def iterator =
+      override def iterator: Iterator[T] =
         Iterator
           .iterate[Option[T]](Some(old)) { self.prev(_) }
           .takeWhile(_.isDefined)
@@ -59,8 +59,8 @@ object Predecessible extends java.io.Serializable {
    */
   def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] =
     new Predecessible[T] {
-      def prev(t: T) = prevFn(t)
-      def ordering = ord
+      override def prev(t: T): Option[T] = prevFn(t)
+      override def ordering: Ordering[T] = ord
     }
   // enables: Predecessible.prev(2) == Some(1)
   def prev[T](t: T)(implicit p: Predecessible[T]): Option[T] = p.prev(t)
@@ -88,7 +88,7 @@ object IntegralPredecessible {
 class IntegralPredecessible[T: Integral] extends Predecessible[T] {
   private[this] val integral = implicitly[Integral[T]]
 
-  def prev(old: T) = IntegralPredecessible.prev(old)
+  override def prev(old: T): Option[T] = IntegralPredecessible.prev(old)
 
-  def ordering: Ordering[T] = integral
+  override def ordering: Ordering[T] = integral
 }

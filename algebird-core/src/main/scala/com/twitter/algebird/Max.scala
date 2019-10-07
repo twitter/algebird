@@ -66,7 +66,7 @@ object Max extends MaxInstances {
    */
   def maxSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
     new Semigroup[T] with Semilattice[T] {
-      def plus(l: T, r: T): T = ord.max(l, r)
+      override def plus(l: T, r: T): T = ord.max(l, r)
     }
 }
 
@@ -114,9 +114,9 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
   def monoid[T: Ordering](zero: => T): Monoid[Max[T]] with BoundedSemilattice[Max[T]] = {
     val z = zero // avoid confusion below when overriding zero
     new Monoid[Max[T]] with BoundedSemilattice[Max[T]] {
-      val zero = Max(z)
-      val ord = implicitly[Ordering[T]]
-      def plus(l: Max[T], r: Max[T]): Max[T] =
+      override val zero: Max[T] = Max(z)
+      val ord: Ordering[T] = implicitly[Ordering[T]]
+      override def plus(l: Max[T], r: Max[T]): Max[T] =
         if (ord.gteq(l.get, r.get)) l else r
     }
   }
@@ -130,8 +130,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
     // implementation does no allocation other than the outer `Option`
     // and `plus` doesn't do any allocation.
     new Semigroup[Max[T]] with Semilattice[Max[T]] {
-      val ord = implicitly[Ordering[T]]
-      def plus(l: Max[T], r: Max[T]): Max[T] =
+      val ord: Ordering[T] = implicitly[Ordering[T]]
+      override def plus(l: Max[T], r: Max[T]): Max[T] =
         if (ord.gteq(l.get, r.get)) l else r
     }
 
@@ -182,7 +182,7 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
    */
   implicit def vectorMonoid[T: Ordering]: Monoid[Max[Vector[T]]] with BoundedSemilattice[Max[Vector[T]]] =
     monoid[Vector[T]](Vector.empty[T])(new Ordering[Vector[T]] {
-      def compare(l: Vector[T], r: Vector[T]): Int =
+      override def compare(l: Vector[T], r: Vector[T]): Int =
         if (l eq r) 0
         else iteratorCompare(l.iterator, r.iterator)
     })
@@ -194,7 +194,7 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
    */
   implicit def streamMonoid[T: Ordering]: Monoid[Max[Stream[T]]] with BoundedSemilattice[Max[Stream[T]]] =
     monoid[Stream[T]](Stream.empty[T])(new Ordering[Stream[T]] {
-      def compare(l: Stream[T], r: Stream[T]): Int =
+      override def compare(l: Stream[T], r: Stream[T]): Int =
         if (l eq r) 0
         else iteratorCompare(l.iterator, r.iterator)
     })
@@ -205,7 +205,7 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
  * aggregated stream.
  */
 case class MaxAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
-  def prepare(v: T) = v
-  val semigroup = Max.maxSemigroup[T]
-  def present(v: T) = v
+  override def prepare(v: T): T = v
+  override val semigroup: Semigroup[T] with Semilattice[T] = Max.maxSemigroup[T]
+  override def present(v: T): T = v
 }

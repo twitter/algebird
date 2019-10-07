@@ -28,9 +28,9 @@ object RightFolded {
   def monoid[In, Out](foldfn: (In, Out) => Out) =
     new Monoid[RightFolded[In, Out]] {
 
-      val zero = RightFoldedZero
+      override val zero: RightFoldedZero.type = RightFoldedZero
 
-      def plus(left: RightFolded[In, Out], right: RightFolded[In, Out]) =
+      override def plus(left: RightFolded[In, Out], right: RightFolded[In, Out]): RightFolded[In, Out] =
         left match {
           case RightFoldedValue(_) => left
           case RightFoldedZero     => right

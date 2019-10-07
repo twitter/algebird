@@ -221,7 +221,7 @@ object HyperLogLog {
     SparseHLL(bits, maxRhow)
   }
 
-  def alpha(bits: Int) = bits match {
+  def alpha(bits: Int): Double = bits match {
 
     case 4 => 0.673
     case 5 => 0.697
@@ -396,19 +396,19 @@ sealed abstract class HLL extends java.io.Serializable {
   protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL
 }
 
-case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
+case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
 
-  val size = 1 << bits
+  override val size: Int = 1 << bits
 
-  lazy val zeroCnt = size - maxRhow.size
+  override lazy val zeroCnt: Int = size - maxRhow.size
 
-  lazy val z = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj =>
+  override lazy val z: Double = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj =>
     HyperLogLog.negativePowersOfTwo(mj.get)
   }.sum)
 
-  def +(other: HLL) =
+  override def +(other: HLL): HLL =
     other match {
 
       case sparse @ SparseHLL(_, oMaxRhow) =>
@@ -443,9 +443,9 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
     Bytes(array)
   }
 
-  lazy val toDenseHLL = DenseHLL(bits, sparseMapToArray(maxRhow))
+  override lazy val toDenseHLL: DenseHLL = DenseHLL(bits, sparseMapToArray(maxRhow))
 
-  def updateInto(buffer: Array[Byte]): Unit = {
+  override def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
     maxRhow.foreach {
       case (idx, maxb) =>
@@ -470,16 +470,16 @@ case class SparseHLL(bits: Int, maxRhow: Map[Int, Max[Byte]]) extends HLL {
 /**
  * These are the individual instances which the Monoid knows how to add
  */
-case class DenseHLL(bits: Int, v: Bytes) extends HLL {
+case class DenseHLL(override val bits: Int, v: Bytes) extends HLL {
 
   assert(v.size == (1 << bits), "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
 
-  def size = v.size
+  override def size: Int = v.size
 
   // Named from the parameter in the paper, probably never useful to anyone
   // except HyperLogLogMonoid
 
-  lazy val (zeroCnt, z) = {
+  override lazy val (zeroCnt, z) = {
     var count: Int = 0
     var res: Double = 0
 
@@ -500,7 +500,7 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
     (count, 1.0 / res)
   }
 
-  def +(other: HLL): HLL =
+  override def +(other: HLL): HLL =
     other match {
 
       case SparseHLL(_, _) => (other + this)
@@ -525,8 +525,8 @@ case class DenseHLL(bits: Int, v: Bytes) extends HLL {
         DenseHLL(bits, Bytes(newContents))
     }
 
-  val toDenseHLL = this
-  def updateInto(buffer: Array[Byte]): Unit = {
+  override val toDenseHLL: DenseHLL = this
+  override def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
 
     val arr: Array[Byte] = v.array
@@ -562,14 +562,14 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
 
   assert(bits > 3, "Use at least 4 bits (2^(bits) = bytes consumed)")
 
-  val size = 1 << bits
+  val size: Int = 1 << bits
 
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
-  def apply[T <% Array[Byte]](t: T) = create(t)
+  def apply[T <% Array[Byte]](t: T): HLL = create(t)
 
-  val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
+  override val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
 
-  def plus(left: HLL, right: HLL) = left + right
+  override def plus(left: HLL, right: HLL): HLL = left + right
 
   private[this] final def denseUpdate(existing: HLL, iter: Iterator[HLL]): HLL = {
     val buffer = new Array[Byte](size)
@@ -714,17 +714,17 @@ object HyperLogLogAggregator {
 
 case class GenHLLAggregator[K](val hllMonoid: HyperLogLogMonoid, val hash: Hash128[K])
     extends MonoidAggregator[K, HLL, HLL] {
-  def monoid = hllMonoid
-  def prepare(k: K) = hllMonoid.toHLL(k)(hash)
-  def present(hll: HLL) = hll
+  override def monoid: HyperLogLogMonoid = hllMonoid
+  override def prepare(k: K): HLL = hllMonoid.toHLL(k)(hash)
+  override def present(hll: HLL): HLL = hll
 }
 
 case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid)
     extends MonoidAggregator[Array[Byte], HLL, HLL] {
-  val monoid = hllMonoid
+  override val monoid: HyperLogLogMonoid = hllMonoid
 
-  def prepare(value: Array[Byte]) = monoid.create(value)
-  def present(hll: HLL) = hll
+  override def prepare(value: Array[Byte]): HLL = monoid.create(value)
+  override def present(hll: HLL): HLL = hll
 }
 
 /**
@@ -733,17 +733,18 @@ case class HyperLogLogAggregator(val hllMonoid: HyperLogLogMonoid)
 abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
     extends EventuallyMonoidAggregator[A, HLL, Set[A], Long] {
 
-  def presentLeft(hll: HLL) = hll.approximateSize.estimate
+  override def presentLeft(hll: HLL): Long = hll.approximateSize.estimate
 
-  def mustConvert(set: Set[A]) = set.size > maxSetSize
+  override def mustConvert(set: Set[A]): Boolean = set.size > maxSetSize
 
-  val leftSemigroup = new HyperLogLogMonoid(hllBits)
-  val rightAggregator = Aggregator.uniqueCount[A].andThenPresent { _.toLong }
+  override val leftSemigroup = new HyperLogLogMonoid(hllBits)
+  override val rightAggregator: MonoidAggregator[A, Set[A], Long] =
+    Aggregator.uniqueCount[A].andThenPresent { _.toLong }
 }
 
 case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
-  def convert(set: Set[A]) = leftSemigroup.batchCreate(set.map(toBytes))
+  override def convert(set: Set[A]): HLL = leftSemigroup.batchCreate(set.map(toBytes))
 }
 
 /**
@@ -753,7 +754,7 @@ case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toB
  */
 case class SetSizeHashAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit hash: Hash128[A])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
-  def convert(set: Set[A]) =
+  override def convert(set: Set[A]): HLL =
     leftSemigroup.sum(set.iterator.map { a =>
       leftSemigroup.toHLL(a)(hash)
     })
