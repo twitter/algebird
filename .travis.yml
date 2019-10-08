@@ -40,6 +40,10 @@ matrix:
         "++$TRAVIS_SCALA_VERSION clean" \
         "++$TRAVIS_SCALA_VERSION test"
 
+    - scala: 2.13.1
+      jdk: openjdk8
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; test"
+
 before_install:
   - export PATH=${PATH}:./vendor/bundle
 
