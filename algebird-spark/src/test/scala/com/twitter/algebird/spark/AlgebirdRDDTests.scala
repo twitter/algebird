@@ -1,10 +1,9 @@
 package com.twitter.algebird.spark
 
-import com.twitter.algebird.{MapAlgebra, Min, Monoid, Semigroup}
+import com.twitter.algebird.{MapAlgebra, Monoid, Semigroup}
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.scalatest._
-import org.scalatest.DiagrammedAssertions._
 import scala.reflect.ClassTag
 
 package test {
@@ -20,8 +19,6 @@ package test {
  * Leaving at least a compilation test of using with spark
  */
 class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
-  private val master = "local[2]"
-  private val appName = "algebird-rdd-test"
 
   private var sc: SparkContext = _
 
@@ -52,12 +49,13 @@ class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
   def equiv[V](a: V, b: V)(implicit eq: Equiv[V]): Boolean = eq.equiv(a, b)
   def assertEq[V: Equiv](a: V, b: V): Unit = assert(equiv(a, b))
 
-  def aggregate[T: ClassTag, U: ClassTag, V: Equiv](s: Seq[T], agg: AlgebirdAggregator[T, U, V]) {
+  def aggregate[T: ClassTag, U: ClassTag, V: Equiv](s: Seq[T], agg: AlgebirdAggregator[T, U, V]): Unit =
     assertEq(sc.makeRDD(s).algebird.aggregate(agg), agg(s))
-  }
 
-  def aggregateByKey[K: ClassTag, T: ClassTag, U: ClassTag, V: Equiv](s: Seq[(K, T)],
-                                                                      agg: AlgebirdAggregator[T, U, V]) {
+  def aggregateByKey[K: ClassTag, T: ClassTag, U: ClassTag, V: Equiv](
+      s: Seq[(K, T)],
+      agg: AlgebirdAggregator[T, U, V]
+  ): Unit = {
     val resMap = sc.makeRDD(s).algebird.aggregateByKey[K, T, U, V](agg).collect.toMap
     implicit val sg = agg.semigroup
     val algMap = MapAlgebra.sumByKey(s.map { case (k, t) => k -> agg.prepare(t) }).mapValues(agg.present)
@@ -66,11 +64,10 @@ class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
     }
   }
 
-  def sumOption[T: ClassTag: Equiv: Semigroup](s: Seq[T]) {
+  def sumOption[T: ClassTag: Equiv: Semigroup](s: Seq[T]): Unit =
     assertEq(sc.makeRDD(s).algebird.sumOption, Semigroup.sumOption(s))
-  }
 
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup: Equiv](s: Seq[(K, V)]) {
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup: Equiv](s: Seq[(K, V)]): Unit = {
     val resMap = sc.makeRDD(s).algebird.sumByKey[K, V].collect.toMap
     val algMap = MapAlgebra.sumByKey(s)
     s.map(_._1).toSet.foreach { k: K =>

@@ -51,13 +51,14 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](agg: Aggregator[V1, U, V2])(
-      implicit ev: T <:< (K, V1),
-      ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] =
+  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](
+      agg: Aggregator[V1, U, V2]
+  )(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] =
     aggregateByKey(Partitioner.defaultPartitioner(rdd), agg)
 
-  private def toPair[K: ClassTag, V: ClassTag](kv: RDD[(K, V)])(
-      implicit ordK: Priority[Ordering[K], DummyImplicit]) =
+  private def toPair[K: ClassTag, V: ClassTag](
+      kv: RDD[(K, V)]
+  )(implicit ordK: Priority[Ordering[K], DummyImplicit]) =
     new PairRDDFunctions(kv)(implicitly, implicitly, ordK.getPreferred.orNull)
 
   /**
@@ -65,9 +66,10 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](part: Partitioner, agg: Aggregator[V1, U, V2])(
-      implicit ev: T <:< (K, V1),
-      ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] = {
+  def aggregateByKey[K: ClassTag, V1, U: ClassTag, V2](
+      part: Partitioner,
+      agg: Aggregator[V1, U, V2]
+  )(implicit ev: T <:< (K, V1), ordK: Priority[Ordering[K], DummyImplicit]): RDD[(K, V2)] = {
     /*
      * This mapValues implementation allows us to avoid needing the V1 ClassTag, which would
      * be required to use the implementation in PairRDDFunctions
@@ -78,8 +80,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
 
     toPair(
       toPair(prepared)
-        .reduceByKey(part, agg.reduce(_, _)))
-      .mapValues(agg.present)
+        .reduceByKey(part, agg.reduce(_, _))
+    ).mapValues(agg.present)
   }
 
   private def keyed[K, V](implicit ev: T <:< (K, V)): RDD[(K, V)] = rdd.asInstanceOf[RDD[(K, V)]]
@@ -89,8 +91,10 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit ev: T <:< (K, V),
-                                                    ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](
+      implicit ev: T <:< (K, V),
+      ord: Priority[Ordering[K], DummyImplicit]
+  ): RDD[(K, V)] =
     sumByKey(Partitioner.defaultPartitioner(rdd))
 
   /**
@@ -100,7 +104,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * Unfortunately we need to use a different name than sumByKey in scala 2.11
    */
   def sumByKey[K: ClassTag, V: ClassTag: Semigroup](
-      part: Partitioner)(implicit ev: T <:< (K, V), ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
+      part: Partitioner
+  )(implicit ev: T <:< (K, V), ord: Priority[Ordering[K], DummyImplicit]): RDD[(K, V)] =
     toPair(keyed).reduceByKey(part, implicitly[Semigroup[V]].plus _)
 
   /**
