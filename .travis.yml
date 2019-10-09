@@ -4,7 +4,7 @@ matrix:
   include:
     - scala: 2.10.6
       jdk: openjdk8
-      script: sbt ++$TRAVIS_SCALA_VERSION clean test mimaReportBinaryIssues
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; test; mimaReportBinaryIssues"
       #script: ./sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - name: checks
@@ -16,14 +16,22 @@ matrix:
 
     - scala: 2.11.12
       jdk: openjdk8
-      script: sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport mimaReportBinaryIssues
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; coverage; test; coverageReport; mimaReportBinaryIssues"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
+    - scala: 2.11.12
+      jdk: openjdk11
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; test"
+
     - scala: 2.12.9
       jdk: openjdk8
-      script: sbt "++$TRAVIS_SCALA_VERSION clean" "++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; test; mimaReportBinaryIssues; docs/makeMicrosite"
       #script: ./sbt "+++$TRAVIS_SCALA_VERSION clean" "+++$TRAVIS_SCALA_VERSION test" "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
+
+    - scala: 2.12.9
+      jdk: openjdk11
+      script: sbt ++$TRAVIS_SCALA_VERSION "; clean; test"
 
 before_install:
   - export PATH=${PATH}:./vendor/bundle
