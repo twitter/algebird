@@ -18,7 +18,6 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird._
 import com.twitter.util.{Future, FuturePool}
 import scala.collection.mutable.{ListBuffer, Map => MMap}
-import scala.collection.breakOut
 
 /**
  * @author Ian O Connell
@@ -60,7 +59,7 @@ class AsyncListMMapSum[Key, Value](
       val result: Map[Key, Value] = curData.flatMap {
         case (k, listV) =>
           sg.sumOption(listV).map(v => (k, v))
-      }(breakOut)
+      }.toMap
 
       tuplesOut.incrBy(result.size)
       result

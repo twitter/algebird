@@ -274,6 +274,7 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
+    crossScalaVersions += "2.13.1",
     libraryDependencies ++= Seq("com.twitter" %% "util-core" % utilVersion)
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
