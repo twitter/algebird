@@ -10,7 +10,7 @@ val paradiseVersion = "2.1.0"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.0.8"
 val scalacheckVersion = "1.14.2"
-val utilVersion = "6.20.0"
+val utilVersion = "6.45.0"
 val utilVersion212 = "6.39.0"
 val sparkVersion = "2.4.0"
 
