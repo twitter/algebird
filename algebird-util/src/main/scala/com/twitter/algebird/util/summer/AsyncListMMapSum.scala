@@ -59,7 +59,7 @@ class AsyncListMMapSum[Key, Value](
       val result: Map[Key, Value] = curData.flatMap {
         case (k, listV) =>
           sg.sumOption(listV).map(v => (k, v))
-      }.toMap
+      }
 
       tuplesOut.incrBy(result.size)
       result
