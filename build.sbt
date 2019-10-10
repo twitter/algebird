@@ -251,9 +251,7 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
-    libraryDependencies ++= Seq {
-      "com.twitter" %% "util-core" % utilVersion
-    }
+    libraryDependencies ++= Seq("com.twitter" %% "util-core" % utilVersion)
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 
