@@ -10,8 +10,7 @@ val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.0.8"
 val scalacheckVersion = "1.14.2"
-val utilVersion = "6.20.0"
-val utilVersion212 = "6.39.0"
+val utilVersion = "19.10.0"
 val sparkVersion = "2.4.4"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
@@ -24,8 +23,8 @@ def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
 
 val sharedSettings = Seq(
   organization := "com.twitter",
-  scalaVersion := "2.11.12",
-  crossScalaVersions := Seq("2.11.12", "2.12.9"),
+  scalaVersion := "2.12.9",
+  crossScalaVersions := Seq("2.11.12", scalaVersion.value),
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
     Opts.resolver.sonatypeReleases
@@ -252,10 +251,8 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
-    libraryDependencies ++= {
-      val utilV =
-        if (isScala212x(scalaVersion.value)) utilVersion212 else utilVersion
-      Seq("com.twitter" %% "util-core" % utilV)
+    libraryDependencies ++= Seq {
+      "com.twitter" %% "util-core" % utilVersion
     }
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
