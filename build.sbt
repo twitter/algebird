@@ -3,7 +3,7 @@ import algebird._
 import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
 
-val algebraVersion = "1.0.0"
+val algebraVersion = "1.0.1"
 val bijectionVersion = "0.9.6"
 val javaEwahVersion = "1.1.6"
 val paradiseVersion = "2.1.0"
