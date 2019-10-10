@@ -4,4 +4,5 @@
 -Xmx3G
 -XX:ReservedCodeCacheSize=500M
 -XX:+TieredCompilation
+-XX:-UseGCOverheadLimit
 -XX:+UseParallelGC
