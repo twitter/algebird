@@ -15,41 +15,17 @@ val utilVersion212 = "6.39.0"
 val sparkVersion = "2.4.0"
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
-  case version if version.startsWith("2.10") => "2.10"
   case version if version.startsWith("2.11") => "2.11"
   case version if version.startsWith("2.12") => "2.12"
   case _                                     => sys.error("unknown error")
 }
 
-def isScala210x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.10"
 def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.12"
-
-/**
- * Remove 2.10 projects from doc generation, as the macros used in the projects
- * cause problems generating the documentation on scala 2.10. As the APIs for 2.10
- * and 2.11 are the same this has no effect on the resultant documentation, though
- * it does mean that the scaladocs cannot be generated when the build is in 2.10 mode.
- */
-def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
-  CrossVersion.partialVersion(sv) match {
-    case Some((2, 10)) => (false, Nil)
-    case _ =>
-      (
-        true,
-        Seq(
-          algebirdTest,
-          algebirdCore,
-          algebirdUtil,
-          algebirdBijection,
-          algebirdSpark
-        )
-      )
-  }
 
 val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.11.12",
-  crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.9"),
+  crossScalaVersions := Seq("2.11.12", "2.12.9"),
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
     Opts.resolver.sonatypeReleases
@@ -63,12 +39,6 @@ val sharedSettings = Seq(
     "-language:higherKinds",
     "-language:existentials"
   ),
-  scalacOptions ++= {
-    if (scalaVersion.value.startsWith("2.10"))
-      Seq("-Xdivergence211")
-    else
-      Seq()
-  },
   scalacOptions ++= {
     if (scalaVersion.value.startsWith("2.11"))
       Seq("-Ywarn-unused", "-Ywarn-unused-import")
@@ -223,24 +193,13 @@ lazy val algebird = Project(id = "algebird", base = file("."))
     mimaFailOnNoPrevious := false
   )
   .aggregate(
-    {
-      // workaround: https://github.com/sbt/sbt/issues/4181, simple workaround .settings(crossScalaVersions := List()) doesn't work
-      val projects =
-        if (Option(sys.props("TRAVIS_SCALA_VERSION")).forall(_.startsWith("2.10.")))
-          Seq(algebirdCore, algebirdTest, algebirdUtil, algebirdBijection, algebirdBenchmark, algebirdGeneric)
-        else
-          Seq(
-            algebirdCore,
-            algebirdTest,
-            algebirdUtil,
-            algebirdBijection,
-            algebirdBenchmark,
-            algebirdGeneric,
-            algebirdSpark
-          )
-
-      projects.map(p => LocalProject(p.id))
-    }: _*
+    algebirdCore,
+    algebirdTest,
+    algebirdUtil,
+    algebirdBijection,
+    algebirdBenchmark,
+    algebirdGeneric,
+    algebirdSpark
   )
 
 def module(name: String) = {
@@ -259,12 +218,7 @@ lazy val algebirdCore = module("core").settings(
       "org.typelevel" %% "algebra" % algebraVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-    ) ++ {
-      if (isScala210x(scalaVersion.value))
-        Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
-      else
-        Seq()
-    },
+    ),
   sourceGenerators in Compile += Def.task {
     GenTupleAggregators.gen((sourceManaged in Compile).value)
   }.taskValue,
@@ -281,12 +235,7 @@ lazy val algebirdTest = module("test")
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion
-      ) ++ {
-        if (isScala210x(scalaVersion.value))
-          Seq("org.scalamacros" %% "quasiquotes" % quasiquotesVersion)
-        else
-          Seq()
-      },
+      ),
     addCompilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full))
   )
   .dependsOn(algebirdCore)
@@ -320,7 +269,6 @@ lazy val algebirdBijection = module("bijection")
 lazy val algebirdSpark = module("spark")
   .settings(
     libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-    crossScalaVersions := crossScalaVersions.value.filterNot(isScala210x),
     scalacOptions := scalacOptions.value
       .filterNot(_.contains("inline")) // Disable optimizations for now: https://github.com/scala/bug/issues/11247
   )
@@ -362,8 +310,6 @@ lazy val docSettings = Seq(
     "white-color" -> "#FFFFFF"
   ),
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-    inProjects(docsSourcesAndProjects(scalaVersion.value)._2: _*),
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
   ghpagesNoJekyll := false,
