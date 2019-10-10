@@ -295,11 +295,17 @@ lazy val algebirdSpark = module("spark")
 
 lazy val algebirdGeneric = module("generic")
   .settings(
-    addCompilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)),
+    crossScalaVersions += "2.13.1",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"
-    )
+    ) ++ {
+      if (isScala213x(scalaVersion.value)) {
+        Seq()
+      } else {
+        Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
+      }
+    }
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 
