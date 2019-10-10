@@ -56,10 +56,10 @@ class AsyncListMMapSum[Key, Value](
         queueMap.clear
         l
       }
-      val result: Map[Key, Value] = curData.flatMap {
+      val result: Map[Key, Value] = curData.iterator.flatMap {
         case (k, listV) =>
-          sg.sumOption(listV).map(v => (k, v))
-      }
+          sg.sumOption(listV).iterator.map(v => (k, v))
+      }.toMap
 
       tuplesOut.incrBy(result.size)
       result
