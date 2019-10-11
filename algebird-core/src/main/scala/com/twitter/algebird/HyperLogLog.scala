@@ -20,6 +20,7 @@ import java.nio.ByteBuffer
 import java.lang.Math
 
 import algebra.BoundedSemilattice
+import scala.collection.compat._
 
 /** A super lightweight (hopefully) version of BitSet */
 @deprecated("This is no longer used.", since = "0.12.3")
@@ -463,7 +464,7 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
         val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
         reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
     }
-    SparseHLL(reducedBits, reducedMaxRhoW.toMap.mapValues(Max(_)).toMap)
+    SparseHLL(reducedBits, reducedMaxRhoW.toMap.view.mapValues(Max(_)).toMap)
   }
 }
 
@@ -565,7 +566,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   val size: Int = 1 << bits
 
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
-  def apply[T <% Array[Byte]](t: T): HLL = create(t)
+  def apply[T](t: T)(implicit ev: T => Array[Byte]): HLL = create(t)
 
   override val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
 
@@ -580,10 +581,10 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   }
 
   override def sumOption(items: TraversableOnce[HLL]): Option[HLL] =
-    if (items.isEmpty) {
+    if (items.iterator.isEmpty) {
       None
     } else {
-      val iter = items.toIterator.buffered
+      val iter = items.iterator.buffered
       var curValue = iter.next
       while (iter.hasNext) {
         curValue = (curValue, iter.head) match {
@@ -609,7 +610,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
     SparseHLL(bits, Map(j(hashed, bits) -> Max(rhoW(hashed, bits))))
 
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
-  def batchCreate[T <% Array[Byte]](instances: Iterable[T]): HLL = {
+  def batchCreate[T](instances: Iterable[T])(implicit ev: T => Array[Byte]): HLL = {
     val allMaxRhow = instances
       .map { x =>
         jRhoW(hash(x), bits)

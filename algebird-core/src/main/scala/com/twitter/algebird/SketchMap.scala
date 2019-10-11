@@ -168,7 +168,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
    */
   def updatedHeavyHitters[V: Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping: Map[K, V] =
-      hitters.map(item => (item, frequency(item, table))).toMap
+      hitters.iterator.map(item => (item, frequency(item, table))).toMap
     val specificOrdering = Ordering.by[K, V] { mapping(_) }.reverse
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
   }

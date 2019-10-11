@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.compat._
+
 /**
  * HLLSeries can produce a HyperLogLog counter for any window into the past,
  * using a constant factor more space than HyperLogLog.
@@ -92,7 +94,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     else {
       monoid.sum(rows.iterator.zipWithIndex.map {
         case (map, i) =>
-          SparseHLL(bits, map.mapValues { _ =>
+          SparseHLL(bits, map.view.mapValues { _ =>
             Max((i + 1).toByte)
           }.toMap)
       })

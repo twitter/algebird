@@ -109,7 +109,7 @@ object Applicative {
       ms: S[M[T]]
   )(implicit app: Applicative[M], cbf: Factory[T, R[T]]): M[R[T]] = {
     val bldr = cbf.newBuilder
-    val mbldr = ms.toIterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
+    val mbldr = ms.iterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
       app.joinWith(mb, mt)(_ += _)
     }
     app.map(mbldr)(_.result)

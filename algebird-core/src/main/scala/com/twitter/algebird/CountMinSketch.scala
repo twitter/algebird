@@ -18,6 +18,8 @@ package com.twitter.algebird
 
 import algebra.CommutativeMonoid
 
+import scala.collection.compat._
+
 /**
  * A Count-Min sketch is a probabilistic data structure used for summarizing
  * streams of data in sub-linear space.
@@ -136,7 +138,7 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
   }
 
   override def sumOption(sketches: TraversableOnce[CMS[K]]): Option[CMS[K]] =
-    if (sketches.isEmpty) None else Some(sum(sketches))
+    if (sketches.iterator.isEmpty) None else Some(sum(sketches))
 
   override def sum(sketches: TraversableOnce[CMS[K]]): CMS[K] = {
     val summation = new CMSSummation(params)
@@ -172,7 +174,7 @@ class CMSSummation[K](params: CMSParams[K]) {
   }
 
   def updateAll(sketches: TraversableOnce[CMS[K]]): Unit =
-    sketches.foreach(updateInto)
+    sketches.iterator.foreach(updateInto)
 
   def updateInto(cms: CMS[K]): Unit =
     cms match {
@@ -1013,7 +1015,7 @@ class TopCMSMonoid[K](emptyCms: CMS[K], logic: HeavyHittersLogic[K]) extends Mon
   override def sum(sketches: TraversableOnce[TopCMS[K]]): TopCMS[K] = {
     val topCandidates = scala.collection.mutable.Set.empty[K]
     val summation = new CMSSummation(emptyCms.params)
-    sketches.foreach { sketch =>
+    sketches.iterator.foreach { sketch =>
       summation.updateInto(sketch.cms)
       topCandidates ++= sketch.heavyHitters
     }
@@ -1025,7 +1027,7 @@ class TopCMSMonoid[K](emptyCms: CMS[K], logic: HeavyHittersLogic[K]) extends Mon
   }
 
   override def sumOption(sketches: TraversableOnce[TopCMS[K]]): Option[TopCMS[K]] =
-    if (sketches.isEmpty) None else Some(sum(sketches))
+    if (sketches.iterator.isEmpty) None else Some(sum(sketches))
 }
 
 class TopCMSAggregator[K](cmsMonoid: TopCMSMonoid[K]) extends MonoidAggregator[K, TopCMS[K], TopCMS[K]] {
@@ -1311,12 +1313,12 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
     val (underLimit, overLimit) = grouped.partition {
       _._2.size <= heavyHittersN
     }
-    val sorted = overLimit.mapValues { hhs =>
+    val sorted = overLimit.view.mapValues { hhs =>
       hhs.toSeq.sortBy { hh =>
         hh.count
       }
     }.toMap
-    val purged = sorted.mapValues { hhs =>
+    val purged = sorted.view.mapValues { hhs =>
       hhs.takeRight(heavyHittersN)
     }.toMap
     HeavyHitters[(K1, K2)](purged.values.flatten.toSet ++ underLimit.values.flatten.toSet)

@@ -134,7 +134,7 @@ sealed trait Fold[-I, +O] extends Serializable {
    */
   def overTraversable(is: TraversableOnce[I]): O = {
     val state = build()
-    state.end(is.foldLeft(state.start)(state.add))
+    state.end(is.iterator.foldLeft(state.start)(state.add))
   }
 }
 

@@ -17,6 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import algebra.CommutativeGroup
+import scala.collection.compat._
 
 /**
  * Tracks the count and mean value of Doubles in a data stream.
@@ -147,11 +148,11 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
    * intermediate objects.
    */
   override def sumOption(iter: TraversableOnce[AveragedValue]): Option[AveragedValue] =
-    if (iter.isEmpty) None
+    if (iter.iterator.isEmpty) None
     else {
       var count = 0L
       var average = 0.0
-      iter.foreach {
+      iter.iterator.foreach {
         case AveragedValue(c, v) =>
           average = getCombinedMean(count, average, c, v)
           count += c
