@@ -15,8 +15,8 @@ matrix:
         coverage \
         "++$TRAVIS_SCALA_VERSION clean" \
         "++$TRAVIS_SCALA_VERSION test" \
-        "++$TRAVIS_SCALA_VERSION coverageReport"
-        # "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
+        "++$TRAVIS_SCALA_VERSION coverageReport" \
+        "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
@@ -31,8 +31,8 @@ matrix:
       script: sbt \
         "++$TRAVIS_SCALA_VERSION clean" \
         "++$TRAVIS_SCALA_VERSION test" \
-        "++$TRAVIS_SCALA_VERSION docs/makeMicrosite"
-        # "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
+        "++$TRAVIS_SCALA_VERSION docs/makeMicrosite" \
+        "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
 
     - scala: 2.12.9
       jdk: openjdk11
@@ -45,6 +45,12 @@ matrix:
       script: sbt \
         "++$TRAVIS_SCALA_VERSION clean" \
         "++$TRAVIS_SCALA_VERSION test"
+
+    - scala: 2.13.1
+      jdk: openjdk11
+      script: sbt \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test
 
 before_install:
   - export PATH=${PATH}:./vendor/bundle

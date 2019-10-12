@@ -16,7 +16,6 @@ limitations under the License.
 package com.twitter.algebird
 
 import com.twitter.algebird.macros.{Cuber, Roller}
-import com.twitter.algebird.collections.MutableBackedMap
 import scala.collection.mutable.{Builder, Map => MMap}
 import scala.collection.{Map => ScMap}
 import algebra.ring.Rng
