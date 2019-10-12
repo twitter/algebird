@@ -50,7 +50,7 @@ matrix:
       jdk: openjdk11
       script: sbt \
         "++$TRAVIS_SCALA_VERSION clean" \
-        "++$TRAVIS_SCALA_VERSION test
+        "++$TRAVIS_SCALA_VERSION test"
 
 before_install:
   - export PATH=${PATH}:./vendor/bundle
