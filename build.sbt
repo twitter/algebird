@@ -14,6 +14,15 @@ val scalaCollectionCompat = "2.1.2"
 val utilVersion = "19.10.0"
 val sparkVersion = "2.4.4"
 
+def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y)) if y <= 12 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case Some((2, y)) if y >= 13 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
+    case _ => Nil
+  }
+
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version.startsWith("2.11") => "2.11"
   case version if version.startsWith("2.12") => "2.12"
@@ -115,7 +124,15 @@ val sharedSettings = Seq(
         <name>Sam Ritchie</name>
         <url>http://twitter.com/sritchie</url>
       </developer>
-    </developers>)
+    </developers>),
+  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
+    (Compile / scalaSource).value,
+    scalaVersion.value
+  ),
+  Test / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
+    (Test / scalaSource).value,
+    scalaVersion.value
+  )
 ) ++ mimaSettings
 
 lazy val noPublishSettings = Seq(
