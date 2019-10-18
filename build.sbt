@@ -132,6 +132,10 @@ val sharedSettings = Seq(
   Test / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
     (Test / scalaSource).value,
     scalaVersion.value
+  ),
+  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
+    (Compile / javaSource).value,
+    scalaVersion.value
   )
 ) ++ mimaSettings
 
@@ -235,6 +239,7 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
+  // scalaVersion := "2.13.1",
   crossScalaVersions += "2.13.1",
   initialCommands := """
                      import com.twitter.algebird._
@@ -264,6 +269,7 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test")
   .settings(
     testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
+    // scalaVersion := "2.13.1",
     crossScalaVersions += "2.13.1",
     libraryDependencies ++=
       Seq(

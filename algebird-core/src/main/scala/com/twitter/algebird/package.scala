@@ -17,9 +17,6 @@
 package com.twitter
 
 package object algebird {
-  type Seq[+T] = scala.collection.Seq[T]
-  type IndexedSeq[+T] = scala.collection.IndexedSeq[T]
-
   /**
    * TODO remove these in scala 2.11 and use the standard there.
    * these are here to avoid massive bloat around these classes

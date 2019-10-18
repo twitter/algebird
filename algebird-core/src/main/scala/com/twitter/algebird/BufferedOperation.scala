@@ -63,7 +63,7 @@ object ArrayBufferedOperation {
     new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
       // calling `.get is okay because the interface guarantees a
       // non-empty sequence.
-      override def operate(items: Seq[T]): T = sg.sumOption(items.iterator).get
+      override def operate(items: scala.collection.Seq[T]): T = sg.sumOption(items.iterator).get
     }
 }
 

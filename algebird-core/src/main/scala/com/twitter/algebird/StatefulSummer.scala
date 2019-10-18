@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.compat._
+
 /**
  * A Stateful summer is something that is potentially more efficient
  * (a buffer, a cache, etc...) that has the same result as a sum:
@@ -52,5 +54,5 @@ class BufferedSumAll[V](size: Int)(implicit override val semigroup: Semigroup[V]
     with StatefulSummer[V]
     with BufferedReduce[V] {
 
-  override def operate(nonEmpty: Seq[V]): V = semigroup.sumOption(nonEmpty).get
+  override def operate(nonEmpty: scala.collection.Seq[V]): V = semigroup.sumOption(nonEmpty).get
 }
