@@ -30,7 +30,7 @@ trait Buffered[I, O] extends java.io.Serializable {
 }
 
 abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
-  def operate(nonEmpty: scala.collection.Seq[I]): O
+  def operate(nonEmpty: Seq[I]): O
 
   require(size > 0, "buffer <= 0 not allowed")
 
@@ -45,7 +45,7 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
   override def flush: Option[O] =
     if (buffer.isEmpty) None
     else {
-      val res = operate(buffer)
+      val res = operate(buffer.toSeq)
       buffer.clear
       Some(res)
     }
@@ -63,7 +63,7 @@ object ArrayBufferedOperation {
     new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
       // calling `.get is okay because the interface guarantees a
       // non-empty sequence.
-      override def operate(items: scala.collection.Seq[T]): T = sg.sumOption(items.iterator).get
+      override def operate(items: Seq[T]): T = sg.sumOption(items.iterator).get
     }
 }
 

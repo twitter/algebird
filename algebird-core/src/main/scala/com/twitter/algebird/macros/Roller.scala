@@ -77,7 +77,7 @@ object Roller {
     val roller = q"""
     new _root_.com.twitter.algebird.macros.Roller[${T}] {
       type K = $tupleName
-      def apply(in: ${T}): _root_.scala.collection.Seq[K] = {
+      def apply(in: ${T}): _root_.scala.Seq[K] = {
         ..$somes
         Seq(..$items)
       }

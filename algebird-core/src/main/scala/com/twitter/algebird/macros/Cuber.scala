@@ -68,7 +68,7 @@ object Cuber {
     val cuber = q"""
     new _root_.com.twitter.algebird.macros.Cuber[${T}] {
       type K = $tupleName
-      def apply(in: ${T}): _root_.scala.collection.Seq[K] = {
+      def apply(in: ${T}): _root_.scala.Seq[K] = {
         ..$somes
         (0 until (1 << $arity)).map { i =>
           new K(..$options)
