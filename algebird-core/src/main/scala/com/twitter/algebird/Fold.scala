@@ -244,14 +244,6 @@ object Fold extends CompatFold {
       }
     }
 
-  // /**
-  //  * Simple Fold that collects elements into a container.
-  //  */
-  // def container[I, C[_]](implicit cbf: Factory[I, C[I]]): Fold[I, C[I]] =
-  //   Fold.foldMutable[Builder[I, C[I]], I, C[I]]({ case (b, i) => b += i }, { _ =>
-  //     cbf.newBuilder
-  //   }, { _.result })
-
   /**
    * An even simpler Fold that collects into a Seq.  Shorthand for "container[I, Seq];" fewer type
    * arguments, better type inferrence.
