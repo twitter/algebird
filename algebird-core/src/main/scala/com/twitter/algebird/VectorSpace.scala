@@ -24,7 +24,9 @@ import scala.annotation.implicitNotFound
  * http://en.wikipedia.org/wiki/Vector_space#Definition
  *
  */
-object VectorSpace {
+object VectorSpace extends VectorSpaceOps with Implicits
+
+sealed trait VectorSpaceOps {
   def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] =
     vs.scale(v, c)
   def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) =
@@ -34,19 +36,21 @@ object VectorSpace {
       override def scale(v: F, c: C[F]): C[F] =
         if (r.isNonZero(v)) scaleFn(v, c) else cGroup.zero
     }
+}
+private object VectorSpaceOps extends VectorSpaceOps
 
-  // Implicits
+sealed trait Implicits extends LowPrioImpicits {
   implicit def indexedSeqSpace[T: Ring] =
-    from[T, IndexedSeq] { (s, seq) =>
+    VectorSpaceOps.from[T, IndexedSeq] { (s, seq) =>
       seq.map(Ring.times(s, _))
     }
+}
 
+sealed trait LowPrioImpicits {
   implicit def mapSpace[K, T: Ring] =
-    from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
+    VectorSpaceOps.from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
       m.transform { case (_, v) => Ring.times(s, v) }
     }
-
-  // TODO: add implicits for java lists, arrays, and options
 }
 
 @implicitNotFound(msg = "Cannot find VectorSpace type class for Container: ${C} and Ring: ${F}")
