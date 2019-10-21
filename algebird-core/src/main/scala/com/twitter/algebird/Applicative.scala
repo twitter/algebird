@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import scala.annotation.implicitNotFound
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 
 /**
  * Simple implementation of an Applicative type-class.
@@ -107,9 +107,9 @@ object Applicative {
    */
   def sequenceGen[M[_], T, S[X] <: TraversableOnce[X], R[_]](
       ms: S[M[T]]
-  )(implicit app: Applicative[M], cbf: CanBuildFrom[Nothing, T, R[T]]): M[R[T]] = {
-    val bldr = cbf()
-    val mbldr = ms.toIterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
+  )(implicit app: Applicative[M], cbf: Factory[T, R[T]]): M[R[T]] = {
+    val bldr = cbf.newBuilder
+    val mbldr = ms.iterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
       app.joinWith(mb, mt)(_ += _)
     }
     app.map(mbldr)(_.result)

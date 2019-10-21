@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import scala.collection.compat._
+
 /**
  * Classes that support algebraic structures with dynamic switching between
  * two representations, the original type O and the eventual type E.
@@ -79,7 +81,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
       Left(newBuffer)
     }
 
-    (iter.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]())) {
+    (iter.iterator.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]())) {
       case (buffer @ Left(be), v) =>
         // turns the list of either into an either of lists
         checkSize(be)

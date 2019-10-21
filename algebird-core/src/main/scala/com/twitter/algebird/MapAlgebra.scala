@@ -19,6 +19,7 @@ import com.twitter.algebird.macros.{Cuber, Roller}
 import scala.collection.mutable.{Builder, Map => MMap}
 import scala.collection.{Map => ScMap}
 import algebra.ring.Rng
+import scala.collection.compat._
 
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
@@ -79,10 +80,10 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
         remove(oldMap, kv._1)
     }
   override def sumOption(items: TraversableOnce[M]): Option[M] =
-    if (items.isEmpty) None
+    if (items.iterator.isEmpty) None
     else {
       val mutable = MMap[K, V]()
-      items.foreach { m =>
+      items.iterator.foreach { m =>
         m.foreach {
           case (k, v) =>
             val oldVOpt = mutable.get(k)
@@ -115,33 +116,25 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
     new MutableBackedMap(mut)
 }
 
-private[this] class MutableBackedMap[K, V](val backingMap: MMap[K, V])
-    extends Map[K, V]
-    with java.io.Serializable {
-  override def get(key: K): Option[V] = backingMap.get(key)
-
-  override def iterator: Iterator[(K, V)] = backingMap.iterator
-
-  override def +[B1 >: V](kv: (K, B1)): Map[K, B1] = backingMap.toMap + kv
-
-  override def -(key: K): Map[K, V] = backingMap.toMap - key
-}
-
 /**
  * You can think of this as a Sparse vector group
  */
 class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group) with Group[Map[K, V]] {
-  override def negate(kv: Map[K, V]): Map[K, V] = kv.mapValues { v =>
-    group.negate(v)
-  }
+  override def negate(kv: Map[K, V]): Map[K, V] =
+    kv.iterator.map {
+      case (k, v) =>
+        (k, group.negate(v))
+    }.toMap
 }
 
 class ScMapGroup[K, V](implicit val group: Group[V])
     extends ScMapMonoid[K, V]()(group)
     with Group[ScMap[K, V]] {
-  override def negate(kv: ScMap[K, V]): ScMap[K, V] = kv.mapValues { v =>
-    group.negate(v)
-  }
+  override def negate(kv: ScMap[K, V]): ScMap[K, V] =
+    kv.iterator.map {
+      case (k, v) =>
+        (k, group.negate(v))
+    }.toMap
 }
 
 /**
@@ -197,7 +190,7 @@ object MapAlgebra {
       keys: TraversableOnce[T]
   )(lookup: T => Option[V])(present: T => U): Map[U, V] =
     sumByKey {
-      keys.map { k =>
+      keys.iterator.map { k =>
         present(k) -> lookup(k).getOrElse(Monoid.zero[V])
       }
     }
@@ -218,7 +211,7 @@ object MapAlgebra {
    *   pairs.groupBy(_._1).mapValues(_.map(_._2).sum)
    */
   def sumByKey[K, V: Semigroup](pairs: TraversableOnce[(K, V)]): Map[K, V] =
-    Monoid.sum(pairs.map { Map(_) })
+    Monoid.sum(pairs.iterator.map { Map(_) })
 
   /**
    * For each key, creates a list of all values. This function is equivalent to:
@@ -226,10 +219,10 @@ object MapAlgebra {
    *   pairs.groupBy(_._1).mapValues(_.map(_._2))
    */
   def group[K, V](pairs: TraversableOnce[(K, V)]): Map[K, List[V]] =
-    if (pairs.isEmpty) Map.empty
+    if (pairs.iterator.isEmpty) Map.empty
     else {
       val mutable = MMap[K, Builder[V, List[V]]]()
-      pairs.foreach {
+      pairs.iterator.foreach {
         case (k, v) =>
           val oldVOpt = mutable.get(k)
           // sorry for the micro optimization here: avoiding a closure
@@ -250,12 +243,14 @@ object MapAlgebra {
   /** join the keys of two maps (similar to outer-join in a DB) */
   def join[K, V, W](map1: Map[K, V], map2: Map[K, W]): Map[K, (Option[V], Option[W])] =
     Monoid
-      .plus(map1.mapValues { v =>
-        (List(v), List[W]())
-      }, map2.mapValues { w =>
-        (List[V](), List(w))
+      .plus(map1.transform {
+        case (_, v) =>
+          (List(v), List[W]())
+      }, map2.transform {
+        case (_, w) =>
+          (List[V](), List(w))
       })
-      .mapValues { case (v, w) => (v.headOption, w.headOption) }
+      .transform { case (_, (v, w)) => (v.headOption, w.headOption) }
 
   /**
    * Reverses a graph losslessly
@@ -286,11 +281,10 @@ object MapAlgebra {
     Monoid.sum(mring.times(left, right).values)
 
   def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
-    val map: collection.mutable.Map[c.K, List[V]] =
-      collection.mutable.Map[c.K, List[V]]()
-    it.toIterator.foreach {
+    val map: MMap[c.K, List[V]] = MMap[c.K, List[V]]()
+    it.iterator.foreach {
       case (k, v) =>
-        c(k).foreach { ik =>
+        c(k).iterator.foreach { ik =>
           map.get(ik) match {
             case Some(vs) => map += ik -> (v :: vs)
             case None     => map += ik -> List(v)
@@ -302,22 +296,21 @@ object MapAlgebra {
   }
 
   def cubeSum[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K], sg: Semigroup[V]): Map[c.K, V] =
-    sumByKey(it.toIterator.flatMap { case (k, v) => c(k).map((_, v)) })
+    sumByKey(it.iterator.flatMap { case (k, v) => c(k).map((_, v)) })
 
   def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
       fn: T => K
   )(implicit c: Cuber[K]): Map[c.K, V] =
-    sumByKey(it.toIterator.flatMap { t =>
-      c(fn(t)).map((_, agg.prepare(t)))
+    sumByKey(it.iterator.flatMap { t =>
+      c(fn(t)).iterator.map((_, agg.prepare(t)))
     })(agg.semigroup)
       .map { case (k, v) => (k, agg.present(v)) }
 
   def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
-    val map: collection.mutable.Map[r.K, List[V]] =
-      collection.mutable.Map[r.K, List[V]]()
-    it.toIterator.foreach {
+    val map: MMap[r.K, List[V]] = MMap[r.K, List[V]]()
+    it.iterator.foreach {
       case (k, v) =>
-        r(k).foreach { ik =>
+        r(k).iterator.foreach { ik =>
           map.get(ik) match {
             case Some(vs) => map += ik -> (v :: vs)
             case None     => map += ik -> List(v)
@@ -329,13 +322,13 @@ object MapAlgebra {
   }
 
   def rollupSum[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K], sg: Semigroup[V]): Map[r.K, V] =
-    sumByKey(it.toIterator.flatMap { case (k, v) => r(k).map((_, v)) })
+    sumByKey(it.iterator.flatMap { case (k, v) => r(k).iterator.map((_, v)) })
 
   def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
       fn: T => K
   )(implicit r: Roller[K]): Map[r.K, V] =
-    sumByKey(it.toIterator.flatMap { t =>
-      r(fn(t)).map((_, agg.prepare(t)))
+    sumByKey(it.iterator.flatMap { t =>
+      r(fn(t)).iterator.map((_, agg.prepare(t)))
     })(agg.semigroup)
       .map { case (k, v) => (k, agg.present(v)) }
 

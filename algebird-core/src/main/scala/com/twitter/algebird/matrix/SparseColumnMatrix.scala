@@ -62,7 +62,7 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
   def toDense: DenseMatrix[V] = {
     val buf = ArrayBuffer.fill(size)(valueMonoid.zero)
     updateInto(buf)
-    DenseMatrix(rows, cols, buf)
+    DenseMatrix(rows, cols, buf.toIndexedSeq)
   }
 
   override def toString: String = {

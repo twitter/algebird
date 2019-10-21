@@ -21,7 +21,7 @@ package com.twitter.algebird
  * Its monoid consists of exponentially scaling the older value and summing with
  * the newer one.
  */
-object DecayedVector {
+object DecayedVector extends CompatDecayedVector {
   def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
 
@@ -54,10 +54,6 @@ object DecayedVector {
   )(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
     monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
 
-  // This is the default monoid that never thresholds.
-  // If you want to set a specific accuracy you need to implicitly override this
-  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]], ord: Ordering[F]) =
-    monoidWithEpsilon(-1.0)
   implicit def mapMonoid[K](
       implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
       metric: Metric[Map[K, Double]]

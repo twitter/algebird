@@ -210,7 +210,7 @@ case class SSOne[T] private[algebird] (override val capacity: Int, item: T) exte
 
 object SSMany {
   private def bucketsFromCounters[T](counters: Map[T, (Long, Long)]): SortedMap[Long, Set[T]] =
-    SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet)
+    SortedMap[Long, Set[T]]() ++ counters.groupBy(_._2._1).mapValues(_.keySet).toMap
 
   private[algebird] def apply[T](capacity: Int, counters: Map[T, (Long, Long)]): SSMany[T] =
     SSMany(capacity, counters, bucketsFromCounters(counters))

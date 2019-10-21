@@ -26,7 +26,7 @@ class HashingTrickMonoid[V: Group](bits: Int, seed: Int = 123456) extends Monoid
   override def plus(left: AdaptiveVector[V], right: AdaptiveVector[V]): AdaptiveVector[V] =
     Monoid.plus(left, right)
 
-  def init[K <% Array[Byte]](kv: (K, V)): AdaptiveVector[V] = {
+  def init[K](kv: (K, V))(implicit ev: K => Array[Byte]): AdaptiveVector[V] = {
     val (long1, long2) = hash(kv._1)
     val index = (long1 & bitMask).toInt
     val isNegative = (long2 & 1) == 1

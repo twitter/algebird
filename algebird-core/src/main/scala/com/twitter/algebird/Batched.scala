@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import scala.annotation.tailrec
+import scala.collection.compat._
 
 /**
  * Batched: the free semigroup.
@@ -109,9 +110,9 @@ object Batched {
    * is empty, and `Some(batch)` otherwise.
    */
   def items[T](ts: TraversableOnce[T]): Option[Batched[T]] =
-    if (ts.isEmpty) None
+    if (ts.iterator.isEmpty) None
     else {
-      val it = ts.toIterator
+      val it = ts.iterator
       val t0 = it.next
       Some(Item(t0).append(it))
     }

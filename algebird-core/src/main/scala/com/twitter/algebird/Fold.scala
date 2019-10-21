@@ -16,8 +16,7 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.io.Serializable
-import scala.collection.generic.CanBuildFrom
-import scala.collection.mutable.Builder
+import scala.collection.compat._
 
 /**
  * Folds are first-class representations of "Traversable.foldLeft." They have the nice property that
@@ -134,7 +133,7 @@ sealed trait Fold[-I, +O] extends Serializable {
    */
   def overTraversable(is: TraversableOnce[I]): O = {
     val state = build()
-    state.end(is.foldLeft(state.start)(state.add))
+    state.end(is.iterator.foldLeft(state.start)(state.add))
   }
 }
 
@@ -181,7 +180,7 @@ final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val st
  * Additionally, it is recommended that "end" functions not mutate the accumulator in order to
  * support scans (producing a stream of intermediate outputs by calling "end" at each step).
  */
-object Fold {
+object Fold extends CompatFold {
 
   /**
    * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
@@ -244,14 +243,6 @@ object Fold {
         new FoldState(add, starts, end)
       }
     }
-
-  /**
-   * Simple Fold that collects elements into a container.
-   */
-  def container[I, C[_]](implicit cbf: CanBuildFrom[C[I], I, C[I]]): Fold[I, C[I]] =
-    Fold.foldMutable[Builder[I, C[I]], I, C[I]]({ case (b, i) => b += i }, { _ =>
-      cbf.apply
-    }, { _.result })
 
   /**
    * An even simpler Fold that collects into a Seq.  Shorthand for "container[I, Seq];" fewer type

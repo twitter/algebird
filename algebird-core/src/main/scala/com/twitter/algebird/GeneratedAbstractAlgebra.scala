@@ -3,6 +3,8 @@ package com.twitter.algebird
 
 import ArrayBufferedOperation.fromSumOption
 
+import scala.collection.compat._
+
 /**
  * Combine 2 semigroups into a product semigroup
  */
@@ -11,7 +13,7 @@ class Tuple2Semigroup[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semig
   override def plus(l: (A, B), r: (A, B)): (A, B) =
     (asemigroup.plus(l._1, r._1), bsemigroup.plus(l._2, r._2))
   override def sumOption(to: TraversableOnce[(A, B)]): Option[(A, B)] =
-    if (to.isEmpty) None
+    if (to.iterator.isEmpty) None
     else {
       val bufA = fromSumOption[A](1000)
       val bufB = fromSumOption[B](1000)

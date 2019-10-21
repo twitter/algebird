@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
+import com.twitter.algebird.collections.compat._
 import scala.annotation.tailrec
 
 /**
@@ -68,7 +69,7 @@ object AdaptiveVector {
     import scala.collection.mutable.Buffer
     val buf = Buffer.fill[V](size)(sparse)
     m.foreach { case (idx, v) => buf(idx) = v }
-    Vector(buf: _*)
+    Vector.from(buf)
   }
 
   def toVector[V](v: AdaptiveVector[V]): Vector[V] =
@@ -99,13 +100,13 @@ object AdaptiveVector {
           case (DenseVector(lv, ls, _), DenseVector(rv, _, _)) =>
             val vec = Semigroup.plus[IndexedSeq[V]](lv, rv) match {
               case v: Vector[_] => v.asInstanceOf[Vector[V]]
-              case notV         => Vector(notV: _*)
+              case notV         => Vector.from(notV)
             }
             fromVector(vec, ls)
 
           case _ if valueIsNonZero(left.sparseValue) =>
             fromVector(
-              Vector(Semigroup.plus(toVector(left): IndexedSeq[V], toVector(right): IndexedSeq[V]): _*),
+              Vector.from(Semigroup.plus(toVector(left): IndexedSeq[V], toVector(right): IndexedSeq[V])),
               left.sparseValue
             )
           case _ => // sparse is zero:
@@ -195,7 +196,7 @@ sealed trait AdaptiveVector[V] extends IndexedSeq[V] {
 case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override val denseCount: Int)
     extends AdaptiveVector[V] {
 
-  override def size: Int = iseq.size
+  override def length: Int = iseq.size
   override def apply(idx: Int): V = iseq(idx)
   override def updated(idx: Int, v: V): AdaptiveVector[V] = {
     val oldIsSparse = if (iseq(idx) == sparseValue) 1 else 0
@@ -226,7 +227,7 @@ case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override
       .iterator
 }
 
-case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, override val size: Int)
+case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, override val length: Int)
     extends AdaptiveVector[V] {
 
   override def denseCount: Int = map.size

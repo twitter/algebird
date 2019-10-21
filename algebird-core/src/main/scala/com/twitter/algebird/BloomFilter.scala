@@ -20,6 +20,7 @@ import algebra.BoundedSemilattice
 import com.googlecode.javaewah.IntIterator
 import com.googlecode.javaewah.{EWAHCompressedBitmap => CBitSet}
 import scala.collection.immutable.BitSet
+import scala.collection.compat._
 
 object RichCBitSet {
   def apply(xs: Int*): CBitSet = fromArray(xs.toArray)
@@ -205,7 +206,7 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
   override def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
 
   override def sumOption(as: TraversableOnce[BF[A]]): Option[BF[A]] =
-    if (as.isEmpty) None
+    if (as.iterator.isEmpty) None
     else {
       // share a single mutable bitset
       val longBitSet = LongBitSet.empty(width)
@@ -228,7 +229,7 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
         }
       }
 
-      as.foreach {
+      as.iterator.foreach {
         case BFZero(_, _)         => ()
         case bf @ BFItem(_, _, _) => add(bf)
         case BFSparse(_, cbitset, _) =>
@@ -447,7 +448,7 @@ case class BFItem[A](item: A, hashes: BFHash[A], override val width: Int) extend
 
   override def toBitSet: BitSet = {
     val hashvalues = hashes(item)
-    BitSet(hashvalues: _*)
+    BitSet.fromSpecific(hashvalues)
   }
 
   private[algebird] def toSparse: BFSparse[A] =

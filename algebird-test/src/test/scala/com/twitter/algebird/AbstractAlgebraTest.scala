@@ -99,18 +99,18 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
       val left = l.padTo(math.max(l.size, r.size), 0)
       val right = r.padTo(math.max(l.size, r.size), 0)
 
-      (left, right).zipped.map(_ + _).toArray.deep == monoid
+      (left, right).zipped.map(_ + _).toSeq == monoid
         .sum(List(l.toArray, r.toArray))
-        .deep
+        .toSeq
     }
   }
 
   property("An ArrayGroup should negate") {
     val arrayGroup = new ArrayGroup[Int]
     forAll { intList: List[Int] =>
-      intList.map(-1 * _).toArray.deep == arrayGroup
+      intList.map(-1 * _).toSeq == arrayGroup
         .negate(intList.toArray)
-        .deep
+        .toSeq
     }
   }
 

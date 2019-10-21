@@ -69,7 +69,7 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("Array Monoid laws") {
-    implicit val equiv: Equiv[Array[Int]] = Equiv.by(_.deep)
+    implicit val equiv: Equiv[Array[Int]] = Equiv.by(_.toSeq)
     monoidLaws[Array[Int]]
   }
 
@@ -226,6 +226,7 @@ class CollectionSpecification extends CheckProperties {
           v.map { _._2 }.sum
         }
         .filter { _._2 != 0 }
+        .toMap
       MapAlgebra.sumByKey(tupList) == expected && tupList.sumByKey == expected
     }
   }
@@ -234,7 +235,7 @@ class CollectionSpecification extends CheckProperties {
     forAll { (keys: List[Int], values: List[Int]) =>
       import com.twitter.algebird.Operators._
       val tupList = keys.zip(values)
-      val expected = tupList.groupBy(_._1).mapValues(_.map(_._2).toList)
+      val expected = tupList.groupBy(_._1).mapValues(_.map(_._2).toList).toMap
       MapAlgebra.group(tupList) == expected && tupList.group == expected
     }
   }
@@ -253,7 +254,7 @@ class CollectionSpecification extends CheckProperties {
     forAll { (l: Set[(Int, Int)]) =>
       (MapAlgebra
         .toGraph(l)
-        .toIterable
+        .toIterator
         .flatMap {
           case (k, sv) =>
             sv.map { v =>
@@ -287,7 +288,7 @@ class CollectionSpecification extends CheckProperties {
 
   property("MapAlgebra.invertExact works") {
     forAll { (m: Map[Option[Int], Set[Int]]) =>
-      (MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined))
+      (MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined).toMap)
     }
   }
 
@@ -300,12 +301,14 @@ class CollectionSpecification extends CheckProperties {
         }
         .filter { _._2.isDefined }
         .mapValues { _.get }
+        .toMap
       val m2after = m3
         .mapValues { vw =>
           vw._2
         }
         .filter { _._2.isDefined }
         .mapValues { _.get }
+        .toMap
       val m1Orm2 = (m1.keySet | m2.keySet)
       ((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))
     }

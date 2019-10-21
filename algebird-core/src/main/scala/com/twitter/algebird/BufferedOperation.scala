@@ -45,7 +45,7 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
   override def flush: Option[O] =
     if (buffer.isEmpty) None
     else {
-      val res = operate(buffer)
+      val res = operate(buffer.toSeq)
       buffer.clear
       Some(res)
     }

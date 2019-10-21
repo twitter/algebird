@@ -1,6 +1,7 @@
 package com.twitter.algebird
 
 import java.util.PriorityQueue
+import scala.collection.compat._
 import scala.collection.generic.CanBuildFrom
 
 /**
@@ -102,12 +103,12 @@ object Aggregator extends java.io.Serializable {
       override def append(l: T, r: F): T = appnd(l, r)
 
       override def appendAll(old: T, items: TraversableOnce[F]): T =
-        if (items.isEmpty) old else reduce(old, agg(items).get)
+        if (items.iterator.isEmpty) old else reduce(old, agg(items).get)
 
       private def agg(inputs: TraversableOnce[F]): Option[T] =
-        if (inputs.isEmpty) None
+        if (inputs.iterator.isEmpty) None
         else {
-          val itr = inputs.toIterator
+          val itr = inputs.iterator
           val t = prepare(itr.next)
           Some(itr.foldLeft(t)(appnd))
         }
@@ -152,7 +153,7 @@ object Aggregator extends java.io.Serializable {
       override def appendAll(items: TraversableOnce[F]): T = agg(items)
 
       private def agg(inputs: TraversableOnce[F]): T =
-        inputs.aggregate(m.zero)(appnd, m.plus)
+        inputs.foldLeft(m.zero)(append)
     }
 
   /**
@@ -414,13 +415,13 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    * you see present(Monoid.zero[B])
    */
   def apply(inputs: TraversableOnce[A]): C =
-    present(reduce(inputs.map(prepare)))
+    present(reduce(inputs.iterator.map(prepare)))
 
   /**
    * This returns None if the inputs are empty
    */
   def applyOption(inputs: TraversableOnce[A]): Option[C] =
-    reduceOption(inputs.map(prepare))
+    reduceOption(inputs.iterator.map(prepare))
       .map(present)
 
   /**
@@ -441,16 +442,13 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    */
   def applyCumulatively[In <: TraversableOnce[A], Out](
       inputs: In
-  )(implicit bf: CanBuildFrom[In, C, Out]): Out = {
-    val builder = bf()
-    builder ++= cumulativeIterator(inputs.toIterator)
-    builder.result
-  }
+  )(implicit bf: CanBuildFrom[In, C, Out]): Out =
+    (bf: BuildFrom[In, C, Out]).fromSpecific(inputs)(cumulativeIterator(inputs.iterator))
 
   def append(l: B, r: A): B = reduce(l, prepare(r))
 
   def appendAll(old: B, items: TraversableOnce[A]): B =
-    if (items.isEmpty) old else reduce(old, reduce(items.map(prepare)))
+    if (items.iterator.isEmpty) old else reduce(old, reduce(items.iterator.map(prepare)))
 
   /** Like calling andThen on the present function */
   def andThenPresent[D](present2: C => D): Aggregator[A, B, D] =
@@ -551,7 +549,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   final override def reduce(items: TraversableOnce[B]): B =
     monoid.sum(items)
 
-  def appendAll(items: TraversableOnce[A]): B = reduce(items.map(prepare))
+  def appendAll(items: TraversableOnce[A]): B = reduce(items.iterator.map(prepare))
 
   override def andThenPresent[D](present2: C => D): MonoidAggregator[A, B, D] = {
     val self = this
@@ -615,7 +613,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     new MonoidAggregator[TraversableOnce[A], B, C] {
       override def monoid: Monoid[B] = self.monoid
       override def prepare(input: TraversableOnce[A]): B =
-        monoid.sum(input.map(self.prepare))
+        monoid.sum(input.iterator.map(self.prepare))
       override def present(reduction: B): C = self.present(reduction)
     }
 
