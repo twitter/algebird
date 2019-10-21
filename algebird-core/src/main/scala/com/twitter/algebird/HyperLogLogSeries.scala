@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import scala.collection.compat._
 
 /**
  * HLLSeries can produce a HyperLogLog counter for any window into the past,
