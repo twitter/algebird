@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-
 /**
  * A Stateful summer is something that is potentially more efficient
  * (a buffer, a cache, etc...) that has the same result as a sum:

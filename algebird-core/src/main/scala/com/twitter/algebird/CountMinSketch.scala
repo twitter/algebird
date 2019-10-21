@@ -1313,14 +1313,16 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
     val (underLimit, overLimit) = grouped.partition {
       _._2.size <= heavyHittersN
     }
-    val sorted = overLimit.view.mapValues { hhs =>
-      hhs.toSeq.sortBy { hh =>
-        hh.count
-      }
-    }.toMap
-    val purged = sorted.view.mapValues { hhs =>
-      hhs.takeRight(heavyHittersN)
-    }.toMap
+    val sorted = overLimit.transform {
+      case (_, hhs) =>
+        hhs.toSeq.sortBy { hh =>
+          hh.count
+        }
+    }
+    val purged = sorted.transform {
+      case (_, hhs) =>
+        hhs.takeRight(heavyHittersN)
+    }
     HeavyHitters[(K1, K2)](purged.values.flatten.toSet ++ underLimit.values.flatten.toSet)
   }
 

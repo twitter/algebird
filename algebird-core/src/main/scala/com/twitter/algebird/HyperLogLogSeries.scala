@@ -94,9 +94,10 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     else {
       monoid.sum(rows.iterator.zipWithIndex.map {
         case (map, i) =>
-          SparseHLL(bits, map.view.mapValues { _ =>
-            Max((i + 1).toByte)
-          }.toMap)
+          SparseHLL(bits, map.transform {
+            case _ =>
+              Max((i + 1).toByte)
+          })
       })
     }
   }

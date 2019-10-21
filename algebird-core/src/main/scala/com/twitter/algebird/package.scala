@@ -17,6 +17,7 @@
 package com.twitter
 
 package object algebird {
+
   /**
    * TODO remove these in scala 2.11 and use the standard there.
    * these are here to avoid massive bloat around these classes
