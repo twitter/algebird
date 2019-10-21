@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-
 /**
  * HLLSeries can produce a HyperLogLog counter for any window into the past,
  * using a constant factor more space than HyperLogLog.
