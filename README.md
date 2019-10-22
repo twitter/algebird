@@ -14,11 +14,10 @@ See the [Algebird website](https://twitter.github.io/algebird) for more informat
 ### What can you do with this code?
 
 ```scala
-> ./sbt algebird-core/console
+> sbt algebird-core/console
 
-Welcome to Scala version 2.10.5 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_40).
-Type in expressions to have them evaluated.
-Type :help for more information.
+Welcome to Scala 2.12.9 (OpenJDK 64-Bit Server VM, Java 11.0.1).
+Type in expressions for evaluation. Or try :help.
 
 scala> import com.twitter.algebird._
 import com.twitter.algebird._
@@ -64,7 +63,7 @@ A list of contributors to the project can be found here: [Contributors](https://
 
 ## Maven
 
-Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.13.0`.
+Algebird modules are available on maven central. The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.13.5`.
 
 See [Algebird's page on the Scaladex](https://index.scala-lang.org/twitter/algebird) for information on all published artifacts and their associated Scala versions. Algebird currently supports Scala 2.10, 2.11 and 2.12.
 
