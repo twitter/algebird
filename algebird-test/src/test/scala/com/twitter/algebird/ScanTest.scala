@@ -73,7 +73,7 @@ class ScanTest extends WordSpec with Matchers with GeneratorDrivenPropertyChecks
   def freeScanLaws(freeScan: StringScan): Unit =
     forAll(Gen.listOf(Gen.alphaLowerChar)) { inputList =>
       val outputList = freeScan(inputList)
-
+      
       outputList.length should equal(inputList.length)
       outputList.zipWithIndex
         .foreach {
