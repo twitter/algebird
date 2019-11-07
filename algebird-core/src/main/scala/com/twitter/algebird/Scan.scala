@@ -264,8 +264,12 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   /**
    *
    * @tparam I1
-   * @return A scanner that is semantically identical to .join(Scan.identity[I1]), but without
-   *         where we don't pollute the {{State}} by pairing it redundantly with {{Unit}}.
+   * @return If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * of the form [o_1, ..., o_n], then {{joinWithInput}} results in a Scan whose {{apply}} method
+   * returns [(a_1, o_1), ..., (a_n, o_n)] when given the same input.
+   * In other words, {{joinWithInput}} returns a scanner that is semantically identical to
+   * {{this.join(Scan.identity[I1])}}, but where we don't pollute the {{State}} by pairing it
+   * redundantly with {{Unit}}.
    */
   def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = new Scan[I1, (I1, O)] {
     override type State = self.State
@@ -278,6 +282,13 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
     }
   }
 
+  /**
+   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * of the form [o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
+   *  and state_0 = initialState:
+   * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
+   * [(o_1, state_0), ..., (o_n, state_(n-1))].
+   */
   def joinWithPriorState: Aux[I, State, (State, O)] = new Scan[I, (State, O)] {
     override type State = self.State
 
@@ -289,6 +300,13 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
     }
   }
 
+  /**
+   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * of the form [o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
+   *  and state_0 = initialState:
+   * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
+   * [(o_1, state_1), ..., (o_n, state_n].
+   */
   def joinWithPosteriorState: Aux[I, State, (O, State)] = new Scan[I, (O, State)] {
     override type State = self.State
 
@@ -300,8 +318,25 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
     }
   }
 
+  /**
+   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * of the form [o_1, ..., o_n]
+   * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
+   * [(o_1, 1), ..., (o_n, n)].
+   * In other words: {{scan.joinWithIndex(foo) == scan(foo).zipWithIndex)}}
+   */
   def joinWithIndex: Aux[I, (State, Long), (O, Long)] = join(Scan.index)
 
+  /**
+   * @param scan2
+   * @tparam I2
+   * @tparam O2
+   * @return f this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
+   * the form [o_1, ..., o_n], and scan2.apply([b_1, ..., b_n] = [p_1, ..., p_n] then
+   * {{zip}} will return a scan whose apply method, when given input
+   * [(a_1, b_1), ..., (a_n, b_n)] results in the output [(o_1, p_1), ..., (o_2, p_2)].
+   * In other words: {{scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar)) }}
+   */
   def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
     new Scan[(I, I2), (O, O2)] {
       override type State = (self.State, scan2.State)
@@ -321,6 +356,15 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
       }
     }
 
+  /**
+   * @param scan2
+   * @tparam I2
+   * @tparam O2
+   * @return  If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
+   * the form [o_1, ..., o_n], and scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n] then
+   * {{join}} will return a scan whose apply method returns [(o_1, p_1), ..., (o_2, p_2)].
+   * In other words: {{scan.join(scan2)(foo) == scan(foo).zip(scan2(foo)) }}
+   */
   def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] = new Scan[I2, (O, O2)] {
     override type State = (self.State, scan2.State)
 
@@ -333,6 +377,14 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
     }
   }
 
+  /**
+   * Takes the output of this scan and feeds as input into scan2.
+   * @param scan2
+   * @tparam P
+   * @return If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
+   * the form [o_1, ..., o_n], and scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n] then
+   * {{compose}} will return a scan which returns [p_1, ..., p_n].
+   */
   def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] = new Scan[I, P] {
     override type State = (self.State, scan2.State)
 
