@@ -1,7 +1,6 @@
 package com.twitter.algebird
 
 import scala.collection.compat._
-import scala.collection.generic.CanBuildFrom
 
 object Scan {
 
@@ -229,11 +228,8 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    */
   def apply[In <: TraversableOnce[I], Out](
       inputs: In
-  )(implicit bf: CanBuildFrom[In, O, Out]): Out = {
-    val builder = bf()
-    builder ++= scanIterator(inputs.toIterator)
-    builder.result
-  }
+  )(implicit bf: BuildFrom[In, O, Out]): Out =
+    bf.fromSpecific(inputs)(scanIterator(inputs.toIterator))
 
   // combinators
 
