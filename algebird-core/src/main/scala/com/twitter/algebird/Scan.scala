@@ -39,7 +39,7 @@ object Scan {
    * @return A Scan whose inputs are irrelevant, and whose outputs are those that we would get from implementing
    *         a stream using the information provided to this method.
    */
-  def fromStreamLike[S, O](initState: S)(destructor: S => (O, S)): Aux[Any, S, O] = new Scan[Any, O] {
+  def iterate[S, O](initState: S)(destructor: S => (O, S)): Aux[Any, S, O] = new Scan[Any, O] {
     override type State = S
     override val initialState = initState
     override def presentAndNextState(i: Any, stateBeforeProcessingI: S): (O, S) =
@@ -49,7 +49,7 @@ object Scan {
   /**
    * A Scan that returns the number N for the Nth input (starting from 0)
    */
-  val index: Aux[Any, Long, Long] = fromStreamLike(0L)(n => (n, n + 1))
+  val index: Aux[Any, Long, Long] = iterate(0L)(n => (n, n + 1))
 
   def identity[A] = fromFunction[A, A](x => x)
 
