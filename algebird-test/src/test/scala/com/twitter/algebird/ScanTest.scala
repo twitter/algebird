@@ -6,7 +6,6 @@ import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.Queue
 
-
 object ScanTest {
   // normal people will use Scan not Scan.Aux, so it's good for most of the tests to be using the more common interface.
   type StringScan = Scan[Char, String]
@@ -14,15 +13,15 @@ object ScanTest {
   // technically speaking, these aren't exactly the Free scanner, since that would output a giant tree structure from
   // the whole scan, but that giant tree structure is pretty close to a String.
 
-  val directFreeScan: Scan.Aux[Char, List[Char], String] = Scan.from(List.empty[Char]) { (char, previousState) =>
-    val nextState = char :: previousState
-    (nextState.reverse.mkString, nextState)
+  val directFreeScan: Scan.Aux[Char, List[Char], String] = Scan.from(List.empty[Char]) {
+    (char, previousState) =>
+      val nextState = char :: previousState
+      (nextState.reverse.mkString, nextState)
   }
 
-  val mutableFreeScan: StringScan = Scan.mutable(new Queue[Char]()) {
-    (char, previousState) =>
-      previousState.enqueue(char)
-      previousState.mkString
+  val mutableFreeScan: StringScan = Scan.mutable(new Queue[Char]()) { (char, previousState) =>
+    previousState.enqueue(char)
+    previousState.mkString
   }
 
   val aggregatorFreeScan: StringScan = {
@@ -53,17 +52,17 @@ object ScanTest {
 
   val joinWithPriorStateFreeScan1: StringScan =
     directFreeScan
-    .andThenPresent(_ => ())
-    .joinWithPriorState
-    .joinWithInput
-    .andThenPresent{ case (input, (state, ())) => (input::state).mkString.reverse}
+      .andThenPresent(_ => ())
+      .joinWithPriorState
+      .joinWithInput
+      .andThenPresent { case (input, (state, ())) => (input :: state).mkString.reverse }
 
   val joinWithPriorStateFreeScan2: StringScan =
     directFreeScan
-    .andThenPresent(_ => ())
-    .joinWithPriorState
-    .join(Scan.identity[Char])
-    .andThenPresent{ case ((state, ()) , input) => (input::state).mkString.reverse}
+      .andThenPresent(_ => ())
+      .joinWithPriorState
+      .join(Scan.identity[Char])
+      .andThenPresent { case ((state, ()), input) => (input :: state).mkString.reverse }
 
 }
 

@@ -4,13 +4,14 @@ import scala.collection.compat._
 import scala.collection.generic.CanBuildFrom
 
 object Scan {
+
   /**
-    * Most consumers of Scan don't care about the type of the {{State}} type variable. But for those that do,
-    * we make an effort to expose it in all of our combinators.
-    * @tparam I
-    * @tparam S
-    * @tparam O
-    */
+   * Most consumers of Scan don't care about the type of the {{State}} type variable. But for those that do,
+   * we make an effort to expose it in all of our combinators.
+   * @tparam I
+   * @tparam S
+   * @tparam O
+   */
   type Aux[-I, S, +O] = Scan[I, O] { type State = S }
 
   implicit def applicative[I]: Applicative[({ type L[O] = Scan[I, O] })#L] = new ScanApplicative[I]
@@ -29,16 +30,16 @@ object Scan {
   }
 
   /**
-    * Streams can be thought of as being a hidden state that is queryable for a head element, and another hidden state
-    * that represents the rest of the stream. Scans take streams of inputs to streams of outputs, but some scans
-    * have trivial inputs and just produce a stream of outputs.
-    * @param initState The initial state of the scan; think of this as an infinite stream.
-    * @param destructor This function decomposes a stream into the its head-element and tail-stream.
-    * @tparam S The hidden state of the stream that we are turning into a Scan.
-    * @tparam O The type of the elments of the stream that we are turning into a Scan
-    * @return A Scan whose inputs are irrelevant, and whose outputs are those that we would get from implementing
-    *         a stream using the information provided to this method.
-    */
+   * Streams can be thought of as being a hidden state that is queryable for a head element, and another hidden state
+   * that represents the rest of the stream. Scans take streams of inputs to streams of outputs, but some scans
+   * have trivial inputs and just produce a stream of outputs.
+   * @param initState The initial state of the scan; think of this as an infinite stream.
+   * @param destructor This function decomposes a stream into the its head-element and tail-stream.
+   * @tparam S The hidden state of the stream that we are turning into a Scan.
+   * @tparam O The type of the elments of the stream that we are turning into a Scan
+   * @return A Scan whose inputs are irrelevant, and whose outputs are those that we would get from implementing
+   *         a stream using the information provided to this method.
+   */
   def fromStreamLike[S, O](initState: S)(destructor: S => (O, S)): Aux[Any, S, O] = new Scan[Any, O] {
     override type State = S
     override val initialState = initState
@@ -47,9 +48,9 @@ object Scan {
   }
 
   /**
-    * A Scan that returns the number N for the Nth input (starting from 0)
-    */
-  val index: Aux[Any, Long, Long] = fromStreamLike(0L)(n => (n, n+1))
+   * A Scan that returns the number N for the Nth input (starting from 0)
+   */
+  val index: Aux[Any, Long, Long] = fromStreamLike(0L)(n => (n, n + 1))
 
   def identity[A] = fromFunction[A, A](x => x)
 
@@ -265,11 +266,11 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   }
 
   /**
-    *
-    * @tparam I1
-    * @return A scanner that is semantically identical to .join(Scan.identity[I1]), but without
-    *         where we don't pollute the {{State}} by pairing it redundantly with {{Unit}}.
-    */
+   *
+   * @tparam I1
+   * @return A scanner that is semantically identical to .join(Scan.identity[I1]), but without
+   *         where we don't pollute the {{State}} by pairing it redundantly with {{Unit}}.
+   */
   def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = new Scan[I1, (I1, O)] {
     override type State = self.State
 
@@ -305,23 +306,24 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
 
   def joinWithIndex: Aux[I, (State, Long), (O, Long)] = join(Scan.index)
 
-  def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] = new Scan[(I, I2), (O, O2)] {
-    override type State = (self.State, scan2.State)
+  def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
+    new Scan[(I, I2), (O, O2)] {
+      override type State = (self.State, scan2.State)
 
-    override def initialState: State = (self.initialState, scan2.initialState)
+      override def initialState: State = (self.initialState, scan2.initialState)
 
-    override def presentAndNextState(
-        i1i2: (I, I2),
-        stateBeforeProcessingI1I2: State
-    ): ((O, O2), State) = {
-      val (o1, state1AfterProcesingI1) =
-        self.presentAndNextState(i1i2._1, stateBeforeProcessingI1I2._1)
-      val (o2, state2AfterProcesingI2) =
-        scan2.presentAndNextState(i1i2._2, stateBeforeProcessingI1I2._2)
-      ((o1, o2), (state1AfterProcesingI1, state2AfterProcesingI2))
+      override def presentAndNextState(
+          i1i2: (I, I2),
+          stateBeforeProcessingI1I2: State
+      ): ((O, O2), State) = {
+        val (o1, state1AfterProcesingI1) =
+          self.presentAndNextState(i1i2._1, stateBeforeProcessingI1I2._1)
+        val (o2, state2AfterProcesingI2) =
+          scan2.presentAndNextState(i1i2._2, stateBeforeProcessingI1I2._2)
+        ((o1, o2), (state1AfterProcesingI1, state2AfterProcesingI2))
 
+      }
     }
-  }
 
   def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] = new Scan[I2, (O, O2)] {
     override type State = (self.State, scan2.State)
