@@ -34,16 +34,6 @@ object ScanTest {
 
   }
 
-  val reverseAggregatorFreeScan: StringScan = {
-    val aggregator = Aggregator.fromMonoid[List[Char]]
-
-    Scan
-      .fromMonoidAggregatorReverse(aggregator)
-      .composePrepare[Char](c => List(c))
-      .andThenPresent(_.reverse.mkString)
-
-  }
-
   val joinWithPosteriorStateFreeScan: StringScan =
     directFreeScan
       .andThenPresent(_ => ())
@@ -121,10 +111,6 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
 
       "be obeyed by an implementation of the almost-free Scan using fromAggregator, composePrepare, and andThenPresent" in {
         freeScanLaws(aggregatorFreeScan)
-      }
-
-      "be obeyed by an implementation of the almost-free Scan using fromReverseAggregator, composePrepare, and andThenPresent" in {
-        freeScanLaws(reverseAggregatorFreeScan)
       }
 
       "be obeyed by an implementation of the almost-free Scan using a direct implementation, andThenPresent, and joinWithPosteriorState" in {

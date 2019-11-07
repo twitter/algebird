@@ -115,45 +115,6 @@ object Scan {
   def fromMonoidAggregator[A, B, C](monoidAggregator: MonoidAggregator[A, B, C]): Aux[A, B, C] =
     fromAggregator(monoidAggregator, monoidAggregator.monoid.zero)
 
-  /**
-   *
-   * @param aggregator
-   * @param initState
-   * @tparam A
-   * @tparam B
-   * @tparam C
-   * @return  A scan which, when given [a_1, ..., a_n] outputs [c_1, ..., c_n] where
-   *         c_i = aggregator.prepare(a_i) + ... + aggregator.prepare(a_1) + initState
-   */
-  def fromAggregatorReverse[A, B, C](aggregator: Aggregator[A, B, C], initState: B): Aux[A, B, C] =
-    new Scan[A, C] {
-      override type State = B
-
-      override val initialState = initState
-
-      override def presentAndNextState(a: A, stateBeforeProcessingI: B): (C, B) = {
-        // nb: the order of the arguments to semigroup.plus here is what determines the order of the final summation;
-        // this matters because not all semigroups are commutative
-        val stateAfterProcessingA =
-          aggregator.semigroup.plus(aggregator.prepare(a), stateBeforeProcessingI)
-        (aggregator.present(stateAfterProcessingA), stateAfterProcessingA)
-      }
-    }
-
-  /**
-   *
-   * @param monoidAggregator
-   * @tparam A
-   * @tparam B
-   * @tparam C
-   * @return  A scan which, when given [a_1, ..., a_n] outputs [c_1, ..., c_n] where
-   *         c_i = aggregator.prepare(a_i) + ... + aggregator.prepare(a_1) + monoidAggregator.monoid.zero
-   */
-  def fromMonoidAggregatorReverse[A, B, C](
-      monoidAggregator: MonoidAggregator[A, B, C]
-  ): Aux[A, B, C] =
-    fromAggregatorReverse(monoidAggregator, monoidAggregator.monoid.zero)
-
 }
 
 /**
