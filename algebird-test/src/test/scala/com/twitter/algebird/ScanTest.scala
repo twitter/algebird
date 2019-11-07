@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalacheck.Gen
-import org.scalatest.prop.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.Queue
@@ -93,7 +93,21 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
       val zippedScanOutput = zippedScan(zippedInput)
 
       (zippedOutput should contain).theSameElementsInOrderAs(zippedScanOutput)
+    }
 
+    def joinWithIndexLaws(freeScan: StringScan): Unit =
+      forAll(Gen.listOf(Gen.alphaLowerChar)) { inputList =>
+        val unIndexedOutput = freeScan(inputList)
+
+        val joinedWithIndexOutput = freeScan.joinWithIndex(inputList)
+        (unIndexedOutput.zipWithIndex should contain).theSameElementsInOrderAs(joinedWithIndexOutput)
+      }
+
+    "an illustrative example without scalacheck" should {
+      "work as you'd expect" in {
+        val output = directFreeScan(List('a', 'b', 'c'))
+        (output should contain).theSameElementsInOrderAs(List("a", "ab", "abc"))
+      }
     }
 
     "freeAggreator laws" should {
@@ -133,8 +147,14 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
     }
 
     "zipping aggregators" should {
-      "obey their laws" in {
+      "obey its laws" in {
         zipLaws(directFreeScan, directFreeScan)
+      }
+    }
+
+    "joinWithIndex" should {
+      "obey its laws" in {
+        joinWithIndexLaws(directFreeScan)
       }
     }
   }
