@@ -72,7 +72,7 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
         }
     }
 
-  def zipLaws(scan1: StringScan, scan2: StringScan): Unit = {
+  def zipLaws(scan1: StringScan, scan2: StringScan): Unit =
     forAll(Gen.listOf(Gen.alphaLowerChar), Gen.listOf(Gen.alphaLowerChar)) { (inputList1, inputList2) =>
       val outputList1 = scan1(inputList1)
       val outputList2 = scan2(inputList2)
@@ -85,64 +85,62 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
       (zippedOutput should contain).theSameElementsInOrderAs(zippedScanOutput)
     }
 
-    def joinWithIndexLaws(freeScan: StringScan): Unit =
-      forAll(Gen.listOf(Gen.alphaLowerChar)) { inputList =>
-        val unIndexedOutput = freeScan(inputList)
+  def joinWithIndexLaws(freeScan: StringScan): Unit =
+    forAll(Gen.listOf(Gen.alphaLowerChar)) { inputList =>
+      val unIndexedOutput = freeScan(inputList)
 
-        val joinedWithIndexOutput = freeScan.joinWithIndex(inputList)
-        (unIndexedOutput.zipWithIndex should contain).theSameElementsInOrderAs(joinedWithIndexOutput)
-      }
-
-    "an illustrative example without scalacheck" should {
-      "work as you'd expect" in {
-        val output = directFreeScan(List('a', 'b', 'c'))
-        (output should contain).theSameElementsInOrderAs(List("a", "ab", "abc"))
-      }
+      val joinedWithIndexOutput = freeScan.joinWithIndex(inputList)
+      (unIndexedOutput.zipWithIndex should contain).theSameElementsInOrderAs(joinedWithIndexOutput)
     }
 
-    "freeAggreator laws" should {
-      "be obeyed by a direct implementation of the almost-free Scan" in {
-        freeScanLaws(directFreeScan)
-      }
-
-      "be obeyed by a mutable implementation of the almost-free Scan" in {
-        freeScanLaws(mutableFreeScan)
-      }
-
-      "be obeyed by an implementation of the almost-free Scan using fromAggregator, composePrepare, and andThenPresent" in {
-        freeScanLaws(aggregatorFreeScan)
-      }
-
-      "be obeyed by an implementation of the almost-free Scan using a direct implementation, andThenPresent, and joinWithPosteriorState" in {
-        freeScanLaws(joinWithPosteriorStateFreeScan)
-      }
-
-      "be obeyed by an implementation of the almost-free Scan using a direct implmeentation, andThenPresent, joinWithPriorState, and joinWithInput" in {
-        freeScanLaws(joinWithPriorStateFreeScan1)
-      }
-
-      "be obeyed by an implementation of the almost-free Scan using a direct implmeentation, andThenPresent, joinWithPriorState, and join with scan.Identity" in {
-        freeScanLaws(joinWithPriorStateFreeScan2)
-      }
-
-      "be obeyed by composing the identity scan on either side of a direct-implementation of the almost-free Scan" in {
-        freeScanLaws(Scan.identity.compose(directFreeScan))
-        freeScanLaws(directFreeScan.compose(Scan.identity))
-      }
-
-    }
-
-    "zipping aggregators" should {
-      "obey its laws" in {
-        zipLaws(directFreeScan, directFreeScan)
-      }
-    }
-
-    "joinWithIndex" should {
-      "obey its laws" in {
-        joinWithIndexLaws(directFreeScan)
-      }
+  "an illustrative example without scalacheck" should {
+    "work as you'd expect" in {
+      val output = directFreeScan(List('a', 'b', 'c'))
+      (output should contain).theSameElementsInOrderAs(List("a", "ab", "abc"))
     }
   }
 
+  "freeAggreator laws" should {
+    "be obeyed by a direct implementation of the almost-free Scan" in {
+      freeScanLaws(directFreeScan)
+    }
+
+    "be obeyed by a mutable implementation of the almost-free Scan" in {
+      freeScanLaws(mutableFreeScan)
+    }
+
+    "be obeyed by an implementation of the almost-free Scan using fromAggregator, composePrepare, and andThenPresent" in {
+      freeScanLaws(aggregatorFreeScan)
+    }
+
+    "be obeyed by an implementation of the almost-free Scan using a direct implementation, andThenPresent, and joinWithPosteriorState" in {
+      freeScanLaws(joinWithPosteriorStateFreeScan)
+    }
+
+    "be obeyed by an implementation of the almost-free Scan using a direct implmeentation, andThenPresent, joinWithPriorState, and joinWithInput" in {
+      freeScanLaws(joinWithPriorStateFreeScan1)
+    }
+
+    "be obeyed by an implementation of the almost-free Scan using a direct implmeentation, andThenPresent, joinWithPriorState, and join with scan.Identity" in {
+      freeScanLaws(joinWithPriorStateFreeScan2)
+    }
+
+    "be obeyed by composing the identity scan on either side of a direct-implementation of the almost-free Scan" in {
+      freeScanLaws(Scan.identity.compose(directFreeScan))
+      freeScanLaws(directFreeScan.compose(Scan.identity))
+    }
+
+  }
+
+  "zipping aggregators" should {
+    "obey its laws" in {
+      zipLaws(directFreeScan, directFreeScan)
+    }
+  }
+
+  "joinWithIndex" should {
+    "obey its laws" in {
+      joinWithIndexLaws(directFreeScan)
+    }
+  }
 }
