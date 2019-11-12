@@ -111,14 +111,16 @@ object Scan {
 
 /**
  * The Scan trait is an alternative to the "scanLeft" method on iterators/other collections for a range of
- * of use-cases where scanLeft is awkward to use. At a high level it provides some of the same functionality as scanleft,
- * but with a separation of "what is the state of the scan" from "what are the elements that I'm scanning over?"
- * In particular, when scanning over an iterator with N elements, the output is an iterator with N elements (in contrast
- * to scanLeft's N+1).
+ * of use-cases where scanLeft is awkward to use. At a high level it provides some of the same functionality as
+ * [[scala.collection.Iterator.scanLeft]], but with a separation of "what is the state of the scan" from
+ * "what are the elements that I'm scanning over?". In particular, when scanning over an iterator with `N` elements,
+ * the output is an iterator with `N` elements (in contrast to scanLeft's `N+1`).
  *
- * If you find yourself writing a ScanLeft over pairs of elements, where you only use one element of the pair within
- * the scanLeft itself then throw that element away in a "map" immediately after the scanLeft is done, then this
+ * If you find yourself writing a `scanLeft` over pairs of elements, where you only use one element of the pair within
+ * the `scanLeft` itself then throw that element away in a `map` immediately after the scanLeft is done, then this
  * abstraction is for you.
+ *
+ * The canonical method to use a scanner is its `apply` method.
  *
  *
  * @tparam I The type of elements that the computation is scanning over.
@@ -174,10 +176,10 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @tparam In The type of the input collection
    * @tparam Out The type of the output collection
    * @return
-   * Given inputs as a collection of the form [a_1, ..., a_n] the output will be a collection of the form:
-   * [o_1, ..., o_n] where
-   * (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
-   * and state_0 = initialState
+   * Given inputs as a collection of the form `[a_1, ..., a_n]` the output will be a collection of the form:
+   * `[o_1, ..., o_n]` where
+   * `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
+   * and `state_0 = initialState`.
    */
   def apply[In <: TraversableOnce[I], Out](
       inputs: In
