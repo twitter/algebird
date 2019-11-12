@@ -152,10 +152,10 @@ sealed trait Scan[-I, +O] extends Serializable {
 
   /**
    * @param iter
-   * @return If iter = Iterator(a_1, ..., a_n), return:
-   * Iterator(o_1, ..., o_n) where
-   * (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
-   * and state_0 = initialState
+   * @return If `iter = Iterator(a_1, ..., a_n)`, return:`
+   * `Iterator(o_1, ..., o_n)` where
+   * `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
+   * and `state_0 = initialState`
    *
    */
   def scanIterator(iter: Iterator[I]): Iterator[O] = new AbstractIterator[O] {
