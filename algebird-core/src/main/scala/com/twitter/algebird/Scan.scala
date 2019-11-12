@@ -83,8 +83,8 @@ object Scan {
    * @tparam A
    * @tparam B
    * @tparam C
-   * @return A scan which, when given [a_1, ..., a_n] outputs [c_1, ..., c_n] where
-   *         c_i = initState + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)
+   * @return A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where
+   *         `c_i = initState + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
    */
   def fromAggregator[A, B, C](aggregator: Aggregator[A, B, C], initState: B): Aux[A, B, C] =
     from(initState) { (a: A, stateBeforeProcessingI: B) =>
@@ -101,8 +101,8 @@ object Scan {
    * @tparam A
    * @tparam B
    * @tparam C
-   * @return A scan which, when given [a_1, ..., a_n] outputs [c_1, ..., c_n] where
-   *         c_i = monoidAggregator.monoid.zero + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)
+   * @return A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where
+   *         `c_i = monoidAggregator.monoid.zero + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
    */
   def fromMonoidAggregator[A, B, C](monoidAggregator: MonoidAggregator[A, B, C]): Aux[A, B, C] =
     fromAggregator(monoidAggregator, monoidAggregator.monoid.zero)
@@ -206,14 +206,13 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   *
-   * @tparam I1
-   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
-   * of the form [o_1, ..., o_n], then {{joinWithInput}} results in a Scan whose `apply` method
-   * returns [(a_1, o_1), ..., (a_n, o_n)] when given the same input.
-   * In other words, `joinWithInput` returns a scanner that is semantically identical to
+   * Returns a scanner that is semantically identical to
    * `this.join(Scan.identity[I1]`, but where we don't pollute the `State` by pairing it
    * redundantly with `Unit`.
+   * @tparam I1
+   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
+   * of the form `[o_1, ..., o_n`, then this results in a Scan whose `apply` method
+   * returns `[(a_1, o_1), ..., (a_n, o_n)]` when given the same input.
    */
   def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
     val (o, stateAfterProcessingI) = presentAndNextState(i, stateBeforeProcessingI)
@@ -222,7 +221,7 @@ sealed trait Scan[-I, +O] extends Serializable {
 
   /**
    * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
-   * of the form `[o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)``
+   * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
    *  and `state_0 = initialState`,
    * return scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
    * `[(o_1, state_0), ..., (o_n, state_(n-1))]`.
@@ -245,9 +244,9 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   *  `scan.joinWithIndex(foo) == scan(foo).zipWithIndex)`.
+   *  `scan.joinWithIndex(foo) == scan(foo).zipWithIndex`.
    * @return
-   *            * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
+   * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form `[o_1, ..., o_n]`, return a scan that whose apply method, when given the same input, will return
    * `[(o_1, 1), ..., (o_n, n)]`.
    */
@@ -263,7 +262,7 @@ sealed trait Scan[-I, +O] extends Serializable {
    * the form `[o_1, ..., o_n]`, and `scan2.apply([b_1, ..., b_n] = [p_1, ..., p_n]` then
    * `zip` will return a scan whose apply method, when given input
    * `[(a_1, b_1), ..., (a_n, b_n)]` results in the output `[(o_1, p_1), ..., (o_2, p_2)]`.
-   * In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar)) `
+   * In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar))`
    */
   def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
     from((initialState, scan2.initialState)) { (i1i2, stateBeforeProcessingI1I2) =>
@@ -275,15 +274,15 @@ sealed trait Scan[-I, +O] extends Serializable {
     }
 
   /**
-   * Given a scan that takes compatible input to this one, compose the state and outputs of each scan pairwise
+   * Given a scan that takes compatible input to this one, pairwise compose the state and outputs of each scan
    * on a common input stream.
    * @param scan2
    * @tparam I2
    * @tparam O2
    * @return  If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
-   * the form [o_1, ..., o_n], and scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n] then
-   * `join` will return a scan whose apply method returns [(o_1, p_1), ..., (o_2, p_2)].
-   * In other words: `scan.join(scan2)(foo) == scan(foo).zip(scan2(foo)) `
+   * the form `[o_1, ..., o_n]`, and `scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n]` then
+   * `join` will return a scan whose apply method returns `[(o_1, p_1), ..., (o_2, p_2)]`.
+   * In other words: `scan.join(scan2)(foo) == scan(foo).zip(scan2(foo))`
    */
   def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] =
     from((initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>
@@ -296,9 +295,9 @@ sealed trait Scan[-I, +O] extends Serializable {
    * Takes the output of this scan and feeds as input into scan2.
    * @param scan2
    * @tparam P
-   * @return If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
-   * the form [o_1, ..., o_n], and scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n] then
-   * `compose` will return a scan which returns [p_1, ..., p_n].
+   * @return If this Scan's apply method is given inputs `[a_1, ..., a_n]` resulting in outputs of
+   * the form `[o_1, ..., o_n]`, and `scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n]` then
+   * `compose` will return a scan which returns `[p_1, ..., p_n]`.
    */
   def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] =
     from((initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>
