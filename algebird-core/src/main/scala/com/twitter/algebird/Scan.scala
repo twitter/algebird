@@ -126,7 +126,7 @@ object Scan {
  */
 sealed trait Scan[-I, +O] extends Serializable { self =>
 
-  import Scan.{Aux, from}
+  import Scan.{from, Aux}
 
   /**
    * The computation of any given scan involves keeping track of a hidden state.
@@ -186,41 +186,31 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
 
   // combinators
 
-  def replaceState(newInitialState: => State): Aux[I, State, O] = from(newInitialState)(presentAndNextState(_, _))
+  def replaceState(newInitialState: => State): Aux[I, State, O] =
+    from(newInitialState)(presentAndNextState(_, _))
 
-  def composePrepare[I1](f: I1 => I): Aux[I1, State, O] = from(self.initialState){(i, stateBeforeProcessingI) =>
-      presentAndNextState(f(i), stateBeforeProcessingI)
+  def composePrepare[I1](f: I1 => I): Aux[I1, State, O] = from(initialState) { (i, stateBeforeProcessingI) =>
+    presentAndNextState(f(i), stateBeforeProcessingI)
   }
 
-  def andThenPresent[O1](g: O => O1): Aux[I, State, O1] = new Scan[I, O1] {
-    override type State = self.State
-    override def initialState: State = self.initialState
-
-    override def presentAndNextState(i: I, stateBeforeProcessingI: State): (O1, State) = {
-      val (c, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
-      (g(c), stateAfterProcessingA)
-    }
+  def andThenPresent[O1](g: O => O1): Aux[I, State, O1] = from(initialState) { (i, stateBeforeProcessingI) =>
+    val (c, stateAfterProcessingA) = presentAndNextState(i, stateBeforeProcessingI)
+    (g(c), stateAfterProcessingA)
   }
 
   /**
    *
    * @tparam I1
-   * @return If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
+   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form [o_1, ..., o_n], then {{joinWithInput}} results in a Scan whose `apply` method
    * returns [(a_1, o_1), ..., (a_n, o_n)] when given the same input.
-   * In other words, {{joinWithInput}} returns a scanner that is semantically identical to
-   * {{this.join(Scan.identity[I1])}}, but where we don't pollute the {{State}} by pairing it
-   * redundantly with {{Unit}}.
+   * In other words, `joinWithInput` returns a scanner that is semantically identical to
+   * `this.join(Scan.identity[I1]`, but where we don't pollute the `State` by pairing it
+   * redundantly with `Unit`.
    */
-  def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = new Scan[I1, (I1, O)] {
-    override type State = self.State
-
-    override def initialState: State = self.initialState
-
-    override def presentAndNextState(i: I1, stateBeforeProcessingI: State): ((I1, O), State) = {
-      val (o, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
-      ((i, o), stateAfterProcessingA)
-    }
+  def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
+    val (o, stateAfterProcessingI) = self.presentAndNextState(i, stateBeforeProcessingI)
+    ((i, o), stateAfterProcessingI)
   }
 
   /**
@@ -230,15 +220,9 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
    * [(o_1, state_0), ..., (o_n, state_(n-1))].
    */
-  def joinWithPriorState: Aux[I, State, (State, O)] = new Scan[I, (State, O)] {
-    override type State = self.State
-
-    override def initialState: State = self.initialState
-
-    override def presentAndNextState(i: I, stateBeforeProcessingI: State): ((State, O), State) = {
-      val (o, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
-      ((stateBeforeProcessingI, o), stateAfterProcessingA)
-    }
+  def joinWithPriorState: Aux[I, State, (State, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
+    val (o, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
+    ((stateBeforeProcessingI, o), stateAfterProcessingA)
   }
 
   /**
@@ -248,15 +232,9 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
    * [(o_1, state_1), ..., (o_n, state_n].
    */
-  def joinWithPosteriorState: Aux[I, State, (O, State)] = new Scan[I, (O, State)] {
-    override type State = self.State
-
-    override def initialState: State = self.initialState
-
-    override def presentAndNextState(i: I, stateBeforeProcessingI: State): ((O, State), State) = {
-      val (c, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
-      ((c, stateAfterProcessingA), stateAfterProcessingA)
-    }
+  def joinWithPosteriorState: Aux[I, State, (O, State)] = from(initialState) { (i, stateBeforeProcessingI) =>
+    val (c, stateAfterProcessingA) = self.presentAndNextState(i, stateBeforeProcessingI)
+    ((c, stateAfterProcessingA), stateAfterProcessingA)
   }
 
   /**
@@ -279,22 +257,12 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar)) `
    */
   def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
-    new Scan[(I, I2), (O, O2)] {
-      override type State = (self.State, scan2.State)
-
-      override def initialState: State = (self.initialState, scan2.initialState)
-
-      override def presentAndNextState(
-          i1i2: (I, I2),
-          stateBeforeProcessingI1I2: State
-      ): ((O, O2), State) = {
-        val (o1, state1AfterProcesingI1) =
-          self.presentAndNextState(i1i2._1, stateBeforeProcessingI1I2._1)
-        val (o2, state2AfterProcesingI2) =
-          scan2.presentAndNextState(i1i2._2, stateBeforeProcessingI1I2._2)
-        ((o1, o2), (state1AfterProcesingI1, state2AfterProcesingI2))
-
-      }
+    from((self.initialState, scan2.initialState)) { (i1i2, stateBeforeProcessingI1I2) =>
+      val (o1, state1AfterProcesingI1) =
+        self.presentAndNextState(i1i2._1, stateBeforeProcessingI1I2._1)
+      val (o2, state2AfterProcesingI2) =
+        scan2.presentAndNextState(i1i2._2, stateBeforeProcessingI1I2._2)
+      ((o1, o2), (state1AfterProcesingI1, state2AfterProcesingI2))
     }
 
   /**
@@ -306,17 +274,12 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * `join` will return a scan whose apply method returns [(o_1, p_1), ..., (o_2, p_2)].
    * In other words: `scan.join(scan2)(foo) == scan(foo).zip(scan2(foo)) `
    */
-  def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] = new Scan[I2, (O, O2)] {
-    override type State = (self.State, scan2.State)
-
-    override def initialState: State = (self.initialState, scan2.initialState)
-
-    override def presentAndNextState(i: I2, stateBeforeProcessingI: State): ((O, O2), State) = {
+  def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] =
+    from((self.initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>
       val (o1, state1AfterProcesingI1) = self.presentAndNextState(i, stateBeforeProcessingI._1)
       val (o2, state2AfterProcesingI2) = scan2.presentAndNextState(i, stateBeforeProcessingI._2)
       ((o1, o2), (state1AfterProcesingI1, state2AfterProcesingI2))
     }
-  }
 
   /**
    * Takes the output of this scan and feeds as input into scan2.
@@ -326,17 +289,12 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * the form [o_1, ..., o_n], and scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n] then
    * `compose` will return a scan which returns [p_1, ..., p_n].
    */
-  def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] = new Scan[I, P] {
-    override type State = (self.State, scan2.State)
-
-    override def initialState: State = (self.initialState, scan2.initialState)
-
-    override def presentAndNextState(i: I, stateBeforeProcessingI: State): (P, State) = {
-      val (o, state1AfterProcesingI1) = self.presentAndNextState(i, stateBeforeProcessingI._1)
-      val (p, state2AfterProcesingI2) = scan2.presentAndNextState(o, stateBeforeProcessingI._2)
-      (p, (state1AfterProcesingI1, state2AfterProcesingI2))
+  def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] =
+    from((self.initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>
+      val (o, state1AfterProcesingI) = presentAndNextState(i, stateBeforeProcessingI._1)
+      val (p, state2AfterProcesingO) = scan2.presentAndNextState(o, stateBeforeProcessingI._2)
+      (p, (state1AfterProcesingI, state2AfterProcesingO))
     }
-  }
 
 }
 
