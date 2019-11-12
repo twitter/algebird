@@ -51,7 +51,7 @@ object Scan {
    */
   val index: Aux[Any, Long, Long] = iterate(0L)(n => (n, n + 1))
 
-  def identity[A] = fromFunction[A, A](x => x)
+  def identity[A]: Aux[A, Unit, A] = fromFunction[A, A](x => x)
 
   /**
    *
@@ -91,7 +91,7 @@ object Scan {
       // nb: the order of the arguments to semigroup.plus here is what determines the order of the final summation;
       // this matters because not all semigroups are commutative
       val stateAfterProcessingA =
-        aggregator.semigroup.plus(stateBeforeProcessingI, aggregator.prepare(a))
+        aggregator.append(stateBeforeProcessingI, a)
       (aggregator.present(stateAfterProcessingA), stateAfterProcessingA)
     }
 
