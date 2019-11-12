@@ -110,9 +110,9 @@ object Scan {
 }
 
 /**
- * The Scan trait is an alternative to the "scanLeft" method on iterators/other collections for a range of
+ * The Scan trait is an alternative to the `scanLeft` method on iterators/other collections for a range of
  * of use-cases where scanLeft is awkward to use. At a high level it provides some of the same functionality as
- * [[scala.collection.Iterator.scanLeft]], but with a separation of "what is the state of the scan" from
+ * `scanleft`, but with a separation of "what is the state of the scan" from
  * "what are the elements that I'm scanning over?". In particular, when scanning over an iterator with `N` elements,
  * the output is an iterator with `N` elements (in contrast to scanLeft's `N+1`).
  *
