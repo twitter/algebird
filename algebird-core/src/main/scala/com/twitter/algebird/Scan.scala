@@ -223,8 +223,8 @@ sealed trait Scan[-I, +O] extends Serializable {
   /**
    * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
    * of the form `[o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)``
-   *  and `state_0 = initialState`:
-   * @return A scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   *  and `state_0 = initialState`,
+   * return scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
    * `[(o_1, state_0), ..., (o_n, state_(n-1))]`.
    */
   def joinWithPriorState: Aux[I, State, (State, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
@@ -236,7 +236,7 @@ sealed trait Scan[-I, +O] extends Serializable {
    * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)``
    *  and state_0 = initialState:
-   * @return A scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   * return A scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
    * `[(o_1, state_1), ..., (o_n, state_n]`.
    */
   def joinWithPosteriorState: Aux[I, State, (O, State)] = from(initialState) { (i, stateBeforeProcessingI) =>
