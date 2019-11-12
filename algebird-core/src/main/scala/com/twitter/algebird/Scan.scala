@@ -47,7 +47,7 @@ object Scan {
   }
 
   /**
-   * A Scan that returns the number N for the Nth input (starting from 0)
+   * A Scan whose `Nth` output is the number `N` (starting from 0).
    */
   val index: Aux[Any, Long, Long] = iterate(0L)(n => (n, n + 1))
 
@@ -116,15 +116,15 @@ object Scan {
  * "what are the elements that I'm scanning over?". In particular, when scanning over an iterator with `N` elements,
  * the output is an iterator with `N` elements (in contrast to scanLeft's `N+1`).
  *
- * If you find yourwriting a `scanLeft` over pairs of elements, where you only use one element of the pair within
- * the `scanLeft` itthen throw that element away in a `map` immediately after the scanLeft is done, then this
+ * If you find yourself writing a `scanLeft` over pairs of elements, where you only use one element of the pair within
+ * the `scanLeft`, then throw that element away in a `map` immediately after the scanLeft is done, then this
  * abstraction is for you.
  *
- * The canonical method to use a scanner is `apply`.
+ * The canonical method to use a scan is `apply`.
  *
  *
  * @tparam I The type of elements that the computation is scanning over.
- * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan.
+ * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan).
  */
 sealed trait Scan[-I, +O] extends Serializable {
 
@@ -206,8 +206,8 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   * Returns a scanner that is semantically identical to
-   * `this.join(Scan.identity[I1]`, but where we don't pollute the `State` by pairing it
+   * Return a scan that is semantically identical to
+   * `this.join(Scan.identity[I1])`, but where we don't pollute the `State` by pairing it
    * redundantly with `Unit`.
    * @tparam I1
    * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
@@ -220,10 +220,11 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
+   * Return a scan whose output is paired with the state of the scan before each input updates the state.
+   * @return If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
    * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
-   *  and `state_0 = initialState`,
-   * return scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   * and `state_0 = initialState`,
+   * return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
    * `[(o_1, state_0), ..., (o_n, state_(n-1))]`.
    */
   def joinWithPriorState: Aux[I, State, (State, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
@@ -232,10 +233,11 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
+   * Return a scan whose output is paired with the state of the scan after each input updates the state.
+   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)``
-   *  and state_0 = initialState:
-   * return A scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   *  and state_0 = initialState,
+   * return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
    * `[(o_1, state_1), ..., (o_n, state_n]`.
    */
   def joinWithPosteriorState: Aux[I, State, (O, State)] = from(initialState) { (i, stateBeforeProcessingI) =>
@@ -244,7 +246,7 @@ sealed trait Scan[-I, +O] extends Serializable {
   }
 
   /**
-   *  `scan.joinWithIndex(foo) == scan(foo).zipWithIndex`.
+   * For every `foo`, `scan.joinWithIndex(foo) == scan(foo).zipWithIndex`.
    * @return
    * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form `[o_1, ..., o_n]`, return a scan that whose apply method, when given the same input, will return
