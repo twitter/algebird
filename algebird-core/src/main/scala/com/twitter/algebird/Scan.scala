@@ -5,7 +5,7 @@ import scala.collection.compat._
 object Scan {
 
   /**
-   * Most consumers of Scan don't care about the type of the {{State}} type variable. But for those that do,
+   * Most consumers of Scan don't care about the type of the type State type variable. But for those that do,
    * we make an effort to expose it in all of our combinators.
    * @tparam I
    * @tparam S
@@ -29,9 +29,9 @@ object Scan {
   }
 
   /**
-   * Streams can be thought of as being a hidden state that is queryable for a head element, and another hidden state
-   * that represents the rest of the stream. Scans take streams of inputs to streams of outputs, but some scans
-   * have trivial inputs and just produce a stream of outputs.
+   * Scans take streams of inputs to streams of outputs, but some scans have trivial inputs and just produce a stream of
+   * outputs. Streams can be thought of as being a hidden state that is queryable for a head element, and another hidden
+   * state that represents the rest of the stream.
    * @param initState The initial state of the scan; think of this as an infinite stream.
    * @param destructor This function decomposes a stream into the its head-element and tail-stream.
    * @tparam S The hidden state of the stream that we are turning into a Scan.
@@ -74,9 +74,7 @@ object Scan {
    * @param t
    * @tparam T
    */
-  def const[T](t: T): Aux[Any, Unit, T] = from(()) { (_, _) =>
-    (t, ())
-  }
+  def const[T](t: T): Aux[Any, Unit, T] = fromFunction(_ => t)
 
   /**
    *
@@ -89,18 +87,12 @@ object Scan {
    *         c_i = initState + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)
    */
   def fromAggregator[A, B, C](aggregator: Aggregator[A, B, C], initState: B): Aux[A, B, C] =
-    new Scan[A, C] {
-      override type State = B
-
-      override val initialState = initState
-
-      override def presentAndNextState(a: A, stateBeforeProcessingI: B): (C, B) = {
-        // nb: the order of the arguments to semigroup.plus here is what determines the order of the final summation;
-        // this matters because not all semigroups are commutative
-        val stateAfterProcessingA =
-          aggregator.semigroup.plus(stateBeforeProcessingI, aggregator.prepare(a))
-        (aggregator.present(stateAfterProcessingA), stateAfterProcessingA)
-      }
+    from(initState) { (a: A, stateBeforeProcessingI: B) =>
+      // nb: the order of the arguments to semigroup.plus here is what determines the order of the final summation;
+      // this matters because not all semigroups are commutative
+      val stateAfterProcessingA =
+        aggregator.semigroup.plus(stateBeforeProcessingI, aggregator.prepare(a))
+      (aggregator.present(stateAfterProcessingA), stateAfterProcessingA)
     }
 
   /**
@@ -130,29 +122,29 @@ object Scan {
  *
  *
  * @tparam I The type of elements that the computation is scanning over.
- * @tparam O The output type of the scan (typically distinct from the hidden {{{State}}} of the scan.
+ * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan.
  */
 sealed trait Scan[-I, +O] extends Serializable { self =>
 
-  import Scan.Aux
+  import Scan.{Aux, from}
 
   /**
-   * The computation of any given scan involves keeping track of a hidden state of type {{{State}}}
+   * The computation of any given scan involves keeping track of a hidden state.
    */
   type State
 
   /**
-   *
-   * @return The state of the scan before any elements have been processed
+   * The state of the scan before any elements have been processed
+   * @return
    */
   def initialState: State
 
   /**
    *
    * @param i An element in the stream to process
-   * @param stateBeforeProcessingI The state of the scan before processing {{{i}}}
-   * @return The output of the scan corresponding to processing {{{i}}} with state {{{stateBeforeProcessing}}},
-   *         along with the result of updating {{{stateBeforeProcessing}}} with the information from {{{i}}}.
+   * @param stateBeforeProcessingI The state of the scan before processing i
+   * @return The output of the scan corresponding to processing i with state stateBeforeProcessing,
+   *         along with the result of updating stateBeforeProcessing with the information from i.
    */
   def presentAndNextState(i: I, stateBeforeProcessingI: State): (O, State)
 
@@ -194,22 +186,10 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
 
   // combinators
 
-  def replaceState(newInitialState: => State): Aux[I, State, O] = new Scan[I, O] {
-    override type State = self.State
+  def replaceState(newInitialState: => State): Aux[I, State, O] = from(newInitialState)(presentAndNextState(_, _))
 
-    override def initialState: State = newInitialState
-
-    override def presentAndNextState(i: I, stateBeforeProcessingI: State): (O, State) =
-      self.presentAndNextState(i, stateBeforeProcessingI)
-  }
-
-  def composePrepare[I1](f: I1 => I): Aux[I1, State, O] = new Scan[I1, O] {
-    override type State = self.State
-
-    override def initialState: State = self.initialState
-
-    override def presentAndNextState(i: I1, stateBeforeProcessingI: State): (O, State) =
-      self.presentAndNextState(f(i), stateBeforeProcessingI)
+  def composePrepare[I1](f: I1 => I): Aux[I1, State, O] = from(self.initialState){(i, stateBeforeProcessingI) =>
+      presentAndNextState(f(i), stateBeforeProcessingI)
   }
 
   def andThenPresent[O1](g: O => O1): Aux[I, State, O1] = new Scan[I, O1] {
@@ -225,8 +205,8 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   /**
    *
    * @tparam I1
-   * @return If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
-   * of the form [o_1, ..., o_n], then {{joinWithInput}} results in a Scan whose {{apply}} method
+   * @return If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
+   * of the form [o_1, ..., o_n], then {{joinWithInput}} results in a Scan whose `apply` method
    * returns [(a_1, o_1), ..., (a_n, o_n)] when given the same input.
    * In other words, {{joinWithInput}} returns a scanner that is semantically identical to
    * {{this.join(Scan.identity[I1])}}, but where we don't pollute the {{State}} by pairing it
@@ -244,7 +224,7 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   }
 
   /**
-   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
    * of the form [o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
    *  and state_0 = initialState:
    * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
@@ -262,7 +242,7 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   }
 
   /**
-   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
    * of the form [o_1, ..., o_n], where (o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)
    *  and state_0 = initialState:
    * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
@@ -280,11 +260,11 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
   }
 
   /**
-   * If this Scan's {{apply}} method is given inputs [a_1, ..., a_n] resulting in outputs
+   * If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
    * of the form [o_1, ..., o_n]
    * @return A scan that whose apply method, when given inputs [a_1, ..., a_n] will return
    * [(o_1, 1), ..., (o_n, n)].
-   * In other words: {{scan.joinWithIndex(foo) == scan(foo).zipWithIndex)}}
+   * In other words: `scan.joinWithIndex(foo) == scan(foo).zipWithIndex)`
    */
   def joinWithIndex: Aux[I, (State, Long), (O, Long)] = join(Scan.index)
 
@@ -294,9 +274,9 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @tparam O2
    * @return f this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
    * the form [o_1, ..., o_n], and scan2.apply([b_1, ..., b_n] = [p_1, ..., p_n] then
-   * {{zip}} will return a scan whose apply method, when given input
+   * `zip` will return a scan whose apply method, when given input
    * [(a_1, b_1), ..., (a_n, b_n)] results in the output [(o_1, p_1), ..., (o_2, p_2)].
-   * In other words: {{scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar)) }}
+   * In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar)) `
    */
   def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
     new Scan[(I, I2), (O, O2)] {
@@ -323,8 +303,8 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @tparam O2
    * @return  If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
    * the form [o_1, ..., o_n], and scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n] then
-   * {{join}} will return a scan whose apply method returns [(o_1, p_1), ..., (o_2, p_2)].
-   * In other words: {{scan.join(scan2)(foo) == scan(foo).zip(scan2(foo)) }}
+   * `join` will return a scan whose apply method returns [(o_1, p_1), ..., (o_2, p_2)].
+   * In other words: `scan.join(scan2)(foo) == scan(foo).zip(scan2(foo)) `
    */
   def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] = new Scan[I2, (O, O2)] {
     override type State = (self.State, scan2.State)
@@ -344,7 +324,7 @@ sealed trait Scan[-I, +O] extends Serializable { self =>
    * @tparam P
    * @return If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
    * the form [o_1, ..., o_n], and scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n] then
-   * {{compose}} will return a scan which returns [p_1, ..., p_n].
+   * `compose` will return a scan which returns [p_1, ..., p_n].
    */
   def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] = new Scan[I, P] {
     override type State = (self.State, scan2.State)
