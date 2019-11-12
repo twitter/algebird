@@ -45,7 +45,7 @@ object ScanTest {
       .andThenPresent(_ => ())
       .joinWithPriorState
       .joinWithInput
-      .andThenPresent { case (input, (state, ())) => (input :: state).mkString.reverse }
+      .andThenPresent { case ((state, ()), input) => (input :: state).mkString.reverse }
 
   val joinWithPriorStateFreeScan2: StringScan =
     directFreeScan

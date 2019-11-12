@@ -212,11 +212,11 @@ sealed trait Scan[-I, +O] extends Serializable {
    * @tparam I1
    * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
    * of the form `[o_1, ..., o_n`, then this results in a Scan whose `apply` method
-   * returns `[(a_1, o_1), ..., (a_n, o_n)]` when given the same input.
+   * returns `[(o_1, a_1), ..., (o_n, a_n)]` when given the same input.
    */
-  def joinWithInput[I1 <: I]: Aux[I1, State, (I1, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
+  def joinWithInput[I1 <: I]: Aux[I1, State, (O, I1)] = from(initialState) { (i, stateBeforeProcessingI) =>
     val (o, stateAfterProcessingI) = presentAndNextState(i, stateBeforeProcessingI)
-    ((i, o), stateAfterProcessingI)
+    ((o, i), stateAfterProcessingI)
   }
 
   /**
