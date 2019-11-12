@@ -189,7 +189,7 @@ sealed trait Scan[-I, +O] extends Serializable {
   // combinators
 
   /**
-   * Returns a new scan that is the same as this scan, but with a different `initialState`.
+   * Return a new scan that is the same as this scan, but with a different `initialState`.
    * @param newInitialState
    * @return
    */

@@ -146,8 +146,9 @@ class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyCheck
     "replaceState" should {
       "behave as you'd expect" in {
         forAll(Gen.listOf(Gen.alphaLowerChar), Gen.listOf(Gen.alphaLowerChar)) { (inputList1, inputList2) =>
-          // first we'll run the scan on inputList1 ++ inputList2, which. We should be able to replace the initial state
-          // of the scan such that just scanning only inputList2 will
+          // first we'll run the scan on inputList1 ++ inputList2, which will result in output1 ++ output2.
+          // We should be able to replace the initial state of the scan such that just scanning only inputList2
+          // will return output2.
           val (_, output2) = directFreeScan(inputList1 ++ inputList2).splitAt(inputList1.length)
           val stateOfScanAfterProcessingList1 = inputList1.reverse
           val scanAfterReplacingState = directFreeScan.replaceState(stateOfScanAfterProcessingList1)
