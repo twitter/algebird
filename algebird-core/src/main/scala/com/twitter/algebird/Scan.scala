@@ -126,7 +126,7 @@ object Scan {
  * @tparam I The type of elements that the computation is scanning over.
  * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan).
  */
-sealed trait Scan[-I, +O] extends Serializable {
+sealed abstract class Scan[-I, +O] extends Serializable {
 
   import Scan.{from, Aux}
 
