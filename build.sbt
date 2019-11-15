@@ -11,7 +11,7 @@ val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.0.8"
 val scalacheckVersion = "1.14.2"
 val scalaCollectionCompat = "2.1.2"
-val utilVersion = "19.10.0"
+val utilVersion = "19.11.0"
 val sparkVersion = "2.4.4"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
