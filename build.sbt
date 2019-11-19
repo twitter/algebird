@@ -92,9 +92,9 @@ val sharedSettings = Seq(
     commitReleaseVersion,
     tagRelease,
     releaseStepCommandAndRemaining("+publishSigned"), // formerly publishArtifacts, here to deal with algebird-spark
+    ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
     pushChanges
   ),
   publishTo := sonatypePublishToBundle.value,
