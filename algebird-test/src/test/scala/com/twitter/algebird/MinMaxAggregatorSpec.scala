@@ -1,8 +1,10 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MinMaxAggregatorSpec extends WordSpec with Matchers {
+class MinMaxAggregatorSpec extends AnyWordSpec with Matchers {
   sealed trait TestElementParent
   case object TestElementA extends TestElementParent
   case object TestElementB extends TestElementParent

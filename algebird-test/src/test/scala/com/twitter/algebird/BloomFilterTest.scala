@@ -3,8 +3,9 @@ package com.twitter.algebird
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 object BloomFilterTestUtils {
   def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
@@ -285,7 +286,7 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
   }
 }
 
-class BloomFilterTest extends WordSpec with Matchers {
+class BloomFilterTest extends AnyWordSpec with Matchers {
 
   val RAND = new scala.util.Random
 

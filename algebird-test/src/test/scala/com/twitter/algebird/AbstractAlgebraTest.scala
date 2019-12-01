@@ -2,8 +2,8 @@ package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.Matchers
 import org.scalacheck.Prop._
+import org.scalatest.matchers.should.Matchers
 
 class AbstractAlgebraTest extends CheckProperties with Matchers {
 

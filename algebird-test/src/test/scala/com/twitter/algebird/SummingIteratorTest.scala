@@ -16,9 +16,10 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
 object SummingIteratorTest {
   implicit def mapEquiv[K, V: Monoid: Equiv]: Equiv[Map[K, V]] =
@@ -38,7 +39,7 @@ object SummingIteratorTest {
     }
 }
 
-class SummingIteratorTest extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class SummingIteratorTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   import SummingIteratorTest._
   def sumEquiv[V: Semigroup: Equiv](it0: Iterator[V], it1: Iterator[V]): Boolean =
     StatefulSummerLaws.zeroEquiv(Semigroup.sumOption(it0), Semigroup.sumOption(it1))

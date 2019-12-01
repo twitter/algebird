@@ -5,6 +5,8 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest._
 
 import scala.util.Try
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class SpaceSaverLaws extends CheckProperties {
 
@@ -65,7 +67,7 @@ class SpaceSaverLaws extends CheckProperties {
   }
 }
 
-class SpaceSaverTest extends WordSpec with Matchers {
+class SpaceSaverTest extends AnyWordSpec with Matchers {
 
   "SpaceSaver" should {
     "produce a top 20 with exact bounds" in {

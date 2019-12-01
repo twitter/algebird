@@ -5,6 +5,8 @@ import org.scalatest._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
 object Helpers {
   implicit def arbitraryBatched[A: Arbitrary]: Arbitrary[Batched[A]] = {
@@ -50,7 +52,7 @@ class BatchedLaws extends CheckProperties {
   testBatchedMonoid[String]("String", 1000000)
 }
 
-class BatchedTests extends PropSpec with Matchers with ScalaCheckPropertyChecks {
+class BatchedTests extends AnyPropSpec with Matchers with ScalaCheckPropertyChecks {
   property(".iterator works") {
     forAll { (x: Int, xs: List[Int]) =>
       Batched(x).append(xs).iterator.toList shouldBe (x :: xs)

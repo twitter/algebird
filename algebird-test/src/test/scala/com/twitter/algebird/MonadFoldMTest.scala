@@ -1,8 +1,10 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class MonadFoldMTest extends WordSpec with Matchers {
+class MonadFoldMTest extends AnyWordSpec with Matchers {
 
   def binSmalls(x: Int, y: Int): Option[Int] = if (y > 9) None else Some(x + y)
   "A monad foldM" should {

@@ -2,6 +2,8 @@ package com.twitter.algebird
 
 import org.scalatest._
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 object SketchMapTestImplicits {
   val DELTA = 1e-6
@@ -34,7 +36,7 @@ class SketchMapLaws extends CheckProperties {
   }
 }
 
-class SketchMapTest extends WordSpec with Matchers {
+class SketchMapTest extends AnyWordSpec with Matchers {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 

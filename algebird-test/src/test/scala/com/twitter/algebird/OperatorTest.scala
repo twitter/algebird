@@ -3,8 +3,10 @@ package com.twitter.algebird
 import org.scalatest._
 
 import Operators._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class OperatorTest extends WordSpec with Matchers {
+class OperatorTest extends AnyWordSpec with Matchers {
 
   "Operators" should {
     "allow plus" in {

@@ -3,6 +3,9 @@ package com.twitter.algebird
 import org.scalatest._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen, Prop}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
+import org.scalatest.wordspec.AnyWordSpec
 
 class EventuallyRingLaws extends CheckProperties {
   import BaseProperties._
@@ -55,7 +58,7 @@ class EventuallyMonoidLaws extends CheckProperties {
 
 }
 
-class EventuallyTest extends WordSpec with Matchers {
+class EventuallyTest extends AnyWordSpec with Matchers {
 
   val eventuallyMonoid =
     new EventuallyMonoid[Int, String](_.length)(_.length > 100)
@@ -152,7 +155,7 @@ class EventuallyTest extends WordSpec with Matchers {
 
 }
 
-class EventuallyAggregatorLaws extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   implicit def aggregator[A, B, C](
       implicit
       prepare: Arbitrary[A => B],

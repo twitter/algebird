@@ -2,10 +2,11 @@ package com.twitter.algebird
 
 import org.scalacheck._
 import org.scalacheck.Prop._
-import org.scalatest.{Matchers, WordSpec}
 import org.scalatestplus.scalacheck.Checkers
 
 import Arbitrary.arbitrary
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 object SetDiffTest {
   implicit def arbSetDiff[T: Arbitrary]: Arbitrary[SetDiff[T]] =
@@ -14,7 +15,7 @@ object SetDiffTest {
     })
 }
 
-class SetDiffTest extends WordSpec with Matchers with Checkers {
+class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
   import SetDiffTest._
 
   "SetDiff" should {

@@ -5,6 +5,7 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.scalatest._
 import scala.reflect.ClassTag
+import org.scalatest.funsuite.AnyFunSuite
 
 package test {
   // not needed in the algebird package, just testing the API
@@ -18,7 +19,7 @@ package test {
  * This test almost always times out on travis.
  * Leaving at least a compilation test of using with spark
  */
-class AlgebirdRDDTest extends FunSuite with BeforeAndAfter {
+class AlgebirdRDDTest extends AnyFunSuite with BeforeAndAfter {
 
   private var sc: SparkContext = _
 

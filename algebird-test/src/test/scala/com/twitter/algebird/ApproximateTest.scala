@@ -1,8 +1,9 @@
 package com.twitter.algebird
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Matchers, WordSpec}
 import org.scalacheck.Prop._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 // TODO add tests for scala check that uses a statistical test to check
 // that an ApproximateBoolean agrees with the correct Boolean at least as often
@@ -93,7 +94,7 @@ class ApproximateLaws extends CheckProperties {
   }
 }
 
-class ApproximateTest extends WordSpec with Matchers {
+class ApproximateTest extends AnyWordSpec with Matchers {
 
   "Approximate" should {
     "Correctly identify exact" in {

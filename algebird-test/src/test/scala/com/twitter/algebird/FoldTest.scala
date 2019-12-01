@@ -1,8 +1,9 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
 
-class FoldTest extends WordSpec {
+class FoldTest extends AnyWordSpec {
 
   sealed trait Case[I, O] {
     def expected: O

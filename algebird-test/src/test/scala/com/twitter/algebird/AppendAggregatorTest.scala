@@ -1,8 +1,10 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class AppendAggregatorTest extends WordSpec with Matchers {
+class AppendAggregatorTest extends AnyWordSpec with Matchers {
   val data = Vector.fill(100) { scala.util.Random.nextInt(100) }
   val mpty = Vector.empty[Int]
 
