@@ -9,6 +9,7 @@ val javaEwahVersion = "1.1.7"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.1.0"
+val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.14.2"
 val scalaCollectionCompat = "2.1.2"
 val utilVersion = "19.11.0"
@@ -272,7 +273,8 @@ lazy val algebirdTest = module("test")
     libraryDependencies ++=
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
-        "org.scalatest" %% "scalatest" % scalaTestVersion
+        "org.scalatest" %% "scalatest" % scalaTestVersion,
+        "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
       ) ++ {
         if (isScala213x(scalaVersion.value)) {
           Seq()
