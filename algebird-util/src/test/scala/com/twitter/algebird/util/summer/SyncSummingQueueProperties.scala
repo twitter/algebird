@@ -16,10 +16,11 @@
 
 package com.twitter.algebird.util.summer
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class SyncSummingQueueProperties extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class SyncSummingQueueProperties extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   import AsyncSummerLaws._
   property("Summing with and without the summer should match") {
     forAll {

@@ -2,9 +2,10 @@ package com.twitter.algebird
 
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.Queue
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 object ScanTest {
   // normal people will use Scan not Scan.Aux, so it's good for most of the tests to be using the more common interface.
@@ -56,7 +57,7 @@ object ScanTest {
 
 }
 
-class ScanTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ScanTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   import ScanTest._
 
   def freeScanLaws(freeScan: StringScan): Unit =

@@ -2,8 +2,10 @@ package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Matchers, _}
+import org.scalatest._
 import scala.math.Equiv
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class MinHasherTest extends CheckProperties {
   implicit val mhMonoid = new MinHasher32(0.5, 512)
@@ -17,7 +19,7 @@ class MinHasherTest extends CheckProperties {
   }
 }
 
-class MinHasherSpec extends WordSpec with Matchers {
+class MinHasherSpec extends AnyWordSpec with Matchers {
   val r = new java.util.Random
 
   def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double) = {

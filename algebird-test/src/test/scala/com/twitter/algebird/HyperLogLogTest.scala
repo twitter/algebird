@@ -8,6 +8,9 @@ import org.scalacheck.{Arbitrary, Gen, Prop}
 import scala.collection.BitSet
 
 import java.lang.AssertionError
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
+import org.scalatest.wordspec.AnyWordSpec
 
 object ReferenceHyperLogLog {
 
@@ -90,7 +93,7 @@ class HyperLogLogLaws extends CheckProperties {
 }
 
 /* Ensure jRhoW matches referenceJRhoW */
-class jRhoWMatchTest extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   import HyperLogLog._
 
   implicit val hashGen = Arbitrary {
@@ -286,7 +289,7 @@ class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregat
   }
 }
 
-class HyperLogLogTest extends WordSpec with Matchers {
+class HyperLogLogTest extends AnyWordSpec with Matchers {
 
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 

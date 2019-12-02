@@ -1,8 +1,10 @@
 package com.twitter.algebird
 
 import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class TupleAggregatorsTest extends WordSpec with Matchers {
+class TupleAggregatorsTest extends AnyWordSpec with Matchers {
   // This gives you an implicit conversion from tuples of aggregators
   // to aggregator of tuples
 

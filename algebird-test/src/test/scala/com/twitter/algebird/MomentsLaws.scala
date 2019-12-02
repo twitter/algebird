@@ -3,6 +3,8 @@ package com.twitter.algebird
 import org.scalatest._
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class MomentsLaws extends CheckProperties {
   val EPS = 1e-10
@@ -20,7 +22,7 @@ class MomentsLaws extends CheckProperties {
   }
 }
 
-class MomentsTest extends WordSpec with Matchers {
+class MomentsTest extends AnyWordSpec with Matchers {
   def testApproxEq(f1: Double, f2: Double): Unit =
     assert(approxEq(1e-10)(f1, f2))
 

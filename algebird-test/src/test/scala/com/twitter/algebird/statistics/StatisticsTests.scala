@@ -4,7 +4,9 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.CheckProperties
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
-import org.scalatest.{Matchers, _}
+import org.scalatest._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class StatisticsRingLaws extends CheckProperties with Matchers {
   implicit val statsRing = new StatisticsRing[Int]
@@ -20,7 +22,7 @@ class StatisticsMonoidLaws extends CheckProperties with Matchers {
   property("StatisticsMonoid is a Monoid") { monoidLaws[Int] }
 }
 
-class StatisticsTest extends WordSpec with Matchers {
+class StatisticsTest extends AnyWordSpec with Matchers {
 
   // the test framework garbles the exceptions :/
   lazy val statsMonoid = new StatisticsMonoid[Int]

@@ -1,11 +1,13 @@
 package com.twitter.algebird
 
-import org.scalatest.{Matchers, PropSpec, WordSpec}
 import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks, ScalaCheckPropertyChecks}
 import org.scalacheck.{Arbitrary, Gen}
 
 import scala.util.Random
 import CMSHasherImplicits.CMSHasherBigInt
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
+import org.scalatest.wordspec.AnyWordSpec
 
 object CmsLaws {
   def int2Bytes(i: Int): Bytes = Bytes(BigInt(i).toByteArray)
@@ -144,7 +146,7 @@ class TopPctCmsLaws extends CheckProperties {
   }
 }
 
-class SparseCMSTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class SparseCMSTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val DELTA = 1e-8
   val EPS = 0.005
@@ -161,7 +163,7 @@ class SparseCMSTest extends WordSpec with Matchers with ScalaCheckDrivenProperty
   }
 }
 
-class CMSInstanceTest extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class CMSInstanceTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val DELTA = 1e-8
   val EPS = 0.005
@@ -179,7 +181,7 @@ class CMSInstanceTest extends WordSpec with Matchers with ScalaCheckDrivenProper
 /**
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
  */
-class CMSContraMapSpec extends WordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class CMSContraMapSpec extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
     // Given a "source" CMSHasher[K]
@@ -412,7 +414,7 @@ class CmsProperties extends ApproximateProperties("CountMinSketch") {
 abstract class CMSRingTest[K: CMSHasher: Ring] extends CMSTest[K]((x: Int) => implicitly[Ring[K]].fromInt(x))
 
 abstract class CMSTest[K: CMSHasher](toK: Int => K)
-    extends WordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaCheckDrivenPropertyChecks {
 
@@ -944,7 +946,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   }
 }
 
-class CMSFunctionsSpec extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class CMSFunctionsSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   property("roundtrips width->eps->width") {
     forAll { (i: Int) =>
       whenever(i > 0) {
@@ -993,7 +995,7 @@ class CMSFunctionsSpec extends PropSpec with ScalaCheckPropertyChecks with Match
 
 }
 
-class CMSParamsSpec extends PropSpec with ScalaCheckPropertyChecks with Matchers {
+class CMSParamsSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 
   val AnyEps = 0.001
   val AnyDelta = 1e-5
@@ -1044,7 +1046,7 @@ class CMSHasherBytesSpec extends CMSHasherSpec[Bytes](CmsLaws.int2Bytes(_))
 abstract class CMSHasherRingSpec[K: CMSHasher: Ring] extends CMSHasherSpec[K](implicitly[Ring[K]].fromInt(_))
 
 abstract class CMSHasherSpec[K: CMSHasher](toK: Int => K)
-    extends PropSpec
+    extends AnyPropSpec
     with ScalaCheckPropertyChecks
     with Matchers {
 

@@ -1,12 +1,12 @@
 package com.twitter.algebird
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * This is just a compilation test that we can resolve
  * algebird types from implicit algebra instances.
  */
-class AlgebraResolutionTest extends FunSuite {
+class AlgebraResolutionTest extends AnyFunSuite {
   // A type with no built in algebird algebras
   trait Empty {}
   test("algebra.Semigroup") {

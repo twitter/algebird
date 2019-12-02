@@ -20,7 +20,8 @@ import org.scalatest._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class QTreeLaws extends CheckProperties {
   import BaseProperties._
@@ -35,7 +36,7 @@ class QTreeLaws extends CheckProperties {
   }
 }
 
-class QTreeTest extends WordSpec with Matchers {
+class QTreeTest extends AnyWordSpec with Matchers {
   def randomList(n: Long) =
     (1L to n).map(_ => math.random)
 
