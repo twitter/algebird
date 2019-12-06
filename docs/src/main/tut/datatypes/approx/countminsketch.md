@@ -8,7 +8,7 @@ scaladoc: "#com.twitter.algebird.CountMinSketch"
 
 # Count Min Sketch
 
-Count-min sketch is a probablistic data structure that estimates the frequencies of elements in a data stream. Count-min sketches are somewhat similar to Bloom filters; the main distinction is that Bloom filters represent sets, while count-min sketches represent multisets. For more info, see [Wikipedia](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch).
+Count-min sketch is a probabilistic data structure that estimates the frequencies of elements in a data stream. Count-min sketches are somewhat similar to Bloom filters; the main distinction is that Bloom filters represent sets, while count-min sketches represent multisets. For more info, see [Wikipedia](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch).
 
 In Algebird, count-min sketches are represented as the abstract class `CMS`, along with the `CMSMonoid` class. Here's an example usage:
 
