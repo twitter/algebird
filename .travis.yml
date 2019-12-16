@@ -2,29 +2,29 @@ language: scala
 sudo: false
 matrix:
   include:
-#   - name: checks
-#     scala: 2.11.12
-#     jdk: openjdk8
-#     script: sbt \
-#       "; scalafmtCheckAll; scalafmtSbtCheck" \
-#       "; scalafixEnable; scalafix --check; test:scalafix --check"
+    - name: checks
+      scala: 2.11.12
+      jdk: openjdk8
+      script: sbt \
+        "; scalafmtCheckAll; scalafmtSbtCheck" \
+        "; scalafixEnable; scalafix --check; test:scalafix --check"
 
-#   - scala: 2.11.12
-#     jdk: openjdk8
-#     script: sbt \
-#       coverage \
-#       "++$TRAVIS_SCALA_VERSION clean" \
-#       "++$TRAVIS_SCALA_VERSION test" \
-#       "++$TRAVIS_SCALA_VERSION coverageReport" \
-#       "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
-#     after_success:
-#       - bash <(curl -s https://codecov.io/bash)
+    - scala: 2.11.12
+      jdk: openjdk8
+      script: sbt \
+        coverage \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test" \
+        "++$TRAVIS_SCALA_VERSION coverageReport" \
+        "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
-#   - scala: 2.11.12
-#     jdk: openjdk11
-#     script: sbt \
-#       "++$TRAVIS_SCALA_VERSION clean" \
-#       "++$TRAVIS_SCALA_VERSION test"
+    - scala: 2.11.12
+      jdk: openjdk11
+      script: sbt \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test"
 
     - scala: 2.12.9
       jdk: openjdk8
@@ -40,23 +40,23 @@ matrix:
         "++$TRAVIS_SCALA_VERSION docs/makeMicrosite" \
         "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
 
-#   - scala: 2.12.9
-#     jdk: openjdk11
-#     script: sbt \
-#       "++$TRAVIS_SCALA_VERSION clean" \
-#       "++$TRAVIS_SCALA_VERSION test"
+    - scala: 2.12.9
+      jdk: openjdk11
+      script: sbt \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test"
 
-#   - scala: 2.13.1
-#     jdk: openjdk8
-#     script: sbt \
-#       "++$TRAVIS_SCALA_VERSION clean" \
-#       "++$TRAVIS_SCALA_VERSION test"
+    - scala: 2.13.1
+      jdk: openjdk8
+      script: sbt \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test"
 
-#   - scala: 2.13.1
-#     jdk: openjdk11
-#     script: sbt \
-#       "++$TRAVIS_SCALA_VERSION clean" \
-#       "++$TRAVIS_SCALA_VERSION test"
+    - scala: 2.13.1
+      jdk: openjdk11
+      script: sbt \
+        "++$TRAVIS_SCALA_VERSION clean" \
+        "++$TRAVIS_SCALA_VERSION test"
 
 cache:
   directories:
