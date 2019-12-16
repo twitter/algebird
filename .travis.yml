@@ -30,6 +30,7 @@ matrix:
       jdk: openjdk8
       before_install:
         - export PATH=${PATH}:./vendor/bundle
+        - gem update bundler
       install:
         - rvm use 2.6.1 --install --fuzzy
         - gem update --system
