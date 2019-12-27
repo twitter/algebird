@@ -388,7 +388,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     }
 
     "work as an Aggregator and return a HLL" in {
-      List(5, 7, 8, 10).foreach(bits => {
+      List(5, 7, 8, 10).foreach { bits =>
         val aggregator = HyperLogLogAggregator(bits)
         val data = (0 to 10000).map { _ =>
           r.nextInt(1000)
@@ -398,11 +398,11 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
         val approxCount =
           aggregator(data.map(int2Bytes(_))).approximateSize.estimate.toDouble
         assert(scala.math.abs(exact - approxCount) / exact < 3.5 * aveErrorOf(bits))
-      })
+      }
     }
 
     "work as an Aggregator and return size" in {
-      List(5, 7, 8, 10).foreach(bits => {
+      List(5, 7, 8, 10).foreach { bits =>
         val aggregator = HyperLogLogAggregator.sizeAggregator(bits)
         val data = (0 to 10000).map { _ =>
           r.nextInt(1000)
@@ -411,7 +411,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
 
         val estimate = aggregator(data.map(int2Bytes(_)))
         assert(scala.math.abs(exact - estimate) / exact < 3.5 * aveErrorOf(bits))
-      })
+      }
     }
 
     "correctly downsize sparse HLL" in {
