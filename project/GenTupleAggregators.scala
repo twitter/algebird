@@ -52,7 +52,7 @@ object MultiAggregator {
 
   def genMethods(max: Int, defStr: String, name: Option[String], isMonoid: Boolean = false): String =
     (2 to max)
-      .map(i => {
+      .map { i =>
         val methodName = name.getOrElse("from%d".format(i))
         val aggType = if (isMonoid) "Monoid" else ""
         val nums = (1 to i)
@@ -93,7 +93,7 @@ object MultiAggregator {
           tupleBs,
           present
         )
-      })
+      }
       .mkString("\n")
 
   def genMapMethods(max: Int, isMonoid: Boolean = false): String = {
@@ -116,7 +116,7 @@ object MultiAggregator {
     """.stripMargin
 
     (2 to max)
-      .map(aggrCount => {
+      .map { aggrCount =>
         val aggrNums = 1 to aggrCount
 
         val inputAggs = aggrNums.map(i => s"agg$i: (K, ${inputAggregatorType}[A, B$i, C])").mkString(", ")
@@ -142,7 +142,7 @@ object MultiAggregator {
       |    )
       |  }
       |}""".stripMargin
-      })
+      }
       .mkString("\n") + aggregatorForOneItem
   }
 }

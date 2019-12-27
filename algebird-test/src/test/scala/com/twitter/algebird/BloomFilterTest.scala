@@ -308,15 +308,13 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
 
     "identify all true positives" in {
       (0 to 100).foreach { _ =>
-        {
-          val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = bfMonoid.create(entries: _*)
+        val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+        val numEntries = 5
+        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val bf = bfMonoid.create(entries: _*)
 
-          entries.foreach { i =>
-            assert(bf.contains(i.toString).isTrue)
-          }
+        entries.foreach { i =>
+          assert(bf.contains(i.toString).isTrue)
         }
       }
     }
@@ -325,29 +323,25 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
       val iter = 10000
 
       Seq(0.1, 0.01, 0.001).foreach { fpProb =>
-        {
-          val fps = (0 until iter).map { _ =>
-            {
-              val numEntries = RAND.nextInt(10) + 1
+        val fps = (0 until iter).map { _ =>
+          val numEntries = RAND.nextInt(10) + 1
 
-              val bfMonoid = BloomFilter[String](numEntries, fpProb)
+          val bfMonoid = BloomFilter[String](numEntries, fpProb)
 
-              val entries = RAND
-                .shuffle((0 until 1000).toList)
-                .take(numEntries + 1)
-                .map(_.toString)
-              val bf = bfMonoid.create(entries.drop(1): _*)
+          val entries = RAND
+            .shuffle((0 until 1000).toList)
+            .take(numEntries + 1)
+            .map(_.toString)
+          val bf = bfMonoid.create(entries.drop(1): _*)
 
-              if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
-            }
-          }
-
-          val observedFpProb = fps.sum / fps.size
-
-          // the 2.5 is a fudge factor to make the probability of it low
-          // in tests
-          assert(observedFpProb <= 2.5 * fpProb)
+          if (bf.contains(entries(0)).isTrue) 1.0 else 0.0
         }
+
+        val observedFpProb = fps.sum / fps.size
+
+        // the 2.5 is a fudge factor to make the probability of it low
+        // in tests
+        assert(observedFpProb <= 2.5 * fpProb)
       }
     }
 
@@ -366,15 +360,13 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
 
     "work as an Aggregator" in {
       (0 to 10).foreach { _ =>
-        {
-          val aggregator = BloomFilterAggregator[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = aggregator(entries)
+        val aggregator = BloomFilterAggregator[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+        val numEntries = 5
+        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val bf = aggregator(entries)
 
-          entries.foreach { i =>
-            assert(bf.contains(i.toString).isTrue)
-          }
+        entries.foreach { i =>
+          assert(bf.contains(i.toString).isTrue)
         }
       }
     }
@@ -417,25 +409,23 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
 
     "be identical to method `+`" in {
       (0 to 100).foreach { _ =>
-        {
-          val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-          val numEntries = 5
-          val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-          val bf = bfMonoid.create(entries: _*)
-          entries
-            .map { entry =>
-              (entry, bfMonoid.create(entry))
-            }
-            .foldLeft((bfMonoid.zero, bfMonoid.zero)) {
-              case ((left, leftAlt), (entry, _)) =>
-                val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
-                left.contains(entry) shouldBe contained
-                (left + entry, newLeftAlt)
-            }
-
-          entries.foreach { i =>
-            assert(bf.contains(i.toString).isTrue)
+        val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+        val numEntries = 5
+        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val bf = bfMonoid.create(entries: _*)
+        entries
+          .map { entry =>
+            (entry, bfMonoid.create(entry))
           }
+          .foldLeft((bfMonoid.zero, bfMonoid.zero)) {
+            case ((left, leftAlt), (entry, _)) =>
+              val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
+              left.contains(entry) shouldBe contained
+              (left + entry, newLeftAlt)
+          }
+
+        entries.foreach { i =>
+          assert(bf.contains(i.toString).isTrue)
         }
       }
     }
