@@ -72,7 +72,7 @@ val sharedSettings = Seq(
   },
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
   libraryDependencies ++= Seq(
-    "junit" % "junit" % "4.12" % Test,
+    "junit" % "junit" % "4.13" % Test,
     "com.novocode" % "junit-interface" % "0.11" % Test
   ),
   // Publishing options:
