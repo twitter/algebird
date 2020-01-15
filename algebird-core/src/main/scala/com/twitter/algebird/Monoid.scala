@@ -48,12 +48,8 @@ trait Monoid[@specialized(Int, Long, Float, Double) T]
       throw new java.lang.IllegalArgumentException("argument should not be zero")
     }
 
-  def nonZeroOption(v: T): Option[T] =
-    if (isNonZero(v)) {
-      Some(v)
-    } else {
-      None
-    }
+  def nonZeroOption(v: T): Option[T] = Some(v).filter(isNonZero)
+
   override def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
 
   /**
@@ -148,7 +144,7 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
     val (longer, shorter) =
       if (left.length > right.length) (left, right) else (right, left)
     val sum = longer.clone
-    for (i <- 0 until shorter.length)
+    for (i <- shorter.indices)
       sum.update(i, semi.plus(sum(i), shorter(i)))
 
     sum
