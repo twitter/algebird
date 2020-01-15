@@ -2,28 +2,18 @@ package com.twitter.algebird
 
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
+import com.twitter.algebird.immutable.BitSet
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 object BloomFilterTestUtils {
-  def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
-    case BFZero(hashes, width) => BFSparse(hashes, RichCBitSet(), width)
-    case BFItem(item, hashes, width) =>
-      BFSparse(hashes, RichCBitSet.fromArray(hashes(item)), width)
-    case bfs @ BFSparse(_, _, _) => bfs
-    case BFInstance(hashes, bitset, width) =>
-      BFSparse(hashes, RichCBitSet.fromBitSet(bitset), width)
-  }
-
   def toDense[A](bf: BF[A]): BFInstance[A] = bf match {
     case BFZero(hashes, width) => BFInstance.empty[A](hashes, width)
     case BFItem(item, hashes, width) =>
-      val bs = LongBitSet.empty(width)
-      bs += hashes(item)
-      BFInstance(hashes, bs.toBitSetNoCopy, width)
-    case bfs @ BFSparse(_, _, _)   => bfs.dense
+      val bs = hashes(item).foldLeft(BitSet.empty)(_ + _)
+      BFInstance(hashes, bs, width)
     case bfi @ BFInstance(_, _, _) => bfi
   }
 }
@@ -45,7 +35,7 @@ class BloomFilterLaws extends CheckProperties {
       }
       val zero = Gen.const(bfMonoid.zero)
       val sparse = Gen.listOf(item).map { its =>
-        toSparse(bfMonoid.sum(its))
+        bfMonoid.sum(its)
       }
       val dense = Gen.listOf(item).map { its =>
         toDense(bfMonoid.sum(its))
@@ -123,11 +113,6 @@ class BloomFilterLaws extends CheckProperties {
     }
   }
 
-  property(".dense returns an equivalent BF") {
-    forAll { (a: BF[String]) =>
-      Equiv[BF[String]].equiv(toSparse(a).dense, a)
-    }
-  }
   property("a ++ a = a for BF") {
     forAll { (a: BF[String]) =>
       Equiv[BF[String]].equiv(a ++ a, a)
@@ -314,7 +299,7 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
         val bf = bfMonoid.create(entries: _*)
 
         entries.foreach { i =>
-          assert(bf.contains(i.toString).isTrue)
+          assert(bf.contains(i).isTrue)
         }
       }
     }

@@ -1,26 +1,16 @@
 package com.twitter.algebird
 package benchmark
 
+import com.twitter.algebird.immutable.BitSet
 import org.openjdk.jmh.annotations._
 
 object BloomFilterDistanceBenchmark {
 
-  def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
-    case BFZero(hashes, width) => BFSparse(hashes, RichCBitSet(), width)
-    case BFItem(item, hashes, width) =>
-      BFSparse(hashes, RichCBitSet.fromArray(hashes(item)), width)
-    case bfs @ BFSparse(_, _, _) => bfs
-    case BFInstance(hashes, bitset, width) =>
-      BFSparse(hashes, RichCBitSet.fromBitSet(bitset), width)
-  }
-
   def toDense[A](bf: BF[A]): BFInstance[A] = bf match {
     case BFZero(hashes, width) => BFInstance.empty[A](hashes, width)
     case BFItem(item, hashes, width) =>
-      val bs = LongBitSet.empty(width)
-      bs += hashes(item)
-      BFInstance(hashes, bs.toBitSetNoCopy, width)
-    case bfs @ BFSparse(_, _, _)   => bfs.dense
+      val bs = hashes(item).foldLeft(BitSet.empty)(_ + _)
+      BFInstance(hashes, bs, width)
     case bfi @ BFInstance(_, _, _) => bfi
   }
 
@@ -39,15 +29,11 @@ object BloomFilterDistanceBenchmark {
       BloomFilter[String](nbrOfElements, falsePositiveRate).zero
 
     val sparseBF1: BF[String] =
-      toSparse(
-        BloomFilter[String](nbrOfElements, falsePositiveRate)
-          .create(randomElements: _*)
-      )
+      BloomFilter[String](nbrOfElements, falsePositiveRate)
+        .create(randomElements: _*)
     val sparesBF2: BF[String] =
-      toSparse(
-        BloomFilter[String](nbrOfElements, falsePositiveRate)
-          .create(randomElements: _*)
-      )
+      BloomFilter[String](nbrOfElements, falsePositiveRate)
+        .create(randomElements: _*)
 
     val denseBF1: BF[String] = toDense(
       BloomFilter[String](nbrOfElements, falsePositiveRate)
