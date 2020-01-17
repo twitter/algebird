@@ -7,7 +7,7 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.47deg" % "sbt-microsites" % "1.1.0")
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.2")
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.12")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.0")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.6.1")
