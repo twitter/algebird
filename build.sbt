@@ -246,7 +246,7 @@ lazy val algebirdCore = module("core").settings(
                      """.stripMargin('|'),
   libraryDependencies ++=
     Seq(
-      "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
+      "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion % "provided",
       "org.typelevel" %% "algebra" % algebraVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
@@ -290,7 +290,10 @@ lazy val algebirdBenchmark = module("benchmark")
   .settings(noPublishSettings)
   .settings(
     coverageExcludedPackages := "com\\.twitter\\.algebird\\.benchmark.*",
-    libraryDependencies ++= Seq("com.twitter" %% "bijection-core" % bijectionVersion)
+    libraryDependencies ++= Seq(
+      "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
+      "com.twitter" %% "bijection-core" % bijectionVersion
+      )
   )
   .dependsOn(algebirdCore, algebirdUtil, algebirdTest % "test->compile")
   .enablePlugins(JmhPlugin)
