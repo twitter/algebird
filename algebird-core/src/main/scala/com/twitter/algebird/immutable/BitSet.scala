@@ -13,6 +13,9 @@ import BitSet.{Branch, Empty, Leaf}
 /**
  * A fast, immutable BitSet.
  *
+ * This implementation is taken from cats-collections.
+ * https://github.com/typelevel/cats-collections/blob/0336992942aba9aba4a322b629447fcabe251920/core/src/main/scala/cats/collections/BitSet.scala
+ *
  * A Bitset is a specialized type of set that tracks the `Int` values
  * it contains: for each integer value, a BitSet uses a single bit to
  * track whether the value is present (1) or absent (0). Bitsets are
