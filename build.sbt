@@ -304,6 +304,7 @@ lazy val algebirdUtil = module("util")
 
 lazy val algebirdBijection = module("bijection")
   .settings(
+    crossScalaVersions += "2.13.1",
     libraryDependencies += "com.twitter" %% "bijection-core" % bijectionVersion
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
