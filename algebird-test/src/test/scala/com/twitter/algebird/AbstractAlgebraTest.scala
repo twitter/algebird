@@ -25,9 +25,9 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     val monoid = implicitly[Monoid[Option[Int]]]
 
     forAll { intList: List[Option[Int]] =>
-      val flattenedList = intList.flatMap(x => x)
+      val flattenedList = intList.flatten
       val expectedResult =
-        if (!flattenedList.isEmpty) Some(flattenedList.sum) else None
+        if (flattenedList.nonEmpty) Some(flattenedList.sum) else None
       expectedResult == monoid.sum(intList)
     }
   }
@@ -37,23 +37,19 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
     val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
     forAll { intList: List[Option[Int]] =>
       val minList = intList.map {
-        _ match {
-          case Some(x) => Some(Min(x))
-          case None    => None
-        }
+        case Some(x) => Some(Min(x))
+        case None    => None
       }
       val maxList = intList.map {
-        _ match {
-          case Some(x) => Some(Max(x))
-          case None    => None
-        }
+        case Some(x) => Some(Max(x))
+        case None    => None
       }
 
-      val flattenedList = intList.flatMap(x => x)
+      val flattenedList = intList.flatten
       val expectedMax =
-        if (!flattenedList.isEmpty) Some(Max(flattenedList.max)) else None
+        if (flattenedList.nonEmpty) Some(Max(flattenedList.max)) else None
       val expectedMin =
-        if (!flattenedList.isEmpty) Some(Min(flattenedList.min)) else None
+        if (flattenedList.nonEmpty) Some(Min(flattenedList.min)) else None
 
       expectedMax == maxMonoid.sum(maxList) &&
       expectedMin == minMonoid.sum(minList)

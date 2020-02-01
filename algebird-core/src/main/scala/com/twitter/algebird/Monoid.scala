@@ -148,7 +148,7 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
     val (longer, shorter) =
       if (left.length > right.length) (left, right) else (right, left)
     val sum = longer.clone
-    for (i <- 0 until shorter.length)
+    for (i <- shorter.indices)
       sum.update(i, semi.plus(sum(i), shorter(i)))
 
     sum
