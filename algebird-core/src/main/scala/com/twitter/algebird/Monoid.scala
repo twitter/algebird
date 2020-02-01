@@ -48,8 +48,12 @@ trait Monoid[@specialized(Int, Long, Float, Double) T]
       throw new java.lang.IllegalArgumentException("argument should not be zero")
     }
 
-  def nonZeroOption(v: T): Option[T] = Some(v).filter(isNonZero)
-
+  def nonZeroOption(v: T): Option[T] =
+    if (isNonZero(v)) {
+      Some(v)
+    } else {
+      None
+    }
   override def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
 
   /**
