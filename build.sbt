@@ -322,7 +322,7 @@ lazy val algebirdGeneric = module("generic")
     crossScalaVersions += "2.13.1",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.4"
     ) ++ {
       if (isScala213x(scalaVersion.value)) {
         Seq()
