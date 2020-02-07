@@ -13,7 +13,7 @@ val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.14.3"
 val scalaCollectionCompat = "2.1.3"
 val utilVersion = "20.1.0"
-val sparkVersion = "2.4.4"
+val sparkVersion = "2.4.5"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
