@@ -85,7 +85,9 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
 
   /** Esimate Jaccard similarity (size of union / size of intersection) */
   def similarity(left: MinHashSignature, right: MinHashSignature): Double =
-    buildArray(left.bytes, right.bytes)((l, r) => if (l == r) n.one else n.zero).map(_.toDouble).sum / numHashes
+    buildArray(left.bytes, right.bytes)((l, r) => if (l == r) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / numHashes
 
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
   def buckets(sig: MinHashSignature): List[Long] =
