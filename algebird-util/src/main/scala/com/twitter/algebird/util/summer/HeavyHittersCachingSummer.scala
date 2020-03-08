@@ -52,9 +52,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 
   private[this] final val hashes: IndexedSeq[CMSHash[Long]] = {
     val r = new scala.util.Random(5)
-    (0 until DEPTH).map { _ =>
-      CMSHash[Long](r.nextInt, 0, WIDTH)
-    }
+    (0 until DEPTH).map(_ => CMSHash[Long](r.nextInt, 0, WIDTH))
   }.toIndexedSeq
 
   @inline
@@ -249,9 +247,7 @@ class HeavyHittersCachingSummer[K, V](
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
     //todo not sure if need to increment as backing summer may already be doing it
     insertOp.incr
-    val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T =>
-      t._1.hashCode
-    })
+    val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 
     if (!hh.isEmpty) {
       backingSummer.addAll(hh).map { fResp =>

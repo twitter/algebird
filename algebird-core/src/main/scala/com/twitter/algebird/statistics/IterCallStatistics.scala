@@ -28,7 +28,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
     import scala.math.min
     import java.lang.Long.numberOfLeadingZeros
     val maxBucket = 10
-    val distribution: IndexedSeq[Counter] = IndexedSeq.fill(maxBucket + 1) { Counter(threadSafe) }
+    val distribution: IndexedSeq[Counter] = IndexedSeq.fill(maxBucket + 1)(Counter(threadSafe))
     val total: Counter = Counter(threadSafe)
 
     def put(v: Long): Unit = {
@@ -38,7 +38,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
       distribution(bucket).increment
     }
 
-    def count: Long = distribution.foldLeft(0L) { _ + _.get } // sum
+    def count: Long = distribution.foldLeft(0L)(_ + _.get) // sum
 
     def pow2(i: Int): Int = 1 << i
 

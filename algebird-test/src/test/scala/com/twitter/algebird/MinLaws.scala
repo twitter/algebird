@@ -15,23 +15,21 @@ class MinLaws extends CheckProperties {
 
   def minSemigroupTest[T: Arbitrary: Ordering] =
     forAll { v: NonEmptyVector[T] =>
-      val minItems = v.items.map { Min(_) }
+      val minItems = v.items.map(Min(_))
       v.items.min == Min.semigroup[T].combineAllOption(minItems).get.get
     }
 
   // Test equiv import.
   val equiv = implicitly[Equiv[Min[Int]]]
 
-  property("Min.{ +, min } works on ints") { minTest[Int] }
+  property("Min.{ +, min } works on ints")(minTest[Int])
 
   property("Min should work on non-monoid types like String") {
     minTest[String]
   }
 
   property("Min.aggregator returns the minimum item") {
-    forAll { v: NonEmptyVector[Int] =>
-      v.items.min == Min.aggregator[Int].apply(v.items)
-    }
+    forAll { v: NonEmptyVector[Int] => v.items.min == Min.aggregator[Int].apply(v.items) }
   }
 
   property("Min.semigroup[Int] returns the minimum item") {

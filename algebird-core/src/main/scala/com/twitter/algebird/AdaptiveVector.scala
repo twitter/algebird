@@ -35,7 +35,7 @@ object AdaptiveVector {
     if (v.size == 0) {
       fill[V](0)(sparseVal)
     } else {
-      val denseCount = v.count { _ != sparseVal }
+      val denseCount = v.count(_ != sparseVal)
       val sz = v.size
       if (denseCount < sz * THRESHOLD)
         SparseVector(toMap(v, sparseVal), sparseVal, sz)
@@ -48,7 +48,7 @@ object AdaptiveVector {
     } else {
       val maxIdx = m.keys.max
       require(maxIdx < sizeOfDense, "Max key (" + maxIdx + ") exceeds valid for size (" + sizeOfDense + ")")
-      val denseCount = m.count { _._2 != sparseVal }
+      val denseCount = m.count(_._2 != sparseVal)
       if (denseCount < sizeOfDense * THRESHOLD)
         SparseVector(m, sparseVal, sizeOfDense)
       else
@@ -62,7 +62,7 @@ object AdaptiveVector {
     }
 
   def toMap[V](iseq: IndexedSeq[V], sparse: V): Map[Int, V] =
-    iseq.view.zipWithIndex.filter { _._1 != sparse }.map { _.swap }.toMap
+    iseq.view.zipWithIndex.filter(_._1 != sparse).map(_.swap).toMap
 
   def toVector[V](m: Map[Int, V], sparse: V, size: Int): Vector[V] = {
     // Mutable local variable to optimize performance
@@ -122,9 +122,7 @@ object AdaptiveVector {
       val sparseAreZero =
         if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
       sparseAreZero &&
-      v.denseIterator.forall { idxv =>
-        !Monoid.isNonZero(idxv._2)
-      }
+      v.denseIterator.forall(idxv => !Monoid.isNonZero(idxv._2))
     }
   }
   private class AVGroup[V: Group] extends AVMonoid[V] with Group[AdaptiveVector[V]] {
@@ -222,8 +220,8 @@ case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override
 
   override def denseIterator: Iterator[(Int, V)] =
     iseq.view.zipWithIndex
-      .filter { _._1 != sparseValue }
-      .map { _.swap }
+      .filter(_._1 != sparseValue)
+      .map(_.swap)
       .iterator
 }
 
@@ -249,6 +247,6 @@ case class SparseVector[V](map: Map[Int, V], override val sparseValue: V, overri
     }
   override def extend(cnt: Int): SparseVector[V] = SparseVector(map, sparseValue, size + cnt)
 
-  private lazy val sortedList = map.toList.sortBy { _._1 }
+  private lazy val sortedList = map.toList.sortBy(_._1)
   override def denseIterator: Iterator[(Int, V)] = sortedList.iterator
 }

@@ -35,7 +35,7 @@ trait Successible[T] extends Serializable {
     new AbstractIterable[T] {
       override def iterator: Iterator[T] =
         Iterator
-          .iterate[Option[T]](Some(old)) { self.next(_) }
+          .iterate[Option[T]](Some(old))(self.next(_))
           .takeWhile(_.isDefined)
           .collect { case Some(t) => t }
     }

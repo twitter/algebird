@@ -17,9 +17,7 @@ class Tuple2Semigroup[A, B](implicit asemigroup: Semigroup[A], bsemigroup: Semig
     else {
       val bufA = fromSumOption[A](1000)
       val bufB = fromSumOption[B](1000)
-      to.foreach { tuple =>
-        bufA.put(tuple._1); bufB.put(tuple._2)
-      }
+      to.foreach { tuple => bufA.put(tuple._1); bufB.put(tuple._2) }
       Some((bufA.flush.get, bufB.flush.get))
     }
 }
@@ -69,9 +67,7 @@ class Tuple3Semigroup[A, B, C](
       val bufA = fromSumOption[A](1000)
       val bufB = fromSumOption[B](1000)
       val bufC = fromSumOption[C](1000)
-      to.foreach { tuple =>
-        bufA.put(tuple._1); bufB.put(tuple._2); bufC.put(tuple._3)
-      }
+      to.foreach { tuple => bufA.put(tuple._1); bufB.put(tuple._2); bufC.put(tuple._3) }
       Some((bufA.flush.get, bufB.flush.get, bufC.flush.get))
     }
 }

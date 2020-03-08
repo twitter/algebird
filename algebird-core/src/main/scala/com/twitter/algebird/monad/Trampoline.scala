@@ -35,9 +35,7 @@ final case class Done[A](override val get: A) extends Trampoline[A] {
 
 final case class FlatMapped[C, A](start: Trampoline[C], fn: C => Trampoline[A]) extends Trampoline[A] {
   override def map[B](fn: A => B): FlatMapped[A, B] =
-    FlatMapped(this, { (a: A) =>
-      Done(fn(a))
-    })
+    FlatMapped(this, (a: A) => Done(fn(a)))
   override lazy val get: A = Trampoline.run(this)
 }
 

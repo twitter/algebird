@@ -8,9 +8,7 @@ class FunctionMonoidTests extends CheckProperties {
     // TODO: switch the scope of the quantification?
     Prop.forAll { (n: Int) =>
       implicit val eq: Equiv[Function1[Int, Int]] =
-        Equiv.fromFunction { (f1, f2) =>
-          f1(n) == f2(n)
-        }
+        Equiv.fromFunction((f1, f2) => f1(n) == f2(n))
 
       monoidLaws[Function1[Int, Int]]
     }

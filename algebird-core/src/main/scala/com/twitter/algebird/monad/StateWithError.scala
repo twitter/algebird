@@ -37,7 +37,7 @@ sealed trait StateWithError[S, +F, +T] {
       sgs: Semigroup[S]
   ): // TODO: deep joins could blow the stack, not yet using trampoline here
   StateWithError[S, F1, (T, U)] =
-    StateFn({ (requested: S) =>
+    StateFn { (requested: S) =>
       (run(requested), that.run(requested)) match {
         case (Right((s1, r1)), Right((s2, r2))) =>
           Right((sgs.plus(s1, s2), (r1, r2)))
@@ -46,7 +46,7 @@ sealed trait StateWithError[S, +F, +T] {
         case (Left(err), _) => Left(err)
         case (_, Left(err)) => Left(err)
       }
-    })
+    }
 
   def apply(state: S): Either[F, (S, T)] = run(state)
 
@@ -56,9 +56,7 @@ sealed trait StateWithError[S, +F, +T] {
     FlatMappedState(this, next)
 
   def map[U](fn: (T) => U): StateWithError[S, F, U] =
-    FlatMappedState(this, { (t: T) =>
-      StateWithError.const(fn(t))
-    })
+    FlatMappedState(this, (t: T) => StateWithError.const(fn(t)))
 }
 
 /** Simple wrapper of a function in the Monad */
@@ -92,26 +90,16 @@ final case class FlatMappedState[S, F, T, U](start: StateWithError[S, F, T], fn:
 
 object StateWithError {
   def getState[S]: StateWithError[S, Nothing, S] =
-    StateFn({ (state: S) =>
-      Right((state, state))
-    })
+    StateFn((state: S) => Right((state, state)))
   def putState[S](newState: S): StateWithError[S, Nothing, Unit] =
-    StateFn({ (_: S) =>
-      Right((newState, ()))
-    })
+    StateFn((_: S) => Right((newState, ())))
   def swapState[S](newState: S): StateWithError[S, Nothing, S] =
-    StateFn({ (old: S) =>
-      Right((newState, old))
-    })
+    StateFn((old: S) => Right((newState, old)))
 
   def const[S, T](t: T): StateWithError[S, Nothing, T] =
-    StateFn({ (state: S) =>
-      Right((state, t))
-    })
+    StateFn((state: S) => Right((state, t)))
   def lazyVal[S, T](t: => T): StateWithError[S, Nothing, T] =
-    StateFn({ (state: S) =>
-      Right((state, t))
-    })
+    StateFn((state: S) => Right((state, t)))
   def failure[S, F](f: F): StateWithError[S, F, Nothing] =
     StateFn(_ => Left(f))
 
@@ -121,16 +109,12 @@ object StateWithError {
    */
   def fromEither[S] = new ConstantStateMaker[S]
   class ConstantStateMaker[S] {
-    def apply[F, T](either: Either[F, T]): StateWithError[S, F, T] = { (s: S) =>
-      either.right.map { (s, _) }
-    }
+    def apply[F, T](either: Either[F, T]): StateWithError[S, F, T] = { (s: S) => either.right.map((s, _)) }
   }
 
   class FunctionLifter[S] {
     def apply[I, F, T](fn: I => Either[F, T]): (I => StateWithError[S, F, T]) = { (i: I) =>
-      StateFn({ (s: S) =>
-        fn(i).right.map { (s, _) }
-      })
+      StateFn((s: S) => fn(i).right.map((s, _)))
     }
   }
   // TODO this should move to Monad and work for any Monad
@@ -141,9 +125,7 @@ object StateWithError {
     new StateFMonad[F, S]
 
   class StateFMonad[F, S] extends Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] {
-    override def apply[T](const: T): StateWithError[S, Nothing, T] = { (s: S) =>
-      Right((s, const))
-    }
+    override def apply[T](const: T): StateWithError[S, Nothing, T] = { (s: S) => Right((s, const)) }
     override def flatMap[T, U](
         earlier: StateWithError[S, F, T]
     )(next: T => StateWithError[S, F, U]): StateWithError[S, F, U] =

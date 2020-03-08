@@ -28,9 +28,7 @@ sealed trait Reader[-Env, +T] {
   def flatMap[E1 <: Env, U](next: T => Reader[E1, U]): Reader[E1, U] =
     FlatMappedReader[E1, T, U](this, next)
   def map[U](thatFn: T => U): Reader[Env, U] =
-    FlatMappedReader(this, { (t: T) =>
-      ConstantReader(thatFn(t))
-    })
+    FlatMappedReader(this, (t: T) => ConstantReader(thatFn(t)))
 }
 
 final case class ConstantReader[+T](get: T) extends Reader[Any, T] {

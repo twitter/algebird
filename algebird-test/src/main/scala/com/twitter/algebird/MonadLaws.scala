@@ -27,9 +27,7 @@ import Monad.{operators, pureOp}
 object MonadLaws {
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.
   @deprecated("No longer used. Use Equiv[T] instance", since = "0.13.0")
-  def defaultEq[T] = { (t0: T, t1: T) =>
-    (t0 == t1)
-  }
+  def defaultEq[T] = { (t0: T, t1: T) => (t0 == t1) }
 
   @deprecated("use leftIdentity[T]", since = "0.13.0")
   def leftIdentityEquiv[M[_], T, U](
@@ -65,9 +63,7 @@ object MonadLaws {
       for {
         m <- implicitly[Arbitrary[Map[T, M[U]]]].arbitrary
         defu <- implicitly[Arbitrary[M[U]]].arbitrary
-      } yield ({ (t: T) =>
-        m.getOrElse(t, defu)
-      })
+      } yield ({ (t: T) => m.getOrElse(t, defu) })
     }
 
   @deprecated("use monadLaws[T]", since = "0.13.0")
@@ -93,14 +89,10 @@ object MonadLaws {
       arbfn: Arbitrary[(T) => M[U]],
       equiv: Equiv[M[U]]
   ) =
-    forAll { (t: T, fn: T => M[U]) =>
-      Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t))
-    }
+    forAll((t: T, fn: T => M[U]) => Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t)))
 
   def rightIdentity[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
-    forAll { (mt: M[T]) =>
-      Equiv[M[T]].equiv(mt.flatMap { _.pure[M] }, mt)
-    }
+    forAll((mt: M[T]) => Equiv[M[T]].equiv(mt.flatMap(_.pure[M]), mt))
 
   def associative[M[_], T, U, V](
       implicit monad: Monad[M],
@@ -109,9 +101,7 @@ object MonadLaws {
       fn2: Arbitrary[U => M[V]],
       equiv: Equiv[M[V]]
   ) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
-    Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap { t =>
-      f1(t).flatMap(f2)
-    })
+    Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap(t => f1(t).flatMap(f2)))
   }
 
   def monadLaws[M[_], T, U, R](
@@ -129,33 +119,25 @@ object MonadLaws {
     associative[M, T, U, R] && rightIdentity[M, R] && leftIdentity[M, U, R]
 
   implicit def indexedSeqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[IndexedSeq[T]] =
-    Arbitrary { arbl.arbitrary.map { _.toIndexedSeq } }
+    Arbitrary(arbl.arbitrary.map(_.toIndexedSeq))
 
   implicit def vectorA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[Vector[T]] =
     Arbitrary {
-      arbl.arbitrary.map { l =>
-        Vector(l: _*)
-      }
+      arbl.arbitrary.map(l => Vector(l: _*))
     }
 
   implicit def seqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[Seq[T]] =
     Arbitrary {
-      arbl.arbitrary.map { l =>
-        Seq(l: _*)
-      }
+      arbl.arbitrary.map(l => Seq(l: _*))
     }
 
   implicit def someA[T](implicit arbl: Arbitrary[T]): Arbitrary[Some[T]] =
     Arbitrary {
-      arbl.arbitrary.map { l =>
-        Some(l)
-      }
+      arbl.arbitrary.map(l => Some(l))
     }
 
   implicit def identityA[T](implicit arbl: Arbitrary[T]): Arbitrary[Identity[T]] =
     Arbitrary {
-      arbl.arbitrary.map { l =>
-        Identity(l)
-      }
+      arbl.arbitrary.map(l => Identity(l))
     }
 }

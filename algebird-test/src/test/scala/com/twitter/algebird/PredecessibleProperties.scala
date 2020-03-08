@@ -18,9 +18,9 @@ package com.twitter.algebird
 class PredecessibleProperties extends CheckProperties {
   import com.twitter.algebird.PredecessibleLaws.{predecessibleLaws => laws}
 
-  property("Int is Predecessible") { laws[Int] }
-  property("Long is Predecessible") { laws[Long] }
-  property("BigInt is Predecessible") { laws[BigInt] }
+  property("Int is Predecessible")(laws[Int])
+  property("Long is Predecessible")(laws[Long])
+  property("BigInt is Predecessible")(laws[BigInt])
   property("Predecessible.fromPrevOrd[Int] is Predecessible") {
     implicit val pred =
       Predecessible.fromPrevOrd[Int](IntegralPredecessible.prev(_))

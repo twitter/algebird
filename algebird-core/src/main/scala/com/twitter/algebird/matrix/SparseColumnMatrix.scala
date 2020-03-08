@@ -21,9 +21,7 @@ import com.twitter.algebird.{AdaptiveVector, Monoid}
 object SparseColumnMatrix {
   def fromSeqMap[V: Monoid](cols: Int, data: IndexedSeq[MMap[Int, V]]): SparseColumnMatrix[V] = {
     val monoidZero = implicitly[Monoid[V]].zero
-    SparseColumnMatrix(data.map { mm =>
-      AdaptiveVector.fromMap(mm.toMap, monoidZero, cols)
-    }.toIndexedSeq)
+    SparseColumnMatrix(data.map(mm => AdaptiveVector.fromMap(mm.toMap, monoidZero, cols)).toIndexedSeq)
   }
 }
 

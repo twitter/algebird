@@ -57,9 +57,7 @@ private[algebird] sealed abstract class LastInstances {
       override def plus(l: T, r: T): T = r
       override def sumOption(ts: TraversableOnce[T]): Option[T] = {
         var res: Option[T] = None
-        ts.foreach { t =>
-          res = Some(t)
-        }
+        ts.foreach(t => res = Some(t))
         res
       }
     }

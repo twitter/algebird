@@ -30,9 +30,7 @@ object SummingIteratorTest {
         zl.forall {
           case (k, v) =>
             zr.get(k)
-              .map { rv =>
-                Equiv[V].equiv(rv, v)
-              }
+              .map(rv => Equiv[V].equiv(rv, v))
               .getOrElse(false)
         }
       }
@@ -51,7 +49,7 @@ class SummingIteratorTest extends AnyPropSpec with ScalaCheckPropertyChecks with
 
   property("With Maps is preserved[(Short,Int)]") {
     forAll { (cap: Capacity, items: List[(Short, Int)]) =>
-      val mitems = items.map { Map(_) }
+      val mitems = items.map(Map(_))
       val qit =
         SummingIterator[Map[Short, Int]](SummingQueue[Map[Short, Int]](cap.c), mitems.iterator)
       val qitc =
@@ -62,7 +60,7 @@ class SummingIteratorTest extends AnyPropSpec with ScalaCheckPropertyChecks with
 
   property("With Maps is preserved[(Short,String)]") {
     forAll { (cap: Capacity, items: List[(Short, String)]) =>
-      val mitems = items.map { Map(_) }
+      val mitems = items.map(Map(_))
       val qit = SummingIterator(SummingQueue[Map[Short, String]](cap.c), mitems.iterator)
       val qitc =
         SummingIterator(SummingCache[Short, String](cap.c), mitems.iterator)

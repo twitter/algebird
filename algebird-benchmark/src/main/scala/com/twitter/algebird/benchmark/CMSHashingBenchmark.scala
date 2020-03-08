@@ -65,9 +65,7 @@ object CMSHashingBenchmark {
     def setup(): Unit = {
       random = new scala.util.Random
       // We draw numbers randomly from a 2^maxBits address space.
-      inputs = (1 to operations).view.map { _ =>
-        scala.math.BigInt(maxBits, random)
-      }
+      inputs = (1 to operations).view.map(_ => scala.math.BigInt(maxBits, random))
     }
 
   }
@@ -92,13 +90,9 @@ class CMSHashingBenchmark {
   }
 
   def timeBrokenCurrentHashWithRandomMaxBitsNumbers(state: CMSState) =
-    state.inputs.foreach { input =>
-      brokenCurrentHash(state.a, state.b, state.width)(input)
-    }
+    state.inputs.foreach(input => brokenCurrentHash(state.a, state.b, state.width)(input))
 
   def timeMurmurHashScalaWithRandomMaxBitsNumbers(state: CMSState) =
-    state.inputs.foreach { input =>
-      murmurHashScala(state.a, state.b, state.width)(input)
-    }
+    state.inputs.foreach(input => murmurHashScala(state.a, state.b, state.width)(input))
 
 }

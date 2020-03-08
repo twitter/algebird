@@ -70,27 +70,19 @@ class IntervalLaws extends CheckProperties {
   }
 
   property("[x, x + 1) does not contain x + 1") {
-    forAll { x: Int =>
-      !Interval.leftClosedRightOpen(x, x + 1).contains(x + 1)
-    }
+    forAll { x: Int => !Interval.leftClosedRightOpen(x, x + 1).contains(x + 1) }
   }
 
   property("(x, x + 1] does not contain x") {
-    forAll { x: Int =>
-      !Interval.leftOpenRightClosed(x, x + 1).contains(x)
-    }
+    forAll { x: Int => !Interval.leftOpenRightClosed(x, x + 1).contains(x) }
   }
 
   property("[x, x) is empty") {
-    forAll { x: Int =>
-      Interval.leftClosedRightOpen(x, x).isEmpty
-    }
+    forAll { x: Int => Interval.leftClosedRightOpen(x, x).isEmpty }
   }
 
   property("(x, x] is empty") {
-    forAll { x: Int =>
-      Interval.leftOpenRightClosed(x, x).isEmpty
-    }
+    forAll { x: Int => Interval.leftOpenRightClosed(x, x).isEmpty }
   }
 
   property("[x, y).isEmpty == (x >= y)") {
@@ -135,33 +127,23 @@ class IntervalLaws extends CheckProperties {
   }
 
   property("[n, inf) and (-inf, n] intersect") {
-    forAll { (n: Long) =>
-      InclusiveLower(n).intersects(InclusiveUpper(n))
-    }
+    forAll((n: Long) => InclusiveLower(n).intersects(InclusiveUpper(n)))
   }
 
   property("(x, inf) and (-inf, y) intersects if and only if y > x") {
-    forAll { (x: Long, y: Long) =>
-      ((y > x) == ExclusiveLower(x).intersects(ExclusiveUpper(y)))
-    }
+    forAll((x: Long, y: Long) => ((y > x) == ExclusiveLower(x).intersects(ExclusiveUpper(y))))
   }
 
   property("(x, inf) and (-inf, y] intersect if and only if y > x") {
-    forAll { (x: Long, y: Long) =>
-      ((y > x) == ExclusiveLower(x).intersects(InclusiveUpper(y)))
-    }
+    forAll((x: Long, y: Long) => ((y > x) == ExclusiveLower(x).intersects(InclusiveUpper(y))))
   }
 
   property("[x, inf) and (-inf, y) intersect if and only if y > x") {
-    forAll { (x: Long, y: Long) =>
-      ((y > x) == InclusiveLower(x).intersects(ExclusiveUpper(y)))
-    }
+    forAll((x: Long, y: Long) => ((y > x) == InclusiveLower(x).intersects(ExclusiveUpper(y))))
   }
 
   property("[x, inf) and (-inf, y] intersect if and only if y >= x") {
-    forAll { (x: Long, y: Long) =>
-      ((y >= x) == InclusiveLower(x).intersects(InclusiveUpper(y)))
-    }
+    forAll((x: Long, y: Long) => ((y >= x) == InclusiveLower(x).intersects(InclusiveUpper(y))))
   }
 
   def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) =
@@ -182,9 +164,7 @@ class IntervalLaws extends CheckProperties {
     } else {
       // nothing is in both
       low.least.map(upper.contains(_) == false).getOrElse(true) &&
-      items.forall { i =>
-        (low.contains(i) && upper.contains(i)) == false
-      } &&
+      items.forall(i => (low.contains(i) && upper.contains(i)) == false) &&
       (low && upper match {
         case Empty() => true
         case _       => false
@@ -210,9 +190,7 @@ class IntervalLaws extends CheckProperties {
         .map {
           case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
             val intr2 = Interval.leftClosedRightOpen(low, high)
-            tests.forall { t =>
-              intr(t) == intr2(t)
-            }
+            tests.forall(t => intr(t) == intr2(t))
         }
         .getOrElse(true)) // none means this can't be expressed as this kind of interval
     }
@@ -220,7 +198,7 @@ class IntervalLaws extends CheckProperties {
 
   property("least is the smallest") {
     forAll { (lower: Lower[Long]) =>
-      ((for {
+      (for {
         le <- lower.least
         ple <- Predecessible.prev(le)
       } yield lower.contains(le) && !lower.contains(ple))
@@ -229,13 +207,13 @@ class IntervalLaws extends CheckProperties {
             case InclusiveLower(l) => l == Long.MinValue
             case ExclusiveLower(l) => l == Long.MaxValue
           }
-        })
+        }
     }
   }
 
   property("greatest is the biggest") {
     forAll { (upper: Upper[Long]) =>
-      ((for {
+      (for {
         gr <- upper.greatest
         ngr <- Successible.next(gr)
       } yield upper.contains(gr) && !upper.contains(ngr))
@@ -244,7 +222,7 @@ class IntervalLaws extends CheckProperties {
             case InclusiveUpper(l) => l == Long.MaxValue
             case ExclusiveUpper(l) => l == Long.MinValue
           }
-        })
+        }
     }
   }
 
@@ -279,9 +257,7 @@ class IntervalLaws extends CheckProperties {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedLeast match {
         case Some(l) =>
-          (i :: rest).forall { v =>
-            !intr(v) || (l <= v)
-          }
+          (i :: rest).forall(v => !intr(v) || (l <= v))
         case None => true
       }
     }
@@ -290,9 +266,7 @@ class IntervalLaws extends CheckProperties {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedGreatest match {
         case Some(u) =>
-          (i :: rest).forall { v =>
-            !intr(v) || (v <= u)
-          }
+          (i :: rest).forall(v => !intr(v) || (v <= u))
         case None => true
       }
     }

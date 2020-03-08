@@ -54,7 +54,7 @@ class JavaBoxedTests extends CheckProperties {
   // TODO add testing with JFloat/JDouble but check for approximate equals, pain in the ass.
 
   implicit def jlist[T: Arbitrary] = Arbitrary {
-    implicitly[Arbitrary[List[T]]].arbitrary.map { _.asJava }
+    implicitly[Arbitrary[List[T]]].arbitrary.map(_.asJava)
   }
 
   property("JList is a Monoid") {
@@ -63,9 +63,7 @@ class JavaBoxedTests extends CheckProperties {
 
   implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup] = Arbitrary {
     implicitly[Arbitrary[Map[K, V]]].arbitrary.map {
-      _.filter { kv =>
-        isNonZero[V](kv._2)
-      }.asJava
+      _.filter(kv => isNonZero[V](kv._2)).asJava
     }
   }
 

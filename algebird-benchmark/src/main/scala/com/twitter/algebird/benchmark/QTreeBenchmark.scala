@@ -34,24 +34,18 @@ object QTreeBenchmark {
       inputDataUnit = {
         val rng = new Random("qtree".hashCode)
 
-        (0L until numElements).map { _ =>
-          QTree((rng.nextInt(1000).toLong, ()))
-        }
+        (0L until numElements).map(_ => QTree((rng.nextInt(1000).toLong, ())))
       }
 
       inputDataLong = {
         val rng = new Random("qtree".hashCode)
-        (0L until numElements).map { _ =>
-          QTree(rng.nextInt(1000).toLong)
-        }
+        (0L until numElements).map(_ => QTree(rng.nextInt(1000).toLong))
       }
 
       inputDataDouble = {
         val rng = new Random("qtree".hashCode)
 
-        (0L until numElements).map { _ =>
-          QTree(rng.nextInt(1000).toDouble)
-        }
+        (0L until numElements).map(_ => QTree(rng.nextInt(1000).toDouble))
       }
 
     }

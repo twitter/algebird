@@ -54,9 +54,7 @@ class BatchedLaws extends CheckProperties {
 
 class BatchedTests extends AnyPropSpec with Matchers with ScalaCheckPropertyChecks {
   property(".iterator works") {
-    forAll { (x: Int, xs: List[Int]) =>
-      Batched(x).append(xs).iterator.toList shouldBe (x :: xs)
-    }
+    forAll((x: Int, xs: List[Int]) => Batched(x).append(xs).iterator.toList shouldBe (x :: xs))
   }
 
   property(".iterator and .reverseIterator agree") {
@@ -67,8 +65,6 @@ class BatchedTests extends AnyPropSpec with Matchers with ScalaCheckPropertyChec
   }
 
   property(".toList works") {
-    forAll { (b: Batched[Int]) =>
-      b.toList shouldBe b.iterator.toList
-    }
+    forAll((b: Batched[Int]) => b.toList shouldBe b.iterator.toList)
   }
 }

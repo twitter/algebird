@@ -29,9 +29,7 @@ class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { /
 
   def plus(older: PromiseLink[V], newer: PromiseLink[V]): PromiseLink[V] = {
     val (PromiseLink(p1, v1), PromiseLink(p2, v2)) = (older, newer)
-    p2.foreach { futureV =>
-      Tunnel.properPromiseUpdate(p1, monoid.plus(futureV, v2))
-    }
+    p2.foreach(futureV => Tunnel.properPromiseUpdate(p1, monoid.plus(futureV, v2)))
     PromiseLink(p2, monoid.plus(v1, v2))
   }
 

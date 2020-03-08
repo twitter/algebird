@@ -18,10 +18,8 @@ object ReferenceHyperLogLog {
   def bytesToBitSet(in: Array[Byte]): BitSet =
     BitSet(
       in.zipWithIndex
-        .map { bi =>
-          (bi._1, bi._2 * 8)
-        }
-        .flatMap { byteToIndicator(_) }: _*
+        .map(bi => (bi._1, bi._2 * 8))
+        .flatMap(byteToIndicator(_)): _*
     )
   def byteToIndicator(bi: (Byte, Int)): Seq[Int] =
     (0 to 7).flatMap { i =>
@@ -34,8 +32,8 @@ object ReferenceHyperLogLog {
 
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) = {
     val onBits = bytesToBitSet(in)
-    val j = onBits.filter { _ < bits }.map { 1 << _ }.sum
-    val rhow = onBits.find { _ >= bits }.map { _ - bits + 1 }.getOrElse(0)
+    val j = onBits.filter(_ < bits).map(1 << _).sum
+    val rhow = onBits.find(_ >= bits).map(_ - bits + 1).getOrElse(0)
     (j, rhow.toByte)
   }
 
@@ -77,9 +75,7 @@ class HyperLogLogLaws extends CheckProperties {
    * serialized HLLs
    */
   property("HyperLogLog.hash matches reference") {
-    Prop.forAll { a: Array[Byte] =>
-      HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq
-    }
+    Prop.forAll { a: Array[Byte] => HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq }
   }
 
   property("HyperLogLog.j and rhow match reference") {
@@ -106,9 +102,7 @@ class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matc
   }
 
   property("jRhoW matches referenceJRhoW") {
-    forAll { (in: Array[Byte], bits: Int) =>
-      assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
-    }
+    forAll((in: Array[Byte], bits: Int) => assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits)))
   }
 }
 
@@ -152,7 +146,7 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(it: Seq[Seq[T]]) = it.map { iterableToHLL(_) }
+  def makeApproximate(it: Seq[Seq[T]]) = it.map(iterableToHLL(_))
 
   def exactGenerator: Gen[Seq[Seq[T]]] = {
     val vectorGenerator: Gen[Seq[T]] =
@@ -298,18 +292,16 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
   def exactCount[T](it: Iterable[T]): Int = it.toSet.size
   def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]) = {
     val hll = new HyperLogLogMonoid(bits)
-    hll.sizeOf(hll.sum(it.map { hll.create(_) })).estimate.toDouble
+    hll.sizeOf(hll.sum(it.map(hll.create(_)))).estimate.toDouble
   }
 
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)
 
   def testDownsize(dataSize: Int)(oldBits: Int, newBits: Int): Unit = {
-    val data = (0 until dataSize).map { _ =>
-      r.nextLong
-    }
+    val data = (0 until dataSize).map(_ => r.nextLong)
     val exact = exactCount(data).toDouble
     val hll = new HyperLogLogMonoid(oldBits)
-    val oldHll = hll.sum(data.map { hll.create(_) })
+    val oldHll = hll.sum(data.map(hll.create(_)))
     val newHll = oldHll.downsize(newBits)
     assert(scala.math.abs(exact - newHll.estimatedSize) / exact < 3.5 * aveErrorOf(newBits))
   }
@@ -342,12 +334,8 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     }
     "be consistent for sparse vs. dense" in {
       val mon = new HyperLogLogMonoid(12)
-      val data = (1 to 100).map { _ =>
-        r.nextLong
-      }
-      val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) =>
-        seq :+ (seq.last + mon.create(value))
-      }
+      val data = (1 to 100).map(_ => r.nextLong)
+      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ (seq.last + mon.create(value)))
       // Now the ith entry of partialSums (0-based) is an HLL structure for i underlying elements
       partialSums.foreach { hll =>
         assert(hll.isInstanceOf[SparseHLL])
@@ -360,12 +348,8 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     }
     "properly convert to dense" in {
       val mon = new HyperLogLogMonoid(10)
-      val data = (1 to 200).map { _ =>
-        r.nextLong
-      }
-      val partialSums = data.foldLeft(Seq(mon.zero)) { (seq, value) =>
-        seq :+ (seq.last + mon.create(value))
-      }
+      val data = (1 to 200).map(_ => r.nextLong)
+      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ (seq.last + mon.create(value)))
       partialSums.foreach { hll =>
         if (hll.size - hll.zeroCnt <= 64) {
           assert(hll.isInstanceOf[SparseHLL])
@@ -376,23 +360,17 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     }
     "properly do a batch create" in {
       val mon = new HyperLogLogMonoid(10)
-      val data = (1 to 200).map { _ =>
-        r.nextLong
-      }
+      val data = (1 to 200).map(_ => r.nextLong)
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) =>
         seq :+ (seq.last + mon.create(value))
       }
-      (1 to 200).map { n =>
-        assert(partialSums(n) == mon.batchCreate(data.slice(0, n)))
-      }
+      (1 to 200).map(n => assert(partialSums(n) == mon.batchCreate(data.slice(0, n))))
     }
 
     "work as an Aggregator and return a HLL" in {
       List(5, 7, 8, 10).foreach { bits =>
         val aggregator = HyperLogLogAggregator(bits)
-        val data = (0 to 10000).map { _ =>
-          r.nextInt(1000)
-        }
+        val data = (0 to 10000).map(_ => r.nextInt(1000))
         val exact = exactCount(data).toDouble
 
         val approxCount =
@@ -404,9 +382,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     "work as an Aggregator and return size" in {
       List(5, 7, 8, 10).foreach { bits =>
         val aggregator = HyperLogLogAggregator.sizeAggregator(bits)
-        val data = (0 to 10000).map { _ =>
-          r.nextInt(1000)
-        }
+        val data = (0 to 10000).map(_ => r.nextInt(1000))
         val exact = exactCount(data).toDouble
 
         val estimate = aggregator(data.map(int2Bytes(_)))

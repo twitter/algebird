@@ -33,9 +33,7 @@ trait AsyncSummer[T, +M <: Iterable[T]] { self =>
     new AsyncSummerProxy[T, M] {
       override val self = oldSelf
       override def cleanup =
-        oldSelf.cleanup.flatMap { _ =>
-          cleanupFn()
-        }
+        oldSelf.cleanup.flatMap(_ => cleanupFn())
     }
   }
 }

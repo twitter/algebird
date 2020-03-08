@@ -51,8 +51,8 @@ class ApproximateLaws extends CheckProperties {
     }
   }
 
-  val trueGen = choose(0.0, 1.0).map { ApproximateBoolean(true, _) }
-  val falseGen = choose(0.0, 1.0).map { ApproximateBoolean(false, _) }
+  val trueGen = choose(0.0, 1.0).map(ApproximateBoolean(true, _))
+  val falseGen = choose(0.0, 1.0).map(ApproximateBoolean(false, _))
 
   implicit val approxArb: Arbitrary[ApproximateBoolean] =
     Arbitrary(

@@ -55,7 +55,7 @@ class CollectionSpecification extends CheckProperties {
   }
 
   implicit def arbSeq[T: Arbitrary]: Arbitrary[Seq[T]] =
-    Arbitrary { implicitly[Arbitrary[List[T]]].arbitrary.map { _.toSeq } }
+    Arbitrary(implicitly[Arbitrary[List[T]]].arbitrary.map(_.toSeq))
 
   property("Seq plus") {
     forAll { (a: Seq[Int], b: Seq[Int]) =>
@@ -88,24 +88,18 @@ class CollectionSpecification extends CheckProperties {
     val mv = implicitly[Monoid[V]]
     implicitly[Arbitrary[Map[K, V]]].arbitrary
       .map {
-        _.filter { kv =>
-          mv.isNonZero(kv._2)
-        }
+        _.filter(kv => mv.isNonZero(kv._2))
       }
   }
 
   implicit def scMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
     mapArb[K, V].arbitrary
-      .map { map: Map[K, V] =>
-        map: ScMap[K, V]
-      }
+      .map { map: Map[K, V] => map: ScMap[K, V] }
   }
 
   implicit def mMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
     mapArb[K, V].arbitrary
-      .map { map: Map[K, V] =>
-        MMap(map.toSeq: _*): MMap[K, V]
-      }
+      .map { map: Map[K, V] => MMap(map.toSeq: _*): MMap[K, V] }
   }
 
   def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit rng: Ring[ScMap[Int, Int]], arbMap: Arbitrary[M]) =
@@ -113,9 +107,7 @@ class CollectionSpecification extends CheckProperties {
       // Subsets because zeros are removed from the times/plus values
       ((rng.times(a, b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
       (rng.plus(a, b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
-      (rng.plus(a, a).keys == (a.filter { kv =>
-        (kv._2 + kv._2) != 0
-      }).keys))
+      (rng.plus(a, a).keys == a.filter(kv => (kv._2 + kv._2) != 0).keys))
     }
 
   property("Map plus/times keys") {
@@ -187,7 +179,7 @@ class CollectionSpecification extends CheckProperties {
 
   implicit def arbIndexedSeq[T: Arbitrary]: Arbitrary[IndexedSeq[T]] =
     Arbitrary {
-      implicitly[Arbitrary[List[T]]].arbitrary.map { _.toIndexedSeq }
+      implicitly[Arbitrary[List[T]]].arbitrary.map(_.toIndexedSeq)
     }
 
   property("IndexedSeq (of a Semigroup) is a semigroup") {
@@ -205,15 +197,11 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MapAlgebra.removeZeros works") {
-    forAll { (m: Map[Int, Int]) =>
-      (MapAlgebra.removeZeros(m).values.toSet.contains(0) == false)
-    }
+    forAll((m: Map[Int, Int]) => (MapAlgebra.removeZeros(m).values.toSet.contains(0) == false))
   }
 
   property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") {
-    forAll { (m: Map[Int, Int]) =>
-      (Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m)))
-    }
+    forAll((m: Map[Int, Int]) => (Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m))))
   }
 
   property("MapAlgebra.sumByKey works") {
@@ -221,11 +209,9 @@ class CollectionSpecification extends CheckProperties {
       import com.twitter.algebird.Operators._
       val tupList = keys.zip(values)
       val expected = tupList
-        .groupBy { _._1 }
-        .mapValues { v =>
-          v.map { _._2 }.sum
-        }
-        .filter { _._2 != 0 }
+        .groupBy(_._1)
+        .mapValues(v => v.map(_._2).sum)
+        .filter(_._2 != 0)
         .toMap
       MapAlgebra.sumByKey(tupList) == expected && tupList.sumByKey == expected
     }
@@ -244,9 +230,7 @@ class CollectionSpecification extends CheckProperties {
     forAll { (m1: Map[Int, Int], m2: Map[Int, Int]) =>
       // .toList below is to make sure we don't remove duplicate values
       (MapAlgebra.dot(m1, m2) ==
-        (m1.keySet ++ m2.keySet).toList.map { k =>
-          m1.getOrElse(k, 0) * m2.getOrElse(k, 0)
-        }.sum)
+        (m1.keySet ++ m2.keySet).toList.map(k => m1.getOrElse(k, 0) * m2.getOrElse(k, 0)).sum)
     }
   }
 
@@ -257,9 +241,7 @@ class CollectionSpecification extends CheckProperties {
         .toIterator
         .flatMap {
           case (k, sv) =>
-            sv.map { v =>
-              (k, v)
-            }
+            sv.map(v => (k, v))
         }
         .toSet == l)
     }
@@ -296,18 +278,14 @@ class CollectionSpecification extends CheckProperties {
     forAll { (m1: Map[Int, Int], m2: Map[Int, Int]) =>
       val m3 = MapAlgebra.join(m1, m2)
       val m1after = m3
-        .mapValues { vw =>
-          vw._1
-        }
-        .filter { _._2.isDefined }
-        .mapValues { _.get }
+        .mapValues(vw => vw._1)
+        .filter(_._2.isDefined)
+        .mapValues(_.get)
         .toMap
       val m2after = m3
-        .mapValues { vw =>
-          vw._2
-        }
-        .filter { _._2.isDefined }
-        .mapValues { _.get }
+        .mapValues(vw => vw._2)
+        .filter(_._2.isDefined)
+        .mapValues(_.get)
         .toMap
       val m1Orm2 = (m1.keySet | m2.keySet)
       ((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))

@@ -182,9 +182,7 @@ class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks
       def mustConvert(o: List[Int]) = pred(o)
 
       val leftSemigroup = Semigroup.doubleSemigroup
-      def rightAggregator = rightAg.andThenPresent { _ =>
-        "Right"
-      }
+      def rightAggregator = rightAg.andThenPresent(_ => "Right")
     }
 
   property("EventuallyAggregator converts correctly") {
@@ -198,9 +196,7 @@ class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks
      * For HLL/Set, which is the common example, this is lawful.
      */
     forAll { (in: List[Int], thresh: Int, rightAg: Aggregator[Int, List[Int], Int]) =>
-      val pred = { x: List[Int] =>
-        x.lengthCompare(thresh) > 0
-      }
+      val pred = { x: List[Int] => x.lengthCompare(thresh) > 0 }
       val eventuallyAg = eventuallyAggregator(rightAg)(pred)
       eventuallyAg.semigroup
 

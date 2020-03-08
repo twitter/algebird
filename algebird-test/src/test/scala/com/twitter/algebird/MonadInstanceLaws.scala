@@ -86,9 +86,7 @@ class MonadInstanceLaws extends CheckProperties {
       bigReader(m1)
 
       // This should be the same as this loop:
-      fns.foreach { fn =>
-        m2.inc(fn(m2.item))
-      }
+      fns.foreach(fn => m2.inc(fn(m2.item)))
       m1.item == m2.item
     }
   }

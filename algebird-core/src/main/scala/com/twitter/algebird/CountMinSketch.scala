@@ -131,9 +131,7 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
    */
   def create(data: Seq[K]): CMS[K] = {
     val summation = new CMSSummation(params)
-    data.foreach { k =>
-      summation.insert(k, 1L)
-    }
+    data.foreach(k => summation.insert(k, 1L))
     summation.result
   }
 
@@ -345,9 +343,7 @@ object CMSFunctions {
     val r = new scala.util.Random(seed)
     val numHashes = depth(delta)
     val numCounters = width(eps)
-    (0 to (numHashes - 1)).map { _ =>
-      CMSHash[K](r.nextInt(), 0, numCounters)
-    }
+    (0 to (numHashes - 1)).map(_ => CMSHash[K](r.nextInt(), 0, numCounters))
   }
 
 }
@@ -665,7 +661,7 @@ case class SparseCMS[K](
   override def innerProduct(other: CMS[K]): Approximate[Long] =
     exactCountTable.iterator
       .map { case (x, count) => Approximate.exact(count) * other.frequency(x) }
-      .reduceOption { _ + _ }
+      .reduceOption(_ + _)
       .getOrElse(Approximate.exact(0L))
 }
 
@@ -751,7 +747,7 @@ case class CMSInstance[K](
             countsTable.getCount((d, w)) * other.countsTable.getCount((d, w))
           }.sum
 
-        val est = (0 to (depth - 1)).iterator.map { innerProductAtDepth }.min
+        val est = (0 to (depth - 1)).iterator.map(innerProductAtDepth).min
         val minimum =
           math.max(est - (eps * totalCount * other.totalCount).toLong, 0)
         Approximate(minimum, est, est, 1 - delta)
@@ -1085,7 +1081,7 @@ case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] 
 
   override def purgeHeavyHitters(cms: CMS[K])(hitters: HeavyHitters[K]): HeavyHitters[K] = {
     val minCount = heavyHittersPct * cms.totalCount
-    HeavyHitters[K](hitters.hhs.filter { _.count >= minCount })
+    HeavyHitters[K](hitters.hhs.filter(_.count >= minCount))
   }
 
 }
@@ -1125,7 +1121,7 @@ case class HeavyHitters[K](hhs: Set[HeavyHitter[K]]) extends java.io.Serializabl
   def ++(other: HeavyHitters[K]): HeavyHitters[K] =
     HeavyHitters[K](hhs ++ other.hhs)
 
-  def items: Set[K] = hhs.map { _.item }
+  def items: Set[K] = hhs.map(_.item)
 
 }
 
@@ -1307,17 +1303,13 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
   override def purgeHeavyHitters(
       cms: CMS[(K1, K2)]
   )(hitters: HeavyHitters[(K1, K2)]): HeavyHitters[(K1, K2)] = {
-    val grouped = hitters.hhs.groupBy { hh =>
-      hh.item._1
-    }
+    val grouped = hitters.hhs.groupBy(hh => hh.item._1)
     val (underLimit, overLimit) = grouped.partition {
       _._2.size <= heavyHittersN
     }
     val sorted = overLimit.transform {
       case (_, hhs) =>
-        hhs.toSeq.sortBy { hh =>
-          hh.count
-        }
+        hhs.toSeq.sortBy(hh => hh.count)
     }
     val purged = sorted.transform {
       case (_, hhs) =>

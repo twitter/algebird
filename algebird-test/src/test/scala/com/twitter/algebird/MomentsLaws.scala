@@ -31,9 +31,7 @@ class MomentsTest extends AnyWordSpec with Matchers {
    * the list's central moments.
    */
   def getMoments(xs: List[Double]): Moments =
-    xs.foldLeft(MomentsGroup.zero) { (m, x) =>
-      MomentsGroup.plus(m, Moments(x))
-    }
+    xs.foldLeft(MomentsGroup.zero)((m, x) => MomentsGroup.plus(m, Moments(x)))
 
   "Moments should count" in {
     val m1 = getMoments(List(1, 2, 3, 4, 5))

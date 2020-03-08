@@ -57,7 +57,7 @@ class RightFolded2Test extends CheckProperties {
       case RightFoldedValue2(v, _, _) => {
         Some(
           l.dropRight(1)
-            .flatMap { _.asInstanceOf[RightFoldedToFold2[In]].in }
+            .flatMap(_.asInstanceOf[RightFoldedToFold2[In]].in)
             .foldRight(v)(foldfn)
         )
       }
@@ -74,7 +74,7 @@ class RightFolded2Test extends CheckProperties {
     val chunks = chunk(l)(notIsVal)
 
     val grp = implicitly[Group[Acc]]
-    val vals = chunks.map { fold(_)(foldfn).map(mapfn).getOrElse(grp.zero) }
+    val vals = chunks.map(fold(_)(foldfn).map(mapfn).getOrElse(grp.zero))
     grp.sum(vals)
   }
 

@@ -43,10 +43,8 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
       case (k, v) =>
         val newV = cache
           .get(k)
-          .map { oldV =>
-            sgv.plus(oldV, v)
-          }
-          .getOrElse { v }
+          .map(oldV => sgv.plus(oldV, v))
+          .getOrElse(v)
         (k, newV)
     }
 

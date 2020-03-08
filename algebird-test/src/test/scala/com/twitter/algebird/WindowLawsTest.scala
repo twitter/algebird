@@ -19,7 +19,7 @@ class WindowLaws extends CheckProperties {
       } yield Window.fromIterable(as)
     }
 
-  property("Window obeys monoid laws using a group") { monoidLaws[Window[Int]] }
+  property("Window obeys monoid laws using a group")(monoidLaws[Window[Int]])
   property("Window obeys monoid laws using a monoid") {
     implicit val mon = Window.monoid[String](5)
     monoidLaws[Window[String]]
@@ -62,7 +62,7 @@ class WindowTest extends CheckProperties {
     forAll { (ts0: List[Int], pn: PosNum[Int]) =>
       val n = pn.value
       val mon = Window.monoid[Int](n)
-      val got = mon.sumOption(ts0.map { Window(_) })
+      val got = mon.sumOption(ts0.map(Window(_)))
       val trunc = Queue(ts0.takeRight(n): _*)
       val expected = if (ts0.size == 0) None else Some(Window(trunc.sum, trunc))
       expected == got

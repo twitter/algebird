@@ -60,9 +60,7 @@ class AlgebirdRDDTest extends AnyFunSuite with BeforeAndAfter {
     val resMap = sc.makeRDD(s).algebird.aggregateByKey[K, T, U, V](agg).collect.toMap
     implicit val sg = agg.semigroup
     val algMap = MapAlgebra.sumByKey(s.map { case (k, t) => k -> agg.prepare(t) }).mapValues(agg.present)
-    s.map(_._1).toSet.foreach { k: K =>
-      assertEq(resMap.get(k), algMap.get(k))
-    }
+    s.map(_._1).toSet.foreach { k: K => assertEq(resMap.get(k), algMap.get(k)) }
   }
 
   def sumOption[T: ClassTag: Equiv: Semigroup](s: Seq[T]): Unit =
@@ -71,9 +69,7 @@ class AlgebirdRDDTest extends AnyFunSuite with BeforeAndAfter {
   def sumByKey[K: ClassTag, V: ClassTag: Semigroup: Equiv](s: Seq[(K, V)]): Unit = {
     val resMap = sc.makeRDD(s).algebird.sumByKey[K, V].collect.toMap
     val algMap = MapAlgebra.sumByKey(s)
-    s.map(_._1).toSet.foreach { k: K =>
-      assertEq(resMap.get(k), algMap.get(k))
-    }
+    s.map(_._1).toSet.foreach { k: K => assertEq(resMap.get(k), algMap.get(k)) }
   }
 
   /**

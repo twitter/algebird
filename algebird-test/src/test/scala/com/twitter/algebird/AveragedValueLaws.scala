@@ -25,9 +25,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue.aggregator returns the average") {
-    forAll { v: NonEmptyVector[Double] =>
-      approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items))
-    }
+    forAll { v: NonEmptyVector[Double] => approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items)) }
   }
 
   property("AveragedValue instances subtract") {
@@ -39,9 +37,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue can absorb numbers directly") {
-    forAll { (base: AveragedValue, x: BigInt) =>
-      (base + AveragedValue(x)) == (base + x)
-    }
+    forAll((base: AveragedValue, x: BigInt) => (base + AveragedValue(x)) == (base + x))
   }
 
   property("AveragedValue works by + or sumOption") {

@@ -53,9 +53,7 @@ object PredecessibleLaws {
    * }}}
    */
   def predecessibleLaws[T: Predecessible: Arbitrary]: Prop =
-    forAll { (t: T, size: Short) =>
-      law(t) && iteratePrevDecreases(t, size)
-    }
+    forAll((t: T, size: Short) => law(t) && iteratePrevDecreases(t, size))
 
   @deprecated("Deprecated in favor of predecessibleLaws.", since = "0.12.3")
   def predessibleLaws[T: Predecessible: Arbitrary]: Prop = predecessibleLaws

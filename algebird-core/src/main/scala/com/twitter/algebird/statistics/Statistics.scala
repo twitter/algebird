@@ -41,7 +41,7 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
   }
 
   override def sumOption(iter: TraversableOnce[T]): Option[T] =
-    sumOptionCallsStats.measure(iter) { Semigroup.sumOption(_) }
+    sumOptionCallsStats.measure(iter)(Semigroup.sumOption(_))
 
   override def toString: String =
     "plus calls: " + plusCallsCount + "\n" +
@@ -69,7 +69,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
   }
 
   override def sum(vs: TraversableOnce[T]): T =
-    sumCallsStats.measure(vs) { Monoid.sum(_) }
+    sumCallsStats.measure(vs)(Monoid.sum(_))
 
   override def toString: String =
     super.toString + "\n" +
@@ -135,7 +135,7 @@ class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
   }
 
   override def product(iter: TraversableOnce[T]): T =
-    productCallsStats.measure(iter) { Ring.product(_) }
+    productCallsStats.measure(iter)(Ring.product(_))
 
   override def toString: String =
     super.toString + "\n" +

@@ -30,7 +30,7 @@ class TopKTests extends CheckProperties {
 
   implicit def qmonoid = new PriorityQueueMonoid[Int](SIZE)
   implicit def queueArb = Arbitrary {
-    implicitly[Arbitrary[List[Int]]].arbitrary.map { qmonoid.build(_) }
+    implicitly[Arbitrary[List[Int]]].arbitrary.map(qmonoid.build(_))
   }
 
   def q2l(q: PriorityQueue[Int]): List[Int] = q.iterator.asScala.toList.sorted
@@ -40,15 +40,11 @@ class TopKTests extends CheckProperties {
   def pqIsCorrect(items: List[List[Int]]): Boolean = {
     val correct = items.flatten.sorted.take(SIZE)
     // Have to do this last since this monoid is mutating inputs
-    q2l(Monoid.sum(items.map { l =>
-      qmonoid.build(l)
-    })) == correct
+    q2l(Monoid.sum(items.map(l => qmonoid.build(l)))) == correct
   }
 
   property("PriorityQueueMonoid works") {
-    forAll { (items: List[List[Int]]) =>
-      pqIsCorrect(items)
-    }
+    forAll((items: List[List[Int]]) => pqIsCorrect(items))
   }
 
   /**
@@ -67,7 +63,7 @@ class TopKTests extends CheckProperties {
   implicit def tkmonoid = new TopKMonoid[Int](SIZE)
 
   implicit def topkArb = Arbitrary {
-    implicitly[Arbitrary[List[Int]]].arbitrary.map { tkmonoid.build(_) }
+    implicitly[Arbitrary[List[Int]]].arbitrary.map(tkmonoid.build(_))
   }
 
   property("TopKMonoid works") {
@@ -75,9 +71,7 @@ class TopKTests extends CheckProperties {
       val correct = its.flatten.sorted.take(SIZE)
       Equiv[List[Int]].equiv(
         Monoid
-          .sum(its.map { l =>
-            tkmonoid.build(l)
-          })
+          .sum(its.map(l => tkmonoid.build(l)))
           .items,
         correct
       )

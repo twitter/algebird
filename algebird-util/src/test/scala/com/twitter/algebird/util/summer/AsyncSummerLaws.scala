@@ -32,33 +32,25 @@ object AsyncSummerLaws {
   implicit def arbFlushFreq = Arbitrary {
     Gen
       .choose(1, 4000)
-      .map { x: Int =>
-        FlushFrequency(Duration.fromMilliseconds(x))
-      }
+      .map { x: Int => FlushFrequency(Duration.fromMilliseconds(x)) }
   }
 
   implicit def arbBufferSize = Arbitrary {
     Gen
       .choose(1, 10)
-      .map { x =>
-        BufferSize(x)
-      }
+      .map(x => BufferSize(x))
   }
 
   implicit def arbMemoryFlushPercent = Arbitrary {
     Gen
       .choose(80.0f, 90.0f)
-      .map { x =>
-        MemoryFlushPercent(x)
-      }
+      .map(x => MemoryFlushPercent(x))
   }
 
   implicit def arbCompactSize = Arbitrary {
     Gen
       .choose(1, 10)
-      .map { x =>
-        CompactionSize(x)
-      }
+      .map(x => CompactionSize(x))
   }
 
   def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get

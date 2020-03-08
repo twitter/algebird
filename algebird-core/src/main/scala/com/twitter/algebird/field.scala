@@ -20,7 +20,7 @@ object field {
     override def plus(l: Float, r: Float): Float = l + r
     override def sum(v: TraversableOnce[Float]): Float = {
       var sum = 0.0f
-      v.foreach { sum += _ }
+      v.foreach(sum += _)
       return sum
     }
     override def trySum(v: TraversableOnce[Float]): Option[Float] =
@@ -36,7 +36,7 @@ object field {
     override def plus(l: JFloat, r: JFloat): JFloat = l + r
     override def sum(v: TraversableOnce[JFloat]): JFloat = {
       var sum = 0.0f
-      v.foreach { sum += _ }
+      v.foreach(sum += _)
       return sum
     }
     override def trySum(v: TraversableOnce[JFloat]): Option[JFloat] =
@@ -52,7 +52,7 @@ object field {
     override def plus(l: Double, r: Double): Double = l + r
     override def sum(v: TraversableOnce[Double]): Double = {
       var sum = 0.0
-      v.foreach { sum += _.floatValue }
+      v.foreach(sum += _.floatValue)
       return sum
     }
     override def trySum(v: TraversableOnce[Double]): Option[Double] =
@@ -68,7 +68,7 @@ object field {
     override def plus(l: JDouble, r: JDouble): JDouble = l + r
     override def sum(v: TraversableOnce[JDouble]): JDouble = {
       var sum = 0.0
-      v.foreach { sum += _.doubleValue }
+      v.foreach(sum += _.doubleValue)
       return sum
     }
     override def trySum(v: TraversableOnce[JDouble]): Option[JDouble] =

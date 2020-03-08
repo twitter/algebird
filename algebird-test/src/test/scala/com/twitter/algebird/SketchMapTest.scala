@@ -48,9 +48,7 @@ class SketchMapTest extends AnyWordSpec with Matchers {
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
-      val data = (0 to (totalCount - 1)).map { _ =>
-        (RAND.nextInt(range), 1L)
-      }
+      val data = (0 to (totalCount - 1)).map(_ => (RAND.nextInt(range), 1L))
       val sm = MONOID.create(data)
       assert(sm.totalValue == totalCount)
     }
@@ -123,7 +121,7 @@ class SketchMapTest extends AnyWordSpec with Matchers {
 
       // Ordering that orders from biggest to smallest (so that HeavyHitters
       // are the smallest numbers).
-      val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long] { -_ }
+      val smallerOrdering: Ordering[Long] = Ordering.by[Long, Long](-_)
 
       val monoid =
         SketchMap.monoid[Int, Long](PARAMS)(smallerOrdering, smallerMonoid)

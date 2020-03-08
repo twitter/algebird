@@ -74,9 +74,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 
     def toEventualBuffer[R](buffer: Buffer[O], e: E): Left[Buffer[E], R] = {
       val newBuffer = Buffer[E]()
-      Semigroup.sumOption(buffer).foreach { sum =>
-        newBuffer += convert(sum)
-      }
+      Semigroup.sumOption(buffer).foreach(sum => newBuffer += convert(sum))
       newBuffer += e
       Left(newBuffer)
     }

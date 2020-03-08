@@ -27,9 +27,7 @@ object TunnelMonoidProperties {
       collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]]
   ) = {
     val r = new Random
-    val numbers = (1 to 40).map { _ =>
-      makeRandomInput(r.nextInt)
-    }
+    val numbers = (1 to 40).map(_ => makeRandomInput(r.nextInt))
     def helper(seeds: Seq[I], toFeed: I) = {
       val tunnels = seeds.map(makeTunnel)
       @annotation.tailrec
@@ -56,7 +54,7 @@ object TunnelMonoidProperties {
             b2 <- f2
           } yield b1 == b2
       }
-      Await.result(Future.collect(finalResults).map { _.forall(identity) })
+      Await.result(Future.collect(finalResults).map(_.forall(identity)))
     }
   }
 }
@@ -72,7 +70,7 @@ class TunnelMonoidPropertiesextends extends CheckProperties {
   property("associative") {
     def makeTunnel(seed: Int) = Tunnel.toIncrement(seed)
     def collapseFinalValues(finalTunnel: Tunnel[Int], tunnels: Seq[Tunnel[Int]], toFeed: Int) =
-      finalTunnel(toFeed) +: tunnels.map { _.future }
+      finalTunnel(toFeed) +: tunnels.map(_.future)
 
     testTunnelMonoid[Int, Tunnel[Int]](identity, makeTunnel, collapseFinalValues)
   }

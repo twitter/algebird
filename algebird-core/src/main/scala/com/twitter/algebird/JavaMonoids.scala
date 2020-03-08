@@ -114,9 +114,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
   override def isNonZero(x: JMap[K, V]): Boolean =
     !x.isEmpty && (implicitly[Semigroup[V]] match {
       case mon: Monoid[_] =>
-        x.values.asScala.exists { v =>
-          mon.isNonZero(v)
-        }
+        x.values.asScala.exists(v => mon.isNonZero(v))
       case _ => true
     })
   override def plus(x: JMap[K, V], y: JMap[K, V]): JHashMap[K, V] = {

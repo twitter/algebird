@@ -21,9 +21,7 @@ object Aggregator extends java.io.Serializable {
    * This is a trivial aggregator that always returns a single value
    */
   def const[T](t: T): MonoidAggregator[Any, Unit, T] =
-    prepareMonoid { _: Any =>
-      ()
-    }.andThenPresent(_ => t)
+    prepareMonoid { _: Any => () }.andThenPresent(_ => t)
 
   /**
    * Using Aggregator.prepare,present you can add to this aggregator
@@ -160,9 +158,7 @@ object Aggregator extends java.io.Serializable {
    * How many items satisfy a predicate
    */
   def count[T](pred: T => Boolean): MonoidAggregator[T, Long, Long] =
-    prepareMonoid { t: T =>
-      if (pred(t)) 1L else 0L
-    }
+    prepareMonoid { t: T => if (pred(t)) 1L else 0L }
 
   /**
    * Do any items satisfy some predicate
@@ -179,16 +175,12 @@ object Aggregator extends java.io.Serializable {
   /**
    * Take the first (left most in reduce order) item found
    */
-  def head[T]: Aggregator[T, T, T] = fromReduce[T] { (l, _) =>
-    l
-  }
+  def head[T]: Aggregator[T, T, T] = fromReduce[T]((l, _) => l)
 
   /**
    * Take the last (right most in reduce order) item found
    */
-  def last[T]: Aggregator[T, T, T] = fromReduce[T] { (_, r) =>
-    r
-  }
+  def last[T]: Aggregator[T, T, T] = fromReduce[T]((_, r) => r)
 
   /**
    * Get the maximum item
@@ -212,9 +204,7 @@ object Aggregator extends java.io.Serializable {
    * This returns the number of items we find
    */
   def size: MonoidAggregator[Any, Long, Long] =
-    prepareMonoid { (_: Any) =>
-      1L
-    }
+    prepareMonoid((_: Any) => 1L)
 
   /**
    * Take the smallest `count` items using a heap
@@ -306,9 +296,7 @@ object Aggregator extends java.io.Serializable {
    * Put everything in a Set. Note, this could fill the memory if the Set is very large.
    */
   def toSet[T]: MonoidAggregator[T, Set[T], Set[T]] =
-    prepareMonoid { t: T =>
-      Set(t)
-    }
+    prepareMonoid { t: T => Set(t) }
 
   /**
    * This builds an in-memory Set, and then finally gets the size of that set.
@@ -497,7 +485,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     Fold.fold[Option[B], A, Option[C]]({
       case (None, a)    => Some(self.prepare(a))
       case (Some(b), a) => Some(self.append(b, a))
-    }, None, { _.map(self.present) })
+    }, None, _.map(self.present))
 
   def lift: MonoidAggregator[A, Option[B], Option[C]] =
     new MonoidAggregator[A, Option[B], Option[C]] {

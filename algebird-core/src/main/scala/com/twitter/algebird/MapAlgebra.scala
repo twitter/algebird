@@ -39,9 +39,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
   override def isNonZero(x: M): Boolean =
     !x.isEmpty && (semigroup match {
       case mon: Monoid[_] =>
-        x.valuesIterator.exists { v =>
-          mon.isNonZero(v)
-        }
+        x.valuesIterator.exists(v => mon.isNonZero(v))
       case _ => true
     })
 
@@ -190,9 +188,7 @@ object MapAlgebra {
       keys: TraversableOnce[T]
   )(lookup: T => Option[V])(present: T => U): Map[U, V] =
     sumByKey {
-      keys.iterator.map { k =>
-        present(k) -> lookup(k).getOrElse(Monoid.zero[V])
-      }
+      keys.iterator.map(k => present(k) -> lookup(k).getOrElse(Monoid.zero[V]))
     }
 
   // Returns a new map with zero-value entries removed
@@ -211,7 +207,7 @@ object MapAlgebra {
    *   pairs.groupBy(_._1).mapValues(_.map(_._2).sum)
    */
   def sumByKey[K, V: Semigroup](pairs: TraversableOnce[(K, V)]): Map[K, V] =
-    Monoid.sum(pairs.iterator.map { Map(_) })
+    Monoid.sum(pairs.iterator.map(Map(_)))
 
   /**
    * For each key, creates a list of all values. This function is equivalent to:
@@ -260,7 +256,7 @@ object MapAlgebra {
     def nonEmptyIter[T](i: Iterable[T]): Iterable[Option[T]] =
       if (i.isEmpty) Iterable(None)
       else {
-        i.map { Some(_) }
+        i.map(Some(_))
       }
 
     Monoid.sum {
@@ -301,9 +297,7 @@ object MapAlgebra {
   def cubeAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
       fn: T => K
   )(implicit c: Cuber[K]): Map[c.K, V] =
-    sumByKey(it.iterator.flatMap { t =>
-      c(fn(t)).iterator.map((_, agg.prepare(t)))
-    })(agg.semigroup)
+    sumByKey(it.iterator.flatMap(t => c(fn(t)).iterator.map((_, agg.prepare(t)))))(agg.semigroup)
       .map { case (k, v) => (k, agg.present(v)) }
 
   def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
@@ -327,9 +321,7 @@ object MapAlgebra {
   def rollupAggregate[T, K, U, V](it: TraversableOnce[T], agg: Aggregator[T, U, V])(
       fn: T => K
   )(implicit r: Roller[K]): Map[r.K, V] =
-    sumByKey(it.iterator.flatMap { t =>
-      r(fn(t)).iterator.map((_, agg.prepare(t)))
-    })(agg.semigroup)
+    sumByKey(it.iterator.flatMap(t => r(fn(t)).iterator.map((_, agg.prepare(t)))))(agg.semigroup)
       .map { case (k, v) => (k, agg.present(v)) }
 
 }

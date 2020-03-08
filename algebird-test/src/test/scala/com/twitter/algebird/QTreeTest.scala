@@ -42,7 +42,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
 
   def buildQTree(k: Int, list: Seq[Double]) = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
-    qtSemigroup.sumOption(list.map { QTree(_) }).get
+    qtSemigroup.sumOption(list.map(QTree(_))).get
   }
 
   def trueQuantile[T: Ordering](list: Seq[T], q: Double): T = {
@@ -52,7 +52,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
   }
 
   def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
-    list.filter { _ >= from }.filter { _ < to }.sum
+    list.filter(_ >= from).filter(_ < to).sum
 
   for (k <- Seq(3, 11, 51, 101)) {
     s"QTree with elements (1 to $k)" should {

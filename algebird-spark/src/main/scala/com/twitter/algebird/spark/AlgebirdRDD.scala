@@ -20,13 +20,15 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * T.
    */
   def aggregateOption[B: ClassTag, C](agg: Aggregator[T, B, C]): Option[C] = {
-    val pr = rdd.mapPartitions({ data =>
-      if (data.isEmpty) Iterator.empty
-      else {
-        val b = agg.prepare(data.next)
-        Iterator(agg.appendAll(b, data))
-      }
-    }, preservesPartitioning = true)
+    val pr = rdd.mapPartitions(
+      data =>
+        if (data.isEmpty) Iterator.empty
+        else {
+          val b = agg.prepare(data.next)
+          Iterator(agg.appendAll(b, data))
+        },
+      preservesPartitioning = true
+    )
     pr.repartition(1)
       .mapPartitions(pr => Iterator(agg.semigroup.sumOption(pr)))
       .collect
@@ -74,9 +76,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
      * This mapValues implementation allows us to avoid needing the V1 ClassTag, which would
      * be required to use the implementation in PairRDDFunctions
      */
-    val prepared = keyed.mapPartitions({ it =>
-      it.map { case (k, v) => (k, agg.prepare(v)) }
-    }, preservesPartitioning = true)
+    val prepared =
+      keyed.mapPartitions(it => it.map { case (k, v) => (k, agg.prepare(v)) }, preservesPartitioning = true)
 
     toPair(
       toPair(prepared)
@@ -122,17 +123,14 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * T.
    */
   def sumOption(implicit sg: Semigroup[T], ct: ClassTag[T]): Option[T] = {
-    val partialReduce: RDD[T] = rdd.mapPartitions({ itT =>
-      sg.sumOption(itT).toIterator
-    }, preservesPartitioning = true)
+    val partialReduce: RDD[T] =
+      rdd.mapPartitions(itT => sg.sumOption(itT).toIterator, preservesPartitioning = true)
 
     // my reading of the docs is that we do want a shuffle at this stage to
     // to make sure the upstream work is done in parallel.
     val results = partialReduce
       .repartition(1)
-      .mapPartitions({ it =>
-        Iterator(sg.sumOption(it))
-      }, preservesPartitioning = true)
+      .mapPartitions(it => Iterator(sg.sumOption(it)), preservesPartitioning = true)
       .collect
 
     assert(results.size == 1, s"Should only be 1 item: ${results.toList}")

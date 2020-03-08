@@ -95,8 +95,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
    * Create a Sketch Map sketch from a sequence of pairs.
    */
   def create(data: Seq[(K, V)]): SketchMap[K, V] = {
-    val heavyHitters = data.map { _._1 }
-    val totalValue = Monoid.sum(data.map { _._2 })
+    val heavyHitters = data.map(_._1)
+    val totalValue = Monoid.sum(data.map(_._2))
     val initTable =
       AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
@@ -128,9 +128,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
    * Returns a sorted list of heavy hitter key/value tuples.
    */
   def heavyHitters(sm: SketchMap[K, V]): List[(K, V)] =
-    sm.heavyHitterKeys.map { item =>
-      (item, frequency(sm, item))
-    }
+    sm.heavyHitterKeys.map(item => (item, frequency(sm, item)))
 }
 
 /**
@@ -169,7 +167,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
   def updatedHeavyHitters[V: Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping: Map[K, V] =
       hitters.iterator.map(item => (item, frequency(item, table))).toMap
-    val specificOrdering = Ordering.by[K, V] { mapping(_) }.reverse
+    val specificOrdering = Ordering.by[K, V](mapping(_)).reverse
     hitters.sorted(specificOrdering).take(heavyHittersCount).toList
   }
 }

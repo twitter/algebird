@@ -38,7 +38,7 @@ class TunnelMonoid[V] extends Monoid[Tunnel[V]] {
 
   def plus(older: Tunnel[V], newer: Tunnel[V]): Tunnel[V] = {
     val (Tunnel(f1, p1), Tunnel(f2, p2)) = (older, newer)
-    f2.foreach { Tunnel.properPromiseUpdate(p1, _) }
+    f2.foreach(Tunnel.properPromiseUpdate(p1, _))
     Tunnel(f1, p2)
   }
 }
@@ -78,7 +78,7 @@ object Tunnel {
    */
   def toIncrement[V](v: V)(implicit monoid: Monoid[V]) = {
     val promise = new Promise[V]
-    Tunnel(promise.map { monoid.plus(_, v) }, promise)
+    Tunnel(promise.map(monoid.plus(_, v)), promise)
   }
 
   /**

@@ -19,9 +19,8 @@ class SpaceSaverLaws extends CheckProperties {
       forAll(Gen.choose(1, 100)) { range =>
         // need a non-uniform distro
         implicit val ssGenOne: Arbitrary[SSOne[Int]] = Arbitrary {
-          for (key <- Gen.frequency((1 to range).map { x =>
-                 (x * x, x: Gen[Int])
-               }: _*)) yield SpaceSaver(capacity, key).asInstanceOf[SSOne[Int]]
+          for (key <- Gen.frequency((1 to range).map(x => (x * x, x: Gen[Int])): _*))
+            yield SpaceSaver(capacity, key).asInstanceOf[SSOne[Int]]
         }
 
         implicit def ssGen(implicit sg: Semigroup[SpaceSaver[Int]]): Arbitrary[SpaceSaver[Int]] = Arbitrary {
@@ -34,9 +33,7 @@ class SpaceSaverLaws extends CheckProperties {
         }
 
         implicit def equiv[T]: Equiv[SpaceSaver[T]] =
-          Equiv.fromFunction { (left, right) =>
-            (left.consistentWith(right)) && (right.consistentWith(left))
-          }
+          Equiv.fromFunction((left, right) => (left.consistentWith(right)) && (right.consistentWith(left)))
 
         commutativeSemigroupLaws[SpaceSaver[Int]]
       }
@@ -71,9 +68,7 @@ class SpaceSaverTest extends AnyWordSpec with Matchers {
 
   "SpaceSaver" should {
     "produce a top 20 with exact bounds" in {
-      val gen = Gen.frequency((1 to 100).map { x =>
-        (x * x, x: Gen[Int])
-      }: _*)
+      val gen = Gen.frequency((1 to 100).map(x => (x * x, x: Gen[Int])): _*)
       val items = (1 to 1000).map(_ => gen.sample.get)
       val exactCounts = items.groupBy(identity).mapValues(_.size)
 

@@ -30,11 +30,7 @@ object FunctorLaws {
       functor: Functor[M],
       arb: Arbitrary[M[V]]
   ): Prop =
-    forAll { (mv: M[V]) =>
-      eq(functor.map(mv) { x =>
-        x
-      }, mv)
-    }
+    forAll((mv: M[V]) => eq(functor.map(mv)(x => x), mv))
 
   def composeLaw[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(
       implicit

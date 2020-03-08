@@ -36,9 +36,7 @@ class IndexedSeqSemigroup[T](implicit semi: Semigroup[T]) extends Semigroup[Inde
 
     val sum = leftSummand
       .zip(rightSummand)
-      .map { tup =>
-        semi.plus(tup._1, tup._2)
-      }
+      .map(tup => semi.plus(tup._1, tup._2))
 
     (sum ++ remainder).toIndexedSeq
   }
@@ -49,15 +47,13 @@ class IndexedSeqMonoid[T](implicit mont: Monoid[T])
     with Monoid[IndexedSeq[T]] {
   override def zero: IndexedSeq[T] = IndexedSeq.empty[T]
   override def isNonZero(v: IndexedSeq[T]): Boolean =
-    v.exists { t =>
-      mont.isNonZero(t)
-    }
+    v.exists(t => mont.isNonZero(t))
 }
 
 class IndexedSeqGroup[T](implicit grp: Group[T])
     extends IndexedSeqMonoid[T]()(grp)
     with Group[IndexedSeq[T]] {
-  override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map { grp.negate(_) }
+  override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map(grp.negate(_))
 }
 
 class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng) with Ring[IndexedSeq[T]] {
@@ -70,8 +66,6 @@ class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng)
     // We don't need to pad, because 0 * x = 0
     left.view
       .zip(right)
-      .map { tup =>
-        rng.times(tup._1, tup._2)
-      }
+      .map(tup => rng.times(tup._1, tup._2))
       .toIndexedSeq
 }

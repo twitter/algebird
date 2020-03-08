@@ -23,9 +23,7 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
       check(BaseProperties.monoidLaws[SetDiff[Int]])
     }
     "be idempotent" in {
-      check { (d: SetDiff[Int]) =>
-        d.merge(d) == d
-      }
+      check((d: SetDiff[Int]) => d.merge(d) == d)
     }
 
     /**
@@ -46,40 +44,26 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
       }
     }
     "+ is the same as SetDiff.add" in {
-      check { (d: SetDiff[Int], inc: Int) =>
-        d + inc == (d.merge(SetDiff.add(inc)))
-      }
+      check((d: SetDiff[Int], inc: Int) => d + inc == (d.merge(SetDiff.add(inc))))
     }
     "- is the same as SetDiff.remove" in {
-      check { (d: SetDiff[Int], dec: Int) =>
-        d - dec == (d.merge(SetDiff.remove(dec)))
-      }
+      check((d: SetDiff[Int], dec: Int) => d - dec == (d.merge(SetDiff.remove(dec))))
     }
     "++ is the same as SetDiff.addAll" in {
-      check { (d: SetDiff[Int], inc: Set[Int]) =>
-        d ++ inc == (d.merge(SetDiff.addAll(inc)))
-      }
+      check((d: SetDiff[Int], inc: Set[Int]) => d ++ inc == (d.merge(SetDiff.addAll(inc))))
     }
     "-- is the same as SetDiff.removeAll" in {
-      check { (d: SetDiff[Int], dec: Set[Int]) =>
-        d -- dec == (d.merge(SetDiff.removeAll(dec)))
-      }
+      check((d: SetDiff[Int], dec: Set[Int]) => d -- dec == (d.merge(SetDiff.removeAll(dec))))
     }
     "+ then - is the same as -" in {
-      check { (i: Int) =>
-        (SetDiff.add(i).merge(SetDiff.remove(i))) == SetDiff.remove(i)
-      }
+      check((i: Int) => (SetDiff.add(i).merge(SetDiff.remove(i))) == SetDiff.remove(i))
     }
     "- then + is the same as +" in {
-      check { (i: Int) =>
-        (SetDiff.remove(i).merge(SetDiff.add(i))) == SetDiff.add(i)
-      }
+      check((i: Int) => (SetDiff.remove(i).merge(SetDiff.add(i))) == SetDiff.add(i))
     }
 
     "apply diffs between sets" in {
-      check { (oldSet: Set[String], newSet: Set[String]) =>
-        SetDiff.of(oldSet, newSet)(oldSet) == newSet
-      }
+      check((oldSet: Set[String], newSet: Set[String]) => SetDiff.of(oldSet, newSet)(oldSet) == newSet)
     }
 
     "create proper diffs" in {
@@ -100,9 +84,7 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
     }
 
     "apply distributes over merge" in {
-      check { (init: Set[Int], a: SetDiff[Int], b: SetDiff[Int]) =>
-        a.merge(b)(init) == b(a(init))
-      }
+      check((init: Set[Int], a: SetDiff[Int], b: SetDiff[Int]) => a.merge(b)(init) == b(a(init)))
     }
 
     "strict application fails if the diff tries to remove extra items" in {

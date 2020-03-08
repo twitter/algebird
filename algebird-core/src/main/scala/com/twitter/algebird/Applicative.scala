@@ -41,16 +41,12 @@ trait Applicative[M[_]] extends Functor[M] {
   def sequence[T](ms: Seq[M[T]]): M[Seq[T]] =
     ms match {
       case Seq()     => apply(Seq.empty)
-      case Seq(m)    => map(m) { Seq(_) }
-      case Seq(m, n) => joinWith(m, n) { Seq(_, _) }
+      case Seq(m)    => map(m)(Seq(_))
+      case Seq(m, n) => joinWith(m, n)(Seq(_, _))
       case _ =>
         val mb =
-          ms.foldLeft(apply(Seq.newBuilder[T])) { (mb, mt) =>
-            joinWith(mb, mt) { (b, t) =>
-              b += t
-            }
-          }
-        map(mb) { _.result }
+          ms.foldLeft(apply(Seq.newBuilder[T]))((mb, mt) => joinWith(mb, mt)((b, t) => b += t))
+        map(mb)(_.result)
     }
   def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
     map(join(mt, mu)) { case (t, u) => fn(t, u) }
@@ -109,9 +105,7 @@ object Applicative {
       ms: S[M[T]]
   )(implicit app: Applicative[M], cbf: Factory[T, R[T]]): M[R[T]] = {
     val bldr = cbf.newBuilder
-    val mbldr = ms.iterator.foldLeft(app.apply(bldr)) { (mb, mt) =>
-      app.joinWith(mb, mt)(_ += _)
-    }
+    val mbldr = ms.iterator.foldLeft(app.apply(bldr))((mb, mt) => app.joinWith(mb, mt)(_ += _))
     app.map(mbldr)(_.result)
   }
 

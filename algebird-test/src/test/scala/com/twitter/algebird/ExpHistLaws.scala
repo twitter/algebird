@@ -120,17 +120,13 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
       }
 
       // every histogram's relative error stays within bounds.
-      histograms.foreach { e =>
-        assert(e.relativeError <= e.conf.epsilon)
-      }
+      histograms.foreach(e => assert(e.relativeError <= e.conf.epsilon))
     }
   }
 
   property("Invariant 2: bucket sizes are nondecreasing powers of two") {
     forAll { e: ExpHist =>
-      assert(e.buckets.forall { b =>
-        isPowerOfTwo(b.size)
-      })
+      assert(e.buckets.forall(b => isPowerOfTwo(b.size)))
 
       // sizes are nondecreasing:
       val sizes = e.buckets.map(_.size)
@@ -139,15 +135,11 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("Total tracked by e is the sum of all bucket sizes") {
-    forAll { e: ExpHist =>
-      assert(e.buckets.map(_.size).sum == e.total)
-    }
+    forAll { e: ExpHist => assert(e.buckets.map(_.size).sum == e.total) }
   }
 
   property("ExpHist bucket sizes are the l-canonical rep of the tracked total") {
-    forAll { e: ExpHist =>
-      assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l))
-    }
+    forAll { e: ExpHist => assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l)) }
   }
 
   property("adding i results in upperBoundSum == i") {
@@ -188,9 +180,7 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("step(t) == add(0, t)") {
-    forAll { (expHist: ExpHist, ts: Timestamp) =>
-      assert(expHist.step(ts) == expHist.add(0, ts))
-    }
+    forAll((expHist: ExpHist, ts: Timestamp) => assert(expHist.step(ts) == expHist.add(0, ts)))
   }
 
   property("add(i) and inc i times should generate the same EH") {
@@ -245,9 +235,7 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
       assert(rebucketed.map(_.size) == desired)
 
       // all bucket sizes are now powers of two.
-      assert(rebucketed.forall { b =>
-        isPowerOfTwo(b.size)
-      })
+      assert(rebucketed.forall(b => isPowerOfTwo(b.size)))
     }
   }
 }
@@ -267,9 +255,7 @@ class CanonicalLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("canonical representation round-trips") {
-    forAll { (i: PosNum[Long], l: PosNum[Short]) =>
-      assert(fromLong(i.value, l.value).toLong == i.value)
-    }
+    forAll((i: PosNum[Long], l: PosNum[Short]) => assert(fromLong(i.value, l.value).toLong == i.value))
   }
 
   property("fromLong(i, k).sum == # of buckets required to encode i") {
