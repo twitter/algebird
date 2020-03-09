@@ -44,9 +44,7 @@ trait MetricProperties {
     }
 
   def isSymmetric[T: Metric: Arbitrary]: Prop =
-    forAll { (a: T, b: T) =>
-      beCloseTo(Metric(a, b), Metric(b, a))
-    }
+    forAll((a: T, b: T) => beCloseTo(Metric(a, b), Metric(b, a)))
 
   def satisfiesTriangleInequality[T: Metric: Arbitrary]: Prop =
     forAll { (a: T, b: T, c: T) =>

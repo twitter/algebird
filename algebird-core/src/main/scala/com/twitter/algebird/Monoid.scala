@@ -83,7 +83,7 @@ class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
     }
   override def sumOption(items: TraversableOnce[Option[T]]): Option[Option[T]] =
     if (items.isEmpty) None
-    else Some(semi.sumOption(items.filter(_.isDefined).map { _.get }))
+    else Some(semi.sumOption(items.filter(_.isDefined).map(_.get)))
 }
 
 class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R])
@@ -113,7 +113,7 @@ class ListMonoid[T] extends Monoid[List[T]] {
       // ListBuilder mutates the tail of the list until
       // result is called so that it is O(N) to push N things on, not N^2
       val builder = List.newBuilder[T]
-      items.foreach { builder ++= _ }
+      items.foreach(builder ++= _)
       Some(builder.result())
     }
 }
@@ -126,7 +126,7 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
     if (items.isEmpty) None
     else {
       val builder = Seq.newBuilder[T]
-      items.foreach { builder ++= _ }
+      items.foreach(builder ++= _)
       Some(builder.result())
     }
 }
@@ -171,9 +171,7 @@ class SetMonoid[T] extends Monoid[Set[T]] {
     if (items.isEmpty) None
     else {
       val builder = Set.newBuilder[T]
-      items.foreach { s =>
-        builder ++= s
-      }
+      items.foreach(s => builder ++= s)
       Some(builder.result())
     }
 }
@@ -187,9 +185,7 @@ class Function1Monoid[T] extends Monoid[Function1[T, T]] {
 
   // (f1 + f2)(x) = f2(f1(x)) so that:
   // listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
-  override def plus(f1: Function1[T, T], f2: Function1[T, T]): T => T = { (t: T) =>
-    f2(f1(t))
-  }
+  override def plus(f1: Function1[T, T], f2: Function1[T, T]): T => T = { (t: T) => f2(f1(t)) }
 }
 
 // To use the OrValMonoid wrap your item in a OrVal object

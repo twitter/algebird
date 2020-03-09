@@ -31,9 +31,7 @@ class HyperLogLogSeriesLaws extends CheckProperties {
   }
 
   property("HyperLogLogSeries is commutative") {
-    Prop.forAll { (h: HLLSeries, ts: List[Timestamp]) =>
-      absorb(h, ts) == absorb(h, ts.reverse)
-    }
+    Prop.forAll((h: HLLSeries, ts: List[Timestamp]) => absorb(h, ts) == absorb(h, ts.reverse))
   }
 
   property("series.approximateSizeSince(start) = h.since(t).toHLL.approximateSize") {
@@ -43,9 +41,7 @@ class HyperLogLogSeriesLaws extends CheckProperties {
   }
 
   property("h.insert(bs, t) = m.plus(h, m.create(bs, t))") {
-    Prop.forAll { (h: HLLSeries, ts: List[Timestamp]) =>
-      absorb(h, ts) == directAbsorb(h, ts)
-    }
+    Prop.forAll((h: HLLSeries, ts: List[Timestamp]) => absorb(h, ts) == directAbsorb(h, ts))
   }
 
   // this is a deterministic test to ensure that our rates are staying
@@ -67,9 +63,7 @@ class HyperLogLogSeriesLaws extends CheckProperties {
     // possible future regressions (where the error rate gets worse
     // than expected).
     val cardinalities = List(1024, 2048, 4096, 8192, 16384, 32768, 65536)
-    cardinalities.forall { n =>
-      verify(n, 0.1)
-    }
+    cardinalities.forall(n => verify(n, 0.1))
   }
 }
 

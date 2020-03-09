@@ -19,16 +19,17 @@ class FoldTest extends AnyWordSpec {
   }
 
   def run[I, O](fold: Fold[I, O], cases: Case[I, O]*): Unit =
-    cases.foreach { c =>
-      assert(c.runCase(fold) === c.expected)
-    }
+    cases.foreach(c => assert(c.runCase(fold) === c.expected))
 
   "Fold" should {
 
     "foldLeft" in {
-      run[String, String](Fold.foldLeft("") { (a, b) =>
-        a ++ b
-      }, Zero(""), One("1", "1"), Many(Seq("1", "2", "3"), "123"))
+      run[String, String](
+        Fold.foldLeft("")((a, b) => a ++ b),
+        Zero(""),
+        One("1", "1"),
+        Many(Seq("1", "2", "3"), "123")
+      )
     }
 
     "seq" in {
@@ -92,13 +93,16 @@ class FoldTest extends AnyWordSpec {
     }
 
     "average" in {
-      run[Int, Double](Fold.sum[Int].joinWith(Fold.size) { (s, c) =>
-        s.toDouble / c
-      }, One(1, 1.0), Many(Seq(1, 2, 3), 2.0), Many(Seq(2, 1, 3), 2.0))
+      run[Int, Double](
+        Fold.sum[Int].joinWith(Fold.size)((s, c) => s.toDouble / c),
+        One(1, 1.0),
+        Many(Seq(1, 2, 3), 2.0),
+        Many(Seq(2, 1, 3), 2.0)
+      )
     }
 
     "sequence" in {
-      run[Int, Seq[Long]](Fold.sequence(Seq(Fold.count { _ < 0 }, Fold.count {
+      run[Int, Seq[Long]](Fold.sequence(Seq(Fold.count(_ < 0), Fold.count {
         _ >= 0
       })), Zero(Seq(0, 0)), One(1, Seq(0, 1)), Many(Seq(-2, -1, 0, 1, 2), Seq(2, 3)))
     }

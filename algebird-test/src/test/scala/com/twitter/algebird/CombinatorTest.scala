@@ -23,9 +23,7 @@ import org.scalacheck.Arbitrary
 class CombinatorTest extends CheckProperties {
 
   private def fold(m: Max[Int], l: List[Int]): List[Int] = {
-    val sortfn = { (i: Int) =>
-      i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1)
-    }
+    val sortfn = { (i: Int) => i % (scala.math.sqrt(m.get.toLong - Int.MinValue).toInt + 1) }
     l.sortWith { (l, r) =>
       val (sl, sr) = (sortfn(l), sortfn(r))
       if (sl == sr) l < r else sl < sr
@@ -54,7 +52,7 @@ class CombinatorTest extends CheckProperties {
 
   // Now test the expected use case: top-K by appearances:
   implicit val monTopK: Monoid[(Map[Int, Int], Set[Int])] =
-    new MonoidCombinator({ (m: Map[Int, Int], top: Set[Int]) =>
+    new MonoidCombinator((m: Map[Int, Int], top: Set[Int]) =>
       top.toList
         .sortWith { (l, r) =>
           val lc = m(l)
@@ -64,17 +62,15 @@ class CombinatorTest extends CheckProperties {
         }
         .take(40)
         .toSet
-    })
+    )
   // Make sure the sets start sorted:
   implicit def topKArb: Arbitrary[(Map[Int, Int], Set[Int])] =
     Arbitrary {
       for (s <- Arbitrary.arbitrary[List[Int]];
-           smallvals = s.map { _ % 31 };
+           smallvals = s.map(_ % 31);
            m = smallvals
-             .groupBy { s =>
-               s
-             }
-             .mapValues { _.size })
+             .groupBy(s => s)
+             .mapValues(_.size))
         yield monTopK.plus(monTopK.zero, (m.toMap, smallvals.toSet))
     }
   property("MonoidCombinator with top-K forms a Monoid") {

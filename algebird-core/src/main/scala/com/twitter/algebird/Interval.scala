@@ -87,7 +87,7 @@ object Interval extends java.io.Serializable {
   type ExLowInUp[T] = Intersection[ExclusiveLower, InclusiveUpper, T]
 
   implicit def monoid[T: Ordering]: Monoid[Interval[T]] =
-    Monoid.from[Interval[T]](Universe[T]()) { _ && _ }
+    Monoid.from[Interval[T]](Universe[T]())(_ && _)
 
   // Automatically convert from a MaybeEmpty instance
   implicit def fromMaybeEmpty[T, NonEmpty[t] <: Interval[t]](me: MaybeEmpty[T, NonEmpty]): Interval[T] =

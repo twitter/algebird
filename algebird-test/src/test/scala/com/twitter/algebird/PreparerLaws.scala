@@ -45,9 +45,7 @@ class PreparerLaws extends CheckProperties {
 
   property("split with two aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
-      val c = Preparer[Int].split { p =>
-        (p.aggregate(ag1), p.aggregate(ag2))
-      }
+      val c = Preparer[Int].split(p => (p.aggregate(ag1), p.aggregate(ag2)))
       in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
@@ -76,17 +74,22 @@ class PreparerLaws extends CheckProperties {
   }
 
   property("map, flatMap, and split all together are correct") {
-    forAll { (in: List[Int], mapFn: (Int => Int), flatMapFn: (Int => List[Int]), ag1: MonoidAggregator[Int, Int, Int], ag2: MonoidAggregator[Int, Int, Int]) =>
-      val ag =
-        Preparer[Int]
-          .map(mapFn)
-          .flatMap(flatMapFn)
-          .split { a =>
-            (a.aggregate(ag1), a.aggregate(ag2))
-          }
+    forAll {
+      (
+          in: List[Int],
+          mapFn: (Int => Int),
+          flatMapFn: (Int => List[Int]),
+          ag1: MonoidAggregator[Int, Int, Int],
+          ag2: MonoidAggregator[Int, Int, Int]
+      ) =>
+        val ag =
+          Preparer[Int]
+            .map(mapFn)
+            .flatMap(flatMapFn)
+            .split(a => (a.aggregate(ag1), a.aggregate(ag2)))
 
-      val preSplit = in.map(mapFn).flatMap(flatMapFn)
-      in.isEmpty || ag(in) == ((ag1(preSplit), ag2(preSplit)))
+        val preSplit = in.map(mapFn).flatMap(flatMapFn)
+        in.isEmpty || ag(in) == ((ag1(preSplit), ag2(preSplit)))
     }
   }
 }

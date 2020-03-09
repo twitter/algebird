@@ -14,16 +14,12 @@ class LastLaws extends CheckProperties {
   }
 
   property("Last.+ should work") {
-    forAll { (l: Last[Int], r: Last[Int]) =>
-      l + r == r
-    }
+    forAll((l: Last[Int], r: Last[Int]) => l + r == r)
   }
 
   property("Last.aggregator returns the last item") {
-    forAll { v: NonEmptyVector[Int] =>
-      v.items.last == Last.aggregator(v.items)
-    }
+    forAll { v: NonEmptyVector[Int] => v.items.last == Last.aggregator(v.items) }
   }
 
-  property("Last[Int] is a Semigroup") { semigroupLaws[Last[Int]] }
+  property("Last[Int] is a Semigroup")(semigroupLaws[Last[Int]])
 }

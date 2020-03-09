@@ -193,7 +193,9 @@ class CMSContraMapSpec extends AnyWordSpec with Matchers with ScalaCheckDrivenPr
     // then the result should be a CMSHasher[L]...
     val targetHasher: CMSHasher[Seq[Byte]] =
       sourceHasher.contramap((d: Seq[Byte]) => f(d))
-    targetHasher shouldBe an[CMSHasher[_]] // Can't test CMSHasher[Seq[Byte]] specifically because of type erasure.
+    targetHasher shouldBe an[CMSHasher[
+      _
+    ]] // Can't test CMSHasher[Seq[Byte]] specifically because of type erasure.
 
     // ...and hashing should work correctly (this is only a smoke test).
     val a = 4
@@ -371,9 +373,7 @@ class CmsInnerProductProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   def exactResult(lists: (Vector[K], Vector[K]), input: Unit) = {
     val counts1 = lists._1.groupBy(identity).mapValues(_.size)
     val counts2 = lists._2.groupBy(identity).mapValues(_.size)
-    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map { k =>
-      counts1(k) * counts2(k)
-    }.sum
+    (counts1.keys.toSet & counts2.keys.toSet).toSeq.map(k => counts1(k) * counts2(k)).sum
   }
 
   def approximateResult(cmses: (CMS[K], CMS[K]), input: Unit) =
@@ -443,7 +443,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   def exactHeavyHitters(data: Seq[K], heavyHittersPct: Double): Set[K] = {
     val counts = data.groupBy(x => x).mapValues(_.size)
     val totalCount = counts.values.sum
-    counts.filter { _._2 >= heavyHittersPct * totalCount }.keys.toSet
+    counts.filter(_._2 >= heavyHittersPct * totalCount).keys.toSet
   }
 
   /**
@@ -455,9 +455,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
    */
   def createRandomStream(size: Int, range: Int, rnd: Random = RAND): Seq[K] = {
     require(size > 0)
-    (1 to size).map { _ =>
-      toK(rnd.nextInt(range))
-    }
+    (1 to size).map(_ => toK(rnd.nextInt(range)))
   }
 
   "A Count-Min sketch implementing CMSCounting" should {
@@ -539,15 +537,9 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
 
     "estimate heavy hitters" in {
       // Simple way of making some elements appear much more often than others.
-      val data1 = (1 to 3000).map { _ =>
-        toK(RAND.nextInt(3))
-      }
-      val data2 = (1 to 3000).map { _ =>
-        toK(RAND.nextInt(10))
-      }
-      val data3 = (1 to 1450).map { _ =>
-        toK(-1)
-      } // element close to being a 20% heavy hitter
+      val data1 = (1 to 3000).map(_ => toK(RAND.nextInt(3)))
+      val data2 = (1 to 3000).map(_ => toK(RAND.nextInt(10)))
+      val data3 = (1 to 1450).map(_ => toK(-1)) // element close to being a 20% heavy hitter
       val data = data1 ++ data2 ++ data3
 
       // Find elements that appear at least 20% of the time.
@@ -564,11 +556,9 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
       // (heavyHittersPct - eps) * totalCount is claimed as a heavy hitter.
       val minHhCount = (heavyHittersPct - cms.eps) * cms.totalCount
       val infrequent = data
-        .groupBy { x =>
-          x
-        }
-        .mapValues { _.size }
-        .filter { _._2 < minHhCount }
+        .groupBy(x => x)
+        .mapValues(_.size)
+        .filter(_._2 < minHhCount)
         .keys
         .toSet
       infrequent.intersect(estimatedHhs) should be('empty)
@@ -935,9 +925,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
       val heavyHittersN = 2
       val data =
         Seq(1, 2, 2, 3, 3, 3, 6, 6, 6, 6, 6, 6)
-          .flatMap { i =>
-            Seq((4, i), (7, i + 2))
-          }
+          .flatMap(i => Seq((4, i), (7, i + 2)))
           .map(pairToK)
       val monoid = ScopedTopNCMS.monoid[K, K](EPS, DELTA, SEED, heavyHittersN)
       val cms = monoid.create(data)

@@ -135,9 +135,7 @@ object QTree {
   private[algebird] val cachedRangeLowerBound: Int = cachedRangeCacheSize * -1
   private[algebird] val rangeLut: Array[Double] =
     (cachedRangeLowerBound until cachedRangeCacheSize)
-      .map { level =>
-        math.pow(2.0, level)
-      }
+      .map(level => math.pow(2.0, level))
       .toArray[Double]
 }
 
@@ -348,7 +346,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       (s, s)
     } else if (from < upperBound && to >= lowerBound) {
       val ((lower1, upper1), (lower2, upper2)) =
-        mapChildrenWithDefault((0L, 0L)) { _.rangeCountBounds(from, to) }
+        mapChildrenWithDefault((0L, 0L))(_.rangeCountBounds(from, to))
       (lower1 + lower2, parentCount + upper1 + upper2)
     } else {
       (0L, 0L)
@@ -406,7 +404,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * to estimate serialization size.
    */
   def size: Int = {
-    val childSizes = mapChildrenWithDefault(0) { _.size }
+    val childSizes = mapChildrenWithDefault(0)(_.size)
     1 + childSizes._1 + childSizes._2
   }
 
@@ -414,7 +412,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    * Total sum over the entire tree.
    */
   def totalSum(implicit monoid: Monoid[A]): A = {
-    val childSums = mapChildrenWithDefault(monoid.zero) { _.totalSum }
+    val childSums = mapChildrenWithDefault(monoid.zero)(_.totalSum)
     monoid.plus(sum, monoid.plus(childSums._1, childSums._2))
   }
 
@@ -422,7 +420,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     (lowerChild.map(fn).getOrElse(default), upperChild.map(fn).getOrElse(default))
 
   private def parentCount = {
-    val childCounts = mapChildrenWithDefault(0L) { _.count }
+    val childCounts = mapChildrenWithDefault(0L)(_.count)
     _count - childCounts._1 - childCounts._2
   }
 
@@ -437,8 +435,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       print(" (" + parentCount + ")")
     }
     println(" {" + _sum + "}")
-    lowerChild.foreach { _.dump }
-    upperChild.foreach { _.dump }
+    lowerChild.foreach(_.dump)
+    upperChild.foreach(_.dump)
   }
 
   /**

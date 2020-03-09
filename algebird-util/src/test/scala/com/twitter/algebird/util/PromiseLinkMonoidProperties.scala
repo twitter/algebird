@@ -23,7 +23,7 @@ class PromiseLinkMonoidProperties extends CheckProperties {
     def makeTunnel(seed: Int) = PromiseLink.toPromiseLink(seed)
     def collapseFinalValues(finalTunnel: PromiseLink[Int], tunnels: Seq[PromiseLink[Int]], toFeed: Int) = {
       finalTunnel.completeWithStartingValue(toFeed)
-      finalTunnel.promise +: tunnels.map { _.promise }
+      finalTunnel.promise +: tunnels.map(_.promise)
     }
 
     TunnelMonoidProperties.testTunnelMonoid(identity, makeTunnel, collapseFinalValues)

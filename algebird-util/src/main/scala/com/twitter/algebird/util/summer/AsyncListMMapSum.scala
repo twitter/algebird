@@ -46,7 +46,7 @@ class AsyncListMMapSum[Key, Value](
 
   protected override val emptyResult = Map.empty[Key, Value]
 
-  override def isFlushed: Boolean = mutex.synchronized { presentTuples == 0 }
+  override def isFlushed: Boolean = mutex.synchronized(presentTuples == 0)
 
   override def flush: Future[Map[Key, Value]] =
     workPool {

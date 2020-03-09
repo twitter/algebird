@@ -11,7 +11,7 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
   val data = List(1, 3, 2, 0, 5, 6)
   val MinAgg = Aggregator.min[Int]
 
-  val longData = data.map { _.toLong }
+  val longData = data.map(_.toLong)
   val SizeAgg = Aggregator.size
 
   "GeneratedTupleAggregators" should {
@@ -2086,7 +2086,7 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
 
   "MapAggregator" should {
 
-    val MinLongAgg = Aggregator.min[Int].andThenPresent { _.toLong }
+    val MinLongAgg = Aggregator.min[Int].andThenPresent(_.toLong)
 
     "Create an aggregator from 1 (key, aggregator) pair" in {
       val agg: MapMonoidAggregator[Int, Long, String, Long] =

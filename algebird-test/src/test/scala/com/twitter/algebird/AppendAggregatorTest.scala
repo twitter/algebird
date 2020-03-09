@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class AppendAggregatorTest extends AnyWordSpec with Matchers {
-  val data = Vector.fill(100) { scala.util.Random.nextInt(100) }
+  val data = Vector.fill(100)(scala.util.Random.nextInt(100))
   val mpty = Vector.empty[Int]
 
   // test the methods that appendSemigroup method defines or overrides
@@ -20,9 +20,7 @@ class AppendAggregatorTest extends AnyWordSpec with Matchers {
     val (half1, half2) = data.splitAt(n / 2)
     val lhs = agg1.appendAll(agg1.prepare(half1.head), half1.tail)
 
-    data.foreach { e =>
-      agg1.prepare(e) should be(agg2.prepare(e))
-    }
+    data.foreach(e => agg1.prepare(e) should be(agg2.prepare(e)))
 
     agg1.present(lhs) should be(agg2.present(lhs))
 
@@ -31,9 +29,7 @@ class AppendAggregatorTest extends AnyWordSpec with Matchers {
     agg1.applyOption(data) should be(agg2.applyOption(data))
     agg1.applyOption(empty) should be(agg2.applyOption(empty))
 
-    half2.foreach { e =>
-      agg1.append(lhs, e) should be(agg2.append(lhs, e))
-    }
+    half2.foreach(e => agg1.append(lhs, e) should be(agg2.append(lhs, e)))
 
     agg1.appendAll(lhs, half2) should be(agg2.appendAll(lhs, half2))
   }

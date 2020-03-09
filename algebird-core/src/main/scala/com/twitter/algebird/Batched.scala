@@ -213,9 +213,7 @@ object Batched {
 
   def fold[T](batchSize: Int)(implicit m: Monoid[T]): Fold[T, T] =
     Fold
-      .foldLeft[T, Batched[T]](Batched(m.zero)) { (b, t) =>
-        b.combine(Item(t)).compact(batchSize)
-      }
+      .foldLeft[T, Batched[T]](Batched(m.zero))((b, t) => b.combine(Item(t)).compact(batchSize))
       .map(_.sum)
 
   /**

@@ -38,11 +38,7 @@ trait Monad[M[_]] extends Applicative[M] {
   override def map[T, U](m: M[T])(fn: (T) => U): M[U] =
     flatMap(m)((t: T) => apply(fn(t)))
   override def join[T, U](mt: M[T], mu: M[U]): M[(T, U)] =
-    flatMap(mt) { (t: T) =>
-      map(mu) { (u: U) =>
-        (t, u)
-      }
-    }
+    flatMap(mt)((t: T) => map(mu)((u: U) => (t, u)))
 }
 
 /**
@@ -65,9 +61,7 @@ object Monad {
     if (xs.isEmpty)
       monad.apply(acc)
     else
-      monad.flatMap(fn(acc, xs.head)) { t: T =>
-        foldM(t, xs.tail)(fn)
-      }
+      monad.flatMap(fn(acc, xs.head)) { t: T => foldM(t, xs.tail)(fn) }
 
   // Some instances of the Monad typeclass (case for a macro):
   implicit val list: Monad[List] = new Monad[List] {

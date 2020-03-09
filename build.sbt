@@ -81,9 +81,7 @@ val sharedSettings = Seq(
   releaseVersionBump := sbtrelease.Version.Bump.Minor, // need to tweak based on mima results
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  pomIncludeRepository := { x =>
-    false
-  },
+  pomIncludeRepository := { x => false },
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
@@ -92,7 +90,9 @@ val sharedSettings = Seq(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    releaseStepCommandAndRemaining("+publishSigned"), // formerly publishArtifacts, here to deal with algebird-spark
+    releaseStepCommandAndRemaining(
+      "+publishSigned"
+    ), // formerly publishArtifacts, here to deal with algebird-spark
     ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
     setNextVersion,
     commitNextVersion,
@@ -212,9 +212,7 @@ val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic", "spark"
 def previousVersion(subProj: String) =
   Some(subProj)
     .filterNot(noBinaryCompatCheck.contains)
-    .map { s =>
-      "com.twitter" %% ("algebird-" + s) % "0.13.5"
-    }
+    .map(s => "com.twitter" %% ("algebird-" + s) % "0.13.5")
 
 lazy val algebird = Project(id = "algebird", base = file("."))
   .settings(sharedSettings)
@@ -313,7 +311,9 @@ lazy val algebirdSpark = module("spark")
   .settings(
     libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
     scalacOptions := scalacOptions.value
-      .filterNot(_.contains("inline")) // Disable optimizations for now: https://github.com/scala/bug/issues/11247
+      .filterNot(
+        _.contains("inline")
+      ) // Disable optimizations for now: https://github.com/scala/bug/issues/11247
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 

@@ -21,9 +21,7 @@ package com.twitter.algebird
  * f(x) = slope * x + intercept
  */
 case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializable {
-  def toFn(implicit ring: Ring[R]): Function1[R, R] = { x =>
-    this.apply(x)(ring)
-  }
+  def toFn(implicit ring: Ring[R]): Function1[R, R] = { x => this.apply(x)(ring) }
   def apply(x: R)(implicit ring: Ring[R]): R =
     ring.plus(ring.times(slope, x), intercept)
 }

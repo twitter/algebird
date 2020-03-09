@@ -29,20 +29,17 @@ object SGD {
     val xsPlusConst = xs :+ 1.0
     val err = dot(w, xsPlusConst) - y
     // Here is the gradient
-    xsPlusConst.map { _ * err }
+    xsPlusConst.map(_ * err)
   }
 
   def dot(x: IndexedSeq[Double], y: IndexedSeq[Double]): Double =
     x.view.zip(y).map { case (a: Double, b: Double) => a * b }.sum
 
   // Here are some step algorithms:
-  def constantStep(s: Double): (Long, IndexedSeq[Double]) => Double = { (_, _) =>
-    s
-  }
+  def constantStep(s: Double): (Long, IndexedSeq[Double]) => Double = { (_, _) => s }
   // A standard: a/(steps + b)^c
   def countAdaptiveStep(a: Double, b: Double, c: Double = 1.0): (Long, IndexedSeq[Double]) => Double = {
-    (cnt, _) =>
-      a / scala.math.pow((cnt + b), c)
+    (cnt, _) => a / scala.math.pow((cnt + b), c)
   }
 
   def weightsOf[T](s: SGD[T]): Option[IndexedSeq[Double]] =
@@ -99,9 +96,7 @@ class SGDMonoid[Pos](
       case (_, SGDZero)                 => left
       case (SGDPos(llps), SGDPos(rlps)) => SGDPos(llps ::: rlps)
       case (rsw @ SGDWeights(_, _), SGDPos(p)) =>
-        p.foldLeft(rsw) { (cntWeight, pos) =>
-          newWeights(cntWeight, pos)
-        }
+        p.foldLeft(rsw)((cntWeight, pos) => newWeights(cntWeight, pos))
       // TODO make a RightFolded2 which folds A,B => (B,C), and a group on C.
       case _ => right
     }

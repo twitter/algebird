@@ -55,9 +55,7 @@ class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
   override lazy val zero: TopK[T] = TopK[T](0, List[T](), None)
 
   def build(t: T): TopK[T] = TopK(1, List(t), Some(t))
-  def build(ts: Iterable[T]): TopK[T] = ts.foldLeft(zero) { (acc, t) =>
-    plus(acc, build(t))
-  }
+  def build(ts: Iterable[T]): TopK[T] = ts.foldLeft(zero)((acc, t) => plus(acc, build(t)))
 
   override def plus(left: TopK[T], right: TopK[T]): TopK[T] = {
     val (bigger, smaller) =

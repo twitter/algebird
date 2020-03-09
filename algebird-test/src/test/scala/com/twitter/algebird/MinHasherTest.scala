@@ -57,19 +57,11 @@ class MinHasherSpec extends AnyWordSpec with Matchers {
 
   def approxSimilarity[T, H](mh: MinHasher[H], x: Set[T], y: Set[T]) = {
     val sig1 = x
-      .map { l =>
-        mh.init(l.toString)
-      }
-      .reduce { (a, b) =>
-        mh.plus(a, b)
-      }
+      .map(l => mh.init(l.toString))
+      .reduce((a, b) => mh.plus(a, b))
     val sig2 = y
-      .map { l =>
-        mh.init(l.toString)
-      }
-      .reduce { (a, b) =>
-        mh.plus(a, b)
-      }
+      .map(l => mh.init(l.toString))
+      .reduce((a, b) => mh.plus(a, b))
     mh.similarity(sig1, sig2)
   }
 

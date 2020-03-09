@@ -38,22 +38,18 @@ class SummingCacheTest extends CheckProperties {
   // Maps are tricky to compare equality for since zero values are often removed
   def test[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
     val sc = newCache[K, V](c)
-    val mitems = items.map { Map(_) }
+    val mitems = items.map(Map(_))
     implicit val mapEq = mapEquiv[K, V]
     StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
     StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
   }
 
   property("puts are like sums (Int, Int)") {
-    forAll { (c: Capacity, items: List[(Int, Int)]) =>
-      test(c, items)
-    }
+    forAll((c: Capacity, items: List[(Int, Int)]) => test(c, items))
   }
   // String is not commutative:
   property("puts are like sums (Int, List[Int])") {
-    forAll { (c: Capacity, items: List[(Int, List[Int])]) =>
-      test(c, items)
-    }
+    forAll((c: Capacity, items: List[(Int, List[Int])]) => test(c, items))
   }
 }
 
@@ -71,8 +67,8 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
 
   def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
     val sc = SummingWithHitsCache[K, V](c.cap)
-    val mitems = items.map { Map(_) }
-    mitems.map { sc.putWithHits(_)._1 }.tail
+    val mitems = items.map(Map(_))
+    mitems.map(sc.putWithHits(_)._1).tail
   }
 
   property("hit rates will always be 1 for stream with the same key") {
@@ -80,7 +76,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
       // Only run this when we have at least 2 items and non-zero cap
       (values.size > 1 && c.cap > 1) ==> {
         val key = RAND.nextInt
-        val items = values.map { (key, _) }
+        val items = values.map((key, _))
         val keyHits = getHits(c, items)
         !keyHits.exists(_ != 1)
       }
@@ -113,17 +109,13 @@ class SummingQueueTest extends CheckProperties {
   val zeroCapQueue = SummingQueue[Int](0) // passes all through
 
   property("0 capacity always returns") {
-    forAll { i: Int =>
-      zeroCapQueue(i) == Some(i)
-    }
+    forAll { i: Int => zeroCapQueue(i) == Some(i) }
   }
 
   val sb = SummingQueue[Int](3) // buffers three at a time
 
   property("puts are like sums") {
-    forAll { (items: List[Int]) =>
-      StatefulSummerLaws.sumIsPreserved(sb, items)
-    }
+    forAll((items: List[Int]) => StatefulSummerLaws.sumIsPreserved(sb, items))
   }
 
   property("puts are like sums(String)") {
@@ -134,21 +126,17 @@ class SummingQueueTest extends CheckProperties {
   }
 
   property("isFlushed is consistent") {
-    forAll { (items: List[Int]) =>
-      StatefulSummerLaws.isFlushedIsConsistent(sb, items)
-    }
+    forAll((items: List[Int]) => StatefulSummerLaws.isFlushedIsConsistent(sb, items))
   }
 
   property("puts return None sometimes") {
     forAll { (items: List[Int]) =>
       // Should be: true, true, true, false, true, true, true, false
       sb.flush
-      val empties = items.map { sb.put(_).isEmpty }
+      val empties = items.map(sb.put(_).isEmpty)
       val correct = Stream
         .continually(Stream(true, true, true, false))
-        .flatMap { s =>
-          s
-        }
+        .flatMap(s => s)
         .take(empties.size)
         .toList
       empties == correct

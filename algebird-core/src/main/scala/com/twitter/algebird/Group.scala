@@ -76,12 +76,10 @@ object NullGroup extends ConstantGroup[Null](null)
 class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Group[Option[T]] {
 
   override def isNonZero(opt: Option[T]): Boolean =
-    opt.exists { group.isNonZero(_) }
+    opt.exists(group.isNonZero(_))
 
   override def negate(opt: Option[T]): Option[T] =
-    opt.map { v =>
-      group.negate(v)
-    }
+    opt.map(v => group.negate(v))
 }
 
 /**

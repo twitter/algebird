@@ -76,5 +76,5 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
       queue.drainTo(toSum.asJava)
       Semigroup.sumOption(toSum)
     }
-  override def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
+  override def isFlushed: Boolean = queueOption.map(_.size == 0).getOrElse(true)
 }

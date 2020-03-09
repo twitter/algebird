@@ -31,9 +31,9 @@ import ref.SoftReference
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
   private val map = new SoftReference(new HashMap[K, V]())
 
-  def size: Int = map.get.map { _.size }.getOrElse(0)
+  def size: Int = map.get.map(_.size).getOrElse(0)
 
-  def clear(): Unit = map.get.foreach { _.clear }
+  def clear(): Unit = map.get.foreach(_.clear)
 
   def stopGrowing(): Unit = map.clear
 
@@ -43,13 +43,11 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
         case (k, v) =>
           val newValue =
             map.get
-              .flatMap { _.get(k) }
-              .map { oldV =>
-                sgv.plus(oldV, v)
-              }
+              .flatMap(_.get(k))
+              .map(oldV => sgv.plus(oldV, v))
               .getOrElse(v)
 
-          map.get.foreach { _.put(k, newValue) }
+          map.get.foreach(_.put(k, newValue))
       }
     }
 }
@@ -73,9 +71,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
   private val sentinelCache = new SentinelCache[K, V]
 
   private def update(evicted: Option[Map[K, V]]) = {
-    evicted.foreach { e =>
-      sentinelCache.put(e)
-    }
+    evicted.foreach(e => sentinelCache.put(e))
 
     var ret = evicted
 

@@ -97,9 +97,7 @@ class AsyncListSum[Key, Value](
       }.toSeq)
       lFuts
         .map(_.toMap)
-        .foreach { r =>
-          tuplesOut.incrBy(r.size)
-        }
+        .foreach(r => tuplesOut.incrBy(r.size))
     }.flatten
 
   @annotation.tailrec

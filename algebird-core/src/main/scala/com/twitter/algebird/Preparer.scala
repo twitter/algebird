@@ -34,14 +34,10 @@ sealed trait Preparer[A, T] extends java.io.Serializable {
    * Filter out values that do not meet the predicate.
    * Like flatMap, this limits future aggregations to MonoidAggregator.
    */
-  def filter(fn: T => Boolean): FlatMapPreparer[A, T] = flatMap { t =>
-    if (fn(t)) Some(t) else None
-  }
+  def filter(fn: T => Boolean): FlatMapPreparer[A, T] = flatMap(t => if (fn(t)) Some(t) else None)
 
   def collect[U](p: PartialFunction[T, U]): FlatMapPreparer[A, U] =
-    flatMap { t =>
-      if (p.isDefinedAt(t)) Some(p(t)) else None
-    }
+    flatMap(t => if (p.isDefinedAt(t)) Some(p(t)) else None)
 
   /**
    * count and following methods all just call monoidAggregate with one of the standard Aggregators.
@@ -195,14 +191,10 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
   def prepareFn: A => TraversableOnce[T]
 
   def map[U](fn: T => U): FlatMapPreparer[A, U] =
-    FlatMapPreparer { a: A =>
-      prepareFn(a).map(fn)
-    }
+    FlatMapPreparer { a: A => prepareFn(a).map(fn) }
 
   override def flatMap[U](fn: T => TraversableOnce[U]): FlatMapPreparer[A, U] =
-    FlatMapPreparer { a: A =>
-      prepareFn(a).flatMap(fn)
-    }
+    FlatMapPreparer { a: A => prepareFn(a).flatMap(fn) }
 
   override def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C] =
     aggregator.sumBefore.composePrepare(prepareFn)
@@ -256,14 +248,10 @@ object FlatMapPreparer {
     override val prepareFn: TraversableOnce[A] => TraversableOnce[A] = (a: TraversableOnce[A]) => a
 
     override def map[U](fn: A => U): FlatMapPreparer[TraversableOnce[A], U] =
-      FlatMapPreparer { a: TraversableOnce[A] =>
-        a.map(fn)
-      }
+      FlatMapPreparer { a: TraversableOnce[A] => a.map(fn) }
 
     override def flatMap[U](fn: A => TraversableOnce[U]): FlatMapPreparer[TraversableOnce[A], U] =
-      FlatMapPreparer { a: TraversableOnce[A] =>
-        a.flatMap(fn)
-      }
+      FlatMapPreparer { a: TraversableOnce[A] => a.flatMap(fn) }
 
     override def monoidAggregate[B, C](
         aggregator: MonoidAggregator[A, B, C]

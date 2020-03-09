@@ -12,14 +12,14 @@ class StatisticsRingLaws extends CheckProperties with Matchers {
   implicit val statsRing = new StatisticsRing[Int]
   implicit val arb = Arbitrary(for (v <- choose(0, 1 << 30)) yield v)
 
-  property("StatisticsRing is a Ring") { ringLaws[Int] }
+  property("StatisticsRing is a Ring")(ringLaws[Int])
 }
 
 class StatisticsMonoidLaws extends CheckProperties with Matchers {
   implicit val statsMonoid = new StatisticsMonoid[Int]
   implicit val arb = Arbitrary(for (v <- choose(0, 1 << 14)) yield v)
 
-  property("StatisticsMonoid is a Monoid") { monoidLaws[Int] }
+  property("StatisticsMonoid is a Monoid")(monoidLaws[Int])
 }
 
 class StatisticsTest extends AnyWordSpec with Matchers {

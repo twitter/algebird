@@ -103,11 +103,7 @@ case class ExpHist(
   def fold: Fold[Bucket, ExpHist] =
     Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist]({
       case (b, bucket) => b += bucket
-    }, { _ =>
-      Vector.newBuilder[Bucket]
-    }, { x =>
-      addAll(x.result)
-    })
+    }, _ => Vector.newBuilder[Bucket], x => addAll(x.result))
 
   // This internal method assumes that the instance is stepped forward
   // already, and does NOT try to step internally. It also assumes
@@ -184,9 +180,7 @@ object ExpHist {
   case class Bucket(size: Long, timestamp: Timestamp)
 
   object Bucket {
-    implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket =>
-      (b.timestamp, b.size)
-    }
+    implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket => (b.timestamp, b.size) }
   }
 
   /**
@@ -326,9 +320,7 @@ object ExpHist {
     @inline private[this] def bit(i: Int, idx: Int): Int = (i >>> idx) & 1
 
     private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
-      (0 until bits).map { idx =>
-        offset + bit(i, idx)
-      }.toVector
+      (0 until bits).map(idx => offset + bit(i, idx)).toVector
 
     /**
      * @param s the number to convert to l-canonical form

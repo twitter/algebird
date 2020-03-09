@@ -37,7 +37,7 @@ object StatefulSummerLaws {
   def sumIsPreserved[V: Semigroup: Equiv](summer: StatefulSummer[V], items: Iterable[V]): Boolean = {
     summer.flush
     val sg = Semigroup.sumOption(items)
-    val wsummer = Monoid.plus(Monoid.sum(items.map { summer.put(_) }.filter {
+    val wsummer = Monoid.plus(Monoid.sum(items.map(summer.put(_)).filter {
       _.isDefined
     }), summer.flush)
     zeroEquiv(sg, wsummer) && summer.isFlushed

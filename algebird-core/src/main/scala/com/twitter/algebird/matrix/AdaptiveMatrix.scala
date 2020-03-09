@@ -114,9 +114,7 @@ object AdaptiveMatrix {
           val iter = items.toIterator.buffered
           val rows = iter.head.rows
           val cols = iter.head.cols
-          val sparseStorage = (0 until rows).map { _ =>
-            MMap[Int, V]()
-          }.toIndexedSeq
+          val sparseStorage = (0 until rows).map(_ => MMap[Int, V]()).toIndexedSeq
 
           while (iter.hasNext) {
             val current = iter.next

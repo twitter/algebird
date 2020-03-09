@@ -9,16 +9,12 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]
-    forAll { intList: List[Int] =>
-      intList.sum == monoid.sum(intList)
-    }
+    forAll { intList: List[Int] => intList.sum == monoid.sum(intList) }
   }
 
   property("A Ring should be able to product") {
     val ring = implicitly[Ring[Int]]
-    forAll { intList: List[Int] =>
-      intList.product == ring.product(intList)
-    }
+    forAll { intList: List[Int] => intList.product == ring.product(intList) }
   }
 
   property("An OptionMonoid should be able to sum") {
@@ -59,9 +55,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("IndexedSeq should sum") {
     forAll { (lIndexedSeq: IndexedSeq[Int]) =>
-      val rIndexedSeq = lIndexedSeq.map { _ =>
-        scala.util.Random.nextInt
-      }
+      val rIndexedSeq = lIndexedSeq.map(_ => scala.util.Random.nextInt)
       (lIndexedSeq.size == rIndexedSeq.size) ==> {
         val leftBase = lIndexedSeq.map(Max(_))
         val rightBase = rIndexedSeq.map(Max(_))

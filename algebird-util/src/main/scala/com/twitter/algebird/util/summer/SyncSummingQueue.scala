@@ -106,5 +106,5 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
       queue.drainTo(toSum.asJava)
       Semigroup.sumOption(toSum)
     }
-  def isFlushed: Boolean = queueOption.map { _.size == 0 }.getOrElse(true)
+  def isFlushed: Boolean = queueOption.map(_.size == 0).getOrElse(true)
 }

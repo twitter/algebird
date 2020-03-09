@@ -167,9 +167,7 @@ final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val st
    * Transforms the input type of the FoldState (see Fold.contramap).
    */
   def contramap[H](f: H => I): FoldState[X, H, O] =
-    new FoldState({ (x, h) =>
-      add(x, f(h))
-    }, start, end)
+    new FoldState((x, h) => add(x, f(h)), start, end)
 }
 
 /**
@@ -193,9 +191,7 @@ object Fold extends CompatFold {
    * The accumulator MUST be immutable and serializable.
    */
   def foldLeft[I, O](o: O)(add: (O, I) => O): Fold[I, O] =
-    fold[O, I, O](add, o, { o =>
-      o
-    })
+    fold[O, I, O](add, o, o => o)
 
   /**
    * A general way of defining Folds that supports a separate accumulator type.
@@ -227,19 +223,15 @@ object Fold extends CompatFold {
       type X = Seq[Any]
       override def build(): FoldState[Seq[Any], I, Seq[O]] = {
         val bs: Seq[FoldState[Any, I, O]] =
-          ms.map { _.build().asInstanceOf[FoldState[Any, I, O]] }
+          ms.map(_.build().asInstanceOf[FoldState[Any, I, O]])
         val adds =
-          bs.map { _.add }
+          bs.map(_.add)
         val ends =
-          bs.map { _.end }
+          bs.map(_.end)
         val starts: Seq[Any] =
-          bs.map { _.start }
-        val add: (Seq[Any], I) => Seq[Any] = { (xs, i) =>
-          adds.zip(xs).map { case (f, x) => f(x, i) }
-        }
-        val end: (Seq[Any] => Seq[O]) = { xs =>
-          ends.zip(xs).map { case (f, x) => f(x) }
-        }
+          bs.map(_.start)
+        val add: (Seq[Any], I) => Seq[Any] = { (xs, i) => adds.zip(xs).map { case (f, x) => f(x, i) } }
+        val end: (Seq[Any] => Seq[O]) = { xs => ends.zip(xs).map { case (f, x)           => f(x) } }
         new FoldState(add, starts, end)
       }
     }
@@ -331,18 +323,14 @@ object Fold extends CompatFold {
    * Note this does not short-circuit enumeration of the sequence.
    */
   def forall[I](pred: I => Boolean): Fold[I, Boolean] =
-    foldLeft(true) { (b, i) =>
-      b && pred(i)
-    }
+    foldLeft(true)((b, i) => b && pred(i))
 
   /**
    * A Fold that returns "true" if any element of the sequence statisfies the predicate.
    * Note this does not short-circuit enumeration of the sequence.
    */
   def exists[I](pred: I => Boolean): Fold[I, Boolean] =
-    foldLeft(false) { (b, i) =>
-      b || pred(i)
-    }
+    foldLeft(false)((b, i) => b || pred(i))
 
   /**
    * A Fold that counts the number of elements satisfying the predicate.

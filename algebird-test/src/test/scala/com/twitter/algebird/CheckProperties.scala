@@ -9,5 +9,5 @@ import org.scalatest.propspec.AnyPropSpec
 trait CheckProperties extends AnyPropSpec with Checkers {
 
   def property(testName: String, testTags: org.scalatest.Tag*)(testFun: org.scalacheck.Prop): Unit =
-    super.property(testName, testTags: _*) { check { testFun } }
+    super.property(testName, testTags: _*)(check(testFun))
 }

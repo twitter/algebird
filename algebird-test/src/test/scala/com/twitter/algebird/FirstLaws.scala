@@ -14,16 +14,12 @@ class FirstLaws extends CheckProperties {
   }
 
   property("First.+ should work") {
-    forAll { (l: First[Int], r: First[Int]) =>
-      l + r == l
-    }
+    forAll((l: First[Int], r: First[Int]) => l + r == l)
   }
 
   property("First.aggregator returns the first item") {
-    forAll { v: NonEmptyVector[Int] =>
-      v.items.head == First.aggregator(v.items)
-    }
+    forAll { v: NonEmptyVector[Int] => v.items.head == First.aggregator(v.items) }
   }
 
-  property("First[Int] is a semigroup") { semigroupLaws[First[Int]] }
+  property("First[Int] is a semigroup")(semigroupLaws[First[Int]])
 }

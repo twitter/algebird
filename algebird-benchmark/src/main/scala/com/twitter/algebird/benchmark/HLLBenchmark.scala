@@ -15,7 +15,7 @@ class OldMonoid(bits: Int) extends HyperLogLogMonoid(bits) {
     if (items.isEmpty) None
     else {
       val buffer = new Array[Byte](size)
-      items.foreach { _.updateInto(buffer) }
+      items.foreach(_.updateInto(buffer))
       Some(DenseHLL(bits, Bytes(buffer)))
     }
 }
@@ -53,9 +53,7 @@ object HllBenchmark {
         hllMonoid.batchCreate(elements)(byteEncoder)
 
       val inputIntermediate = (0L until numElements).map { _ =>
-        val setElements = (0 until setSize).map { _ =>
-          rng.nextInt(1000).toLong
-        }.toSet
+        val setElements = (0 until setSize).map(_ => rng.nextInt(1000).toLong).toSet
         (pow(numInputKeys, rng.nextFloat).toLong, List(hll(setElements)))
       }
       inputData = MapAlgebra.sumByKey(inputIntermediate).map(_._2).toSeq
@@ -67,18 +65,12 @@ class HllBenchmark {
   import HllBenchmark._
   @Benchmark
   def timeSumOption(state: HLLState, bh: Blackhole) =
-    state.inputData.foreach { vals =>
-      bh.consume(state.hllMonoid.sumOption(vals))
-    }
+    state.inputData.foreach(vals => bh.consume(state.hllMonoid.sumOption(vals)))
   @Benchmark
   def timeOldSumOption(state: HLLState, bh: Blackhole) =
-    state.inputData.foreach { d =>
-      bh.consume(state.oldHllMonoid.sumOption(d))
-    }
+    state.inputData.foreach(d => bh.consume(state.oldHllMonoid.sumOption(d)))
 
   @Benchmark
   def timePlus(state: HLLState, bh: Blackhole) =
-    state.inputData.foreach { vals =>
-      bh.consume(vals.reduce(state.hllMonoid.plus(_, _)))
-    }
+    state.inputData.foreach(vals => bh.consume(vals.reduce(state.hllMonoid.plus(_, _))))
 }

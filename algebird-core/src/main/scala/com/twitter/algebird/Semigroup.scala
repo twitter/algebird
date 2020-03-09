@@ -57,7 +57,7 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] 
    *       `iter.reduceLeftOption` using [[plus]].
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
-    iter.reduceLeftOption { plus(_, _) }
+    iter.reduceLeftOption(plus(_, _))
 
   /*
    * These are methods from algebra

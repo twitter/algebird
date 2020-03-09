@@ -31,9 +31,7 @@ object ApplicativeLaws {
       arb: Arbitrary[T],
       arbFn: Arbitrary[T => U]
   ): Prop =
-    forAll { (t: T, fn: T => U) =>
-      eq(app.map(app.apply(t))(fn), app.apply(fn(t)))
-    }
+    forAll((t: T, fn: T => U) => eq(app.map(app.apply(t))(fn), app.apply(fn(t))))
 
   def joinLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(
       implicit
@@ -41,9 +39,7 @@ object ApplicativeLaws {
       arb1: Arbitrary[T],
       arb2: Arbitrary[U]
   ): Prop =
-    forAll { (t: T, u: U) =>
-      eq(app.join(app.apply(t), app.apply(u)), app.apply((t, u)))
-    }
+    forAll((t: T, u: U) => eq(app.join(app.apply(t), app.apply(u)), app.apply((t, u))))
 
   // These follow from apply and join:
 
@@ -52,9 +48,7 @@ object ApplicativeLaws {
       app: Applicative[M],
       arb: Arbitrary[Seq[T]]
   ): Prop =
-    forAll { (ts: Seq[T]) =>
-      eq(app.sequence(ts.map { app.apply(_) }), app.apply(ts))
-    }
+    forAll((ts: Seq[T]) => eq(app.sequence(ts.map(app.apply(_))), app.apply(ts)))
 
   def joinWithLaw[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(
       implicit

@@ -32,7 +32,7 @@ trait Predecessible[T] extends java.io.Serializable {
     new AbstractIterable[T] {
       override def iterator: Iterator[T] =
         Iterator
-          .iterate[Option[T]](Some(old)) { self.prev(_) }
+          .iterate[Option[T]](Some(old))(self.prev(_))
           .takeWhile(_.isDefined)
           .collect { case Some(t) => t }
     }

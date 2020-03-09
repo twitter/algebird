@@ -49,11 +49,7 @@ object HyperLogLog {
   val hashSize = 128
 
   private[algebird] val negativePowersOfTwo: Array[Double] =
-    0.to(hashSize)
-      .map { i =>
-        math.pow(2.0, -i)
-      }
-      .toArray
+    0.to(hashSize).map(i => math.pow(2.0, -i)).toArray
 
   def hash(input: Array[Byte]): Array[Byte] = {
     val (l0, l1) = Hash128.arrayByteHash.hash(input)
@@ -405,9 +401,8 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
 
   override lazy val zeroCnt: Int = size - maxRhow.size
 
-  override lazy val z: Double = 1.0 / (zeroCnt.toDouble + maxRhow.values.map { mj =>
-    HyperLogLog.negativePowersOfTwo(mj.get)
-  }.sum)
+  override lazy val z: Double =
+    1.0 / (zeroCnt.toDouble + maxRhow.values.map(mj => HyperLogLog.negativePowersOfTwo(mj.get)).sum)
 
   override def +(other: HLL): HLL =
     other match {
@@ -575,7 +570,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   private[this] final def denseUpdate(existing: HLL, iter: Iterator[HLL]): HLL = {
     val buffer = new Array[Byte](size)
     existing.updateInto(buffer)
-    iter.foreach { _.updateInto(buffer) }
+    iter.foreach(_.updateInto(buffer))
 
     DenseHLL(bits, Bytes(buffer))
   }
@@ -612,9 +607,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
   def batchCreate[T](instances: Iterable[T])(implicit ev: T => Array[Byte]): HLL = {
     val allMaxRhow = instances
-      .map { x =>
-        jRhoW(hash(x), bits)
-      }
+      .map(x => jRhoW(hash(x), bits))
       .groupBy { case (j, _) => j }
       .map { case (j, iter) => (j, Max(iter.maxBy(_._2)._2)) }
     if (allMaxRhow.size * 16 <= size) {
@@ -650,9 +643,9 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
          * since + on HLLInstance creates the instance for the union.
          */
         sizeOf(head) + intersectionSize(tail) -
-          intersectionSize(tail.map { _ + head })
+          intersectionSize(tail.map(_ + head))
       }
-      .map { _.withMin(0L) } // We always know the intersection is >= 0
+      .map(_.withMin(0L)) // We always know the intersection is >= 0
       .getOrElse(Approximate.exact(0L)) // Empty lists have no intersection
 }
 
@@ -740,7 +733,7 @@ abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
 
   override val leftSemigroup = new HyperLogLogMonoid(hllBits)
   override val rightAggregator: MonoidAggregator[A, Set[A], Long] =
-    Aggregator.uniqueCount[A].andThenPresent { _.toLong }
+    Aggregator.uniqueCount[A].andThenPresent(_.toLong)
 }
 
 case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
@@ -756,7 +749,5 @@ case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toB
 case class SetSizeHashAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit hash: Hash128[A])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
   override def convert(set: Set[A]): HLL =
-    leftSemigroup.sum(set.iterator.map { a =>
-      leftSemigroup.toHLL(a)(hash)
-    })
+    leftSemigroup.sum(set.iterator.map(a => leftSemigroup.toHLL(a)(hash)))
 }

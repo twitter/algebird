@@ -73,39 +73,35 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map { _ =>
-      MurmurHash128(r.nextLong)
-    }
+    (1 to numHashFunctions).map(_ => MurmurHash128(r.nextLong))
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
-  override val zero: MinHashSignature = MinHashSignature(buildArray { maxHash })
+  override val zero: MinHashSignature = MinHashSignature(buildArray(maxHash))
 
   /** Set union */
   override def plus(left: MinHashSignature, right: MinHashSignature): MinHashSignature =
-    MinHashSignature(buildArray(left.bytes, right.bytes) { (l, r) =>
-      n.min(l, r)
-    })
+    MinHashSignature(buildArray(left.bytes, right.bytes)((l, r) => n.min(l, r)))
 
   /** Esimate Jaccard similarity (size of union / size of intersection) */
   def similarity(left: MinHashSignature, right: MinHashSignature): Double =
-    buildArray(left.bytes, right.bytes) { (l, r) =>
-      if (l == r) n.one else n.zero
-    }.map { _.toDouble }.sum / numHashes
+    buildArray(left.bytes, right.bytes)((l, r) => if (l == r) n.one else n.zero)
+      .map(_.toDouble)
+      .sum / numHashes
 
   /** Bucket keys to use for quickly finding other similar items via locality sensitive hashing */
   def buckets(sig: MinHashSignature): List[Long] =
     sig.bytes
       .grouped(numRows * hashSize)
-      .filter { _.size == numRows * hashSize }
-      .map { hashFunctions.head(_)._1 }
+      .filter(_.size == numRows * hashSize)
+      .map(hashFunctions.head(_)._1)
       .toList
 
   /** Create a signature for a single Long value */
-  def init(value: Long): MinHashSignature = init { _(value) }
+  def init(value: Long): MinHashSignature = init(_(value))
 
   /** Create a signature for a single String value */
-  def init(value: String): MinHashSignature = init { _(value) }
+  def init(value: String): MinHashSignature = init(_(value))
 
   /** Create a signature for an arbitrary value */
   def init(fn: MurmurHash128 => (Long, Long)): MinHashSignature = {
@@ -162,7 +158,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
   ): Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asIntBuffer
     val rightBuffer = ByteBuffer.wrap(right).asIntBuffer
-    buildArray { fn(leftBuffer.get, rightBuffer.get) }
+    buildArray(fn(leftBuffer.get, rightBuffer.get))
   }
 
   /** Seems to work, but experimental and not generic yet */
@@ -199,6 +195,6 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
   ): Array[Byte] = {
     val leftBuffer = ByteBuffer.wrap(left).asCharBuffer
     val rightBuffer = ByteBuffer.wrap(right).asCharBuffer
-    buildArray { fn(leftBuffer.get, rightBuffer.get) }
+    buildArray(fn(leftBuffer.get, rightBuffer.get))
   }
 }

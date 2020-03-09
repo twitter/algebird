@@ -47,9 +47,7 @@ object Cuber {
 
     val tupleName = {
       val types = getParamTypes(c)
-      val optionTypes = types.map { t =>
-        tq"_root_.scala.Option[$t]"
-      }
+      val optionTypes = types.map(t => tq"_root_.scala.Option[$t]")
       val tupleType = typeName(c)(s"Tuple${arity}")
       tq"_root_.scala.$tupleType[..$optionTypes]"
     }

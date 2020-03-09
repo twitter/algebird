@@ -16,33 +16,31 @@ case class MurmurHash128(seed: Long) extends AnyVal {
     apply(buffer, 0, maxBytes)
   }
   def apply(array: Array[Char]): (Long, Long) =
-    apply(array.size * 2, { _.asCharBuffer.put(array) })
+    apply(array.size * 2, _.asCharBuffer.put(array))
   def apply(array: Array[Short]): (Long, Long) =
-    apply(array.size * 2, { _.asShortBuffer.put(array) })
+    apply(array.size * 2, _.asShortBuffer.put(array))
   def apply(array: Array[Int]): (Long, Long) =
-    apply(array.size * 4, { _.asIntBuffer.put(array) })
+    apply(array.size * 4, _.asIntBuffer.put(array))
   def apply(array: Array[Float]): (Long, Long) =
-    apply(array.size * 4, { _.asFloatBuffer.put(array) })
+    apply(array.size * 4, _.asFloatBuffer.put(array))
   def apply(array: Array[Long]): (Long, Long) =
-    apply(array.size * 8, { _.asLongBuffer.put(array) })
+    apply(array.size * 8, _.asLongBuffer.put(array))
   def apply(array: Array[Double]): (Long, Long) =
-    apply(array.size * 8, { _.asDoubleBuffer.put(array) })
+    apply(array.size * 8, _.asDoubleBuffer.put(array))
 
-  def apply(value: Char): (Long, Long) = apply(2, { _.asCharBuffer.put(value) })
+  def apply(value: Char): (Long, Long) = apply(2, _.asCharBuffer.put(value))
   def apply(value: Short): (Long, Long) =
-    apply(2, { _.asShortBuffer.put(value) })
-  def apply(value: Int): (Long, Long) = apply(4, { _.asIntBuffer.put(value) })
+    apply(2, _.asShortBuffer.put(value))
+  def apply(value: Int): (Long, Long) = apply(4, _.asIntBuffer.put(value))
   def apply(value: Float): (Long, Long) =
-    apply(4, { _.asFloatBuffer.put(value) })
-  def apply(value: Long): (Long, Long) = apply(8, { _.asLongBuffer.put(value) })
+    apply(4, _.asFloatBuffer.put(value))
+  def apply(value: Long): (Long, Long) = apply(8, _.asLongBuffer.put(value))
   def apply(value: Double): (Long, Long) =
-    apply(8, { _.asDoubleBuffer.put(value) })
+    apply(8, _.asDoubleBuffer.put(value))
 
   def apply(string: CharSequence): (Long, Long) =
     apply(string.length * 2, { buffer =>
       val charBuffer = buffer.asCharBuffer
-      0.to(string.length - 1).foreach { i =>
-        charBuffer.put(string.charAt(i))
-      }
+      0.to(string.length - 1).foreach(i => charBuffer.put(string.charAt(i)))
     })
 }

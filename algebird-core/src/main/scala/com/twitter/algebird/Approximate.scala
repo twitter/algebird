@@ -39,8 +39,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
     if (isTrue || that.isTrue) {
       // We need at least one of them to be true:
       val newP = List(this, that)
-        .filter { _.isTrue }
-        .map { _.withProb }
+        .filter(_.isTrue)
+        .map(_.withProb)
         .max
       ApproximateBoolean(true, newP)
     } else {
@@ -55,8 +55,8 @@ case class ApproximateBoolean(isTrue: Boolean, withProb: Double) extends Approxi
     } else {
       // Our confidence is the maximum confidence of the false cases:
       val newP = List(this, that)
-        .filterNot { _.isTrue }
-        .map { _.withProb }
+        .filterNot(_.isTrue)
+        .map(_.withProb)
         .max
       ApproximateBoolean(false, newP)
     }

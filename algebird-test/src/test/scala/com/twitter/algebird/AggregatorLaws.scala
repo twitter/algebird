@@ -90,7 +90,7 @@ class AggregatorLaws extends CheckProperties {
       val aggregator = Aggregator.numericSum[T]
       aggregator(in) == in.map(num.toDouble).sum
     }
-  property("Aggregator.numericSum is correct for Ints") { checkNumericSum[Int] }
+  property("Aggregator.numericSum is correct for Ints")(checkNumericSum[Int])
   property("Aggregator.numericSum is correct for Longs") {
     checkNumericSum[Long]
   }
@@ -118,29 +118,19 @@ class AggregatorLaws extends CheckProperties {
     }
 
   property("Aggregator.count is like List.count") {
-    forAll { (in: List[Int], fn: Int => Boolean) =>
-      in.count(fn) == (Aggregator.count(fn)(in))
-    }
+    forAll((in: List[Int], fn: Int => Boolean) => in.count(fn) == (Aggregator.count(fn)(in)))
   }
   property("Aggregator.exists is like List.exists") {
-    forAll { (in: List[Int], fn: Int => Boolean) =>
-      in.exists(fn) == (Aggregator.exists(fn)(in))
-    }
+    forAll((in: List[Int], fn: Int => Boolean) => in.exists(fn) == (Aggregator.exists(fn)(in)))
   }
   property("Aggregator.forall is like List.forall") {
-    forAll { (in: List[Int], fn: Int => Boolean) =>
-      in.forall(fn) == (Aggregator.forall(fn)(in))
-    }
+    forAll((in: List[Int], fn: Int => Boolean) => in.forall(fn) == (Aggregator.forall(fn)(in)))
   }
   property("Aggregator.head is like List.head") {
-    forAll { (in: List[Int]) =>
-      in.headOption == (Aggregator.head.applyOption(in))
-    }
+    forAll((in: List[Int]) => in.headOption == (Aggregator.head.applyOption(in)))
   }
   property("Aggregator.last is like List.last") {
-    forAll { (in: List[Int]) =>
-      in.lastOption == (Aggregator.last.applyOption(in))
-    }
+    forAll((in: List[Int]) => in.lastOption == (Aggregator.last.applyOption(in)))
   }
   property("Aggregator.maxBy is like List.maxBy") {
     forAll { (head: Int, in: List[Int], fn: Int => Int) =>
@@ -201,9 +191,7 @@ class AggregatorLaws extends CheckProperties {
     }
   }
   property("Aggregator.toList is identity on lists") {
-    forAll { (in: List[Int]) =>
-      in == Aggregator.toList(in)
-    }
+    forAll((in: List[Int]) => in == Aggregator.toList(in))
   }
 
   property("MonoidAggregator.sumBefore is correct") {

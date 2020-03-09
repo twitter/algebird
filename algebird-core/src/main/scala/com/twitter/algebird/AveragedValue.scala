@@ -106,9 +106,7 @@ object AveragedValue {
    */
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
     Aggregator
-      .prepareMonoid { n: N =>
-        AveragedValue(num.toDouble(n))
-      }
+      .prepareMonoid { n: N => AveragedValue(num.toDouble(n)) }
       .andThenPresent(_.value)
 
   /**

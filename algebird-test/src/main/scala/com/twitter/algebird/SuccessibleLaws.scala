@@ -53,7 +53,5 @@ object SuccessibleLaws {
    * }}}
    */
   def successibleLaws[T: Successible: Arbitrary]: Prop =
-    forAll { (t: T, size: Short) =>
-      law(t) && iterateNextIncreases(t, size)
-    }
+    forAll((t: T, size: Short) => law(t) && iterateNextIncreases(t, size))
 }

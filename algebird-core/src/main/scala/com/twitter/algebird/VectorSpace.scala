@@ -41,9 +41,7 @@ private object VectorSpaceOps extends VectorSpaceOps
 
 sealed trait Implicits extends LowPrioImpicits {
   implicit def indexedSeqSpace[T: Ring] =
-    VectorSpaceOps.from[T, IndexedSeq] { (s, seq) =>
-      seq.map(Ring.times(s, _))
-    }
+    VectorSpaceOps.from[T, IndexedSeq]((s, seq) => seq.map(Ring.times(s, _)))
 }
 
 sealed trait LowPrioImpicits {

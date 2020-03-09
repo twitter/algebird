@@ -42,9 +42,7 @@ class DecayedValueLaws extends CheckProperties {
       } yield Params(x, hl, c, n)
     }
 
-    averageApproxEq { (dv, params) =>
-      dv.average(params.halfLife)
-    }
+    averageApproxEq((dv, params) => dv.average(params.halfLife))
   }
 
   property("for large HL but small count, averageFrom(f(t)=x)=x") {
@@ -57,9 +55,7 @@ class DecayedValueLaws extends CheckProperties {
       } yield Params(x, hl, c, n)
     }
 
-    averageApproxEq { (dv, params) =>
-      dv.averageFrom(params.halfLife, 0, params.count)
-    }
+    averageApproxEq((dv, params) => dv.averageFrom(params.halfLife, 0, params.count))
   }
 
   property("for small HL but large count, discreteAverage(f(t)=x)=x") {
@@ -72,8 +68,6 @@ class DecayedValueLaws extends CheckProperties {
       } yield Params(x, hl, c, n)
     }
 
-    averageApproxEq { (dv, params) =>
-      dv.discreteAverage(params.halfLife)
-    }
+    averageApproxEq((dv, params) => dv.discreteAverage(params.halfLife))
   }
 }

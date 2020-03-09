@@ -26,9 +26,7 @@ object BaseVectorSpaceProperties {
   def isEqualIfZero[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
   )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]) =
-    forAll { (a: C[F]) =>
-      eqfn(VectorSpace.scale(vs.field.zero, a), vs.group.zero)
-    }
+    forAll((a: C[F]) => eqfn(VectorSpace.scale(vs.field.zero, a), vs.group.zero))
 
   def distributesWithPlus[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
@@ -51,9 +49,7 @@ object BaseVectorSpaceProperties {
   def identityOne[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
   )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]) =
-    forAll { (a: C[F]) =>
-      eqfn(VectorSpace.scale(vs.field.one, a), a)
-    }
+    forAll((a: C[F]) => eqfn(VectorSpace.scale(vs.field.one, a), a))
 
   def distributesOverScalarPlus[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean

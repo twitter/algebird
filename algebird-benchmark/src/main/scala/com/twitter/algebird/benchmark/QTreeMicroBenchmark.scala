@@ -21,9 +21,7 @@ object QTreeMicroBenchmark {
     def setup(): Unit = {
       val rng = new Random("qtree".hashCode)
 
-      inputDataLong = (0L until numElements).map { _ =>
-        QTree(rng.nextInt(1000).toLong)
-      }
+      inputDataLong = (0L until numElements).map(_ => QTree(rng.nextInt(1000).toLong))
 
     }
   }

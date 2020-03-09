@@ -49,7 +49,11 @@ object SpaceSaver {
           .put(itemAsBytes)
         buffer
 
-      case SSMany(capacity, counters, _) => //We do not care about the buckets are thery are created by SSMany.apply
+      case SSMany(
+          capacity,
+          counters,
+          _
+          ) => //We do not care about the buckets are thery are created by SSMany.apply
         val buffer = scala.collection.mutable.ArrayBuffer.newBuilder[Byte]
         buffer += (2: Byte)
 
@@ -190,9 +194,7 @@ sealed abstract class SpaceSaver[T] {
    * Returns boolean indicating if they are consistent
    */
   def consistentWith(that: SpaceSaver[T]): Boolean =
-    (counters.keys ++ that.counters.keys).forall { item =>
-      (frequency(item) - that.frequency(item)) ~ 0
-    }
+    (counters.keys ++ that.counters.keys).forall(item => (frequency(item) - that.frequency(item)) ~ 0)
 }
 
 case class SSOne[T] private[algebird] (override val capacity: Int, item: T) extends SpaceSaver[T] {

@@ -21,9 +21,9 @@ import org.scalacheck.Prop.forAll
 class SuccessibleProperties extends CheckProperties {
   import com.twitter.algebird.SuccessibleLaws.{successibleLaws => laws}
 
-  property("Int is Successible") { laws[Int] }
-  property("Long is Successible") { laws[Long] }
-  property("BigInt is Successible") { laws[BigInt] }
+  property("Int is Successible")(laws[Int])
+  property("Long is Successible")(laws[Long])
+  property("BigInt is Successible")(laws[BigInt])
   property("Successible.fromNextOrd[Int] is Successible") {
     implicit val succ =
       Successible.fromNextOrd[Int](IntegralSuccessible.next(_))

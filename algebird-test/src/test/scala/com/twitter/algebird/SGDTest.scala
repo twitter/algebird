@@ -52,9 +52,7 @@ class SGDLaws extends CheckProperties {
   }
 
   property("Gradient at x=0 has zero first component") {
-    forAll { (w: SGDWeights, y: Double) =>
-      (SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0)
-    }
+    forAll((w: SGDWeights, y: Double) => (SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0))
   }
 
   property("Zero-step leaves Weights unchanged") {

@@ -40,7 +40,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
       (a == mon.plus(mon.zero, a)) &&
         (a == mon.plus(a, mon.zero)) &&
         (a == grp.minus(a, grp.zero)) &&
-        (mon.nonZeroOption(a) == Some(a).filter { _ != num.zero })
+        (mon.nonZeroOption(a) == Some(a).filter(_ != num.zero))
     )
   }
 
