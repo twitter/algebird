@@ -53,7 +53,6 @@ final class DecayingCMS[K](
   val empty: CMS =
     new CMS(Array.fill(depth)(Vector.fill[Double](width)(0.0)), 0.0, Double.NegativeInfinity)
 
-
   /**
    * Represents a decaying scalar value at a particular point in time.
    *
@@ -167,10 +166,10 @@ final class DecayingCMS[K](
     override def toString: String =
       s"DoubleAt($value, $timeInHL)"
 
-    def <(rhs: DoubleAt): Boolean = (lhs compare rhs) < 0
-    def <=(rhs: DoubleAt): Boolean = (lhs compare rhs) <= 0
-    def >(rhs: DoubleAt): Boolean = (lhs compare rhs) > 0
-    def >=(rhs: DoubleAt): Boolean = (lhs compare rhs) >= 0
+    def <(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) < 0
+    def <=(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) <= 0
+    def >(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) > 0
+    def >=(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) >= 0
 
     def time: Long =
       toTimestamp(timeInHL)
@@ -306,9 +305,9 @@ final class DecayingCMS[K](
 
     override def hashCode: Int =
       deepHashCode(cells.asInstanceOf[Array[Object]]) * 59 +
-    logScale.## * 17 +
-    timeInHL.## * 37 +
-            19
+        logScale.## * 17 +
+        timeInHL.## * 37 +
+        19
 
     // unfortunately we can't check the path-dependent type of this
     // CMS, which we signal by using a type projection here.
@@ -316,8 +315,8 @@ final class DecayingCMS[K](
       any match {
         case that: DecayingCMS[_]#CMS =>
           this.logScale == that.logScale &&
-          this.timeInHL == that.timeInHL &&
-          this.cells.length == that.cells.length && {
+            this.timeInHL == that.timeInHL &&
+            this.cells.length == that.cells.length && {
             var i = 0
             while (i < depth) {
               if (this.cells(i) != that.cells(i)) return false
