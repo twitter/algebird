@@ -266,7 +266,9 @@ lazy val algebirdCore = module("core").settings(
 
 lazy val algebirdTest = module("test")
   .settings(
-    testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
+    testOptions in Test ++= Seq(
+      Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4"),
+      Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "10000")),
     crossScalaVersions += "2.13.1",
     libraryDependencies ++=
       Seq(

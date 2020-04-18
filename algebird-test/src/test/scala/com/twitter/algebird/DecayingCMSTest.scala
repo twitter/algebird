@@ -7,7 +7,11 @@ import Prop.{forAllNoShrink => forAll}
 
 class DecayingCMSProperties extends CheckProperties {
 
-  val eps = 1e-6
+  // uncomment to stress test (scalatest default is 10)
+  // override val generatorDrivenConfig =
+  //   PropertyCheckConfiguration(minSuccessful = 1000)
+
+  val eps = 1e-5
 
   def close(a: Double, b: Double): Boolean =
     if (a == b) {
@@ -105,7 +109,6 @@ class DecayingCMSProperties extends CheckProperties {
     Gen.listOf(stdItem)
 
   def genTimestamp[K](module: DecayingCMS[K]): Gen[Long] =
-    //Gen.choose(0L, module.halfLifeSecs.toLong * 1000L * 10L)
     Gen.choose(0L, module.halfLifeSecs.toLong * 10L)
 
   def genDoubleAt[K](module: DecayingCMS[K]): Gen[module.DoubleAt] =
