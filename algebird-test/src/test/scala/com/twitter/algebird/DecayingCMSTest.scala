@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 import org.scalacheck.{Arbitrary, Gen, Prop}
-import scala.concurrent.duration.{Duration, MINUTES, HOURS, DAYS}
+import scala.concurrent.duration.{DAYS, Duration, HOURS, MINUTES}
 
 import Prop.{forAllNoShrink => forAll}
 
@@ -24,15 +24,13 @@ class DecayingCMSProperties extends CheckProperties {
     }
 
   def fuzzyEq[K](module: DecayingCMS[K])(cms0: module.CMS, cms1: module.CMS): Boolean = {
-    val t = cms0.timeInHL max cms1.timeInHL
+    val t = cms0.timeInHL.max(cms1.timeInHL)
     val (x0, x1) =
       if (t == Double.NegativeInfinity) (cms0, cms1)
       else (cms0.rescaleTo(t), cms1.rescaleTo(t))
 
     (0 until module.depth).forall { d =>
-      (0 until module.width).forall { w =>
-        close(x0.cells(d)(w), x1.cells(d)(w))
-      }
+      (0 until module.width).forall(w => close(x0.cells(d)(w), x1.cells(d)(w)))
     }
   }
 
@@ -217,8 +215,8 @@ class DecayingCMSProperties extends CheckProperties {
   //
   timeCommutativeBinop("+")(_ + _)
   timeCommutativeBinop("-")(_ - _)
-  timeCommutativeBinop("min")(_ min _)
-  timeCommutativeBinop("max")(_ max _)
+  timeCommutativeBinop("min")(_.min(_))
+  timeCommutativeBinop("max")(_.max(_))
 
   timeCommutativeUnop("abs")(_.abs)
   timeCommutativeUnop("unary -")(-_)
@@ -280,7 +278,7 @@ class DecayingCMSProperties extends CheckProperties {
       val g = genDoubleAt(module)
       forAll(g, g, genTimestamp(module)) { (x, y, t) =>
         val got = x.compare(y)
-        val expected = x.at(t) compare y.at(t)
+        val expected = x.at(t).compare(y.at(t))
         Prop(got == expected)
       }
     }
@@ -296,8 +294,8 @@ class DecayingCMSProperties extends CheckProperties {
         items.iterator.map(_._2).foldLeft(Prop(true)) { (res, k) =>
           val x = cms1.get(k).value
           res &&
-            (Prop(xmin <= x) :| s"$xmin <= $x was false for key $k") &&
-            (Prop(x <= xmax) :| s"$x <= $xmax was false for key $k")
+          (Prop(xmin <= x) :| s"$xmin <= $x was false for key $k") &&
+          (Prop(x <= xmax) :| s"$x <= $xmax was false for key $k")
         }
       }
     }
