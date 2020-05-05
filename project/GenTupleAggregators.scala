@@ -55,7 +55,7 @@ object MultiAggregator {
       .map { i =>
         val methodName = name.getOrElse("from%d".format(i))
         val aggType = if (isMonoid) "Monoid" else ""
-        val nums = (1 to i)
+        val nums = 1 to i
         val bs = nums.map("B" + _).mkString(", ")
         val cs = nums.map("C" + _).mkString(", ")
         val aggs = nums.map(x => "%sAggregator[A, B%s, C%s]".format(aggType, x, x)).mkString(", ")
