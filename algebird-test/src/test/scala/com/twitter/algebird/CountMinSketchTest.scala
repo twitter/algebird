@@ -431,7 +431,8 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   // and uses it for all its counting/querying functionality (like an adapter) we can test CMS[K] indirectly through
   // testing TopPctCMS[K].
   val COUNTING_CMS_MONOID = {
-    val ANY_HEAVY_HITTERS_PCT = 0.1 // heavy hitters functionality is not relevant for the tests using this monoid
+    val ANY_HEAVY_HITTERS_PCT =
+      0.1 // heavy hitters functionality is not relevant for the tests using this monoid
     TopPctCMS.monoid[K](EPS, DELTA, SEED, ANY_HEAVY_HITTERS_PCT)
   }
 

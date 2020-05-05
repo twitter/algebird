@@ -50,9 +50,9 @@ object SpaceSaver {
         buffer
 
       case SSMany(
-          capacity,
-          counters,
-          _
+            capacity,
+            counters,
+            _
           ) => //We do not care about the buckets are thery are created by SSMany.apply
         val buffer = scala.collection.mutable.ArrayBuffer.newBuilder[Byte]
         buffer += (2: Byte)

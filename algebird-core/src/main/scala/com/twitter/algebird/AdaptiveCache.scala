@@ -75,8 +75,10 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
 
     var ret = evicted
 
-    if (currentCapacity < maxCapacity &&
-        sentinelCache.size > (currentCapacity * growthMargin)) {
+    if (
+      currentCapacity < maxCapacity &&
+      sentinelCache.size > (currentCapacity * growthMargin)
+    ) {
       currentCapacity = (currentCapacity * 2).min(maxCapacity)
 
       ret = (ret, summingCache.flush) match {

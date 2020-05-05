@@ -131,7 +131,10 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MMap[Int,Int] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[
+      Int,
+      Int
+    ], MMap[
       Int,
       Int
     ]]
@@ -158,7 +161,10 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MMap[Int,String] Monoid laws") {
-    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[Int, Int], MMap[
+    isAssociativeDifferentTypes[ScMap[Int, Int], MMap[Int, Int]] && weakZeroDifferentTypes[ScMap[
+      Int,
+      Int
+    ], MMap[
       Int,
       Int
     ]]
@@ -287,7 +293,7 @@ class CollectionSpecification extends CheckProperties {
         .filter(_._2.isDefined)
         .mapValues(_.get)
         .toMap
-      val m1Orm2 = (m1.keySet | m2.keySet)
+      val m1Orm2 = m1.keySet | m2.keySet
       ((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))
     }
   }
@@ -314,9 +320,13 @@ class CollectionSpecification extends CheckProperties {
       } yield AdaptiveVector.fromVector(Vector(l: _*), sparse),
       for {
         m <- Arbitrary.arbitrary[Map[Int, T]]
-      } yield AdaptiveVector.fromMap(m.filter {
-        case (k, _) => (k < 1000) && (k >= 0)
-      }, sparse, 1000),
+      } yield AdaptiveVector.fromMap(
+        m.filter {
+          case (k, _) => (k < 1000) && (k >= 0)
+        },
+        sparse,
+        1000
+      ),
       for {
         size <- Gen.posNum[Int]
       } yield AdaptiveVector.fromMap(Map.empty, sparse, size)

@@ -6,8 +6,8 @@ import ArrayBufferedOperation.fromSumOption
 /**
  * Combine 2 semigroups into a product semigroup
  */
-class Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
-    implicit asemigroup: Semigroup[A],
+class Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B]
 ) extends Semigroup[X] {
   override def plus(l: X, r: X): X = {
@@ -30,8 +30,8 @@ class Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)
 /**
  * Combine 2 monoids into a product monoid
  */
-class Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
-    implicit amonoid: Monoid[A],
+class Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B]
 ) extends Product2Semigroup[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Monoid[X] {
@@ -41,8 +41,8 @@ class Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
 /**
  * Combine 2 groups into a product group
  */
-class Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
-    implicit agroup: Group[A],
+class Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(implicit
+    agroup: Group[A],
     bgroup: Group[B]
 ) extends Product2Monoid[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Group[X] {
@@ -59,8 +59,8 @@ class Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
 /**
  * Combine 2 rings into a product ring
  */
-class Product2Ring[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
-    implicit aring: Ring[A],
+class Product2Ring[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(implicit
+    aring: Ring[A],
     bring: Ring[B]
 ) extends Product2Group[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])
     with Ring[X] {
@@ -74,8 +74,8 @@ class Product2Ring[X, A, B](apply: (A, B) => X, unapply: X => Option[(A, B)])(
 /**
  * Combine 3 semigroups into a product semigroup
  */
-class Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(
-    implicit asemigroup: Semigroup[A],
+class Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C]
 ) extends Semigroup[X] {
@@ -104,8 +104,8 @@ class Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[
 /**
  * Combine 3 monoids into a product monoid
  */
-class Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(
-    implicit amonoid: Monoid[A],
+class Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C]
 ) extends Product3Semigroup[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
@@ -116,8 +116,8 @@ class Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A,
 /**
  * Combine 3 groups into a product group
  */
-class Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(
-    implicit agroup: Group[A],
+class Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C]
 ) extends Product3Monoid[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
@@ -139,8 +139,8 @@ class Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, 
 /**
  * Combine 3 rings into a product ring
  */
-class Product3Ring[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(
-    implicit aring: Ring[A],
+class Product3Ring[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C]
 ) extends Product3Group[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B, C)])
@@ -159,8 +159,8 @@ class Product3Ring[X, A, B, C](apply: (A, B, C) => X, unapply: X => Option[(A, B
 /**
  * Combine 4 semigroups into a product semigroup
  */
-class Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(
-    implicit asemigroup: Semigroup[A],
+class Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D]
@@ -193,8 +193,8 @@ class Product4Semigroup[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => O
 /**
  * Combine 4 monoids into a product monoid
  */
-class Product4Monoid[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(
-    implicit amonoid: Monoid[A],
+class Product4Monoid[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D]
@@ -207,8 +207,8 @@ class Product4Monoid[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Opti
 /**
  * Combine 4 groups into a product group
  */
-class Product4Group[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(
-    implicit agroup: Group[A],
+class Product4Group[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D]
@@ -232,8 +232,8 @@ class Product4Group[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Optio
 /**
  * Combine 4 rings into a product ring
  */
-class Product4Ring[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(
-    implicit aring: Ring[A],
+class Product4Ring[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option[(A, B, C, D)])(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D]
@@ -255,7 +255,8 @@ class Product4Ring[X, A, B, C, D](apply: (A, B, C, D) => X, unapply: X => Option
  * Combine 5 semigroups into a product semigroup
  */
 class Product5Semigroup[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => Option[(A, B, C, D, E)])(
-    implicit asemigroup: Semigroup[A],
+    implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -292,7 +293,8 @@ class Product5Semigroup[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: 
  * Combine 5 monoids into a product monoid
  */
 class Product5Monoid[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => Option[(A, B, C, D, E)])(
-    implicit amonoid: Monoid[A],
+    implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -310,7 +312,8 @@ class Product5Monoid[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X =
  * Combine 5 groups into a product group
  */
 class Product5Group[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => Option[(A, B, C, D, E)])(
-    implicit agroup: Group[A],
+    implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -346,7 +349,8 @@ class Product5Group[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X =>
  * Combine 5 rings into a product ring
  */
 class Product5Ring[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => Option[(A, B, C, D, E)])(
-    implicit aring: Ring[A],
+    implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -376,8 +380,8 @@ class Product5Ring[X, A, B, C, D, E](apply: (A, B, C, D, E) => X, unapply: X => 
 class Product6Semigroup[X, A, B, C, D, E, F](
     apply: (A, B, C, D, E, F) => X,
     unapply: X => Option[(A, B, C, D, E, F)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -421,8 +425,8 @@ class Product6Semigroup[X, A, B, C, D, E, F](
 class Product6Monoid[X, A, B, C, D, E, F](
     apply: (A, B, C, D, E, F) => X,
     unapply: X => Option[(A, B, C, D, E, F)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -443,8 +447,8 @@ class Product6Monoid[X, A, B, C, D, E, F](
 class Product6Group[X, A, B, C, D, E, F](
     apply: (A, B, C, D, E, F) => X,
     unapply: X => Option[(A, B, C, D, E, F)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -512,8 +516,8 @@ class Product6Ring[X, A, B, C, D, E, F](
 class Product7Semigroup[X, A, B, C, D, E, F, G](
     apply: (A, B, C, D, E, F, G) => X,
     unapply: X => Option[(A, B, C, D, E, F, G)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -569,8 +573,8 @@ class Product7Semigroup[X, A, B, C, D, E, F, G](
 class Product7Monoid[X, A, B, C, D, E, F, G](
     apply: (A, B, C, D, E, F, G) => X,
     unapply: X => Option[(A, B, C, D, E, F, G)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -592,8 +596,8 @@ class Product7Monoid[X, A, B, C, D, E, F, G](
 class Product7Group[X, A, B, C, D, E, F, G](
     apply: (A, B, C, D, E, F, G) => X,
     unapply: X => Option[(A, B, C, D, E, F, G)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -637,8 +641,8 @@ class Product7Group[X, A, B, C, D, E, F, G](
 class Product7Ring[X, A, B, C, D, E, F, G](
     apply: (A, B, C, D, E, F, G) => X,
     unapply: X => Option[(A, B, C, D, E, F, G)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -672,8 +676,8 @@ class Product7Ring[X, A, B, C, D, E, F, G](
 class Product8Semigroup[X, A, B, C, D, E, F, G, H](
     apply: (A, B, C, D, E, F, G, H) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -733,8 +737,8 @@ class Product8Semigroup[X, A, B, C, D, E, F, G, H](
 class Product8Monoid[X, A, B, C, D, E, F, G, H](
     apply: (A, B, C, D, E, F, G, H) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -766,8 +770,8 @@ class Product8Monoid[X, A, B, C, D, E, F, G, H](
 class Product8Group[X, A, B, C, D, E, F, G, H](
     apply: (A, B, C, D, E, F, G, H) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -814,8 +818,8 @@ class Product8Group[X, A, B, C, D, E, F, G, H](
 class Product8Ring[X, A, B, C, D, E, F, G, H](
     apply: (A, B, C, D, E, F, G, H) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -851,8 +855,8 @@ class Product8Ring[X, A, B, C, D, E, F, G, H](
 class Product9Semigroup[X, A, B, C, D, E, F, G, H, I](
     apply: (A, B, C, D, E, F, G, H, I) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -916,8 +920,8 @@ class Product9Semigroup[X, A, B, C, D, E, F, G, H, I](
 class Product9Monoid[X, A, B, C, D, E, F, G, H, I](
     apply: (A, B, C, D, E, F, G, H, I) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -951,8 +955,8 @@ class Product9Monoid[X, A, B, C, D, E, F, G, H, I](
 class Product9Group[X, A, B, C, D, E, F, G, H, I](
     apply: (A, B, C, D, E, F, G, H, I) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1002,8 +1006,8 @@ class Product9Group[X, A, B, C, D, E, F, G, H, I](
 class Product9Ring[X, A, B, C, D, E, F, G, H, I](
     apply: (A, B, C, D, E, F, G, H, I) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1041,8 +1045,8 @@ class Product9Ring[X, A, B, C, D, E, F, G, H, I](
 class Product10Semigroup[X, A, B, C, D, E, F, G, H, I, J](
     apply: (A, B, C, D, E, F, G, H, I, J) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1111,8 +1115,8 @@ class Product10Semigroup[X, A, B, C, D, E, F, G, H, I, J](
 class Product10Monoid[X, A, B, C, D, E, F, G, H, I, J](
     apply: (A, B, C, D, E, F, G, H, I, J) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1148,8 +1152,8 @@ class Product10Monoid[X, A, B, C, D, E, F, G, H, I, J](
 class Product10Group[X, A, B, C, D, E, F, G, H, I, J](
     apply: (A, B, C, D, E, F, G, H, I, J) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1202,8 +1206,8 @@ class Product10Group[X, A, B, C, D, E, F, G, H, I, J](
 class Product10Ring[X, A, B, C, D, E, F, G, H, I, J](
     apply: (A, B, C, D, E, F, G, H, I, J) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1254,8 +1258,8 @@ class Product10Ring[X, A, B, C, D, E, F, G, H, I, J](
 class Product11Semigroup[X, A, B, C, D, E, F, G, H, I, J, K](
     apply: (A, B, C, D, E, F, G, H, I, J, K) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1328,8 +1332,8 @@ class Product11Semigroup[X, A, B, C, D, E, F, G, H, I, J, K](
 class Product11Monoid[X, A, B, C, D, E, F, G, H, I, J, K](
     apply: (A, B, C, D, E, F, G, H, I, J, K) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1367,8 +1371,8 @@ class Product11Monoid[X, A, B, C, D, E, F, G, H, I, J, K](
 class Product11Group[X, A, B, C, D, E, F, G, H, I, J, K](
     apply: (A, B, C, D, E, F, G, H, I, J, K) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1424,8 +1428,8 @@ class Product11Group[X, A, B, C, D, E, F, G, H, I, J, K](
 class Product11Ring[X, A, B, C, D, E, F, G, H, I, J, K](
     apply: (A, B, C, D, E, F, G, H, I, J, K) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1479,8 +1483,8 @@ class Product11Ring[X, A, B, C, D, E, F, G, H, I, J, K](
 class Product12Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1557,8 +1561,8 @@ class Product12Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L](
 class Product12Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1598,8 +1602,8 @@ class Product12Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L](
 class Product12Group[X, A, B, C, D, E, F, G, H, I, J, K, L](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1658,8 +1662,8 @@ class Product12Group[X, A, B, C, D, E, F, G, H, I, J, K, L](
 class Product12Ring[X, A, B, C, D, E, F, G, H, I, J, K, L](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1716,8 +1720,8 @@ class Product12Ring[X, A, B, C, D, E, F, G, H, I, J, K, L](
 class Product13Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1799,8 +1803,8 @@ class Product13Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
 class Product13Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1842,8 +1846,8 @@ class Product13Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
 class Product13Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1905,8 +1909,8 @@ class Product13Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
 class Product13Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1966,8 +1970,8 @@ class Product13Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
 class Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2053,8 +2057,8 @@ class Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 class Product14Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2098,8 +2102,8 @@ class Product14Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 class Product14Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2164,8 +2168,8 @@ class Product14Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 class Product14Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2228,8 +2232,8 @@ class Product14Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 class Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2319,8 +2323,8 @@ class Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 class Product15Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2366,8 +2370,8 @@ class Product15Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 class Product15Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2435,8 +2439,8 @@ class Product15Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 class Product15Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2502,8 +2506,8 @@ class Product15Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 class Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2598,8 +2602,8 @@ class Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 class Product16Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2647,8 +2651,8 @@ class Product16Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 class Product16Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2719,8 +2723,8 @@ class Product16Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 class Product16Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2789,8 +2793,8 @@ class Product16Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 class Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2889,8 +2893,8 @@ class Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 class Product17Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2940,8 +2944,8 @@ class Product17Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 class Product17Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3015,8 +3019,8 @@ class Product17Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 class Product17Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3088,8 +3092,8 @@ class Product17Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 class Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3192,8 +3196,8 @@ class Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
 class Product18Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3245,8 +3249,8 @@ class Product18Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 class Product18Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3323,8 +3327,8 @@ class Product18Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 class Product18Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3399,8 +3403,8 @@ class Product18Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 class Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3508,8 +3512,8 @@ class Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
 class Product19Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3563,8 +3567,8 @@ class Product19Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
 class Product19Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3644,8 +3648,8 @@ class Product19Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
 class Product19Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3723,8 +3727,8 @@ class Product19Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 class Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3836,8 +3840,8 @@ class Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
 class Product20Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3893,8 +3897,8 @@ class Product20Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
 class Product20Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3977,8 +3981,8 @@ class Product20Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
 class Product20Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -4059,8 +4063,8 @@ class Product20Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 class Product21Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -4176,8 +4180,8 @@ class Product21Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
 class Product21Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -4235,8 +4239,8 @@ class Product21Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
 class Product21Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -4322,8 +4326,8 @@ class Product21Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
 class Product21Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -4407,8 +4411,8 @@ class Product21Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 class Product22Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-)(
-    implicit asemigroup: Semigroup[A],
+)(implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -4529,8 +4533,8 @@ class Product22Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
 class Product22Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-)(
-    implicit amonoid: Monoid[A],
+)(implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -4590,8 +4594,8 @@ class Product22Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
 class Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-)(
-    implicit agroup: Group[A],
+)(implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -4680,8 +4684,8 @@ class Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
 class Product22Ring[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
     apply: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
     unapply: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-)(
-    implicit aring: Ring[A],
+)(implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -4775,16 +4779,16 @@ trait ProductSemigroups {
   )(implicit asemigroup: Semigroup[A], bsemigroup: Semigroup[B], csemigroup: Semigroup[C]): Semigroup[X] =
     new Product3Semigroup[X, A, B, C](applyX, unapplyX)(asemigroup, bsemigroup, csemigroup)
 
-  def apply[X, A, B, C, D](applyX: (A, B, C, D) => X, unapplyX: X => Option[(A, B, C, D)])(
-      implicit asemigroup: Semigroup[A],
+  def apply[X, A, B, C, D](applyX: (A, B, C, D) => X, unapplyX: X => Option[(A, B, C, D)])(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D]
   ): Semigroup[X] =
     new Product4Semigroup[X, A, B, C, D](applyX, unapplyX)(asemigroup, bsemigroup, csemigroup, dsemigroup)
 
-  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(
-      implicit asemigroup: Semigroup[A],
+  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4799,7 +4803,8 @@ trait ProductSemigroups {
     )
 
   def apply[X, A, B, C, D, E, F](applyX: (A, B, C, D, E, F) => X, unapplyX: X => Option[(A, B, C, D, E, F)])(
-      implicit asemigroup: Semigroup[A],
+      implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4818,8 +4823,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G](
       applyX: (A, B, C, D, E, F, G) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4840,8 +4845,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H](
       applyX: (A, B, C, D, E, F, G, H) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4864,8 +4869,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I](
       applyX: (A, B, C, D, E, F, G, H, I) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4890,8 +4895,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J](
       applyX: (A, B, C, D, E, F, G, H, I, J) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4918,8 +4923,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K](
       applyX: (A, B, C, D, E, F, G, H, I, J, K) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4948,8 +4953,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4980,8 +4985,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5014,8 +5019,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5050,8 +5055,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5088,8 +5093,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5128,8 +5133,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5170,8 +5175,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5214,8 +5219,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5260,8 +5265,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5308,8 +5313,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5361,8 +5366,8 @@ trait ProductSemigroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-  )(
-      implicit asemigroup: Semigroup[A],
+  )(implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -5434,8 +5439,8 @@ trait ProductMonoids {
   )(implicit amonoid: Monoid[A], bmonoid: Monoid[B], cmonoid: Monoid[C], dmonoid: Monoid[D]): Monoid[X] =
     new Product4Monoid[X, A, B, C, D](applyX, unapplyX)(amonoid, bmonoid, cmonoid, dmonoid)
 
-  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(
-      implicit amonoid: Monoid[A],
+  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5444,7 +5449,8 @@ trait ProductMonoids {
     new Product5Monoid[X, A, B, C, D, E](applyX, unapplyX)(amonoid, bmonoid, cmonoid, dmonoid, emonoid)
 
   def apply[X, A, B, C, D, E, F](applyX: (A, B, C, D, E, F) => X, unapplyX: X => Option[(A, B, C, D, E, F)])(
-      implicit amonoid: Monoid[A],
+      implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5463,8 +5469,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G](
       applyX: (A, B, C, D, E, F, G) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5485,8 +5491,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H](
       applyX: (A, B, C, D, E, F, G, H) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5509,8 +5515,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I](
       applyX: (A, B, C, D, E, F, G, H, I) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5535,8 +5541,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J](
       applyX: (A, B, C, D, E, F, G, H, I, J) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5563,8 +5569,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K](
       applyX: (A, B, C, D, E, F, G, H, I, J, K) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5593,8 +5599,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5625,8 +5631,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5659,8 +5665,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5695,8 +5701,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5733,8 +5739,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5773,8 +5779,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5815,8 +5821,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5859,8 +5865,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5905,8 +5911,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5953,8 +5959,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -6003,8 +6009,8 @@ trait ProductMonoids {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-  )(
-      implicit amonoid: Monoid[A],
+  )(implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -6076,8 +6082,8 @@ trait ProductGroups {
   )(implicit agroup: Group[A], bgroup: Group[B], cgroup: Group[C], dgroup: Group[D]): Group[X] =
     new Product4Group[X, A, B, C, D](applyX, unapplyX)(agroup, bgroup, cgroup, dgroup)
 
-  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(
-      implicit agroup: Group[A],
+  def apply[X, A, B, C, D, E](applyX: (A, B, C, D, E) => X, unapplyX: X => Option[(A, B, C, D, E)])(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6086,7 +6092,8 @@ trait ProductGroups {
     new Product5Group[X, A, B, C, D, E](applyX, unapplyX)(agroup, bgroup, cgroup, dgroup, egroup)
 
   def apply[X, A, B, C, D, E, F](applyX: (A, B, C, D, E, F) => X, unapplyX: X => Option[(A, B, C, D, E, F)])(
-      implicit agroup: Group[A],
+      implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6098,8 +6105,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G](
       applyX: (A, B, C, D, E, F, G) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6120,8 +6127,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H](
       applyX: (A, B, C, D, E, F, G, H) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6144,8 +6151,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I](
       applyX: (A, B, C, D, E, F, G, H, I) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6170,8 +6177,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J](
       applyX: (A, B, C, D, E, F, G, H, I, J) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6198,8 +6205,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K](
       applyX: (A, B, C, D, E, F, G, H, I, J, K) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6228,8 +6235,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6260,8 +6267,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6294,8 +6301,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6330,8 +6337,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6368,8 +6375,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6408,8 +6415,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6450,8 +6457,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6494,8 +6501,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6540,8 +6547,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6588,8 +6595,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6638,8 +6645,8 @@ trait ProductGroups {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-  )(
-      implicit agroup: Group[A],
+  )(implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6715,7 +6722,8 @@ trait ProductRings {
     new Product5Ring[X, A, B, C, D, E](applyX, unapplyX)(aring, bring, cring, dring, ering)
 
   def apply[X, A, B, C, D, E, F](applyX: (A, B, C, D, E, F) => X, unapplyX: X => Option[(A, B, C, D, E, F)])(
-      implicit aring: Ring[A],
+      implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6727,8 +6735,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G](
       applyX: (A, B, C, D, E, F, G) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6749,8 +6757,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H](
       applyX: (A, B, C, D, E, F, G, H) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6773,8 +6781,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I](
       applyX: (A, B, C, D, E, F, G, H, I) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6799,8 +6807,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J](
       applyX: (A, B, C, D, E, F, G, H, I, J) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6827,8 +6835,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K](
       applyX: (A, B, C, D, E, F, G, H, I, J, K) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6857,8 +6865,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6889,8 +6897,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6923,8 +6931,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6959,8 +6967,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6997,8 +7005,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7037,8 +7045,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7079,8 +7087,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7123,8 +7131,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7169,8 +7177,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7217,8 +7225,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -7267,8 +7275,8 @@ trait ProductRings {
   def apply[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       applyX: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) => X,
       unapplyX: X => Option[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)]
-  )(
-      implicit aring: Ring[A],
+  )(implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],

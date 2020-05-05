@@ -67,8 +67,8 @@ object Aggregator extends java.io.Serializable {
    * Obtain an [[Aggregator]] that uses an efficient append operation for faster aggregation.
    * Equivalent to {{{ appendSemigroup(prep, appnd, identity[T]_)(sg) }}}
    */
-  def appendSemigroup[F, T](prep: F => T, appnd: (T, F) => T)(
-      implicit sg: Semigroup[T]
+  def appendSemigroup[F, T](prep: F => T, appnd: (T, F) => T)(implicit
+      sg: Semigroup[T]
   ): Aggregator[F, T, T] =
     appendSemigroup(prep, appnd, identity[T])(sg)
 
@@ -84,8 +84,8 @@ object Aggregator extends java.io.Serializable {
    * @param sg The [[Semigroup]] type class
    * @note The functions 'appnd' and 'prep' are expected to obey the law: {{{ appnd(t, f) == sg.plus(t, prep(f)) }}}
    */
-  def appendSemigroup[F, T, P](prep: F => T, appnd: (T, F) => T, pres: T => P)(
-      implicit sg: Semigroup[T]
+  def appendSemigroup[F, T, P](prep: F => T, appnd: (T, F) => T, pres: T => P)(implicit
+      sg: Semigroup[T]
   ): Aggregator[F, T, P] =
     new Aggregator[F, T, P] {
       override def semigroup: Semigroup[T] = sg
@@ -130,8 +130,8 @@ object Aggregator extends java.io.Serializable {
    * @param m The [[Monoid]] type class
    * @note The function 'appnd' is expected to obey the law: {{{ appnd(t, f) == m.plus(t, appnd(m.zero, f)) }}}
    */
-  def appendMonoid[F, T, P](appnd: (T, F) => T, pres: T => P)(
-      implicit m: Monoid[T]
+  def appendMonoid[F, T, P](appnd: (T, F) => T, pres: T => P)(implicit
+      m: Monoid[T]
   ): MonoidAggregator[F, T, P] =
     new MonoidAggregator[F, T, P] {
       override def monoid: Monoid[T] = m
@@ -320,8 +320,8 @@ object Aggregator extends java.io.Serializable {
    * Returns the lower bound of a given percentile where the percentile is between (0,1]
    * The items that are iterated over cannot be negative.
    */
-  def approximatePercentile[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-      implicit num: Numeric[T]
+  def approximatePercentile[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit
+      num: Numeric[T]
   ): QTreeAggregatorLowerBound[T] =
     QTreeAggregatorLowerBound[T](percentile, k)
 
@@ -329,8 +329,8 @@ object Aggregator extends java.io.Serializable {
    * Returns the intersection of a bounded percentile where the percentile is between (0,1]
    * The items that are iterated over cannot be negative.
    */
-  def approximatePercentileBounds[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(
-      implicit num: Numeric[T]
+  def approximatePercentileBounds[T](percentile: Double, k: Int = QTreeAggregator.DefaultK)(implicit
+      num: Numeric[T]
   ): QTreeAggregator[T] =
     QTreeAggregator[T](percentile, k)
 
@@ -482,10 +482,14 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
    * joining a Fold with an Aggregator to produce a Fold
    */
   def toFold: Fold[A, Option[C]] =
-    Fold.fold[Option[B], A, Option[C]]({
-      case (None, a)    => Some(self.prepare(a))
-      case (Some(b), a) => Some(self.append(b, a))
-    }, None, _.map(self.present))
+    Fold.fold[Option[B], A, Option[C]](
+      {
+        case (None, a)    => Some(self.prepare(a))
+        case (Some(b), a) => Some(self.append(b, a))
+      },
+      None,
+      _.map(self.present)
+    )
 
   def lift: MonoidAggregator[A, Option[B], Option[C]] =
     new MonoidAggregator[A, Option[B], Option[C]] {

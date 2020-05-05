@@ -83,54 +83,15 @@ class GeneratedAbstractAlgebraLaws extends CheckProperties {
   }
   property("tuple21 is a ring") {
     type T = (
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
+        Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
         Int
     )
     ringLaws[T] && isCommutative[T]
   }
   property("tuple22 is a ring") {
     type T = (
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int
+        Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
+        Int, Int
     )
     ringLaws[T] && isCommutative[T]
   }

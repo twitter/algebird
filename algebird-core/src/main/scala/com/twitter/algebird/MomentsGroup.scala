@@ -97,8 +97,8 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
     if (n < k) getCombinedMean(k, ak, n, an)
     else
       (n + k) match {
-        case 0L                          => 0.0
-        case newCount if (newCount == n) => an
+        case 0L                        => 0.0
+        case newCount if newCount == n => an
         case newCount =>
           val scaling = k.toDouble / newCount
           // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k

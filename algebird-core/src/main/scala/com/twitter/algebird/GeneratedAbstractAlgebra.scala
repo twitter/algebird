@@ -54,8 +54,8 @@ class Tuple2Ring[A, B](implicit aring: Ring[A], bring: Ring[B]) extends Tuple2Gr
 /**
  * Combine 3 semigroups into a product semigroup
  */
-class Tuple3Semigroup[A, B, C](
-    implicit asemigroup: Semigroup[A],
+class Tuple3Semigroup[A, B, C](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C]
 ) extends Semigroup[(A, B, C)] {
@@ -107,8 +107,8 @@ class Tuple3Ring[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C
 /**
  * Combine 4 semigroups into a product semigroup
  */
-class Tuple4Semigroup[A, B, C, D](
-    implicit asemigroup: Semigroup[A],
+class Tuple4Semigroup[A, B, C, D](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D]
@@ -138,8 +138,8 @@ class Tuple4Semigroup[A, B, C, D](
 /**
  * Combine 4 monoids into a product monoid
  */
-class Tuple4Monoid[A, B, C, D](
-    implicit amonoid: Monoid[A],
+class Tuple4Monoid[A, B, C, D](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D]
@@ -174,8 +174,8 @@ class Tuple4Ring[A, B, C, D](implicit aring: Ring[A], bring: Ring[B], cring: Rin
 /**
  * Combine 5 semigroups into a product semigroup
  */
-class Tuple5Semigroup[A, B, C, D, E](
-    implicit asemigroup: Semigroup[A],
+class Tuple5Semigroup[A, B, C, D, E](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -208,8 +208,8 @@ class Tuple5Semigroup[A, B, C, D, E](
 /**
  * Combine 5 monoids into a product monoid
  */
-class Tuple5Monoid[A, B, C, D, E](
-    implicit amonoid: Monoid[A],
+class Tuple5Monoid[A, B, C, D, E](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -223,8 +223,8 @@ class Tuple5Monoid[A, B, C, D, E](
 /**
  * Combine 5 groups into a product group
  */
-class Tuple5Group[A, B, C, D, E](
-    implicit agroup: Group[A],
+class Tuple5Group[A, B, C, D, E](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -246,8 +246,8 @@ class Tuple5Group[A, B, C, D, E](
 /**
  * Combine 5 rings into a product ring
  */
-class Tuple5Ring[A, B, C, D, E](
-    implicit aring: Ring[A],
+class Tuple5Ring[A, B, C, D, E](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -268,8 +268,8 @@ class Tuple5Ring[A, B, C, D, E](
 /**
  * Combine 6 semigroups into a product semigroup
  */
-class Tuple6Semigroup[A, B, C, D, E, F](
-    implicit asemigroup: Semigroup[A],
+class Tuple6Semigroup[A, B, C, D, E, F](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -305,8 +305,8 @@ class Tuple6Semigroup[A, B, C, D, E, F](
 /**
  * Combine 6 monoids into a product monoid
  */
-class Tuple6Monoid[A, B, C, D, E, F](
-    implicit amonoid: Monoid[A],
+class Tuple6Monoid[A, B, C, D, E, F](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -321,8 +321,8 @@ class Tuple6Monoid[A, B, C, D, E, F](
 /**
  * Combine 6 groups into a product group
  */
-class Tuple6Group[A, B, C, D, E, F](
-    implicit agroup: Group[A],
+class Tuple6Group[A, B, C, D, E, F](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -353,8 +353,8 @@ class Tuple6Group[A, B, C, D, E, F](
 /**
  * Combine 6 rings into a product ring
  */
-class Tuple6Ring[A, B, C, D, E, F](
-    implicit aring: Ring[A],
+class Tuple6Ring[A, B, C, D, E, F](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -378,8 +378,8 @@ class Tuple6Ring[A, B, C, D, E, F](
 /**
  * Combine 7 semigroups into a product semigroup
  */
-class Tuple7Semigroup[A, B, C, D, E, F, G](
-    implicit asemigroup: Semigroup[A],
+class Tuple7Semigroup[A, B, C, D, E, F, G](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -429,8 +429,8 @@ class Tuple7Semigroup[A, B, C, D, E, F, G](
 /**
  * Combine 7 monoids into a product monoid
  */
-class Tuple7Monoid[A, B, C, D, E, F, G](
-    implicit amonoid: Monoid[A],
+class Tuple7Monoid[A, B, C, D, E, F, G](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -446,8 +446,8 @@ class Tuple7Monoid[A, B, C, D, E, F, G](
 /**
  * Combine 7 groups into a product group
  */
-class Tuple7Group[A, B, C, D, E, F, G](
-    implicit agroup: Group[A],
+class Tuple7Group[A, B, C, D, E, F, G](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -481,8 +481,8 @@ class Tuple7Group[A, B, C, D, E, F, G](
 /**
  * Combine 7 rings into a product ring
  */
-class Tuple7Ring[A, B, C, D, E, F, G](
-    implicit aring: Ring[A],
+class Tuple7Ring[A, B, C, D, E, F, G](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -508,8 +508,8 @@ class Tuple7Ring[A, B, C, D, E, F, G](
 /**
  * Combine 8 semigroups into a product semigroup
  */
-class Tuple8Semigroup[A, B, C, D, E, F, G, H](
-    implicit asemigroup: Semigroup[A],
+class Tuple8Semigroup[A, B, C, D, E, F, G, H](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -563,8 +563,8 @@ class Tuple8Semigroup[A, B, C, D, E, F, G, H](
 /**
  * Combine 8 monoids into a product monoid
  */
-class Tuple8Monoid[A, B, C, D, E, F, G, H](
-    implicit amonoid: Monoid[A],
+class Tuple8Monoid[A, B, C, D, E, F, G, H](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -590,8 +590,8 @@ class Tuple8Monoid[A, B, C, D, E, F, G, H](
 /**
  * Combine 8 groups into a product group
  */
-class Tuple8Group[A, B, C, D, E, F, G, H](
-    implicit agroup: Group[A],
+class Tuple8Group[A, B, C, D, E, F, G, H](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -628,8 +628,8 @@ class Tuple8Group[A, B, C, D, E, F, G, H](
 /**
  * Combine 8 rings into a product ring
  */
-class Tuple8Ring[A, B, C, D, E, F, G, H](
-    implicit aring: Ring[A],
+class Tuple8Ring[A, B, C, D, E, F, G, H](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -657,8 +657,8 @@ class Tuple8Ring[A, B, C, D, E, F, G, H](
 /**
  * Combine 9 semigroups into a product semigroup
  */
-class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](
-    implicit asemigroup: Semigroup[A],
+class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -721,8 +721,8 @@ class Tuple9Semigroup[A, B, C, D, E, F, G, H, I](
 /**
  * Combine 9 monoids into a product monoid
  */
-class Tuple9Monoid[A, B, C, D, E, F, G, H, I](
-    implicit amonoid: Monoid[A],
+class Tuple9Monoid[A, B, C, D, E, F, G, H, I](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -750,8 +750,8 @@ class Tuple9Monoid[A, B, C, D, E, F, G, H, I](
 /**
  * Combine 9 groups into a product group
  */
-class Tuple9Group[A, B, C, D, E, F, G, H, I](
-    implicit agroup: Group[A],
+class Tuple9Group[A, B, C, D, E, F, G, H, I](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -794,8 +794,8 @@ class Tuple9Group[A, B, C, D, E, F, G, H, I](
 /**
  * Combine 9 rings into a product ring
  */
-class Tuple9Ring[A, B, C, D, E, F, G, H, I](
-    implicit aring: Ring[A],
+class Tuple9Ring[A, B, C, D, E, F, G, H, I](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -828,8 +828,8 @@ class Tuple9Ring[A, B, C, D, E, F, G, H, I](
 /**
  * Combine 10 semigroups into a product semigroup
  */
-class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](
-    implicit asemigroup: Semigroup[A],
+class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -897,8 +897,8 @@ class Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](
 /**
  * Combine 10 monoids into a product monoid
  */
-class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](
-    implicit amonoid: Monoid[A],
+class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -928,8 +928,8 @@ class Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](
 /**
  * Combine 10 groups into a product group
  */
-class Tuple10Group[A, B, C, D, E, F, G, H, I, J](
-    implicit agroup: Group[A],
+class Tuple10Group[A, B, C, D, E, F, G, H, I, J](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -975,8 +975,8 @@ class Tuple10Group[A, B, C, D, E, F, G, H, I, J](
 /**
  * Combine 10 rings into a product ring
  */
-class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](
-    implicit aring: Ring[A],
+class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1022,8 +1022,8 @@ class Tuple10Ring[A, B, C, D, E, F, G, H, I, J](
 /**
  * Combine 11 semigroups into a product semigroup
  */
-class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](
-    implicit asemigroup: Semigroup[A],
+class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1095,8 +1095,8 @@ class Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](
 /**
  * Combine 11 monoids into a product monoid
  */
-class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](
-    implicit amonoid: Monoid[A],
+class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1128,8 +1128,8 @@ class Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](
 /**
  * Combine 11 groups into a product group
  */
-class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](
-    implicit agroup: Group[A],
+class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1178,8 +1178,8 @@ class Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](
 /**
  * Combine 11 rings into a product ring
  */
-class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](
-    implicit aring: Ring[A],
+class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1228,8 +1228,8 @@ class Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](
 /**
  * Combine 12 semigroups into a product semigroup
  */
-class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](
-    implicit asemigroup: Semigroup[A],
+class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1305,8 +1305,8 @@ class Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](
 /**
  * Combine 12 monoids into a product monoid
  */
-class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](
-    implicit amonoid: Monoid[A],
+class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1340,8 +1340,8 @@ class Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](
 /**
  * Combine 12 groups into a product group
  */
-class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](
-    implicit agroup: Group[A],
+class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1393,8 +1393,8 @@ class Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](
 /**
  * Combine 12 rings into a product ring
  */
-class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](
-    implicit aring: Ring[A],
+class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1446,8 +1446,8 @@ class Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](
 /**
  * Combine 13 semigroups into a product semigroup
  */
-class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](
-    implicit asemigroup: Semigroup[A],
+class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1528,8 +1528,8 @@ class Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](
 /**
  * Combine 13 monoids into a product monoid
  */
-class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](
-    implicit amonoid: Monoid[A],
+class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1565,8 +1565,8 @@ class Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](
 /**
  * Combine 13 groups into a product group
  */
-class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](
-    implicit agroup: Group[A],
+class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1621,8 +1621,8 @@ class Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](
 /**
  * Combine 13 rings into a product ring
  */
-class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](
-    implicit aring: Ring[A],
+class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1677,8 +1677,8 @@ class Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](
 /**
  * Combine 14 semigroups into a product semigroup
  */
-class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-    implicit asemigroup: Semigroup[A],
+class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -1763,8 +1763,8 @@ class Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 /**
  * Combine 14 monoids into a product monoid
  */
-class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-    implicit amonoid: Monoid[A],
+class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -1802,8 +1802,8 @@ class Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 /**
  * Combine 14 groups into a product group
  */
-class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-    implicit agroup: Group[A],
+class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -1863,8 +1863,8 @@ class Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 /**
  * Combine 14 rings into a product ring
  */
-class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-    implicit aring: Ring[A],
+class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -1922,8 +1922,8 @@ class Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
 /**
  * Combine 15 semigroups into a product semigroup
  */
-class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-    implicit asemigroup: Semigroup[A],
+class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2012,8 +2012,8 @@ class Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 /**
  * Combine 15 monoids into a product monoid
  */
-class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-    implicit amonoid: Monoid[A],
+class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2053,8 +2053,8 @@ class Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 /**
  * Combine 15 groups into a product group
  */
-class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-    implicit agroup: Group[A],
+class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2117,8 +2117,8 @@ class Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 /**
  * Combine 15 rings into a product ring
  */
-class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-    implicit aring: Ring[A],
+class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2179,8 +2179,8 @@ class Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
 /**
  * Combine 16 semigroups into a product semigroup
  */
-class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-    implicit asemigroup: Semigroup[A],
+class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2274,8 +2274,8 @@ class Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 /**
  * Combine 16 monoids into a product monoid
  */
-class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-    implicit amonoid: Monoid[A],
+class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2317,8 +2317,8 @@ class Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 /**
  * Combine 16 groups into a product group
  */
-class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-    implicit agroup: Group[A],
+class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2384,8 +2384,8 @@ class Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 /**
  * Combine 16 rings into a product ring
  */
-class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-    implicit aring: Ring[A],
+class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2449,8 +2449,8 @@ class Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
 /**
  * Combine 17 semigroups into a product semigroup
  */
-class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-    implicit asemigroup: Semigroup[A],
+class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2548,8 +2548,8 @@ class Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 /**
  * Combine 17 monoids into a product monoid
  */
-class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-    implicit amonoid: Monoid[A],
+class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2593,8 +2593,8 @@ class Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 /**
  * Combine 17 groups into a product group
  */
-class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-    implicit agroup: Group[A],
+class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2663,8 +2663,8 @@ class Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 /**
  * Combine 17 rings into a product ring
  */
-class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-    implicit aring: Ring[A],
+class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -2731,8 +2731,8 @@ class Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
 /**
  * Combine 18 semigroups into a product semigroup
  */
-class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-    implicit asemigroup: Semigroup[A],
+class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -2834,8 +2834,8 @@ class Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 /**
  * Combine 18 monoids into a product monoid
  */
-class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-    implicit amonoid: Monoid[A],
+class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -2881,8 +2881,8 @@ class Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 /**
  * Combine 18 groups into a product group
  */
-class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-    implicit agroup: Group[A],
+class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -2954,8 +2954,8 @@ class Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 /**
  * Combine 18 rings into a product ring
  */
-class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-    implicit aring: Ring[A],
+class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3025,8 +3025,8 @@ class Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
 /**
  * Combine 19 semigroups into a product semigroup
  */
-class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-    implicit asemigroup: Semigroup[A],
+class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3133,8 +3133,8 @@ class Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 /**
  * Combine 19 monoids into a product monoid
  */
-class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-    implicit amonoid: Monoid[A],
+class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3182,8 +3182,8 @@ class Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 /**
  * Combine 19 groups into a product group
  */
-class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-    implicit agroup: Group[A],
+class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3258,8 +3258,8 @@ class Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 /**
  * Combine 19 rings into a product ring
  */
-class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-    implicit aring: Ring[A],
+class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3332,8 +3332,8 @@ class Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
 /**
  * Combine 20 semigroups into a product semigroup
  */
-class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-    implicit asemigroup: Semigroup[A],
+class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3444,8 +3444,8 @@ class Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 /**
  * Combine 20 monoids into a product monoid
  */
-class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-    implicit amonoid: Monoid[A],
+class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3495,8 +3495,8 @@ class Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
 /**
  * Combine 20 groups into a product group
  */
-class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-    implicit agroup: Group[A],
+class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3574,8 +3574,8 @@ class Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
 /**
  * Combine 20 rings into a product ring
  */
-class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-    implicit aring: Ring[A],
+class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3651,8 +3651,8 @@ class Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
 /**
  * Combine 21 semigroups into a product semigroup
  */
-class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-    implicit asemigroup: Semigroup[A],
+class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -3767,8 +3767,8 @@ class Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 /**
  * Combine 21 monoids into a product monoid
  */
-class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-    implicit amonoid: Monoid[A],
+class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -3820,8 +3820,8 @@ class Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, 
 /**
  * Combine 21 groups into a product group
  */
-class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-    implicit agroup: Group[A],
+class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -3902,8 +3902,8 @@ class Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
 /**
  * Combine 21 rings into a product ring
  */
-class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-    implicit aring: Ring[A],
+class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -3982,8 +3982,8 @@ class Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
 /**
  * Combine 22 semigroups into a product semigroup
  */
-class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-    implicit asemigroup: Semigroup[A],
+class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+    asemigroup: Semigroup[A],
     bsemigroup: Semigroup[B],
     csemigroup: Semigroup[C],
     dsemigroup: Semigroup[D],
@@ -4103,8 +4103,8 @@ class Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
 /**
  * Combine 22 monoids into a product monoid
  */
-class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-    implicit amonoid: Monoid[A],
+class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+    amonoid: Monoid[A],
     bmonoid: Monoid[B],
     cmonoid: Monoid[C],
     dmonoid: Monoid[D],
@@ -4158,8 +4158,8 @@ class Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, 
 /**
  * Combine 22 groups into a product group
  */
-class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-    implicit agroup: Group[A],
+class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+    agroup: Group[A],
     bgroup: Group[B],
     cgroup: Group[C],
     dgroup: Group[D],
@@ -4243,8 +4243,8 @@ class Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
 /**
  * Combine 22 rings into a product ring
  */
-class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-    implicit aring: Ring[A],
+class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+    aring: Ring[A],
     bring: Ring[B],
     cring: Ring[C],
     dring: Ring[D],
@@ -4324,29 +4324,29 @@ class Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
 }
 
 trait GeneratedSemigroupImplicits {
-  implicit def semigroup2[A, B](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup2[A, B](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B]
   ): Semigroup[(A, B)] =
     new Tuple2Semigroup[A, B]()(asemigroup, bsemigroup)
 
-  implicit def semigroup3[A, B, C](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup3[A, B, C](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C]
   ): Semigroup[(A, B, C)] =
     new Tuple3Semigroup[A, B, C]()(asemigroup, bsemigroup, csemigroup)
 
-  implicit def semigroup4[A, B, C, D](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup4[A, B, C, D](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D]
   ): Semigroup[(A, B, C, D)] =
     new Tuple4Semigroup[A, B, C, D]()(asemigroup, bsemigroup, csemigroup, dsemigroup)
 
-  implicit def semigroup5[A, B, C, D, E](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup5[A, B, C, D, E](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4354,8 +4354,8 @@ trait GeneratedSemigroupImplicits {
   ): Semigroup[(A, B, C, D, E)] =
     new Tuple5Semigroup[A, B, C, D, E]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup)
 
-  implicit def semigroup6[A, B, C, D, E, F](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup6[A, B, C, D, E, F](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4371,8 +4371,8 @@ trait GeneratedSemigroupImplicits {
       fsemigroup
     )
 
-  implicit def semigroup7[A, B, C, D, E, F, G](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup7[A, B, C, D, E, F, G](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4390,8 +4390,8 @@ trait GeneratedSemigroupImplicits {
       gsemigroup
     )
 
-  implicit def semigroup8[A, B, C, D, E, F, G, H](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup8[A, B, C, D, E, F, G, H](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4411,8 +4411,8 @@ trait GeneratedSemigroupImplicits {
       hsemigroup
     )
 
-  implicit def semigroup9[A, B, C, D, E, F, G, H, I](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup9[A, B, C, D, E, F, G, H, I](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4434,8 +4434,8 @@ trait GeneratedSemigroupImplicits {
       isemigroup
     )
 
-  implicit def semigroup10[A, B, C, D, E, F, G, H, I, J](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup10[A, B, C, D, E, F, G, H, I, J](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4459,8 +4459,8 @@ trait GeneratedSemigroupImplicits {
       jsemigroup
     )
 
-  implicit def semigroup11[A, B, C, D, E, F, G, H, I, J, K](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup11[A, B, C, D, E, F, G, H, I, J, K](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4486,8 +4486,8 @@ trait GeneratedSemigroupImplicits {
       ksemigroup
     )
 
-  implicit def semigroup12[A, B, C, D, E, F, G, H, I, J, K, L](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup12[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4515,8 +4515,8 @@ trait GeneratedSemigroupImplicits {
       lsemigroup
     )
 
-  implicit def semigroup13[A, B, C, D, E, F, G, H, I, J, K, L, M](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4546,8 +4546,8 @@ trait GeneratedSemigroupImplicits {
       msemigroup
     )
 
-  implicit def semigroup14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4579,8 +4579,8 @@ trait GeneratedSemigroupImplicits {
       nsemigroup
     )
 
-  implicit def semigroup15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4614,8 +4614,8 @@ trait GeneratedSemigroupImplicits {
       osemigroup
     )
 
-  implicit def semigroup16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4651,8 +4651,8 @@ trait GeneratedSemigroupImplicits {
       psemigroup
     )
 
-  implicit def semigroup17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4690,8 +4690,8 @@ trait GeneratedSemigroupImplicits {
       qsemigroup
     )
 
-  implicit def semigroup18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4731,8 +4731,8 @@ trait GeneratedSemigroupImplicits {
       rsemigroup
     )
 
-  implicit def semigroup19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4774,8 +4774,8 @@ trait GeneratedSemigroupImplicits {
       ssemigroup
     )
 
-  implicit def semigroup20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4819,8 +4819,8 @@ trait GeneratedSemigroupImplicits {
       tsemigroup
     )
 
-  implicit def semigroup21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4866,8 +4866,8 @@ trait GeneratedSemigroupImplicits {
       usemigroup
     )
 
-  implicit def semigroup22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      implicit asemigroup: Semigroup[A],
+  implicit def semigroup22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+      asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D],
@@ -4921,23 +4921,23 @@ trait GeneratedMonoidImplicits {
   implicit def monoid2[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B]): Monoid[(A, B)] =
     new Tuple2Monoid[A, B]()(amonoid, bmonoid)
 
-  implicit def monoid3[A, B, C](
-      implicit amonoid: Monoid[A],
+  implicit def monoid3[A, B, C](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C]
   ): Monoid[(A, B, C)] =
     new Tuple3Monoid[A, B, C]()(amonoid, bmonoid, cmonoid)
 
-  implicit def monoid4[A, B, C, D](
-      implicit amonoid: Monoid[A],
+  implicit def monoid4[A, B, C, D](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D]
   ): Monoid[(A, B, C, D)] =
     new Tuple4Monoid[A, B, C, D]()(amonoid, bmonoid, cmonoid, dmonoid)
 
-  implicit def monoid5[A, B, C, D, E](
-      implicit amonoid: Monoid[A],
+  implicit def monoid5[A, B, C, D, E](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -4945,8 +4945,8 @@ trait GeneratedMonoidImplicits {
   ): Monoid[(A, B, C, D, E)] =
     new Tuple5Monoid[A, B, C, D, E]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid)
 
-  implicit def monoid6[A, B, C, D, E, F](
-      implicit amonoid: Monoid[A],
+  implicit def monoid6[A, B, C, D, E, F](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -4955,8 +4955,8 @@ trait GeneratedMonoidImplicits {
   ): Monoid[(A, B, C, D, E, F)] =
     new Tuple6Monoid[A, B, C, D, E, F]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid)
 
-  implicit def monoid7[A, B, C, D, E, F, G](
-      implicit amonoid: Monoid[A],
+  implicit def monoid7[A, B, C, D, E, F, G](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -4966,8 +4966,8 @@ trait GeneratedMonoidImplicits {
   ): Monoid[(A, B, C, D, E, F, G)] =
     new Tuple7Monoid[A, B, C, D, E, F, G]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid)
 
-  implicit def monoid8[A, B, C, D, E, F, G, H](
-      implicit amonoid: Monoid[A],
+  implicit def monoid8[A, B, C, D, E, F, G, H](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -4987,8 +4987,8 @@ trait GeneratedMonoidImplicits {
       hmonoid
     )
 
-  implicit def monoid9[A, B, C, D, E, F, G, H, I](
-      implicit amonoid: Monoid[A],
+  implicit def monoid9[A, B, C, D, E, F, G, H, I](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5010,8 +5010,8 @@ trait GeneratedMonoidImplicits {
       imonoid
     )
 
-  implicit def monoid10[A, B, C, D, E, F, G, H, I, J](
-      implicit amonoid: Monoid[A],
+  implicit def monoid10[A, B, C, D, E, F, G, H, I, J](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5035,8 +5035,8 @@ trait GeneratedMonoidImplicits {
       jmonoid
     )
 
-  implicit def monoid11[A, B, C, D, E, F, G, H, I, J, K](
-      implicit amonoid: Monoid[A],
+  implicit def monoid11[A, B, C, D, E, F, G, H, I, J, K](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5062,8 +5062,8 @@ trait GeneratedMonoidImplicits {
       kmonoid
     )
 
-  implicit def monoid12[A, B, C, D, E, F, G, H, I, J, K, L](
-      implicit amonoid: Monoid[A],
+  implicit def monoid12[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5091,8 +5091,8 @@ trait GeneratedMonoidImplicits {
       lmonoid
     )
 
-  implicit def monoid13[A, B, C, D, E, F, G, H, I, J, K, L, M](
-      implicit amonoid: Monoid[A],
+  implicit def monoid13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5122,8 +5122,8 @@ trait GeneratedMonoidImplicits {
       mmonoid
     )
 
-  implicit def monoid14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-      implicit amonoid: Monoid[A],
+  implicit def monoid14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5155,8 +5155,8 @@ trait GeneratedMonoidImplicits {
       nmonoid
     )
 
-  implicit def monoid15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-      implicit amonoid: Monoid[A],
+  implicit def monoid15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5190,8 +5190,8 @@ trait GeneratedMonoidImplicits {
       omonoid
     )
 
-  implicit def monoid16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      implicit amonoid: Monoid[A],
+  implicit def monoid16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5227,8 +5227,8 @@ trait GeneratedMonoidImplicits {
       pmonoid
     )
 
-  implicit def monoid17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      implicit amonoid: Monoid[A],
+  implicit def monoid17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5266,8 +5266,8 @@ trait GeneratedMonoidImplicits {
       qmonoid
     )
 
-  implicit def monoid18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      implicit amonoid: Monoid[A],
+  implicit def monoid18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5307,8 +5307,8 @@ trait GeneratedMonoidImplicits {
       rmonoid
     )
 
-  implicit def monoid19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      implicit amonoid: Monoid[A],
+  implicit def monoid19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5350,8 +5350,8 @@ trait GeneratedMonoidImplicits {
       smonoid
     )
 
-  implicit def monoid20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-      implicit amonoid: Monoid[A],
+  implicit def monoid20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5395,8 +5395,8 @@ trait GeneratedMonoidImplicits {
       tmonoid
     )
 
-  implicit def monoid21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      implicit amonoid: Monoid[A],
+  implicit def monoid21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5442,8 +5442,8 @@ trait GeneratedMonoidImplicits {
       umonoid
     )
 
-  implicit def monoid22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      implicit amonoid: Monoid[A],
+  implicit def monoid22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+      amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C],
       dmonoid: Monoid[D],
@@ -5497,23 +5497,23 @@ trait GeneratedGroupImplicits {
   implicit def group2[A, B](implicit agroup: Group[A], bgroup: Group[B]): Group[(A, B)] =
     new Tuple2Group[A, B]()(agroup, bgroup)
 
-  implicit def group3[A, B, C](
-      implicit agroup: Group[A],
+  implicit def group3[A, B, C](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C]
   ): Group[(A, B, C)] =
     new Tuple3Group[A, B, C]()(agroup, bgroup, cgroup)
 
-  implicit def group4[A, B, C, D](
-      implicit agroup: Group[A],
+  implicit def group4[A, B, C, D](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D]
   ): Group[(A, B, C, D)] =
     new Tuple4Group[A, B, C, D]()(agroup, bgroup, cgroup, dgroup)
 
-  implicit def group5[A, B, C, D, E](
-      implicit agroup: Group[A],
+  implicit def group5[A, B, C, D, E](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5521,8 +5521,8 @@ trait GeneratedGroupImplicits {
   ): Group[(A, B, C, D, E)] =
     new Tuple5Group[A, B, C, D, E]()(agroup, bgroup, cgroup, dgroup, egroup)
 
-  implicit def group6[A, B, C, D, E, F](
-      implicit agroup: Group[A],
+  implicit def group6[A, B, C, D, E, F](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5531,8 +5531,8 @@ trait GeneratedGroupImplicits {
   ): Group[(A, B, C, D, E, F)] =
     new Tuple6Group[A, B, C, D, E, F]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup)
 
-  implicit def group7[A, B, C, D, E, F, G](
-      implicit agroup: Group[A],
+  implicit def group7[A, B, C, D, E, F, G](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5542,8 +5542,8 @@ trait GeneratedGroupImplicits {
   ): Group[(A, B, C, D, E, F, G)] =
     new Tuple7Group[A, B, C, D, E, F, G]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup)
 
-  implicit def group8[A, B, C, D, E, F, G, H](
-      implicit agroup: Group[A],
+  implicit def group8[A, B, C, D, E, F, G, H](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5554,8 +5554,8 @@ trait GeneratedGroupImplicits {
   ): Group[(A, B, C, D, E, F, G, H)] =
     new Tuple8Group[A, B, C, D, E, F, G, H]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup)
 
-  implicit def group9[A, B, C, D, E, F, G, H, I](
-      implicit agroup: Group[A],
+  implicit def group9[A, B, C, D, E, F, G, H, I](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5577,8 +5577,8 @@ trait GeneratedGroupImplicits {
       igroup
     )
 
-  implicit def group10[A, B, C, D, E, F, G, H, I, J](
-      implicit agroup: Group[A],
+  implicit def group10[A, B, C, D, E, F, G, H, I, J](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5602,8 +5602,8 @@ trait GeneratedGroupImplicits {
       jgroup
     )
 
-  implicit def group11[A, B, C, D, E, F, G, H, I, J, K](
-      implicit agroup: Group[A],
+  implicit def group11[A, B, C, D, E, F, G, H, I, J, K](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5629,8 +5629,8 @@ trait GeneratedGroupImplicits {
       kgroup
     )
 
-  implicit def group12[A, B, C, D, E, F, G, H, I, J, K, L](
-      implicit agroup: Group[A],
+  implicit def group12[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5658,8 +5658,8 @@ trait GeneratedGroupImplicits {
       lgroup
     )
 
-  implicit def group13[A, B, C, D, E, F, G, H, I, J, K, L, M](
-      implicit agroup: Group[A],
+  implicit def group13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5689,8 +5689,8 @@ trait GeneratedGroupImplicits {
       mgroup
     )
 
-  implicit def group14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-      implicit agroup: Group[A],
+  implicit def group14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5722,8 +5722,8 @@ trait GeneratedGroupImplicits {
       ngroup
     )
 
-  implicit def group15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-      implicit agroup: Group[A],
+  implicit def group15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5757,8 +5757,8 @@ trait GeneratedGroupImplicits {
       ogroup
     )
 
-  implicit def group16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      implicit agroup: Group[A],
+  implicit def group16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5794,8 +5794,8 @@ trait GeneratedGroupImplicits {
       pgroup
     )
 
-  implicit def group17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      implicit agroup: Group[A],
+  implicit def group17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5833,8 +5833,8 @@ trait GeneratedGroupImplicits {
       qgroup
     )
 
-  implicit def group18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      implicit agroup: Group[A],
+  implicit def group18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5874,8 +5874,8 @@ trait GeneratedGroupImplicits {
       rgroup
     )
 
-  implicit def group19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      implicit agroup: Group[A],
+  implicit def group19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5917,8 +5917,8 @@ trait GeneratedGroupImplicits {
       sgroup
     )
 
-  implicit def group20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-      implicit agroup: Group[A],
+  implicit def group20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -5962,8 +5962,8 @@ trait GeneratedGroupImplicits {
       tgroup
     )
 
-  implicit def group21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      implicit agroup: Group[A],
+  implicit def group21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6009,8 +6009,8 @@ trait GeneratedGroupImplicits {
       ugroup
     )
 
-  implicit def group22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      implicit agroup: Group[A],
+  implicit def group22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+      agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C],
       dgroup: Group[D],
@@ -6067,16 +6067,16 @@ trait GeneratedRingImplicits {
   implicit def ring3[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C]): Ring[(A, B, C)] =
     new Tuple3Ring[A, B, C]()(aring, bring, cring)
 
-  implicit def ring4[A, B, C, D](
-      implicit aring: Ring[A],
+  implicit def ring4[A, B, C, D](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D]
   ): Ring[(A, B, C, D)] =
     new Tuple4Ring[A, B, C, D]()(aring, bring, cring, dring)
 
-  implicit def ring5[A, B, C, D, E](
-      implicit aring: Ring[A],
+  implicit def ring5[A, B, C, D, E](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6084,8 +6084,8 @@ trait GeneratedRingImplicits {
   ): Ring[(A, B, C, D, E)] =
     new Tuple5Ring[A, B, C, D, E]()(aring, bring, cring, dring, ering)
 
-  implicit def ring6[A, B, C, D, E, F](
-      implicit aring: Ring[A],
+  implicit def ring6[A, B, C, D, E, F](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6094,8 +6094,8 @@ trait GeneratedRingImplicits {
   ): Ring[(A, B, C, D, E, F)] =
     new Tuple6Ring[A, B, C, D, E, F]()(aring, bring, cring, dring, ering, fring)
 
-  implicit def ring7[A, B, C, D, E, F, G](
-      implicit aring: Ring[A],
+  implicit def ring7[A, B, C, D, E, F, G](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6105,8 +6105,8 @@ trait GeneratedRingImplicits {
   ): Ring[(A, B, C, D, E, F, G)] =
     new Tuple7Ring[A, B, C, D, E, F, G]()(aring, bring, cring, dring, ering, fring, gring)
 
-  implicit def ring8[A, B, C, D, E, F, G, H](
-      implicit aring: Ring[A],
+  implicit def ring8[A, B, C, D, E, F, G, H](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6117,8 +6117,8 @@ trait GeneratedRingImplicits {
   ): Ring[(A, B, C, D, E, F, G, H)] =
     new Tuple8Ring[A, B, C, D, E, F, G, H]()(aring, bring, cring, dring, ering, fring, gring, hring)
 
-  implicit def ring9[A, B, C, D, E, F, G, H, I](
-      implicit aring: Ring[A],
+  implicit def ring9[A, B, C, D, E, F, G, H, I](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6130,8 +6130,8 @@ trait GeneratedRingImplicits {
   ): Ring[(A, B, C, D, E, F, G, H, I)] =
     new Tuple9Ring[A, B, C, D, E, F, G, H, I]()(aring, bring, cring, dring, ering, fring, gring, hring, iring)
 
-  implicit def ring10[A, B, C, D, E, F, G, H, I, J](
-      implicit aring: Ring[A],
+  implicit def ring10[A, B, C, D, E, F, G, H, I, J](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6155,8 +6155,8 @@ trait GeneratedRingImplicits {
       jring
     )
 
-  implicit def ring11[A, B, C, D, E, F, G, H, I, J, K](
-      implicit aring: Ring[A],
+  implicit def ring11[A, B, C, D, E, F, G, H, I, J, K](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6182,8 +6182,8 @@ trait GeneratedRingImplicits {
       kring
     )
 
-  implicit def ring12[A, B, C, D, E, F, G, H, I, J, K, L](
-      implicit aring: Ring[A],
+  implicit def ring12[A, B, C, D, E, F, G, H, I, J, K, L](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6211,8 +6211,8 @@ trait GeneratedRingImplicits {
       lring
     )
 
-  implicit def ring13[A, B, C, D, E, F, G, H, I, J, K, L, M](
-      implicit aring: Ring[A],
+  implicit def ring13[A, B, C, D, E, F, G, H, I, J, K, L, M](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6242,8 +6242,8 @@ trait GeneratedRingImplicits {
       mring
     )
 
-  implicit def ring14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-      implicit aring: Ring[A],
+  implicit def ring14[A, B, C, D, E, F, G, H, I, J, K, L, M, N](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6275,8 +6275,8 @@ trait GeneratedRingImplicits {
       nring
     )
 
-  implicit def ring15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-      implicit aring: Ring[A],
+  implicit def ring15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6310,8 +6310,8 @@ trait GeneratedRingImplicits {
       oring
     )
 
-  implicit def ring16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      implicit aring: Ring[A],
+  implicit def ring16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6347,8 +6347,8 @@ trait GeneratedRingImplicits {
       pring
     )
 
-  implicit def ring17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      implicit aring: Ring[A],
+  implicit def ring17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6386,8 +6386,8 @@ trait GeneratedRingImplicits {
       qring
     )
 
-  implicit def ring18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      implicit aring: Ring[A],
+  implicit def ring18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6427,8 +6427,8 @@ trait GeneratedRingImplicits {
       rring
     )
 
-  implicit def ring19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      implicit aring: Ring[A],
+  implicit def ring19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6470,8 +6470,8 @@ trait GeneratedRingImplicits {
       sring
     )
 
-  implicit def ring20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-      implicit aring: Ring[A],
+  implicit def ring20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6515,8 +6515,8 @@ trait GeneratedRingImplicits {
       tring
     )
 
-  implicit def ring21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      implicit aring: Ring[A],
+  implicit def ring21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],
@@ -6562,8 +6562,8 @@ trait GeneratedRingImplicits {
       uring
     )
 
-  implicit def ring22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      implicit aring: Ring[A],
+  implicit def ring22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](implicit
+      aring: Ring[A],
       bring: Ring[B],
       cring: Ring[C],
       dring: Ring[D],

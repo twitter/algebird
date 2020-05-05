@@ -66,11 +66,14 @@ class CombinatorTest extends CheckProperties {
   // Make sure the sets start sorted:
   implicit def topKArb: Arbitrary[(Map[Int, Int], Set[Int])] =
     Arbitrary {
-      for (s <- Arbitrary.arbitrary[List[Int]];
-           smallvals = s.map(_ % 31);
-           m = smallvals
-             .groupBy(s => s)
-             .mapValues(_.size))
+      for (
+        s <- Arbitrary.arbitrary[List[Int]];
+        smallvals = s.map(_ % 31);
+        m =
+          smallvals
+            .groupBy(s => s)
+            .mapValues(_.size)
+      )
         yield monTopK.plus(monTopK.zero, (m.toMap, smallvals.toSet))
     }
   property("MonoidCombinator with top-K forms a Monoid") {

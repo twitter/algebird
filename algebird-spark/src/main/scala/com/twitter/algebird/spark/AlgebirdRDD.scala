@@ -92,8 +92,8 @@ class AlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
    * requires a commutative Semigroup. To generalize to non-commutative, we need a sorted partition for
    * T.
    */
-  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](
-      implicit ev: T <:< (K, V),
+  def sumByKey[K: ClassTag, V: ClassTag: Semigroup](implicit
+      ev: T <:< (K, V),
       ord: Priority[Ordering[K], DummyImplicit]
   ): RDD[(K, V)] =
     sumByKey(Partitioner.defaultPartitioner(rdd))

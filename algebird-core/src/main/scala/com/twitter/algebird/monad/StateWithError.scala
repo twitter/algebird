@@ -32,8 +32,8 @@ sealed trait StateWithError[S, +F, +T] {
   ): StateWithError[S, F1, (T, U)] =
     join(that)(Semigroup.from(mergeErr), Semigroup.from(mergeState))
 
-  def join[F1 >: F, U](that: StateWithError[S, F1, U])(
-      implicit sgf: Semigroup[F1],
+  def join[F1 >: F, U](that: StateWithError[S, F1, U])(implicit
+      sgf: Semigroup[F1],
       sgs: Semigroup[S]
   ): // TODO: deep joins could blow the stack, not yet using trampoline here
   StateWithError[S, F1, (T, U)] =

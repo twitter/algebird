@@ -239,13 +239,16 @@ object MapAlgebra {
   /** join the keys of two maps (similar to outer-join in a DB) */
   def join[K, V, W](map1: Map[K, V], map2: Map[K, W]): Map[K, (Option[V], Option[W])] =
     Monoid
-      .plus(map1.transform {
-        case (_, v) =>
-          (List(v), List[W]())
-      }, map2.transform {
-        case (_, w) =>
-          (List[V](), List(w))
-      })
+      .plus(
+        map1.transform {
+          case (_, v) =>
+            (List(v), List[W]())
+        },
+        map2.transform {
+          case (_, w) =>
+            (List[V](), List(w))
+        }
+      )
       .transform { case (_, (v, w)) => (v.headOption, w.headOption) }
 
   /**

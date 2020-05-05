@@ -14,20 +14,20 @@ class RightFolded2Test extends CheckProperties {
   implicit val rightFoldedMonoid =
     RightFolded2.monoid[Int, Long, Long](mapFn)(monFold)
 
-  def rightFolded2Value[In, Out, Acc](
-      implicit arbout: Arbitrary[Out],
+  def rightFolded2Value[In, Out, Acc](implicit
+      arbout: Arbitrary[Out],
       mon: RightFolded2Monoid[In, Out, Acc]
   ): Gen[RightFoldedValue2[In, Out, Acc]] =
     for (v <- arbout.arbitrary) yield mon.init(v)
 
-  def rightFolded2ToFold[In, Out, Acc](
-      implicit arbin: Arbitrary[In],
+  def rightFolded2ToFold[In, Out, Acc](implicit
+      arbin: Arbitrary[In],
       mon: RightFolded2Monoid[In, Out, Acc]
   ): Gen[RightFoldedToFold2[In]] =
     for (v <- arbin.arbitrary) yield mon.toFold(v)
 
-  implicit def rightFolded2[In, Out, Acc](
-      implicit arbin: Arbitrary[In],
+  implicit def rightFolded2[In, Out, Acc](implicit
+      arbin: Arbitrary[In],
       arbout: Arbitrary[Out],
       mon: RightFolded2Monoid[In, Out, Acc]
   ): Arbitrary[RightFolded2[In, Out, Acc]] =

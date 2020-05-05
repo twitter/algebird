@@ -37,8 +37,8 @@ case class SketchMapHash[K](hasher: CMSHash[Long], seed: Int)(implicit serializa
 /**
  * Responsible for creating instances of SketchMap.
  */
-class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
-    implicit valueOrdering: Ordering[V],
+class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit
+    valueOrdering: Ordering[V],
     monoid: Monoid[V]
 ) extends Monoid[SketchMap[K, V]]
     with CommutativeMonoid[SketchMap[K, V]] {
@@ -134,8 +134,8 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(
 /**
  * Convenience class for holding constant parameters of a Sketch Map.
  */
-case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)(
-    implicit serialization: K => Array[Byte]
+case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCount: Int)(implicit
+    serialization: K => Array[Byte]
 ) {
   assert(0 < width, "width must be greater than 0")
   assert(0 < depth, "depth must be greater than 0")
@@ -177,8 +177,8 @@ object SketchMapParams {
   /**
    * Overloaded apply method for convenience.
    */
-  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)(
-      implicit serialization: K => Array[Byte]
+  def apply[K](seed: Int, eps: Double, delta: Double, heavyHittersCount: Int)(implicit
+      serialization: K => Array[Byte]
   ): SketchMapParams[K] =
     SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
 

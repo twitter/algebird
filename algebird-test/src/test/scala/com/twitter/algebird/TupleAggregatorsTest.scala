@@ -194,7 +194,22 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 14 aggregators" in {
-      val agg: Aggregator[Int, Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple14[
+      val agg: Aggregator[Int, Tuple14[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple14[
         Int,
         Int,
         Int,
@@ -844,7 +859,22 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 14 aggregators" in {
-      val agg: Aggregator[Int, Tuple14[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Tuple14[
+      val agg: Aggregator[Int, Tuple14[
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Tuple14[
         Int,
         Int,
         Int,
@@ -1428,7 +1458,18 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create a MonoidAggregator from a tuple of 10 MonoidAggregators" in {
-      val agg: MonoidAggregator[Long, Tuple10[Long, Long, Long, Long, Long, Long, Long, Long, Long, Long], Tuple10[
+      val agg: MonoidAggregator[Long, Tuple10[
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long,
+        Long
+      ], Tuple10[
         Long,
         Long,
         Long,
@@ -2352,7 +2393,22 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create an aggregator from 14 (key, aggregator) pairs" in {
-      val agg: Aggregator[Int, Tuple14[Long, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int], Map[
+      val agg: Aggregator[Int, Tuple14[
+        Long,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
+      ], Map[
         String,
         Long
       ]] = MapAggregator(

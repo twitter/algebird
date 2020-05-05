@@ -37,8 +37,8 @@ import scala.collection.compat._
  * @param E eventual type
  * @param O original type
  */
-class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
-    implicit eventualSemigroup: Semigroup[E],
+class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
+    eventualSemigroup: Semigroup[E],
     originalSemigroup: Semigroup[O]
 ) extends Semigroup[Either[E, O]] {
 
@@ -124,8 +124,8 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 /**
  * @see EventuallySemigroup
  */
-class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(
-    implicit lSemigroup: Semigroup[E],
+class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
+    lSemigroup: Semigroup[E],
     rMonoid: Monoid[O]
 ) extends EventuallySemigroup[E, O](convert)(mustConvert)
     with Monoid[Either[E, O]] {
@@ -137,8 +137,8 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(
 /**
  * @see EventuallySemigroup
  */
-class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
-    implicit lGroup: Group[E],
+class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
+    lGroup: Group[E],
     rGroup: Group[O]
 ) extends EventuallyMonoid[E, O](convert)(mustConvert)
     with Group[Either[E, O]] {
@@ -156,8 +156,8 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(
 /**
  * @see EventuallySemigroup
  */
-class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(
-    implicit lRing: Ring[E],
+class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
+    lRing: Ring[E],
     rRing: Ring[O]
 ) extends EventuallyGroup[E, O](convert)(mustConvert)
     with Ring[Either[E, O]] {

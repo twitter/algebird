@@ -101,9 +101,13 @@ case class ExpHist(
    * into this exponential histogram instance.
    */
   def fold: Fold[Bucket, ExpHist] =
-    Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist]({
-      case (b, bucket) => b += bucket
-    }, _ => Vector.newBuilder[Bucket], x => addAll(x.result))
+    Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist](
+      {
+        case (b, bucket) => b += bucket
+      },
+      _ => Vector.newBuilder[Bucket],
+      x => addAll(x.result)
+    )
 
   // This internal method assumes that the instance is stepped forward
   // already, and does NOT try to step internally. It also assumes

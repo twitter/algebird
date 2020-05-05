@@ -136,7 +136,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
 
   override val zero: AveragedValue = AveragedValue(0L, 0.0)
 
-  override def isNonZero(av: AveragedValue): Boolean = (av.count != 0L)
+  override def isNonZero(av: AveragedValue): Boolean = av.count != 0L
 
   override def negate(av: AveragedValue): AveragedValue = -av
 

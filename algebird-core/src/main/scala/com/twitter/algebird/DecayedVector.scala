@@ -54,14 +54,14 @@ object DecayedVector extends CompatDecayedVector {
   )(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
     monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
 
-  implicit def mapMonoid[K](
-      implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+  implicit def mapMonoid[K](implicit
+      vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
       metric: Metric[Map[K, Double]]
   ) =
     mapMonoidWithEpsilon(-1.0)
 
-  def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(
-      implicit vs: VectorSpace[Double, C],
+  def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(implicit
+      vs: VectorSpace[Double, C],
       metric: Metric[C[Double]]
   ): DecayedVector[C] = {
     implicit val mon: Monoid[C[Double]] = vs.group

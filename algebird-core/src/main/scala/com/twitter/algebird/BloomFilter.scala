@@ -299,7 +299,7 @@ object BF {
 
                 var pos = 0
 
-                override def hasNext: Boolean = (pos < len)
+                override def hasNext: Boolean = pos < len
                 override def next: Int = {
                   val n = uniqVs(pos)
                   pos += 1
