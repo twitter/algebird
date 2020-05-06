@@ -39,8 +39,11 @@ case class MurmurHash128(seed: Long) extends AnyVal {
     apply(8, _.asDoubleBuffer.put(value))
 
   def apply(string: CharSequence): (Long, Long) =
-    apply(string.length * 2, { buffer =>
-      val charBuffer = buffer.asCharBuffer
-      0.to(string.length - 1).foreach(i => charBuffer.put(string.charAt(i)))
-    })
+    apply(
+      string.length * 2,
+      { buffer =>
+        val charBuffer = buffer.asCharBuffer
+        0.to(string.length - 1).foreach(i => charBuffer.put(string.charAt(i)))
+      }
+    )
 }

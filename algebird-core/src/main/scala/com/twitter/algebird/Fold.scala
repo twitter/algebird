@@ -83,11 +83,15 @@ sealed trait Fold[-I, +O] extends Serializable {
       override def build(): FoldState[X, I2, Q] = {
         val first = self.build()
         val second = other.build()
-        new FoldState({
-          case ((x, y), i) => (first.add(x, i), second.add(y, i))
-        }, (first.start, second.start), {
-          case (x, y) => f(first.end(x), second.end(y))
-        })
+        new FoldState(
+          {
+            case ((x, y), i) => (first.add(x, i), second.add(y, i))
+          },
+          (first.start, second.start),
+          {
+            case (x, y) => f(first.end(x), second.end(y))
+          }
+        )
       }
     }
   }
@@ -231,7 +235,7 @@ object Fold extends CompatFold {
         val starts: Seq[Any] =
           bs.map(_.start)
         val add: (Seq[Any], I) => Seq[Any] = { (xs, i) => adds.zip(xs).map { case (f, x) => f(x, i) } }
-        val end: (Seq[Any] => Seq[O]) = { xs => ends.zip(xs).map { case (f, x)           => f(x) } }
+        val end: (Seq[Any] => Seq[O]) = { xs => ends.zip(xs).map { case (f, x) => f(x) } }
         new FoldState(add, starts, end)
       }
     }
@@ -276,9 +280,9 @@ object Fold extends CompatFold {
    */
   def max[I](implicit ordering: Ordering[I]): Fold[I, Option[I]] =
     Fold.foldLeft[I, Option[I]](None) {
-      case (None, i)                                    => Some(i)
-      case (Some(y), i) if (ordering.compare(y, i) < 0) => Some(i)
-      case (x, _)                                       => x
+      case (None, i)                                  => Some(i)
+      case (Some(y), i) if ordering.compare(y, i) < 0 => Some(i)
+      case (x, _)                                     => x
     }
 
   /**
@@ -286,9 +290,9 @@ object Fold extends CompatFold {
    */
   def min[I](implicit ordering: Ordering[I]): Fold[I, Option[I]] =
     Fold.foldLeft[I, Option[I]](None) {
-      case (None, i)                                    => Some(i)
-      case (Some(y), i) if (ordering.compare(y, i) > 0) => Some(i)
-      case (x, _)                                       => x
+      case (None, i)                                  => Some(i)
+      case (Some(y), i) if ordering.compare(y, i) > 0 => Some(i)
+      case (x, _)                                     => x
     }
 
   /**

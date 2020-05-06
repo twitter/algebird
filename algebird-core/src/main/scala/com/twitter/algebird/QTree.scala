@@ -122,8 +122,8 @@ object QTree {
     )
   }
 
-  private def mergeOptions[A](aNullable: QTree[A], bNullable: QTree[A])(
-      implicit monoid: Monoid[A]
+  private def mergeOptions[A](aNullable: QTree[A], bNullable: QTree[A])(implicit
+      monoid: Monoid[A]
   ): QTree[A] =
     if (aNullable != null) {
       if (bNullable != null) {
@@ -485,8 +485,11 @@ object QTreeAggregator {
  * The items that are iterated over to produce this approximation cannot be negative.
  * Returns an Intersection which represents the bounded approximation.
  */
-case class QTreeAggregator[T](override val percentile: Double, override val k: Int = QTreeAggregator.DefaultK)(
-    implicit override val num: Numeric[T]
+case class QTreeAggregator[T](
+    override val percentile: Double,
+    override val k: Int = QTreeAggregator.DefaultK
+)(implicit
+    override val num: Numeric[T]
 ) extends Aggregator[T, QTree[Unit], Intersection[InclusiveLower, InclusiveUpper, Double]]
     with QTreeAggregatorLike[T] {
 
@@ -505,8 +508,8 @@ case class QTreeAggregator[T](override val percentile: Double, override val k: I
 case class QTreeAggregatorLowerBound[T](
     override val percentile: Double,
     override val k: Int = QTreeAggregator.DefaultK
-)(
-    implicit override val num: Numeric[T]
+)(implicit
+    override val num: Numeric[T]
 ) extends Aggregator[T, QTree[Unit], Double]
     with QTreeAggregatorLike[T] {
 

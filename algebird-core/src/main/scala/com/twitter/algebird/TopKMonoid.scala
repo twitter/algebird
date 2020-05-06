@@ -22,8 +22,8 @@ case class TopK[N](size: Int, items: List[N], max: Option[N])
 object TopKMonoid extends java.io.Serializable {
   // Does a merge sort and returns the reversed list
   @tailrec
-  private[algebird] def mergeSortR[T](acc: List[T], list1: List[T], list2: List[T], cnt: Int)(
-      implicit ord: Ordering[T]
+  private[algebird] def mergeSortR[T](acc: List[T], list1: List[T], list2: List[T], cnt: Int)(implicit
+      ord: Ordering[T]
   ): List[T] =
     (list1, list2, cnt) match {
       case (_, _, 0) => acc

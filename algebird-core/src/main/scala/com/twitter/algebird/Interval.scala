@@ -385,8 +385,8 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
    * it this way, it does not mean it is empty or universe, etc... (there
    * are other cases).
    */
-  def toLeftClosedRightOpen(
-      implicit s: Successible[T]
+  def toLeftClosedRightOpen(implicit
+      s: Successible[T]
   ): Option[Intersection[InclusiveLower, ExclusiveUpper, T]] =
     for {
       l <- lower.least

@@ -186,9 +186,9 @@ sealed trait AdaptiveVector[V] extends IndexedSeq[V] {
   /** Iterator of indices and values of all non-sparse values */
   def denseIterator: Iterator[(Int, V)]
   /*
- * Note that IndexedSeq provides hashCode and equals that
- * work correctly based on length and apply.
- */
+   * Note that IndexedSeq provides hashCode and equals that
+   * work correctly based on length and apply.
+   */
 }
 
 case class DenseVector[V](iseq: Vector[V], override val sparseValue: V, override val denseCount: Int)

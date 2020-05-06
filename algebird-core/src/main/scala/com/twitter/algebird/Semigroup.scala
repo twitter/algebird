@@ -156,8 +156,8 @@ object Semigroup
   }
 
   @tailrec
-  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(
-      implicit sg: Semigroup[T]
+  private def intTimesRec[T](i: BigInt, v: T, pow: Int, vaccMemo: (T, Vector[T]))(implicit
+      sg: Semigroup[T]
   ): T =
     if (i == 0) {
       vaccMemo._1

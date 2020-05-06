@@ -15,8 +15,7 @@ abstract class Shapeless3 extends Shapeless2 {
   /**
    * Pairwise ring for arbitrary heterogeneous lists (HList).
    */
-  implicit def hconsRing[A, B <: HList](
-      implicit
+  implicit def hconsRing[A, B <: HList](implicit
       a: Ring[A],
       lb: Lazy[Ring[B]]
   ): Ring[A :: B] =
@@ -40,8 +39,7 @@ abstract class Shapeless2 extends Shapeless1 {
   /**
    * Pairwise group for arbitrary heterogeneous lists (HList).
    */
-  implicit def hconsGroup[A, B <: HList](
-      implicit
+  implicit def hconsGroup[A, B <: HList](implicit
       a: Group[A],
       lb: Lazy[Group[B]]
   ): Group[A :: B] =
@@ -65,8 +63,7 @@ abstract class Shapeless1 extends Shapeless0 {
   /**
    * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
-  implicit def hconsMonoid[A, B <: HList](
-      implicit
+  implicit def hconsMonoid[A, B <: HList](implicit
       a: Monoid[A],
       lb: Lazy[Monoid[B]]
   ): Monoid[A :: B] =
@@ -90,8 +87,7 @@ abstract class Shapeless0 {
   /**
    * Pairwise monoid for arbitrary heterogeneous lists (HList).
    */
-  implicit def hconsSemigroup[A, B <: HList](
-      implicit
+  implicit def hconsSemigroup[A, B <: HList](implicit
       a: Semigroup[A],
       lb: Lazy[Semigroup[B]]
   ): Semigroup[A :: B] =

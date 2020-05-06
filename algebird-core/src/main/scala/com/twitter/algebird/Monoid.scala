@@ -42,7 +42,7 @@ trait Monoid[@specialized(Int, Long, Float, Double) T]
     extends Semigroup[T]
     with AMonoid[T]
     with AdditiveMonoid[T] {
-  def isNonZero(v: T): Boolean = (v != zero)
+  def isNonZero(v: T): Boolean = v != zero
   def assertNotZero(v: T): Unit =
     if (!isNonZero(v)) {
       throw new java.lang.IllegalArgumentException("argument should not be zero")

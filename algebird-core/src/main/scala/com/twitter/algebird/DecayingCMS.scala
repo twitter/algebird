@@ -681,8 +681,8 @@ object DecayingCMS {
    * (e.g. 5-10) is fine. Each update requires O(depth) work so you
    * want to keep this as small as possible.
    */
-  def apply[K](seed: Long, halfLife: Duration, depth: Int, width: Int)(
-      implicit hasher: CMSHasher[K]
+  def apply[K](seed: Long, halfLife: Duration, depth: Int, width: Int)(implicit
+      hasher: CMSHasher[K]
   ): DecayingCMS[K] =
     new DecayingCMS(seed, halfLife, depth, width, hasher)
 }

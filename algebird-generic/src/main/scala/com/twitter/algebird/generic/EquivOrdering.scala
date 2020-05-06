@@ -3,8 +3,7 @@ package com.twitter.algebird.generic
 import shapeless._
 
 object EquivOrdering extends EquivOrdering1 {
-  implicit def hconsOrdering[A, B <: HList](
-      implicit
+  implicit def hconsOrdering[A, B <: HList](implicit
       a: Ordering[A],
       lb: Lazy[Ordering[B]]
   ): Ordering[A :: B] =

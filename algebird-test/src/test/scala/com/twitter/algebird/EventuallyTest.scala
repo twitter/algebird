@@ -156,8 +156,7 @@ class EventuallyTest extends AnyWordSpec with Matchers {
 }
 
 class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
-  implicit def aggregator[A, B, C](
-      implicit
+  implicit def aggregator[A, B, C](implicit
       prepare: Arbitrary[A => B],
       sg: Semigroup[B],
       present: Arbitrary[B => C]

@@ -21,8 +21,8 @@ import org.scalacheck.Prop._
 
 class AggregatorLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](
-      implicit prepare: Arbitrary[A => B],
+  implicit def aggregator[A, B, C](implicit
+      prepare: Arbitrary[A => B],
       sg: Semigroup[B],
       present: Arbitrary[B => C]
   ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
@@ -101,8 +101,8 @@ class AggregatorLaws extends CheckProperties {
     checkNumericSum[Float]
   }
 
-  implicit def monoidAggregator[A, B, C](
-      implicit prepare: Arbitrary[A => B],
+  implicit def monoidAggregator[A, B, C](implicit
+      prepare: Arbitrary[A => B],
       m: Monoid[B],
       present: Arbitrary[B => C]
   ): Arbitrary[MonoidAggregator[A, B, C]] =
@@ -148,7 +148,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], t0: Int) =>
       val t = math.max(t0, 1)
       val l = in.sorted.take(t)
-      val a = (Aggregator.sortedTake[Int](t).apply(in))
+      val a = Aggregator.sortedTake[Int](t).apply(in)
       l == a
     }
   }
@@ -156,7 +156,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
       val t = math.max(t0, 1)
       val l = in.sortBy(fn).take(t)
-      val a = (Aggregator.sortByTake(t)(fn).apply(in))
+      val a = Aggregator.sortByTake(t)(fn).apply(in)
       // since we considered two things equivalent under fn,
       // we have to use that here:
       val ord = Ordering.Iterable(Ordering.by(fn))
@@ -167,7 +167,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], t0: Int, fn: Int => Int) =>
       val t = math.max(t0, 1)
       val l = in.sortBy(fn).reverse.take(t)
-      val a = (Aggregator.sortByReverseTake(t)(fn).apply(in))
+      val a = Aggregator.sortByReverseTake(t)(fn).apply(in)
       // since we considered two things equivalent under fn,
       // we have to use that here:
       val ord = Ordering.Iterable(Ordering.by(fn))
@@ -178,7 +178,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], t0: Int) =>
       val t = math.max(t0, 1)
       val l = in.sorted.take(t)
-      val a = (Aggregator.immutableSortedTake[Int](t).apply(in))
+      val a = Aggregator.immutableSortedTake[Int](t).apply(in)
       l == a
     }
   }
@@ -186,7 +186,7 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], t0: Int) =>
       val t = math.max(t0, 1)
       val l = in.sorted.reverse.take(t)
-      val a = (Aggregator.immutableSortedReverseTake[Int](t).apply(in))
+      val a = Aggregator.immutableSortedReverseTake[Int](t).apply(in)
       l == a
     }
   }

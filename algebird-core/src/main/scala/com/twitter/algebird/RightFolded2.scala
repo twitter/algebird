@@ -40,8 +40,8 @@ object RightFolded2 {
     new RightFolded2Monoid[In, Out, Acc](foldfn, trans)
 }
 
-class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(
-    implicit grpAcc: Group[Acc]
+class RightFolded2Monoid[In, Out, Acc](foldfn: (In, Out) => Out, accfn: (Out) => Acc)(implicit
+    grpAcc: Group[Acc]
 ) extends Monoid[RightFolded2[In, Out, Acc]] {
   override val zero: RightFoldedZero2.type = RightFoldedZero2
 

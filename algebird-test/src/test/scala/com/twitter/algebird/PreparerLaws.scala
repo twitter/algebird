@@ -21,8 +21,8 @@ import org.scalacheck.Prop._
 
 class PreparerLaws extends CheckProperties {
 
-  implicit def aggregator[A, B, C](
-      implicit prepare: Arbitrary[A => B],
+  implicit def aggregator[A, B, C](implicit
+      prepare: Arbitrary[A => B],
       sg: Semigroup[B],
       present: Arbitrary[B => C]
   ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
@@ -50,8 +50,8 @@ class PreparerLaws extends CheckProperties {
     }
   }
 
-  implicit def monoidAggregator[A, B, C](
-      implicit prepare: Arbitrary[A => B],
+  implicit def monoidAggregator[A, B, C](implicit
+      prepare: Arbitrary[A => B],
       m: Monoid[B],
       present: Arbitrary[B => C]
   ): Arbitrary[MonoidAggregator[A, B, C]] =

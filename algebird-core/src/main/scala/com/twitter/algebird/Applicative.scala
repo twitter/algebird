@@ -87,12 +87,12 @@ object Applicative {
     app.join(mt, mu)
   def join[M[_], T1, T2, T3](m1: M[T1], m2: M[T2], m3: M[T3])(implicit app: Applicative[M]): M[(T1, T2, T3)] =
     app.join(m1, m2, m3)
-  def join[M[_], T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4])(
-      implicit app: Applicative[M]
+  def join[M[_], T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4])(implicit
+      app: Applicative[M]
   ): M[(T1, T2, T3, T4)] =
     app.join(m1, m2, m3, m4)
-  def join[M[_], T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5])(
-      implicit app: Applicative[M]
+  def join[M[_], T1, T2, T3, T4, T5](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4], m5: M[T5])(implicit
+      app: Applicative[M]
   ): M[(T1, T2, T3, T4, T5)] =
     app.join(m1, m2, m3, m4, m5)
   def sequence[M[_], T](ms: Seq[M[T]])(implicit app: Applicative[M]): M[Seq[T]] =

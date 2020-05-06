@@ -373,7 +373,7 @@ sealed abstract class HLL extends java.io.Serializable {
     else {
       val reducedSize = 1 << reducedBits
       // bit mask to set MSBs to 1. Makes rhoW exit fast
-      val bitMask = 0xFFFFFFFF << bits
+      val bitMask = 0xffffffff << bits
       val buf = new Array[Byte](4)
 
       downsize(reducedBits, reducedSize, bitMask, buf)

@@ -102,9 +102,19 @@ class FoldTest extends AnyWordSpec {
     }
 
     "sequence" in {
-      run[Int, Seq[Long]](Fold.sequence(Seq(Fold.count(_ < 0), Fold.count {
-        _ >= 0
-      })), Zero(Seq(0, 0)), One(1, Seq(0, 1)), Many(Seq(-2, -1, 0, 1, 2), Seq(2, 3)))
+      run[Int, Seq[Long]](
+        Fold.sequence(
+          Seq(
+            Fold.count(_ < 0),
+            Fold.count {
+              _ >= 0
+            }
+          )
+        ),
+        Zero(Seq(0, 0)),
+        One(1, Seq(0, 1)),
+        Many(Seq(-2, -1, 0, 1, 2), Seq(2, 3))
+      )
     }
 
   }

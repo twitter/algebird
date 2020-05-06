@@ -25,16 +25,14 @@ import org.scalacheck.Prop.forAll
 object ApplicativeLaws {
   import BaseProperties.{DefaultHigherEq, HigherEq}
 
-  def applyLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(
-      implicit
+  def applyLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
       app: Applicative[M],
       arb: Arbitrary[T],
       arbFn: Arbitrary[T => U]
   ): Prop =
     forAll((t: T, fn: T => U) => eq(app.map(app.apply(t))(fn), app.apply(fn(t))))
 
-  def joinLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(
-      implicit
+  def joinLaw[M[_], T, U](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
       app: Applicative[M],
       arb1: Arbitrary[T],
       arb2: Arbitrary[U]
@@ -43,15 +41,13 @@ object ApplicativeLaws {
 
   // These follow from apply and join:
 
-  def sequenceLaw[M[_], T](eq: HigherEq[M] = new DefaultHigherEq[M])(
-      implicit
+  def sequenceLaw[M[_], T](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
       app: Applicative[M],
       arb: Arbitrary[Seq[T]]
   ): Prop =
     forAll((ts: Seq[T]) => eq(app.sequence(ts.map(app.apply(_))), app.apply(ts)))
 
-  def joinWithLaw[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(
-      implicit
+  def joinWithLaw[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
       app: Applicative[M],
       arbT: Arbitrary[T],
       arbU: Arbitrary[U],
@@ -61,8 +57,7 @@ object ApplicativeLaws {
       eq(app.joinWith(app.apply(t), app.apply(u))(fn), app.apply(fn(t, u)))
     }
 
-  def applicativeLaws[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(
-      implicit
+  def applicativeLaws[M[_], T, U, V](eq: HigherEq[M] = new DefaultHigherEq[M])(implicit
       app: Applicative[M],
       arbMt: Arbitrary[T],
       arbMts: Arbitrary[Seq[T]],

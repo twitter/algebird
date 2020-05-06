@@ -63,7 +63,9 @@ object BaseVectorSpaceProperties {
   def vectorSpaceLaws[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
   )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]) =
-    isEqualIfZero(eqfn) && distributesWithPlus(eqfn) && isAssociative(eqfn) && identityOne(eqfn) && distributesOverScalarPlus(
+    isEqualIfZero(eqfn) && distributesWithPlus(eqfn) && isAssociative(eqfn) && identityOne(
+      eqfn
+    ) && distributesOverScalarPlus(
       eqfn
     )
 
