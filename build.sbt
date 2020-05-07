@@ -52,22 +52,18 @@ val sharedSettings = Seq(
     "-language:existentials"
   ),
   scalacOptions ++= {
-    if (scalaVersion.value.startsWith("2.11"))
-      Seq("-Ywarn-unused", "-Ywarn-unused-import")
-    else
-      Seq()
-  },
-  scalacOptions ++= {
-    if (scalaVersion.value.startsWith("2.12"))
-      Seq("-Ywarn-unused", "-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
-    else
-      Seq("-optimize")
-  },
-  scalacOptions ++= {
-    if (isScala213x(scalaVersion.value)) {
-      Seq("-Ymacro-annotations", "-Ywarn-unused")
-    } else {
-      Seq()
+    VersionNumber(scalaVersion.value) match {
+      case v if v.matchesSemVer(SemanticSelector("<2.12")) =>
+        Seq("-Ywarn-unused", "-Ywarn-unused-import", "-optimize")
+      case v if v.matchesSemVer(SemanticSelector(">=2.12")) =>
+        val ops = Seq("-Ywarn-unused", "-opt:l:inline", "-opt-inline-from:com.twitter.algebird.**")
+        if (v.matchesSemVer(SemanticSelector("2.13.x"))) {
+          "-Ymacro-annotations" +: ops
+        } else {
+          ops
+        }
+      case _ =>
+        Nil
     }
   },
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
