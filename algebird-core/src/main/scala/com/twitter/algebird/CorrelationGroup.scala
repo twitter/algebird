@@ -7,7 +7,14 @@ object Correlation {
   implicit val group: Group[Correlation] = CorrelationGroup
 }
 
-case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Double, m1Right: Double, m0: Long) {
+case class Correlation(
+    c2: Double,
+    m2Left: Double,
+    m2Right: Double,
+    m1Left: Double,
+    m1Right: Double,
+    m0: Long
+) {
   def count: Long = m0
 
   def meanLeft: Double = m1Left
@@ -52,7 +59,8 @@ object CorrelationGroup extends Group[Correlation] {
       val deltaRight = b.m1Right - a.m1Right
 
       val m2Left = a.m2Left + b.m2Left + math.pow(deltaLeft, 2) * prodSumRatio // a.count * b.count / count
-      val m2Right = a.m2Right + b.m2Right + math.pow(deltaRight, 2) * prodSumRatio // a.count * b.count / count
+      val m2Right =
+        a.m2Right + b.m2Right + math.pow(deltaRight, 2) * prodSumRatio // a.count * b.count / count
 
       val c2 = a.c2 + b.c2 + deltaLeft * deltaRight * prodSumRatio // a.count * b.count / count
 
@@ -63,7 +71,14 @@ object CorrelationGroup extends Group[Correlation] {
   override val zero = Correlation(0, 0, 0, 0, 0, 0)
 
   override def negate(v: Correlation): Correlation =
-    Correlation(c2 = -v.c2, m2Left = -v.m2Left, m2Right = -v.m2Right, m1Left = v.m1Left, m1Right = v.m1Right, m0 = -v.m0)
+    Correlation(
+      c2 = -v.c2,
+      m2Left = -v.m2Left,
+      m2Right = -v.m2Right,
+      m1Left = v.m1Left,
+      m1Right = v.m1Right,
+      m0 = -v.m0
+    )
 
 }
 

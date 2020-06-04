@@ -69,7 +69,6 @@ object gen extends ExpHistGen with IntervalGen {
   def genSSManySpaceSaver: Gen[SpaceSaver[String]] =
     Gen.nonEmptyListOf(genFixedSSOneSpaceSaver).flatMap(l => l.reduce(_ ++ _))
 
-
   def genCorrelation: Gen[Correlation] =
     for {
       c2 <- choose(-1e50, 1e50)
@@ -78,5 +77,12 @@ object gen extends ExpHistGen with IntervalGen {
       m1Left <- choose(-1e50, 1e50)
       m1Right <- choose(-1e50, 1e50)
       m0 <- choose(1L, Int.MaxValue.toLong)
-    } yield Correlation(c2 = c2, m2Left = m2Left, m2Right = m2Right, m1Left = m1Left, m1Right = m1Right, m0 = m0)
+    } yield Correlation(
+      c2 = c2,
+      m2Left = m2Left,
+      m2Right = m2Right,
+      m1Left = m1Left,
+      m1Right = m1Right,
+      m0 = m0
+    )
 }
