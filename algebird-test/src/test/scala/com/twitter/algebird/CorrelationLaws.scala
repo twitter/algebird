@@ -28,13 +28,6 @@ class CorrelationLaws extends CheckProperties {
       val corr = Monoid.plus(corr1, corr2)
       val leftMoment = Monoid.plus(corr1.leftMoment, corr2.leftMoment)
       val rightMoment = Monoid.plus(corr1.rightMoment, corr2.rightMoment)
-
-      println("="*80)
-      println(corr.leftMoment)
-      println(leftMoment)
-      println(corr.rightMoment)
-      println(rightMoment)
-      println("*"*80)
       corr.count == leftMoment.count  &&
       corr.count == rightMoment.count &&
       approxEq(EPS)(corr.meanLeft, leftMoment.mean) &&
@@ -54,8 +47,27 @@ class CorrelationTest extends WordSpec with Matchers {
       assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
   }
 
-  val aggregator = CorrelationAggregator.andThenPresent(_.correlation)
 
+  def zipWithFunction(l: List[Double])(f: Double => Double): List[(Double, Double)] =
+    l.map(x => (x, f(x)))
 
+  def aggregateFunction(f: Double => Double): Aggregator[Double, Correlation, Double] =
+    CorrelationAggregator
+    .composePrepare[Double](x => (x, f(x)))
+    .andThenPresent(_.correlation)
+
+  val testList = Range.inclusive(-10, 10).map(_.toDouble).toList
+
+  "correlation with y = x should be 1" in {
+    aggregateFunction(identity)(testList) shouldEqual(1.0)
+  }
+
+  "correlation with y = -x should be -1" in {
+    aggregateFunction(x => -x)(testList) shouldEqual(-1.0)
+  }
+
+  "correlation with y = x*x should be 0" in {
+    aggregateFunction(x => x*x) should equal(0.0)
+  }
 
 }
