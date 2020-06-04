@@ -7,7 +7,7 @@ import com.twitter.algebird.scalacheck.arbitrary._
 class CorrelationLaws extends CheckProperties {
   val EPS = 1e-10
 
-  property("Correlation semigroup laws") {
+  property("Correlation group laws") {
     implicit val equiv: Equiv[Correlation] =
       Equiv.fromFunction { (corr1, corr2) =>
         approxEq(EPS)(corr1.c2, corr2.c2) &&
@@ -17,7 +17,6 @@ class CorrelationLaws extends CheckProperties {
           approxEq(EPS)(corr1.m1Right, corr2.m1Right) &&
           (corr1.m0 == corr2.m0)
       }
-    semigroupLawsEquiv[Correlation]
+    groupLawsEquiv[Correlation]
   }
 }
-
