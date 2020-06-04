@@ -4,7 +4,7 @@ object Correlation {
   def apply(x: (Double, Double)): Correlation =
     Correlation(c2 = 0, m2Left = 0, m2Right = 0, m1Left = x._1, m1Right = x._2, 1L)
 
-  implicit val semigroup: SemiGroup[Correlation] = CorrelationSemigroup
+  implicit val semigroup: Semigroup[Correlation] = CorrelationSemigroup
 }
 
 case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Double, m1Right: Double, m0: Long) {
@@ -15,9 +15,9 @@ case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Doub
   def meanRight: Double = m2Right
 
   // useful in calculating variance and stddev
-  private[this] def leftMoment: Moments = Moments(m0, m1Left, m2Left, 0, 0)
+  private[this] def leftMoment: Moments = Moments(m0 = m0, m1 = m1Left, m2 = m2Left, 0, 0)
 
-  private[this] def rightMoment: Moments = Moments(m0, m1Right, m2Right)
+  private[this] def rightMoment: Moments = Moments(m0 = m0, m1 = m1Right, m2 = m2Right, 0, 0)
 
   // variance, stddev, covariance, and correlation are for the population, not a sample
   def varianceLeft: Double = leftMoment.variance
@@ -33,9 +33,9 @@ case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Doub
   // pearson's correlation coefficient
 
   def correlation =
-  // correlation is defined as: covariance / (varianceLeft * varianceRight)
-  // however, dividing by "count" cancels out, and leaves us with the following formula, which relies on fewer
-  // divisions
+    // correlation is defined as: covariance / (varianceLeft * varianceRight)
+    // however, dividing by "count" cancels out, and leaves us with the following formula, which relies on fewer
+    // divisions
     c2 / (Math.sqrt(m2Left * m2Right))
 }
 
@@ -56,5 +56,4 @@ object CorrelationSemigroup extends Semigroup[Correlation] {
     Correlation(c2 = c2, m2Left = m2Left, m2Right = m2Right, m1Left = m1Left, m1Right = m1Right, m0 = count)
   }
 
-  }
 }
