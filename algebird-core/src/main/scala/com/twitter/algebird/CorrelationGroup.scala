@@ -10,14 +10,14 @@ object Correlation {
 case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Double, m1Right: Double, m0: Long) {
   def count: Long = m0
 
-  def meanLeft: Double = m2Left
+  def meanLeft: Double = m1Left
 
-  def meanRight: Double = m2Right
+  def meanRight: Double = m1Right
 
-  // useful in calculating variance and stddev
-  private[this] def leftMoment: Moments = Moments(m0 = m0, m1 = m1Left, m2 = m2Left, 0, 0)
+  // useful in calculating variance and stddev; private because we don't have skewness or kurtosis info
+  private[algebird] def leftMoment: Moments = Moments(m0 = m0, m1 = m1Left, m2 = m2Left, 0, 0)
 
-  private[this] def rightMoment: Moments = Moments(m0 = m0, m1 = m1Right, m2 = m2Right, 0, 0)
+  private[algebird] def rightMoment: Moments = Moments(m0 = m0, m1 = m1Right, m2 = m2Right, 0, 0)
 
   // variance, stddev, covariance, and correlation are for the population, not a sample
   def varianceLeft: Double = leftMoment.variance
@@ -32,7 +32,7 @@ case class Correlation(c2: Double, m2Left: Double, m2Right: Double, m1Left: Doub
 
   // pearson's correlation coefficient
 
-  def correlation =
+  def correlation: Double =
     // correlation is defined as: covariance / (varianceLeft * varianceRight)
     // however, dividing by "count" cancels out, and leaves us with the following formula, which relies on fewer
     // divisions
