@@ -66,3 +66,9 @@ object CorrelationGroup extends Group[Correlation] {
     Correlation(c2 = -v.c2, m2Left = -v.m2Left, m2Right = -v.m2Right, m1Left = v.m1Left, m1Right = v.m1Right, m0 = -v.m0)
 
 }
+
+object CorrelationAggregator extends MonoidAggregator[(Double, Double), Correlation, Correlation] {
+  override def prepare(a: (Double, Double)): Correlation = Correlation(a)
+  override val monoid = CorrelationGroup
+  override def present(c: Correlation): Correlation = c
+}
