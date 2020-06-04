@@ -44,14 +44,14 @@ object CorrelationSemigroup extends Semigroup[Correlation] {
     val count = a.count + b.count
     val prodSumRatio = a.count.toDouble * b.count / count
     val m1Left = MomentsGroup.getCombinedMean(a.count, a.m1Left, b.count, b.m1Left)
-    val m1Right = MomentsGroup.getCombinedMean(a.count, a.m2Right, b.count, b.m2Right)
+    val m1Right = MomentsGroup.getCombinedMean(a.count, a.m1Right, b.count, b.m1Right)
     val deltaLeft = b.m1Left - a.m1Left
     val deltaRight = b.m1Right - a.m1Right
 
-    val m2Left = a.m2Left + b.m2Left + math.pow(deltaLeft, 2) * prodSumRatio
-    val m2Right = a.m2Right + b.m2Right + math.pow(deltaRight, 2) * prodSumRatio
+    val m2Left = a.m2Left + b.m2Left + math.pow(deltaLeft, 2) * prodSumRatio // a.count * b.count / count
+    val m2Right = a.m2Right + b.m2Right + math.pow(deltaRight, 2) * prodSumRatio // a.count * b.count / count
 
-    val c2 = a.c2 + b.c2 + deltaLeft * deltaRight * prodSumRatio
+    val c2 = a.c2 + b.c2 + deltaLeft * deltaRight * prodSumRatio // a.count * b.count / count
 
     Correlation(c2 = c2, m2Left = m2Left, m2Right = m2Right, m1Left = m1Left, m1Right = m1Right, m0 = count)
   }

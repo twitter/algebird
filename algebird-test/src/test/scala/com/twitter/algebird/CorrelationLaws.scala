@@ -10,16 +10,14 @@ class CorrelationLaws extends CheckProperties {
   property("Correlation semigroup laws") {
     implicit val equiv: Equiv[Correlation] =
       Equiv.fromFunction { (corr1, corr2) =>
-        println("=" * 80)
-        println(corr1)
-        println(corr2)
-        println("+" * 80)
         approxEq(EPS)(corr1.c2, corr2.c2) &&
           approxEq(EPS)(corr1.m2Left, corr2.m2Left) &&
           approxEq(EPS)(corr1.m2Right, corr2.m2Right) &&
-          approxEq(EPS)(corr1.m1Left, corr2.m1Right) &&
+          approxEq(EPS)(corr1.m1Left, corr2.m1Left) &&
+          approxEq(EPS)(corr1.m1Right, corr2.m1Right) &&
           (corr1.m0 == corr2.m0)
       }
     semigroupLawsEquiv[Correlation]
   }
 }
+
