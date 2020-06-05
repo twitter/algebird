@@ -38,16 +38,6 @@ class CorrelationLaws extends CheckProperties {
 }
 
 class CorrelationTest extends WordSpec with Matchers {
-  def testApproxEq(f1: Double, f2: Double) {
-    if (f2 == 0)
-      assert(f1 < 1e-10)
-    else
-      assert((scala.math.abs(f1 - f2) / scala.math.abs(f2)) < 1e-10)
-  }
-
-  def zipWithFunction(l: List[Double])(f: Double => Double): List[(Double, Double)] =
-    l.map(x => (x, f(x)))
-
   def aggregateFunction(f: Double => Double): Aggregator[Double, Correlation, Double] =
     CorrelationAggregator
       .composePrepare[Double](x => (x, f(x)))
