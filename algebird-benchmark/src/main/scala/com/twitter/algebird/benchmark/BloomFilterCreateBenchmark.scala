@@ -45,4 +45,36 @@ class BloomFilterCreateBenchmark {
   @Benchmark
   def createBloomFilterExperimental(bloomFilterState: BloomFilterState): experimental.BloomFilter[String]#BF =
     bloomFilterState.experimentalBF.create(bloomFilterState.randomStrings: _*)
+
+  @Benchmark
+  def createBloomFilterUsingFold(bloomFilterState: BloomFilterState): BF[String] = {
+    val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
+    val bf = bloomFilterState.randomStrings.foldLeft(bfMonoid.zero) {
+      case (filter, string) => filter + string
+    }
+    bf
+  }
+
+  @Benchmark
+  def createBloomFilterUsingFoldExperimental(
+      bloomFilterState: BloomFilterState
+  ): experimental.BloomFilter[String]#BF =
+    bloomFilterState.randomStrings.foldLeft(bloomFilterState.experimentalBF.zero) {
+      case (filter, string) => filter + string
+    }
+
+  @Benchmark
+  def createBloomFilterAggregator(bloomFilterState: BloomFilterState): BF[String] = {
+    val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
+    val bfAggregator = BloomFilterAggregator(bfMonoid)
+    val bf = bloomFilterState.randomStrings.aggregate(bfAggregator.monoid.zero)(_ + _, _ ++ _)
+    bf
+  }
+
+  @Benchmark
+  def createBloomFilterAggregatorExperimental(
+      bloomFilterState: BloomFilterState
+  ) =
+    bloomFilterState.randomStrings
+      .aggregate(bloomFilterState.experimentalBF.instances.monoid.zero)(_ + _, (a, b) => a ++ b)
 }
