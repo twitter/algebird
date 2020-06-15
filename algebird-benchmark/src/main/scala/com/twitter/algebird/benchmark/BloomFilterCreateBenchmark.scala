@@ -76,5 +76,5 @@ class BloomFilterCreateBenchmark {
       bloomFilterState: BloomFilterState
   ) =
     bloomFilterState.randomStrings
-      .aggregate(bloomFilterState.experimentalBF.instances.monoid.zero)(_ + _, (a, b) => a ++ b)
+      .aggregate(bloomFilterState.experimentalBF.aggregator.monoid.zero)(_ + _, (a, b) => a ++ b)
 }
