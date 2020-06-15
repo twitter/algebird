@@ -1,4 +1,5 @@
 package com.twitter.algebird
+
 package benchmark
 
 import org.openjdk.jmh.annotations._
@@ -19,10 +20,13 @@ object BloomFilterCreateBenchmark {
     var falsePositiveRate: Double = 0
 
     var randomStrings: Seq[String] = _
+    var experimentalBF: experimental.BloomFilter[String] = _
 
     @Setup(Level.Trial)
-    def setup(): Unit =
+    def setup(): Unit = {
       randomStrings = createRandomString(nbrOfElements, 10)
+      experimentalBF = experimental.BloomFilter[String](nbrOfElements, falsePositiveRate)
+    }
 
   }
 }
@@ -37,4 +41,8 @@ class BloomFilterCreateBenchmark {
     val bf = bfMonoid.create(bloomFilterState.randomStrings: _*)
     bf
   }
+
+  @Benchmark
+  def createBloomFilterExperimental(bloomFilterState: BloomFilterState): experimental.BloomFilter[String]#BF =
+    bloomFilterState.experimentalBF.create(bloomFilterState.randomStrings: _*)
 }
