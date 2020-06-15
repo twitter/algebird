@@ -13,7 +13,7 @@ object BloomFilterCreateBenchmark {
 
   @State(Scope.Benchmark)
   class BloomFilterState {
-    @Param(Array("100", "1000", "10000"))
+    @Param(Array("10000", "50000"))
     var nbrOfElements: Int = 0
 
     @Param(Array("0.001", "0.01"))

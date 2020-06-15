@@ -281,17 +281,6 @@ sealed abstract class BitSet { lhs =>
   def reverseIterator: Iterator[Int]
 
   /**
-   * Present a view of this bitset as a `scala.Set[Int]`.
-   *
-   * This is provided for compatibility with Scala collections. Many
-   * of the set operations are implemented in terms of `BitSet`, but
-   * other operations (for example `map`) may copy these values into a
-   * different `Set` implementation.
-   */
-  def toSet: Set[Int] =
-    new compat.BitSetWrapperSet(this)
-
-  /**
    * Returns false if this bitset contains values, true otherwise.
    */
   def isEmpty: Boolean
