@@ -8,11 +8,11 @@ val bijectionVersion = "0.9.7"
 val javaEwahVersion = "1.1.7"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
-val scalaTestVersion = "3.1.2"
+val scalaTestVersion = "3.2.0"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.14.3"
 val scalaCollectionCompat = "2.1.6"
-val utilVersion = "20.4.1"
+val utilVersion = "20.6.0"
 val sparkVersion = "2.4.6"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =

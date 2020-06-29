@@ -89,7 +89,6 @@ object HyperLogLog {
     j(bsl.in, bits)
 
   /**
-   *
    */
   def j(bytes: Array[Byte], bits: Int): Int = {
     var i = 0

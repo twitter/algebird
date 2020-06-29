@@ -35,7 +35,6 @@ import scala.annotation.implicitNotFound
  *  - addition
  *  - multiplication
  *
- *
  *  Note, if you have distributive property, additive inverses, and multiplicative identity you
  *  can prove you have a commutative group under the ring:
  *

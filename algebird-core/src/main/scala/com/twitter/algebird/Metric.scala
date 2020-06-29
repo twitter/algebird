@@ -36,7 +36,6 @@ import scala.annotation.implicitNotFound
  * 4. m(v1, v3) <= m(v1, v2) + m(v2, v3)
  *
  * If you implement this trait, make sure that you follow these rules.
- *
  */
 object Metric {
   def apply[V: Metric](v1: V, v2: V): Double =

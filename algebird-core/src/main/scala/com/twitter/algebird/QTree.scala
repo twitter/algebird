@@ -250,7 +250,6 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     }
 
   /**
-   *
    * Find the smallest dyadic interval that contains the dyadic interval
    * for this tree's root and the other tree's root, and return its
    * level (that is, the power of 2 for the interval).

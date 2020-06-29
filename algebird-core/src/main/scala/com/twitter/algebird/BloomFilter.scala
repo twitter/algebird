@@ -190,7 +190,6 @@ object BloomFilter {
  *   2) query: hash the value k times.  If there are k collisions, then return true; otherwise false.
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
- *
  */
 case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash128[A])
     extends Monoid[BF[A]]
