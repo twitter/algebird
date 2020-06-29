@@ -489,8 +489,14 @@ class Product6Group[X, A, B, C, D, E, F](
 class Product6Ring[X, A, B, C, D, E, F](
     apply: (A, B, C, D, E, F) => X,
     unapply: X => Option[(A, B, C, D, E, F)]
-)(implicit aring: Ring[A], bring: Ring[B], cring: Ring[C], dring: Ring[D], ering: Ring[E], fring: Ring[F])
-    extends Product6Group[X, A, B, C, D, E, F](
+)(implicit
+    aring: Ring[A],
+    bring: Ring[B],
+    cring: Ring[C],
+    dring: Ring[D],
+    ering: Ring[E],
+    fring: Ring[F]
+) extends Product6Group[X, A, B, C, D, E, F](
       apply: (A, B, C, D, E, F) => X,
       unapply: X => Option[(A, B, C, D, E, F)]
     )

@@ -22,7 +22,6 @@ import scala.annotation.implicitNotFound
  * This class represents a vector space. For the required properties see:
  *
  * http://en.wikipedia.org/wiki/Vector_space#Definition
- *
  */
 object VectorSpace extends VectorSpaceOps with Implicits
 

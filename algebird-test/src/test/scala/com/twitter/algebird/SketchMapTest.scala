@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-import org.scalatest._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

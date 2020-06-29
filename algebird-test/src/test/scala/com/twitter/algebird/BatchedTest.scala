@@ -1,7 +1,5 @@
 package com.twitter.algebird
 
-import org.scalatest._
-
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary

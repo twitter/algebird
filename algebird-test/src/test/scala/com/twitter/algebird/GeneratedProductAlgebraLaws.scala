@@ -156,7 +156,26 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
   }
   property("Product21Ring is a ring") {
     type T = (
-        Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
         Int
     )
     implicit val ring = Ring[
@@ -187,8 +206,28 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
   }
   property("Product22Ring is a ring") {
     type T = (
-        Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-        Int, Int
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int,
+        Int
     )
     implicit val ring = Ring[
       T,

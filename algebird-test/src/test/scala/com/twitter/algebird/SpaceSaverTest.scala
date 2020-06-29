@@ -2,7 +2,6 @@ package com.twitter.algebird
 
 import org.scalacheck.Prop._
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest._
 
 import scala.util.Try
 import org.scalatest.matchers.should.Matchers

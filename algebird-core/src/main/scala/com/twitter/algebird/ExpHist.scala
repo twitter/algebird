@@ -29,7 +29,6 @@ import scala.collection.mutable.Builder
  * - Query EH with a shorter window than the configured window
  * - Discussion of epsilon vs memory tradeoffs
  *
- *
  * @param conf the config values for this instance.
  * @param buckets Vector of timestamps of each (powers of 2)
  *                ticks. This is the key to the exponential histogram
@@ -339,7 +338,6 @@ object ExpHist {
      * res0: Vector[Int] = Vector(3, 2, 2)
      * }}}
      * 15 = (3 * 2^0) + (2 * 2^1) + (2 * 2^2)
-     *
      *
      * the "l" in l-canonical means that
      *

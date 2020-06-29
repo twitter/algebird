@@ -54,7 +54,6 @@ object Scan {
   def identity[A]: Aux[A, Unit, A] = fromFunction[A, A](x => x)
 
   /**
-   *
    * @param initStateCreator A call-by-name method that allocates new mutable state
    * @param presentAndUpdateStateFn A function that both presents the output value, and has the side-effect of updating the mutable state
    * @tparam I
@@ -77,7 +76,6 @@ object Scan {
   def const[T](t: T): Aux[Any, Unit, T] = fromFunction(_ => t)
 
   /**
-   *
    * @param aggregator
    * @param initState
    * @tparam A
@@ -96,7 +94,6 @@ object Scan {
     }
 
   /**
-   *
    * @param monoidAggregator
    * @tparam A
    * @tparam B
@@ -122,7 +119,6 @@ object Scan {
  *
  * The canonical method to use a scan is `apply`.
  *
- *
  * @tparam I The type of elements that the computation is scanning over.
  * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan).
  */
@@ -142,7 +138,6 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   def initialState: State
 
   /**
-   *
    * @param i An element in the stream to process
    * @param stateBeforeProcessingI The state of the scan before processing i
    * @return The output of the scan corresponding to processing i with state stateBeforeProcessing,
@@ -156,7 +151,6 @@ sealed abstract class Scan[-I, +O] extends Serializable {
    * `Iterator(o_1, ..., o_n)` where
    * `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
    * and `state_0 = initialState`
-   *
    */
   def scanIterator(iter: Iterator[I]): Iterator[O] = new AbstractIterator[O] {
     override def hasNext: Boolean = iter.hasNext

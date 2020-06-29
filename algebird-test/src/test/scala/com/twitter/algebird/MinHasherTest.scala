@@ -2,7 +2,6 @@ package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest._
 import scala.math.Equiv
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

@@ -16,8 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import org.scalatest._
-
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalatest.matchers.should.Matchers

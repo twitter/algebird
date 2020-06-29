@@ -4,7 +4,6 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.CheckProperties
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
-import org.scalatest._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-import org.scalatest._
 import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.matchers.should.Matchers

@@ -21,7 +21,6 @@ import java.io.Serializable
 import Operators._
 
 /**
- *
  * Convenience case class defined with a monoid for aggregating elements over
  * a finite window.
  *
