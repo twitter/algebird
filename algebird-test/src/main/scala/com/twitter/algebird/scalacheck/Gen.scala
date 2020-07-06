@@ -89,6 +89,13 @@ object gen extends ExpHistGen with IntervalGen {
 
     // now return with a low probability of choosing the branching cases:
     Gen
-      .frequency((5, genClose), (5, genUncorr), (2, genNeg), (1, CorrelationGroup.zero), (1, genSum), (1, genDiff))
+      .frequency(
+        (5, genClose),
+        (5, genUncorr),
+        (2, genNeg),
+        (1, CorrelationGroup.zero),
+        (1, genSum),
+        (1, genDiff)
+      )
   }
 }

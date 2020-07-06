@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 object Correlation {
   def apply(x: (Double, Double), weight: Double): Correlation =
-    Correlation(c2 = 0, m2Left = 0, m2Right = 0, m1Left = x._1, m1Right = x._2, weight)
+    Correlation(c2 = 0, m2x = 0, m2y = 0, m1x = x._1, m1y = x._2, weight)
 
   def apply(x: (Double, Double)): Correlation =
     apply(x, 1.0)
@@ -46,34 +46,27 @@ object Correlation {
  * A class to calculate covariance and the first two central moments of a sequence of pairs of Doubles, from which the
  * pearson correlation coeifficient can be calculated.
  *
- * m{i}Left denotes the ith central moment of the first projection of the pair.
- * m{i}Right denotes the ith central moment of the second projection of the pair.
- * c2 the covariance equivalent of the second central moment, i.e. c2 = Sum_(l,r) (l - m1Left)*(r - m1Right).
+ * m{i}x denotes the ith central moment of the first projection of the pair.
+ * m{i}y denotes the ith central moment of the second projection of the pair.
+ * c2 the covariance equivalent of the second central moment, i.e. c2 = Sum_(x,y) (x - m1x)*(y - m1y).
  *
  */
-case class Correlation(
-    c2: Double,
-    m2Left: Double,
-    m2Right: Double,
-    m1Left: Double,
-    m1Right: Double,
-    m0: Double
-) {
+case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: Double, m0: Double) {
   def totalWeight: Double = m0
 
-  def meanLeft: Double = m1Left
+  def meanX: Double = m1x
 
-  def meanRight: Double = m1Right
+  def meanY: Double = m1y
 
   // variance, stddev, and covariance are for the population, not a sample
 
-  def varianceLeft: Double = m2Left / m0
+  def varianceX: Double = m2x / m0
 
-  def varianceRight: Double = m2Right / m0
+  def varianceY: Double = m2y / m0
 
-  def stddevLeft: Double = Math.sqrt(varianceLeft)
+  def stddevX: Double = Math.sqrt(varianceX)
 
-  def stddevRight: Double = Math.sqrt(varianceRight)
+  def stddevY: Double = Math.sqrt(varianceY)
 
   def covariance: Double = c2 / totalWeight
 
@@ -85,7 +78,7 @@ case class Correlation(
     // correlation is defined as: covariance / (varianceLeft * varianceRight)
     // however, dividing by "count" cancels out, and leaves us with the following formula, which relies on fewer
     // divisions
-    c2 / (Math.sqrt(m2Left * m2Right))
+    c2 / (Math.sqrt(m2x * m2y))
 
   /**
    * Assume this instance of Correlation came from summing together Correlation.apply((x_i, y_i)) for i in 1...n.
@@ -93,13 +86,13 @@ case class Correlation(
    *         See, e.g. https://mathworld.wolfram.com/LeastSquaresFitting.html.
    */
   def linearLeastSquares: (Double, Double) = {
-    val m = c2 / m2Left
-    val b = meanRight - m * meanLeft
+    val m = c2 / m2x
+    val b = meanY - m * meanX
     (m, b)
   }
 
   def swap: Correlation =
-    Correlation(c2 = c2, m2Left = m2Right, m2Right = m2Left, m1Left = m1Right, m1Right = m1Left, m0 = m0)
+    Correlation(c2 = c2, m2x = m2y, m2y = m2x, m1x = m1y, m1y = m1x, m0 = m0)
 }
 
 object CorrelationGroup extends Group[Correlation] {
@@ -122,18 +115,18 @@ object CorrelationGroup extends Group[Correlation] {
       zero
     else {
       val prodSumRatio = a.totalWeight * b.totalWeight / count
-      val m1Left = Correlation.getCombinedMean(a.totalWeight, a.m1Left, b.totalWeight, b.m1Left)
-      val m1Right = Correlation.getCombinedMean(a.totalWeight, a.m1Right, b.totalWeight, b.m1Right)
-      val deltaLeft = b.m1Left - a.m1Left
-      val deltaRight = b.m1Right - a.m1Right
+      val m1x = Correlation.getCombinedMean(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
+      val m1y = Correlation.getCombinedMean(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
+      val deltaX = b.m1x - a.m1x
+      val deltaY = b.m1y - a.m1y
 
-      val m2Left = a.m2Left + b.m2Left + math.pow(deltaLeft, 2) * prodSumRatio
-      val m2Right =
-        a.m2Right + b.m2Right + math.pow(deltaRight, 2) * prodSumRatio
+      val m2x = a.m2x + b.m2x + math.pow(deltaX, 2) * prodSumRatio
+      val m2y =
+        a.m2y + b.m2y + math.pow(deltaY, 2) * prodSumRatio
 
-      val c2 = a.c2 + b.c2 + deltaLeft * deltaRight * prodSumRatio
+      val c2 = a.c2 + b.c2 + deltaX * deltaY * prodSumRatio
 
-      Correlation(c2 = c2, m2Left = m2Left, m2Right = m2Right, m1Left = m1Left, m1Right = m1Right, m0 = count)
+      Correlation(c2 = c2, m2x = m2x, m2y = m2y, m1x = m1x, m1y = m1y, m0 = count)
     }
   }
 
@@ -142,10 +135,10 @@ object CorrelationGroup extends Group[Correlation] {
   override def negate(v: Correlation): Correlation =
     Correlation(
       c2 = -v.c2,
-      m2Left = -v.m2Left,
-      m2Right = -v.m2Right,
-      m1Left = v.m1Left,
-      m1Right = v.m1Right,
+      m2x = -v.m2x,
+      m2y = -v.m2y,
+      m1x = v.m1x,
+      m1y = v.m1y,
       m0 = -v.m0
     )
 

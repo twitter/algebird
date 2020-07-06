@@ -18,10 +18,10 @@ object CorrelationLaws {
 
   def corrApproxEq(corr1: Correlation, corr2: Correlation): Boolean =
     approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&
-      approxEqOrBothNaN(EPS)(corr1.m2Left, corr2.m2Left) &&
-      approxEqOrBothNaN(EPS)(corr1.m2Right, corr2.m2Right) &&
-      approxEqOrBothNaN(EPS)(corr1.m1Left, corr2.m1Left) &&
-      approxEqOrBothNaN(EPS)(corr1.m1Right, corr2.m1Right) &&
+      approxEqOrBothNaN(EPS)(corr1.m2x, corr2.m2x) &&
+      approxEqOrBothNaN(EPS)(corr1.m2y, corr2.m2y) &&
+      approxEqOrBothNaN(EPS)(corr1.m1x, corr2.m1x) &&
+      approxEqOrBothNaN(EPS)(corr1.m1y, corr2.m1y) &&
       approxEqOrBothNaN(EPS)(corr1.m0, corr2.m0)
 
 }
@@ -34,10 +34,10 @@ class CorrelationLaws extends CheckProperties {
     implicit val equiv: Equiv[Correlation] =
       Equiv.fromFunction { (corr1, corr2) =>
         approxEq(EPS)(corr1.c2, corr2.c2) &&
-        approxEq(EPS)(corr1.m2Left, corr2.m2Left) &&
-        approxEq(EPS)(corr1.m2Right, corr2.m2Right) &&
-        approxEq(EPS)(corr1.m1Left, corr2.m1Left) &&
-        approxEq(EPS)(corr1.m1Right, corr2.m1Right) &&
+        approxEq(EPS)(corr1.m2x, corr2.m2x) &&
+        approxEq(EPS)(corr1.m2y, corr2.m2y) &&
+        approxEq(EPS)(corr1.m1x, corr2.m1x) &&
+        approxEq(EPS)(corr1.m1y, corr2.m1y) &&
         (corr1.m0 == corr2.m0)
       }
     groupLaws[Correlation]
@@ -46,15 +46,15 @@ class CorrelationLaws extends CheckProperties {
   property("Central moments 0 through 2 match implementation from Moments") {
     forAll { (l: List[(Double, Double)]) =>
       val corr = Monoid.sum(l.map(Correlation.apply))
-      val leftMoment = Monoid.sum(l.map { case (x, _) => Moments.apply(x) })
-      val rightMoment = Monoid.sum(l.map { case (_, y) => Moments.apply(y) })
-      approxEq(EPS)(corr.totalWeight, leftMoment.count) &&
-      approxEq(EPS)(corr.totalWeight, rightMoment.count) &&
-      approxEq(EPS)(corr.meanLeft, leftMoment.mean) &&
-      approxEq(EPS)(corr.meanRight, rightMoment.mean) &&
+      val momentX = Monoid.sum(l.map { case (x, _) => Moments.apply(x) })
+      val momentY = Monoid.sum(l.map { case (_, y) => Moments.apply(y) })
+      approxEq(EPS)(corr.totalWeight, momentX.count) &&
+      approxEq(EPS)(corr.totalWeight, momentY.count) &&
+      approxEq(EPS)(corr.meanX, momentX.mean) &&
+      approxEq(EPS)(corr.meanY, momentY.mean) &&
       (l.length < 2 ||
-      (approxEqOrBothNaN(EPS)(corr.stddevLeft, leftMoment.stddev) &&
-      approxEqOrBothNaN(EPS)(corr.stddevRight, rightMoment.stddev)))
+      (approxEqOrBothNaN(EPS)(corr.stddevX, momentX.stddev) &&
+      approxEqOrBothNaN(EPS)(corr.stddevY, momentY.stddev)))
     }
   }
 
