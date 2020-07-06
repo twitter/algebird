@@ -69,20 +69,26 @@ object gen extends ExpHistGen with IntervalGen {
   def genSSManySpaceSaver: Gen[SpaceSaver[String]] =
     Gen.nonEmptyListOf(genFixedSSOneSpaceSaver).flatMap(l => l.reduce(_ ++ _))
 
-  def genCorrelation: Gen[Correlation] =
-    for {
-      c2 <- choose(-1e50, 1e50)
-      m2Left <- choose(0, 1e50)
-      m2Right <- choose(0, 1e50)
-      m1Left <- choose(-1e50, 1e50)
-      m1Right <- choose(-1e50, 1e50)
-      m0 <- choose(1L, Int.MaxValue.toLong)
-    } yield Correlation(
-      c2 = c2,
-      m2Left = m2Left,
-      m2Right = m2Right,
-      m1Left = m1Left,
-      m1Right = m1Right,
-      m0 = m0
-    )
+  lazy val genCorrelation: Gen[Correlation] = {
+    val recur = Gen.lzy(genCorrelation)
+
+    // we can start with any pair of numbers:
+    val genClose: Gen[Correlation] = for {
+      x <- choose(-1000, 1000)
+      delta <- choose(-100.0, 100.0)
+    } yield Correlation((x, x + delta))
+
+    val genUncorr: Gen[Correlation] = for {
+      x <- choose(-1e10, 1e10)
+      y <- choose(-1e10, 1e10)
+    } yield Correlation((x, y))
+
+    val genSum = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.plus(a, b) }
+    val genDiff = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.minus(a, b) }
+    val genNeg = recur.map(CorrelationGroup.negate)
+
+    // now return with a low probability of choosing the branching cases:
+    Gen
+      .frequency((5, genClose), (5, genUncorr), (2, genNeg), (1, CorrelationGroup.zero), (1, genSum), (1, genDiff))
+  }
 }
