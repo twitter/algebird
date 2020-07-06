@@ -31,10 +31,10 @@ object Correlation {
     if (weightN < weightK) getCombinedMean(weightK, ak, weightN, an)
     else
       (weightN + weightK) match {
-        case 0L                              => 0.0
+        case 0.0                             => 0.0
         case newCount if newCount == weightN => an
         case newCount =>
-          val scaling = weightK.toDouble / newCount
+          val scaling = weightK / newCount
           // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
           if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
           else (weightN * an + weightK * ak) / newCount
@@ -93,6 +93,14 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
 
   def swap: Correlation =
     Correlation(c2 = c2, m2x = m2y, m2y = m2x, m1x = m1y, m1y = m1x, m0 = m0)
+
+  def distanceMetric: Double = math.sqrt(1.0 - correlation)
+
+  def scale(z: Double): Correlation =
+    if (z == 0.0)
+      CorrelationGroup.zero
+    else
+      Correlation(c2 = z * c2, m2x = z * m2x, m2y = z * m2y, m1x = m1x, m1y = m1y, m0 = z * m0)
 }
 
 object CorrelationGroup extends Group[Correlation] {

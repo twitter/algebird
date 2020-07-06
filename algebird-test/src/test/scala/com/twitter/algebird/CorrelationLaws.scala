@@ -87,6 +87,35 @@ class CorrelationLaws extends CheckProperties {
       corrApproxEq(swapped, reversedInput)
     }
   }
+
+  property("scaling by 0 and 1 works as you'd expect") {
+    forAll { (corr: Correlation) =>
+      corr.scale(0.0) == CorrelationGroup.zero &&
+      corr.scale(1.0) == corr
+    }
+  }
+
+  property("scaling by a and b is the same as scaling by a*b") {
+    // use Int here instead of doubles so that we don't have to worry about overlfowing to Infinity and having to
+    // fine-tune numerical precision thresholds.
+    forAll { (corr: Correlation, a: Int, b: Int) =>
+      corrApproxEq(corr.scale(a).scale(b), corr.scale(a.toDouble * b))
+    }
+  }
+
+  property("scaling does affect total weight, doesn't affect mean, variance, or correlation") {
+    forAll { (corr: Correlation, a: Int) =>
+      val scaled = corr.scale(a.toDouble)
+      (a == 0.0) ||
+      approxEqOrBothNaN(EPS)(scaled.totalWeight, corr.totalWeight * a) &&
+      approxEqOrBothNaN(EPS)(scaled.meanX, corr.meanX) &&
+      approxEqOrBothNaN(EPS)(scaled.meanY, corr.meanY) &&
+      approxEqOrBothNaN(EPS)(scaled.varianceX, corr.varianceX) &&
+      approxEqOrBothNaN(EPS)(scaled.varianceY, corr.varianceY) &&
+      approxEqOrBothNaN(EPS)(scaled.correlation, corr.correlation)
+    }
+
+  }
 }
 
 class CorrelationTest extends AnyWordSpec with Matchers {
