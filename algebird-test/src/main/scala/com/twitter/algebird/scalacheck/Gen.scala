@@ -83,6 +83,23 @@ object gen extends ExpHistGen with IntervalGen {
       y <- choose(-1e10, 1e10)
     } yield Correlation((x, y))
 
+    val genRandom: Gen[Correlation] =
+    for {
+      c2 <- choose(-1e10, 1e10)
+      m2x <- choose(0, 1e10)
+      m2y <- choose(0, 1e10)
+      m1x <- choose(-1e10, 1e10)
+      m1y <- choose(-1e10, 1e10)
+      m0 <- choose(-1e10, 1e10)
+    } yield Correlation(
+      c2 = c2,
+      m2x = m2x,
+      m2y = m2y,
+      m1x = m1x,
+      m1y = m1y,
+      m0 = m0
+    )
+
     val genSum = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.plus(a, b) }
     val genDiff = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.minus(a, b) }
     val genNeg = recur.map(CorrelationGroup.negate)
@@ -92,6 +109,7 @@ object gen extends ExpHistGen with IntervalGen {
       .frequency(
         (5, genClose),
         (5, genUncorr),
+        (1, genRandom),
         (2, genNeg),
         (1, CorrelationGroup.zero),
         (1, genSum),

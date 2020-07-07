@@ -32,15 +32,9 @@ class CorrelationLaws extends CheckProperties {
 
   property("Correlation group laws") {
     implicit val equiv: Equiv[Correlation] =
-      Equiv.fromFunction { (corr1, corr2) =>
-        approxEq(EPS)(corr1.c2, corr2.c2) &&
-        approxEq(EPS)(corr1.m2x, corr2.m2x) &&
-        approxEq(EPS)(corr1.m2y, corr2.m2y) &&
-        approxEq(EPS)(corr1.m1x, corr2.m1x) &&
-        approxEq(EPS)(corr1.m1y, corr2.m1y) &&
-        (corr1.m0 == corr2.m0)
-      }
-    groupLaws[Correlation]
+      Equiv.fromFunction(corrApproxEq)
+     groupLaws[Correlation]
+    true
   }
 
   property("Central moments 0 through 2 match implementation from Moments") {
@@ -104,6 +98,7 @@ class CorrelationLaws extends CheckProperties {
   }
 
   property("scaling does affect total weight, doesn't affect mean, variance, or correlation") {
+  def sign(x: Int): Int = if (x < 0) -1 else 1
     forAll { (corr: Correlation, a: Int) =>
       val scaled = corr.scale(a.toDouble)
       (a == 0.0) ||
@@ -112,7 +107,7 @@ class CorrelationLaws extends CheckProperties {
       approxEqOrBothNaN(EPS)(scaled.meanY, corr.meanY) &&
       approxEqOrBothNaN(EPS)(scaled.varianceX, corr.varianceX) &&
       approxEqOrBothNaN(EPS)(scaled.varianceY, corr.varianceY) &&
-      approxEqOrBothNaN(EPS)(scaled.correlation, corr.correlation)
+      approxEqOrBothNaN(EPS)(scaled.correlation, corr.correlation * sign(a))
     }
 
   }

@@ -119,23 +119,19 @@ object CorrelationGroup extends Group[Correlation] {
    */
   override def plus(a: Correlation, b: Correlation): Correlation = {
     val count = a.totalWeight + b.totalWeight
-    if (count == 0)
-      zero
-    else {
-      val prodSumRatio = a.totalWeight * b.totalWeight / count
-      val m1x = Correlation.getCombinedMean(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
-      val m1y = Correlation.getCombinedMean(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
-      val deltaX = b.m1x - a.m1x
-      val deltaY = b.m1y - a.m1y
+    val prodSumRatio = a.totalWeight * b.totalWeight / count
+    val m1x = Correlation.getCombinedMean(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
+    val m1y = Correlation.getCombinedMean(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
+    val deltaX = b.m1x - a.m1x
+    val deltaY = b.m1y - a.m1y
 
-      val m2x = a.m2x + b.m2x + math.pow(deltaX, 2) * prodSumRatio
-      val m2y =
-        a.m2y + b.m2y + math.pow(deltaY, 2) * prodSumRatio
+    val m2x = a.m2x + b.m2x + math.pow(deltaX, 2) * prodSumRatio
+    val m2y =
+      a.m2y + b.m2y + math.pow(deltaY, 2) * prodSumRatio
 
-      val c2 = a.c2 + b.c2 + deltaX * deltaY * prodSumRatio
+    val c2 = a.c2 + b.c2 + deltaX * deltaY * prodSumRatio
 
-      Correlation(c2 = c2, m2x = m2x, m2y = m2y, m1x = m1x, m1y = m1y, m0 = count)
-    }
+    Correlation(c2 = c2, m2x = m2x, m2y = m2y, m1x = m1x, m1y = m1y, m0 = count)
   }
 
   override val zero = Correlation(0, 0, 0, 0, 0, 0)
