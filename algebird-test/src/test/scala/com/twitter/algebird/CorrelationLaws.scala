@@ -18,13 +18,12 @@ object CorrelationLaws {
   val testList = Range.inclusive(-10, 10).map(_.toDouble).toList
 
   def corrApproxEq(corr1: Correlation, corr2: Correlation): Boolean =
-    (corr1.totalWeight == 0.0 && corr2.totalWeight == 0.0) ||
-      (approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&
+      approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&
       approxEqOrBothNaN(EPS)(corr1.m2x, corr2.m2x) &&
       approxEqOrBothNaN(EPS)(corr1.m2y, corr2.m2y) &&
       approxEqOrBothNaN(EPS)(corr1.m1x, corr2.m1x) &&
       approxEqOrBothNaN(EPS)(corr1.m1y, corr2.m1y) &&
-      approxEqOrBothNaN(EPS)(corr1.m0, corr2.m0))
+      approxEqOrBothNaN(EPS)(corr1.m0, corr2.m0)
 
 }
 
@@ -32,7 +31,7 @@ class CorrelationLaws extends CheckProperties {
 
   import CorrelationLaws._
 
-  property("Correlation group laws") {
+  property("Correlation monoid laws") {
     implicit val equiv: Equiv[Correlation] =
       Equiv.fromFunction(corrApproxEq)
     monoidLaws[Correlation]
