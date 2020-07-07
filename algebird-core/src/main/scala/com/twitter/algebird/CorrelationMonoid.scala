@@ -7,7 +7,7 @@ object Correlation {
   def apply(x: (Double, Double)): Correlation =
     apply(x, 1.0)
 
-  implicit val group: Group[Correlation] = CorrelationGroup
+  implicit val monoid: Monoid[Correlation] = CorrelationMonoid
 
   /**
    * When combining averages, if the counts sizes are too close we
@@ -82,6 +82,7 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
 
   /**
    * Assume this instance of Correlation came from summing together Correlation.apply((x_i, y_i)) for i in 1...n.
+   *
    * @return (m, b) where y = mx + b is the line with the least squares fit of the points (x_i, y_i).
    *         See, e.g. https://mathworld.wolfram.com/LeastSquaresFitting.html.
    */
@@ -97,13 +98,13 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
   def distanceMetric: Double = math.sqrt(1.0 - correlation)
 
   def scale(z: Double): Correlation =
-    if (z == 0.0)
-      CorrelationGroup.zero
+    if (z < 0.0) // the "extraneous" if here is to avoid allocating the error message unless necessary
+      throw new IllegalArgumentException(s"cannot scale by negative value: $z")
     else
       Correlation(c2 = z * c2, m2x = z * m2x, m2y = z * m2y, m1x = m1x, m1y = m1y, m0 = z * m0)
 }
 
-object CorrelationGroup extends Group[Correlation] {
+object CorrelationMonoid extends Monoid[Correlation] {
 
   /**
    * The algorithm for combining the correlation calculations from two partitions of pairs of numbers. Comes from
@@ -120,6 +121,7 @@ object CorrelationGroup extends Group[Correlation] {
   override def plus(a: Correlation, b: Correlation): Correlation = {
     val count = a.totalWeight + b.totalWeight
     val prodSumRatio = a.totalWeight * b.totalWeight / count
+
     val m1x = Correlation.getCombinedMean(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
     val m1y = Correlation.getCombinedMean(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
     val deltaX = b.m1x - a.m1x
@@ -135,22 +137,11 @@ object CorrelationGroup extends Group[Correlation] {
   }
 
   override val zero = Correlation(0, 0, 0, 0, 0, 0)
-
-  override def negate(v: Correlation): Correlation =
-    Correlation(
-      c2 = -v.c2,
-      m2x = -v.m2x,
-      m2y = -v.m2y,
-      m1x = v.m1x,
-      m1y = v.m1y,
-      m0 = -v.m0
-    )
-
 }
 
 object CorrelationAggregator extends MonoidAggregator[(Double, Double), Correlation, Correlation] {
   override def prepare(a: (Double, Double)): Correlation = Correlation(a)
-  override val monoid = CorrelationGroup
+  override val monoid = CorrelationMonoid
   override def present(c: Correlation): Correlation = c
 
   def correlation: MonoidAggregator[(Double, Double), Correlation, Double] =

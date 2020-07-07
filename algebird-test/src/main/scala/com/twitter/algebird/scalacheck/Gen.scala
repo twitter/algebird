@@ -100,20 +100,15 @@ object gen extends ExpHistGen with IntervalGen {
       m0 = m0
     )
 
-    val genSum = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.plus(a, b) }
-    val genDiff = Gen.zip(recur, recur).map { case (a, b) => CorrelationGroup.minus(a, b) }
-    val genNeg = recur.map(CorrelationGroup.negate)
-
+    val genSum = Gen.zip(recur, recur).map { case (a, b) => CorrelationMonoid.plus(a, b) }
     // now return with a low probability of choosing the branching cases:
     Gen
       .frequency(
         (5, genClose),
         (5, genUncorr),
         (1, genRandom),
-        (2, genNeg),
-        (1, CorrelationGroup.zero),
-        (1, genSum),
-        (1, genDiff)
+        (1, CorrelationMonoid.zero),
+        (1, genSum)//,
       )
   }
 }
