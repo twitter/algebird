@@ -10,15 +10,13 @@ object CorrelationLaws {
   val EPS = 1e-10
 
   def aggregateFunction(f: Double => Double): Aggregator[Double, Correlation, Double] =
-    CorrelationAggregator
-      .correlation
+    CorrelationAggregator.correlation
       .composePrepare[Double](x => (x, f(x)))
-
 
   val testList = Range.inclusive(-10, 10).map(_.toDouble).toList
 
   def corrApproxEq(corr1: Correlation, corr2: Correlation): Boolean =
-      approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&
+    approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&
       approxEqOrBothNaN(EPS)(corr1.m2x, corr2.m2x) &&
       approxEqOrBothNaN(EPS)(corr1.m2y, corr2.m2y) &&
       approxEqOrBothNaN(EPS)(corr1.m1x, corr2.m1x) &&
@@ -96,13 +94,13 @@ class CorrelationLaws extends CheckProperties {
       val a = a0 & Int.MaxValue
       val b = b0 & Int.MaxValue
       (corrApproxEq(corr.scale(a).scale(b), corr.scale(a.toDouble * b)) &&
-        corrApproxEq(corr.scale(a.toDouble + b), CorrelationMonoid.plus(corr.scale(a), corr.scale(b))))
+      corrApproxEq(corr.scale(a.toDouble + b), CorrelationMonoid.plus(corr.scale(a), corr.scale(b))))
     }
   }
 
   property("adding together scaled correlations is the same as scaling then adding") {
-    forAll{ (corr1: Correlation, corr2: Correlation, z0: Int) =>
-    val z = z0 & Int.MaxValue
+    forAll { (corr1: Correlation, corr2: Correlation, z0: Int) =>
+      val z = z0 & Int.MaxValue
       val addThenScale = CorrelationMonoid.plus(corr1, corr2).scale(z)
       val scaleThenAdd = CorrelationMonoid.plus(corr1.scale(z), corr2.scale(z))
       corrApproxEq(addThenScale, scaleThenAdd)
@@ -110,7 +108,7 @@ class CorrelationLaws extends CheckProperties {
   }
 
   property("scaling does affect total weight, doesn't affect mean, variance, or correlation") {
-  // def sign(x: Int): Int = if (x < 0) -1 else 1
+    // def sign(x: Int): Int = if (x < 0) -1 else 1
     forAll { (corr: Correlation, a0: Int) =>
       val a = a0 & Int.MaxValue
       val scaled = corr.scale(a.toDouble)

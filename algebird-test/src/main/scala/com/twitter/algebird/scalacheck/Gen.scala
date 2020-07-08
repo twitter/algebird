@@ -84,21 +84,21 @@ object gen extends ExpHistGen with IntervalGen {
     } yield Correlation((x, y))
 
     val genRandom: Gen[Correlation] =
-    for {
-      c2 <- choose(-1e10, 1e10)
-      m2x <- choose(0, 1e10)
-      m2y <- choose(0, 1e10)
-      m1x <- choose(-1e10, 1e10)
-      m1y <- choose(-1e10, 1e10)
-      m0 <- choose(-1e10, 1e10)
-    } yield Correlation(
-      c2 = c2,
-      m2x = m2x,
-      m2y = m2y,
-      m1x = m1x,
-      m1y = m1y,
-      m0 = m0
-    )
+      for {
+        c2 <- choose(-1e10, 1e10)
+        m2x <- choose(0, 1e10)
+        m2y <- choose(0, 1e10)
+        m1x <- choose(-1e10, 1e10)
+        m1y <- choose(-1e10, 1e10)
+        m0 <- choose(-1e10, 1e10)
+      } yield Correlation(
+        c2 = c2,
+        m2x = m2x,
+        m2y = m2y,
+        m1x = m1x,
+        m1y = m1y,
+        m0 = m0
+      )
 
     val genSum = Gen.zip(recur, recur).map { case (a, b) => CorrelationMonoid.plus(a, b) }
     // now return with a low probability of choosing the branching cases:
@@ -108,7 +108,7 @@ object gen extends ExpHistGen with IntervalGen {
         (5, genUncorr),
         (1, genRandom),
         (1, CorrelationMonoid.zero),
-        (1, genSum)//,
+        (1, genSum) //,
       )
   }
 }
