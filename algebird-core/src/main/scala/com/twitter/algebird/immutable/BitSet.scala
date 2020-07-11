@@ -51,7 +51,6 @@ import BitSet.{Branch, Empty, Leaf}
  * The benchmarks suggest this bitset is MUCH faster than Scala's
  * built-in bitset for cases where you may need many modifications and
  * merges, (for example in a BloomFilter).
- *
  */
 sealed abstract class BitSet { lhs =>
 

@@ -116,7 +116,6 @@ object BloomFilter {
  *   2) query: hash the value k times.  If there are k collisions, then return true; otherwise false.
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
- *
  */
 final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { self =>
   case object Hash {
