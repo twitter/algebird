@@ -234,7 +234,7 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
-  crossScalaVersions += "2.13.2",
+  crossScalaVersions += "2.13.3",
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -263,7 +263,7 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test")
   .settings(
     testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++=
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
@@ -291,14 +291,14 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++= Seq("com.twitter" %% "util-core" % utilVersion)
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdBijection = module("bijection")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies += "com.twitter" %% "bijection-core" % bijectionVersion
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
@@ -315,7 +315,7 @@ lazy val algebirdSpark = module("spark")
 
 lazy val algebirdGeneric = module("generic")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5"
