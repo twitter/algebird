@@ -10,14 +10,20 @@ import scala.reflect.ClassTag
  */
 package object spark {
 
+import org.apache.spark.sql.Dataset
+
   /**
    * spark exposes an Aggregator type, so this is here to avoid shadowing
    */
   type AlgebirdAggregator[A, B, C] = Aggregator[A, B, C]
   val AlgebirdAggregator = Aggregator
 
-  implicit class ToAlgebird[T](val rdd: RDD[T]) extends AnyVal {
+  implicit class ToAlgebirdRDD[T](val rdd: RDD[T]) extends AnyVal {
     def algebird: AlgebirdRDD[T] = new AlgebirdRDD[T](rdd)
+  }
+
+  implicit class ToAlgebirdDataset[T](val ds: Dataset[T]) extends AnyVal {
+    def algebird: AlgebirdDataset[T] = new AlgebirdDataset[T](ds)
   }
 
   def rddMonoid[T: ClassTag](sc: SparkContext): Monoid[RDD[T]] = new Monoid[RDD[T]] {
@@ -31,4 +37,6 @@ package object spark {
   }
   // We should be able to make an Applicative[RDD] except that map needs an implicit ClassTag
   // which breaks the Applicative signature. I don't see a way around that.
+
+
 }

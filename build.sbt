@@ -305,7 +305,10 @@ lazy val algebirdBijection = module("bijection")
 
 lazy val algebirdSpark = module("spark")
   .settings(
-    libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+    libraryDependencies ++= Seq(
+      "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+      "org.apache.spark" %% "spark-sql" % sparkVersion % "provided"
+      ),
     scalacOptions := scalacOptions.value
       .filterNot(
         _.contains("inline")
