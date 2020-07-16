@@ -117,10 +117,13 @@ object BloomFilter {
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
  */
-final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { self =>
-  case object Hash {
-    final def apply(s: A): Array[Int] =
-      nextHash(s, 0, new Array[Int](4), 4, new Array[Int](n))
+final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) { self =>
+  object Hash extends Serializable {
+    final def apply(s: A): Array[Int] = {
+      val target = new Array[Int](n)
+      nextHash(s, 0, new Array[Int](4), 4, target)
+      target
+    }
 
     private def splitLong(x: Long, buffer: Array[Int], idx: Int): Unit = {
       // unfortunately, this is the function we committed to some time ago, and we have tests
@@ -143,12 +146,10 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
         buffer: Array[Int],
         bidx: Int,
         target: Array[Int]
-    ): Array[Int] =
-      if (hashIndex == n) target
-      else {
+    ): Unit =
+      if (hashIndex != n) {
         val thisBidx = if (bidx > 3) {
-          val (a, b) =
-            hash.hashWithSeed((n - hashIndex).toLong, valueToHash)
+          val (a, b) = hash.hashWithSeed((n - hashIndex).toLong, valueToHash)
           splitLong(a, buffer, 0)
           splitLong(b, buffer, 2)
           0
@@ -163,9 +164,9 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
    * Bloom Filter data structure
    */
   sealed abstract class BF extends Serializable {
-    val numHashes: Int = n
+    def numHashes: Int = n
 
-    val width: Int = w
+    def width: Int = w
 
     /**
      * The number of bits set to true in the bloom filter
@@ -227,9 +228,9 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
       (this, that) match {
         // Comparing with empty filter should give number
         // of bits in other set
-        case (_: Zero.type, _: Zero.type) => 0
-        case (_: Zero.type, y: BF)        => y.numBits
-        case (x: BF, _: Zero.type)        => x.numBits
+        case (Zero, Zero)  => 0
+        case (Zero, y: BF) => y.numBits
+        case (x: BF, Zero) => x.numBits
 
         // Otherwise compare as bit sets
         case (_, _) => (this.toBitSet ^ that.toBitSet).size.toInt
@@ -238,7 +239,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
   }
 
   case object Zero extends BF {
-    override def toBitSet: BitSet = BitSet()
+    override def toBitSet: BitSet = BitSet.empty
 
     override val numBits = 0
 
@@ -263,7 +264,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
 
     override def ++(other: BF): BF =
       other match {
-        case _: Zero.type    => this
+        case Zero            => this
         case Item(otherItem) => Instance(BitSet(Hash(item) ++ Hash(otherItem)))
         case _               => other + item
       }
@@ -298,7 +299,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
 
     override def ++(other: BF): BF =
       other match {
-        case _: Zero.type        => this
+        case Zero                => this
         case Item(item)          => this + item
         case Instance(otherBits) => Instance(bits | otherBits)
       }
@@ -346,7 +347,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
 
         while (iter.hasNext) {
           iter.next() match {
-            case _: Zero.type => ()
+            case Zero => ()
             case bi @ Item(item) =>
               bfItem = bi
               val array = Hash(item)
@@ -367,7 +368,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
       }
   }
 
-  implicit val aggregator = new MonoidAggregator[A, BF, BF] {
+  implicit val aggregator: MonoidAggregator[A, BF, BF] = new MonoidAggregator[A, BF, BF] {
     override val monoid: Monoid[BF] = self.monoid
 
     override def prepare(value: A): BF = Item(value)
@@ -375,7 +376,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit hash: Hash128[A]) { sel
     override def present(bf: BF): BF = bf
   }
 
-  implicit val equiv = new Equiv[BF] {
+  implicit val equiv: Equiv[BF] = new Equiv[BF] {
     override def equiv(a: BF, b: BF): Boolean =
       (a eq b) || ((a.numHashes == b.numHashes) &&
         (a.width == b.width) &&

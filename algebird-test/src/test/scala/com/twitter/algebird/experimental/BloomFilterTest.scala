@@ -20,7 +20,7 @@ import com.twitter.algebird.{
 
 object BloomFilterTestUtils {
   def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.BF): bloomFilter.Instance = bf match {
-    case _: bloomFilter.Zero.type => bloomFilter.Instance(BitSet.empty)
+    case bloomFilter.Zero => bloomFilter.Instance(BitSet.empty)
     case bloomFilter.Item(item) =>
       val bs = bloomFilter.Hash(item).foldLeft(BitSet.empty)(_ + _)
       bloomFilter.Instance(bs)
