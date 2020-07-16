@@ -49,7 +49,6 @@ object Correlation {
  * m{i}x denotes the ith central moment of the first projection of the pair.
  * m{i}y denotes the ith central moment of the second projection of the pair.
  * c2 the covariance equivalent of the second central moment, i.e. c2 = Sum_(x,y) (x - m1x)*(y - m1y).
- *
  */
 case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: Double, m0: Double) {
   def totalWeight: Double = m0
@@ -71,7 +70,6 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
   def covariance: Double = c2 / totalWeight
 
   /**
-   *
    * @return Pearson's correlation coefficient
    */
   def correlation: Double =
