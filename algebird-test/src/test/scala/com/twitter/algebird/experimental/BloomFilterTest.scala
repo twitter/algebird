@@ -332,11 +332,11 @@ class ExperimentalBloomFilterTest extends AnyWordSpec with Matchers {
     "work as an Aggregator" in {
       (0 to 10).foreach { _ =>
         val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-        import bloomFilter._
+        import bloomFilter.aggregator
 
         val numEntries = 5
         val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
-        val bf = implicitly[Aggregator[String, bloomFilter.BF, bloomFilter.BF]].apply(entries)
+        val bf = aggregator(entries)
 
         entries.foreach(i => assert(bf.contains(i.toString).isTrue))
       }

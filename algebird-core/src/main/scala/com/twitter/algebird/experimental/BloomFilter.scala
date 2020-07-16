@@ -328,7 +328,15 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
   }
 
-  implicit val monoid = new Monoid[BF] with BoundedSemilattice[BF] {
+  val aggregator: MonoidAggregator[A, BF, BF] = new MonoidAggregator[A, BF, BF] {
+    override val monoid: Monoid[BF] = self.monoid
+
+    override def prepare(value: A): BF = Item(value)
+
+    override def present(bf: BF): BF = bf
+  }
+
+  implicit val monoid: Monoid[BF] with BoundedSemilattice[BF] = new Monoid[BF] with BoundedSemilattice[BF] {
     override val zero: BF = Zero
 
     /**
@@ -368,14 +376,6 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       }
   }
 
-  implicit val aggregator: MonoidAggregator[A, BF, BF] = new MonoidAggregator[A, BF, BF] {
-    override val monoid: Monoid[BF] = self.monoid
-
-    override def prepare(value: A): BF = Item(value)
-
-    override def present(bf: BF): BF = bf
-  }
-
   implicit val equiv: Equiv[BF] = new Equiv[BF] {
     override def equiv(a: BF, b: BF): Boolean =
       (a eq b) || ((a.numHashes == b.numHashes) &&
@@ -396,7 +396,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
   /**
    * Create a bloom filter with multiple items from an iterator
    */
-  def create(data: Iterator[A]): BF = monoid.sum(data.map(Item(_)))
+  def create(data: Iterator[A]): BF = monoid.sum(data.map(Item))
 
   val zero: BF = Zero
 
