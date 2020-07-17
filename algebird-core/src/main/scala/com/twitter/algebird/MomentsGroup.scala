@@ -207,7 +207,7 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
  * but (a - a) + b in general isn't associative: it won't equal a - (a - b)
  * which it should.
  */
-@deprecated("use MomentsMonoid, this isn't lawful for negative counts", "0.13.8")
+@deprecated("use Moments.momentsMonoid, this isn't lawful for negative counts", "0.13.8")
 object MomentsGroup extends MomentsMonoid with Group[Moments] with CommutativeGroup[Moments] {
 
   override def negate(a: Moments): Moments =
