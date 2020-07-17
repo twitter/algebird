@@ -19,8 +19,8 @@ import com.twitter.algebird.{
 }
 
 object BloomFilterTestUtils {
-  def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.BF): bloomFilter.Instance = bf match {
-    case bloomFilter.Zero => bloomFilter.Instance(BitSet.empty)
+  def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.Hash): bloomFilter.Instance = bf match {
+    case bloomFilter.Empty => bloomFilter.Instance(BitSet.empty)
     case bloomFilter.Item(item) =>
       val bs = bloomFilter.hashToArray(item).foldLeft(BitSet.empty)(_ + _)
       bloomFilter.Instance(bs)
@@ -36,7 +36,7 @@ class ExperimentalBloomFilterLaws extends CheckProperties {
   val bf: BloomFilter[String] = BloomFilter[String](6, 12)
   import bf._
 
-  implicit val bfGen: Arbitrary[bf.BF] =
+  implicit val bfGen: Arbitrary[bf.Hash] =
     Arbitrary {
       val item = Gen.choose(0, 10000).map(v => bf.create(v.toString))
       val zero = Gen.const(Monoid.zero)
@@ -50,27 +50,27 @@ class ExperimentalBloomFilterLaws extends CheckProperties {
     }
 
   property("BloomFilter is a Monoid") {
-    commutativeMonoidLaws[bf.BF]
+    commutativeMonoidLaws[bf.Hash]
   }
 
   property("++ is the same as plus") {
-    forAll((a: bf.BF, b: bf.BF) => Equiv[bf.BF].equiv(a ++ b, Monoid.plus(a, b)))
+    forAll((a: bf.Hash, b: bf.Hash) => Equiv[bf.Hash].equiv(a ++ b, Monoid.plus(a, b)))
   }
 
   property("the distance between a filter and itself should be 0") {
-    forAll((a: bf.BF) => a.hammingDistance(a) == 0)
+    forAll((a: bf.Hash) => a.hammingDistance(a) == 0)
   }
 
   property(
     "the distance between a filter and an empty filter should be the number of bits" +
       "set in the existing filter"
   ) {
-    forAll((a: bf.BF) => a.hammingDistance(Monoid.zero) == a.numBits)
+    forAll((a: bf.Hash) => a.hammingDistance(Monoid.zero) == a.numBits)
   }
 
   property("all equivalent filters should have 0 Hamming distance") {
-    forAll { (a: bf.BF, b: bf.BF) =>
-      if (Equiv[bf.BF].equiv(a, b))
+    forAll { (a: bf.Hash, b: bf.Hash) =>
+      if (Equiv[bf.Hash].equiv(a, b))
         a.hammingDistance(b) == 0
       else {
         val dist = a.hammingDistance(b)
@@ -80,35 +80,35 @@ class ExperimentalBloomFilterLaws extends CheckProperties {
   }
 
   property("distance between filters should be symmetrical") {
-    forAll((a: bf.BF, b: bf.BF) => a.hammingDistance(b) == b.hammingDistance(a))
+    forAll((a: bf.Hash, b: bf.Hash) => a.hammingDistance(b) == b.hammingDistance(a))
   }
 
   property("+ is the same as adding with create") {
-    forAll { (a: bf.BF, b: String) =>
-      Equiv[bf.BF].equiv(a + b, Monoid.plus(a, bf.create(b)))
+    forAll { (a: bf.Hash, b: String) =>
+      Equiv[bf.Hash].equiv(a + b, Monoid.plus(a, bf.create(b)))
     }
   }
 
   property("maybeContains is consistent with contains") {
-    forAll((a: bf.BF, b: String) => a.maybeContains(b) == a.contains(b).isTrue)
+    forAll((a: bf.Hash, b: String) => a.maybeContains(b) == a.contains(b).isTrue)
   }
 
   property("after + maybeContains is true") {
-    forAll((a: bf.BF, b: String) => (a + b).maybeContains(b))
+    forAll((a: bf.Hash, b: String) => (a + b).maybeContains(b))
   }
 
   property("checkAndAdd works like check the add") {
-    forAll { (a: bf.BF, b: String) =>
+    forAll { (a: bf.Hash, b: String) =>
       val (next, check) = a.checkAndAdd(b)
       val next1 = a + b
 
-      Equiv[bf.BF].equiv(next, next1) &&
+      Equiv[bf.Hash].equiv(next, next1) &&
       (check == a.contains(b))
     }
   }
 
   property("a ++ a = a for BF") {
-    forAll((a: bf.BF) => Equiv[bf.BF].equiv(a ++ a, a))
+    forAll((a: bf.Hash) => Equiv[bf.Hash].equiv(a ++ a, a))
   }
 }
 
@@ -179,7 +179,7 @@ class ExperimentalBloomFilterHashIndices extends CheckProperties {
 class BloomFilterFalsePositives[T: Gen: Hash128](falsePositiveRate: Double) extends ApproximateProperty {
 
   type Exact = Set[T]
-  type Approx = BloomFilter[T]#BF
+  type Approx = BloomFilter[T]#Hash
 
   type Input = T
   type Result = Boolean
@@ -207,13 +207,13 @@ class BloomFilterFalsePositives[T: Gen: Hash128](falsePositiveRate: Double) exte
 
   def exactResult(s: Set[T], t: T) = s.contains(t)
 
-  def approximateResult(bf: BloomFilter[T]#BF, t: T) = bf.contains(t)
+  def approximateResult(bf: BloomFilter[T]#Hash, t: T) = bf.contains(t)
 }
 
 class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
 
   type Exact = Set[T]
-  type Approx = BloomFilter[T]#BF
+  type Approx = BloomFilter[T]#Hash
 
   type Input = Unit
   type Result = Long
@@ -237,7 +237,7 @@ class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
   def inputGenerator(set: Set[T]) = Gen.const(())
 
   def exactResult(s: Set[T], u: Unit) = s.size
-  def approximateResult(bf: BloomFilter[T]#BF, u: Unit) = bf.size
+  def approximateResult(bf: BloomFilter[T]#Hash, u: Unit) = bf.size
 }
 
 class ExperimentalBloomFilterProperties extends ApproximateProperties("BloomFilter") {
@@ -266,14 +266,14 @@ class ExperimentalBloomFilterTest extends AnyWordSpec with Matchers {
       val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
       val entries = (0 until 100).map(_ => RAND.nextInt.toString)
       val bf = bloomFilter.create(entries.iterator)
-      assert(bf.isInstanceOf[bloomFilter.BF])
+      assert(bf.isInstanceOf[bloomFilter.Hash])
     }
 
     "be possible to create from a sequence" in {
       val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
       val entries = (0 until 100).map(_ => RAND.nextInt.toString)
       val bf = bloomFilter.create(entries: _*)
-      assert(bf.isInstanceOf[bloomFilter.BF])
+      assert(bf.isInstanceOf[bloomFilter.Hash])
     }
 
     "identify all true positives" in {
@@ -345,7 +345,7 @@ class ExperimentalBloomFilterTest extends AnyWordSpec with Matchers {
     "not serialize @transient dense Instance" in {
       val bloomFilter = BloomFilter[String](10, 0.1)
 
-      def serialize(bf: bloomFilter.BF): Array[Byte] = {
+      def serialize(bf: bloomFilter.Hash): Array[Byte] = {
         val stream = new ByteArrayOutputStream()
         val out = new ObjectOutputStream(stream)
         out.writeObject(bf)

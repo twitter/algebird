@@ -16,7 +16,7 @@ object BloomFilterQueryBenchmark {
     var falsePositiveRate: Double = 0
 
     var bf: BF[String] = _
-    var experimentalBF: experimental.BloomFilter[String]#BF = _
+    var experimentalBF: experimental.BloomFilter[String]#Hash = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
