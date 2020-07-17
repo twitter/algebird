@@ -147,7 +147,7 @@ object BloomFilter {
   ): Approximate[Long] = {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
-    /**
+    /*
      * s(n) is the expected number of bits that have been set to true after
      * n elements have been inserted into the Bloom filter.
      * This is \hat{S}(n) in the cardinality estimation paper used above.
@@ -155,7 +155,7 @@ object BloomFilter {
     def s(n: Int): Double =
       width * (1 - scala.math.pow(1 - 1.0 / width, numHashes * n))
 
-    /**
+    /*
      * sInverse(t) is the maximum likelihood value for the number of elements
      * that have been inserted into the Bloom filter when it has t bits set to true.
      * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.

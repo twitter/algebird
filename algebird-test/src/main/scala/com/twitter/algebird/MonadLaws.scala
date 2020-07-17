@@ -88,7 +88,7 @@ object MonadLaws {
     forAll((t: T, fn: T => M[U]) => Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t)))
 
   def rightIdentity[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
-    forAll((mt: M[T]) => Equiv[M[T]].equiv(mt.flatMap(_.pure[M]), mt))
+    forAll((mt: M[T]) => equiv.equiv(mt.flatMap(_.pure[M]), mt))
 
   def associative[M[_], T, U, V](implicit
       monad: Monad[M],
@@ -97,7 +97,7 @@ object MonadLaws {
       fn2: Arbitrary[U => M[V]],
       equiv: Equiv[M[V]]
   ) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
-    Equiv[M[V]].equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap(t => f1(t).flatMap(f2)))
+    equiv.equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap(t => f1(t).flatMap(f2)))
   }
 
   def monadLaws[M[_], T, U, R](implicit
@@ -106,11 +106,13 @@ object MonadLaws {
       equivT: Equiv[M[T]],
       equivU: Equiv[M[U]],
       equivR: Equiv[M[R]],
-      fn1: Arbitrary[(T) => M[U]],
+      fn1: Arbitrary[T => M[U]],
       arbr: Arbitrary[M[R]],
       fn2: Arbitrary[U => M[R]],
       arbu: Arbitrary[U]
   ) =
+    // TODO: equivT and equivU are unused, only equivR is used
+    // but it would break binary compatibility to remove them
     associative[M, T, U, R] && rightIdentity[M, R] && leftIdentity[M, U, R]
 
   implicit def indexedSeqA[T](implicit arbl: Arbitrary[List[T]]): Arbitrary[IndexedSeq[T]] =

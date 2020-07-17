@@ -143,19 +143,19 @@ object FloatRing extends Ring[Float] {
   override def plus(l: Float, r: Float): Float = l + r
   override def minus(l: Float, r: Float): Float = l - r
   override def times(l: Float, r: Float): Float = l * r
-  override def sum(t: TraversableOnce[Float]): Float = {
-    var sum = 0.0f
-    val iter = t.toIterator
-    while (iter.hasNext) {
-      sum += iter.next()
-    }
-
-    sum
-  }
 
   override def sumOption(t: TraversableOnce[Float]): Option[Float] =
     if (t.isEmpty) None
-    else Some(sum(t))
+    else
+      Some {
+        var sum = 0.0
+        val iter = t.toIterator
+        while (iter.hasNext) {
+          sum += iter.next().toDouble
+        }
+
+        sum.toFloat
+      }
 }
 
 object DoubleRing extends Ring[Double] {
@@ -165,19 +165,19 @@ object DoubleRing extends Ring[Double] {
   override def plus(l: Double, r: Double): Double = l + r
   override def minus(l: Double, r: Double): Double = l - r
   override def times(l: Double, r: Double): Double = l * r
-  override def sum(t: TraversableOnce[Double]): Double = {
-    var sum = 0.0
-    val iter = t.toIterator
-    while (iter.hasNext) {
-      sum += iter.next()
-    }
-
-    sum
-  }
 
   override def sumOption(t: TraversableOnce[Double]): Option[Double] =
     if (t.isEmpty) None
-    else Some(sum(t))
+    else
+      Some {
+        var sum = 0.0
+        val iter = t.toIterator
+        while (iter.hasNext) {
+          sum += iter.next()
+        }
+
+        sum
+      }
 }
 
 object BooleanRing extends Ring[Boolean] {

@@ -157,7 +157,7 @@ object CorrelationMonoid extends Monoid[Correlation] {
 
       while (iter.hasNext) {
 
-        /**
+        /*
          * This is tested by monoidLaws to match plus
          * we do this loop here to avoid allocating
          * between each pair of Correlations

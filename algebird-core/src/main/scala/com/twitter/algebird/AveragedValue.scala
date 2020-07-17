@@ -150,17 +150,17 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
     else {
       var count = 0L
       var average = 0.0
-      iter.iterator.foreach {
-        case AveragedValue(c, v) =>
-          average = getCombinedMean(count, average, c, v)
-          count += c
+      val it = iter.toIterator
+      while (it.hasNext) {
+        val av = it.next()
+        average = getCombinedMean(count, average, av.count, av.value)
+        count += av.count
       }
       Some(AveragedValue(count, average))
     }
 
   /**
-   * @inheritdoc
-   * @see [[AveragedValue.+]] for the implementation
+   * combine two AveragedValue instances
    */
   override def plus(l: AveragedValue, r: AveragedValue): AveragedValue = {
     val n = l.count

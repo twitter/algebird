@@ -153,7 +153,7 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
 
       while (iter.hasNext) {
 
-        /**
+        /*
          * Unfortunately we copy the code in plus, but we do
          * it to avoid allocating a new Moments on every item
          * in the loop. the Monoid laws test that sum
