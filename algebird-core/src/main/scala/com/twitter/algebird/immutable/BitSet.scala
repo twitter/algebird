@@ -280,6 +280,17 @@ sealed abstract class BitSet { lhs =>
   def reverseIterator: Iterator[Int]
 
   /**
+   * Present a view of this bitset as a `scala.Set[Int]`.
+   *
+   * This is provided for compatibility with Scala collections. Many
+   * of the set operations are implemented in terms of `BitSet`, but
+   * other operations (for example `map`) may copy these values into a
+   * different `Set` implementation.
+   */
+  def toSet: Set[Int] =
+    new compat.BitSetWrapperSet(this)
+
+  /**
    * Returns false if this bitset contains values, true otherwise.
    */
   def isEmpty: Boolean
@@ -937,7 +948,7 @@ object BitSet {
 
     def |(rhs: BitSet): BitSet =
       rhs match {
-        case Leaf(offset, values2) =>
+        case Leaf(`offset`, values2) =>
           val vs = new Array[Long](32)
           var i = 0
           while (i < 32) {
