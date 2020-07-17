@@ -174,11 +174,13 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
     /**
      * Proportion of bits that are set to true.
      */
-    final val density: Double = numBits.toDouble / width
+    def density: Double = numBits.toDouble / width
 
     def ++(other: Hash): Hash
 
     def +(other: A): Hash
+
+    def |(other: Hash): Hash = this ++ other
 
     def checkAndAdd(item: A): (Hash, ApproximateBoolean)
 
@@ -262,9 +264,15 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
 
     override def ++(other: Hash): Hash =
       other match {
-        case Empty           => this
-        case Item(otherItem) => Instance(BitSet(hashToArray(item) ++ hashToArray(otherItem)))
-        case _               => other + item
+        case Empty => this
+        case Item(otherItem) =>
+          Instance {
+            BitSet
+              .newEmpty(0)
+              .mutableAdd(hashToArray(item))
+              .mutableAdd(hashToArray(otherItem))
+          }
+        case _ => other + item
       }
 
     override def +(other: A): Hash = this ++ Item(other)
@@ -298,11 +306,11 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
     override def ++(other: Hash): Hash =
       other match {
         case Empty               => this
-        case Item(item)          => this + item
+        case Item(item)          => Instance(bits | BitSet(hashToArray(item)))
         case Instance(otherBits) => Instance(bits | otherBits)
       }
 
-    override def +(item: A): Instance = Instance(bits | BitSet(hashToArray(item)))
+    override def +(item: A): Hash = this ++ Item(item)
 
     override def checkAndAdd(other: A): (Hash, ApproximateBoolean) =
       (this + other, contains(other))
