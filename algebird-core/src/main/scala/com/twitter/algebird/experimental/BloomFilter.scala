@@ -226,7 +226,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       (this, that) match {
         // Comparing with empty filter should give number
         // of bits in other set
-        case (Empty, Empty)  => 0
+        case (Empty, Empty)   => 0
         case (Empty, y: Hash) => y.numBits
         case (x: Hash, Empty) => x.numBits
 
@@ -262,7 +262,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
 
     override def ++(other: Hash): Hash =
       other match {
-        case Empty            => this
+        case Empty           => this
         case Item(otherItem) => Instance(BitSet(hashToArray(item) ++ hashToArray(otherItem)))
         case _               => other + item
       }
@@ -297,7 +297,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
 
     override def ++(other: Hash): Hash =
       other match {
-        case Empty                => this
+        case Empty               => this
         case Item(item)          => this + item
         case Instance(otherBits) => Instance(bits | otherBits)
       }
@@ -326,45 +326,49 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
   }
 
-  implicit val monoid: Monoid[Hash] with BoundedSemilattice[Hash] = new Monoid[Hash] with BoundedSemilattice[Hash] {
-    override val zero: Hash = Empty
+  implicit val monoid: Monoid[Hash] with BoundedSemilattice[Hash] =
+    new Monoid[Hash] with BoundedSemilattice[Hash] {
+      override val zero: Hash = Empty
 
-    /**
-     * Assume the bloom filters are compatible (same width and same hashing functions).  This
-     * is the union of the 2 bloom filters.
-     */
-    override def plus(left: Hash, right: Hash): Hash = left ++ right
+      /**
+       * Assume the bloom filters are compatible (same width and same hashing functions).  This
+       * is the union of the 2 bloom filters.
+       */
+      override def plus(left: Hash, right: Hash): Hash = left ++ right
 
-    override def sumOption(as: TraversableOnce[Hash]): Option[Hash] =
-      if (as.iterator.isEmpty) None
-      else {
-        var bfItem: Item = null
-        val iter = as.iterator
-        var counter = 0
-        var bs = BitSet.newEmpty(0)
+      override def sum(t: TraversableOnce[Hash]): Hash =
+        if (t.iterator.isEmpty) empty
+        else {
+          var bfItem: Item = null
+          val iter = t.iterator
+          var counter = 0
+          var bs = BitSet.newEmpty(0)
 
-        while (iter.hasNext) {
-          iter.next() match {
-            case Empty => ()
-            case bi @ Item(item) =>
-              bfItem = bi
-              val array = hashToArray(item)
-              counter += array.length
-              bs = bs.mutableAdd(array)
-            case Instance(bitset) =>
-              val iter = bitset.iterator
-              while (iter.hasNext) {
-                counter += 1
-                bs = bs.mutableAdd(iter.next())
-              }
+          while (iter.hasNext) {
+            iter.next() match {
+              case Empty => ()
+              case bi @ Item(item) =>
+                bfItem = bi
+                val array = hashToArray(item)
+                counter += array.length
+                bs = bs.mutableAdd(array)
+              case Instance(bitset) =>
+                val iter = bitset.iterator
+                while (iter.hasNext) {
+                  counter += 1
+                  bs = bs.mutableAdd(iter.next())
+                }
+            }
           }
+
+          if (counter == 0) empty
+          else if (counter == n && (bfItem != null)) bfItem
+          else Instance(bs)
         }
 
-        if (counter == 0) Some(zero)
-        else if (counter == n && (bfItem != null)) Some(bfItem)
-        else Some(Instance(bs))
-      }
-  }
+      override def sumOption(t: TraversableOnce[Hash]): Option[Hash] =
+        if (t.iterator.isEmpty) None else Some(sum(t))
+    }
 
   val aggregator: MonoidAggregator[A, Hash, Hash] = new MonoidAggregator[A, Hash, Hash] {
     override val monoid: Monoid[Hash] = self.monoid
@@ -396,6 +400,6 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
    */
   def create(data: Iterator[A]): Hash = monoid.sum(data.map(Item))
 
-  val zero: Hash = Empty
+  val empty: Hash = Empty
 
 }

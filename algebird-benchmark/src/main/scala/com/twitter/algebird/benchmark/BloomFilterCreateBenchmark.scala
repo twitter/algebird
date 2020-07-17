@@ -59,7 +59,7 @@ class BloomFilterCreateBenchmark {
   def createBloomFilterUsingFoldExperimental(
       bloomFilterState: BloomFilterState
   ): experimental.BloomFilter[String]#Hash =
-    bloomFilterState.randomStrings.foldLeft(bloomFilterState.experimentalBF.zero) {
+    bloomFilterState.randomStrings.foldLeft(bloomFilterState.experimentalBF.empty) {
       case (filter, string) => filter + string
     }
 
