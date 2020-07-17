@@ -118,47 +118,45 @@ object BloomFilter {
  * http://en.wikipedia.org/wiki/Bloom_filter
  */
 final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) { self =>
-  object Hash extends Serializable {
-    final def apply(s: A): Array[Int] = {
-      val target = new Array[Int](n)
-      nextHash(s, 0, new Array[Int](4), 4, target)
-      target
-    }
-
-    private def splitLong(x: Long, buffer: Array[Int], idx: Int): Unit = {
-      // unfortunately, this is the function we committed to some time ago, and we have tests
-      // locking it down. x.toInt & 0x7fffffff should work, but this gives a few different values
-      def toNonNegativeInt(x: Long): Int =
-        (math
-          .abs(x)
-          .toInt) & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
-
-      val upper = toNonNegativeInt(x >> 32)
-      val lower = toNonNegativeInt((x << 32) >> 32)
-      buffer(idx) = upper
-      buffer(idx + 1) = lower
-    }
-
-    @annotation.tailrec
-    private def nextHash(
-        valueToHash: A,
-        hashIndex: Int,
-        buffer: Array[Int],
-        bidx: Int,
-        target: Array[Int]
-    ): Unit =
-      if (hashIndex != n) {
-        val thisBidx = if (bidx > 3) {
-          val (a, b) = hash.hashWithSeed((n - hashIndex).toLong, valueToHash)
-          splitLong(a, buffer, 0)
-          splitLong(b, buffer, 2)
-          0
-        } else bidx
-
-        target(hashIndex) = buffer(thisBidx) % w
-        nextHash(valueToHash, hashIndex + 1, buffer, thisBidx + 1, target)
-      }
+  def hashToArray(s: A): Array[Int] = {
+    val target = new Array[Int](n)
+    nextHash(s, 0, new Array[Int](4), 4, target)
+    target
   }
+
+  private def splitLong(x: Long, buffer: Array[Int], idx: Int): Unit = {
+    // unfortunately, this is the function we committed to some time ago, and we have tests
+    // locking it down. x.toInt & 0x7fffffff should work, but this gives a few different values
+    def toNonNegativeInt(x: Long): Int =
+      (math
+        .abs(x)
+        .toInt) & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
+
+    val upper = toNonNegativeInt(x >> 32)
+    val lower = toNonNegativeInt((x << 32) >> 32)
+    buffer(idx) = upper
+    buffer(idx + 1) = lower
+  }
+
+  @annotation.tailrec
+  private def nextHash(
+      valueToHash: A,
+      hashIndex: Int,
+      buffer: Array[Int],
+      bidx: Int,
+      target: Array[Int]
+  ): Unit =
+    if (hashIndex != n) {
+      val thisBidx = if (bidx > 3) {
+        val (a, b) = hash.hashWithSeed((n - hashIndex).toLong, valueToHash)
+        splitLong(a, buffer, 0)
+        splitLong(b, buffer, 2)
+        0
+      } else bidx
+
+      target(hashIndex) = buffer(thisBidx) % w
+      nextHash(valueToHash, hashIndex + 1, buffer, thisBidx + 1, target)
+    }
 
   /**
    * Bloom Filter data structure
@@ -260,12 +258,12 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
   case class Item(item: A) extends BF {
     override val numBits: Int = numHashes
 
-    override def toBitSet: BitSet = BitSet(Hash(item))
+    override def toBitSet: BitSet = BitSet(hashToArray(item))
 
     override def ++(other: BF): BF =
       other match {
         case Zero            => this
-        case Item(otherItem) => Instance(BitSet(Hash(item) ++ Hash(otherItem)))
+        case Item(otherItem) => Instance(BitSet(hashToArray(item) ++ hashToArray(otherItem)))
         case _               => other + item
       }
 
@@ -304,13 +302,13 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
         case Instance(otherBits) => Instance(bits | otherBits)
       }
 
-    override def +(item: A): Instance = Instance(bits | BitSet(Hash(item)))
+    override def +(item: A): Instance = Instance(bits | BitSet(hashToArray(item)))
 
     override def checkAndAdd(other: A): (BF, ApproximateBoolean) =
       (this + other, contains(other))
 
     override def maybeContains(item: A): Boolean = {
-      val il = Hash(item)
+      val il = hashToArray(item)
       var idx = 0
       var found = true
       while (idx < il.length && found) {
@@ -350,7 +348,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
             case Zero => ()
             case bi @ Item(item) =>
               bfItem = bi
-              val array = Hash(item)
+              val array = hashToArray(item)
               counter += array.length
               bs = bs.mutableAdd(array)
             case Instance(bitset) =>

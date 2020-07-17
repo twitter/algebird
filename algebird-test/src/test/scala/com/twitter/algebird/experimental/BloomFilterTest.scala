@@ -22,7 +22,7 @@ object BloomFilterTestUtils {
   def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.BF): bloomFilter.Instance = bf match {
     case bloomFilter.Zero => bloomFilter.Instance(BitSet.empty)
     case bloomFilter.Item(item) =>
-      val bs = bloomFilter.Hash(item).foldLeft(BitSet.empty)(_ + _)
+      val bs = bloomFilter.hashToArray(item).foldLeft(BitSet.empty)(_ + _)
       bloomFilter.Instance(bs)
     case bfi: bloomFilter.Instance => bfi
   }
@@ -123,7 +123,7 @@ class ExperimentalBloomFilterHashIndices extends CheckProperties {
     }
 
   property("Indices are non negative") {
-    forAll((bf: BloomFilter[String], v: Long) => bf.Hash(v.toString).forall(e => e >= 0))
+    forAll((bf: BloomFilter[String], v: Long) => bf.hashToArray(v.toString).forall(e => e >= 0))
   }
 
   /**
@@ -171,7 +171,7 @@ class ExperimentalBloomFilterHashIndices extends CheckProperties {
       val s = v.toString
       val (bf, negativeHash) = pair
       val indices = negativeHash.apply(s)
-      (indices == (bf.Hash(s).toStream)) || indices.exists(_ < 0)
+      (indices == (bf.hashToArray(s).toStream)) || indices.exists(_ < 0)
     }
   }
 }
@@ -367,9 +367,9 @@ class ExperimentalBloomFilterTest extends AnyWordSpec with Matchers {
      * this test failed before the fix for https://github.com/twitter/algebird/issues/229
      */
     "not have negative hash values" in {
-      val bfHash = BloomFilter[String](2, 4752800).Hash
+      val bf = BloomFilter[String](2, 4752800)
       val s = "7024497610539761509"
-      val index = bfHash.apply(s).head
+      val index = bf.hashToArray(s).head
 
       assert(index >= 0)
     }
