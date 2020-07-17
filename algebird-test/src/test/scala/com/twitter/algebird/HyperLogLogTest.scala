@@ -362,7 +362,10 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) =>
         seq :+ (seq.last + mon.create(value))
       }
-      (1 to 200).map(n => assert(partialSums(n) == mon.batchCreate(data.slice(0, n))))
+      (1 to 200).map { n =>
+        val bc = mon.sum(data.slice(0, n).map(mon.toHLL(_)))
+        assert(partialSums(n) == bc)
+      }
     }
 
     "work as an Aggregator and return a HLL" in {

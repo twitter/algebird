@@ -2,7 +2,6 @@ package com.twitter.algebird
 package benchmark
 
 import scala.util.Random
-import com.twitter.bijection._
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
@@ -47,10 +46,9 @@ object HllBenchmark {
 
       val rng = new Random(3)
 
-      val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
       def setSize = rng.nextInt(10) + 1 // 1 -> 10
       def hll(elements: Set[Long]): HLL =
-        hllMonoid.batchCreate(elements)(byteEncoder)
+        hllMonoid.sum(elements.map(hllMonoid.toHLL[Long](_)))
 
       val inputIntermediate = (0L until numElements).map { _ =>
         val setElements = (0 until setSize).map(_ => rng.nextInt(1000).toLong).toSet

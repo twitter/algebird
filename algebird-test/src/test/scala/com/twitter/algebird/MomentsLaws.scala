@@ -1,23 +1,47 @@
 package com.twitter.algebird
 
 import com.twitter.algebird.BaseProperties._
-import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalacheck.{Arbitrary, Gen}
 
 class MomentsLaws extends CheckProperties {
   val EPS = 1e-10
 
+  implicit val equiv: Equiv[Moments] =
+    Equiv.fromFunction { (ml, mr) =>
+      (ml.m0 == mr.m0) &&
+      approxEq(EPS)(ml.m1, mr.m1) &&
+      approxEq(EPS)(ml.m2, mr.m2) &&
+      approxEq(EPS)(ml.m3, mr.m3) &&
+      approxEq(EPS)(ml.m4, mr.m4)
+    }
+
+  def opBasedGen[A: Numeric](genA: Gen[A]): Gen[Moments] = {
+    val init: Gen[Moments] = genA.map(Moments(_))
+
+    val recur = Gen.lzy(opBasedGen[A](genA))
+    val pair = Gen.zip(recur, recur)
+
+    import Operators.Ops
+
+    Gen.frequency(
+      (10, init),
+      (1, pair.map { case (a, b) => a + b })
+    )
+  }
+
   property("Moments Group laws") {
-    implicit val equiv: Equiv[Moments] =
-      Equiv.fromFunction { (ml, mr) =>
-        (ml.m0 == mr.m0) &&
-        approxEq(EPS)(ml.m1, mr.m1) &&
-        approxEq(EPS)(ml.m2, mr.m2) &&
-        approxEq(EPS)(ml.m3, mr.m3) &&
-        approxEq(EPS)(ml.m4, mr.m4)
-      }
+    import com.twitter.algebird.scalacheck.arbitrary.momentsArb
+    implicit val group: Group[Moments] = MomentsGroup
     groupLaws[Moments]
+  }
+
+  property("Moments laws tested with operational generation") {
+    implicit val arbMom: Arbitrary[Moments] =
+      Arbitrary(opBasedGen[Double](Gen.choose(-1e10, 1e10)))
+
+    monoidLaws[Moments]
   }
 }
 
@@ -30,7 +54,7 @@ class MomentsTest extends AnyWordSpec with Matchers {
    * the list's central moments.
    */
   def getMoments(xs: List[Double]): Moments =
-    xs.foldLeft(MomentsGroup.zero)((m, x) => MomentsGroup.plus(m, Moments(x)))
+    MomentsAggregator(xs)
 
   "Moments should count" in {
     val m1 = getMoments(List(1, 2, 3, 4, 5))

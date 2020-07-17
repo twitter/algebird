@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.twitter.algebird
 
-import algebra.CommutativeGroup
+import algebra.{CommutativeGroup, CommutativeMonoid}
 
 /**
  * A class to calculate the first five central moments over a sequence of Doubles.
@@ -57,8 +57,13 @@ case class Moments(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
 }
 
 object Moments {
-  implicit val group: Group[Moments] with CommutativeGroup[Moments] =
+  @deprecated("use monoid[Moments], this isn't lawful for negate", "0.13.8")
+  def group: Group[Moments] with CommutativeGroup[Moments] =
     MomentsGroup
+
+  implicit val momentsMonoid: Monoid[Moments] with CommutativeMonoid[Moments] =
+    new MomentsMonoid
+
   val aggregator: MomentsAggregator.type = MomentsAggregator
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
@@ -73,10 +78,7 @@ object Moments {
     new Moments(m0, num.toDouble(m1), num.toDouble(m2), num.toDouble(m3), num.toDouble(m4))
 }
 
-/**
- * A monoid to perform moment calculations.
- */
-object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
+class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
 
   /**
    * When combining averages, if the counts sizes are too close we
@@ -108,35 +110,108 @@ object MomentsGroup extends Group[Moments] with CommutativeGroup[Moments] {
 
   override val zero: Moments = Moments(0L, 0.0, 0.0, 0.0, 0.0)
 
-  override def negate(a: Moments): Moments =
-    Moments(-a.count, a.m1, -a.m2, -a.m3, -a.m4)
-
   // Combines the moment calculations from two streams.
   // See http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Higher-order_statistics
   // for more information on the formulas used to update the moments.
   override def plus(a: Moments, b: Moments): Moments = {
-    val delta = b.mean - a.mean
     val countCombined = a.count + b.count
-    if (countCombined == 0)
-      return zero
-    val meanCombined = getCombinedMean(a.count, a.mean, b.count, b.mean)
+    if (countCombined == 0L) zero
+    else {
+      val delta = b.mean - a.mean
+      val meanCombined = getCombinedMean(a.count, a.mean, b.count, b.mean)
 
-    val m2 = a.m2 + b.m2 +
-      math.pow(delta, 2) * a.count * b.count / countCombined
+      val m2 = a.m2 + b.m2 +
+        math.pow(delta, 2) * a.count * b.count / countCombined
 
-    val m3 = a.m3 + b.m3 +
-      math.pow(delta, 3) * a.count * b.count * (a.count - b.count) / math.pow(countCombined, 2) +
-      3 * delta * (a.count * b.m2 - b.count * a.m2) / countCombined
+      val m3 = a.m3 + b.m3 +
+        math.pow(delta, 3) * a.count * b.count * (a.count - b.count) / math.pow(countCombined, 2) +
+        3 * delta * (a.count * b.m2 - b.count * a.m2) / countCombined
 
-    val m4 = a.m4 + b.m4 +
-      math.pow(delta, 4) * a.count * b.count * (math.pow(a.count, 2) -
-        a.count * b.count + math.pow(b.count, 2)) / math.pow(countCombined, 3) +
-      6 * math.pow(delta, 2) * (math.pow(a.count, 2) * b.m2 +
-        math.pow(b.count, 2) * a.m2) / math.pow(countCombined, 2) +
-      4 * delta * (a.count * b.m3 - b.count * a.m3) / countCombined
+      val m4 = a.m4 + b.m4 +
+        math.pow(delta, 4) * a.count * b.count * (math.pow(a.count, 2) -
+          a.count * b.count + math.pow(b.count, 2)) / math.pow(countCombined, 3) +
+        6 * math.pow(delta, 2) * (math.pow(a.count, 2) * b.m2 +
+          math.pow(b.count, 2) * a.m2) / math.pow(countCombined, 2) +
+        4 * delta * (a.count * b.m3 - b.count * a.m3) / countCombined
 
-    Moments(countCombined, meanCombined, m2, m3, m4)
+      Moments(countCombined, meanCombined, m2, m3, m4)
+    }
   }
+
+  override def sumOption(items: TraversableOnce[Moments]): Option[Moments] =
+    if (items.isEmpty) None
+    else {
+      val iter = items.toIterator
+
+      val init = iter.next()
+
+      var count: Long = init.count
+      var mean: Double = init.mean
+      var m2: Double = init.m2
+      var m3: Double = init.m3
+      var m4: Double = init.m4
+
+      while (iter.hasNext) {
+
+        /**
+         * Unfortunately we copy the code in plus, but we do
+         * it to avoid allocating a new Moments on every item
+         * in the loop. the Monoid laws test that sum
+         * matches looping on plus
+         */
+        val b = iter.next()
+
+        val countCombined = count + b.count
+
+        if (countCombined == 0L) {
+          mean = 0.0
+          m2 = 0.0
+          m3 = 0.0
+          m4 = 0.0
+        } else {
+          val delta = b.mean - mean
+          val meanCombined = getCombinedMean(count, mean, b.count, b.mean)
+
+          val m2Combined = m2 + b.m2 +
+            math.pow(delta, 2) * count * b.count / countCombined
+
+          val m3Combined = m3 + b.m3 +
+            math.pow(delta, 3) * count * b.count * (count - b.count) / math.pow(countCombined, 2) +
+            3 * delta * (count * b.m2 - b.count * m2) / countCombined
+
+          val m4Combined = m4 + b.m4 +
+            math.pow(delta, 4) * count * b.count * (math.pow(count, 2) -
+              count * b.count + math.pow(b.count, 2)) / math.pow(countCombined, 3) +
+            6 * math.pow(delta, 2) * (math.pow(count, 2) * b.m2 +
+              math.pow(b.count, 2) * m2) / math.pow(countCombined, 2) +
+            4 * delta * (count * b.m3 - b.count * m3) / countCombined
+
+          mean = meanCombined
+          m2 = m2Combined
+          m3 = m3Combined
+          m4 = m4Combined
+        }
+
+        count = countCombined
+      }
+
+      Some(Moments(count, mean, m2, m3, m4))
+    }
+}
+
+/**
+ * This should not be used as a group (avoid negate and minus). It was wrongly
+ * believed that this was a group for several years in this code, however
+ * it was only being tested with positive counts (which is to say the generators
+ * were too weak). It isn't the case that minus and negate are totally wrong
+ * but (a - a) + b in general isn't associative: it won't equal a - (a - b)
+ * which it should.
+ */
+@deprecated("use MomentsMonoid, this isn't lawful for negative counts", "0.13.8")
+object MomentsGroup extends MomentsMonoid with Group[Moments] with CommutativeGroup[Moments] {
+
+  override def negate(a: Moments): Moments =
+    Moments(-a.count, a.m1, -a.m2, -a.m3, -a.m4)
 }
 
 object MomentsAggregator extends MonoidAggregator[Double, Moments, Moments] {

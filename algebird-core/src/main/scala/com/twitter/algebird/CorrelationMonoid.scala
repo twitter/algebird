@@ -120,7 +120,7 @@ object CorrelationMonoid extends Monoid[Correlation] {
    */
   override def plus(a: Correlation, b: Correlation): Correlation = {
     val count = a.totalWeight + b.totalWeight
-    if (count == 0)
+    if (count == 0.0)
       CorrelationMonoid.zero
     else {
       val prodSumRatio = a.totalWeight * b.totalWeight / count
@@ -141,11 +141,67 @@ object CorrelationMonoid extends Monoid[Correlation] {
   }
 
   override val zero = Correlation(0, 0, 0, 0, 0, 0)
+
+  override def sumOption(cs: TraversableOnce[Correlation]): Option[Correlation] =
+    if (cs.isEmpty) None
+    else {
+      val iter = cs.toIterator
+      val item = iter.next()
+
+      var m0 = item.m0
+      var m1y = item.m1y
+      var m1x = item.m1x
+      var m2y = item.m2y
+      var m2x = item.m2x
+      var c2 = item.c2
+
+      while (iter.hasNext) {
+
+        /**
+         * This is tested by monoidLaws to match plus
+         * we do this loop here to avoid allocating
+         * between each pair of Correlations
+         */
+        val b = iter.next()
+        val m0New = m0 + b.m0
+
+        if (m0New == 0.0) {
+          m1y = 0.0
+          m1x = 0.0
+          m2y = 0.0
+          m2x = 0.0
+          c2 = 0.0
+        } else {
+          val prodSumRatio = m0 * b.m0 / m0New
+
+          val m1xNew = Correlation.getCombinedMean(m0, m1x, b.m0, b.m1x)
+          val m1yNew = Correlation.getCombinedMean(m0, m1y, b.m0, b.m1y)
+          val deltaX = b.m1x - m1x
+          val deltaY = b.m1y - m1y
+
+          val m2xNew = m2x + b.m2x + math.pow(deltaX, 2) * prodSumRatio
+          val m2yNew =
+            m2y + b.m2y + math.pow(deltaY, 2) * prodSumRatio
+
+          val c2New = c2 + b.c2 + deltaX * deltaY * prodSumRatio
+
+          m1y = m1yNew
+          m1x = m1xNew
+          m2y = m2yNew
+          m2x = m2xNew
+          c2 = c2New
+        }
+        m0 = m0New
+      }
+
+      if (m0 == 0.0) Some(zero)
+      else Some(Correlation(c2 = c2, m2x = m2x, m2y = m2y, m1x = m1x, m1y = m1y, m0 = m0))
+    }
 }
 
 object CorrelationAggregator extends MonoidAggregator[(Double, Double), Correlation, Correlation] {
   override def prepare(a: (Double, Double)): Correlation = Correlation(a)
-  override val monoid = CorrelationMonoid
+  override def monoid: Monoid[Correlation] = CorrelationMonoid
   override def present(c: Correlation): Correlation = c
 
   def correlation: MonoidAggregator[(Double, Double), Correlation, Double] =

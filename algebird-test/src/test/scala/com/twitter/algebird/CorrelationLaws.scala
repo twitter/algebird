@@ -75,7 +75,9 @@ class CorrelationLaws extends CheckProperties {
   property("the swap method on moments works as you'd think") {
     forAll { l: List[(Double, Double)] =>
       val swapped = CorrelationAggregator(l).swap
-      val reversedInput = CorrelationAggregator.composePrepare[(Double, Double)] { case (x, y) => (y, x) }(l)
+      val fn: ((Double, Double)) => (Double, Double) = { tup => tup.swap }
+
+      val reversedInput = CorrelationAggregator.composePrepare[(Double, Double)](fn)(l)
       corrApproxEq(swapped, reversedInput)
     }
   }

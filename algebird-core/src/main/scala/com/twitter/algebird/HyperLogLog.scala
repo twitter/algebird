@@ -737,7 +737,8 @@ abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
 
 case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
-  override def convert(set: Set[A]): HLL = leftSemigroup.batchCreate(set.map(toBytes))
+  override def convert(set: Set[A]): HLL =
+    leftSemigroup.sum(set.iterator.map(a => leftSemigroup.toHLL(toBytes(a))))
 }
 
 /**
