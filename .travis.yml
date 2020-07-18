@@ -26,7 +26,7 @@ matrix:
         "++$TRAVIS_SCALA_VERSION clean" \
         "++$TRAVIS_SCALA_VERSION test"
 
-    - scala: 2.12.11
+    - scala: 2.12.12
       jdk: openjdk8
       before_install:
         - export PATH=${PATH}:./vendor/bundle
@@ -40,7 +40,7 @@ matrix:
         "++$TRAVIS_SCALA_VERSION docs/makeMicrosite" \
         "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
 
-    - scala: 2.12.11
+    - scala: 2.12.12
       jdk: openjdk11
       script: sbt \
         "++$TRAVIS_SCALA_VERSION clean" \

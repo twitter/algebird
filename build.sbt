@@ -36,7 +36,7 @@ def isScala213x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.1
 
 val sharedSettings = Seq(
   organization := "com.twitter",
-  scalaVersion := "2.12.11",
+  scalaVersion := "2.12.12",
   crossScalaVersions := Seq("2.11.12", scalaVersion.value),
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
