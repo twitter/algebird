@@ -16,7 +16,7 @@ See the [Algebird website](https://twitter.github.io/algebird) for more informat
 ```scala
 > sbt algebird-core/console
 
-Welcome to Scala 2.12.11 (OpenJDK 64-Bit Server VM, Java 11.0.1).
+Welcome to Scala 2.12.12 (OpenJDK 64-Bit Server VM, Java 11.0.1).
 Type in expressions for evaluation. Or try :help.
 
 scala> import com.twitter.algebird._
