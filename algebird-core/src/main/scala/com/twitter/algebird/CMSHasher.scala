@@ -10,7 +10,7 @@ package com.twitter.algebird
  * count.  Algebird ships with several such implicits for commonly used types `K` such as `Long` and `BigInt`.
  *
  * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
+ * convert items of your (unsupported) type `K` to a supported type such as Double, and then use the `contramap`
  * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of `contramap`
  * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
  * starting point.
@@ -31,7 +31,7 @@ trait CMSHasher[K] extends java.io.Serializable {
    * def hash(a: Int, b: Int, width: Int)(x: L): CMSHasher[L] = CMSHasher[K].hash(a, b, width)(f(x))
    * }}}
    */
-  def on[L](f: L => K) = new CMSHasher[L] {
+  def on[L](f: L => K): CMSHasher[L] = new CMSHasher[L] {
     override def hash(a: Int, b: Int, width: Int)(x: L): Int =
       self.hash(a, b, width)(f(x))
   }
@@ -59,7 +59,7 @@ trait CMSHasher[K] extends java.io.Serializable {
    * implicit val cmsHasherDouble: CMSHasher[Double] = CMSHasherArrayByte.contramap((d: Double) => f(d))
    * }}}
    */
-  def contramap[L](f: L => K) = on(f)
+  def contramap[L](f: L => K): CMSHasher[L] = on(f)
 
 }
 

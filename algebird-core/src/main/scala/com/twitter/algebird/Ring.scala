@@ -85,7 +85,10 @@ object IntRing extends Ring[Int] {
   override def times(l: Int, r: Int): Int = l * r
   override def sum(t: TraversableOnce[Int]): Int = {
     var sum = 0
-    t.foreach(sum += _)
+    val iter = t.toIterator
+    while (iter.hasNext) {
+      sum += iter.next()
+    }
     sum
   }
   override def sumOption(t: TraversableOnce[Int]): Option[Int] =
@@ -102,7 +105,10 @@ object ShortRing extends Ring[Short] {
   override def times(l: Short, r: Short): Short = (l * r).toShort
   override def sum(t: TraversableOnce[Short]): Short = {
     var sum = 0
-    t.foreach(sum += _)
+    val iter = t.toIterator
+    while (iter.hasNext) {
+      sum += iter.next()
+    }
     sum.toShort
   }
   override def sumOption(t: TraversableOnce[Short]): Option[Short] =
@@ -119,7 +125,10 @@ object LongRing extends Ring[Long] {
   override def times(l: Long, r: Long): Long = l * r
   override def sum(t: TraversableOnce[Long]): Long = {
     var sum = 0L
-    t.foreach(sum += _)
+    val iter = t.toIterator
+    while (iter.hasNext) {
+      sum += iter.next()
+    }
     sum
   }
   override def sumOption(t: TraversableOnce[Long]): Option[Long] =
@@ -134,6 +143,19 @@ object FloatRing extends Ring[Float] {
   override def plus(l: Float, r: Float): Float = l + r
   override def minus(l: Float, r: Float): Float = l - r
   override def times(l: Float, r: Float): Float = l * r
+
+  override def sumOption(t: TraversableOnce[Float]): Option[Float] =
+    if (t.isEmpty) None
+    else
+      Some {
+        var sum = 0.0
+        val iter = t.toIterator
+        while (iter.hasNext) {
+          sum += iter.next().toDouble
+        }
+
+        sum.toFloat
+      }
 }
 
 object DoubleRing extends Ring[Double] {
@@ -143,6 +165,19 @@ object DoubleRing extends Ring[Double] {
   override def plus(l: Double, r: Double): Double = l + r
   override def minus(l: Double, r: Double): Double = l - r
   override def times(l: Double, r: Double): Double = l * r
+
+  override def sumOption(t: TraversableOnce[Double]): Option[Double] =
+    if (t.isEmpty) None
+    else
+      Some {
+        var sum = 0.0
+        val iter = t.toIterator
+        while (iter.hasNext) {
+          sum += iter.next()
+        }
+
+        sum
+      }
 }
 
 object BooleanRing extends Ring[Boolean] {

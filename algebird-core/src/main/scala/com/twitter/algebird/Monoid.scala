@@ -54,7 +54,11 @@ trait Monoid[@specialized(Int, Long, Float, Double) T]
     } else {
       None
     }
-  override def sum(vs: TraversableOnce[T]): T = sumOption(vs).getOrElse(zero)
+  override def sum(vs: TraversableOnce[T]): T = {
+    val optT = sumOption(vs)
+    if (optT.isDefined) optT.get
+    else zero
+  }
 
   /**
    * These are from algebra.Monoid
@@ -83,7 +87,7 @@ class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
     }
   override def sumOption(items: TraversableOnce[Option[T]]): Option[Option[T]] =
     if (items.isEmpty) None
-    else Some(semi.sumOption(items.filter(_.isDefined).map(_.get)))
+    else Some(semi.sumOption(items.toIterator.filter(_.isDefined).map(_.get)))
 }
 
 class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R])
@@ -148,8 +152,11 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
     val (longer, shorter) =
       if (left.length > right.length) (left, right) else (right, left)
     val sum = longer.clone
-    for (i <- shorter.indices)
-      sum.update(i, semi.plus(sum(i), shorter(i)))
+    var idx = 0
+    while (idx < shorter.length) {
+      sum(idx) = semi.plus(longer(idx), shorter(idx))
+      idx = idx + 1
+    }
 
     sum
   }

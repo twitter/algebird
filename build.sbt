@@ -203,12 +203,12 @@ lazy val mimaSettings = Def.settings(
  * This returns the previous jar we released that is compatible with
  * the current.
  */
-val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic", "spark")
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "spark")
 
 def previousVersion(subProj: String) =
   Some(subProj)
     .filterNot(noBinaryCompatCheck.contains)
-    .map(s => "com.twitter" %% ("algebird-" + s) % "0.13.5")
+    .map(s => "com.twitter" %% ("algebird-" + s) % "0.13.7")
 
 lazy val algebird = Project(id = "algebird", base = file("."))
   .settings(sharedSettings)

@@ -164,7 +164,7 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
  * SetSizeAggregator should work as an aggregator and return
  * approximate size when > maxSetSize
  */
-abstract class SetSizeAggregatorProperty[T](bits: Int) extends ApproximateProperty {
+abstract class SetSizeAggregatorProperty[T] extends ApproximateProperty {
   type Exact = Set[T]
   type Approx = Long
 
@@ -178,7 +178,7 @@ abstract class SetSizeAggregatorProperty[T](bits: Int) extends ApproximateProper
   def exactResult(set: Set[T], i: Unit) = set.size
 }
 
-abstract class SmallSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+abstract class SmallSetSizeAggregatorProperty[T: Gen] extends SetSizeAggregatorProperty[T] {
   def exactGenerator: Gen[Set[T]] =
     for {
       size <- Gen.choose(maxSetSize + 1, maxSetSize * 2)
@@ -189,7 +189,7 @@ abstract class SmallSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSize
     Approximate.exact(aggResult.toDouble)
 }
 
-abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSizeAggregatorProperty[T](bits) {
+abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSizeAggregatorProperty[T] {
   def exactGenerator: Gen[Set[T]] =
     for {
       size <- Gen.choose(1, maxSetSize)
@@ -203,7 +203,7 @@ abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSize
 }
 
 class SmallBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int)
-    extends SmallSetSizeAggregatorProperty[T](bits) {
+    extends SmallSetSizeAggregatorProperty[T] {
   def makeApproximate(s: Set[T]): Long =
     SetSizeAggregator[T](bits, maxSetSize).apply(s)
 }
@@ -215,7 +215,7 @@ class LargeBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int)
 }
 
 class SmallSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int)
-    extends SmallSetSizeAggregatorProperty[T](bits) {
+    extends SmallSetSizeAggregatorProperty[T] {
   def makeApproximate(s: Set[T]): Long =
     SetSizeHashAggregator[T](bits, maxSetSize).apply(s)
 }
@@ -362,7 +362,10 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) =>
         seq :+ (seq.last + mon.create(value))
       }
-      (1 to 200).map(n => assert(partialSums(n) == mon.batchCreate(data.slice(0, n))))
+      (1 to 200).map { n =>
+        val bc = mon.sum(data.slice(0, n).map(mon.toHLL(_)))
+        assert(partialSums(n) == bc)
+      }
     }
 
     "work as an Aggregator and return a HLL" in {
