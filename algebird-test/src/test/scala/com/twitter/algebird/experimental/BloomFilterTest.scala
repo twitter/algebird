@@ -8,7 +8,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import com.twitter.algebird.immutable.BitSet
 import com.twitter.algebird.{
-  Aggregator,
   ApproximateProperties,
   ApproximateProperty,
   Bytes,

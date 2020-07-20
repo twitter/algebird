@@ -3,7 +3,6 @@ package com.twitter.algebird.immutable
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import Arbitrary.{arbitrary => arb}
-import scala.annotation.tailrec
 
 object BitSetTest extends Properties("BitSet") {
 
