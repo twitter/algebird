@@ -43,7 +43,9 @@ class BloomFilterCreateBenchmark {
   }
 
   @Benchmark
-  def createBloomFilterExperimental(bloomFilterState: BloomFilterState): experimental.BloomFilter[String]#Hash =
+  def createBloomFilterExperimental(
+      bloomFilterState: BloomFilterState
+  ): experimental.BloomFilter[String]#Hash =
     bloomFilterState.experimentalBF.create(bloomFilterState.randomStrings: _*)
 
   @Benchmark
