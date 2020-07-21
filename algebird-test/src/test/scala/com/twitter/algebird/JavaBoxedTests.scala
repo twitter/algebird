@@ -62,7 +62,7 @@ class JavaBoxedTests extends CheckProperties {
     monoidLaws[JList[Int]]
   }
 
-  implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup]: Arbitrary[ju.Map[K,V]] = Arbitrary {
+  implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup]: Arbitrary[ju.Map[K, V]] = Arbitrary {
     implicitly[Arbitrary[Map[K, V]]].arbitrary.map {
       _.filter(kv => isNonZero[V](kv._2)).asJava
     }

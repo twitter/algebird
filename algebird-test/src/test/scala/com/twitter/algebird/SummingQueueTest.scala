@@ -57,7 +57,7 @@ class SummingCacheTest extends CheckProperties {
 class AdaptiveCacheTest extends SummingCacheTest {
   import SummingCacheTest._
 
-  override def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K,V]] =
+  override def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K, V]] =
     new AdaptiveCache[K, V](c.cap)
 }
 

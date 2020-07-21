@@ -56,7 +56,7 @@ class MetricLaws extends CheckProperties {
     metricLaws[List[Double]]
   }
 
-  implicit val mapMetric: Metric[Map[Int,Double]] = Metric.L1Map[Int, Double]
+  implicit val mapMetric: Metric[Map[Int, Double]] = Metric.L1Map[Int, Double]
 
   // TODO: we won't need this when we have an Equatable trait
   def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]): Boolean =

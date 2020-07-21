@@ -199,7 +199,7 @@ trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O
 trait EventuallyAggregator[A, E, O, C] extends AbstractEventuallyAggregator[A, E, O, C] {
 
   //avoid init order issues and cyclical references
-  @transient override lazy val semigroup: EventuallySemigroup[E,O] =
+  @transient override lazy val semigroup: EventuallySemigroup[E, O] =
     new EventuallySemigroup[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.semigroup)
 }
 
@@ -209,6 +209,6 @@ trait EventuallyMonoidAggregator[A, E, O, C]
 
   override def rightAggregator: MonoidAggregator[A, O, C]
 
-  @transient override lazy val monoid: EventuallyMonoid[E,O] =
+  @transient override lazy val monoid: EventuallyMonoid[E, O] =
     new EventuallyMonoid[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.monoid)
 }

@@ -139,19 +139,19 @@ class AsyncSummerBenchmark {
   import AsyncSummerBenchmark._
 
   @inline
-  def fn(state: SummerState, summer: AsyncSummer[(Long, HLL), Map[Long, HLL]]): Map[Long,HLL] = {
+  def fn(state: SummerState, summer: AsyncSummer[(Long, HLL), Map[Long, HLL]]): Map[Long, HLL] = {
     val batch = Random.nextInt(state.batchCount)
     Await.result(summer.addAll(state.inputItems(batch)))
   }
 
-  def timeAsyncNonCompactListSum(state: SummerState): Map[Long,HLL] =
+  def timeAsyncNonCompactListSum(state: SummerState): Map[Long, HLL] =
     fn(state, state.asyncNonCompactListSum)
-  def timeAsyncCompactListSum(state: SummerState): Map[Long,HLL] =
+  def timeAsyncCompactListSum(state: SummerState): Map[Long, HLL] =
     fn(state, state.asyncCompactListSum)
-  def timeAsyncMapSum(state: SummerState): Map[Long,HLL] = fn(state, state.asyncMapSum)
-  def timeSyncSummingQueue(state: SummerState): Map[Long,HLL] =
+  def timeAsyncMapSum(state: SummerState): Map[Long, HLL] = fn(state, state.asyncMapSum)
+  def timeSyncSummingQueue(state: SummerState): Map[Long, HLL] =
     fn(state, state.syncSummingQueue)
-  def timeNullSummer(state: SummerState): Map[Long,HLL] = fn(state, state.nullSummer)
+  def timeNullSummer(state: SummerState): Map[Long, HLL] = fn(state, state.nullSummer)
 
 }
 

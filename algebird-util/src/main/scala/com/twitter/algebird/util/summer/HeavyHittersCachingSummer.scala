@@ -182,7 +182,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ): HeavyHittersCachingSummer[Key,Value] =
+  ): HeavyHittersCachingSummer[Key, Value] =
     new HeavyHittersCachingSummer[Key, Value](
       DEFAULT_HH_PERCENT,
       DEFAULT_UPDATE_FREQUENCY,
@@ -207,7 +207,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ): HeavyHittersCachingSummer[Key,Value] =
+  ): HeavyHittersCachingSummer[Key, Value] =
     new HeavyHittersCachingSummer[Key, Value](
       hhPct,
       updateFreq,

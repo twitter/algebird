@@ -8,10 +8,10 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
   // to aggregator of tuples
 
   val data: List[Int] = List(1, 3, 2, 0, 5, 6)
-  val MinAgg: Aggregator[Int,Int,Int] = Aggregator.min[Int]
+  val MinAgg: Aggregator[Int, Int, Int] = Aggregator.min[Int]
 
   val longData: List[Long] = data.map(_.toLong)
-  val SizeAgg: MonoidAggregator[Any,Long,Long] = Aggregator.size
+  val SizeAgg: MonoidAggregator[Any, Long, Long] = Aggregator.size
 
   "GeneratedTupleAggregators" should {
     import GeneratedTupleAggregator._

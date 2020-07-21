@@ -115,7 +115,7 @@ object Metric {
 
   // If you don't want to use L2 as your default metrics, you need to override these
   implicit def iterableMetric[V: Monoid: Metric]: Metric[Iterable[V]] = L2Iterable[V]
-  implicit def mapMetric[K, V: Monoid: Metric]: Metric[Map[K,V]] = L2Map[K, V]
+  implicit def mapMetric[K, V: Monoid: Metric]: Metric[Map[K, V]] = L2Map[K, V]
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")

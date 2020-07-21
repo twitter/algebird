@@ -11,7 +11,7 @@ class RightFolded2Test extends CheckProperties {
   def monFold(i: Int, l: Long): Long = l + i.toLong
   def mapFn(l: Long): Long = l / 2
 
-  implicit val rightFoldedMonoid: RightFolded2Monoid[Int,Long,Long] =
+  implicit val rightFoldedMonoid: RightFolded2Monoid[Int, Long, Long] =
     RightFolded2.monoid[Int, Long, Long](mapFn)(monFold)
 
   def rightFolded2Value[In, Out, Acc](implicit
