@@ -7,7 +7,7 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 
 object CorrelationLaws {
-  val EPS = 1e-10
+  val EPS: Double = 1e-10
 
   def aggregateFunction(f: Double => Double): Aggregator[Double, Correlation, Double] =
     CorrelationAggregator.correlation

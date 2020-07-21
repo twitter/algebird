@@ -69,14 +69,14 @@ object Interval extends java.io.Serializable {
      * Represents an empty interval.
      */
     case class SoEmpty[T, NonEmpty[t] <: Interval[t]]() extends MaybeEmpty[T, NonEmpty] {
-      override def isEmpty = true
+      override def isEmpty: Boolean = true
     }
 
     /**
      * Represents a non-empty interval.
      */
     case class NotSoEmpty[T, NonEmpty[t] <: Interval[t]](get: NonEmpty[T]) extends MaybeEmpty[T, NonEmpty] {
-      override def isEmpty = false
+      override def isEmpty: Boolean = false
     }
   }
 

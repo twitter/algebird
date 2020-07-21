@@ -40,11 +40,11 @@ trait AsyncSummer[T, +M <: Iterable[T]] { self =>
 
 trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
   def self: AsyncSummer[T, M]
-  def flush = self.flush
-  def tick = self.tick
+  def flush: Future[M] = self.flush
+  def tick: Future[M] = self.tick
   override def add(t: T): Future[M] = self.add(t)
   def addAll(vals: TraversableOnce[T]): Future[M] = self.addAll(vals)
-  def isFlushed = self.isFlushed
+  def isFlushed: Boolean = self.isFlushed
   override def cleanup: Future[Unit] = self.cleanup
 }
 

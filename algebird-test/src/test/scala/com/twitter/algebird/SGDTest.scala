@@ -8,10 +8,10 @@ class SGDLaws extends CheckProperties {
 
   implicit val sgdMonoid: SGDMonoid[(Double, IndexedSeq[Double])] =
     new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
-  val zeroStepMonoid = new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
+  val zeroStepMonoid: SGDMonoid[(Double, IndexedSeq[Double])] = new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
 
   val (m, b) = (2.0, 4.0)
-  val eps = 1e-3
+  val eps: Double = 1e-3
 
   val sgdPosGen: Gen[SGDPos[(Double, Vector[Double])]] = for {
     x <- Gen.choose(0.0, 1.0)
@@ -65,7 +65,7 @@ class SGDLaws extends CheckProperties {
   def minus(x: IndexedSeq[Double], y: IndexedSeq[Double]): IndexedSeq[Double] =
     x.zip(y).map { case (x: Double, y: Double) => x - y }
 
-  val oneStepMonoid = new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
+  val oneStepMonoid: SGDMonoid[(Double, IndexedSeq[Double])] = new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
 
   property("unit step can be undone by adding gradient") {
     forAll { (w: SGDWeights, pos: SGDPos[(Double, Vector[Double])]) =>

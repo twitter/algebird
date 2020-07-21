@@ -35,7 +35,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
 
   require(capacity >= 0, "Cannot have negative capacity in SummingIterator")
 
-  override val semigroup = new MapMonoid[K, V]
+  override val semigroup: MapMonoid[K,V] = new MapMonoid[K, V]
   protected def optNonEmpty(m: Map[K, V]): Option[Map[K, V]] = if (m.isEmpty) None else Some(m)
 
   override def put(m: Map[K, V]): Option[Map[K, V]] = {

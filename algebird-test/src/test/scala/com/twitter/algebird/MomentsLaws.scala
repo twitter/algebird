@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalacheck.{Arbitrary, Gen}
 
 class MomentsLaws extends CheckProperties {
-  val EPS = 1e-10
+  val EPS: Double = 1e-10
 
   implicit val equiv: Equiv[Moments] =
     Equiv.fromFunction { (ml, mr) =>

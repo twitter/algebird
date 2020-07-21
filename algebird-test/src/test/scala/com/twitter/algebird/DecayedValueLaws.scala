@@ -8,7 +8,7 @@ import org.scalacheck.Prop._
 import org.scalacheck.Prop
 
 class DecayedValueLaws extends CheckProperties {
-  val EPS = 0.1
+  val EPS: Double = 0.1
 
   case class Params(mean: Double, halfLife: Double, count: Int, maxNoise: Double)
 

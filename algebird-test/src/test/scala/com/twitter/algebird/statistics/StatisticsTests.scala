@@ -26,7 +26,7 @@ class StatisticsMonoidLaws extends CheckProperties with Matchers {
 class StatisticsTest extends AnyWordSpec with Matchers {
 
   // the test framework garbles the exceptions :/
-  lazy val statsMonoid = new StatisticsMonoid[Int]
+  lazy val statsMonoid: StatisticsMonoid[Int] = new StatisticsMonoid[Int]
   try {
     for (_ <- 1 to 2) statsMonoid.zero
     for (i <- 1 to 3) statsMonoid.plus(i, i)

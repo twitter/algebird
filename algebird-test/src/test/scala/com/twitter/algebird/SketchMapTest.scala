@@ -3,12 +3,13 @@ package com.twitter.algebird
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.util.Random
 
 object SketchMapTestImplicits {
-  val DELTA = 1e-6
-  val EPS = 0.001
-  val SEED = 1
-  val HEAVY_HITTERS_COUNT = 10
+  val DELTA: Double = 1e-6
+  val EPS: Double = 0.001
+  val SEED: Int = 1
+  val HEAVY_HITTERS_COUNT: Int = 10
 }
 
 class SketchMapLaws extends CheckProperties {
@@ -41,7 +42,7 @@ class SketchMapTest extends AnyWordSpec with Matchers {
 
   val PARAMS: SketchMapParams[Int] = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
   val MONOID: SketchMapMonoid[Int,Long] = SketchMap.monoid[Int, Long](PARAMS)
-  val RAND = new scala.util.Random
+  val RAND: Random = new scala.util.Random
 
   "SketchMap" should {
     "count total number of elements in a stream" in {

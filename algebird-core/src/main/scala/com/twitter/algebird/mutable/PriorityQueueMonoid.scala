@@ -49,7 +49,7 @@ class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid
   protected def limit(q: PriorityQueue[K]): Unit =
     while (q.size > max) { q.poll() }
 
-  override def zero = new PriorityQueue[K](MINQUEUESIZE, ord.reverse)
+  override def zero: PriorityQueue[K] = new PriorityQueue[K](MINQUEUESIZE, ord.reverse)
   override def isNonZero(q: PriorityQueue[K]): Boolean = q.size > 0
 
   override def plus(left: PriorityQueue[K], right: PriorityQueue[K]): PriorityQueue[K] = {

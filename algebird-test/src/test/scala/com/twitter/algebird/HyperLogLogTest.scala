@@ -9,6 +9,7 @@ import java.lang.AssertionError
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.propspec.AnyPropSpec
 import org.scalatest.wordspec.AnyWordSpec
+import java.{util => ju}
 
 object ReferenceHyperLogLog {
 
@@ -51,7 +52,7 @@ class HyperLogLogLaws extends CheckProperties {
   import BaseProperties._
   import HyperLogLog._
 
-  val bits = 8
+  val bits: Int = 8
   implicit val hllMonoid: HyperLogLogMonoid = new HyperLogLogMonoid(bits)
 
   implicit val hllGen: Arbitrary[HLL] =
@@ -105,7 +106,7 @@ class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matc
 }
 
 abstract class HyperLogLogProperty(bits: Int) extends ApproximateProperty {
-  val monoid = new HyperLogLogMonoid(bits)
+  val monoid: HyperLogLogMonoid = new HyperLogLogMonoid(bits)
 
   def iterableToHLL[T: Hash128](it: Iterable[T]): HLL =
     monoid.sum(it.map(monoid.toHLL(_)))
@@ -123,8 +124,8 @@ class HLLCountProperty[T: Hash128: Gen](bits: Int) extends HyperLogLogProperty(b
   def exactGenerator: Gen[Vector[T]] = Gen.containerOf[Vector, T](implicitly[Gen[T]])
 
   def inputGenerator(it: Exact): Gen[Unit] = Gen.const(())
-  def approximateResult(a: HLL, i: Unit) = a.approximateSize
-  def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
+  def approximateResult(a: HLL, i: Unit): Approximate[Long] = a.approximateSize
+  def exactResult(it: Iterable[T], i: Unit): Long = it.toSet.size
 }
 
 class HLLDownsizeCountProperty[T: Hash128: Gen](numItems: Int, oldBits: Int, newBits: Int)
@@ -171,11 +172,11 @@ abstract class SetSizeAggregatorProperty[T] extends ApproximateProperty {
   type Input = Unit
   type Result = Double
 
-  val maxSetSize = 10000
+  val maxSetSize: Int = 10000
 
   def inputGenerator(it: Exact): Gen[Unit] = Gen.const(())
 
-  def exactResult(set: Set[T], i: Unit) = set.size
+  def exactResult(set: Set[T], i: Unit): Double = set.size
 }
 
 abstract class SmallSetSizeAggregatorProperty[T: Gen] extends SetSizeAggregatorProperty[T] {
@@ -285,7 +286,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
 
   import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
 
-  val r = new java.util.Random
+  val r: ju.Random = new java.util.Random
 
   def exactCount[T](it: Iterable[T]): Int = it.toSet.size
   def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]): Double = {

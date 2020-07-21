@@ -26,7 +26,7 @@ import scala.collection.JavaConverters._
 
 class TopKTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
-  val SIZE = 10
+  val SIZE: Int = 10
 
   implicit def qmonoid: PriorityQueueMonoid[Int] = new PriorityQueueMonoid[Int](SIZE)
   implicit def queueArb: Arbitrary[PriorityQueue[Int]] = Arbitrary {

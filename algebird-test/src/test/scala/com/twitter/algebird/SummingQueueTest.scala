@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
+import scala.util.Random
 
 object SummingCacheTest {
   case class Capacity(cap: Int) extends AnyVal
@@ -56,14 +57,14 @@ class SummingCacheTest extends CheckProperties {
 class AdaptiveCacheTest extends SummingCacheTest {
   import SummingCacheTest._
 
-  override def newCache[K, V: Monoid](c: Capacity) =
+  override def newCache[K, V: Monoid](c: Capacity): StatefulSummer[Map[K,V]] =
     new AdaptiveCache[K, V](c.cap)
 }
 
 class SummingWithHitsCacheTest extends SummingCacheTest {
   import SummingCacheTest._
 
-  val RAND = new scala.util.Random
+  val RAND: Random = new scala.util.Random
 
   def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]): List[Int] = {
     val sc = SummingWithHitsCache[K, V](c.cap)

@@ -76,9 +76,9 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
   type Input = Long
   type Result = Long
 
-  val bits = 12
-  val monoid = new HyperLogLogSeriesMonoid(bits)
-  val hll = new HyperLogLogMonoid(bits)
+  val bits: Int = 12
+  val monoid: HyperLogLogSeriesMonoid = new HyperLogLogSeriesMonoid(bits)
+  val hll: HyperLogLogMonoid = new HyperLogLogMonoid(bits)
 
   def makeApproximate(timestampedData: Seq[(Long, Long)]): HLLSeries = {
     val hllSeries = timestampedData

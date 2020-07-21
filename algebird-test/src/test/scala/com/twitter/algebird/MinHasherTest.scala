@@ -6,6 +6,7 @@ import scala.math.Equiv
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.Assertion
+import java.{util => ju}
 
 class MinHasherTest extends CheckProperties {
   implicit val mhMonoid: MinHasher32 = new MinHasher32(0.5, 512)
@@ -20,7 +21,7 @@ class MinHasherTest extends CheckProperties {
 }
 
 class MinHasherSpec extends AnyWordSpec with Matchers {
-  val r = new java.util.Random
+  val r: ju.Random = new java.util.Random
 
   def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double): Assertion = {
     val (set1, set2) = randomSets(similarity)

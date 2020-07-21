@@ -142,7 +142,7 @@ class MinHasher32(numHashes: Int, numBands: Int) extends MinHasher[Int](numHashe
   def this(targetThreshold: Double, maxBytes: Int) =
     this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 4))
 
-  override def hashSize = 4
+  override def hashSize: Int = 4
 
   override def maxHash: Int = Int.MaxValue
 
@@ -179,7 +179,7 @@ class MinHasher16(numHashes: Int, numBands: Int) extends MinHasher[Char](numHash
   def this(targetThreshold: Double, maxBytes: Int) =
     this(MinHasher.pickHashesAndBands(targetThreshold, maxBytes / 2))
 
-  override def hashSize = 2
+  override def hashSize: Int = 2
 
   override def maxHash: Char = Char.MaxValue
 

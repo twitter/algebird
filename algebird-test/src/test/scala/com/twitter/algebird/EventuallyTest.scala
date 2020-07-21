@@ -59,10 +59,10 @@ class EventuallyMonoidLaws extends CheckProperties {
 
 class EventuallyTest extends AnyWordSpec with Matchers {
 
-  val eventuallyMonoid =
+  val eventuallyMonoid: EventuallyMonoid[Int,String] =
     new EventuallyMonoid[Int, String](_.length)(_.length > 100)
 
-  val short = "foo"
+  val short: String = "foo"
   val med: String = Stream.continually("bar").take(20).mkString("")
   val long: String = Stream.continually("bell").take(100).mkString("")
 

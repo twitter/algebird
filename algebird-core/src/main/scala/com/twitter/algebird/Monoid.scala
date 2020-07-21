@@ -97,7 +97,7 @@ class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R])
 }
 
 object StringMonoid extends Monoid[String] {
-  override val zero = ""
+  override val zero: String = ""
   override def plus(left: String, right: String): String = left + right
   override def sumOption(items: TraversableOnce[String]): Option[String] =
     if (items.isEmpty) None

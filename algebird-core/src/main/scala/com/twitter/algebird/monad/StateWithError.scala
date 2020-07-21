@@ -107,7 +107,7 @@ object StateWithError {
    * Use like fromEither[Int](Right("good"))
    * to get a constant Either in the monad
    */
-  def fromEither[S] = new ConstantStateMaker[S]
+  def fromEither[S]: ConstantStateMaker[S] = new ConstantStateMaker[S]
   class ConstantStateMaker[S] {
     def apply[F, T](either: Either[F, T]): StateWithError[S, F, T] = { (s: S) => either.right.map((s, _)) }
   }
@@ -118,7 +118,7 @@ object StateWithError {
     }
   }
   // TODO this should move to Monad and work for any Monad
-  def toKleisli[S] = new FunctionLifter[S]
+  def toKleisli[S]: FunctionLifter[S] = new FunctionLifter[S]
 
   implicit def apply[S, F, T](fn: S => Either[F, (S, T)]): StateWithError[S, F, T] = StateFn(fn)
   implicit def monad[S, F]: Monad[({ type Result[T] = StateWithError[S, F, T] })#Result] =

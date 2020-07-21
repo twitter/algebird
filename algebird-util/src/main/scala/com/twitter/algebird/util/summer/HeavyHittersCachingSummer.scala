@@ -182,7 +182,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ) =
+  ): HeavyHittersCachingSummer[Key,Value] =
     new HeavyHittersCachingSummer[Key, Value](
       DEFAULT_HH_PERCENT,
       DEFAULT_UPDATE_FREQUENCY,
@@ -207,7 +207,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ) =
+  ): HeavyHittersCachingSummer[Key,Value] =
     new HeavyHittersCachingSummer[Key, Value](
       hhPct,
       updateFreq,
@@ -238,7 +238,7 @@ class HeavyHittersCachingSummer[K, V](
   type T = (K, V) // We only treat the K, V types as a pair almost exclusively in this class.
 
   override def flush: Future[Iterable[T]] = backingSummer.flush
-  override def isFlushed = backingSummer.isFlushed
+  override def isFlushed: Boolean = backingSummer.isFlushed
   override val emptyResult: Seq[(K, V)] = Seq[T]()
 
   private[this] final val approxHH =

@@ -67,7 +67,7 @@ class AsyncListSum[Key, Value](
       case _                  => false
     }
 
-    lazy val toSeq = privBuf.reverse
+    lazy val toSeq: List[Future[Value]] = privBuf.reverse
   }
 
   protected override val emptyResult = Map.empty[Key, Value]
