@@ -23,7 +23,7 @@ import com.twitter.util.Future
 trait AsyncSummer[T, +M <: Iterable[T]] { self =>
   def flush: Future[M]
   def tick: Future[M]
-  def add(t: T) = addAll(Iterator(t))
+  def add(t: T): Future[M] = addAll(Iterator(t))
   def addAll(vals: TraversableOnce[T]): Future[M]
 
   def isFlushed: Boolean
@@ -42,8 +42,8 @@ trait AsyncSummerProxy[T, +M <: Iterable[T]] extends AsyncSummer[T, M] {
   def self: AsyncSummer[T, M]
   def flush = self.flush
   def tick = self.tick
-  override def add(t: T) = self.add(t)
-  def addAll(vals: TraversableOnce[T]) = self.addAll(vals)
+  override def add(t: T): Future[M] = self.add(t)
+  def addAll(vals: TraversableOnce[T]): Future[M] = self.addAll(vals)
   def isFlushed = self.isFlushed
   override def cleanup: Future[Unit] = self.cleanup
 }

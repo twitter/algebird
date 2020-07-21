@@ -39,10 +39,10 @@ class MetricLaws extends CheckProperties {
     metricLaws[Short]
   }
 
-  implicit val iterMetric = Metric.L1Iterable[Double]
+  implicit val iterMetric: Metric[Iterable[Double]] = Metric.L1Iterable[Double]
 
   // TODO: we won't need this when we have an Equatable trait
-  def listEqFn(a: List[Double], b: List[Double]) = {
+  def listEqFn(a: List[Double], b: List[Double]): Boolean = {
     val maxSize = scala.math.max(a.size, b.size)
     val diffA = maxSize - a.size
     val diffB = maxSize - b.size
@@ -56,10 +56,10 @@ class MetricLaws extends CheckProperties {
     metricLaws[List[Double]]
   }
 
-  implicit val mapMetric = Metric.L1Map[Int, Double]
+  implicit val mapMetric: Metric[Map[Int,Double]] = Metric.L1Map[Int, Double]
 
   // TODO: we won't need this when we have an Equatable trait
-  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) =
+  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]): Boolean =
     (a.keySet ++ b.keySet).forall { key =>
       (a.get(key), b.get(key)) match {
         case (Some(aVal), Some(bVal)) => aVal == bVal

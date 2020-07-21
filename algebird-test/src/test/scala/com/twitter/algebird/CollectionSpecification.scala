@@ -5,6 +5,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
 import org.scalacheck.Prop._
+import org.scalacheck.Prop
 
 class CollectionSpecification extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
@@ -84,7 +85,7 @@ class CollectionSpecification extends CheckProperties {
     monoidLaws[Set[Int]]
   }
 
-  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
+  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary { // scalafix:ok
     val mv = implicitly[Monoid[V]]
     implicitly[Arbitrary[Map[K, V]]].arbitrary
       .map {
@@ -92,17 +93,20 @@ class CollectionSpecification extends CheckProperties {
       }
   }
 
-  implicit def scMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
+  implicit def scMapArb[K: Arbitrary, V: Arbitrary: Monoid]: Arbitrary[ScMap[K, V]] = Arbitrary {
     mapArb[K, V].arbitrary
       .map { map: Map[K, V] => map: ScMap[K, V] }
   }
 
-  implicit def mMapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary {
+  implicit def mMapArb[K: Arbitrary, V: Arbitrary: Monoid]: Arbitrary[MMap[K, V]] = Arbitrary {
     mapArb[K, V].arbitrary
       .map { map: Map[K, V] => MMap(map.toSeq: _*): MMap[K, V] }
   }
 
-  def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit rng: Ring[ScMap[Int, Int]], arbMap: Arbitrary[M]) =
+  def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit
+      rng: Ring[ScMap[Int, Int]],
+      arbMap: Arbitrary[M]
+  ): Prop =
     forAll { (a: M, b: M) =>
       // Subsets because zeros are removed from the times/plus values
       ((rng.times(a, b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
@@ -298,8 +302,8 @@ class CollectionSpecification extends CheckProperties {
     }
   }
 
-  def square(x: Int) = if (x % 2 == 0) Some(x * x) else None
-  def mapEq[K] = MapAlgebra.sparseEquiv[K, Int]
+  def square(x: Int): Option[Int] = if (x % 2 == 0) Some(x * x) else None
+  def mapEq[K]: Equiv[Map[K, Int]] = MapAlgebra.sparseEquiv[K, Int]
 
   property("MapAlgebra.mergeLookup works") {
     forAll { (items: Set[Int]) =>

@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop
 
 /**
  * Base properties for VectorSpace tests.
@@ -25,12 +26,12 @@ import org.scalacheck.Prop.forAll
 object BaseVectorSpaceProperties {
   def isEqualIfZero[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]) =
+  )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]): Prop =
     forAll((a: C[F]) => eqfn(VectorSpace.scale(vs.field.zero, a), vs.group.zero))
 
   def distributesWithPlus[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]) =
+  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]): Prop =
     forAll { (a: C[F], b: C[F], c: F) =>
       val v1 = VectorSpace.scale(c, vs.group.plus(a, b))
       val v2 = vs.group.plus(VectorSpace.scale(c, a), VectorSpace.scale(c, b))
@@ -39,7 +40,7 @@ object BaseVectorSpaceProperties {
 
   def isAssociative[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]) =
+  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]): Prop =
     forAll { (a: C[F], b: F, c: F) =>
       val v1 = VectorSpace.scale(c, VectorSpace.scale(b, a))
       val v2 = VectorSpace.scale(vs.field.times(c, b), a)
@@ -48,12 +49,12 @@ object BaseVectorSpaceProperties {
 
   def identityOne[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]) =
+  )(implicit vs: VectorSpace[F, C], arb: Arbitrary[C[F]]): Prop =
     forAll((a: C[F]) => eqfn(VectorSpace.scale(vs.field.one, a), a))
 
   def distributesOverScalarPlus[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]) =
+  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]): Prop =
     forAll { (a: C[F], b: F, c: F) =>
       val v1 = VectorSpace.scale(vs.field.plus(b, c), a)
       val v2 = vs.group.plus(VectorSpace.scale(b, a), VectorSpace.scale(c, a))
@@ -62,13 +63,13 @@ object BaseVectorSpaceProperties {
 
   def vectorSpaceLaws[F, C[_]](
       eqfn: (C[F], C[F]) => Boolean
-  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]) =
+  )(implicit vs: VectorSpace[F, C], arbC: Arbitrary[C[F]], arbF: Arbitrary[F]): Prop =
     isEqualIfZero(eqfn) && distributesWithPlus(eqfn) && isAssociative(eqfn) && identityOne(
       eqfn
     ) && distributesOverScalarPlus(
       eqfn
     )
 
-  def beCloseTo(a: Double, b: Double) =
+  def beCloseTo(a: Double, b: Double): Boolean =
     a == b || (math.abs(a - b) / math.abs(a)) < 1e-10 || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
 }

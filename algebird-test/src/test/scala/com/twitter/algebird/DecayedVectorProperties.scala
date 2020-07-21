@@ -32,7 +32,7 @@ class DecayedVectorProperties extends CheckProperties {
   def decayedMapEqFn(
       a: DecayedVector[({ type x[a] = Map[Int, a] })#x],
       b: DecayedVector[({ type x[a] = Map[Int, a] })#x]
-  ) = {
+  ): Boolean = {
 
     def beCloseTo(a: Double, b: Double, eps: Double = 1e-5) =
       a == b ||

@@ -4,6 +4,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalacheck.Arbitrary
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.propspec.AnyPropSpec
+import org.scalatest.compatible.Assertion
 
 /**
  * Tests abstract algebra against scala's Numeric trait
@@ -11,7 +12,7 @@ import org.scalatest.propspec.AnyPropSpec
  * below to test all the numeric traits.
  */
 class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
-  def plusNumericProp[T: Monoid: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
+  def plusNumericProp[T: Monoid: Numeric: Arbitrary]: Assertion = forAll { (a: T, b: T) =>
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
     assert(num.plus(a, b) == mon.plus(a, b))
@@ -32,7 +33,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     plusNumericProp[Float]
   }
 
-  def zeroNumericProp[T: Monoid: Group: Numeric: Arbitrary] = forAll { (a: T) =>
+  def zeroNumericProp[T: Monoid: Group: Numeric: Arbitrary]: Assertion = forAll { (a: T) =>
     val mon = implicitly[Monoid[T]]
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
@@ -44,7 +45,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     )
   }
 
-  def zeroProps[T: Monoid: Numeric] = {
+  def zeroProps[T: Monoid: Numeric]: Assertion = {
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
     assert(
@@ -73,7 +74,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     zeroProps[Float]
   }
 
-  def minusNumericProp[T: Group: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
+  def minusNumericProp[T: Group: Numeric: Arbitrary]: Assertion = forAll { (a: T, b: T) =>
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
     assert(num.minus(a, b) == grp.minus(a, b))
@@ -95,7 +96,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     minusNumericProp[Float]
   }
 
-  def oneNumericProp[T: Ring: Numeric: Arbitrary] = forAll { (a: T) =>
+  def oneNumericProp[T: Ring: Numeric: Arbitrary]: Assertion = forAll { (a: T) =>
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
     assert(
@@ -119,7 +120,7 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     oneNumericProp[Float]
   }
 
-  def timesNumericProp[T: Ring: Numeric: Arbitrary] = forAll { (a: T, b: T) =>
+  def timesNumericProp[T: Ring: Numeric: Arbitrary]: Assertion = forAll { (a: T, b: T) =>
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
     assert(num.times(a, b) == ring.times(a, b))

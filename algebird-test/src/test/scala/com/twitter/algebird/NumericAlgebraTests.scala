@@ -1,8 +1,9 @@
 package com.twitter.algebird
 
+import org.scalacheck.Arbitrary
 class NumericAlgebraTests extends CheckProperties {
   import BaseProperties._
-  implicit val arbitraryBigDecimalsHere =
+  implicit val arbitraryBigDecimalsHere: Arbitrary[BigDecimal] =
     BaseProperties.arbReasonableBigDecimals
 
   property(s"test int") {

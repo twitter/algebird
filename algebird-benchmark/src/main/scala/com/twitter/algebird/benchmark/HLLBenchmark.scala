@@ -62,13 +62,13 @@ object HllBenchmark {
 class HllBenchmark {
   import HllBenchmark._
   @Benchmark
-  def timeSumOption(state: HLLState, bh: Blackhole) =
+  def timeSumOption(state: HLLState, bh: Blackhole): Unit =
     state.inputData.foreach(vals => bh.consume(state.hllMonoid.sumOption(vals)))
   @Benchmark
-  def timeOldSumOption(state: HLLState, bh: Blackhole) =
+  def timeOldSumOption(state: HLLState, bh: Blackhole): Unit =
     state.inputData.foreach(d => bh.consume(state.oldHllMonoid.sumOption(d)))
 
   @Benchmark
-  def timePlus(state: HLLState, bh: Blackhole) =
+  def timePlus(state: HLLState, bh: Blackhole): Unit =
     state.inputData.foreach(vals => bh.consume(vals.reduce(state.hllMonoid.plus(_, _))))
 }

@@ -52,7 +52,7 @@ class HyperLogLogLaws extends CheckProperties {
   import HyperLogLog._
 
   val bits = 8
-  implicit val hllMonoid = new HyperLogLogMonoid(bits)
+  implicit val hllMonoid: HyperLogLogMonoid = new HyperLogLogMonoid(bits)
 
   implicit val hllGen: Arbitrary[HLL] =
     Arbitrary(Gen.choose(0L, 1000000L).map(v => hllMonoid.create(long2Bytes(v))))
@@ -90,12 +90,12 @@ class HyperLogLogLaws extends CheckProperties {
 class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   import HyperLogLog._
 
-  implicit val hashGen = Arbitrary {
+  implicit val hashGen: Arbitrary[Array[Byte]] = Arbitrary {
     Gen.containerOfN[Array, Byte](16, Arbitrary.arbitrary[Byte])
   }
   /* For some reason choose in this version of scalacheck
   is bugged so I need the suchThat clause */
-  implicit val bitsGen = Arbitrary {
+  implicit val bitsGen: Arbitrary[Int] = Arbitrary {
     Gen.choose(4, 31).suchThat(x => x >= 4 && x <= 31)
   }
 
@@ -118,11 +118,11 @@ class HLLCountProperty[T: Hash128: Gen](bits: Int) extends HyperLogLogProperty(b
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(it: Iterable[T]) = iterableToHLL(it)
+  def makeApproximate(it: Iterable[T]): HLL = iterableToHLL(it)
 
-  def exactGenerator = Gen.containerOf[Vector, T](implicitly[Gen[T]])
+  def exactGenerator: Gen[Vector[T]] = Gen.containerOf[Vector, T](implicitly[Gen[T]])
 
-  def inputGenerator(it: Exact) = Gen.const(())
+  def inputGenerator(it: Exact): Gen[Unit] = Gen.const(())
   def approximateResult(a: HLL, i: Unit) = a.approximateSize
   def exactResult(it: Iterable[T], i: Unit) = it.toSet.size
 }
@@ -130,10 +130,10 @@ class HLLCountProperty[T: Hash128: Gen](bits: Int) extends HyperLogLogProperty(b
 class HLLDownsizeCountProperty[T: Hash128: Gen](numItems: Int, oldBits: Int, newBits: Int)
     extends HLLCountProperty[T](oldBits) {
 
-  override def exactGenerator =
+  override def exactGenerator: Gen[Vector[T]] =
     Gen.containerOfN[Vector, T](numItems, implicitly[Gen[T]])
 
-  override def approximateResult(a: HLL, i: Unit) =
+  override def approximateResult(a: HLL, i: Unit): Approximate[Long] =
     a.downsize(newBits).approximateSize
 }
 
@@ -144,7 +144,7 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(it: Seq[Seq[T]]) = it.map(iterableToHLL(_))
+  def makeApproximate(it: Seq[Seq[T]]): Approx = it.map(iterableToHLL(_))
 
   def exactGenerator: Gen[Seq[Seq[T]]] = {
     val vectorGenerator: Gen[Seq[T]] =
@@ -152,11 +152,11 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
     Gen.containerOfN[Vector, Seq[T]](numHlls, vectorGenerator)
   }
 
-  def inputGenerator(it: Exact) = Gen.const(())
+  def inputGenerator(it: Exact): Gen[Unit] = Gen.const(())
 
-  def approximateResult(hlls: Seq[HLL], i: Unit) = monoid.intersectionSize(hlls)
+  def approximateResult(hlls: Seq[HLL], i: Unit): Approximate[Long] = monoid.intersectionSize(hlls)
 
-  def exactResult(it: Seq[Seq[T]], i: Unit) =
+  def exactResult(it: Seq[Seq[T]], i: Unit): Long =
     it.map(_.toSet).reduce(_.intersect(_)).size
 }
 
@@ -173,7 +173,7 @@ abstract class SetSizeAggregatorProperty[T] extends ApproximateProperty {
 
   val maxSetSize = 10000
 
-  def inputGenerator(it: Exact) = Gen.const(())
+  def inputGenerator(it: Exact): Gen[Unit] = Gen.const(())
 
   def exactResult(set: Set[T], i: Unit) = set.size
 }
@@ -185,7 +185,7 @@ abstract class SmallSetSizeAggregatorProperty[T: Gen] extends SetSizeAggregatorP
       set <- Gen.containerOfN[Set, T](size, implicitly[Gen[T]])
     } yield set
 
-  def approximateResult(aggResult: Long, i: Unit) =
+  def approximateResult(aggResult: Long, i: Unit): Approximate[Double] =
     Approximate.exact(aggResult.toDouble)
 }
 
@@ -196,7 +196,7 @@ abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSize
       set <- Gen.containerOfN[Set, T](size, implicitly[Gen[T]])
     } yield set
 
-  def approximateResult(aggResult: Long, i: Unit) = {
+  def approximateResult(aggResult: Long, i: Unit): Approximate[Double] = {
     val error = 1.04 / scala.math.sqrt(1 << bits)
     Approximate[Double](aggResult - error, aggResult, aggResult + error, 0.9972)
   }
@@ -229,8 +229,8 @@ class LargeSetSizeHashAggregatorProperty[T: Hash128: Gen](bits: Int)
 class HLLProperties extends ApproximateProperties("HyperLogLog") {
   import ApproximateProperty.toProp
 
-  implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
-  implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
+  implicit val intGen: Gen[Int] = Gen.chooseNum(Int.MinValue, Int.MaxValue)
+  implicit val longGen: Gen[Long] = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
   for (bits <- List(5, 6, 7, 8, 10)) {
     property(s"Count ints with $bits bits") = toProp(new HLLCountProperty[Int](bits), 100, 1, 0.01)
@@ -259,8 +259,8 @@ class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregat
   import ApproximateProperty.toProp
   import HyperLogLog.int2Bytes
 
-  implicit val intGen = Gen.chooseNum(Int.MinValue, Int.MaxValue)
-  implicit val longGen = Gen.chooseNum(Long.MinValue, Long.MaxValue)
+  implicit val intGen: Gen[Int] = Gen.chooseNum(Int.MinValue, Int.MaxValue)
+  implicit val longGen: Gen[Long] = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
   for (bits <- List(5, 7, 8, 10)) {
     property(
@@ -288,7 +288,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
   val r = new java.util.Random
 
   def exactCount[T](it: Iterable[T]): Int = it.toSet.size
-  def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]) = {
+  def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]): Double = {
     val hll = new HyperLogLogMonoid(bits)
     hll.sizeOf(hll.sum(it.map(hll.create(_)))).estimate.toDouble
   }

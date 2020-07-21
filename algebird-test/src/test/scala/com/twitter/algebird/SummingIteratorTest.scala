@@ -43,7 +43,7 @@ class SummingIteratorTest extends AnyPropSpec with ScalaCheckPropertyChecks with
     StatefulSummerLaws.zeroEquiv(Semigroup.sumOption(it0), Semigroup.sumOption(it1))
 
   case class Capacity(c: Int)
-  implicit val capArb = Arbitrary {
+  implicit val capArb: Arbitrary[Capacity] = Arbitrary {
     for (c <- Gen.choose(0, 10240)) yield Capacity(c)
   }
 

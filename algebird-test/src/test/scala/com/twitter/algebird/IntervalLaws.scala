@@ -146,7 +146,7 @@ class IntervalLaws extends CheckProperties {
     forAll((x: Long, y: Long) => ((y >= x) == InclusiveLower(x).intersects(InclusiveUpper(y))))
   }
 
-  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) =
+  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]): Boolean =
     if (low.intersects(upper)) {
       low.least
         .map { lb =>

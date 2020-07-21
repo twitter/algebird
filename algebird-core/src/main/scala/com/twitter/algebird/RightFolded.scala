@@ -25,7 +25,7 @@ package com.twitter.algebird
  * so this forms a kind of reset of the fold.
  */
 object RightFolded {
-  def monoid[In, Out](foldfn: (In, Out) => Out) =
+  def monoid[In, Out](foldfn: (In, Out) => Out): Monoid[RightFolded[In,Out]] =
     new Monoid[RightFolded[In, Out]] {
 
       override val zero: RightFoldedZero.type = RightFoldedZero

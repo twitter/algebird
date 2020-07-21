@@ -8,7 +8,7 @@ import HyperLogLog.{int2Bytes, long2Bytes}
 class HyperLogLogSeriesLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val monoid = new HyperLogLogSeriesMonoid(8)
+  implicit val monoid: HyperLogLogSeriesMonoid = new HyperLogLogSeriesMonoid(8)
 
   case class Timestamp(value: Long)
 
@@ -80,7 +80,7 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
   val monoid = new HyperLogLogSeriesMonoid(bits)
   val hll = new HyperLogLogMonoid(bits)
 
-  def makeApproximate(timestampedData: Seq[(Long, Long)]) = {
+  def makeApproximate(timestampedData: Seq[(Long, Long)]): HLLSeries = {
     val hllSeries = timestampedData
       .map { case (value, timestamp) => monoid.create(value, timestamp) }
     monoid.sum(hllSeries)
@@ -96,7 +96,7 @@ class HLLSeriesSinceProperty extends ApproximateProperty {
   def inputGenerator(timestampedData: Exact): Gen[Long] =
     Gen.oneOf(timestampedData).map { case (_, timestamp) => timestamp }
 
-  def approximateResult(series: HLLSeries, timestamp: Long) =
+  def approximateResult(series: HLLSeries, timestamp: Long): Approximate[Long] =
     series.since(timestamp).toHLL.approximateSize
 
   def exactResult(timestampedData: Seq[(Long, Long)], timestamp: Long): Long =

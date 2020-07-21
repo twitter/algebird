@@ -140,7 +140,7 @@ object CorrelationMonoid extends Monoid[Correlation] {
     }
   }
 
-  override val zero = Correlation(0, 0, 0, 0, 0, 0)
+  override val zero: Correlation = Correlation(0, 0, 0, 0, 0, 0)
 
   override def sumOption(cs: TraversableOnce[Correlation]): Option[Correlation] =
     if (cs.isEmpty) None

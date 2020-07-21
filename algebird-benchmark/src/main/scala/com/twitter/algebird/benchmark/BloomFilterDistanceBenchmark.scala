@@ -30,7 +30,7 @@ object BloomFilterDistanceBenchmark {
     val nbrOfElements: Int = 1000
     val falsePositiveRate = 0.01
 
-    def randomElements =
+    def randomElements: Seq[String] =
       BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
 
     val emptyBF1: BF[String] =

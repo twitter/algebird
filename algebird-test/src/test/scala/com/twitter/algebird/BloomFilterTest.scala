@@ -36,7 +36,7 @@ class BloomFilterLaws extends CheckProperties {
   val NUM_HASHES = 6
   val WIDTH = 32
 
-  implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
+  implicit val bfMonoid: BloomFilterMonoid[String] = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
 
   implicit val bfGen: Arbitrary[BF[String]] =
     Arbitrary {
@@ -190,28 +190,28 @@ class BloomFilterFalsePositives[T: Gen: Hash128](falsePositiveRate: Double) exte
 
   val maxNumEntries = 1000
 
-  def exactGenerator =
+  def exactGenerator: Gen[Set[T]] =
     for {
       numEntries <- Gen.choose(1, maxNumEntries)
       set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
     } yield set
 
-  def makeApproximate(set: Set[T]) = {
+  def makeApproximate(set: Set[T]): BF[T] = {
     val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
     val values = set.toSeq
     bfMonoid.create(values: _*)
   }
 
-  def inputGenerator(set: Set[T]) =
+  def inputGenerator(set: Set[T]): Gen[T] =
     for {
       randomValues <- Gen.listOfN[T](set.size, implicitly[Gen[T]])
       x <- Gen.oneOf((set ++ randomValues).toSeq)
     } yield x
 
-  def exactResult(s: Set[T], t: T) = s.contains(t)
+  def exactResult(s: Set[T], t: T): Boolean = s.contains(t)
 
-  def approximateResult(bf: BF[T], t: T) = bf.contains(t)
+  def approximateResult(bf: BF[T], t: T): ApproximateBoolean = bf.contains(t)
 }
 
 class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
@@ -225,20 +225,20 @@ class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
   val maxNumEntries = 10000
   val falsePositiveRate = 0.01
 
-  def exactGenerator =
+  def exactGenerator: Gen[Set[T]] =
     for {
       numEntries <- Gen.choose(1, maxNumEntries)
       set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
     } yield set
 
-  def makeApproximate(set: Set[T]) = {
+  def makeApproximate(set: Set[T]): BF[T] = {
     val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
     val values = set.toSeq
     bfMonoid.create(values: _*)
   }
 
-  def inputGenerator(set: Set[T]) = Gen.const(())
+  def inputGenerator(set: Set[T]): Gen[Unit] = Gen.const(())
 
   def exactResult(s: Set[T], u: Unit) = s.size
   def approximateResult(bf: BF[T], u: Unit) = bf.size

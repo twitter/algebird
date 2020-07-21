@@ -25,7 +25,9 @@ object DecayedVector extends CompatDecayedVector {
   def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
 
-  def monoidWithEpsilon[C[_]](eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) =
+  def monoidWithEpsilon[C[_]](
+      eps: Double
+  )(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]): Monoid[DecayedVector[C]] =
     new Monoid[DecayedVector[C]] {
       override val zero = DecayedVector(vs.group.zero, Double.NegativeInfinity)
       override def plus(left: DecayedVector[C], right: DecayedVector[C]) =
@@ -51,13 +53,16 @@ object DecayedVector extends CompatDecayedVector {
 
   def mapMonoidWithEpsilon[K](
       eps: Double
-  )(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
+  )(implicit
+      vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+      metric: Metric[Map[K, Double]]
+  ): Monoid[DecayedVector[({ type x[a] = Map[K, a] })#x]] =
     monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
 
   implicit def mapMonoid[K](implicit
       vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
       metric: Metric[Map[K, Double]]
-  ) =
+  ): Monoid[DecayedVector[({ type x[a] = Map[K, a] })#x]] =
     mapMonoidWithEpsilon(-1.0)
 
   def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(implicit

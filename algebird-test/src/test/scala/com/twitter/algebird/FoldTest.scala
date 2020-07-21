@@ -12,10 +12,10 @@ class FoldTest extends AnyWordSpec {
     override def runCase(fold: Fold[I, O]) = fold.overEmpty
   }
   case class One[I, O](in: I, expected: O) extends Case[I, O] {
-    override def runCase(fold: Fold[I, O]) = fold.overSingleton(in)
+    override def runCase(fold: Fold[I, O]): O = fold.overSingleton(in)
   }
   case class Many[I, O](in: Traversable[I], expected: O) extends Case[I, O] {
-    override def runCase(fold: Fold[I, O]) = fold.overTraversable(in)
+    override def runCase(fold: Fold[I, O]): O = fold.overTraversable(in)
   }
 
   def run[I, O](fold: Fold[I, O], cases: Case[I, O]*): Unit =

@@ -28,7 +28,7 @@ object VectorSpace extends VectorSpaceOps with Implicits
 sealed trait VectorSpaceOps {
   def scale[F, C[_]](v: F, c: C[F])(implicit vs: VectorSpace[F, C]): C[F] =
     vs.scale(v, c)
-  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]) =
+  def from[F, C[_]](scaleFn: (F, C[F]) => C[F])(implicit r: Ring[F], cGroup: Group[C[F]]): VectorSpace[F, C] =
     new VectorSpace[F, C] {
       override def ring: Ring[F] = r
       override def group: Group[C[F]] = cGroup
@@ -39,12 +39,12 @@ sealed trait VectorSpaceOps {
 private object VectorSpaceOps extends VectorSpaceOps
 
 sealed trait Implicits extends LowPrioImpicits {
-  implicit def indexedSeqSpace[T: Ring] =
+  implicit def indexedSeqSpace[T: Ring]: VectorSpace[T, IndexedSeq] =
     VectorSpaceOps.from[T, IndexedSeq]((s, seq) => seq.map(Ring.times(s, _)))
 }
 
 sealed trait LowPrioImpicits {
-  implicit def mapSpace[K, T: Ring] =
+  implicit def mapSpace[K, T: Ring]: VectorSpace[T, ({ type x[a] = Map[K, a] })#x] =
     VectorSpaceOps.from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
       m.transform { case (_, v) => Ring.times(s, v) }
     }

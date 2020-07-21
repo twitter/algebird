@@ -38,18 +38,18 @@ class Tuple4Benchmark {
   import Tuple4Benchmark._
 
   @Benchmark
-  def timeTuplePlus(state: Tuple4State, bh: Blackhole) =
+  def timeTuplePlus(state: Tuple4State, bh: Blackhole): Unit =
     bh.consume(state.inputData.reduce(state.tupleMonoid.plus(_, _)))
 
   @Benchmark
-  def timeTupleSumOption(state: Tuple4State, bh: Blackhole) =
+  def timeTupleSumOption(state: Tuple4State, bh: Blackhole): Unit =
     bh.consume(state.tupleMonoid.sumOption(state.inputData))
 
   @Benchmark
-  def timeProductPlus(state: Tuple4State, bh: Blackhole) =
+  def timeProductPlus(state: Tuple4State, bh: Blackhole): Unit =
     bh.consume(state.inputData.reduce(state.productMonoid.plus(_, _)))
 
   @Benchmark
-  def timeProductSumOption(state: Tuple4State, bh: Blackhole) =
+  def timeProductSumOption(state: Tuple4State, bh: Blackhole): Unit =
     bh.consume(state.productMonoid.sumOption(state.inputData))
 }

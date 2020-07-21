@@ -22,7 +22,7 @@ import Helpers.arbitraryBatched
 class BatchedLaws extends CheckProperties {
 
   import BaseProperties._
-  implicit val arbitraryBigDecimalsHere =
+  implicit val arbitraryBigDecimalsHere: Arbitrary[BigDecimal] =
     BaseProperties.arbReasonableBigDecimals
 
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {

@@ -67,7 +67,7 @@ class QTreeMicroBenchmark {
   import QTreeMicroBenchmark._
 
   @Benchmark
-  def doubleBranch(state: QTreeMicroState) = {
+  def doubleBranch(state: QTreeMicroState): Unit = {
     val iter = state.inputDataLong.toIterator
     while (iter.hasNext) {
       extendToLevelDoubleBranch(iter.next, state.extendToLevel)
@@ -75,7 +75,7 @@ class QTreeMicroBenchmark {
   }
 
   @Benchmark
-  def singleBranch(state: QTreeMicroState) = {
+  def singleBranch(state: QTreeMicroState): Unit = {
     val iter = state.inputDataLong.toIterator
     while (iter.hasNext) {
       extendToLevelSingleBranch(iter.next, state.extendToLevel)

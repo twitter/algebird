@@ -5,10 +5,11 @@ import org.scalacheck.{Arbitrary, Gen}
 import scala.math.Equiv
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.Assertion
 
 class MinHasherTest extends CheckProperties {
-  implicit val mhMonoid = new MinHasher32(0.5, 512)
-  implicit val mhGen = Arbitrary {
+  implicit val mhMonoid: MinHasher32 = new MinHasher32(0.5, 512)
+  implicit val mhGen: Arbitrary[MinHashSignature] = Arbitrary {
     for (v <- Gen.choose(0, 10000)) yield (mhMonoid.init(v))
   }
 
@@ -21,7 +22,7 @@ class MinHasherTest extends CheckProperties {
 class MinHasherSpec extends AnyWordSpec with Matchers {
   val r = new java.util.Random
 
-  def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double) = {
+  def test[H](mh: MinHasher[H], similarity: Double, epsilon: Double): Assertion = {
     val (set1, set2) = randomSets(similarity)
 
     val exact = exactSimilarity(set1, set2)
@@ -30,7 +31,7 @@ class MinHasherSpec extends AnyWordSpec with Matchers {
     assert(error < epsilon)
   }
 
-  def randomSets(similarity: Double) = {
+  def randomSets(similarity: Double): (Set[Double], Set[Double]) = {
     val s = 10000
     val uniqueFraction =
       if (similarity == 1.0) 0.0 else (1 - similarity) / (1 + similarity)
@@ -51,10 +52,10 @@ class MinHasherSpec extends AnyWordSpec with Matchers {
     (unique1 ++ shared, unique2 ++ shared)
   }
 
-  def exactSimilarity[T](x: Set[T], y: Set[T]) =
+  def exactSimilarity[T](x: Set[T], y: Set[T]): Double =
     (x & y).size.toDouble / (x ++ y).size
 
-  def approxSimilarity[T, H](mh: MinHasher[H], x: Set[T], y: Set[T]) = {
+  def approxSimilarity[T, H](mh: MinHasher[H], x: Set[T], y: Set[T]): Double = {
     val sig1 = x
       .map(l => mh.init(l.toString))
       .reduce((a, b) => mh.plus(a, b))

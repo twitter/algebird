@@ -29,12 +29,12 @@ import com.twitter.util.{Future, Promise, Return}
  * objects are created. This is the async analogue of Function1Monoid.
  */
 class TunnelMonoid[V] extends Monoid[Tunnel[V]] {
-  def zero = {
+  def zero: Tunnel[V] = {
     val promise = new Promise[V]
     Tunnel(promise, promise)
   }
 
-  override def isNonZero(v: Tunnel[V]) = !(v.promise eq v.future)
+  override def isNonZero(v: Tunnel[V]): Boolean = !(v.promise eq v.future)
 
   def plus(older: Tunnel[V], newer: Tunnel[V]): Tunnel[V] = {
     val (Tunnel(f1, p1), Tunnel(f2, p2)) = (older, newer)
@@ -76,7 +76,7 @@ object Tunnel {
    * This lifts a value into a Tunnel. This is where the Monoidic
    * computation underlying a TunnelMonoid actually happens.
    */
-  def toIncrement[V](v: V)(implicit monoid: Monoid[V]) = {
+  def toIncrement[V](v: V)(implicit monoid: Monoid[V]): Tunnel[V] = {
     val promise = new Promise[V]
     Tunnel(promise.map(monoid.plus(_, v)), promise)
   }

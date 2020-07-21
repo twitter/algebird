@@ -9,7 +9,7 @@ class MinMaxAggregatorSpec extends AnyWordSpec with Matchers {
   case object TestElementB extends TestElementParent
   case object TestElementC extends TestElementParent
 
-  implicit val testOrdering = Ordering.fromLessThan[TestElementParent]((x, y) =>
+  implicit val testOrdering: Ordering[TestElementParent] = Ordering.fromLessThan[TestElementParent]((x, y) =>
     (x, y) match {
       case (TestElementA, TestElementA) => false
       case (TestElementA, _)            => true
@@ -20,7 +20,7 @@ class MinMaxAggregatorSpec extends AnyWordSpec with Matchers {
     }
   )
 
-  val data = List(TestElementC, TestElementA, TestElementB)
+  val data: List[TestElementParent] = List(TestElementC, TestElementA, TestElementB)
 
   "MinAggregator" should {
     "produce the minimum value" in {

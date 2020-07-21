@@ -21,7 +21,7 @@ import org.scalacheck.Prop._
 
 object SummingCacheTest {
   case class Capacity(cap: Int) extends AnyVal
-  implicit val capArb = Arbitrary {
+  implicit val capArb: Arbitrary[Capacity] = Arbitrary {
     for (c <- Gen.choose(0, 1024)) yield Capacity(c)
   }
 }
@@ -36,7 +36,7 @@ class SummingCacheTest extends CheckProperties {
     SummingCache[K, V](c.cap)
 
   // Maps are tricky to compare equality for since zero values are often removed
-  def test[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
+  def test[K, V: Monoid](c: Capacity, items: List[(K, V)]): Boolean = {
     val sc = newCache[K, V](c)
     val mitems = items.map(Map(_))
     implicit val mapEq = mapEquiv[K, V]
@@ -65,7 +65,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
 
   val RAND = new scala.util.Random
 
-  def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]) = {
+  def getHits[K, V: Monoid](c: Capacity, items: List[(K, V)]): List[Int] = {
     val sc = SummingWithHitsCache[K, V](c.cap)
     val mitems = items.map(Map(_))
     mitems.map(sc.putWithHits(_)._1).tail
@@ -106,13 +106,13 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
 }
 
 class SummingQueueTest extends CheckProperties {
-  val zeroCapQueue = SummingQueue[Int](0) // passes all through
+  val zeroCapQueue: SummingQueue[Int] = SummingQueue[Int](0) // passes all through
 
   property("0 capacity always returns") {
     forAll { i: Int => zeroCapQueue(i) == Some(i) }
   }
 
-  val sb = SummingQueue[Int](3) // buffers three at a time
+  val sb: SummingQueue[Int] = SummingQueue[Int](3) // buffers three at a time
 
   property("puts are like sums") {
     forAll((items: List[Int]) => StatefulSummerLaws.sumIsPreserved(sb, items))

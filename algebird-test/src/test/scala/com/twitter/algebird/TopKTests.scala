@@ -28,8 +28,8 @@ class TopKTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
   val SIZE = 10
 
-  implicit def qmonoid = new PriorityQueueMonoid[Int](SIZE)
-  implicit def queueArb = Arbitrary {
+  implicit def qmonoid: PriorityQueueMonoid[Int] = new PriorityQueueMonoid[Int](SIZE)
+  implicit def queueArb: Arbitrary[PriorityQueue[Int]] = Arbitrary {
     implicitly[Arbitrary[List[Int]]].arbitrary.map(qmonoid.build(_))
   }
 
@@ -51,7 +51,7 @@ class TopKTests extends CheckProperties {
    * The following were specific bugs that we failed some prior
    * scalacheck (yay for randomized testing)
    */
-  val pqPriorBugs = Seq(List(List(1, 1, 1, 2), List(0, 0, 0, 0, 0, 0, 0)))
+  val pqPriorBugs: Seq[List[List[Int]]] = Seq(List(List(1, 1, 1, 2), List(0, 0, 0, 0, 0, 0, 0)))
   property("Specific regressions are handled") {
     pqPriorBugs.forall(pqIsCorrect(_))
   }
@@ -60,9 +60,9 @@ class TopKTests extends CheckProperties {
     monoidLaws[PriorityQueue[Int]]
   }
 
-  implicit def tkmonoid = new TopKMonoid[Int](SIZE)
+  implicit def tkmonoid: TopKMonoid[Int] = new TopKMonoid[Int](SIZE)
 
-  implicit def topkArb = Arbitrary {
+  implicit def topkArb: Arbitrary[TopK[Int]] = Arbitrary {
     implicitly[Arbitrary[List[Int]]].arbitrary.map(tkmonoid.build(_))
   }
 

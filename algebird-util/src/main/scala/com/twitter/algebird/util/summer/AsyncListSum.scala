@@ -62,7 +62,7 @@ class AsyncListSum[Key, Value](
         (new MapContainer(Future.value(v) :: privBuf, size + 1, compact), 1)
       }
 
-    override def equals(o: Any) = o match {
+    override def equals(o: Any): Boolean = o match {
       case that: MapContainer => that eq this
       case _                  => false
     }

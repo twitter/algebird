@@ -4,8 +4,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class AppendAggregatorTest extends AnyWordSpec with Matchers {
-  val data = Vector.fill(100)(scala.util.Random.nextInt(100))
-  val mpty = Vector.empty[Int]
+  val data: Vector[Int] = Vector.fill(100)(scala.util.Random.nextInt(100))
+  val mpty: Vector[Int] = Vector.empty[Int]
 
   // test the methods that appendSemigroup method defines or overrides
   def testMethodsSemigroup[E, M, P](

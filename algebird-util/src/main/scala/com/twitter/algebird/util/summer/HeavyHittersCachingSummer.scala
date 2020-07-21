@@ -169,9 +169,9 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 }
 
 object HeavyHittersCachingSummer {
-  val DEFAULT_HH_PERCENT = HeavyHittersPercent(0.01f)
-  val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
-  val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
+  val DEFAULT_HH_PERCENT: HeavyHittersPercent = HeavyHittersPercent(0.01f)
+  val DEFAULT_ROLL_OVER_FREQUENCY: RollOverFrequency = RollOverFrequency(1000000L)
+  val DEFAULT_UPDATE_FREQUENCY: UpdateFrequency = UpdateFrequency(2)
 
   def apply[Key, Value](
       flushFrequency: FlushFrequency,
@@ -239,7 +239,7 @@ class HeavyHittersCachingSummer[K, V](
 
   override def flush: Future[Iterable[T]] = backingSummer.flush
   override def isFlushed = backingSummer.isFlushed
-  override val emptyResult = Seq[T]()
+  override val emptyResult: Seq[(K, V)] = Seq[T]()
 
   private[this] final val approxHH =
     new ApproxHHTracker(hhPct, updateFreq, roFreq)

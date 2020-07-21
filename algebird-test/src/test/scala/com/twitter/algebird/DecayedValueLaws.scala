@@ -5,13 +5,14 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 import org.scalacheck.Gen.choose
 import org.scalacheck.Prop._
+import org.scalacheck.Prop
 
 class DecayedValueLaws extends CheckProperties {
   val EPS = 0.1
 
   case class Params(mean: Double, halfLife: Double, count: Int, maxNoise: Double)
 
-  implicit val decayedMonoid = DecayedValue.monoidWithEpsilon(0.001)
+  implicit val decayedMonoid: Monoid[DecayedValue] = DecayedValue.monoidWithEpsilon(0.001)
 
   property("DecayedValue Monoid laws") {
     implicit val equiv: Equiv[DecayedValue] =
@@ -21,7 +22,7 @@ class DecayedValueLaws extends CheckProperties {
     commutativeMonoidLaws[DecayedValue]
   }
 
-  def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]) =
+  def averageApproxEq(fn: (DecayedValue, Params) => Double)(implicit p: Arbitrary[Params]): Prop =
     forAll { (params: Params) =>
       val rand = new scala.util.Random
       val data = (0 to params.count).map { t =>
