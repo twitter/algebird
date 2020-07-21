@@ -12,7 +12,7 @@ case class Counter(name: String) extends Incrementor {
 
   override def incrBy(amount: Long): Unit = counter.addAndGet(amount)
 
-  def size = counter.get()
+  def size: Long = counter.get()
 
   override def toString: String = s"$name: size:$size"
 }

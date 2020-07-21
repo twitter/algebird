@@ -41,6 +41,6 @@ class HLLPresentBenchmark {
     }
 
   @Benchmark
-  def timeBatchCreate(state: HLLPresentState, bh: Blackhole) =
+  def timeBatchCreate(state: HLLPresentState, bh: Blackhole): Unit =
     state.data.foreach(hll => bh.consume(clone(hll).approximateSize))
 }

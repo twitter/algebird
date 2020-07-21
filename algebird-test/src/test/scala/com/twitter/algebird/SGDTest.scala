@@ -6,28 +6,29 @@ import org.scalacheck.{Arbitrary, Gen}
 class SGDLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val sgdMonoid =
+  implicit val sgdMonoid: SGDMonoid[(Double, IndexedSeq[Double])] =
     new SGDMonoid(SGD.constantStep(0.001), SGD.linearGradient)
-  val zeroStepMonoid = new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
+  val zeroStepMonoid: SGDMonoid[(Double, IndexedSeq[Double])] =
+    new SGDMonoid(SGD.constantStep(0.0), SGD.linearGradient)
 
   val (m, b) = (2.0, 4.0)
-  val eps = 1e-3
+  val eps: Double = 1e-3
 
-  val sgdPosGen = for {
+  val sgdPosGen: Gen[SGDPos[(Double, Vector[Double])]] = for {
     x <- Gen.choose(0.0, 1.0)
     n <- Gen.choose(0.0, 0.001)
   } yield SGDPos((m * x + b + n, Vector(x)))
 
-  val sgdWGen = for {
+  val sgdWGen: Gen[SGDWeights] = for {
     cnt <- Gen.choose(0L, 100000L)
     m <- Gen.choose(-10.0, 10.0)
     b <- Gen.choose(-10.0, 10.0)
   } yield SGDWeights(cnt, Vector(m, b))
 
-  val zeroGen = Gen.const(SGDZero)
+  val zeroGen: Gen[SGDZero.type] = Gen.const(SGDZero)
 
-  implicit val sgdPos = Arbitrary(sgdPosGen)
-  implicit val sgdWArb = Arbitrary(sgdWGen)
+  implicit val sgdPos: Arbitrary[SGDPos[(Double, Vector[Double])]] = Arbitrary(sgdPosGen)
+  implicit val sgdWArb: Arbitrary[SGDWeights] = Arbitrary(sgdWGen)
   implicit val sgdArb: Arbitrary[SGD[(Double, IndexedSeq[Double])]] =
     Arbitrary {
       Gen.oneOf(sgdWGen, sgdPosGen, zeroGen)
@@ -65,7 +66,8 @@ class SGDLaws extends CheckProperties {
   def minus(x: IndexedSeq[Double], y: IndexedSeq[Double]): IndexedSeq[Double] =
     x.zip(y).map { case (x: Double, y: Double) => x - y }
 
-  val oneStepMonoid = new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
+  val oneStepMonoid: SGDMonoid[(Double, IndexedSeq[Double])] =
+    new SGDMonoid(SGD.constantStep(1.0), SGD.linearGradient)
 
   property("unit step can be undone by adding gradient") {
     forAll { (w: SGDWeights, pos: SGDPos[(Double, Vector[Double])]) =>

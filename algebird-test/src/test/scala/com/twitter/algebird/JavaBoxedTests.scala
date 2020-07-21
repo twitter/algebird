@@ -6,22 +6,23 @@ import java.util.{List => JList, Map => JMap}
 import org.scalacheck.{Arbitrary, Gen}
 
 import scala.collection.JavaConverters._
+import java.{util => ju}
 
 class JavaBoxedTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val jboolArg = Arbitrary {
+  implicit val jboolArg: Arbitrary[JBool] = Arbitrary {
     for (v <- Gen.oneOf(JBool.TRUE, JBool.FALSE)) yield v
   }
-  implicit val jintArg = Arbitrary {
+  implicit val jintArg: Arbitrary[Integer] = Arbitrary {
     for (v <- Gen.choose(Int.MinValue, Int.MaxValue))
       yield JInt.valueOf(v)
   }
-  implicit val jshortArg = Arbitrary {
+  implicit val jshortArg: Arbitrary[JShort] = Arbitrary {
     for (v <- Gen.choose(Short.MinValue, Short.MaxValue))
       yield Short.box(v)
   }
-  implicit val jlongArg = Arbitrary {
+  implicit val jlongArg: Arbitrary[JLong] = Arbitrary {
     // If we put Long.Max/Min we get overflows that seem to break the ring properties, not clear why
     for (v <- Gen.choose(Int.MinValue, Int.MaxValue))
       yield JLong.valueOf(v)
@@ -53,7 +54,7 @@ class JavaBoxedTests extends CheckProperties {
 
   // TODO add testing with JFloat/JDouble but check for approximate equals, pain in the ass.
 
-  implicit def jlist[T: Arbitrary] = Arbitrary {
+  implicit def jlist[T: Arbitrary]: Arbitrary[ju.List[T]] = Arbitrary {
     implicitly[Arbitrary[List[T]]].arbitrary.map(_.asJava)
   }
 
@@ -61,7 +62,7 @@ class JavaBoxedTests extends CheckProperties {
     monoidLaws[JList[Int]]
   }
 
-  implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup] = Arbitrary {
+  implicit def jmap[K: Arbitrary, V: Arbitrary: Semigroup]: Arbitrary[ju.Map[K, V]] = Arbitrary {
     implicitly[Arbitrary[Map[K, V]]].arbitrary.map {
       _.filter(kv => isNonZero[V](kv._2)).asJava
     }

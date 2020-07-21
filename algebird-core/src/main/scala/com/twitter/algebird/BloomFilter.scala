@@ -422,7 +422,7 @@ case class BFZero[A](hashes: BFHash[A], override val width: Int) extends BF[A] {
 
   override def numHashes: Int = hashes.size
 
-  override def numBits = 0
+  override def numBits: Int = 0
 
   override def ++(other: BF[A]): BF[A] = other
 

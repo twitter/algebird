@@ -57,15 +57,15 @@ object QTreeBenchmark {
 class QTreeBenchmark {
   import QTreeBenchmark._
   @Benchmark
-  def timeSumOptionUnit(state: QTreeState) =
+  def timeSumOptionUnit(state: QTreeState): Option[QTree[Unit]] =
     state.qtreeUnit.sumOption(state.inputDataUnit)
 
   @Benchmark
-  def timeSumOptionLong(state: QTreeState) =
+  def timeSumOptionLong(state: QTreeState): Option[QTree[Long]] =
     state.qtreeLong.sumOption(state.inputDataLong)
 
   @Benchmark
-  def timeSumOptionDouble(state: QTreeState) =
+  def timeSumOptionDouble(state: QTreeState): Option[QTree[Double]] =
     state.qtreeDouble.sumOption(state.inputDataDouble)
 
   @Benchmark
@@ -81,7 +81,7 @@ class QTreeBenchmark {
     state.inputDataDouble.tail.reduce(state.qtreeDouble.plus)
 
   @Benchmark
-  def timeQuantileBounds(state: QTreeState) = {
+  def timeQuantileBounds(state: QTreeState): Seq[(Double, Double)] = {
     state.inputDataUnit.map(_.quantileBounds(0))
     state.inputDataUnit.map(_.quantileBounds(0.25))
     state.inputDataUnit.map(_.quantileBounds(0.5))

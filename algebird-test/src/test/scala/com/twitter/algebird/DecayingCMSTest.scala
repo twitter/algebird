@@ -11,7 +11,7 @@ class DecayingCMSProperties extends CheckProperties {
   // override val generatorDrivenConfig =
   //   PropertyCheckConfiguration(minSuccessful = 1000)
 
-  val eps = 1e-5
+  val eps: Double = 1e-5
 
   def close(a: Double, b: Double): Boolean =
     if (a == b) {

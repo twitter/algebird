@@ -27,7 +27,7 @@ object AdaptiveVector {
   /**
    * When density >= this value * size, we switch to dense vectors
    */
-  val THRESHOLD = 0.25
+  val THRESHOLD: Double = 0.25
   def fill[V](size: Int)(sparse: V): AdaptiveVector[V] =
     SparseVector(Map.empty[Int, V], sparse, size)
 

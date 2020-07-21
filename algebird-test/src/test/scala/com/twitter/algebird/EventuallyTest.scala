@@ -9,8 +9,8 @@ import org.scalatest.wordspec.AnyWordSpec
 class EventuallyRingLaws extends CheckProperties {
   import BaseProperties._
 
-  val lGen = for (v <- Gen.choose(0L, 1L << 30L)) yield Left(v)
-  val rGen = for (v <- Gen.choose(0, 10000)) yield Right(v)
+  val lGen: Gen[Left[Long, Nothing]] = for (v <- Gen.choose(0L, 1L << 30L)) yield Left(v)
+  val rGen: Gen[Right[Nothing, Int]] = for (v <- Gen.choose(0, 10000)) yield Right(v)
   implicit val eitherArb: Arbitrary[Either[Long, Int]] =
     Arbitrary(Gen.oneOf(lGen, rGen))
 
@@ -44,12 +44,12 @@ class EventuallyRingLaws extends CheckProperties {
 class EventuallyMonoidLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val eventuallyMonoid =
+  implicit val eventuallyMonoid: EventuallyMonoid[Int, String] =
     new EventuallyMonoid[Int, String](_.length)(_.length > 100)
 
-  val lGen = for (v <- Gen.choose(0, 1 << 14)) yield Left(v)
-  val rGen = for (v <- Gen.alphaStr) yield Right(v)
-  implicit val arb = Arbitrary(Gen.oneOf(lGen, rGen))
+  val lGen: Gen[Left[Int, Nothing]] = for (v <- Gen.choose(0, 1 << 14)) yield Left(v)
+  val rGen: Gen[Right[Nothing, String]] = for (v <- Gen.alphaStr) yield Right(v)
+  implicit val arb: Arbitrary[Either[Int, String]] = Arbitrary(Gen.oneOf(lGen, rGen))
 
   property("EventuallyMonoid is a Monoid") {
     monoidLaws[Either[Int, String]]
@@ -59,17 +59,17 @@ class EventuallyMonoidLaws extends CheckProperties {
 
 class EventuallyTest extends AnyWordSpec with Matchers {
 
-  val eventuallyMonoid =
+  val eventuallyMonoid: EventuallyMonoid[Int, String] =
     new EventuallyMonoid[Int, String](_.length)(_.length > 100)
 
-  val short = "foo"
-  val med = Stream.continually("bar").take(20).mkString("")
-  val long = Stream.continually("bell").take(100).mkString("")
+  val short: String = "foo"
+  val med: String = Stream.continually("bar").take(20).mkString("")
+  val long: String = Stream.continually("bell").take(100).mkString("")
 
   // max batch is 1000
-  val listOfRights =
+  val listOfRights: List[Either[Int, String]] =
     Stream.continually[Either[Int, String]](Right(short)).take(1010).toList
-  val listOfLefts = Stream
+  val listOfLefts: List[Either[Int, String]] = Stream
     .continually[Either[Int, String]](Left(short.length))
     .take(1010)
     .toList

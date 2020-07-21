@@ -5,6 +5,7 @@ import com.twitter.algebird.scalacheck.arbitrary._
 import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop
 
 class AveragedValueLaws extends CheckProperties {
   def avg[T](v: Vector[T])(implicit num: Numeric[T]): Double = {
@@ -51,7 +52,7 @@ class AveragedValueLaws extends CheckProperties {
     }
   }
 
-  def numericAggregatorTest[T: Numeric: Arbitrary] =
+  def numericAggregatorTest[T: Numeric: Arbitrary]: Prop =
     forAll { v: NonEmptyVector[T] =>
       val averaged = AveragedValue.numericAggregator[T].apply(v.items)
       approxEq(1e-10)(avg(v.items), averaged)

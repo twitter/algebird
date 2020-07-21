@@ -27,7 +27,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
   private class Statistics(threadSafe: Boolean) {
     import scala.math.min
     import java.lang.Long.numberOfLeadingZeros
-    val maxBucket = 10
+    val maxBucket: Int = 10
     val distribution: IndexedSeq[Counter] = IndexedSeq.fill(maxBucket + 1)(Counter(threadSafe))
     val total: Counter = Counter(threadSafe)
 

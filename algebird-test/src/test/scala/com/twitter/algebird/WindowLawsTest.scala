@@ -10,7 +10,7 @@ import org.scalacheck.Prop.forAll
 
 class WindowLaws extends CheckProperties {
 
-  implicit val mon = Window.monoid[Int](5)
+  implicit val mon: WindowMonoid[Int] = Window.monoid[Int](5)
 
   implicit def wGen[A: Arbitrary](implicit wm: WindowMonoid[A]): Arbitrary[Window[A]] =
     Arbitrary {

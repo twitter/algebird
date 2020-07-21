@@ -11,13 +11,15 @@ import com.twitter.bijection._
 import com.twitter.util.{Await, Duration, FuturePool}
 
 import scala.util.Random
+import com.twitter.util.ExecutorServiceFuturePool
+import java.util.concurrent.ExecutorService
 
 object AsyncSummerBenchmark {
-  val flushFrequency = FlushFrequency(Duration.fromMilliseconds(100))
-  val memoryFlushPercent = MemoryFlushPercent(80.0f)
-  val executor = Executors.newFixedThreadPool(4)
-  val workPool = FuturePool(executor)
-  implicit val hllMonoid = new HyperLogLogMonoid(24)
+  val flushFrequency: FlushFrequency = FlushFrequency(Duration.fromMilliseconds(100))
+  val memoryFlushPercent: MemoryFlushPercent = MemoryFlushPercent(80.0f)
+  val executor: ExecutorService = Executors.newFixedThreadPool(4)
+  val workPool: ExecutorServiceFuturePool = FuturePool(executor)
+  implicit val hllMonoid: HyperLogLogMonoid = new HyperLogLogMonoid(24)
 
   def hll[T](t: T)(implicit monoid: HyperLogLogMonoid, inj: Injection[T, Array[Byte]]): HLL =
     monoid.create(inj(t))
@@ -137,19 +139,19 @@ class AsyncSummerBenchmark {
   import AsyncSummerBenchmark._
 
   @inline
-  def fn(state: SummerState, summer: AsyncSummer[(Long, HLL), Map[Long, HLL]]) = {
+  def fn(state: SummerState, summer: AsyncSummer[(Long, HLL), Map[Long, HLL]]): Map[Long, HLL] = {
     val batch = Random.nextInt(state.batchCount)
     Await.result(summer.addAll(state.inputItems(batch)))
   }
 
-  def timeAsyncNonCompactListSum(state: SummerState) =
+  def timeAsyncNonCompactListSum(state: SummerState): Map[Long, HLL] =
     fn(state, state.asyncNonCompactListSum)
-  def timeAsyncCompactListSum(state: SummerState) =
+  def timeAsyncCompactListSum(state: SummerState): Map[Long, HLL] =
     fn(state, state.asyncCompactListSum)
-  def timeAsyncMapSum(state: SummerState) = fn(state, state.asyncMapSum)
-  def timeSyncSummingQueue(state: SummerState) =
+  def timeAsyncMapSum(state: SummerState): Map[Long, HLL] = fn(state, state.asyncMapSum)
+  def timeSyncSummingQueue(state: SummerState): Map[Long, HLL] =
     fn(state, state.syncSummingQueue)
-  def timeNullSummer(state: SummerState) = fn(state, state.nullSummer)
+  def timeNullSummer(state: SummerState): Map[Long, HLL] = fn(state, state.nullSummer)
 
 }
 
@@ -160,7 +162,7 @@ case class Counter(name: String) extends Incrementor {
 
   override def incrBy(amount: Long): Unit = counter.addAndGet(amount)
 
-  def size = counter.get()
+  def size: Long = counter.get()
 
   override def toString: String = s"$name: size:$size"
 }

@@ -16,9 +16,9 @@ object CmsLaws {
 class CmsLaws extends CheckProperties {
   import BaseProperties._
 
-  val DELTA = 1e-8
-  val EPS = 0.005
-  val SEED = 1
+  val DELTA: Double = 1e-8
+  val EPS: Double = 0.005
+  val SEED: Int = 1
 
   def monoid[K: CMSHasher]: CMSMonoid[K] =
     CMS.monoid[K](EPS, DELTA, SEED)
@@ -83,10 +83,10 @@ class CmsLaws extends CheckProperties {
 class TopPctCmsLaws extends CheckProperties {
   import BaseProperties._
 
-  val DELTA = 1e-8
-  val EPS = 0.005
-  val SEED = 1
-  val HEAVY_HITTERS_PCT = 0.1
+  val DELTA: Double = 1e-8
+  val EPS: Double = 0.005
+  val SEED: Int = 1
+  val HEAVY_HITTERS_PCT: Double = 0.1
 
   def monoid[K: CMSHasher]: TopCMSMonoid[K] =
     TopPctCMS.monoid[K](EPS, DELTA, SEED, HEAVY_HITTERS_PCT)
@@ -148,9 +148,9 @@ class TopPctCmsLaws extends CheckProperties {
 
 class SparseCMSTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
-  val DELTA = 1e-8
-  val EPS = 0.005
-  val SEED = 1
+  val DELTA: Double = 1e-8
+  val EPS: Double = 0.005
+  val SEED: Int = 1
 
   "correctly count SparseCMS numbers" in {
     val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
@@ -165,9 +165,9 @@ class SparseCMSTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPrope
 
 class CMSInstanceTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
-  val DELTA = 1e-8
-  val EPS = 0.005
-  val SEED = 1
+  val DELTA: Double = 1e-8
+  val EPS: Double = 0.005
+  val SEED: Int = 1
 
   "correctly count CMSItem numbers" in {
     val cmsMonoid = CMS.monoid[Int](EPS, DELTA, SEED)
@@ -318,11 +318,11 @@ class CMSBytesTest extends CMSTest[Bytes](CmsLaws.int2Bytes(_))
 abstract class CmsProperty[K] extends ApproximateProperty
 
 object CmsProperty {
-  val delta = 1e-10
-  val eps = 0.001
-  val seed = 1
+  val delta: Double = 1e-10
+  val eps: Double = 0.001
+  val seed: Int = 1
 
-  def makeApproximate[K: CMSHasher](exact: Vector[K]) = {
+  def makeApproximate[K: CMSHasher](exact: Vector[K]): CMS[K] = {
     val cmsMonoid: CMSMonoid[K] = CMS.monoid(eps, delta, seed)
     cmsMonoid.sum(exact.map(cmsMonoid.create(_)))
   }
@@ -335,11 +335,11 @@ abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty {
   type Input = K
   type Result = Long
 
-  def makeApproximate(e: Exact) = CmsProperty.makeApproximate(e)
+  def makeApproximate(e: Exact): CMS[K] = CmsProperty.makeApproximate(e)
   def inputGenerator(e: Vector[K]): Gen[K] = Gen.oneOf(e)
 
-  def exactResult(vec: Vector[K], key: K) = vec.count(_ == key)
-  def approximateResult(cms: CMS[K], key: K) = cms.frequency(key)
+  def exactResult(vec: Vector[K], key: K): Long = vec.count(_ == key)
+  def approximateResult(cms: CMS[K], key: K): Approximate[Long] = cms.frequency(key)
 }
 
 class CmsSmallFrequencyProperty[K: CMSHasher: Gen] extends CmsFrequencyProperty[K] {
@@ -359,7 +359,7 @@ class CmsInnerProductProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(exacts: (Vector[K], Vector[K])) =
+  def makeApproximate(exacts: (Vector[K], Vector[K])): (CMS[K], CMS[K]) =
     (CmsProperty.makeApproximate(exacts._1), CmsProperty.makeApproximate(exacts._2))
 
   def exactGenerator: Gen[(Vector[K], Vector[K])] =
@@ -370,13 +370,13 @@ class CmsInnerProductProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
 
   def inputGenerator(e: (Vector[K], Vector[K])): Gen[Unit] = Gen.const(())
 
-  def exactResult(lists: (Vector[K], Vector[K]), input: Unit) = {
+  def exactResult(lists: (Vector[K], Vector[K]), input: Unit): Long = {
     val counts1 = lists._1.groupBy(identity).mapValues(_.size)
     val counts2 = lists._2.groupBy(identity).mapValues(_.size)
     (counts1.keys.toSet & counts2.keys.toSet).toSeq.map(k => counts1(k) * counts2(k)).sum
   }
 
-  def approximateResult(cmses: (CMS[K], CMS[K]), input: Unit) =
+  def approximateResult(cmses: (CMS[K], CMS[K]), input: Unit): Approximate[Long] =
     cmses._1.innerProduct(cmses._2)
 }
 
@@ -387,23 +387,23 @@ class CmsTotalCountProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   type Input = Unit
   type Result = Long
 
-  def makeApproximate(exact: Vector[K]) = CmsProperty.makeApproximate(exact)
+  def makeApproximate(exact: Vector[K]): CMS[K] = CmsProperty.makeApproximate(exact)
 
   def exactGenerator: Gen[Vector[K]] =
     Gen.containerOfN[Vector, K](10000, implicitly[Gen[K]])
 
   def inputGenerator(e: Vector[K]): Gen[Unit] = Gen.const(())
 
-  def exactResult(list: Vector[K], input: Unit) = list.length
+  def exactResult(list: Vector[K], input: Unit): Long = list.length
 
-  def approximateResult(cms: CMS[K], input: Unit) =
+  def approximateResult(cms: CMS[K], input: Unit): Approximate[Long] =
     Approximate.exact(cms.totalCount)
 }
 
 class CmsProperties extends ApproximateProperties("CountMinSketch") {
   import ApproximateProperty.toProp
 
-  implicit val intGen = Gen.choose(1, 100)
+  implicit val intGen: Gen[Int] = Gen.choose(1, 100)
 
   property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
   property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
@@ -418,9 +418,9 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
     with Matchers
     with ScalaCheckDrivenPropertyChecks {
 
-  val DELTA = 1e-10
-  val EPS = 0.001
-  val SEED = 1
+  val DELTA: Double = 1e-10
+  val EPS: Double = 0.001
+  val SEED: Int = 1
 
   private[this] val maxDepth = 70
   private[this] val maxWidth = 1000
@@ -430,13 +430,13 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   // We use TopPctCMS for testing CMSCounting functionality.  We argue that because TopPctCMS[K] encapsulates CMS[K]
   // and uses it for all its counting/querying functionality (like an adapter) we can test CMS[K] indirectly through
   // testing TopPctCMS[K].
-  val COUNTING_CMS_MONOID = {
+  val COUNTING_CMS_MONOID: TopPctCMSMonoid[K] = {
     val ANY_HEAVY_HITTERS_PCT =
       0.1 // heavy hitters functionality is not relevant for the tests using this monoid
     TopPctCMS.monoid[K](EPS, DELTA, SEED, ANY_HEAVY_HITTERS_PCT)
   }
 
-  val RAND = new scala.util.Random
+  val RAND: Random = new scala.util.Random
 
   /**
    * Returns the elements in {data} that appear at least heavyHittersPct * data.size times.
@@ -986,9 +986,9 @@ class CMSFunctionsSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Ma
 
 class CMSParamsSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 
-  val AnyEps = 0.001
-  val AnyDelta = 1e-5
-  val AnyHashes = {
+  val AnyEps: Double = 0.001
+  val AnyDelta: Double = 1e-5
+  val AnyHashes: Seq[CMSHash[Long]] = {
     val AnySeed = 1
     CMSFunctions.generateHashes[Long](AnyEps, AnyDelta, AnySeed)
   }

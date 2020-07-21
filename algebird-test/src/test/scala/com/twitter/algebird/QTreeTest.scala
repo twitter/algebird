@@ -20,12 +20,13 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.collection.immutable
 
 class QTreeLaws extends CheckProperties {
   import BaseProperties._
 
-  implicit val qtSemigroup = new QTreeSemigroup[Long](4)
-  implicit val qtGen = Arbitrary {
+  implicit val qtSemigroup: QTreeSemigroup[Long] = new QTreeSemigroup[Long](4)
+  implicit val qtGen: Arbitrary[QTree[Long]] = Arbitrary {
     for (v <- choose(0L, 10000L)) yield (QTree(v))
   }
 
@@ -35,10 +36,10 @@ class QTreeLaws extends CheckProperties {
 }
 
 class QTreeTest extends AnyWordSpec with Matchers {
-  def randomList(n: Long) =
+  def randomList(n: Long): immutable.IndexedSeq[Double] =
     (1L to n).map(_ => math.random)
 
-  def buildQTree(k: Int, list: Seq[Double]) = {
+  def buildQTree(k: Int, list: Seq[Double]): QTree[Double] = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
     qtSemigroup.sumOption(list.map(QTree(_))).get
   }
@@ -49,7 +50,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
     sorted(rank)
   }
 
-  def trueRangeSum(list: Seq[Double], from: Double, to: Double) =
+  def trueRangeSum(list: Seq[Double], from: Double, to: Double): Double =
     list.filter(_ >= from).filter(_ < to).sum
 
   for (k <- Seq(3, 11, 51, 101)) {

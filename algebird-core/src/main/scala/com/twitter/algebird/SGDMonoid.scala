@@ -52,7 +52,7 @@ object SGD {
 sealed abstract class SGD[+Pos]
 case object SGDZero extends SGD[Nothing]
 object SGDWeights {
-  def apply(w: IndexedSeq[Double]) = new SGDWeights(1L, w)
+  def apply(w: IndexedSeq[Double]): SGDWeights = new SGDWeights(1L, w)
   def average(left: SGDWeights, right: SGDWeights): SGDWeights = {
     val lc = left.count
     val rc = right.count
@@ -73,7 +73,7 @@ object SGDWeights {
 case class SGDWeights(val count: Long, val weights: IndexedSeq[Double]) extends SGD[Nothing]
 
 object SGDPos {
-  def apply[Pos](p: Pos) = new SGDPos(List(p))
+  def apply[Pos](p: Pos): SGDPos[Pos] = new SGDPos(List(p))
 }
 case class SGDPos[+Pos](val pos: List[Pos]) extends SGD[Pos]
 

@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
+import org.scalacheck.Prop
 
 class AggregatorLaws extends CheckProperties {
 
@@ -85,7 +86,7 @@ class AggregatorLaws extends CheckProperties {
     }
   }
 
-  def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]) =
+  def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]): Prop =
     forAll { in: List[T] =>
       val aggregator = Aggregator.numericSum[T]
       aggregator(in) == in.map(num.toDouble).sum

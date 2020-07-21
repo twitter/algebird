@@ -122,7 +122,7 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
       Some(bufA.flush.get :: bufB.flush.get)
     }
 
-  override val hashCode = (a, b).hashCode
+  override val hashCode: Int = (a, b).hashCode
 
   override def equals(that: Any): Boolean =
     that match {

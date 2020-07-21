@@ -21,33 +21,35 @@ import com.twitter.algebird.{MapAlgebra, Semigroup}
 import com.twitter.util.{Await, Duration, Future, FuturePool}
 
 import java.util.concurrent.Executors
+import com.twitter.util.ExecutorServiceFuturePool
+import java.util.concurrent.ExecutorService
 
 object AsyncSummerLaws {
-  val executor = Executors.newFixedThreadPool(4)
-  val workPool = FuturePool(executor)
+  val executor: ExecutorService = Executors.newFixedThreadPool(4)
+  val workPool: ExecutorServiceFuturePool = FuturePool(executor)
 
   private[this] val schedulingExecutor = Executors.newFixedThreadPool(4)
   private[this] val schedulingWorkPool = FuturePool(schedulingExecutor)
 
-  implicit def arbFlushFreq = Arbitrary {
+  implicit def arbFlushFreq: Arbitrary[FlushFrequency] = Arbitrary {
     Gen
       .choose(1, 4000)
       .map { x: Int => FlushFrequency(Duration.fromMilliseconds(x)) }
   }
 
-  implicit def arbBufferSize = Arbitrary {
+  implicit def arbBufferSize: Arbitrary[BufferSize] = Arbitrary {
     Gen
       .choose(1, 10)
       .map(x => BufferSize(x))
   }
 
-  implicit def arbMemoryFlushPercent = Arbitrary {
+  implicit def arbMemoryFlushPercent: Arbitrary[MemoryFlushPercent] = Arbitrary {
     Gen
       .choose(80.0f, 90.0f)
       .map(x => MemoryFlushPercent(x))
   }
 
-  implicit def arbCompactSize = Arbitrary {
+  implicit def arbCompactSize: Arbitrary[CompactionSize] = Arbitrary {
     Gen
       .choose(1, 10)
       .map(x => CompactionSize(x))
@@ -58,7 +60,7 @@ object AsyncSummerLaws {
   def summingWithAndWithoutSummerShouldMatch[K, V: Semigroup](
       asyncSummer: AsyncSummer[(K, V), Iterable[(K, V)]],
       inputs: List[List[(K, V)]]
-  ) = {
+  ): Boolean = {
     val reference = MapAlgebra.sumByKey(inputs.flatten)
     val resA = Await
       .result(Future.collect(inputs.map { i =>

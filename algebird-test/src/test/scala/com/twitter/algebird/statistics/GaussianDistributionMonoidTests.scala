@@ -6,7 +6,7 @@ import org.scalacheck.{Arbitrary, Gen}
 class GaussianDistributionMonoidTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val gaussianGenerators = Arbitrary {
+  implicit val gaussianGenerators: Arbitrary[GaussianDistribution] = Arbitrary {
     for {
       mean <- Gen.choose(0, 10000)
       sigma <- Gen.choose(0, 10000)

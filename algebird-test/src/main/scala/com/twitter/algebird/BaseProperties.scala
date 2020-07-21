@@ -168,7 +168,7 @@ object BaseProperties extends MetricProperties {
   }
 
   class DefaultHigherEq[M[_]] extends HigherEq[M] {
-    override def apply[T](m: M[T], n: M[T]) = m == n
+    override def apply[T](m: M[T], n: M[T]): Boolean = m == n
   }
 
   def isNonZero[V: Semigroup](v: V): Boolean =

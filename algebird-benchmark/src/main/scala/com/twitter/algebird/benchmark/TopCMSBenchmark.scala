@@ -72,26 +72,26 @@ class TopCMSBenchmark {
   import TopCMSBenchmark._
 
   @Benchmark
-  def sumSmallLongTopCms(st: CMSState) =
+  def sumSmallLongTopCms(st: CMSState): TopCMS[Long] =
     sumTopCmsVector(st.smallLongs, st.cmsLongMonoid)
 
   @Benchmark
-  def sumSmallBigIntTopCms(st: CMSState) =
+  def sumSmallBigIntTopCms(st: CMSState): TopCMS[BigInt] =
     sumTopCmsVector(st.smallBigInts, st.cmsBigIntMonoid)
 
   @Benchmark
-  def sumLargeBigIntTopCms(st: CMSState) =
+  def sumLargeBigIntTopCms(st: CMSState): TopCMS[BigInt] =
     sumTopCmsVector(st.largeBigInts, st.cmsBigIntMonoid)
 
   @Benchmark
-  def sumSmallBigDecimalTopCms(st: CMSState) =
+  def sumSmallBigDecimalTopCms(st: CMSState): TopCMS[BigDecimal] =
     sumTopCmsVector(st.smallBigDecimals, st.cmsBigDecimalMonoid)
 
   @Benchmark
-  def sumLargeBigDecimalTopCms(st: CMSState) =
+  def sumLargeBigDecimalTopCms(st: CMSState): TopCMS[BigDecimal] =
     sumTopCmsVector(st.largeBigDecimals, st.cmsBigDecimalMonoid)
 
   @Benchmark
-  def sumLargeStringTopCms(st: CMSState) =
+  def sumLargeStringTopCms(st: CMSState): TopCMS[String] =
     sumTopCmsVector(st.largeStrings, st.cmsStringMonoid)
 }

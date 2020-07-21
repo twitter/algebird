@@ -13,7 +13,7 @@ class ApproximateLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
   import org.scalacheck.Gen.choose
 
-  implicit val approxGen =
+  implicit val approxGen: Arbitrary[Approximate[Long]] =
     Arbitrary {
       for {
         v0 <- choose(0L, (1L << 15) - 2)
@@ -35,7 +35,7 @@ class ApproximateLaws extends CheckProperties {
       ((ap1 + (ap1.negate)) ~ 0L) && ((ap2 + (ap2.negate)) ~ 0L)
     }
   }
-  def boundsAreOrdered[N](ap: Approximate[N]) = {
+  def boundsAreOrdered[N](ap: Approximate[N]): Boolean = {
     val n = ap.numeric
     n.lteq(ap.min, ap.estimate) && n.lteq(ap.estimate, ap.max)
   }
@@ -51,8 +51,8 @@ class ApproximateLaws extends CheckProperties {
     }
   }
 
-  val trueGen = choose(0.0, 1.0).map(ApproximateBoolean(true, _))
-  val falseGen = choose(0.0, 1.0).map(ApproximateBoolean(false, _))
+  val trueGen: Gen[ApproximateBoolean] = choose(0.0, 1.0).map(ApproximateBoolean(true, _))
+  val falseGen: Gen[ApproximateBoolean] = choose(0.0, 1.0).map(ApproximateBoolean(false, _))
 
   implicit val approxArb: Arbitrary[ApproximateBoolean] =
     Arbitrary(

@@ -472,11 +472,11 @@ trait QTreeAggregatorLike[T] {
   def level: Int = QTree.DefaultLevel
   implicit def num: Numeric[T]
   def prepare(input: T): QTree[Unit] = QTree.value(num.toDouble(input), level)
-  def semigroup = new QTreeSemigroup[Unit](k)
+  def semigroup: QTreeSemigroup[Unit] = new QTreeSemigroup[Unit](k)
 }
 
 object QTreeAggregator {
-  val DefaultK = 9
+  val DefaultK: Int = 9
 }
 
 /**

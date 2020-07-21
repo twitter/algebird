@@ -89,10 +89,10 @@ class CMSHashingBenchmark {
     h
   }
 
-  def timeBrokenCurrentHashWithRandomMaxBitsNumbers(state: CMSState) =
+  def timeBrokenCurrentHashWithRandomMaxBitsNumbers(state: CMSState): Unit =
     state.inputs.foreach(input => brokenCurrentHash(state.a, state.b, state.width)(input))
 
-  def timeMurmurHashScalaWithRandomMaxBitsNumbers(state: CMSState) =
+  def timeMurmurHashScalaWithRandomMaxBitsNumbers(state: CMSState): Unit =
     state.inputs.foreach(input => murmurHashScala(state.a, state.b, state.width)(input))
 
 }

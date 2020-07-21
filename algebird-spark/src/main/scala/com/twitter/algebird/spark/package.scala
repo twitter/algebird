@@ -14,7 +14,7 @@ package object spark {
    * spark exposes an Aggregator type, so this is here to avoid shadowing
    */
   type AlgebirdAggregator[A, B, C] = Aggregator[A, B, C]
-  val AlgebirdAggregator = Aggregator
+  val AlgebirdAggregator: Aggregator.type = Aggregator
 
   implicit class ToAlgebird[T](val rdd: RDD[T]) extends AnyVal {
     def algebird: AlgebirdRDD[T] = new AlgebirdRDD[T](rdd)

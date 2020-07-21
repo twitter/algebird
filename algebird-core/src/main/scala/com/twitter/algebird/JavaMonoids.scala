@@ -89,7 +89,7 @@ object JBoolRing extends Ring[JBool] {
  */
 class JListMonoid[T] extends Monoid[JList[T]] {
   override def isNonZero(x: JList[T]): Boolean = !x.isEmpty
-  override lazy val zero = new JArrayList[T](0)
+  override lazy val zero: JArrayList[T] = new JArrayList[T](0)
   override def plus(x: JList[T], y: JList[T]): JArrayList[T] = {
     val res = new JArrayList[T](x.size + y.size)
     res.addAll(x)
@@ -104,7 +104,7 @@ class JListMonoid[T] extends Monoid[JList[T]] {
  * TODO extend this to Group, Ring
  */
 class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
-  override lazy val zero = new JHashMap[K, V](0)
+  override lazy val zero: JHashMap[K, V] = new JHashMap[K, V](0)
 
   val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(_)

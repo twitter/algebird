@@ -62,7 +62,7 @@ class MonadInstanceLaws extends CheckProperties {
   }
 
   class MutableBox(var item: Int) {
-    def inc(v: Int) = item += v
+    def inc(v: Int): Unit = item += v
   }
 
   property("Reader behaves correctly") {

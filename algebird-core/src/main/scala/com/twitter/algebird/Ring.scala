@@ -77,8 +77,8 @@ class NumericRing[T](implicit num: Numeric[T]) extends Ring[T] {
 }
 
 object IntRing extends Ring[Int] {
-  override def zero = 0
-  override def one = 1
+  override def zero: Int = 0
+  override def one: Int = 1
   override def negate(v: Int): Int = -v
   override def plus(l: Int, r: Int): Int = l + r
   override def minus(l: Int, r: Int): Int = l - r
@@ -117,8 +117,8 @@ object ShortRing extends Ring[Short] {
 }
 
 object LongRing extends Ring[Long] {
-  override def zero = 0L
-  override def one = 1L
+  override def zero: Long = 0L
+  override def one: Long = 1L
   override def negate(v: Long): Long = -v
   override def plus(l: Long, r: Long): Long = l + r
   override def minus(l: Long, r: Long): Long = l - r
@@ -137,8 +137,8 @@ object LongRing extends Ring[Long] {
 }
 
 object FloatRing extends Ring[Float] {
-  override def one = 1.0f
-  override def zero = 0.0f
+  override def one: Float = 1.0f
+  override def zero: Float = 0.0f
   override def negate(v: Float): Float = -v
   override def plus(l: Float, r: Float): Float = l + r
   override def minus(l: Float, r: Float): Float = l - r
@@ -159,8 +159,8 @@ object FloatRing extends Ring[Float] {
 }
 
 object DoubleRing extends Ring[Double] {
-  override def one = 1.0
-  override def zero = 0.0
+  override def one: Double = 1.0
+  override def zero: Double = 0.0
   override def negate(v: Double): Double = -v
   override def plus(l: Double, r: Double): Double = l + r
   override def minus(l: Double, r: Double): Double = l - r
@@ -181,8 +181,8 @@ object DoubleRing extends Ring[Double] {
 }
 
 object BooleanRing extends Ring[Boolean] {
-  override def one = true
-  override def zero = false
+  override def one: Boolean = true
+  override def zero: Boolean = false
   override def negate(v: Boolean): Boolean = v
   override def plus(l: Boolean, r: Boolean): Boolean = l ^ r
   override def minus(l: Boolean, r: Boolean): Boolean = l ^ r

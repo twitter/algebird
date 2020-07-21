@@ -2,6 +2,7 @@ package com.twitter.algebird.benchmark
 
 import org.openjdk.jmh.annotations._
 import com.twitter.algebird.HyperLogLogMonoid
+import com.twitter.algebird.HLL
 
 object HllBatchCreateBenchmark {
 
@@ -31,6 +32,6 @@ class HllBatchCreateBenchmark {
   import HllBatchCreateBenchmark._
 
   @Benchmark
-  def timeBatchCreate(state: HLLState) =
+  def timeBatchCreate(state: HLLState): HLL =
     state.hllMonoid.sum(state.set.iterator.map(state.hllMonoid.toHLL(_)))
 }

@@ -21,7 +21,7 @@ import com.twitter.algebird.Monad
 // Monad for either, used for modeling Error where L is the type of the error
 object EitherMonad {
   class Error[L] extends Monad[({ type RightType[R] = Either[L, R] })#RightType] {
-    override def apply[R](r: R) = Right(r)
+    override def apply[R](r: R): Right[L, R] = Right(r)
 
     override def flatMap[T, U](self: Either[L, T])(next: T => Either[L, U]): Either[L, U] =
       self.right.flatMap(next)

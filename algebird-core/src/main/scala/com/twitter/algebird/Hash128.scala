@@ -45,7 +45,7 @@ trait Hash128[-K] extends java.io.Serializable {
 object Hash128 extends java.io.Serializable {
   def hash[K](k: K)(implicit h: Hash128[K]): (Long, Long) = h.hash(k)
 
-  val DefaultSeed = 12345678L
+  val DefaultSeed: Long = 12345678L
 
   def murmur128ArrayByte(seed: Long): Hash128[Array[Byte]] =
     new Hash128[Array[Byte]] {

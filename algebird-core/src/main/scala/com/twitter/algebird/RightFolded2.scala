@@ -33,10 +33,12 @@ package com.twitter.algebird
  * sent to a single reducer and all the Accs are added up.
  */
 object RightFolded2 {
-  def monoid[In, Out: Group](foldfn: (In, Out) => Out) =
+  def monoid[In, Out: Group](foldfn: (In, Out) => Out): RightFolded2Monoid[In, Out, Out] =
     new RightFolded2Monoid[In, Out, Out](foldfn, identity _)
 
-  def monoid[In, Out, Acc: Group](trans: (Out) => Acc)(foldfn: (In, Out) => Out) =
+  def monoid[In, Out, Acc: Group](
+      trans: (Out) => Acc
+  )(foldfn: (In, Out) => Out): RightFolded2Monoid[In, Out, Acc] =
     new RightFolded2Monoid[In, Out, Acc](foldfn, trans)
 }
 

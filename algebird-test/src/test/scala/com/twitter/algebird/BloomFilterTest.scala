@@ -6,6 +6,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.util.Random
 
 object BloomFilterTestUtils {
   def toSparse[A](bf: BF[A]): BFSparse[A] = bf match {
@@ -33,10 +34,10 @@ class BloomFilterLaws extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
   import BloomFilterTestUtils._
 
-  val NUM_HASHES = 6
-  val WIDTH = 32
+  val NUM_HASHES: Int = 6
+  val WIDTH: Int = 32
 
-  implicit val bfMonoid = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
+  implicit val bfMonoid: BloomFilterMonoid[String] = new BloomFilterMonoid[String](NUM_HASHES, WIDTH)
 
   implicit val bfGen: Arbitrary[BF[String]] =
     Arbitrary {
@@ -115,8 +116,8 @@ class BloomFilterLaws extends CheckProperties {
 
 class BFHashIndices extends CheckProperties {
 
-  val NUM_HASHES = 10
-  val WIDTH = 4752800
+  val NUM_HASHES: Int = 10
+  val WIDTH: Int = 4752800
 
   implicit val bfHash: Arbitrary[BFHash[String]] =
     Arbitrary {
@@ -134,7 +135,7 @@ class BFHashIndices extends CheckProperties {
    *   This is the version of the BFHash as of before the "negative values fix"
    */
   case class NegativeBFHash(numHashes: Int, width: Int) {
-    val size = numHashes
+    val size: Int = numHashes
 
     def apply(s: String): Stream[Int] = nextHash(s.getBytes, numHashes)
 
@@ -188,30 +189,30 @@ class BloomFilterFalsePositives[T: Gen: Hash128](falsePositiveRate: Double) exte
   type Input = T
   type Result = Boolean
 
-  val maxNumEntries = 1000
+  val maxNumEntries: Int = 1000
 
-  def exactGenerator =
+  def exactGenerator: Gen[Set[T]] =
     for {
       numEntries <- Gen.choose(1, maxNumEntries)
       set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
     } yield set
 
-  def makeApproximate(set: Set[T]) = {
+  def makeApproximate(set: Set[T]): BF[T] = {
     val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
     val values = set.toSeq
     bfMonoid.create(values: _*)
   }
 
-  def inputGenerator(set: Set[T]) =
+  def inputGenerator(set: Set[T]): Gen[T] =
     for {
       randomValues <- Gen.listOfN[T](set.size, implicitly[Gen[T]])
       x <- Gen.oneOf((set ++ randomValues).toSeq)
     } yield x
 
-  def exactResult(s: Set[T], t: T) = s.contains(t)
+  def exactResult(s: Set[T], t: T): Boolean = s.contains(t)
 
-  def approximateResult(bf: BF[T], t: T) = bf.contains(t)
+  def approximateResult(bf: BF[T], t: T): ApproximateBoolean = bf.contains(t)
 }
 
 class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
@@ -222,26 +223,26 @@ class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
   type Input = Unit
   type Result = Long
 
-  val maxNumEntries = 10000
-  val falsePositiveRate = 0.01
+  val maxNumEntries: Int = 10000
+  val falsePositiveRate: Double = 0.01
 
-  def exactGenerator =
+  def exactGenerator: Gen[Set[T]] =
     for {
       numEntries <- Gen.choose(1, maxNumEntries)
       set <- Gen.containerOfN[Set, T](numEntries, implicitly[Gen[T]])
     } yield set
 
-  def makeApproximate(set: Set[T]) = {
+  def makeApproximate(set: Set[T]): BF[T] = {
     val bfMonoid = BloomFilter[T](set.size, falsePositiveRate)
 
     val values = set.toSeq
     bfMonoid.create(values: _*)
   }
 
-  def inputGenerator(set: Set[T]) = Gen.const(())
+  def inputGenerator(set: Set[T]): Gen[Unit] = Gen.const(())
 
-  def exactResult(s: Set[T], u: Unit) = s.size
-  def approximateResult(bf: BF[T], u: Unit) = bf.size
+  def exactResult(s: Set[T], u: Unit): Long = s.size
+  def approximateResult(bf: BF[T], u: Unit): Approximate[Long] = bf.size
 }
 
 class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
@@ -262,7 +263,7 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
 
 class BloomFilterTest extends AnyWordSpec with Matchers {
 
-  val RAND = new scala.util.Random
+  val RAND: Random = new scala.util.Random
 
   "BloomFilter" should {
 

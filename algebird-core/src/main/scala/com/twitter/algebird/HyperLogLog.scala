@@ -46,7 +46,7 @@ case class BitSetLite(in: Array[Byte]) {
 object HyperLogLog {
 
   /* Size of the hash in bits */
-  val hashSize = 128
+  val hashSize: Int = 128
 
   private[algebird] val negativePowersOfTwo: Array[Double] =
     0.to(hashSize).map(i => math.pow(2.0, -i)).toArray
@@ -730,7 +730,7 @@ abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
 
   override def mustConvert(set: Set[A]): Boolean = set.size > maxSetSize
 
-  override val leftSemigroup = new HyperLogLogMonoid(hllBits)
+  override val leftSemigroup: HyperLogLogMonoid = new HyperLogLogMonoid(hllBits)
   override val rightAggregator: MonoidAggregator[A, Set[A], Long] =
     Aggregator.uniqueCount[A].andThenPresent(_.toLong)
 }

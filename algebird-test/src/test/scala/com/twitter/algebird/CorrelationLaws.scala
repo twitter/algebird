@@ -7,13 +7,13 @@ import com.twitter.algebird.BaseProperties._
 import com.twitter.algebird.scalacheck.arbitrary._
 
 object CorrelationLaws {
-  val EPS = 1e-10
+  val EPS: Double = 1e-10
 
   def aggregateFunction(f: Double => Double): Aggregator[Double, Correlation, Double] =
     CorrelationAggregator.correlation
       .composePrepare[Double](x => (x, f(x)))
 
-  val testList = Range.inclusive(-10, 10).map(_.toDouble).toList
+  val testList: List[Double] = Range.inclusive(-10, 10).map(_.toDouble).toList
 
   def corrApproxEq(corr1: Correlation, corr2: Correlation): Boolean =
     approxEqOrBothNaN(EPS)(corr1.c2, corr2.c2) &&

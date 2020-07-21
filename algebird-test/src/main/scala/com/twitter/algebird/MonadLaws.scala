@@ -20,6 +20,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 import scala.math.Equiv
 import Monad.{operators, pureOp}
+import org.scalacheck.Prop
 
 /**
  * Basic Monad laws, useful for testing any monad.
@@ -27,7 +28,7 @@ import Monad.{operators, pureOp}
 object MonadLaws {
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.
   @deprecated("No longer used. Use Equiv[T] instance", since = "0.13.0")
-  def defaultEq[T] = { (t0: T, t1: T) => (t0 == t1) }
+  def defaultEq[T]: (T, T) => Boolean = { (t0: T, t1: T) => (t0 == t1) }
 
   @deprecated("use leftIdentity[T]", since = "0.13.0")
   def leftIdentityEquiv[M[_], T, U](implicit
@@ -35,11 +36,11 @@ object MonadLaws {
       arb: Arbitrary[T],
       arbfn: Arbitrary[(T) => M[U]],
       equiv: Equiv[M[U]]
-  ) =
+  ): Prop =
     leftIdentity[M, T, U]
 
   @deprecated("use rightIdentity[T]", since = "0.13.0")
-  def rightIdentityEquiv[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
+  def rightIdentityEquiv[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]): Prop =
     rightIdentity[M, T]
 
   @deprecated("use associative[T]", since = "0.13.0")
@@ -49,7 +50,7 @@ object MonadLaws {
       fn1: Arbitrary[(T) => M[U]],
       fn2: Arbitrary[U => M[V]],
       equiv: Equiv[M[V]]
-  ) =
+  ): Prop =
     associative[M, T, U, V]
 
   // Just generate a map and use that as a function:
@@ -75,7 +76,7 @@ object MonadLaws {
       arbr: Arbitrary[M[R]],
       fn2: Arbitrary[U => M[R]],
       arbu: Arbitrary[U]
-  ) =
+  ): Prop =
     monadLaws[M, T, U, R]
   // $COVERAGE-ON$
 
@@ -84,10 +85,10 @@ object MonadLaws {
       arb: Arbitrary[T],
       arbfn: Arbitrary[(T) => M[U]],
       equiv: Equiv[M[U]]
-  ) =
+  ): Prop =
     forAll((t: T, fn: T => M[U]) => Equiv[M[U]].equiv(t.pure[M].flatMap(fn), fn(t)))
 
-  def rightIdentity[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]) =
+  def rightIdentity[M[_], T](implicit monad: Monad[M], arb: Arbitrary[M[T]], equiv: Equiv[M[T]]): Prop =
     forAll((mt: M[T]) => equiv.equiv(mt.flatMap(_.pure[M]), mt))
 
   def associative[M[_], T, U, V](implicit
@@ -96,7 +97,7 @@ object MonadLaws {
       fn1: Arbitrary[(T) => M[U]],
       fn2: Arbitrary[U => M[V]],
       equiv: Equiv[M[V]]
-  ) = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
+  ): Prop = forAll { (mt: M[T], f1: T => M[U], f2: U => M[V]) =>
     equiv.equiv(mt.flatMap(f1).flatMap(f2), mt.flatMap(t => f1(t).flatMap(f2)))
   }
 
@@ -110,7 +111,7 @@ object MonadLaws {
       arbr: Arbitrary[M[R]],
       fn2: Arbitrary[U => M[R]],
       arbu: Arbitrary[U]
-  ) =
+  ): Prop =
     // TODO: equivT and equivU are unused, only equivR is used
     // but it would break binary compatibility to remove them
     associative[M, T, U, R] && rightIdentity[M, R] && leftIdentity[M, U, R]
