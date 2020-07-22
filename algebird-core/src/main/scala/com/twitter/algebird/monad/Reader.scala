@@ -65,12 +65,12 @@ object Reader {
   def const[T](t: T): Reader[Any, T] = ConstantReader(t)
   implicit def apply[E, T](fn: (E) => T): Reader[E, T] = ReaderFn(fn)
 
-  class ReaderM[Env] extends Monad[({ type Result[T] = Reader[Env, T] })#Result] {
+  class ReaderM[Env] extends Monad[Reader[Env, *]] {
     override def apply[T](t: T): ConstantReader[T] = ConstantReader(t)
     override def flatMap[T, U](self: Reader[Env, T])(next: T => Reader[Env, U]): Reader[Env, U] =
       self.flatMap(next)
     override def map[T, U](self: Reader[Env, T])(fn: T => U): Reader[Env, U] = self.map(fn)
   }
-  implicit def monad[Env]: Monad[({ type Result[T] = Reader[Env, T] })#Result] =
-    new ReaderM[Env]
+
+  implicit def monad[Env]: Monad[Reader[Env, *]] = new ReaderM[Env]
 }

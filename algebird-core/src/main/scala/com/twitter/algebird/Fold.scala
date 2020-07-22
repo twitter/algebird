@@ -187,7 +187,7 @@ object Fold extends CompatFold {
   /**
    * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
    */
-  implicit def applicative[I]: Applicative[({ type L[O] = Fold[I, O] })#L] =
+  implicit def applicative[I]: Applicative[Fold[I, *]] =
     new FoldApplicative[I]
 
   /**
@@ -349,7 +349,7 @@ object Fold extends CompatFold {
 /**
  * Folds are Applicatives!
  */
-class FoldApplicative[I] extends Applicative[({ type L[O] = Fold[I, O] })#L] {
+class FoldApplicative[I] extends Applicative[Fold[I, *]] {
   override def map[T, U](mt: Fold[I, T])(fn: T => U): Fold[I, U] =
     mt.map(fn)
   override def apply[T](v: T): Fold[I, T] =
