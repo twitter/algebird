@@ -267,7 +267,7 @@ lazy val algebirdTest = module("test")
     testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
     crossScalaVersions += "2.13.3",
     libraryDependencies ++=
-      (Seq(
+      Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion,
         "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
@@ -277,7 +277,7 @@ lazy val algebirdTest = module("test")
         } else {
           Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
         }
-      }),
+      },
     addCompilerPlugin(
       ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
     )
