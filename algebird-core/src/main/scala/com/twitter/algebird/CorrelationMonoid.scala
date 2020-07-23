@@ -8,38 +8,6 @@ object Correlation {
     apply(x, 1.0)
 
   implicit val monoid: Monoid[Correlation] = CorrelationMonoid
-
-  /**
-   * When combining averages, if the counts sizes are too close we
-   * should use a different algorithm.  This constant defines how
-   * close the ratio of the smaller to the total count can be:
-   */
-  private val STABILITY_CONSTANT = 0.1
-
-  /**
-   * Given two streams of doubles (weightN, an) and (weightK, ak) of form (weighted count,
-   * mean), calculates the mean of the combined stream.
-   *
-   * Uses a more stable online algorithm which should be suitable for
-   * large numbers of records similar to:
-   * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-   *
-   * This differs from the implementation in MomentsGroup.scala only in that here, the counts are weighted, and are
-   * thus doubles instead of longs
-   */
-  def getCombinedMean(weightN: Double, an: Double, weightK: Double, ak: Double): Double =
-    if (weightN < weightK) getCombinedMean(weightK, ak, weightN, an)
-    else
-      (weightN + weightK) match {
-        case 0.0                             => 0.0
-        case newCount if newCount == weightN => an
-        case newCount =>
-          val scaling = weightK / newCount
-          // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-          if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
-          else (weightN * an + weightK * ak) / newCount
-      }
-
 }
 
 /**
@@ -125,8 +93,8 @@ object CorrelationMonoid extends Monoid[Correlation] {
     else {
       val prodSumRatio = a.totalWeight * b.totalWeight / count
 
-      val m1x = Correlation.getCombinedMean(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
-      val m1y = Correlation.getCombinedMean(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
+      val m1x = Moments.getCombinedMeanDouble(a.totalWeight, a.m1x, b.totalWeight, b.m1x)
+      val m1y = Moments.getCombinedMeanDouble(a.totalWeight, a.m1y, b.totalWeight, b.m1y)
       val deltaX = b.m1x - a.m1x
       val deltaY = b.m1y - a.m1y
 
@@ -174,8 +142,8 @@ object CorrelationMonoid extends Monoid[Correlation] {
         } else {
           val prodSumRatio = m0 * b.m0 / m0New
 
-          val m1xNew = Correlation.getCombinedMean(m0, m1x, b.m0, b.m1x)
-          val m1yNew = Correlation.getCombinedMean(m0, m1y, b.m0, b.m1y)
+          val m1xNew = Moments.getCombinedMeanDouble(m0, m1x, b.m0, b.m1x)
+          val m1yNew = Moments.getCombinedMeanDouble(m0, m1y, b.m0, b.m1y)
           val deltaX = b.m1x - m1x
           val deltaY = b.m1y - m1y
 
