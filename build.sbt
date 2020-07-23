@@ -386,6 +386,7 @@ lazy val docs = project
   .settings(noPublishSettings)
   .settings(docSettings)
   .settings(
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
     scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
     sources in (ScalaUnidoc, unidoc) ~= (_.filterNot(_.absolutePath.contains("javaapi")))
   )
