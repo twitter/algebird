@@ -39,7 +39,8 @@ class MomentsLaws extends CheckProperties {
     groupLaws[Moments]
   }
 
-  val opGen = opBasedGen[Double](Gen.choose(-1e10, 1e10))
+  private val opGen: Gen[Moments] =
+    opBasedGen[Double](Gen.choose(-1e10, 1e10))
 
   property("Moments laws tested with operational generation") {
     implicit val arbMom: Arbitrary[Moments] = Arbitrary(opGen)
