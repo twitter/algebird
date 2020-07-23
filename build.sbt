@@ -6,6 +6,7 @@ import pl.project13.scala.sbt.JmhPlugin
 val algebraVersion = "2.0.0"
 val bijectionVersion = "0.9.7"
 val javaEwahVersion = "1.1.7"
+val kindProjectorVersion = "0.11.0"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.0"
@@ -252,6 +253,7 @@ lazy val algebirdCore = module("core").settings(
         Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
       }
     },
+  addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
   sourceGenerators in Compile += Def.task {
     GenTupleAggregators.gen((sourceManaged in Compile).value)
   }.taskValue,
@@ -275,7 +277,10 @@ lazy val algebirdTest = module("test")
         } else {
           Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
         }
-      }
+      },
+    addCompilerPlugin(
+      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+    )
   )
   .dependsOn(algebirdCore)
 
@@ -381,6 +386,7 @@ lazy val docs = project
   .settings(noPublishSettings)
   .settings(docSettings)
   .settings(
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
     scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
     sources in (ScalaUnidoc, unidoc) ~= (_.filterNot(_.absolutePath.contains("javaapi")))
   )

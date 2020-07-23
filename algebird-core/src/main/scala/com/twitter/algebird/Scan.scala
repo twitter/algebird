@@ -13,7 +13,7 @@ object Scan {
    */
   type Aux[-I, S, +O] = Scan[I, O] { type State = S }
 
-  implicit def applicative[I]: Applicative[({ type L[O] = Scan[I, O] })#L] = new ScanApplicative[I]
+  implicit def applicative[I]: Applicative[Scan[I, *]] = new ScanApplicative[I]
 
   def from[I, S, O](initState: S)(presentAndNextStateFn: (I, S) => (O, S)): Aux[I, S, O] =
     new Scan[I, O] {
@@ -304,7 +304,7 @@ sealed abstract class Scan[-I, +O] extends Serializable {
 
 }
 
-class ScanApplicative[I] extends Applicative[({ type L[O] = Scan[I, O] })#L] {
+class ScanApplicative[I] extends Applicative[Scan[I, *]] {
   override def map[T, U](mt: Scan[I, T])(fn: T => U): Scan[I, U] =
     mt.andThenPresent(fn)
 

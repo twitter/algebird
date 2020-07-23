@@ -44,8 +44,8 @@ sealed trait Implicits extends LowPrioImpicits {
 }
 
 sealed trait LowPrioImpicits {
-  implicit def mapSpace[K, T: Ring]: VectorSpace[T, ({ type x[a] = Map[K, a] })#x] =
-    VectorSpaceOps.from[T, ({ type x[a] = Map[K, a] })#x] { (s, m) =>
+  implicit def mapSpace[K, T: Ring]: VectorSpace[T, Map[K, *]] =
+    VectorSpaceOps.from[T, Map[K, *]] { (s, m) =>
       m.transform { case (_, v) => Ring.times(s, v) }
     }
 }
