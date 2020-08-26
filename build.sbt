@@ -13,7 +13,7 @@ val scalaTestVersion = "3.2.2"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.14.3"
 val scalaCollectionCompat = "2.1.6"
-val utilVersion = "20.8.0"
+val utilVersion = "20.8.1"
 val sparkVersion = "2.4.6"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
