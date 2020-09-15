@@ -102,9 +102,8 @@ object ApproximateProperty {
         results ++ exampleFailures ++ testsReturnedZeroProb
       }
 
-      val args = argsList.map {
-        case (name, value) =>
-          Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
+      val args = argsList.map { case (name, value) =>
+        Prop.Arg(name, value, 0, value, Pretty.prettyAny(value), Pretty.prettyAny(value))
       }
 
       Prop.Result(success, args = args)

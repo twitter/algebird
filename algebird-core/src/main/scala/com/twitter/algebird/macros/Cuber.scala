@@ -52,10 +52,9 @@ object Cuber {
       tq"_root_.scala.$tupleType[..$optionTypes]"
     }
 
-    val somes = params.zip(Stream.from(1)).map {
-      case (param, index) =>
-        val name = termName(c)(s"some$index")
-        q"val $name = _root_.scala.Some(in.$param)"
+    val somes = params.zip(Stream.from(1)).map { case (param, index) =>
+      val name = termName(c)(s"some$index")
+      q"val $name = _root_.scala.Some(in.$param)"
     }
 
     val options = (1 to arity).map { index =>

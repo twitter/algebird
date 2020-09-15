@@ -181,9 +181,8 @@ class CMSSummation[K](params: CMSParams[K]) {
       case CMSItem(item, count, _) =>
         insert(item, count)
       case SparseCMS(table, _, _) =>
-        table.foreach {
-          case (item, c) =>
-            insert(item, c)
+        table.foreach { case (item, c) =>
+          insert(item, c)
         }
       case CMSInstance(CMSInstance.CountsTable(matrix), count, _) =>
         var offset = 0
@@ -680,9 +679,8 @@ object SparseCMS {
    */
   def toDense[K](exactCountTable: Map[K, Long], params: CMSParams[K]): CMS[K] =
     // Create new CMSInstace
-    exactCountTable.foldLeft(CMSInstance[K](params)) {
-      case (cms, (x, count)) =>
-        cms + (x, count)
+    exactCountTable.foldLeft(CMSInstance[K](params)) { case (cms, (x, count)) =>
+      cms + (x, count)
     }
 }
 
@@ -700,9 +698,8 @@ case class CMSInstance[K](
       case _: CMSZero[_]     => this
       case other: CMSItem[K] => this + other.item
       case other: SparseCMS[K] =>
-        other.exactCountTable.foldLeft(this) {
-          case (cms, (x, count)) =>
-            cms + (x, count)
+        other.exactCountTable.foldLeft(this) { case (cms, (x, count)) =>
+          cms + (x, count)
         }
       case other: CMSInstance[K] =>
         val newTable = countsTable ++ other.countsTable
@@ -758,10 +755,9 @@ case class CMSInstance[K](
     require(count >= 0, "count must be >= 0 (negative counts not implemented")
     if (count != 0L) {
       val newCountsTable =
-        (0 to (depth - 1)).foldLeft(countsTable) {
-          case (table, row) =>
-            val pos = (row, params.hashes(row)(item))
-            table + (pos, count)
+        (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
+          val pos = (row, params.hashes(row)(item))
+          table + (pos, count)
         }
       CMSInstance[K](newCountsTable, totalCount + count, params)
     } else this
@@ -1053,8 +1049,8 @@ abstract class HeavyHittersLogic[K] extends java.io.Serializable {
   }
 
   def updateHeavyHitters(cms: CMS[K])(left: HeavyHitters[K], right: HeavyHitters[K]): HeavyHitters[K] = {
-    val candidates = (left.items ++ right.items).map {
-      case i => HeavyHitter[K](i, cms.frequency(i).estimate)
+    val candidates = (left.items ++ right.items).map { case i =>
+      HeavyHitter[K](i, cms.frequency(i).estimate)
     }
     val newHhs = HeavyHitters.from(candidates)
     purgeHeavyHitters(cms)(newHhs)
@@ -1307,13 +1303,11 @@ case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic
     val (underLimit, overLimit) = grouped.partition {
       _._2.size <= heavyHittersN
     }
-    val sorted = overLimit.transform {
-      case (_, hhs) =>
-        hhs.toSeq.sortBy(hh => hh.count)
+    val sorted = overLimit.transform { case (_, hhs) =>
+      hhs.toSeq.sortBy(hh => hh.count)
     }
-    val purged = sorted.transform {
-      case (_, hhs) =>
-        hhs.takeRight(heavyHittersN)
+    val purged = sorted.transform { case (_, hhs) =>
+      hhs.takeRight(heavyHittersN)
     }
     HeavyHitters[(K1, K2)](purged.values.flatten.toSet ++ underLimit.values.flatten.toSet)
   }

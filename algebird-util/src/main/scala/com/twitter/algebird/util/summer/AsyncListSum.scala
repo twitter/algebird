@@ -128,9 +128,8 @@ class AsyncListSum[Key, Value](
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
     workPool {
       insertOp.incr
-      vals.foreach {
-        case (k, v) =>
-          doInsert(k, v)
+      vals.foreach { case (k, v) =>
+        doInsert(k, v)
       }
 
       if (elementsInCache.get >= innerBuffSize) {

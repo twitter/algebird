@@ -45,8 +45,8 @@ class CorrelationLaws extends CheckProperties {
       approxEq(EPS)(corr.meanX, momentX.mean) &&
       approxEq(EPS)(corr.meanY, momentY.mean) &&
       (l.length < 2 ||
-      (approxEqOrBothNaN(EPS)(corr.stddevX, momentX.stddev) &&
-      approxEqOrBothNaN(EPS)(corr.stddevY, momentY.stddev)))
+        (approxEqOrBothNaN(EPS)(corr.stddevX, momentX.stddev) &&
+          approxEqOrBothNaN(EPS)(corr.stddevY, momentY.stddev)))
     }
   }
 

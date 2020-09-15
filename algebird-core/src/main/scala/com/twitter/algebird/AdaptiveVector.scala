@@ -159,9 +159,9 @@ object AdaptiveVector {
   implicit def equiv[V: Equiv]: Equiv[AdaptiveVector[V]] =
     Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
       (l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
-      toVector(l).view.zip(toVector(r)).forall {
-        case (lv, rv) => Equiv[V].equiv(lv, rv)
-      })
+        toVector(l).view.zip(toVector(r)).forall { case (lv, rv) =>
+          Equiv[V].equiv(lv, rv)
+        })
     }
 }
 

@@ -56,9 +56,8 @@ class AsyncListMMapSum[Key, Value](
         queueMap.clear
         l
       }
-      val result: Map[Key, Value] = curData.iterator.flatMap {
-        case (k, listV) =>
-          sg.sumOption(listV).iterator.map(v => (k, v))
+      val result: Map[Key, Value] = curData.iterator.flatMap { case (k, listV) =>
+        sg.sumOption(listV).iterator.map(v => (k, v))
       }.toMap
 
       tuplesOut.incrBy(result.size)
@@ -70,11 +69,10 @@ class AsyncListMMapSum[Key, Value](
     var newlyAddedTuples = 0
 
     mutex.synchronized {
-      vals.foreach {
-        case (k, v) =>
-          val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
-          existingV += v
-          newlyAddedTuples += 1
+      vals.foreach { case (k, v) =>
+        val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
+        existingV += v
+        newlyAddedTuples += 1
       }
       presentTuples += newlyAddedTuples
     }

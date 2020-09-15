@@ -39,15 +39,14 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
 
   def put(in: Map[K, V]): Unit =
     if (map.get.isDefined) {
-      in.foreach {
-        case (k, v) =>
-          val newValue =
-            map.get
-              .flatMap(_.get(k))
-              .map(oldV => sgv.plus(oldV, v))
-              .getOrElse(v)
+      in.foreach { case (k, v) =>
+        val newValue =
+          map.get
+            .flatMap(_.get(k))
+            .map(oldV => sgv.plus(oldV, v))
+            .getOrElse(v)
 
-          map.get.foreach(_.put(k, newValue))
+        map.get.foreach(_.put(k, newValue))
       }
     }
 }

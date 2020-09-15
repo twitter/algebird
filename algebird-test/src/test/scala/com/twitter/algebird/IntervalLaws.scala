@@ -187,10 +187,9 @@ class IntervalLaws extends CheckProperties {
   property("toLeftClosedRightOpen is an Injection") {
     forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
       (intr.toLeftClosedRightOpen
-        .map {
-          case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
-            val intr2 = Interval.leftClosedRightOpen(low, high)
-            tests.forall(t => intr(t) == intr2(t))
+        .map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
+          val intr2 = Interval.leftClosedRightOpen(low, high)
+          tests.forall(t => intr(t) == intr2(t))
         }
         .getOrElse(true)) // none means this can't be expressed as this kind of interval
     }

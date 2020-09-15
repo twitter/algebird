@@ -206,9 +206,8 @@ class AggregatorLaws extends CheckProperties {
     forAll { (in: List[Int], ag: Aggregator[Int, Int, Int]) =>
       val cumulative: List[Int] = ag.applyCumulatively(in)
       cumulative.size == in.size &&
-      cumulative.zipWithIndex.forall {
-        case (sum, i) =>
-          sum == ag.apply(in.take(i + 1))
+      cumulative.zipWithIndex.forall { case (sum, i) =>
+        sum == ag.apply(in.take(i + 1))
       }
     }
   }

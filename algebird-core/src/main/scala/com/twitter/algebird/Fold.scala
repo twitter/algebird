@@ -84,13 +84,9 @@ sealed trait Fold[-I, +O] extends Serializable {
         val first = self.build()
         val second = other.build()
         new FoldState(
-          {
-            case ((x, y), i) => (first.add(x, i), second.add(y, i))
-          },
+          { case ((x, y), i) => (first.add(x, i), second.add(y, i)) },
           (first.start, second.start),
-          {
-            case (x, y) => f(first.end(x), second.end(y))
-          }
+          { case (x, y) => f(first.end(x), second.end(y)) }
         )
       }
     }

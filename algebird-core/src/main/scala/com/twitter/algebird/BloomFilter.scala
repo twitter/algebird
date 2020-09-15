@@ -175,7 +175,7 @@ object BloomFilter {
     val prob =
       1 -
         scala.math.exp(t - 1 - s(nl)) *
-          scala.math.pow(s(nl) / (t - 1), t - 1) -
+        scala.math.pow(s(nl) / (t - 1), t - 1) -
         scala.math.exp(-scala.math.pow(t + 1 - s(nr), 2) / (2 * s(nr)))
 
     Approximate[Long](nl, n, nr, scala.math.max(0, prob))
@@ -327,8 +327,8 @@ object BF {
         }
 
         (a eq b) || ((a.numHashes == b.numHashes) &&
-        (a.width == b.width) &&
-        eqIntIter(toIntIt(a), toIntIt(b)))
+          (a.width == b.width) &&
+          eqIntIter(toIntIt(a), toIntIt(b)))
       }
     }
 }

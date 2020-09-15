@@ -90,15 +90,13 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     val monoid = new HyperLogLogMonoid(bits)
     if (rows.isEmpty) monoid.zero
     else {
-      monoid.sum(rows.iterator.zipWithIndex.map {
-        case (map, i) =>
-          SparseHLL(
-            bits,
-            map.transform {
-              case _ =>
-                Max((i + 1).toByte)
-            }
-          )
+      monoid.sum(rows.iterator.zipWithIndex.map { case (map, i) =>
+        SparseHLL(
+          bits,
+          map.transform { case _ =>
+            Max((i + 1).toByte)
+          }
+        )
       })
     }
   }
@@ -154,15 +152,14 @@ class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
     if (left.size > right.size) {
       combine(right, left)
     } else {
-      left.foldLeft(right) {
-        case (m, (k, lv)) =>
-          m.updated(
-            k,
-            m.get(k) match {
-              case None     => lv
-              case Some(rv) => Math.max(lv, rv)
-            }
-          )
+      left.foldLeft(right) { case (m, (k, lv)) =>
+        m.updated(
+          k,
+          m.get(k) match {
+            case None     => lv
+            case Some(rv) => Math.max(lv, rv)
+          }
+        )
       }
     }
 }
