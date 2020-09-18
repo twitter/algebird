@@ -82,16 +82,15 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
     else {
       val mutable = MMap[K, V]()
       items.iterator.foreach { m =>
-        m.foreach {
-          case (k, v) =>
-            val oldVOpt = mutable.get(k)
-            // sorry for the micro optimization here: avoiding a closure
-            val newV =
-              if (oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
-            if (nonZero(newV))
-              mutable.update(k, newV)
-            else
-              mutable.remove(k)
+        m.foreach { case (k, v) =>
+          val oldVOpt = mutable.get(k)
+          // sorry for the micro optimization here: avoiding a closure
+          val newV =
+            if (oldVOpt.isEmpty) v else Semigroup.plus(oldVOpt.get, v)
+          if (nonZero(newV))
+            mutable.update(k, newV)
+          else
+            mutable.remove(k)
         }
       }
       Some(fromMutable(mutable))
@@ -119,9 +118,8 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
  */
 class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group) with Group[Map[K, V]] {
   override def negate(kv: Map[K, V]): Map[K, V] =
-    kv.iterator.map {
-      case (k, v) =>
-        (k, group.negate(v))
+    kv.iterator.map { case (k, v) =>
+      (k, group.negate(v))
     }.toMap
 }
 
@@ -129,9 +127,8 @@ class ScMapGroup[K, V](implicit val group: Group[V])
     extends ScMapMonoid[K, V]()(group)
     with Group[ScMap[K, V]] {
   override def negate(kv: ScMap[K, V]): ScMap[K, V] =
-    kv.iterator.map {
-      case (k, v) =>
-        (k, group.negate(v))
+    kv.iterator.map { case (k, v) =>
+      (k, group.negate(v))
     }.toMap
 }
 
@@ -172,9 +169,8 @@ class ScMapRing[K, V](implicit override val ring: Ring[V])
 
 object MapAlgebra {
   def rightContainsLeft[K, V: Equiv](l: Map[K, V], r: Map[K, V]): Boolean =
-    l.forall {
-      case (k, v) =>
-        r.get(k).exists(Equiv[V].equiv(_, v))
+    l.forall { case (k, v) =>
+      r.get(k).exists(Equiv[V].equiv(_, v))
     }
 
   implicit def sparseEquiv[K, V: Monoid: Equiv]: Equiv[Map[K, V]] =
@@ -218,16 +214,15 @@ object MapAlgebra {
     if (pairs.iterator.isEmpty) Map.empty
     else {
       val mutable = MMap[K, Builder[V, List[V]]]()
-      pairs.iterator.foreach {
-        case (k, v) =>
-          val oldVOpt = mutable.get(k)
-          // sorry for the micro optimization here: avoiding a closure
-          val bldr = if (oldVOpt.isEmpty) {
-            val b = List.newBuilder[V]
-            mutable.update(k, b)
-            b
-          } else oldVOpt.get
-          bldr += v
+      pairs.iterator.foreach { case (k, v) =>
+        val oldVOpt = mutable.get(k)
+        // sorry for the micro optimization here: avoiding a closure
+        val bldr = if (oldVOpt.isEmpty) {
+          val b = List.newBuilder[V]
+          mutable.update(k, b)
+          b
+        } else oldVOpt.get
+        bldr += v
       }
       mutable.iterator.map { case (k, bldr) => (k, bldr.result) }.toMap
     }
@@ -240,13 +235,11 @@ object MapAlgebra {
   def join[K, V, W](map1: Map[K, V], map2: Map[K, W]): Map[K, (Option[V], Option[W])] =
     Monoid
       .plus(
-        map1.transform {
-          case (_, v) =>
-            (List(v), List[W]())
+        map1.transform { case (_, v) =>
+          (List(v), List[W]())
         },
-        map2.transform {
-          case (_, w) =>
-            (List[V](), List(w))
+        map2.transform { case (_, w) =>
+          (List[V](), List(w))
         }
       )
       .transform { case (_, (v, w)) => (v.headOption, w.headOption) }
@@ -281,14 +274,13 @@ object MapAlgebra {
 
   def cube[K, V](it: TraversableOnce[(K, V)])(implicit c: Cuber[K]): Map[c.K, List[V]] = {
     val map: MMap[c.K, List[V]] = MMap[c.K, List[V]]()
-    it.iterator.foreach {
-      case (k, v) =>
-        c(k).iterator.foreach { ik =>
-          map.get(ik) match {
-            case Some(vs) => map += ik -> (v :: vs)
-            case None     => map += ik -> List(v)
-          }
+    it.iterator.foreach { case (k, v) =>
+      c(k).iterator.foreach { ik =>
+        map.get(ik) match {
+          case Some(vs) => map += ik -> (v :: vs)
+          case None     => map += ik -> List(v)
         }
+      }
     }
     map.foreach { case (k, v) => map(k) = v.reverse }
     new MutableBackedMap(map)
@@ -305,14 +297,13 @@ object MapAlgebra {
 
   def rollup[K, V](it: TraversableOnce[(K, V)])(implicit r: Roller[K]): Map[r.K, List[V]] = {
     val map: MMap[r.K, List[V]] = MMap[r.K, List[V]]()
-    it.iterator.foreach {
-      case (k, v) =>
-        r(k).iterator.foreach { ik =>
-          map.get(ik) match {
-            case Some(vs) => map += ik -> (v :: vs)
-            case None     => map += ik -> List(v)
-          }
+    it.iterator.foreach { case (k, v) =>
+      r(k).iterator.foreach { ik =>
+        map.get(ik) match {
+          case Some(vs) => map += ik -> (v :: vs)
+          case None     => map += ik -> List(v)
         }
+      }
     }
     map.foreach { case (k, v) => map(k) = v.reverse }
     new MutableBackedMap(map)

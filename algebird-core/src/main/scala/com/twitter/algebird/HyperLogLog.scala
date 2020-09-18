@@ -442,21 +442,19 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
 
   override def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
-    maxRhow.foreach {
-      case (idx, maxb) =>
-        buffer.update(idx, buffer(idx).max(maxb.get))
+    maxRhow.foreach { case (idx, maxb) =>
+      buffer.update(idx, buffer(idx).max(maxb.get))
     }
   }
 
   override protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL = {
     val reducedMaxRhoW = collection.mutable.Map.empty[Int, Byte]
-    maxRhow.foreach {
-      case (j, rhoW) =>
-        val modifiedRhoW =
-          getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
-        val newJ = j % reducedSize
-        val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
-        reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
+    maxRhow.foreach { case (j, rhoW) =>
+      val modifiedRhoW =
+        getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
+      val newJ = j % reducedSize
+      val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
+      reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
     }
     SparseHLL(reducedBits, reducedMaxRhoW.iterator.map { case (k, v) => (k, Max(v)) }.toMap)
   }

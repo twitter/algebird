@@ -100,14 +100,12 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit
     val initTable =
       AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
-    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) {
-      case (table, row) =>
-        data.foldLeft(table) {
-          case (innerTable, (key, value)) =>
-            val pos = (row, params.hashes(row)(key))
-            val currValue: V = innerTable.getValue(pos)
-            innerTable.updated(pos, Monoid.plus(currValue, value))
-        }
+    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
+      data.foldLeft(table) { case (innerTable, (key, value)) =>
+        val pos = (row, params.hashes(row)(key))
+        val currValue: V = innerTable.getValue(pos)
+        innerTable.updated(pos, Monoid.plus(currValue, value))
+      }
     }
 
     SketchMap(newTable, params.updatedHeavyHitters(heavyHitters, newTable), totalValue)
@@ -156,8 +154,8 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
    * Calculates the frequency for a key given a values table.
    */
   def frequency[V: Ordering](key: K, table: AdaptiveMatrix[V]): V =
-    hashes.iterator.zipWithIndex.map {
-      case (hash, row) => table.getValue((row, hash(key)))
+    hashes.iterator.zipWithIndex.map { case (hash, row) =>
+      table.getValue((row, hash(key)))
     }.min
 
   /**

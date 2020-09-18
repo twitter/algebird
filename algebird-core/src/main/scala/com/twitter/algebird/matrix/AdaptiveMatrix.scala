@@ -78,13 +78,11 @@ object AdaptiveMatrix {
       }
 
       private def sparseUpdate(storage: IndexedSeq[MMap[Int, V]], other: SparseColumnMatrix[V]): Unit =
-        other.rowsByColumns.zipWithIndex.foreach {
-          case (contents, indx) =>
-            val curMap: MMap[Int, V] = storage(indx)
-            AdaptiveVector.toMap(contents).foreach {
-              case (col, value) =>
-                curMap.update(col, Monoid.plus(value, curMap.getOrElse(col, innerZero)))
-            }
+        other.rowsByColumns.zipWithIndex.foreach { case (contents, indx) =>
+          val curMap: MMap[Int, V] = storage(indx)
+          AdaptiveVector.toMap(contents).foreach { case (col, value) =>
+            curMap.update(col, Monoid.plus(value, curMap.getOrElse(col, innerZero)))
+          }
         }
 
       private def goDense(
@@ -98,9 +96,8 @@ object AdaptiveMatrix {
         val iter = storage.iterator
         while (iter.hasNext) {
           val curRow = iter.next
-          curRow.foreach {
-            case (col, value) =>
-              buffer(row * cols + col) = value
+          curRow.foreach { case (col, value) =>
+            buffer(row * cols + col) = value
           }
           row += 1
         }

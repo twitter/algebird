@@ -29,8 +29,8 @@ object GroupMacro {
     import c.universe._
 
     val companion = getCompanionObject(c)
-    val negateList = getParams(c).zip(implicitInstances).map {
-      case (param, instance) => q"$instance.negate(x.$param)"
+    val negateList = getParams(c).zip(implicitInstances).map { case (param, instance) =>
+      q"$instance.negate(x.$param)"
     }
 
     q"override def negate(x: $T): $T = $companion.apply(..$negateList)"
@@ -40,8 +40,8 @@ object GroupMacro {
     import c.universe._
 
     val companion = getCompanionObject(c)
-    val minusList = getParams(c).zip(implicitInstances).map {
-      case (param, instance) => q"$instance.minus(l.$param, r.$param)"
+    val minusList = getParams(c).zip(implicitInstances).map { case (param, instance) =>
+      q"$instance.minus(l.$param, r.$param)"
     }
 
     q"override def minus(l: $T, r: $T): $T = $companion.apply(..$minusList)"

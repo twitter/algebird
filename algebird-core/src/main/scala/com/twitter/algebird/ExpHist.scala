@@ -101,8 +101,8 @@ case class ExpHist(
    */
   def fold: Fold[Bucket, ExpHist] =
     Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist](
-      {
-        case (b, bucket) => b += bucket
+      { case (b, bucket) =>
+        b += bucket
       },
       _ => Vector.newBuilder[Bucket],
       x => addAll(x.result)
@@ -422,8 +422,8 @@ object ExpHist {
      * @return vector of powers of 2 (where ret.sum == the original s)
      */
     def toBuckets: Vector[Long] =
-      rep.iterator.zipWithIndex.flatMap {
-        case (i, exp) => Iterator.fill(i)(1L << exp)
+      rep.iterator.zipWithIndex.flatMap { case (i, exp) =>
+        Iterator.fill(i)(1L << exp)
       }.toVector
   }
 }

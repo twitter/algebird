@@ -82,9 +82,8 @@ class SpaceSaverTest extends AnyWordSpec with Matchers {
         }
         .reduce(sg.plus)
         .topK(20)
-        .foreach {
-          case (item, approx, _) =>
-            assert(approx ~ exactCounts(item))
+        .foreach { case (item, approx, _) =>
+          assert(approx ~ exactCounts(item))
         }
     }
 

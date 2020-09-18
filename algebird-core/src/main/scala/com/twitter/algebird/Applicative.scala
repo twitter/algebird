@@ -55,8 +55,8 @@ trait Applicative[M[_]] extends Functor[M] {
     joinWith(join(m1, m2), m3) { case ((t1, t2), t3) => (t1, t2, t3) }
 
   def join[T1, T2, T3, T4](m1: M[T1], m2: M[T2], m3: M[T3], m4: M[T4]): M[(T1, T2, T3, T4)] =
-    joinWith(join(join(m1, m2), m3), m4) {
-      case (((t1, t2), t3), t4) => (t1, t2, t3, t4)
+    joinWith(join(join(m1, m2), m3), m4) { case (((t1, t2), t3), t4) =>
+      (t1, t2, t3, t4)
     }
 
   def join[T1, T2, T3, T4, T5](
@@ -66,8 +66,8 @@ trait Applicative[M[_]] extends Functor[M] {
       m4: M[T4],
       m5: M[T5]
   ): M[(T1, T2, T3, T4, T5)] =
-    joinWith(join(join(join(m1, m2), m3), m4), m5) {
-      case ((((t1, t2), t3), t4), t5) => (t1, t2, t3, t4, t5)
+    joinWith(join(join(join(m1, m2), m3), m4), m5) { case ((((t1, t2), t3), t4), t5) =>
+      (t1, t2, t3, t4, t5)
     }
 }
 

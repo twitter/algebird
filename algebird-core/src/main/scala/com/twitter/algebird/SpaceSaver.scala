@@ -21,8 +21,8 @@ object SpaceSaver {
     SSMany(capacity, Map(item -> ((count, 0L))))
 
   private[algebird] val ordering =
-    Ordering.by[(_, (Long, Long)), (Long, Long)] {
-      case (_, (count, err)) => (-count, err)
+    Ordering.by[(_, (Long, Long)), (Long, Long)] { case (_, (count, err)) =>
+      (-count, err)
     }
 
   implicit def spaceSaverSemiGroup[T]: Semigroup[SpaceSaver[T]] =
@@ -64,20 +64,19 @@ object SpaceSaver {
         buff = ByteBuffer.allocate(4)
         buff.putInt(counters.size)
         buffer ++= buff.array()
-        counters.foreach {
-          case (item, (a, b)) =>
-            val itemAsBytes = tSerializer(item)
+        counters.foreach { case (item, (a, b)) =>
+          val itemAsBytes = tSerializer(item)
 
-            buff = ByteBuffer.allocate(4)
-            buff.putInt(itemAsBytes.length)
-            buffer ++= buff.array()
+          buff = ByteBuffer.allocate(4)
+          buff.putInt(itemAsBytes.length)
+          buffer ++= buff.array()
 
-            buffer ++= itemAsBytes
+          buffer ++= itemAsBytes
 
-            buff = ByteBuffer.allocate(8 * 2)
-            buff.putLong(a)
-            buff.putLong(b)
-            buffer ++= buff.array()
+          buff = ByteBuffer.allocate(8 * 2)
+          buff.putLong(a)
+          buff.putLong(b)
+          buffer ++= buff.array()
         }
         buffer.result.toArray
     }
@@ -168,9 +167,8 @@ sealed abstract class SpaceSaver[T] {
       .filter { case (_, (count, _)) => count >= thres }
       .toList
       .sorted(ordering)
-      .map {
-        case (item, (count, err)) =>
-          (item, Approximate(count - err, count, count, 1.0), thres <= count - err)
+      .map { case (item, (count, err)) =>
+        (item, Approximate(count - err, count, count, 1.0), thres <= count - err)
       }
 
   /**
@@ -183,9 +181,8 @@ sealed abstract class SpaceSaver[T] {
       .sorted(ordering)
     val siK = si.take(k)
     val countKPlus1 = si.drop(k).headOption.map(_._2._1).getOrElse(0L)
-    siK.map {
-      case (item, (count, err)) =>
-        (item, Approximate(count - err, count, count, 1.0), countKPlus1 < count - err)
+    siK.map { case (item, (count, err)) =>
+      (item, Approximate(count - err, count, count, 1.0), countKPlus1 < count - err)
     }
   }
 
