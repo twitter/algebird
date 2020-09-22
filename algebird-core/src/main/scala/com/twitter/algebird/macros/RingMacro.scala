@@ -16,8 +16,8 @@ object RingMacro {
       q"implicitly[_root_.com.twitter.algebird.Ring[${param.typeSignatureIn(T.tpe)}]]"
     }
 
-    val timesList = params.zip(implicitRings).map {
-      case (param, instance) => q"$instance.times(l.$param, r.$param)"
+    val timesList = params.zip(implicitRings).map { case (param, instance) =>
+      q"$instance.times(l.$param, r.$param)"
     }
     val oneList = implicitRings.map(instance => q"$instance.one")
 

@@ -44,9 +44,8 @@ private class IterCallStatistics(threadSafe: Boolean) {
 
     override def toString: String =
       distribution.zipWithIndex
-        .map {
-          case (v, i) =>
-            (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
+        .map { case (v, i) =>
+          (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
         }
         .mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
 

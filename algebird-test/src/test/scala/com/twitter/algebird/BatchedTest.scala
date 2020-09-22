@@ -9,9 +9,8 @@ import org.scalatest.propspec.AnyPropSpec
 object Helpers {
   implicit def arbitraryBatched[A: Arbitrary]: Arbitrary[Batched[A]] = {
     val item = arbitrary[A].map(Batched(_))
-    val items = arbitrary[(A, List[A])].map {
-      case (a, as) =>
-        Batched(a).append(as)
+    val items = arbitrary[(A, List[A])].map { case (a, as) =>
+      Batched(a).append(as)
     }
     Arbitrary(Gen.oneOf(item, items))
   }

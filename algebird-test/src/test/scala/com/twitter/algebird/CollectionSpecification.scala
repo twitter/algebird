@@ -249,9 +249,8 @@ class CollectionSpecification extends CheckProperties {
       (MapAlgebra
         .toGraph(l)
         .toIterator
-        .flatMap {
-          case (k, sv) =>
-            sv.map(v => (k, v))
+        .flatMap { case (k, sv) =>
+          sv.map(v => (k, v))
         }
         .toSet == l)
     }
@@ -325,8 +324,8 @@ class CollectionSpecification extends CheckProperties {
       for {
         m <- Arbitrary.arbitrary[Map[Int, T]]
       } yield AdaptiveVector.fromMap(
-        m.filter {
-          case (k, _) => (k < 1000) && (k >= 0)
+        m.filter { case (k, _) =>
+          (k < 1000) && (k >= 0)
         },
         sparse,
         1000

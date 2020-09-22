@@ -38,31 +38,23 @@ object DecayedVector extends CompatDecayedVector {
         }
     }
 
-  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[
-    ({
-      type x[a] = Map[K, a]
-    })#x
-  ] =
-    DecayedVector[({ type x[a] = Map[K, a] })#x](m, scaledTime)
-  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[
-    ({
-      type x[a] = Map[K, a]
-    })#x
-  ] =
+  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[Map[K, *]] =
+    DecayedVector[Map[K, *]](m, scaledTime)
+  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[Map[K, *]] =
     forMap(m, time * scala.math.log(2.0) / halfLife)
 
   def mapMonoidWithEpsilon[K](
       eps: Double
   )(implicit
-      vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+      vs: VectorSpace[Double, Map[K, *]],
       metric: Metric[Map[K, Double]]
-  ): Monoid[DecayedVector[({ type x[a] = Map[K, a] })#x]] =
-    monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
+  ): Monoid[DecayedVector[Map[K, *]]] =
+    monoidWithEpsilon[Map[K, *]](eps)
 
   implicit def mapMonoid[K](implicit
-      vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+      vs: VectorSpace[Double, Map[K, *]],
       metric: Metric[Map[K, Double]]
-  ): Monoid[DecayedVector[({ type x[a] = Map[K, a] })#x]] =
+  ): Monoid[DecayedVector[Map[K, *]]] =
     mapMonoidWithEpsilon(-1.0)
 
   def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(implicit

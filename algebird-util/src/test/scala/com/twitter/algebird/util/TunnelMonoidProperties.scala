@@ -47,12 +47,11 @@ object TunnelMonoidProperties {
     }
     numbers.forall { _ =>
       val toFeed = makeRandomInput(r.nextInt)
-      val finalResults = helper(numbers, toFeed).zip(helper(numbers, toFeed)).map {
-        case (f1, f2) =>
-          for {
-            b1 <- f1
-            b2 <- f2
-          } yield b1 == b2
+      val finalResults = helper(numbers, toFeed).zip(helper(numbers, toFeed)).map { case (f1, f2) =>
+        for {
+          b1 <- f1
+          b2 <- f2
+        } yield b1 == b2
       }
       Await.result(Future.collect(finalResults).map(_.forall(identity)))
     }

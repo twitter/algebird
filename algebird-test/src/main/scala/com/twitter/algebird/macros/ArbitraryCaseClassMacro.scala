@@ -20,9 +20,8 @@ object ArbitraryCaseClassMacro {
     val params = getParams(c)
     val types = getParamTypes(c)
 
-    val getsList = params.zip(types).map {
-      case (param, t) =>
-        fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[$t]"
+    val getsList = params.zip(types).map { case (param, t) =>
+      fq"${param.name} <- _root_.org.scalacheck.Arbitrary.arbitrary[$t]"
     }
 
     val paramsList =

@@ -114,10 +114,9 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
     } else {
       val bufA = ArrayBufferedOperation.fromSumOption[A](1000)(a)
       val bufB = ArrayBufferedOperation.fromSumOption[B](1000)(b)
-      xs.foreach {
-        case a0 :: b0 =>
-          bufA.put(a0)
-          bufB.put(b0)
+      xs.foreach { case a0 :: b0 =>
+        bufA.put(a0)
+        bufB.put(b0)
       }
       Some(bufA.flush.get :: bufB.flush.get)
     }

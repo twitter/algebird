@@ -89,8 +89,8 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
       val mostRecentTs = buckets.last.timestamp
       val cutoff = conf.expiration(mostRecentTs)
 
-      val fullViaAdd = buckets.foldLeft(ExpHist.empty(conf)) {
-        case (e, Bucket(c, t)) => e.add(c, t)
+      val fullViaAdd = buckets.foldLeft(ExpHist.empty(conf)) { case (e, Bucket(c, t)) =>
+        e.add(c, t)
       }
 
       val actualSum = actualBucketSum(buckets, cutoff)
@@ -114,9 +114,8 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
 
       // sequence of histograms, each with one more oldest bucket
       // dropped off of its tail.
-      val histograms = (0 until numBuckets).scanLeft(hist) {
-        case (e, _) =>
-          e.copy(buckets = e.buckets.init, total = e.total - e.oldestBucketSize)
+      val histograms = (0 until numBuckets).scanLeft(hist) { case (e, _) =>
+        e.copy(buckets = e.buckets.init, total = e.total - e.oldestBucketSize)
       }
 
       // every histogram's relative error stays within bounds.
@@ -188,8 +187,8 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
       val e = ExpHist.empty(conf)
 
       val incs = (0L until bucket.size)
-        .foldLeft(e) {
-          case (acc, _) => acc.inc(bucket.timestamp)
+        .foldLeft(e) { case (acc, _) =>
+          acc.inc(bucket.timestamp)
         }
         .step(bucket.timestamp)
       val adds = e.add(bucket.size, bucket.timestamp)

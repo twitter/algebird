@@ -84,13 +84,9 @@ sealed trait Fold[-I, +O] extends Serializable {
         val first = self.build()
         val second = other.build()
         new FoldState(
-          {
-            case ((x, y), i) => (first.add(x, i), second.add(y, i))
-          },
+          { case ((x, y), i) => (first.add(x, i), second.add(y, i)) },
           (first.start, second.start),
-          {
-            case (x, y) => f(first.end(x), second.end(y))
-          }
+          { case (x, y) => f(first.end(x), second.end(y)) }
         )
       }
     }
@@ -187,7 +183,7 @@ object Fold extends CompatFold {
   /**
    * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
    */
-  implicit def applicative[I]: Applicative[({ type L[O] = Fold[I, O] })#L] =
+  implicit def applicative[I]: Applicative[Fold[I, *]] =
     new FoldApplicative[I]
 
   /**
@@ -349,7 +345,7 @@ object Fold extends CompatFold {
 /**
  * Folds are Applicatives!
  */
-class FoldApplicative[I] extends Applicative[({ type L[O] = Fold[I, O] })#L] {
+class FoldApplicative[I] extends Applicative[Fold[I, *]] {
   override def map[T, U](mt: Fold[I, T])(fn: T => U): Fold[I, U] =
     mt.map(fn)
   override def apply[T](v: T): Fold[I, T] =

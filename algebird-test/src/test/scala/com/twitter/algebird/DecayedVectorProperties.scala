@@ -21,7 +21,7 @@ import org.scalacheck.{Arbitrary, Gen}
 class DecayedVectorProperties extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
+  implicit val mpint: Arbitrary[DecayedVector[Map[Int, *]]] = Arbitrary {
     for {
       t <- Gen.choose(1e-4, 200.0) // Not too high so as to avoid numerical issues
       m <- Gen.mapOf(Gen.zip(Gen.choose(0, 100), Gen.choose(-1e5, 1e5)))
@@ -30,8 +30,8 @@ class DecayedVectorProperties extends CheckProperties {
 
   // TODO: we won't need this when we have an Equatable trait
   def decayedMapEqFn(
-      a: DecayedVector[({ type x[a] = Map[Int, a] })#x],
-      b: DecayedVector[({ type x[a] = Map[Int, a] })#x]
+      a: DecayedVector[Map[Int, *]],
+      b: DecayedVector[Map[Int, *]]
   ): Boolean = {
 
     def beCloseTo(a: Double, b: Double, eps: Double = 1e-5) =
@@ -54,6 +54,6 @@ class DecayedVectorProperties extends CheckProperties {
 
   property("DecayedVector[Map[Int, *]] is a monoid") {
     implicit val equiv = Equiv.fromFunction(decayedMapEqFn)
-    monoidLaws[DecayedVector[({ type x[a] = Map[Int, a] })#x]]
+    monoidLaws[DecayedVector[Map[Int, *]]]
   }
 }

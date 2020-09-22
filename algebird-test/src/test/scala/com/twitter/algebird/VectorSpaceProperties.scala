@@ -35,6 +35,6 @@ class VectorSpaceProperties extends CheckProperties {
   implicit val genDouble: Arbitrary[Double] = Arbitrary(Gen.choose(-1.0e50, 1.0e50))
 
   property("map int double scaling") {
-    vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
+    vectorSpaceLaws[Double, Map[Int, *]](mapEqFn(_, _))
   }
 }

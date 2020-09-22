@@ -26,8 +26,8 @@ object SemigroupMacro {
     import c.universe._
 
     val companion = getCompanionObject(c)
-    val plusList = getParams(c).zip(implicitInstances).map {
-      case (param, instance) => q"$instance.plus(l.$param, r.$param)"
+    val plusList = getParams(c).zip(implicitInstances).map { case (param, instance) =>
+      q"$instance.plus(l.$param, r.$param)"
     }
 
     q"def plus(l: $T, r: $T): $T = $companion.apply(..$plusList)"
@@ -41,9 +41,8 @@ object SemigroupMacro {
 
     val sumOptionsGetted: List[c.Tree] =
       params.map(param => q"${param.name.asInstanceOf[TermName]}.get")
-    val getSumOptions = params.zip(implicitInstances).map {
-      case (param, instance) =>
-        q"val ${param.name.asInstanceOf[TermName]} = $instance.sumOption(items.iterator.map(_.$param))"
+    val getSumOptions = params.zip(implicitInstances).map { case (param, instance) =>
+      q"val ${param.name.asInstanceOf[TermName]} = $instance.sumOption(items.iterator.map(_.$param))"
     }
 
     val result = q"$companion.apply(..$sumOptionsGetted)"
