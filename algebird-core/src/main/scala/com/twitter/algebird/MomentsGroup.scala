@@ -191,6 +191,7 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
    *
    * we no longer use this, but we can't remove it due to binary compatibility
    */
+  @deprecated("Use Moments.getCombinedMeanDouble instead", since = "0.13.8")
   def getCombinedMean(n: Long, an: Double, k: Long, ak: Double): Double =
     if (n < k) getCombinedMean(k, ak, n, an)
     else
