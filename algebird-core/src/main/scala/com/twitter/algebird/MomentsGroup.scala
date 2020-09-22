@@ -33,7 +33,7 @@ import algebra.{CommutativeGroup, CommutativeMonoid}
 sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Double, val m4: Double)
     extends Product
     with Serializable {
-  def this(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) {
+  def this(m0: Long, m1: Double, m2: Double, m3: Double, m4: Double) = {
     this(m0.toDouble, m1, m2, m3, m4)
   }
 
