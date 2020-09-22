@@ -1,4 +1,3 @@
-import ReleaseTransformations._
 import algebird._
 import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
@@ -34,6 +33,9 @@ def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
 
 def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.12"
 def isScala213x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.13"
+
+noPublishSettings
+crossScalaVersions := Nil
 
 val sharedSettings = Seq(
   organization := "com.twitter",
@@ -73,35 +75,7 @@ val sharedSettings = Seq(
     "com.novocode" % "junit-interface" % "0.11" % Test
   ),
   // Publishing options:
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  releaseVersionBump := sbtrelease.Version.Bump.Minor, // need to tweak based on mima results
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
   pomIncludeRepository := { x => false },
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    releaseStepCommandAndRemaining("+test"), // formerly runTest, here to deal with algebird-spark
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    releaseStepCommandAndRemaining(
-      "+publishSigned"
-    ), // formerly publishArtifacts, here to deal with algebird-spark
-    ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
-    setNextVersion,
-    commitNextVersion,
-    pushChanges
-  ),
-  publishTo := sonatypePublishToBundle.value,
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/twitter/algebird"),
-      "scm:git@github.com:twitter/algebird.git"
-    )
-  ),
   pomExtra := (<url>https://github.com/twitter/algebird</url>
     <licenses>
       <license>
@@ -138,6 +112,7 @@ val sharedSettings = Seq(
 ) ++ mimaSettings
 
 lazy val noPublishSettings = Seq(
+  publish / skip := true,
   publish := {},
   publishLocal := {},
   test := {},
