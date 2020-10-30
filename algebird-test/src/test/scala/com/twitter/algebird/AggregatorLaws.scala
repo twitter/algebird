@@ -89,7 +89,11 @@ class AggregatorLaws extends CheckProperties {
   def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]): Prop =
     forAll { in: List[T] =>
       val aggregator = Aggregator.numericSum[T]
-      aggregator(in) == in.map(num.toDouble).sum
+      val ares = aggregator(in)
+      val sres = in.map(num.toDouble).sum
+      (sres == ares) || {
+        (sres - ares).abs / (sres.abs + ares.abs) < 1e-5
+      }
     }
   property("Aggregator.numericSum is correct for Ints")(checkNumericSum[Int])
   property("Aggregator.numericSum is correct for Longs") {

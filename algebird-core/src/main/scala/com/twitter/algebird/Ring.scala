@@ -144,14 +144,20 @@ object FloatRing extends Ring[Float] {
   override def minus(l: Float, r: Float): Float = l - r
   override def times(l: Float, r: Float): Float = l * r
 
+  // see: https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+  // for this algorithm
   override def sumOption(t: TraversableOnce[Float]): Option[Float] =
     if (t.isEmpty) None
     else
       Some {
-        var sum = 0.0
         val iter = t.toIterator
+        var sum = iter.next().toDouble
+        var c = 0.0
         while (iter.hasNext) {
-          sum += iter.next().toDouble
+          val y = iter.next().toDouble - c
+          val t = sum + y
+          c = (t - sum) - y
+          sum = t
         }
 
         sum.toFloat
@@ -166,14 +172,20 @@ object DoubleRing extends Ring[Double] {
   override def minus(l: Double, r: Double): Double = l - r
   override def times(l: Double, r: Double): Double = l * r
 
+  // see: https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+  // for this algorithm
   override def sumOption(t: TraversableOnce[Double]): Option[Double] =
     if (t.isEmpty) None
     else
       Some {
-        var sum = 0.0
         val iter = t.toIterator
+        var sum = iter.next()
+        var c = 0.0
         while (iter.hasNext) {
-          sum += iter.next()
+          val y = iter.next() - c
+          val t = sum + y
+          c = (t - sum) - y
+          sum = t
         }
 
         sum
