@@ -22,8 +22,8 @@ import org.scalacheck.Prop
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
-  Unit tests to highlight specific examples of the properties we guarantee.
-  */
+ *  Unit tests to highlight specific examples of the properties we guarantee.
+ */
 class AggregatorTests extends AnyFunSuite {
   test("Kahan summation mitigates Double error accumulation") {
 
