@@ -26,6 +26,7 @@ import org.scalatest.funsuite.AnyFunSuite
   */
 class AggregatorTests extends AnyFunSuite {
   test("Kahan summation mitigates Double error accumulation") {
+
     val input = Stream.continually(0.01).take(1000)
 
     assert(9.999999999999831 == input.sum, "naive summation accumulates errors")
@@ -38,7 +39,23 @@ class AggregatorTests extends AnyFunSuite {
 
     assert(10.0001335f == input.sum, "naive summation accumulates errors")
     assert(Some(10.0f) == FloatRing.sumOption(input), "Kahan summation controls error accumulation")
+
+    // This version builds an aggregator directly from the FloatRing, which
+    // accesses the correct `sumOption` implementation.
     assert(10.0f == Aggregator.fromMonoid[Float].apply(input))
+  }
+
+  test("Kahan summation works with Aggregator.numericSum[Float]") {
+    val input = Stream.continually(0.01f).take(1000)
+    val sum = Aggregator.numericSum[Float].apply(input)
+
+    assert(10.0 != sum, "numericSum[Float].apply returns a Double, with error in the higher-precision noise.")
+
+    // In fact, it's equivalent to first turning all inputs into Doubles, and
+    // then using the Kahan-enabled numericSum[Double].
+    assert(sum == Aggregator.numericSum[Double].apply(input.map(_.toDouble)))
+
+    assert(10.0f == sum.toFloat, "Converting back to float removes this noise.")
   }
 }
 
