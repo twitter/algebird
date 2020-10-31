@@ -19,6 +19,45 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 import org.scalacheck.Prop
+import org.scalatest.funsuite.AnyFunSuite
+
+/**
+ *  Unit tests to highlight specific examples of the properties we guarantee.
+ */
+class AggregatorTests extends AnyFunSuite {
+  test("Kahan summation mitigates Double error accumulation") {
+
+    val input = Stream.continually(0.01).take(1000)
+
+    assert(9.999999999999831 == input.sum, "naive summation accumulates errors")
+    assert(Some(10.0) == DoubleRing.sumOption(input), "Kahan summation controls error accumulation")
+    assert(10.0 == Aggregator.numericSum[Double].apply(input))
+  }
+
+  test("Kahan summation mitigates Float error accumulation") {
+    val input = Stream.continually(0.01f).take(1000)
+
+    assert(10.0001335f == input.sum, "naive summation accumulates errors")
+    assert(Some(10.0f) == FloatRing.sumOption(input), "Kahan summation controls error accumulation")
+
+    // This version builds an aggregator directly from the FloatRing, which
+    // accesses the correct `sumOption` implementation.
+    assert(10.0f == Aggregator.fromMonoid[Float].apply(input))
+  }
+
+  test("Kahan summation works with Aggregator.numericSum[Float]") {
+    val input = Stream.continually(0.01f).take(1000)
+    val sum = Aggregator.numericSum[Float].apply(input)
+
+    assert(10.0 != sum, "numericSum[Float].apply returns a Double, with error in the higher-precision noise.")
+
+    // In fact, it's equivalent to first turning all inputs into Doubles, and
+    // then using the Kahan-enabled numericSum[Double].
+    assert(sum == Aggregator.numericSum[Double].apply(input.map(_.toDouble)))
+
+    assert(10.0f == sum.toFloat, "Converting back to float removes this noise.")
+  }
+}
 
 class AggregatorLaws extends CheckProperties {
 
@@ -89,9 +128,15 @@ class AggregatorLaws extends CheckProperties {
   def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]): Prop =
     forAll { in: List[T] =>
       val aggregator = Aggregator.numericSum[T]
-      aggregator(in) == in.map(num.toDouble).sum
+      val ares = aggregator(in)
+      val sres = in.map(num.toDouble).sum
+      (sres == ares) || {
+        (sres - ares).abs / (sres.abs + ares.abs) < 1e-5
+      }
     }
-  property("Aggregator.numericSum is correct for Ints")(checkNumericSum[Int])
+  property("Aggregator.numericSum is correct for Ints") {
+    checkNumericSum[Int]
+  }
   property("Aggregator.numericSum is correct for Longs") {
     checkNumericSum[Long]
   }
