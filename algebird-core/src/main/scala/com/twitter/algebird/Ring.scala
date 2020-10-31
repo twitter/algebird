@@ -151,16 +151,16 @@ object FloatRing extends Ring[Float] {
     else
       Some {
         val iter = t.toIterator
-        var sum = iter.next().toDouble
-        var c = 0.0
+        var sum = iter.next()
+        var c = 0.0f
         while (iter.hasNext) {
-          val y = iter.next().toDouble - c
+          val y = iter.next() - c
           val t = sum + y
           c = (t - sum) - y
           sum = t
         }
 
-        sum.toFloat
+        sum
       }
 }
 

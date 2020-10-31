@@ -19,6 +19,28 @@ package com.twitter.algebird
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 import org.scalacheck.Prop
+import org.scalatest.funsuite.AnyFunSuite
+
+/**
+  Unit tests to highlight specific examples of the properties we guarantee.
+  */
+class AggregatorTests extends AnyFunSuite {
+  test("Kahan summation mitigates Double error accumulation") {
+    val input = Stream.continually(0.01).take(1000)
+
+    assert(9.999999999999831 == input.sum, "naive summation accumulates errors")
+    assert(Some(10.0) == DoubleRing.sumOption(input), "Kahan summation controls error accumulation")
+    assert(10.0 == Aggregator.numericSum[Double].apply(input))
+  }
+
+  test("Kahan summation mitigates Float error accumulation") {
+    val input = Stream.continually(0.01f).take(1000)
+
+    assert(10.0001335f == input.sum, "naive summation accumulates errors")
+    assert(Some(10.0f) == FloatRing.sumOption(input), "Kahan summation controls error accumulation")
+    assert(10.0f == Aggregator.fromMonoid[Float].apply(input))
+  }
+}
 
 class AggregatorLaws extends CheckProperties {
 
@@ -95,7 +117,9 @@ class AggregatorLaws extends CheckProperties {
         (sres - ares).abs / (sres.abs + ares.abs) < 1e-5
       }
     }
-  property("Aggregator.numericSum is correct for Ints")(checkNumericSum[Int])
+  property("Aggregator.numericSum is correct for Ints") {
+    checkNumericSum[Int]
+  }
   property("Aggregator.numericSum is correct for Longs") {
     checkNumericSum[Long]
   }
