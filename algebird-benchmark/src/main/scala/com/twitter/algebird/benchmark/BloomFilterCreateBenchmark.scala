@@ -20,12 +20,12 @@ object BloomFilterCreateBenchmark {
     var falsePositiveRate: Double = 0
 
     var randomStrings: Seq[String] = _
-    var experimentalBF: experimental.BloomFilter[String] = _
+    var immutableBF: immutable.BloomFilter[String] = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
       randomStrings = createRandomString(nbrOfElements, 10)
-      experimentalBF = experimental.BloomFilter[String](nbrOfElements, falsePositiveRate)
+      immutableBF = immutable.BloomFilter[String](nbrOfElements, falsePositiveRate)
     }
 
   }
@@ -43,10 +43,10 @@ class BloomFilterCreateBenchmark {
   }
 
   @Benchmark
-  def createBloomFilterExperimental(
+  def createImmutableBloomFilter(
       bloomFilterState: BloomFilterState
-  ): experimental.BloomFilter[String]#Hash =
-    bloomFilterState.experimentalBF.create(bloomFilterState.randomStrings: _*)
+  ): immutable.BloomFilter[String]#Hash =
+    bloomFilterState.immutableBF.create(bloomFilterState.randomStrings: _*)
 
   @Benchmark
   def createBloomFilterUsingFold(bloomFilterState: BloomFilterState): BF[String] = {
@@ -58,10 +58,10 @@ class BloomFilterCreateBenchmark {
   }
 
   @Benchmark
-  def createBloomFilterUsingFoldExperimental(
+  def createImmutableBloomFilterUsingFold(
       bloomFilterState: BloomFilterState
-  ): experimental.BloomFilter[String]#Hash =
-    bloomFilterState.randomStrings.foldLeft(bloomFilterState.experimentalBF.empty) {
+  ): immutable.BloomFilter[String]#Hash =
+    bloomFilterState.randomStrings.foldLeft(bloomFilterState.immutableBF.empty) {
       case (filter, string) => filter + string
     }
 
@@ -74,9 +74,9 @@ class BloomFilterCreateBenchmark {
   }
 
   @Benchmark
-  def createBloomFilterAggregatorExperimental(
+  def createImmutableBloomFilterAggregator(
       bloomFilterState: BloomFilterState
   ) =
     bloomFilterState.randomStrings
-      .aggregate(bloomFilterState.experimentalBF.aggregator.monoid.zero)(_ + _, (a, b) => a ++ b)
+      .aggregate(bloomFilterState.immutableBF.aggregator.monoid.zero)(_ + _, (a, b) => a ++ b)
 }

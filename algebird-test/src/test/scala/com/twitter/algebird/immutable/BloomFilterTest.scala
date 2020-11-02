@@ -1,4 +1,4 @@
-package com.twitter.algebird.experimental
+package com.twitter.algebird.immutable
 
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
@@ -6,7 +6,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import com.twitter.algebird.immutable.BitSet
 import com.twitter.algebird.{
   ApproximateProperties,
   ApproximateProperty,
@@ -18,16 +17,15 @@ import com.twitter.algebird.{
 }
 
 object BloomFilterTestUtils {
-  def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.Hash): bloomFilter.Instance = bf match {
-    case bloomFilter.Empty => bloomFilter.Instance(BitSet.empty)
+  def toDense[A](bloomFilter: BloomFilter[A])(bf: bloomFilter.Hash): bloomFilter.Hash = bf match {
     case bloomFilter.Item(item) =>
       val bs = bloomFilter.hashToArray(item).foldLeft(BitSet.empty)(_ + _)
       bloomFilter.Instance(bs)
-    case bfi: bloomFilter.Instance => bfi
+    case bfi => bfi
   }
 }
 
-class ExperimentalBloomFilterLaws extends CheckProperties {
+class ImmutableBloomFilterLaws extends CheckProperties {
 
   import com.twitter.algebird.BaseProperties._
   import BloomFilterTestUtils._
@@ -109,9 +107,18 @@ class ExperimentalBloomFilterLaws extends CheckProperties {
   property("a ++ a = a for BF") {
     forAll((a: bf.Hash) => Equiv[bf.Hash].equiv(a ++ a, a))
   }
+
+  property("BF Instance has 1 or more BitSet") {
+    forAll { (a: bf.Hash) =>
+      a match {
+        case bf.Instance(bs) => bs.size >= 1
+        case _               => true
+      }
+    }
+  }
 }
 
-class ExperimentalBloomFilterHashIndices extends CheckProperties {
+class ImmutableBloomFilterHashIndices extends CheckProperties {
 
   implicit val bf: Arbitrary[BloomFilter[String]] =
     Arbitrary {
@@ -239,7 +246,7 @@ class BloomFilterCardinality[T: Gen: Hash128] extends ApproximateProperty {
   def approximateResult(bf: BloomFilter[T]#Hash, u: Unit) = bf.size
 }
 
-class ExperimentalBloomFilterProperties extends ApproximateProperties("BloomFilter") {
+class ImmutableBloomFilterProperties extends ApproximateProperties("BloomFilter") {
   import ApproximateProperty.toProp
 
   for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {
@@ -255,7 +262,7 @@ class ExperimentalBloomFilterProperties extends ApproximateProperties("BloomFilt
   }
 }
 
-class ExperimentalBloomFilterTest extends AnyWordSpec with Matchers {
+class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
 
   val RAND = new scala.util.Random
 

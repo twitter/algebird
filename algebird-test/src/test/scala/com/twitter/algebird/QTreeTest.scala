@@ -35,7 +35,7 @@ class QTreeLaws extends CheckProperties {
 }
 
 class QTreeTest extends AnyWordSpec with Matchers {
-  def randomList(n: Long) =
+  def randomList(n: Long): scala.collection.immutable.IndexedSeq[Double] =
     (1L to n).map(_ => math.random)
 
   def buildQTree(k: Int, list: Seq[Double]) = {

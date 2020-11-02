@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package com.twitter.algebird.experimental
+package com.twitter.algebird.immutable
 
 import algebra.BoundedSemilattice
-import com.twitter.algebird.immutable.BitSet
 import com.twitter.algebird.{Approximate, ApproximateBoolean, Hash128, Monoid, MonoidAggregator}
 
 import scala.collection.compat._
@@ -117,12 +116,19 @@ object BloomFilter {
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
  */
-final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) { self =>
+final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: Hash128[A]) { self =>
+
+  /**
+   * Hash the value `numHashes` times and return an array of indices of true bits in the [[BitSet]].
+   */
   def hashToArray(s: A): Array[Int] = {
-    val target = new Array[Int](n)
-    nextHash(s, 0, new Array[Int](4), 4, target)
+    val target = new Array[Int](numHashes)
+    hashToArray(s, target)
     target
   }
+
+  private def hashToArray(s: A, target: Array[Int]): Unit =
+    nextHash(s, 0, new Array[Int](4), 4, target)
 
   private def splitLong(x: Long, buffer: Array[Int], idx: Int): Unit = {
     // unfortunately, this is the function we committed to some time ago, and we have tests
@@ -146,15 +152,15 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       bidx: Int,
       target: Array[Int]
   ): Unit =
-    if (hashIndex != n) {
+    if (hashIndex != numHashes) {
       val thisBidx = if (bidx > 3) {
-        val (a, b) = hash.hashWithSeed((n - hashIndex).toLong, valueToHash)
+        val (a, b) = hash.hashWithSeed((numHashes - hashIndex).toLong, valueToHash)
         splitLong(a, buffer, 0)
         splitLong(b, buffer, 2)
         0
       } else bidx
 
-      target(hashIndex) = buffer(thisBidx) % w
+      target(hashIndex) = buffer(thisBidx) % width
       nextHash(valueToHash, hashIndex + 1, buffer, thisBidx + 1, target)
     }
 
@@ -162,9 +168,9 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
    * Bloom Filter data structure
    */
   sealed abstract class Hash extends Serializable {
-    def numHashes: Int = n
+    def numHashes: Int = self.numHashes
 
-    def width: Int = w
+    def width: Int = self.width
 
     /**
      * The number of bits set to true in the bloom filter
@@ -233,7 +239,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
         case (x: Hash, Empty) => x.numBits
 
         // Otherwise compare as bit sets
-        case (_, _) => (this.toBitSet ^ that.toBitSet).size.toInt
+        case _ => (this.toBitSet ^ that.toBitSet).size.toInt
       }
 
   }
@@ -264,18 +270,22 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
 
     override def ++(other: Hash): Hash =
       other match {
-        case Empty => this
-        case Item(otherItem) =>
-          Instance {
-            BitSet
-              .newEmpty(0)
-              .mutableAdd(hashToArray(item))
-              .mutableAdd(hashToArray(otherItem))
-          }
-        case _ => other + item
+        case Empty           => this
+        case Item(otherItem) => this + otherItem
+        case _               => other + item
       }
 
-    override def +(other: A): Hash = this ++ Item(other)
+    override def +(other: A): Hash = {
+      val bs = BitSet.newEmpty(0)
+      val hash = new Array[Int](numHashes)
+
+      hashToArray(item, hash)
+      bs.mutableAdd(hash)
+      hashToArray(other, hash)
+      bs.mutableAdd(hash)
+
+      Instance(bs)
+    }
 
     override def checkAndAdd(other: A): (Hash, ApproximateBoolean) =
       if (other == item) {
@@ -292,7 +302,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
   }
 
   /*
-   * Bloom filter with multiple values
+   * Bloom filter with 1 or more [[BitSet]].
    */
   case class Instance(bits: BitSet) extends Hash {
 
@@ -306,11 +316,11 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
     override def ++(other: Hash): Hash =
       other match {
         case Empty               => this
-        case Item(item)          => Instance(bits | BitSet(hashToArray(item)))
+        case Item(item)          => this + item
         case Instance(otherBits) => Instance(bits | otherBits)
       }
 
-    override def +(item: A): Hash = this ++ Item(item)
+    override def +(item: A): Hash = Instance(bits | BitSet(hashToArray(item)))
 
     override def checkAndAdd(other: A): (Hash, ApproximateBoolean) =
       (this + other, contains(other))
@@ -347,31 +357,24 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
       override def sum(t: TraversableOnce[Hash]): Hash =
         if (t.iterator.isEmpty) empty
         else {
-          var bfItem: Item = null
           val iter = t.iterator
-          var counter = 0
           var bs = BitSet.newEmpty(0)
+          val hash = new Array[Int](numHashes)
 
           while (iter.hasNext) {
             iter.next() match {
               case Empty => ()
-              case bi @ Item(item) =>
-                bfItem = bi
-                val array = hashToArray(item)
-                counter += array.length
-                bs = bs.mutableAdd(array)
+              case Item(item) =>
+                hashToArray(item, hash)
+                bs = bs.mutableAdd(hash)
               case Instance(bitset) =>
                 val iter = bitset.iterator
                 while (iter.hasNext) {
-                  counter += 1
                   bs = bs.mutableAdd(iter.next())
                 }
             }
           }
-
-          if (counter == 0) empty
-          else if (counter == n && (bfItem != null)) bfItem
-          else Instance(bs)
+          if (bs.isEmpty) Empty else Instance(bs)
         }
 
       override def sumOption(t: TraversableOnce[Hash]): Option[Hash] =
@@ -388,9 +391,7 @@ final case class BloomFilter[A](n: Int, w: Int)(implicit val hash: Hash128[A]) {
 
   implicit val equiv: Equiv[Hash] = new Equiv[Hash] {
     override def equiv(a: Hash, b: Hash): Boolean =
-      (a eq b) || ((a.numHashes == b.numHashes) &&
-        (a.width == b.width) &&
-        a.toBitSet.equals(b.toBitSet))
+      (a eq b) || a.toBitSet.equals(b.toBitSet)
   }
 
   /**

@@ -16,7 +16,7 @@ object BloomFilterQueryBenchmark {
     var falsePositiveRate: Double = 0
 
     var bf: BF[String] = _
-    var experimentalBF: experimental.BloomFilter[String]#Hash = _
+    var immutableBF: immutable.BloomFilter[String]#Hash = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
@@ -24,7 +24,7 @@ object BloomFilterQueryBenchmark {
         BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
       bf = BloomFilter[String](nbrOfElements, falsePositiveRate)
         .create(randomStrings: _*)
-      experimentalBF = experimental
+      immutableBF = immutable
         .BloomFilter[String](nbrOfElements, falsePositiveRate)
         .create(randomStrings: _*)
     }
@@ -40,5 +40,5 @@ class BloomFilterQueryBenchmark {
 
   @Benchmark
   def queryBloomFilterExperimental(bloomFilterState: BloomFilterState): ApproximateBoolean =
-    bloomFilterState.experimentalBF.contains("1")
+    bloomFilterState.immutableBF.contains("1")
 }
