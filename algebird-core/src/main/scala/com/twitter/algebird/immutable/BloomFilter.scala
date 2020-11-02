@@ -100,7 +100,7 @@ object BloomFilter {
     val prob =
       1 -
         scala.math.exp(t - 1 - s(nl)) *
-          scala.math.pow(s(nl) / (t - 1), t - 1) -
+        scala.math.pow(s(nl) / (t - 1), t - 1) -
         scala.math.exp(-scala.math.pow(t + 1 - s(nr), 2) / (2 * s(nr)))
 
     Approximate[Long](nl, n, nr, scala.math.max(0, prob))
@@ -247,7 +247,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
   case object Empty extends Hash {
     override def toBitSet: BitSet = BitSet.empty
 
-    override val numBits = 0
+    override val numBits: Int = 0
 
     override def ++(other: Hash): Hash = other
 

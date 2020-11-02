@@ -51,8 +51,8 @@ class BloomFilterCreateBenchmark {
   @Benchmark
   def createBloomFilterUsingFold(bloomFilterState: BloomFilterState): BF[String] = {
     val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
-    val bf = bloomFilterState.randomStrings.foldLeft(bfMonoid.zero) {
-      case (filter, string) => filter + string
+    val bf = bloomFilterState.randomStrings.foldLeft(bfMonoid.zero) { case (filter, string) =>
+      filter + string
     }
     bf
   }
@@ -61,8 +61,8 @@ class BloomFilterCreateBenchmark {
   def createImmutableBloomFilterUsingFold(
       bloomFilterState: BloomFilterState
   ): immutable.BloomFilter[String]#Hash =
-    bloomFilterState.randomStrings.foldLeft(bloomFilterState.immutableBF.empty) {
-      case (filter, string) => filter + string
+    bloomFilterState.randomStrings.foldLeft(bloomFilterState.immutableBF.empty) { case (filter, string) =>
+      filter + string
     }
 
   @Benchmark
@@ -76,7 +76,7 @@ class BloomFilterCreateBenchmark {
   @Benchmark
   def createImmutableBloomFilterAggregator(
       bloomFilterState: BloomFilterState
-  ) =
+  ): immutable.BloomFilter[String]#Hash =
     bloomFilterState.randomStrings
       .aggregate(bloomFilterState.immutableBF.aggregator.monoid.zero)(_ + _, (a, b) => a ++ b)
 }

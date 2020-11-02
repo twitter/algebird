@@ -393,11 +393,10 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
         val bf = bloomFilter.create(entries: _*)
         entries
           .map(entry => (entry, bloomFilter.create(entry)))
-          .foldLeft((Monoid.zero, Monoid.zero)) {
-            case ((left, leftAlt), (entry, _)) =>
-              val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
-              left.contains(entry) shouldBe contained
-              (left + entry, newLeftAlt)
+          .foldLeft((Monoid.zero, Monoid.zero)) { case ((left, leftAlt), (entry, _)) =>
+            val (newLeftAlt, contained) = leftAlt.checkAndAdd(entry)
+            left.contains(entry) shouldBe contained
+            (left + entry, newLeftAlt)
           }
 
         entries.foreach(i => assert(bf.contains(i.toString).isTrue))
