@@ -25,7 +25,7 @@ object TunnelMonoidProperties {
       makeRandomInput: Int => I,
       makeTunnel: I => V,
       collapseFinalValues: (V, Seq[V], I) => Seq[Future[I]]
-  ) = {
+  ): Boolean = {
     val r = new Random
     val numbers = (1 to 40).map(_ => makeRandomInput(r.nextInt))
     def helper(seeds: Seq[I], toFeed: I) = {
@@ -47,12 +47,11 @@ object TunnelMonoidProperties {
     }
     numbers.forall { _ =>
       val toFeed = makeRandomInput(r.nextInt)
-      val finalResults = helper(numbers, toFeed).zip(helper(numbers, toFeed)).map {
-        case (f1, f2) =>
-          for {
-            b1 <- f1
-            b2 <- f2
-          } yield b1 == b2
+      val finalResults = helper(numbers, toFeed).zip(helper(numbers, toFeed)).map { case (f1, f2) =>
+        for {
+          b1 <- f1
+          b2 <- f2
+        } yield b1 == b2
       }
       Await.result(Future.collect(finalResults).map(_.forall(identity)))
     }
@@ -62,7 +61,7 @@ object TunnelMonoidProperties {
 class TunnelMonoidPropertiesextends extends CheckProperties {
 
   import TunnelMonoidProperties._
-  implicit val monoid = new Monoid[Int] {
+  implicit val monoid: Monoid[Int] = new Monoid[Int] {
     val zero = 0
     def plus(older: Int, newer: Int): Int = older + newer
   }

@@ -9,9 +9,8 @@ import org.scalatest.propspec.AnyPropSpec
 object Helpers {
   implicit def arbitraryBatched[A: Arbitrary]: Arbitrary[Batched[A]] = {
     val item = arbitrary[A].map(Batched(_))
-    val items = arbitrary[(A, List[A])].map {
-      case (a, as) =>
-        Batched(a).append(as)
+    val items = arbitrary[(A, List[A])].map { case (a, as) =>
+      Batched(a).append(as)
     }
     Arbitrary(Gen.oneOf(item, items))
   }
@@ -22,7 +21,7 @@ import Helpers.arbitraryBatched
 class BatchedLaws extends CheckProperties {
 
   import BaseProperties._
-  implicit val arbitraryBigDecimalsHere =
+  implicit val arbitraryBigDecimalsHere: Arbitrary[BigDecimal] =
     BaseProperties.arbReasonableBigDecimals
 
   def testBatchedMonoid[A: Arbitrary: Monoid](name: String, size: Int): Unit = {

@@ -5,22 +5,23 @@ import com.twitter.algebird.scalacheck.arbitrary._
 import com.twitter.algebird.scalacheck.NonEmptyVector
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop
 
 class MinLaws extends CheckProperties {
-  def minTest[T: Arbitrary: Ordering] =
+  def minTest[T: Arbitrary: Ordering]: Prop =
     forAll { (l: Min[T], r: Min[T]) =>
       val realMin = Min(Ordering[T].min(l.get, r.get))
       l + r == realMin && (l.min(r)) == realMin
     }
 
-  def minSemigroupTest[T: Arbitrary: Ordering] =
+  def minSemigroupTest[T: Arbitrary: Ordering]: Prop =
     forAll { v: NonEmptyVector[T] =>
       val minItems = v.items.map(Min(_))
       v.items.min == Min.semigroup[T].combineAllOption(minItems).get.get
     }
 
   // Test equiv import.
-  val equiv = implicitly[Equiv[Min[Int]]]
+  val equiv: Equiv[Min[Int]] = implicitly[Equiv[Min[Int]]]
 
   property("Min.{ +, min } works on ints")(minTest[Int])
 

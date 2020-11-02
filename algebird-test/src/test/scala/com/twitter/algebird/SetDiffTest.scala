@@ -10,8 +10,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 object SetDiffTest {
   implicit def arbSetDiff[T: Arbitrary]: Arbitrary[SetDiff[T]] =
-    Arbitrary(arbitrary[(Set[T], Set[T])].map {
-      case (a, b) => SetDiff.of(a, b)
+    Arbitrary(arbitrary[(Set[T], Set[T])].map { case (a, b) =>
+      SetDiff.of(a, b)
     })
 }
 

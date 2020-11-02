@@ -3,12 +3,13 @@ package com.twitter.algebird
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scala.util.Random
 
 object SketchMapTestImplicits {
-  val DELTA = 1e-6
-  val EPS = 0.001
-  val SEED = 1
-  val HEAVY_HITTERS_COUNT = 10
+  val DELTA: Double = 1e-6
+  val EPS: Double = 0.001
+  val SEED: Int = 1
+  val HEAVY_HITTERS_COUNT: Int = 10
 }
 
 class SketchMapLaws extends CheckProperties {
@@ -16,9 +17,9 @@ class SketchMapLaws extends CheckProperties {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  val params = SketchMapParams[Int](SEED, EPS, 1e-3, HEAVY_HITTERS_COUNT)
-  implicit val smMonoid = SketchMap.monoid[Int, Long](params)
-  implicit val smGen = Arbitrary {
+  val params: SketchMapParams[Int] = SketchMapParams[Int](SEED, EPS, 1e-3, HEAVY_HITTERS_COUNT)
+  implicit val smMonoid: SketchMapMonoid[Int, Long] = SketchMap.monoid[Int, Long](params)
+  implicit val smGen: Arbitrary[SketchMap[Int, Long]] = Arbitrary {
     for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
   }
 
@@ -39,9 +40,9 @@ class SketchMapTest extends AnyWordSpec with Matchers {
   import SketchMapTestImplicits._
   import HyperLogLog.int2Bytes
 
-  val PARAMS = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
-  val MONOID = SketchMap.monoid[Int, Long](PARAMS)
-  val RAND = new scala.util.Random
+  val PARAMS: SketchMapParams[Int] = SketchMapParams[Int](SEED, EPS, DELTA, HEAVY_HITTERS_COUNT)
+  val MONOID: SketchMapMonoid[Int, Long] = SketchMap.monoid[Int, Long](PARAMS)
+  val RAND: Random = new scala.util.Random
 
   "SketchMap" should {
     "count total number of elements in a stream" in {

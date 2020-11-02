@@ -1,4 +1,3 @@
-import ReleaseTransformations._
 import algebird._
 import com.typesafe.tools.mima.core._
 import pl.project13.scala.sbt.JmhPlugin
@@ -6,14 +5,15 @@ import pl.project13.scala.sbt.JmhPlugin
 val algebraVersion = "2.0.0"
 val bijectionVersion = "0.9.7"
 val javaEwahVersion = "1.1.7"
+val kindProjectorVersion = "0.11.0"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
-val scalaTestVersion = "3.2.0"
+val scalaTestVersion = "3.2.2"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
-val scalacheckVersion = "1.14.3"
-val scalaCollectionCompat = "2.1.6"
-val utilVersion = "20.6.0"
-val sparkVersion = "2.4.6"
+val scalacheckVersion = "1.15.0"
+val scalaCollectionCompat = "2.2.0"
+val utilVersion = "20.10.0"
+val sparkVersion = "2.4.7"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
@@ -34,9 +34,12 @@ def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
 def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.12"
 def isScala213x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.13"
 
+noPublishSettings
+crossScalaVersions := Nil
+
 val sharedSettings = Seq(
   organization := "com.twitter",
-  scalaVersion := "2.12.11",
+  scalaVersion := "2.12.12",
   crossScalaVersions := Seq("2.11.12", scalaVersion.value),
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
@@ -68,39 +71,11 @@ val sharedSettings = Seq(
   },
   javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
   libraryDependencies ++= Seq(
-    "junit" % "junit" % "4.13" % Test,
+    "junit" % "junit" % "4.13.1" % Test,
     "com.novocode" % "junit-interface" % "0.11" % Test
   ),
   // Publishing options:
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  releaseVersionBump := sbtrelease.Version.Bump.Minor, // need to tweak based on mima results
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
   pomIncludeRepository := { x => false },
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    releaseStepCommandAndRemaining("+test"), // formerly runTest, here to deal with algebird-spark
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    releaseStepCommandAndRemaining(
-      "+publishSigned"
-    ), // formerly publishArtifacts, here to deal with algebird-spark
-    ReleaseStep(action = releaseStepCommand("sonatypeBundleRelease")),
-    setNextVersion,
-    commitNextVersion,
-    pushChanges
-  ),
-  publishTo := sonatypePublishToBundle.value,
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/twitter/algebird"),
-      "scm:git@github.com:twitter/algebird.git"
-    )
-  ),
   pomExtra := (<url>https://github.com/twitter/algebird</url>
     <licenses>
       <license>
@@ -137,6 +112,7 @@ val sharedSettings = Seq(
 ) ++ mimaSettings
 
 lazy val noPublishSettings = Seq(
+  publish / skip := true,
   publish := {},
   publishLocal := {},
   test := {},
@@ -203,12 +179,12 @@ lazy val mimaSettings = Def.settings(
  * This returns the previous jar we released that is compatible with
  * the current.
  */
-val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "generic", "spark")
+val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "spark")
 
 def previousVersion(subProj: String) =
   Some(subProj)
     .filterNot(noBinaryCompatCheck.contains)
-    .map(s => "com.twitter" %% ("algebird-" + s) % "0.13.5")
+    .map(s => "com.twitter" %% ("algebird-" + s) % "0.13.7")
 
 lazy val algebird = Project(id = "algebird", base = file("."))
   .settings(sharedSettings)
@@ -234,7 +210,7 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
-  crossScalaVersions += "2.13.2",
+  crossScalaVersions += "2.13.3",
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -252,6 +228,7 @@ lazy val algebirdCore = module("core").settings(
         Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
       }
     },
+  addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
   sourceGenerators in Compile += Def.task {
     GenTupleAggregators.gen((sourceManaged in Compile).value)
   }.taskValue,
@@ -263,7 +240,7 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test")
   .settings(
     testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++=
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
@@ -275,7 +252,10 @@ lazy val algebirdTest = module("test")
         } else {
           Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
         }
-      }
+      },
+    addCompilerPlugin(
+      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+    )
   )
   .dependsOn(algebirdCore)
 
@@ -291,14 +271,14 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++= Seq("com.twitter" %% "util-core" % utilVersion)
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdBijection = module("bijection")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies += "com.twitter" %% "bijection-core" % bijectionVersion
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
@@ -315,7 +295,7 @@ lazy val algebirdSpark = module("spark")
 
 lazy val algebirdGeneric = module("generic")
   .settings(
-    crossScalaVersions += "2.13.2",
+    crossScalaVersions += "2.13.3",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5"
@@ -381,6 +361,7 @@ lazy val docs = project
   .settings(noPublishSettings)
   .settings(docSettings)
   .settings(
+    addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
     scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
     sources in (ScalaUnidoc, unidoc) ~= (_.filterNot(_.absolutePath.contains("javaapi")))
   )

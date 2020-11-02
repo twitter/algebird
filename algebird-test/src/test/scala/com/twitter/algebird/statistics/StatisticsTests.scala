@@ -6,17 +6,19 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import com.twitter.algebird.Ring
+import com.twitter.algebird.Monoid
 
 class StatisticsRingLaws extends CheckProperties with Matchers {
-  implicit val statsRing = new StatisticsRing[Int]
-  implicit val arb = Arbitrary(for (v <- choose(0, 1 << 30)) yield v)
+  implicit val statsRing: StatisticsRing[Int] = new StatisticsRing[Int]()(Ring.intRing)
+  implicit val arb: Arbitrary[Int] = Arbitrary(for (v <- choose(0, 1 << 30)) yield v)
 
   property("StatisticsRing is a Ring")(ringLaws[Int])
 }
 
 class StatisticsMonoidLaws extends CheckProperties with Matchers {
-  implicit val statsMonoid = new StatisticsMonoid[Int]
-  implicit val arb = Arbitrary(for (v <- choose(0, 1 << 14)) yield v)
+  implicit val statsMonoid: StatisticsMonoid[Int] = new StatisticsMonoid[Int]()(Monoid.intMonoid)
+  implicit val arb: Arbitrary[Int] = Arbitrary(for (v <- choose(0, 1 << 14)) yield v)
 
   property("StatisticsMonoid is a Monoid")(monoidLaws[Int])
 }
@@ -24,7 +26,7 @@ class StatisticsMonoidLaws extends CheckProperties with Matchers {
 class StatisticsTest extends AnyWordSpec with Matchers {
 
   // the test framework garbles the exceptions :/
-  lazy val statsMonoid = new StatisticsMonoid[Int]
+  lazy val statsMonoid: StatisticsMonoid[Int] = new StatisticsMonoid[Int]
   try {
     for (_ <- 1 to 2) statsMonoid.zero
     for (i <- 1 to 3) statsMonoid.plus(i, i)

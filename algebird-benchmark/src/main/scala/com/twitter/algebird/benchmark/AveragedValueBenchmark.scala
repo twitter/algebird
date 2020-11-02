@@ -24,10 +24,10 @@ class AveragedValueBenchmark {
   import AveragedGroup.{plus, sumOption}
 
   @Benchmark
-  def timePlus(state: AVState, bh: Blackhole) =
+  def timePlus(state: AVState, bh: Blackhole): Unit =
     bh.consume(state.inputData.reduce(plus(_, _)))
 
   @Benchmark
-  def timeSumOption(state: AVState, bh: Blackhole) =
+  def timeSumOption(state: AVState, bh: Blackhole): Unit =
     bh.consume(sumOption(state.inputData))
 }

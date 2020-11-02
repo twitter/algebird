@@ -32,7 +32,7 @@ abstract class PriorityQueueAggregator[A, +C](max: Int)(implicit ord: Ordering[A
   def present(q: PriorityQueue[A]): B
    */
 
-  override val monoid = new PriorityQueueMonoid[A](max)
+  override val monoid: PriorityQueueMonoid[A] = new PriorityQueueMonoid[A](max)
   override final def prepare(a: A): PriorityQueue[A] = monoid.build(a)
 }
 

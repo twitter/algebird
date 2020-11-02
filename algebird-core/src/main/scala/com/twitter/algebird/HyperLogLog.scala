@@ -46,7 +46,7 @@ case class BitSetLite(in: Array[Byte]) {
 object HyperLogLog {
 
   /* Size of the hash in bits */
-  val hashSize = 128
+  val hashSize: Int = 128
 
   private[algebird] val negativePowersOfTwo: Array[Double] =
     0.to(hashSize).map(i => math.pow(2.0, -i)).toArray
@@ -442,21 +442,19 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
 
   override def updateInto(buffer: Array[Byte]): Unit = {
     assert(buffer.length == size, "Length mismatch")
-    maxRhow.foreach {
-      case (idx, maxb) =>
-        buffer.update(idx, buffer(idx).max(maxb.get))
+    maxRhow.foreach { case (idx, maxb) =>
+      buffer.update(idx, buffer(idx).max(maxb.get))
     }
   }
 
   override protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL = {
     val reducedMaxRhoW = collection.mutable.Map.empty[Int, Byte]
-    maxRhow.foreach {
-      case (j, rhoW) =>
-        val modifiedRhoW =
-          getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
-        val newJ = j % reducedSize
-        val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
-        reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
+    maxRhow.foreach { case (j, rhoW) =>
+      val modifiedRhoW =
+        getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
+      val newJ = j % reducedSize
+      val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
+      reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
     }
     SparseHLL(reducedBits, reducedMaxRhoW.iterator.map { case (k, v) => (k, Max(v)) }.toMap)
   }
@@ -730,14 +728,15 @@ abstract class SetSizeAggregatorBase[A](hllBits: Int, maxSetSize: Int)
 
   override def mustConvert(set: Set[A]): Boolean = set.size > maxSetSize
 
-  override val leftSemigroup = new HyperLogLogMonoid(hllBits)
+  override val leftSemigroup: HyperLogLogMonoid = new HyperLogLogMonoid(hllBits)
   override val rightAggregator: MonoidAggregator[A, Set[A], Long] =
     Aggregator.uniqueCount[A].andThenPresent(_.toLong)
 }
 
 case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toBytes: A => Array[Byte])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {
-  override def convert(set: Set[A]): HLL = leftSemigroup.batchCreate(set.map(toBytes))
+  override def convert(set: Set[A]): HLL =
+    leftSemigroup.sum(set.iterator.map(a => leftSemigroup.toHLL(toBytes(a))))
 }
 
 /**

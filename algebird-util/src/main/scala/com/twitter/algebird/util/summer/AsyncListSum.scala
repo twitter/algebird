@@ -62,12 +62,12 @@ class AsyncListSum[Key, Value](
         (new MapContainer(Future.value(v) :: privBuf, size + 1, compact), 1)
       }
 
-    override def equals(o: Any) = o match {
+    override def equals(o: Any): Boolean = o match {
       case that: MapContainer => that eq this
       case _                  => false
     }
 
-    lazy val toSeq = privBuf.reverse
+    lazy val toSeq: List[Future[Value]] = privBuf.reverse
   }
 
   protected override val emptyResult = Map.empty[Key, Value]
@@ -128,9 +128,8 @@ class AsyncListSum[Key, Value](
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
     workPool {
       insertOp.incr
-      vals.foreach {
-        case (k, v) =>
-          doInsert(k, v)
+      vals.foreach { case (k, v) =>
+        doInsert(k, v)
       }
 
       if (elementsInCache.get >= innerBuffSize) {

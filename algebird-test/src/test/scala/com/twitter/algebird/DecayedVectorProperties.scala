@@ -21,20 +21,25 @@ import org.scalacheck.{Arbitrary, Gen}
 class DecayedVectorProperties extends CheckProperties {
   import com.twitter.algebird.BaseProperties._
 
-  implicit val mpint: Arbitrary[DecayedVector[({ type x[a] = Map[Int, a] })#x]] = Arbitrary {
+  implicit val mpint: Arbitrary[DecayedVector[Map[Int, *]]] = Arbitrary {
     for {
-      t <- Gen.choose(1e-5, 200.0) // Not too high so as to avoid numerical issues
-      m <- Arbitrary.arbitrary[Map[Int, Double]]
+      t <- Gen.choose(1e-4, 200.0) // Not too high so as to avoid numerical issues
+      m <- Gen.mapOf(Gen.zip(Gen.choose(0, 100), Gen.choose(-1e5, 1e5)))
     } yield DecayedVector.forMap(m, t)
   }
 
   // TODO: we won't need this when we have an Equatable trait
   def decayedMapEqFn(
-      a: DecayedVector[({ type x[a] = Map[Int, a] })#x],
-      b: DecayedVector[({ type x[a] = Map[Int, a] })#x]
-  ) = {
-    def beCloseTo(a: Double, b: Double, eps: Double = 1e-6) =
-      a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
+      a: DecayedVector[Map[Int, *]],
+      b: DecayedVector[Map[Int, *]]
+  ): Boolean = {
+
+    def beCloseTo(a: Double, b: Double, eps: Double = 1e-5) =
+      a == b ||
+        ((2.0 * math.abs(a - b)) / (math.abs(a) + math.abs(b))) < eps ||
+        (a.isInfinite && b.isInfinite) ||
+        (a.isNaN && b.isNaN)
+
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
       (a.vector.get(key), b.vector.get(key)) match {
         case (Some(aVal), Some(bVal)) => beCloseTo(aVal, bVal)
@@ -47,8 +52,8 @@ class DecayedVectorProperties extends CheckProperties {
     mapsAreClose && timesAreClose
   }
 
-  property("DecayedVector[Map[Int, _]] is a monoid") {
+  property("DecayedVector[Map[Int, *]] is a monoid") {
     implicit val equiv = Equiv.fromFunction(decayedMapEqFn)
-    monoidLaws[DecayedVector[({ type x[a] = Map[Int, a] })#x]]
+    monoidLaws[DecayedVector[Map[Int, *]]]
   }
 }

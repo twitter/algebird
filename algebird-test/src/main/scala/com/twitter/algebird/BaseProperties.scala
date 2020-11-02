@@ -160,12 +160,15 @@ object BaseProperties extends MetricProperties {
       scala.math.abs(f1) < eps
     else (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < eps
 
+  def approxEqOrBothNaN(eps: Double)(f1: Double, f2: Double): Boolean =
+    (f1.isNaN && f2.isNaN) || f1 == f2 || approxEq(eps)(f1, f2)
+
   trait HigherEq[M[_]] {
     def apply[T](m: M[T], n: M[T]): Boolean
   }
 
   class DefaultHigherEq[M[_]] extends HigherEq[M] {
-    override def apply[T](m: M[T], n: M[T]) = m == n
+    override def apply[T](m: M[T], n: M[T]): Boolean = m == n
   }
 
   def isNonZero[V: Semigroup](v: V): Boolean =

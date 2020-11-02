@@ -27,7 +27,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
   private class Statistics(threadSafe: Boolean) {
     import scala.math.min
     import java.lang.Long.numberOfLeadingZeros
-    val maxBucket = 10
+    val maxBucket: Int = 10
     val distribution: IndexedSeq[Counter] = IndexedSeq.fill(maxBucket + 1)(Counter(threadSafe))
     val total: Counter = Counter(threadSafe)
 
@@ -44,9 +44,8 @@ private class IterCallStatistics(threadSafe: Boolean) {
 
     override def toString: String =
       distribution.zipWithIndex
-        .map {
-          case (v, i) =>
-            (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
+        .map { case (v, i) =>
+          (if (i == maxBucket) ">" else "<" + pow2(i)) + ": " + v
         }
         .mkString(", ") + ", avg=" + total.toDouble / count + " count=" + count
 

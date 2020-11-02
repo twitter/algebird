@@ -169,9 +169,9 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 }
 
 object HeavyHittersCachingSummer {
-  val DEFAULT_HH_PERCENT = HeavyHittersPercent(0.01f)
-  val DEFAULT_ROLL_OVER_FREQUENCY = RollOverFrequency(1000000L)
-  val DEFAULT_UPDATE_FREQUENCY = UpdateFrequency(2)
+  val DEFAULT_HH_PERCENT: HeavyHittersPercent = HeavyHittersPercent(0.01f)
+  val DEFAULT_ROLL_OVER_FREQUENCY: RollOverFrequency = RollOverFrequency(1000000L)
+  val DEFAULT_UPDATE_FREQUENCY: UpdateFrequency = UpdateFrequency(2)
 
   def apply[Key, Value](
       flushFrequency: FlushFrequency,
@@ -182,7 +182,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ) =
+  ): HeavyHittersCachingSummer[Key, Value] =
     new HeavyHittersCachingSummer[Key, Value](
       DEFAULT_HH_PERCENT,
       DEFAULT_UPDATE_FREQUENCY,
@@ -207,7 +207,7 @@ object HeavyHittersCachingSummer {
       insertOp: Incrementor,
       sizeIncr: Incrementor,
       backingSummer: AsyncSummer[(Key, Value), Iterable[(Key, Value)]]
-  ) =
+  ): HeavyHittersCachingSummer[Key, Value] =
     new HeavyHittersCachingSummer[Key, Value](
       hhPct,
       updateFreq,
@@ -238,8 +238,8 @@ class HeavyHittersCachingSummer[K, V](
   type T = (K, V) // We only treat the K, V types as a pair almost exclusively in this class.
 
   override def flush: Future[Iterable[T]] = backingSummer.flush
-  override def isFlushed = backingSummer.isFlushed
-  override val emptyResult = Seq[T]()
+  override def isFlushed: Boolean = backingSummer.isFlushed
+  override val emptyResult: Seq[(K, V)] = Seq[T]()
 
   private[this] final val approxHH =
     new ApproxHHTracker(hhPct, updateFreq, roFreq)

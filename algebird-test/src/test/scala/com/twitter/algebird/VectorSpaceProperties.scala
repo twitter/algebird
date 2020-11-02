@@ -22,7 +22,7 @@ class VectorSpaceProperties extends CheckProperties {
   import com.twitter.algebird.BaseVectorSpaceProperties._
 
   // TODO: we won't need this when we have an Equatable trait
-  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]) =
+  def mapEqFn(a: Map[Int, Double], b: Map[Int, Double]): Boolean =
     (a.keySet ++ b.keySet).forall { key =>
       (a.get(key), b.get(key)) match {
         case (Some(aVal), Some(bVal)) => beCloseTo(aVal, bVal)
@@ -32,9 +32,9 @@ class VectorSpaceProperties extends CheckProperties {
       }
     }
 
-  implicit val genDouble = Arbitrary(Gen.choose(-1.0e50, 1.0e50))
+  implicit val genDouble: Arbitrary[Double] = Arbitrary(Gen.choose(-1.0e50, 1.0e50))
 
   property("map int double scaling") {
-    vectorSpaceLaws[Double, ({ type x[a] = Map[Int, a] })#x](mapEqFn(_, _))
+    vectorSpaceLaws[Double, Map[Int, *]](mapEqFn(_, _))
   }
 }

@@ -27,11 +27,10 @@ object SummingIteratorTest {
       val zl = MapAlgebra.removeZeros(l)
       val zr = MapAlgebra.removeZeros(r)
       zl.size == zr.size && {
-        zl.forall {
-          case (k, v) =>
-            zr.get(k)
-              .map(rv => Equiv[V].equiv(rv, v))
-              .getOrElse(false)
+        zl.forall { case (k, v) =>
+          zr.get(k)
+            .map(rv => Equiv[V].equiv(rv, v))
+            .getOrElse(false)
         }
       }
     }
@@ -43,7 +42,7 @@ class SummingIteratorTest extends AnyPropSpec with ScalaCheckPropertyChecks with
     StatefulSummerLaws.zeroEquiv(Semigroup.sumOption(it0), Semigroup.sumOption(it1))
 
   case class Capacity(c: Int)
-  implicit val capArb = Arbitrary {
+  implicit val capArb: Arbitrary[Capacity] = Arbitrary {
     for (c <- Gen.choose(0, 10240)) yield Capacity(c)
   }
 

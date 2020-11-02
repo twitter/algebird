@@ -87,10 +87,16 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Grou
  * negate is defined as the negation of each element of the array.
  */
 class ArrayGroup[T: ClassTag](implicit grp: Group[T]) extends ArrayMonoid[T]() with Group[Array[T]] {
-  override def negate(g: Array[T]): Array[T] =
-    g.map {
-      grp.negate(_)
-    }.toArray
+  override def negate(g: Array[T]): Array[T] = {
+    val res = new Array[T](g.length)
+    var idx = 0
+    while (idx < res.length) {
+      res(idx) = grp.negate(g(idx))
+      idx = idx + 1
+    }
+
+    res
+  }
 }
 
 class FromAlgebraGroup[T](m: AGroup[T]) extends FromAlgebraMonoid(m) with Group[T] {

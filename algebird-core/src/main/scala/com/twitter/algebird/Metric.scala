@@ -41,7 +41,7 @@ object Metric {
   def apply[V: Metric](v1: V, v2: V): Double =
     implicitly[Metric[V]].apply(v1, v2)
   def norm[V: Metric: Monoid](v: V): Double = apply(v, Monoid.zero[V])
-  def from[V](f: (V, V) => Double) = new Metric[V] {
+  def from[V](f: (V, V) => Double): Metric[V] = new Metric[V] {
     override def apply(v1: V, v2: V): Double = f(v1, v2)
   }
 
@@ -62,9 +62,8 @@ object Metric {
 
       val outP = pad(a).view
         .zip(pad(b))
-        .map {
-          case (i, j) =>
-            math.pow(implicitly[Metric[V]].apply(i, j), p)
+        .map { case (i, j) =>
+          math.pow(implicitly[Metric[V]].apply(i, j), p)
         }
         .sum
       math.pow(outP, 1.0 / p)
@@ -88,34 +87,34 @@ object Metric {
   def L2Map[K, V: Monoid: Metric]: Metric[Map[K, V]] = minkowskiMap[K, V](2.0)
 
   // Implicit values
-  implicit val doubleMetric =
+  implicit val doubleMetric: Metric[Double] =
     Metric.from((a: Double, b: Double) => math.abs(a - b))
-  implicit val intMetric =
+  implicit val intMetric: Metric[Int] =
     Metric.from((a: Int, b: Int) => math.abs((a - b).toDouble))
-  implicit val longMetric =
+  implicit val longMetric: Metric[Long] =
     Metric.from((a: Long, b: Long) => math.abs((a - b).toDouble))
-  implicit val floatMetric =
+  implicit val floatMetric: Metric[Float] =
     Metric.from((a: Float, b: Float) => math.abs((a.toDouble - b.toDouble)))
-  implicit val shortMetric =
+  implicit val shortMetric: Metric[Short] =
     Metric.from((a: Short, b: Short) => math.abs((a - b).toDouble))
-  implicit val boolMetric =
+  implicit val boolMetric: Metric[Boolean] =
     Metric.from((x: Boolean, y: Boolean) => if (x ^ y) 1.0 else 0.0)
-  implicit val jDoubleMetric =
+  implicit val jDoubleMetric: Metric[JDouble] =
     Metric.from((a: JDouble, b: JDouble) => math.abs(a - b))
-  implicit val jIntMetric =
+  implicit val jIntMetric: Metric[Integer] =
     Metric.from((a: JInt, b: JInt) => math.abs((a - b).toDouble))
-  implicit val jLongMetric =
+  implicit val jLongMetric: Metric[JLong] =
     Metric.from((a: JLong, b: JLong) => math.abs((a - b).toDouble))
-  implicit val jFloatMetric =
+  implicit val jFloatMetric: Metric[JFloat] =
     Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
-  implicit val jShortMetric =
+  implicit val jShortMetric: Metric[JShort] =
     Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
-  implicit val jBoolMetric =
+  implicit val jBoolMetric: Metric[JBool] =
     Metric.from((x: JBool, y: JBool) => if (x ^ y) 1.0 else 0.0)
 
   // If you don't want to use L2 as your default metrics, you need to override these
-  implicit def iterableMetric[V: Monoid: Metric] = L2Iterable[V]
-  implicit def mapMetric[K, V: Monoid: Metric] = L2Map[K, V]
+  implicit def iterableMetric[V: Monoid: Metric]: Metric[Iterable[V]] = L2Iterable[V]
+  implicit def mapMetric[K, V: Monoid: Metric]: Metric[Map[K, V]] = L2Map[K, V]
 }
 
 @implicitNotFound(msg = "Cannot find Metric type class for ${V}")

@@ -317,13 +317,13 @@ final class DecayingCMS[K](
           this.logScale == that.logScale &&
             this.timeInHL == that.timeInHL &&
             this.cells.length == that.cells.length && {
-            var i = 0
-            while (i < depth) {
-              if (this.cells(i) != that.cells(i)) return false
-              i += 1
+              var i = 0
+              while (i < depth) {
+                if (this.cells(i) != that.cells(i)) return false
+                i += 1
+              }
+              true
             }
-            true
-          }
         case _ =>
           false
       }

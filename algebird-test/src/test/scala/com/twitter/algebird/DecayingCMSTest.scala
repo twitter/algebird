@@ -11,7 +11,7 @@ class DecayingCMSProperties extends CheckProperties {
   // override val generatorDrivenConfig =
   //   PropertyCheckConfiguration(minSuccessful = 1000)
 
-  val eps = 1e-5
+  val eps: Double = 1e-5
 
   def close(a: Double, b: Double): Boolean =
     if (a == b) {
@@ -65,9 +65,8 @@ class DecayingCMSProperties extends CheckProperties {
 
     def genSeq(cms0: module.CMS): Gen[module.CMS] =
       Gen.listOf(genItem).map { items =>
-        items.foldLeft(cms0) {
-          case (cms, (t, k, n)) =>
-            cms.add(t, k, n)
+        items.foldLeft(cms0) { case (cms, (t, k, n)) =>
+          cms.add(t, k, n)
         }
       }
 
@@ -174,9 +173,8 @@ class DecayingCMSProperties extends CheckProperties {
       val g = genCms(module, stdKey, genTimestamp(module), stdVal)
       forAll(g, genItems(module)) { (cms0, items) =>
         val time = cms0.timeInHL
-        val cms1 = items.foldLeft(cms0) {
-          case (c, (_, k, v)) =>
-            c.scaledAdd(time, k, v)
+        val cms1 = items.foldLeft(cms0) { case (c, (_, k, v)) =>
+          c.scaledAdd(time, k, v)
         }
         val got = cms1.total.value
         val expected = cms0.total.value + items.map(_._3).sum
@@ -313,12 +311,11 @@ class DecayingCMSProperties extends CheckProperties {
 
   property("innerProductRoot(x, x) = x for singleton x") {
     forAll { (module: DecayingCMS[String]) =>
-      forAll(genItem(module)) {
-        case (t, k, v) =>
-          val cms0 = module.empty.add(t, k, v)
-          val got = cms0.l2Norm.at(t)
-          val expected = v
-          Prop(close(got, expected)) :| s"got $got, expected $expected"
+      forAll(genItem(module)) { case (t, k, v) =>
+        val cms0 = module.empty.add(t, k, v)
+        val got = cms0.l2Norm.at(t)
+        val expected = v
+        Prop(close(got, expected)) :| s"got $got, expected $expected"
       }
     }
   }
@@ -393,9 +390,8 @@ class DecayingCMSProperties extends CheckProperties {
         val tlast = inputs.last._1
 
         val dvm = new DecayedValueMonoid(0.0)
-        val dv = dvm.sum(inputs.map {
-          case (t, n) =>
-            DecayedValue.build(n, (t.toDouble / 1000.0), halfLifeSecs)
+        val dv = dvm.sum(inputs.map { case (t, n) =>
+          DecayedValue.build(n, (t.toDouble / 1000.0), halfLifeSecs)
         })
         val expected = dvm.valueAsOf(dv, halfLifeSecs, (tlast.toDouble / 1000.0))
 
@@ -427,9 +423,8 @@ class DecayingCMSProperties extends CheckProperties {
         )
       )
 
-    regressions.foldLeft(Prop(true)) {
-      case (res, (k, items, hl)) =>
-        res && law((makeModule(hl), k, items))
+    regressions.foldLeft(Prop(true)) { case (res, (k, items, hl)) =>
+      res && law((makeModule(hl), k, items))
     }
   }
 }

@@ -146,7 +146,7 @@ class IntervalLaws extends CheckProperties {
     forAll((x: Long, y: Long) => ((y >= x) == InclusiveLower(x).intersects(InclusiveUpper(y))))
   }
 
-  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]) =
+  def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]): Boolean =
     if (low.intersects(upper)) {
       low.least
         .map { lb =>
@@ -187,10 +187,9 @@ class IntervalLaws extends CheckProperties {
   property("toLeftClosedRightOpen is an Injection") {
     forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
       (intr.toLeftClosedRightOpen
-        .map {
-          case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
-            val intr2 = Interval.leftClosedRightOpen(low, high)
-            tests.forall(t => intr(t) == intr2(t))
+        .map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
+          val intr2 = Interval.leftClosedRightOpen(low, high)
+          tests.forall(t => intr(t) == intr2(t))
         }
         .getOrElse(true)) // none means this can't be expressed as this kind of interval
     }

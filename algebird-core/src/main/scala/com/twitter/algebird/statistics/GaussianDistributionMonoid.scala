@@ -26,7 +26,7 @@ object GaussianDistribution {
  * [[http://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables]]
  */
 object GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
-  override def zero = new GaussianDistribution(0, 0)
+  override def zero: GaussianDistribution = new GaussianDistribution(0, 0)
 
   override def plus(left: GaussianDistribution, right: GaussianDistribution): GaussianDistribution =
     new GaussianDistribution(left.mean + right.mean, left.sigma2 + right.sigma2)

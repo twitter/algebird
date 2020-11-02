@@ -130,7 +130,7 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implici
 ) extends EventuallySemigroup[E, O](convert)(mustConvert)
     with Monoid[Either[E, O]] {
 
-  override def zero = Right(Monoid.zero[O])
+  override def zero: Right[E, O] = Right(Monoid.zero[O])
 
 }
 
@@ -162,7 +162,7 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
 ) extends EventuallyGroup[E, O](convert)(mustConvert)
     with Ring[Either[E, O]] {
 
-  override def one = Right(Ring.one[O])
+  override def one: Right[E, O] = Right(Ring.one[O])
 
   override def times(x: Either[E, O], y: Either[E, O]): Either[E, O] =
     x match {
@@ -181,7 +181,7 @@ class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
 }
 
 trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O], C] {
-  override def prepare(a: A) = Right(rightAggregator.prepare(a))
+  override def prepare(a: A): Right[E, O] = Right(rightAggregator.prepare(a))
   override def present(b: Either[E, O]): C = b match {
     case Right(o) => rightAggregator.present(o)
     case Left(e)  => presentLeft(e)
@@ -199,7 +199,7 @@ trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O
 trait EventuallyAggregator[A, E, O, C] extends AbstractEventuallyAggregator[A, E, O, C] {
 
   //avoid init order issues and cyclical references
-  @transient override lazy val semigroup =
+  @transient override lazy val semigroup: EventuallySemigroup[E, O] =
     new EventuallySemigroup[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.semigroup)
 }
 
@@ -209,6 +209,6 @@ trait EventuallyMonoidAggregator[A, E, O, C]
 
   override def rightAggregator: MonoidAggregator[A, O, C]
 
-  @transient override lazy val monoid =
+  @transient override lazy val monoid: EventuallyMonoid[E, O] =
     new EventuallyMonoid[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.monoid)
 }

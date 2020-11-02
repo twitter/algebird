@@ -25,7 +25,9 @@ object DecayedVector extends CompatDecayedVector {
   def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =
     DecayedVector(vector, time * scala.math.log(2.0) / halfLife)
 
-  def monoidWithEpsilon[C[_]](eps: Double)(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]) =
+  def monoidWithEpsilon[C[_]](
+      eps: Double
+  )(implicit vs: VectorSpace[Double, C], metric: Metric[C[Double]]): Monoid[DecayedVector[C]] =
     new Monoid[DecayedVector[C]] {
       override val zero = DecayedVector(vs.group.zero, Double.NegativeInfinity)
       override def plus(left: DecayedVector[C], right: DecayedVector[C]) =
@@ -36,28 +38,23 @@ object DecayedVector extends CompatDecayedVector {
         }
     }
 
-  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[
-    ({
-      type x[a] = Map[K, a]
-    })#x
-  ] =
-    DecayedVector[({ type x[a] = Map[K, a] })#x](m, scaledTime)
-  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[
-    ({
-      type x[a] = Map[K, a]
-    })#x
-  ] =
+  def forMap[K](m: Map[K, Double], scaledTime: Double): DecayedVector[Map[K, *]] =
+    DecayedVector[Map[K, *]](m, scaledTime)
+  def forMapWithHalflife[K](m: Map[K, Double], time: Double, halfLife: Double): DecayedVector[Map[K, *]] =
     forMap(m, time * scala.math.log(2.0) / halfLife)
 
   def mapMonoidWithEpsilon[K](
       eps: Double
-  )(implicit vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x], metric: Metric[Map[K, Double]]) =
-    monoidWithEpsilon[({ type x[a] = Map[K, a] })#x](eps)
+  )(implicit
+      vs: VectorSpace[Double, Map[K, *]],
+      metric: Metric[Map[K, Double]]
+  ): Monoid[DecayedVector[Map[K, *]]] =
+    monoidWithEpsilon[Map[K, *]](eps)
 
   implicit def mapMonoid[K](implicit
-      vs: VectorSpace[Double, ({ type x[a] = Map[K, a] })#x],
+      vs: VectorSpace[Double, Map[K, *]],
       metric: Metric[Map[K, Double]]
-  ) =
+  ): Monoid[DecayedVector[Map[K, *]]] =
     mapMonoidWithEpsilon(-1.0)
 
   def scaledPlus[C[_]](newVal: DecayedVector[C], oldVal: DecayedVector[C], eps: Double)(implicit

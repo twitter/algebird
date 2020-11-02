@@ -58,7 +58,7 @@ object Interval extends java.io.Serializable {
    * [[leftOpenRightClosed]] can retain the type information of the
    * returned interval. The compiler doesn't know anything about
    * ordering, so without [[MaybeEmpty]] the only valid return type
-   * is [[Interval[T]]].
+   * is Interval[T].
    */
   sealed abstract class MaybeEmpty[T, NonEmpty[t] <: Interval[t]] {
     def isEmpty: Boolean
@@ -69,14 +69,14 @@ object Interval extends java.io.Serializable {
      * Represents an empty interval.
      */
     case class SoEmpty[T, NonEmpty[t] <: Interval[t]]() extends MaybeEmpty[T, NonEmpty] {
-      override def isEmpty = true
+      override def isEmpty: Boolean = true
     }
 
     /**
      * Represents a non-empty interval.
      */
     case class NotSoEmpty[T, NonEmpty[t] <: Interval[t]](get: NonEmpty[T]) extends MaybeEmpty[T, NonEmpty] {
-      override def isEmpty = false
+      override def isEmpty: Boolean = false
     }
   }
 

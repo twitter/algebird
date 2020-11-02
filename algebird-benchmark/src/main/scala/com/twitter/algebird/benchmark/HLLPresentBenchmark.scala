@@ -1,13 +1,10 @@
 package com.twitter.algebird.benchmark
 
 import com.twitter.algebird.{DenseHLL, HLL, HyperLogLogMonoid, SparseHLL}
-import com.twitter.bijection._
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 object HLLPresentBenchmark {
-  implicit val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
-
   @State(Scope.Benchmark)
   class HLLPresentState {
 
@@ -27,7 +24,7 @@ object HLLPresentBenchmark {
       val r = new scala.util.Random(12345L)
       data = (0 until numHLL).map { _ =>
         val input = (0 until max).map(_ => r.nextLong).toSet
-        hllMonoid.batchCreate(input)(byteEncoder.toFunction)
+        hllMonoid.sum(input.map(hllMonoid.toHLL(_)))
       }.toIndexedSeq
     }
   }
@@ -44,6 +41,6 @@ class HLLPresentBenchmark {
     }
 
   @Benchmark
-  def timeBatchCreate(state: HLLPresentState, bh: Blackhole) =
+  def timeBatchCreate(state: HLLPresentState, bh: Blackhole): Unit =
     state.data.foreach(hll => bh.consume(clone(hll).approximateSize))
 }

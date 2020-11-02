@@ -66,10 +66,9 @@ class ScanTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyCh
 
       outputList.length should equal(inputList.length)
       outputList.zipWithIndex
-        .foreach {
-          case (ithOutput, i) =>
-            val expectedOutput = inputList.slice(0, i + 1).mkString
-            ithOutput should equal(expectedOutput)
+        .foreach { case (ithOutput, i) =>
+          val expectedOutput = inputList.slice(0, i + 1).mkString
+          ithOutput should equal(expectedOutput)
         }
     }
 

@@ -2,11 +2,9 @@ package com.twitter.algebird.benchmark
 
 import org.openjdk.jmh.annotations._
 import com.twitter.algebird.HyperLogLogMonoid
-import com.twitter.bijection._
+import com.twitter.algebird.HLL
 
 object HllBatchCreateBenchmark {
-  val byteEncoder = implicitly[Injection[Long, Array[Byte]]]
-  val byteEncoderFn = byteEncoder.toFunction
 
   @State(Scope.Benchmark)
   class HLLState {
@@ -34,6 +32,6 @@ class HllBatchCreateBenchmark {
   import HllBatchCreateBenchmark._
 
   @Benchmark
-  def timeBatchCreate(state: HLLState) =
-    state.hllMonoid.batchCreate(state.set)(byteEncoderFn)
+  def timeBatchCreate(state: HLLState): HLL =
+    state.hllMonoid.sum(state.set.iterator.map(state.hllMonoid.toHLL(_)))
 }

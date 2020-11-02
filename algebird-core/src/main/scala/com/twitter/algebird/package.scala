@@ -30,5 +30,5 @@ package object algebird {
    * To keep code using algebird.Field compiling, we export algebra Field
    */
   type Field[V] = algebra.ring.Field[V]
-  val Field = algebra.ring.Field
+  val Field = algebra.ring.Field // scalafix:ok
 }

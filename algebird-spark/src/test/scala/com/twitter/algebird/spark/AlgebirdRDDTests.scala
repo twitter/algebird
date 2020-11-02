@@ -11,7 +11,7 @@ package test {
   // not needed in the algebird package, just testing the API
   import com.twitter.algebird.spark.ToAlgebird
   object Test {
-    def sum[T: Monoid: ClassTag](r: RDD[T]) = r.algebird.sum
+    def sum[T: Monoid: ClassTag](r: RDD[T]): T = r.algebird.sum
   }
 }
 
