@@ -423,7 +423,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
     if (bitSet.isEmpty) {
       Success(empty)
     } else {
-      if (bitSet.toSet.max > width)
+      if (bitSet.reverseIterator.next() > width)
         Failure(new IllegalArgumentException("BitSet beyond BloomFilter expected size"))
       else
         Success(Instance(bitSet))
