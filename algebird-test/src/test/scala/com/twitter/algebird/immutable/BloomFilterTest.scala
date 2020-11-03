@@ -116,6 +116,7 @@ class ImmutableBloomFilterLaws extends CheckProperties {
       }
     }
   }
+
 }
 
 class ImmutableBloomFilterHashIndices extends CheckProperties {
@@ -280,6 +281,30 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
       val entries = (0 until 100).map(_ => RAND.nextInt.toString)
       val bf = bloomFilter.create(entries: _*)
       assert(bf.isInstanceOf[bloomFilter.Hash])
+    }
+
+    "be possible to create from a BitSet" in {
+      val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val bf = bloomFilter.create(entries: _*)
+
+      val instance = bloomFilter.fromBitSet(bf.toBitSet)
+      assert(instance.isSuccess)
+    }
+
+    "be possible to create from a empty BitSet" in {
+      val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
+      val instance = bloomFilter.fromBitSet(BitSet.empty)
+      assert(instance.isSuccess)
+    }
+
+    "fail to create from a larger BitSet" in {
+      val bloomFilter = BloomFilter[String](6, 0.01)
+      val entries = (0 until 6).map(_ => RAND.nextInt.toString)
+      val bf = bloomFilter.create(entries: _*)
+
+      val instance = BloomFilter[String](6, 0.1).fromBitSet(bf.toBitSet)
+      assert(instance.isFailure)
     }
 
     "identify all true positives" in {

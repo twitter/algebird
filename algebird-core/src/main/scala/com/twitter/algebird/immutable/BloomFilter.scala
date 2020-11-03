@@ -20,6 +20,7 @@ import algebra.BoundedSemilattice
 import com.twitter.algebird.{Approximate, ApproximateBoolean, Hash128, Monoid, MonoidAggregator}
 
 import scala.collection.compat._
+import scala.util._
 
 object BloomFilter {
 
@@ -410,5 +411,22 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
   def create(data: Iterator[A]): Hash = monoid.sum(data.map(Item))
 
   val empty: Hash = Empty
+
+  /**
+   * Attempts to create a new BloomFilter instance from a [[BitSet]]. Failure might occur
+   * if the BitSet has a maximum entry behond the BloomFilter expected size.
+   *
+   * This method will be helpfull on BloomFilter desirialization. Serialization is achieved
+   * through the serialization of the underlying [[BitSet]].
+   */
+  def fromBitSet(bitSet: BitSet): Try[Hash] =
+    if (bitSet.isEmpty) {
+      Success(empty)
+    } else {
+      if (bitSet.toSet.max > width)
+        Failure(new IllegalArgumentException("BitSet beyond BloomFilter expected size"))
+      else
+        Success(Instance(bitSet))
+    }
 
 }
