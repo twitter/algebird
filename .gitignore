@@ -12,6 +12,7 @@ sonatype.sbt
 
 /target/
 /src/jline/target/
+.bsp
 
 # target directories for ant build
 /build/
@@ -37,6 +38,7 @@ sonatype.sbt
 */.settings
 .bloop
 .metals
+.vscode
 
 # bak files produced by ./cleanup-commit
 *.bak
