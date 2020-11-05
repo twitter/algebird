@@ -37,4 +37,22 @@ class BloomFilterCreateBenchmark {
     val bf = bfMonoid.create(bloomFilterState.randomStrings: _*)
     bf
   }
+
+  @Benchmark
+  def createBloomFilterUsingFold(bloomFilterState: BloomFilterState): BF[String] = {
+    val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
+    val bf = bloomFilterState.randomStrings.foldLeft(bfMonoid.zero) {
+      case (filter, string) => filter + string
+    }
+    bf
+  }
+
+  @Benchmark
+  def createBloomFilterAggregator(bloomFilterState: BloomFilterState): BF[String] = {
+    val bfMonoid = BloomFilter[String](bloomFilterState.nbrOfElements, bloomFilterState.falsePositiveRate)
+    val bfAggregator = BloomFilterAggregator(bfMonoid)
+
+    val bf = bloomFilterState.randomStrings.aggregate(bfAggregator.monoid.zero)(_ + _, _ ++ _)
+    bf
+  }
 }
