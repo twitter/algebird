@@ -1,4 +1,5 @@
 package com.twitter.algebird
+
 package benchmark
 
 import org.openjdk.jmh.annotations._
@@ -15,12 +16,16 @@ object BloomFilterQueryBenchmark {
     var falsePositiveRate: Double = 0
 
     var bf: BF[String] = _
+    var immutableBF: immutable.BloomFilter[String]#Hash = _
 
     @Setup(Level.Trial)
     def setup(): Unit = {
       val randomStrings =
         BloomFilterCreateBenchmark.createRandomString(nbrOfElements, 10)
       bf = BloomFilter[String](nbrOfElements, falsePositiveRate)
+        .create(randomStrings: _*)
+      immutableBF = immutable
+        .BloomFilter[String](nbrOfElements, falsePositiveRate)
         .create(randomStrings: _*)
     }
   }
@@ -32,4 +37,8 @@ class BloomFilterQueryBenchmark {
   @Benchmark
   def queryBloomFilter(bloomFilterState: BloomFilterState): ApproximateBoolean =
     bloomFilterState.bf.contains("1")
+
+  @Benchmark
+  def queryBloomFilterExperimental(bloomFilterState: BloomFilterState): ApproximateBoolean =
+    bloomFilterState.immutableBF.contains("1")
 }

@@ -20,7 +20,6 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen.choose
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import scala.collection.immutable
 
 class QTreeLaws extends CheckProperties {
   import BaseProperties._
@@ -36,7 +35,7 @@ class QTreeLaws extends CheckProperties {
 }
 
 class QTreeTest extends AnyWordSpec with Matchers {
-  def randomList(n: Long): immutable.IndexedSeq[Double] =
+  def randomList(n: Long): scala.collection.immutable.IndexedSeq[Double] =
     (1L to n).map(_ => math.random)
 
   def buildQTree(k: Int, list: Seq[Double]): QTree[Double] = {
