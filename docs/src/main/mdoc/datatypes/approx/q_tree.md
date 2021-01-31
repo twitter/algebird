@@ -65,7 +65,7 @@ For example, if we call `qtree.rangeSumBounds(0.1,0.2)` on the first `QTree` des
 
 ## REPL Tour
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 val data = List(1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8)
 val seqQTree = data.map { QTree(_) }

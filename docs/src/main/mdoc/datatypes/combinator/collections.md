@@ -8,7 +8,7 @@ section: "data"
 
 ## Adding and Multiplication
 
-```tut:book
+```scala mdoc
 val data2 = Map(1 -> 1, 2 -> 1)
 val data1 =  Map(1 -> 3, 2 -> 5, 3 -> 7, 5 -> 1)
 import com.twitter.algebird.Operators._

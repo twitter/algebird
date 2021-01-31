@@ -13,7 +13,7 @@ also called StreamSummary.
 ## Serialization
 You can serialize `SpaceSaver` instances using `fromBytes` and `toBytes`:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 import scala.util.Try
 

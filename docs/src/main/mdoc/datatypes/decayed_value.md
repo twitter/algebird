@@ -18,7 +18,7 @@ See the related issue: https://github.com/twitter/algebird/issues/235
 
 Here is the code example for computing a `DecayedValue` average:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 
 val data = {
@@ -41,7 +41,7 @@ data.zipWithIndex.scanLeft(Monoid.zero[DecayedValue]) { (previous, data) =>
 
 Running the above code in comparison with a simple decayed average:
 
-```tut:book
+```scala mdoc
 data.zipWithIndex.scanLeft(0.0) { (previous, data) =>
   val (value, time) = data
   val avg = (value + previous * (HalfLife - 1.0)) / HalfLife
