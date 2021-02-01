@@ -27,7 +27,7 @@ To read more about Bloom filters see wikipedia: https://en.wikipedia.org/wiki/Bl
 
 example usage:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 
 // It's possible to create a Bloom filter with a set number of

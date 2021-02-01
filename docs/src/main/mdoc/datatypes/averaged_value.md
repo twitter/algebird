@@ -1,6 +1,6 @@
 ---
 layout: docs
-title:  "Averaged Value"
+title: "Averaged Value"
 section: "data"
 source: "algebird-core/src/main/scala/com/twitter/algebird/AveragedValue.scala"
 scaladoc: "#com.twitter.algebird.AveragedValue"
@@ -12,7 +12,7 @@ The `AveragedValue` data structure keeps track of the `count` and `mean` of a st
 
 You can build instances of `AveragedValue` from any numeric type:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 
 val longVal = AveragedValue(3L)
@@ -24,33 +24,33 @@ val intVal = AveragedValue(15)
 
 Combining instances with `+` generates a new instance by adding the `count`s and averaging the `value`s:
 
-```tut:book
+```scala mdoc
 longVal + doubleVal
 longVal + doubleVal + intVal
 ```
 
 You can also add numbers directly to an `AveragedValue` instance:
 
-```tut:book
+```scala mdoc
 longVal + 12
 ```
 
 `AveragedValue` is a commutative group. This means you can add instances in any order:
 
-```tut:book
+```scala mdoc
 longVal + doubleVal == doubleVal + doubleVal
 ```
 
 An `AveragedValue` with a count and value of `0` act as `Monoid.zero`:
 
-```tut:book
+```scala mdoc
 Monoid.zero[AveragedValue]
 longVal + Monoid.zero[AveragedValue] == longVal
 ```
 
 Subtracting `AveragedValue`s is the opposite of addition:
 
-```tut:book
+```scala mdoc
 intVal - longVal
 intVal + doubleVal - doubleVal
 ```
@@ -81,14 +81,14 @@ val newCount = big.count + small.count
 
 `AveragedValue.aggregator` returns an `Aggregator` that uses `AveragedValue` to calculate the mean of all `Double` values in a stream. For example:
 
-```tut:book
+```scala mdoc
 val items = List[Double](1.0, 2.2, 3.3, 4.4, 5.5)
 AveragedValue.aggregator(items)
 ```
 
 `AveragedValue.numericAggregator` works the same way for any numeric type:
 
-```tut:book
+```scala mdoc:nest
 val items = List[Int](1, 3, 5, 7)
 AveragedValue.numericAggregator[Int].apply(items)
 ```

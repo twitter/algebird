@@ -1,6 +1,6 @@
 ---
 layout: docs
-title:  "Count Min Sketch"
+title: "Count Min Sketch"
 section: "data"
 source: "algebird-core/src/main/scala/com/twitter/algebird/CountMinSketch.scala"
 scaladoc: "#com.twitter.algebird.CountMinSketch"
@@ -12,7 +12,7 @@ Count-min sketch is a probabilistic data structure that estimates the frequencie
 
 In Algebird, count-min sketches are represented as the abstract class `CMS`, along with the `CMSMonoid` class. Here's an example usage:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 import CMSHasherImplicits._
 val DELTA = 1E-10
@@ -36,7 +36,7 @@ The Count-Min sketch uses `d` (aka `depth`) pair-wise independent hash functions
 h(x) = [a * x + b (mod p)] (mod m)
 ```
 
-As a requirement for using `CMS` you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to count.  Algebird ships with several such implicits for commonly used types `K` such as `Long` and `scala.BigInt`.
+As a requirement for using `CMS` you must provide an implicit `CMSHasher[K]` for the type `K` of the items you want to count. Algebird ships with several such implicits for commonly used types `K` such as `Long` and `scala.BigInt`.
 
 If your type `K` is not supported out of the box, you have two options:
 
@@ -47,7 +47,7 @@ If your type `K` is not supported out of the box, you have two options:
 
 A Sketch Map is a generalized version of the Count-Min Sketch that is an approximation of Map[K, V] that stores reference to top heavy hitters. The Sketch Map can approximate the sums of any summable value that has a monoid.
 
-```tut:book
+```scala mdoc:nest
 val DELTA = 1E-8
 val EPS = 0.001
 val SEED = 1

@@ -334,12 +334,10 @@ lazy val docSettings = Seq(
     "gray-lighter" -> "#F4F3F4",
     "white-color" -> "#FFFFFF"
   ),
-  micrositeCompilingDocsTool := WithTut,
   autoAPIMappings := true,
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
   ghpagesNoJekyll := false,
-  fork in tut := true,
   fork in (ScalaUnidoc, unidoc) := true,
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
     "-doc-source-url",
@@ -355,14 +353,14 @@ lazy val docSettings = Seq(
 // Documentation is generated for projects defined in
 // `docsSourcesAndProjects`.
 lazy val docs = project
-  .enablePlugins(MicrositesPlugin, TutPlugin, ScalaUnidocPlugin, GhpagesPlugin)
+  .enablePlugins(MicrositesPlugin, MdocPlugin, ScalaUnidocPlugin, GhpagesPlugin)
   .settings(moduleName := "algebird-docs")
   .settings(sharedSettings)
   .settings(noPublishSettings)
   .settings(docSettings)
   .settings(
     addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
-    scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
+    mdocIn := sourceDirectory.value / "main" / "mdoc",
     sources in (ScalaUnidoc, unidoc) ~= (_.filterNot(_.absolutePath.contains("javaapi")))
   )
   .dependsOn(algebirdCore)

@@ -8,7 +8,7 @@ section: "data"
 
 `First[T]` and `Last[T]` are data structures that keep track of, respectively, the earliest and latest instances of `T` that you've seen. `First[T]` works for any type `T`:
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird.{ First, Last }
 First(3) + First(2) + First(1)
 First("a") + First("b") + First("c")
@@ -16,7 +16,7 @@ First("a") + First("b") + First("c")
 
 As does `Last[T]`:
 
-```tut:book
+```scala mdoc
 Last(3) + Last(2) + Last(1)
 Last("a") + Last("b") + Last("c")
 ```
@@ -25,7 +25,7 @@ Last("a") + Last("b") + Last("c")
 
 `First[T]` and `Last[T]` are both non-commutative semigroups. For `First[T]`, the `+` function keeps the left input, while `Last[T]`'s `+` implementation keeps the right input. For example, for `First[T]`:
 
-```tut:book
+```scala mdoc
 val first1 = First(1) + First(3) == First(1)
 val first3 = First(3) + First(1) == First(3)
 assert(first1 && first3)
@@ -33,7 +33,7 @@ assert(first1 && first3)
 
 And for `Last[T]`:
 
-```tut:book
+```scala mdoc
 val last3 = Last(1) + Last(3) == Last(3)
 val last1 = Last(3) + Last(1) == Last(1)
 assert(last3 && last1)
@@ -43,20 +43,20 @@ assert(last3 && last1)
 
 Let's use `First[T]` and `Last[T]` to keep track of the first and last username that a Twitter user has followed over the lifetime of their account. First let's define a type alias for `Username`:
 
-```tut:book
+```scala mdoc
 type Username = String
 ```
 
 To track `First` and `Last` simultaneously we'll use a combinator. As discussed on the [Product Algebra docs page](combinator/product_algebra.html), the `Tuple2[A, B]` semigroup works by separately combining its left and right elements. This means that we can use a pair - a `(First[Username], Last[Username])` - to track both the oldest and most recent twitter username that we've seen.
 
-```tut:book
+```scala mdoc
 def follow(user: Username): (First[Username], Last[Username]) =
   (First(user), Last(user))
 ```
 
 Now let's "add" up a few of these pairs, using the semigroup. First, we'll import Algebird's `Operators._`, which will enrich any semigroup with a `+` method.
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird.Operators._
 
 val follows = follow("sam") + follow("erik") + follow("oscar") + follow("kelley")
