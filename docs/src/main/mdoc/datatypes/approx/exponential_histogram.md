@@ -23,7 +23,7 @@ The approximate count is guaranteed to be within `conf.epsilon` relative error o
 
 Let's set up a bunch of buckets to add into our exponential histogram. Each bucket tracks a delta and a timestamp. This example uses the same number for both, for simplicity.
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird.ExpHist
 import ExpHist.{ Bucket, Config, Timestamp }
 
@@ -37,7 +37,7 @@ val actualSum = inputs.map(_.size).sum
 
 Now we'll configure an instance of `ExpHist` to track the count and add each of our buckets in.
 
-```tut:book
+```scala mdoc
 val epsilon = 0.01
 val windowSize = maxTimestamp
 val eh = ExpHist.empty(Config(epsilon, windowSize))
@@ -48,7 +48,7 @@ val full = inputs.foldLeft(eh) {
 
 Now we can query the full exponential histogram and compare the guess to the actual sum:
 
-```tut:book
+```scala mdoc
 val approximateSum = full.guess
 full.relativeError
 val maxError = actualSum * full.relativeError

@@ -1,6 +1,6 @@
 ---
 layout: docs
-title:  "HyperLogLog"
+title: "HyperLogLog"
 section: "data"
 source: "algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala"
 scaladoc: "#com.twitter.algebird.HyperLogLog"
@@ -26,7 +26,7 @@ The `HyperLogLogMonoid` class is the simplest way to create HLLs. `HyperLogLogMo
 
 The HyperLogLogMonoid constructor takes an Int `bits`, which represents the number of bits of the hash function that the HLL uses. The more bits you use, the more space the HLLs will take up, and the more precise your estimates will be. For a better understanding of the space-to-accuracy trade-off, see [this table](https://github.com/twitter/algebird/blob/develop/algebird-core/src/main/scala/com/twitter/algebird/HyperLogLog.scala#L197) or use one of the other strategies mentioned below, which allow you to specify the desired error.
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird._
 val hllMonoid = new HyperLogLogMonoid(bits = 4)
 ```
@@ -37,7 +37,7 @@ HyperLogLogMonoid has a `create` method which takes a hashed element (as a `Arra
 
 We can create an HLL containing a list of elements by creating HLLs for each element using the `create` method, and combining the elements using the HyperLogLogMonoid's `sum` method.
 
-```tut:book
+```scala mdoc
 import com.twitter.algebird.HyperLogLog.int2Bytes
 val data = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
 val hlls = data.map { hllMonoid.create(_) }
@@ -50,7 +50,7 @@ Note that we were able to call `hllMonoid.create` on an `Int` because we importe
 
 We can use the `sizeOf` method to estimate the approximate number of distinct elements in the multiset.
 
-```tut:book
+```scala mdoc
 val approxSizeOf = hllMonoid.sizeOf(combinedHLL)
 ```
 
@@ -67,7 +67,7 @@ To learn more about the `Array[Byte]` aggregators, see [the source code of Hyper
 This is an aggregator of type `Aggregator[K, HLL, HLL]`, which means that it builds a `HLL` from a `TraversableOnce` of `K`s.
 It takes an `error`, which must be a Double in the range (0,1).
 
-```tut:book
+```scala mdoc:nest
 val agg = HyperLogLogAggregator.withErrorGeneric[Int](0.01)
 val data = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
 val combinedHll: HLL = agg(data)
@@ -77,7 +77,7 @@ val combinedHll: HLL = agg(data)
 
 Similar to `withErrorGeneric`, but takes the number of bits as an Int.
 
-```tut:book
+```scala mdoc:nest
 val agg = HyperLogLogAggregator.withBits[Int](9)
 val data = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
 val combinedHll: HLL = agg(data)
@@ -87,7 +87,7 @@ val combinedHll: HLL = agg(data)
 
 This is an aggregator of type `Aggregator[K, HLL, Long]`, which means that it presents a Long value. The Long that it returns is the estimated size of the combined HLL.
 
-```tut:book
+```scala mdoc:nest
 val agg = HyperLogLogAggregator.sizeWithErrorGeneric[Int](0.01)
 val data = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
 val approximateSize: Long = agg(data)
@@ -95,7 +95,7 @@ val approximateSize: Long = agg(data)
 
 ### REPL Tour
 
-```tut:book
+```scala mdoc:nest
 import HyperLogLog._
 val hll = new HyperLogLogMonoid(4)
 val data = List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
