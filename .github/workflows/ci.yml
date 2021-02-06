@@ -29,8 +29,8 @@ jobs:
           - 11
         scala:
           - 2.11.12
-          - 2.12.12
-          - 2.13.3
+          - 2.12.13
+          - 2.13.4
   test-coverage:
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +40,7 @@ jobs:
       - name: java ${{matrix.java}} setup
         uses: olafurpg/setup-scala@v10
       - run: |
-          sbt coverage test coverageReport
+          sbt ++2.12.12 coverage test coverageReport
           bash <(curl -s https://codecov.io/bash)
   mimaReport:
     runs-on: ubuntu-latest
@@ -60,7 +60,8 @@ jobs:
           - 11
         scala:
           - 2.11.12
-          - 2.12.12
+          - 2.12.13
+          - 2.13.4
   microsite:
     runs-on: ubuntu-latest
     steps:
