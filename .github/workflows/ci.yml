@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - name: Ruby setup
-        uses: actions/setup-ruby@v1.1.2
+        uses: actions/setup-ruby@v1.1.3
         with:
           ruby-version: 2.6
       - run: |
