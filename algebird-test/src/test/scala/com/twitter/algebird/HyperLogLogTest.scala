@@ -93,9 +93,9 @@ class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matc
 
   /* Generate input arrays whose size is proportional to the bits (n) */
   val bitsGen = for {
-    n <- Gen.choose(4, 31)
-    r <- Gen.containerOfN[Array, Byte](4 * n, Arbitrary.arbitrary[Byte])
-  } yield (r, n)
+    bits <- Gen.choose(4, 31)
+    in <- Gen.containerOfN[Array, Byte](4 * bits, Arbitrary.arbitrary[Byte])
+  } yield (in, bits)
 
   property("jRhoW matches referenceJRhoW") {
     forAll(bitsGen) {
