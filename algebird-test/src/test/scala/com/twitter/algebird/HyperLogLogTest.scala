@@ -92,14 +92,14 @@ class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matc
   import HyperLogLog._
 
   /* Generate input arrays whose size is proportional to the bits (n) */
-  val bitsGen = for {
+  val bitsGen: Gen[(Array[Byte], Int)] = for {
     bits <- Gen.choose(4, 31)
     in <- Gen.containerOfN[Array, Byte](4 * bits, Arbitrary.arbitrary[Byte])
   } yield (in, bits)
 
   property("jRhoW matches referenceJRhoW") {
-    forAll(bitsGen) {
-      case (in: Array[Byte], bits: Int) => assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
+    forAll(bitsGen) { case (in: Array[Byte], bits: Int) =>
+      assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
     }
   }
 }
