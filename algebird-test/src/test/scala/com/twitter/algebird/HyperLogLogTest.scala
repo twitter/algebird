@@ -91,17 +91,16 @@ class HyperLogLogLaws extends CheckProperties {
 class jRhoWMatchTest extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   import HyperLogLog._
 
-  implicit val hashGen: Arbitrary[Array[Byte]] = Arbitrary {
-    Gen.containerOfN[Array, Byte](16, Arbitrary.arbitrary[Byte])
-  }
-  /* For some reason choose in this version of scalacheck
-  is bugged so I need the suchThat clause */
-  implicit val bitsGen: Arbitrary[Int] = Arbitrary {
-    Gen.choose(4, 31).suchThat(x => x >= 4 && x <= 31)
-  }
+  /* Generate input arrays whose size is proportional to the bits (n) */
+  val bitsGen: Gen[(Array[Byte], Int)] = for {
+    bits <- Gen.choose(4, 31)
+    in <- Gen.containerOfN[Array, Byte](4 * bits, Arbitrary.arbitrary[Byte])
+  } yield (in, bits)
 
   property("jRhoW matches referenceJRhoW") {
-    forAll((in: Array[Byte], bits: Int) => assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits)))
+    forAll(bitsGen) { case (in: Array[Byte], bits: Int) =>
+      assert(jRhoW(in, bits) == ReferenceHyperLogLog.jRhoW(in, bits))
+    }
   }
 }
 
