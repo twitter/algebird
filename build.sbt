@@ -40,7 +40,7 @@ crossScalaVersions := Nil
 val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.12.13",
-  crossScalaVersions := Seq("2.11.12", scalaVersion.value),
+  crossScalaVersions := Seq("2.13.5", scalaVersion.value),
   resolvers ++= Seq(
     Opts.resolver.sonatypeSnapshots,
     Opts.resolver.sonatypeReleases
