@@ -5,7 +5,7 @@ import pl.project13.scala.sbt.JmhPlugin
 val algebraVersion = "2.0.0"
 val bijectionVersion = "0.9.7"
 val javaEwahVersion = "1.1.9"
-val kindProjectorVersion = "0.11.3"
+val kindProjectorVersion = "0.12.0"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.8"
