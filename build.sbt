@@ -45,7 +45,7 @@ val sharedSettings = Seq(
     Opts.resolver.sonatypeSnapshots,
     Opts.resolver.sonatypeReleases
   ),
-  parallelExecution in Test := true,
+  Test / parallelExecution := true,
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -229,17 +229,17 @@ lazy val algebirdCore = module("core").settings(
       }
     },
   addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
-  sourceGenerators in Compile += Def.task {
-    GenTupleAggregators.gen((sourceManaged in Compile).value)
+  Compile / sourceGenerators += Def.task {
+    GenTupleAggregators.gen((Compile / sourceManaged).value)
   }.taskValue,
   // Scala 2.12's doc task was failing.
-  sources in (Compile, doc) ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
-  testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
+  Compile / doc / sources ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
+  Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
 )
 
 lazy val algebirdTest = module("test")
   .settings(
-    testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
+    Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
     crossScalaVersions += "2.13.5",
     libraryDependencies ++=
       Seq(
@@ -336,18 +336,18 @@ lazy val docSettings = Seq(
   ),
   autoAPIMappings := true,
   docsMappingsAPIDir := "api",
-  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+  addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
   ghpagesNoJekyll := false,
-  fork in (ScalaUnidoc, unidoc) := true,
-  scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
+  ScalaUnidoc / unidoc / fork := true,
+  ScalaUnidoc / unidoc / scalacOptions ++= Seq(
     "-doc-source-url",
     "https://github.com/twitter/algebird/tree/develop€{FILE_PATH}.scala",
     "-sourcepath",
-    baseDirectory.in(LocalRootProject).value.getAbsolutePath,
+    (LocalRootProject / baseDirectory).value.getAbsolutePath,
     "-diagrams"
   ),
   git.remoteRepo := "git@github.com:twitter/algebird.git",
-  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
+  makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
 )
 
 // Documentation is generated for projects defined in
@@ -361,6 +361,6 @@ lazy val docs = project
   .settings(
     addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
     mdocIn := sourceDirectory.value / "main" / "mdoc",
-    sources in (ScalaUnidoc, unidoc) ~= (_.filterNot(_.absolutePath.contains("javaapi")))
+    ScalaUnidoc / unidoc / sources ~= (_.filterNot(_.absolutePath.contains("javaapi")))
   )
   .dependsOn(algebirdCore)
