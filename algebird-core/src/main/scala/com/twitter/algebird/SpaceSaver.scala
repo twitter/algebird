@@ -40,12 +40,12 @@ object SpaceSaver {
         val itemAsBytes = tSerializer(item)
         val itemLength = itemAsBytes.length
         //1 for the type, 4 for capacity, 4 for itemAsBytes.length
-        val buffer = new Array[Byte](1 + 4 + 4 + itemAsBytes.length)
+        val buffer = new Array[Byte](1 + 4 + 4 + itemLength)
         ByteBuffer
           .wrap(buffer)
           .put(1: Byte)
           .putInt(capacity)
-          .putInt(itemLength.toByte)
+          .putInt(itemLength)
           .put(itemAsBytes)
         buffer
 
