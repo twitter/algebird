@@ -30,7 +30,7 @@ jobs:
         scala:
           - 2.11.12
           - 2.12.13
-          - 2.13.5
+          - 2.13.6
   test-coverage:
     runs-on: ubuntu-latest
     steps:
@@ -61,7 +61,7 @@ jobs:
         scala:
           - 2.11.12
           - 2.12.13
-          - 2.13.5
+          - 2.13.6
   microsite:
     runs-on: ubuntu-latest
     steps:
