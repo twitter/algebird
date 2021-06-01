@@ -9,7 +9,7 @@ jobs:
       - name: cache SBT
         uses: coursier/cache-action@v6
       - name: Java 11 setup
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v11
       - run: sbt "; scalafmtCheckAll; scalafmtSbtCheck" "; scalafixEnable; scalafixAll --check"
   test:
     runs-on: ubuntu-latest
@@ -18,7 +18,7 @@ jobs:
       - name: cache SBT
         uses: coursier/cache-action@v6
       - name: java ${{matrix.java}} setup
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v11
         with:
           java-version: ${{matrix.java}}
       - run: sbt "++${{matrix.scala}} test"
@@ -38,7 +38,7 @@ jobs:
       - name: cache SBT
         uses: coursier/cache-action@v6
       - name: java ${{matrix.java}} setup
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v11
       - run: |
           sbt ++2.12.12 coverage test coverageReport
           bash <(curl -s https://codecov.io/bash)
@@ -49,7 +49,7 @@ jobs:
       - name: cache SBT
         uses: coursier/cache-action@v6
       - name: java ${{matrix.java}} setup
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v11
         with:
           java-version: ${{matrix.java}}
       - run: sbt "++${{matrix.scala}} mimaReportBinaryIssues"
@@ -76,5 +76,5 @@ jobs:
       - name: cache SBT
         uses: coursier/cache-action@v6
       - name: java ${{matrix.java}} setup
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v11
       - run: sbt docs/makeMicrosite
