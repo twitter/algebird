@@ -4,7 +4,8 @@ import org.scalatestplus.scalacheck.Checkers
 import org.scalatest.propspec.AnyPropSpec
 
 /**
- * @author Mansur Ashraf.
+ * @author
+ *   Mansur Ashraf.
  */
 trait CheckProperties extends AnyPropSpec with Checkers {
 

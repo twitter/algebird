@@ -3,9 +3,9 @@ package com.twitter.algebird
 import java.nio._
 
 /**
- * MinHasher as a Monoid operates on this class to avoid the too generic Array[Byte].
- * The bytes are assumed to be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is
- * because a ByteBuffer is used internally in MinHasher and it can wrap Array[Byte].
+ * MinHasher as a Monoid operates on this class to avoid the too generic Array[Byte]. The bytes are assumed to
+ * be never modified. The only reason we did not use IndexedSeq[Byte] instead of Array[Byte] is because a
+ * ByteBuffer is used internally in MinHasher and it can wrap Array[Byte].
  */
 case class MinHashSignature(bytes: Array[Byte]) extends AnyVal
 
@@ -28,27 +28,23 @@ object MinHasher {
 }
 
 /**
- * Instances of MinHasher can create, combine, and compare fixed-sized signatures of
- * arbitrarily sized sets.
+ * Instances of MinHasher can create, combine, and compare fixed-sized signatures of arbitrarily sized sets.
  *
- * A signature is represented by a byte array of approx maxBytes size.
- * You can initialize a signature with a single element, usually a Long or String.
- * You can combine any two set's signatures to produce the signature of their union.
- * You can compare any two set's signatures to estimate their Jaccard similarity.
- * You can use a set's signature to estimate the number of distinct values in the set.
- * You can also use a combination of the above to estimate the size of the intersection of
- * two sets from their signatures.
- * The more bytes in the signature, the more accurate all of the above will be.
+ * A signature is represented by a byte array of approx maxBytes size. You can initialize a signature with a
+ * single element, usually a Long or String. You can combine any two set's signatures to produce the signature
+ * of their union. You can compare any two set's signatures to estimate their Jaccard similarity. You can use
+ * a set's signature to estimate the number of distinct values in the set. You can also use a combination of
+ * the above to estimate the size of the intersection of two sets from their signatures. The more bytes in the
+ * signature, the more accurate all of the above will be.
  *
- * You can also use these signatures to quickly find similar sets without doing
- * n^2 comparisons. Each signature is assigned to several buckets; sets whose signatures
- * end up in the same bucket are likely to be similar. The targetThreshold controls
- * the desired level of similarity - the higher the threshold, the more efficiently
- * you can find all the similar sets.
+ * You can also use these signatures to quickly find similar sets without doing n^2 comparisons. Each
+ * signature is assigned to several buckets; sets whose signatures end up in the same bucket are likely to be
+ * similar. The targetThreshold controls the desired level of similarity - the higher the threshold, the more
+ * efficiently you can find all the similar sets.
  *
- * This abstract superclass is generic with regards to the size of the hash used.
- * Depending on the number of unique values in the domain of the sets, you may want
- * a MinHasher16, a MinHasher32, or a new custom subclass.
+ * This abstract superclass is generic with regards to the size of the hash used. Depending on the number of
+ * unique values in the domain of the sets, you may want a MinHasher16, a MinHasher32, or a new custom
+ * subclass.
  *
  * This implementation is modeled after Chapter 3 of Ullman and Rajaraman's Mining of Massive Datasets:
  * http://infolab.stanford.edu/~ullman/mmds/ch3a.pdf
@@ -67,8 +63,8 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   private val seed = 123456789
 
   /**
-   * We always use a 128 bit hash function, so the number of hash functions is different
-   * (and usually smaller) than the number of hashes in the signature.
+   * We always use a 128 bit hash function, so the number of hash functions is different (and usually smaller)
+   * than the number of hashes in the signature.
    */
   private val hashFunctions = {
     val r = new scala.util.Random(seed)

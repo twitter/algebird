@@ -16,12 +16,11 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * This is a typeclass to represent things which increase. Note that it is important
- * that a value after being incremented is always larger than it was before. Note
- * that next returns Option because this class comes with the notion of the "greatest"
- * key, which is None. Ints, for example, will cycle if next(java.lang.Integer.MAX_VALUE)
- * is called, therefore we need a notion of what happens when we hit the bounds at
- * which our ordering is violating. This is also useful for closed sets which have a fixed
+ * This is a typeclass to represent things which increase. Note that it is important that a value after being
+ * incremented is always larger than it was before. Note that next returns Option because this class comes
+ * with the notion of the "greatest" key, which is None. Ints, for example, will cycle if
+ * next(java.lang.Integer.MAX_VALUE) is called, therefore we need a notion of what happens when we hit the
+ * bounds at which our ordering is violating. This is also useful for closed sets which have a fixed
  * progression.
  */
 trait Successible[T] extends Serializable {
@@ -56,8 +55,8 @@ trait Successible[T] extends Serializable {
 object Successible {
 
   /**
-   * This makes it easy to construct from a function when T has an ordering, which is common
-   * Note, your function must respect the ordering
+   * This makes it easy to construct from a function when T has an ordering, which is common Note, your
+   * function must respect the ordering
    */
   def fromNextOrd[T](nextFn: T => Option[T])(implicit ord: Ordering[T]): Successible[T] = new Successible[T] {
     override def next(t: T): Option[T] = nextFn(t)
@@ -74,8 +73,8 @@ object Successible {
     new IntegralSuccessible[N]
 
   /**
-   * The difference between this and the default ordering on Option[T] is that it treats None
-   * as the max value, instead of the minimum value.
+   * The difference between this and the default ordering on Option[T] is that it treats None as the max
+   * value, instead of the minimum value.
    */
   def optionOrdering[T](implicit ord: Ordering[T]): Ordering[Option[T]] =
     new Ordering[Option[T]] {

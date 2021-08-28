@@ -16,10 +16,8 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * Used to represent cases where we need to periodically reset
- *  a +  b =   a + b
- * |a +  b = |(a + b)
- *  a + |b = |b
+ * Used to represent cases where we need to periodically reset a + b = a + b
+ * |a + b = |(a + b) a + |b = |b
  * |a + |b = |b
  */
 sealed trait ResetState[+A] { def get: A }

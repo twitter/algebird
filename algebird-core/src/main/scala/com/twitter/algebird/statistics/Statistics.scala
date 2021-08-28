@@ -18,10 +18,11 @@ package com.twitter.algebird.statistics
 import com.twitter.algebird.{Group, Monoid, Ring, Semigroup}
 
 /**
- * These wrappers can be used to collect statistics around usage of monoids
- * They are thread safe unless false is passed to the constructor (to remove overhead when threads are not used)
+ * These wrappers can be used to collect statistics around usage of monoids They are thread safe unless false
+ * is passed to the constructor (to remove overhead when threads are not used)
  *
- * @author Julien Le Dem
+ * @author
+ *   Julien Le Dem
  */
 /** collect statistics about the calls to the wrapped Semigroup */
 class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigroup: Semigroup[T])
@@ -49,7 +50,8 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see
+ *   StatisticsSemigroup
  */
 class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Monoid[T])
     extends StatisticsSemigroup[T](threadSafe)
@@ -78,7 +80,8 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see
+ *   StatisticsSemigroup
  */
 class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
     extends StatisticsMonoid[T](threadSafe)
@@ -108,7 +111,8 @@ class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
 }
 
 /**
- * @see StatisticsSemigroup
+ * @see
+ *   StatisticsSemigroup
  */
 class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
     extends StatisticsGroup[T](threadSafe)

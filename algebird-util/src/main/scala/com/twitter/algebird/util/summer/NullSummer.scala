@@ -19,7 +19,8 @@ import com.twitter.algebird._
 import com.twitter.util.Future
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 class NullSummer[Key, Value](tuplesIn: Incrementor, tuplesOut: Incrementor)(implicit
     semigroup: Semigroup[Value]

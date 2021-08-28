@@ -77,9 +77,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
   require(numeric.lteq(min, estimate) && numeric.lteq(estimate, max))
 
   /**
-   * Is this value contained within the bounds?
-   * Contract is:
-   * Prob(boundsContain(estimate)) >= probWithinBounds
+   * Is this value contained within the bounds? Contract is: Prob(boundsContain(estimate)) >= probWithinBounds
    */
   def boundsContain(v: N): Boolean =
     numeric.lteq(min, v) && numeric.lteq(v, max)
@@ -88,8 +86,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
     ApproximateBoolean(boundsContain(v), probWithinBounds)
 
   /**
-   * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99)
-   * and then x ~ 1.05 returns true
+   * This is so you can do: val x = Approximate(1.0, 1.1, 1.2, 0.99) and then x ~ 1.05 returns true
    */
   def ~(v: N): Boolean = boundsContain(v)
 
@@ -108,12 +105,9 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
     this.+(right.negate)
 
   /**
-   * This is not distributive, because:
-   * a*(b+c) has two probability multiplications
-   * while (a*b + a*b) has three
-   * Some kind of general formula solver could possibly
-   * make this distributive, but in the mean time, it's only
-   * a group
+   * This is not distributive, because: a*(b+c) has two probability multiplications while (a*b + a*b) has
+   * three Some kind of general formula solver could possibly make this distributive, but in the mean time,
+   * it's only a group
    */
   def *(right: Approximate[N]): Approximate[N] =
     if (right.isZero || isOne) {

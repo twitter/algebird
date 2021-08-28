@@ -105,10 +105,10 @@ object MultiAggregator {
     // there's no Semigroup[Tuple1[T]], so just use T as intermediary type instead of Tuple1[T]
     // TODO: keys for 1 item
     val aggregatorForOneItem = s"""
-       |def apply[K, A, B, C](agg: (K, ${inputAggregatorType}[A, B, C])): ${mapAggregatorType}[A, B, K, C] = {
-       |  new ${mapAggregatorType}[A, B, K, C] {
+       |def apply[K, A, B, C](agg: (K, $inputAggregatorType[A, B, C])): $mapAggregatorType[A, B, K, C] = {
+       |  new $mapAggregatorType[A, B, K, C] {
        |    def prepare(a: A) = agg._2.prepare(a)
-       |    val ${semigroupType} = agg._2.${semigroupType}
+       |    val $semigroupType = agg._2.$semigroupType
        |    def present(b: B) = Map(agg._1 -> agg._2.present(b))
        |    def keys = Set(agg._1)
        |  }
@@ -119,26 +119,26 @@ object MultiAggregator {
       .map { aggrCount =>
         val aggrNums = 1 to aggrCount
 
-        val inputAggs = aggrNums.map(i => s"agg$i: (K, ${inputAggregatorType}[A, B$i, C])").mkString(", ")
+        val inputAggs = aggrNums.map(i => s"agg$i: (K, $inputAggregatorType[A, B$i, C])").mkString(", ")
 
         val bs = aggrNums.map("B" + _).mkString(", ")
-        val tupleBs = s"Tuple${aggrCount}[$bs]"
+        val tupleBs = s"Tuple$aggrCount[$bs]"
 
         s"""
-      |def apply[K, A, $bs, C]($inputAggs): ${mapAggregatorType}[A, $tupleBs, K, C] = {
-      |  new ${mapAggregatorType}[A, $tupleBs, K, C] {
+      |def apply[K, A, $bs, C]($inputAggs): $mapAggregatorType[A, $tupleBs, K, C] = {
+      |  new $mapAggregatorType[A, $tupleBs, K, C] {
       |    def prepare(a: A) = (
-      |      ${aggrNums.map(i => s"agg${i}._2.prepare(a)").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg$i._2.prepare(a)").mkString(", ")}
       |    )
       |    // a field for semigroup/monoid that combines all input aggregators
-      |    val $semigroupType = new Tuple${aggrCount}${semigroupType.capitalize}()(
-      |      ${aggrNums.map(i => s"agg${i}._2.$semigroupType").mkString(", ")}
+      |    val $semigroupType = new Tuple$aggrCount${semigroupType.capitalize}()(
+      |      ${aggrNums.map(i => s"agg$i._2.$semigroupType").mkString(", ")}
       |    )
       |    def present(b: $tupleBs) = Map(
-      |      ${aggrNums.map(i => s"agg${i}._1 -> agg${i}._2.present(b._${i})").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg$i._1 -> agg$i._2.present(b._$i)").mkString(", ")}
       |    )
       |    def keys: Set[K] = Set(
-      |      ${aggrNums.map(i => s"agg${i}._1").mkString(", ")}
+      |      ${aggrNums.map(i => s"agg$i._1").mkString(", ")}
       |    )
       |  }
       |}""".stripMargin

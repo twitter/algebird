@@ -17,16 +17,16 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * @author Avi Bryant
+ * @author
+ *   Avi Bryant
  */
 import collection.mutable.HashMap
 import ref.SoftReference
 
 /**
- * This is a summing cache whose goal is to grow until we run out of memory,
- * at which point it clears itself and stops growing.
- * Note that we can lose the values in this cache at any point;
- * we don't put anything here we care about.
+ * This is a summing cache whose goal is to grow until we run out of memory, at which point it clears itself
+ * and stops growing. Note that we can lose the values in this cache at any point; we don't put anything here
+ * we care about.
  */
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
   private val map = new SoftReference(new HashMap[K, V]())
@@ -52,13 +52,11 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
 }
 
 /**
- * This is a wrapper around SummingCache that attempts to grow the capacity
- * by up to some maximum, as long as there's enough RAM.
- * It determines that there's enough RAM to grow by maintaining a SentinelCache
- * which keeps caching and summing the evicted values.
- * Once the SentinelCache has grown to the same size as the current cache,
- * plus some margin, without running out of RAM, then this indicates that we
- * have enough headroom to double the capacity.
+ * This is a wrapper around SummingCache that attempts to grow the capacity by up to some maximum, as long as
+ * there's enough RAM. It determines that there's enough RAM to grow by maintaining a SentinelCache which
+ * keeps caching and summing the evicted values. Once the SentinelCache has grown to the same size as the
+ * current cache, plus some margin, without running out of RAM, then this indicates that we have enough
+ * headroom to double the capacity.
  */
 class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.0)
     extends StatefulSummer[Map[K, V]] {

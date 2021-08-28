@@ -16,38 +16,31 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
-import algebra.ring.{Ring => ARing, Rig, Rng}
+import algebra.ring.{Rig, Ring => ARing, Rng}
 import algebra.CommutativeGroup
 
 import scala.annotation.implicitNotFound
 
 /**
- * Ring: Group + multiplication (see: http://en.wikipedia.org/wiki/Ring_%28mathematics%29)
- *  and the three elements it defines:
- *  - additive identity aka zero
- *  - addition
- *  - multiplication
+ * Ring: Group + multiplication (see: http://en.wikipedia.org/wiki/Ring_%28mathematics%29) and the three
+ * elements it defines:
+ *   - additive identity aka zero
+ *   - addition
+ *   - multiplication
  *
- *  Note, if you have distributive property, additive inverses, and multiplicative identity you
- *  can prove you have a commutative group under the ring:
+ * Note, if you have distributive property, additive inverses, and multiplicative identity you can prove you
+ * have a commutative group under the ring:
  *
- *  1. (a + 1)*(b + 1) = a(b + 1) + (b + 1)
- *  2.                 = ab + a + b + 1
- *  3. or:
- *  4.
- *  5.                 = (a + 1)b + (a + 1)
- *  6.                 = ab + b + a + 1
- *  7.
- *  8. So: ab + a + b + 1 == ab + b + a + 1
- *  9.   using the fact that -(ab) and -1 exist, we get:
- * 10. a + b == b + a
+ *   1. (a + 1)*(b + 1) = a(b + 1) + (b + 1) 2. = ab + a + b + 1 3. or: 4. 5. = (a + 1)b + (a + 1) 6. = ab + b
+ *      + a + 1 7. 8. So: ab + a + b + 1 == ab + b + a + 1 9. using the fact that -(ab) and -1 exist, we get:
+ *      10. a + b == b + a
  */
 
 @implicitNotFound(msg = "Cannot find Ring type class for ${T}")
@@ -221,10 +214,9 @@ class FromAlgebraRing[T](r: ARing[T]) extends Ring[T] {
 }
 
 /**
- * In some legacy cases, we have implemented Rings where we lacked
- * the full laws. This allows you to be precise (only implement
- * the structure you have), but unsafely use it as a Ring in legacy code
- * that is expecting a Ring.
+ * In some legacy cases, we have implemented Rings where we lacked the full laws. This allows you to be
+ * precise (only implement the structure you have), but unsafely use it as a Ring in legacy code that is
+ * expecting a Ring.
  */
 class UnsafeFromAlgebraRig[T](r: Rig[T]) extends Ring[T] {
   override def zero: T = r.zero
@@ -241,10 +233,9 @@ class UnsafeFromAlgebraRig[T](r: Rig[T]) extends Ring[T] {
 }
 
 /**
- * In some legacy cases, we have implemented Rings where we lacked
- * the full laws. This allows you to be precise (only implement
- * the structure you have), but unsafely use it as a Ring in legacy code
- * that is expecting a Ring.
+ * In some legacy cases, we have implemented Rings where we lacked the full laws. This allows you to be
+ * precise (only implement the structure you have), but unsafely use it as a Ring in legacy code that is
+ * expecting a Ring.
  */
 class UnsafeFromAlgebraRng[T](r: Rng[T]) extends Ring[T] {
   override def zero: T = r.zero

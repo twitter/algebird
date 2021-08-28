@@ -19,17 +19,18 @@ import algebra.Band
 import scala.collection.compat._
 
 /**
- * Tracks the "least recent", or earliest, wrapped instance of `T` by
- * the order in which items are seen.
+ * Tracks the "least recent", or earliest, wrapped instance of `T` by the order in which items are seen.
  *
- * @param get wrapped instance of `T`
+ * @param get
+ *   wrapped instance of `T`
  */
 case class First[@specialized(Int, Long, Float, Double) +T](get: T) {
 
   /**
    * Returns this instance, always.
    *
-   * @param r ignored instance of `First[U]`
+   * @param r
+   *   ignored instance of `First[U]`
    */
   def +[U >: T](r: First[U]): First[T] = {
     val _ = r //suppressing unused `r`
@@ -38,14 +39,12 @@ case class First[@specialized(Int, Long, Float, Double) +T](get: T) {
 }
 
 /**
- * Provides a set of operations and typeclass instances needed to use
- * [[First]] instances.
+ * Provides a set of operations and typeclass instances needed to use [[First]] instances.
  */
 object First extends FirstInstances {
 
   /**
-   * Returns an [[Aggregator]] that selects the first instance of `T`
-   * in the aggregated stream.
+   * Returns an [[Aggregator]] that selects the first instance of `T` in the aggregated stream.
    */
   def aggregator[T]: FirstAggregator[T] = FirstAggregator()
 }
@@ -53,12 +52,11 @@ object First extends FirstInstances {
 private[algebird] sealed abstract class FirstInstances {
 
   /**
-   * Returns a [[Semigroup]] instance with a `plus` implementation
-   * that always returns the first (ie, the left) `T` argument.
+   * Returns a [[Semigroup]] instance with a `plus` implementation that always returns the first (ie, the
+   * left) `T` argument.
    *
-   * This semigroup's `sumOption` is efficient; it only selects the
-   * head of the `TraversableOnce` instance, leaving the rest
-   * untouched.
+   * This semigroup's `sumOption` is efficient; it only selects the head of the `TraversableOnce` instance,
+   * leaving the rest untouched.
    */
   def firstSemigroup[T]: Semigroup[T] with Band[T] =
     new Semigroup[T] with Band[T] {
@@ -69,17 +67,15 @@ private[algebird] sealed abstract class FirstInstances {
     }
 
   /**
-   * Returns a [[Semigroup]] instance for [[First]][T]. The `plus`
-   * implementation always returns the first (ie, the left) `First[T]`
-   * argument.
+   * Returns a [[Semigroup]] instance for [[First]] [T]. The `plus` implementation always returns the first
+   * (ie, the left) `First[T]` argument.
    */
   implicit def semigroup[T]: Semigroup[First[T]] with Band[First[T]] =
     firstSemigroup[First[T]]
 }
 
 /**
- * [[Aggregator]] that selects the first instance of `T` in the
- * aggregated stream.
+ * [[Aggregator]] that selects the first instance of `T` in the aggregated stream.
  */
 case class FirstAggregator[T]() extends Aggregator[T, T, T] {
   override def prepare(v: T): T = v

@@ -17,12 +17,11 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * This is an associative, but not commutative monoid
- * Also, you must start on the right, with a value, and all subsequent RightFolded must
- * be RightFoldedToFold objects or zero
+ * This is an associative, but not commutative monoid Also, you must start on the right, with a value, and all
+ * subsequent RightFolded must be RightFoldedToFold objects or zero
  *
- * If you add two Folded values together, you always get the one on the left,
- * so this forms a kind of reset of the fold.
+ * If you add two Folded values together, you always get the one on the left, so this forms a kind of reset of
+ * the fold.
  */
 object RightFolded {
   def monoid[In, Out](foldfn: (In, Out) => Out): Monoid[RightFolded[In, Out]] =

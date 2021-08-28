@@ -22,7 +22,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 class AsyncMapSum[Key, Value](
     bufferSize: BufferSize,

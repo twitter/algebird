@@ -19,10 +19,8 @@ package com.twitter.algebird.monad
 import com.twitter.algebird.{Monad, Semigroup}
 
 /**
- * Monad to handle mutating input state and possible failures.
- * This is used to interact in the planning phase with existing
- * mutable APIs (like storm or cascading), but retain the ability
- * to compose carefully.
+ * Monad to handle mutating input state and possible failures. This is used to interact in the planning phase
+ * with existing mutable APIs (like storm or cascading), but retain the ability to compose carefully.
  */
 sealed trait StateWithError[S, +F, +T] {
   def join[F1 >: F, U](
@@ -104,8 +102,7 @@ object StateWithError {
     StateFn(_ => Left(f))
 
   /**
-   * Use like fromEither[Int](Right("good"))
-   * to get a constant Either in the monad
+   * Use like fromEither[Int](Right("good")) to get a constant Either in the monad
    */
   def fromEither[S]: ConstantStateMaker[S] = new ConstantStateMaker[S]
   class ConstantStateMaker[S] {

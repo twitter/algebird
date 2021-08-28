@@ -8,14 +8,14 @@ import scala.util.{Failure, Success, Try}
 object SpaceSaver {
 
   /**
-   * Construct SpaceSaver with given capacity containing a single item.
-   * This is the public api to create a new SpaceSaver.
+   * Construct SpaceSaver with given capacity containing a single item. This is the public api to create a new
+   * SpaceSaver.
    */
   def apply[T](capacity: Int, item: T): SpaceSaver[T] = SSOne(capacity, item)
 
   /**
-   * Construct SpaceSaver with given capacity containing a single item with provided exact count.
-   * This is the public api to create a new SpaceSaver.
+   * Construct SpaceSaver with given capacity containing a single item with provided exact count. This is the
+   * public api to create a new SpaceSaver.
    */
   def apply[T](capacity: Int, item: T, count: Long): SpaceSaver[T] =
     SSMany(capacity, Map(item -> ((count, 0L))))
@@ -30,9 +30,9 @@ object SpaceSaver {
 
   /**
    * Encodes the SpaceSaver as a sequence of bytes containing in order
-   * - 1 byte: 1/2 => 1 = SSOne, 2 = SSMany
-   * - 4 bytes: the capacity
-   * - N bytes: the item/counters (counters as length + N*(item size + item + 2 * counters)
+   *   - 1 byte: 1/2 => 1 = SSOne, 2 = SSMany
+   *   - 4 bytes: the capacity
+   *   - N bytes: the item/counters (counters as length + N*(item size + item + 2 * counters)
    */
   def toBytes[T](ss: SpaceSaver[T], tSerializer: T => Array[Byte]): Array[Byte] =
     ss match {
@@ -124,11 +124,11 @@ object SpaceSaver {
 
 /**
  * Data structure used in the Space-Saving Algorithm to find the approximate most frequent and top-k elements.
- * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams".
- * See here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf
- * In the paper the data structure is called StreamSummary but we chose to call it SpaceSaver instead.
- * Note that the adaptation to hadoop and parallelization were not described in the article and have not been proven
- *  to be mathematically correct or preserve the guarantees or benefits of the algorithm.
+ * The algorithm is described in "Efficient Computation of Frequent and Top-k Elements in Data Streams". See
+ * here: www.cs.ucsb.edu/research/tech_reports/reports/2005-23.pdf In the paper the data structure is called
+ * StreamSummary but we chose to call it SpaceSaver instead. Note that the adaptation to hadoop and
+ * parallelization were not described in the article and have not been proven to be mathematically correct or
+ * preserve the guarantees or benefits of the algorithm.
  */
 sealed abstract class SpaceSaver[T] {
   import SpaceSaver.ordering
@@ -144,7 +144,8 @@ sealed abstract class SpaceSaver[T] {
   def min: Long
 
   /**
-   * Map of item to counter, where each counter consists of an observed count and possible over-estimation (error)
+   * Map of item to counter, where each counter consists of an observed count and possible over-estimation
+   * (error)
    */
   def counters: Map[T, (Long, Long)]
 
@@ -159,8 +160,8 @@ sealed abstract class SpaceSaver[T] {
   }
 
   /**
-   * Get the elements that show up more than thres times.
-   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   * Get the elements that show up more than thres times. Returns sorted in descending order: (item,
+   * Approximate[Long], guaranteed)
    */
   def mostFrequent(thres: Int): Seq[(T, Approximate[Long], Boolean)] =
     counters.iterator
@@ -172,8 +173,7 @@ sealed abstract class SpaceSaver[T] {
       }
 
   /**
-   * Get the top-k elements.
-   * Returns sorted in descending order: (item, Approximate[Long], guaranteed)
+   * Get the top-k elements. Returns sorted in descending order: (item, Approximate[Long], guaranteed)
    */
   def topK(k: Int): Seq[(T, Approximate[Long], Boolean)] = {
     require(k < capacity)
@@ -187,8 +187,8 @@ sealed abstract class SpaceSaver[T] {
   }
 
   /**
-   * Check consistency with other SpaceSaver, useful for testing.
-   * Returns boolean indicating if they are consistent
+   * Check consistency with other SpaceSaver, useful for testing. Returns boolean indicating if they are
+   * consistent
    */
   def consistentWith(that: SpaceSaver[T]): Boolean =
     (counters.keys ++ that.counters.keys).forall(item => (frequency(item) - that.frequency(item)) ~ 0)

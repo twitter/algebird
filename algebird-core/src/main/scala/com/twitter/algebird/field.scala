@@ -1,16 +1,14 @@
 package com.twitter.algebird
 
-import java.lang.{Float => JFloat, Double => JDouble}
+import java.lang.{Double => JDouble, Float => JFloat}
 
 /**
- * This is here to ease transition to using algebra.Field as the field
- * type. Intended use is to do:
+ * This is here to ease transition to using algebra.Field as the field type. Intended use is to do:
  *
  * {code} import com.twitter.algebird.field._ {/code}
  *
- * Note, this are not strictly lawful since floating point
- * arithmetic using IEEE-754 is only approximately associative
- * and distributive.
+ * Note, this are not strictly lawful since floating point arithmetic using IEEE-754 is only approximately
+ * associative and distributive.
  */
 object field {
   implicit object ForFloat extends Field[Float] {
@@ -79,8 +77,7 @@ object field {
   }
 
   /**
-   * These methods were originally on algebird.Field, but are not present on
-   * algebra.Field
+   * These methods were originally on algebird.Field, but are not present on algebra.Field
    */
   implicit class AlgebirdFieldEnrichments[T](val field: Field[T]) extends AnyVal {
     def assertNotZero(t: T): Unit =

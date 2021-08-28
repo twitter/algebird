@@ -21,43 +21,38 @@ import algebra.CommutativeMonoid
 import scala.collection.compat._
 
 /**
- * A Count-Min sketch is a probabilistic data structure used for summarizing
- * streams of data in sub-linear space.
+ * A Count-Min sketch is a probabilistic data structure used for summarizing streams of data in sub-linear
+ * space.
  *
- * It works as follows. Let `(eps, delta)` be two parameters that describe the
- * confidence in our error estimates, and let `d = ceil(ln 1/delta)`
- * and `w = ceil(e / eps)`.
+ * It works as follows. Let `(eps, delta)` be two parameters that describe the confidence in our error
+ * estimates, and let `d = ceil(ln 1/delta)` and `w = ceil(e / eps)`.
  *
- * Note: Throughout the code `d` and `w` are called `depth` and `width`,
- * respectively.
+ * Note: Throughout the code `d` and `w` are called `depth` and `width`, respectively.
  *
  * Then:
  *
- * - Take `d` pairwise independent hash functions `h_i`, each of which maps
- *   onto the domain `[0, w - 1]`.
- * - Create a 2-dimensional table of counts, with `d` rows and `w` columns,
- *   initialized with all zeroes.
- * - When a new element x arrives in the stream, update the table of counts
- *   by setting `counts[i, h_i[x]] += 1`, for each `1 <= i <= d`.
- * - (Note the rough similarity to a Bloom filter.)
+ *   - Take `d` pairwise independent hash functions `h_i`, each of which maps onto the domain `[0, w - 1]`.
+ *   - Create a 2-dimensional table of counts, with `d` rows and `w` columns, initialized with all zeroes.
+ *   - When a new element x arrives in the stream, update the table of counts by setting `counts[i, h_i[x]] +=
+ *     1`, for each `1 <= i <= d`.
+ *   - (Note the rough similarity to a Bloom filter.)
  *
- * As an example application, suppose you want to estimate the number of
- * times an element `x` has appeared in a data stream so far.
- * The Count-Min sketch estimate of this frequency is
+ * As an example application, suppose you want to estimate the number of times an element `x` has appeared in
+ * a data stream so far. The Count-Min sketch estimate of this frequency is
  *
- *   min_i { counts[i, h_i[x]] }
+ * min_i { counts[i, h_i[x]] }
  *
- * With probability at least `1 - delta`, this estimate is within `eps * N`
- * of the true frequency (i.e., `true frequency <= estimate <= true frequency + eps * N`),
- * where N is the total size of the stream so far.
+ * With probability at least `1 - delta`, this estimate is within `eps * N` of the true frequency (i.e., `true
+ * frequency <= estimate <= true frequency + eps * N`), where N is the total size of the stream so far.
  *
- * See http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf for technical details,
- * including proofs of the estimates and error bounds used in this implementation.
+ * See http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf for technical details, including proofs of the
+ * estimates and error bounds used in this implementation.
  *
  * Parts of this implementation are taken from
  * https://github.com/clearspring/stream-lib/blob/master/src/main/java/com/clearspring/analytics/stream/frequency/CountMinSketch.java
  *
- * @author Edwin Chen
+ * @author
+ *   Edwin Chen
  */
 /**
  * Monoid for adding CMS sketches.
@@ -65,40 +60,43 @@ import scala.collection.compat._
  * =Usage=
  *
  * `eps` and `delta` are parameters that bound the error of each query estimate. For example, errors in
- * answering point queries (e.g., how often has element x appeared in the stream described by the sketch?)
- * are often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by
- * some factor depending on eps."
+ * answering point queries (e.g., how often has element x appeared in the stream described by the sketch?) are
+ * often of the form: "with probability p >= 1 - delta, the estimate is close to the truth by some factor
+ * depending on eps."
  *
- * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
+ * The type `K` is the type of items you want to count. You must provide an implicit `CMSHasher[K]` for `K`,
+ * and Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
- * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as Double, and then use the `contramap`
- * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
- * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
- * starting point.
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation"
+ * function to convert items of your (unsupported) type `K` to a supported type such as Double, and then use
+ * the `contramap` function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the
+ * documentation of [[CMSHasher]] for an example); 2) You implement a `CMSHasher[K]` from scratch, using the
+ * existing CMSHasher implementations as a starting point.
  *
- * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
- * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
- * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
- * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely
+ * use types such as `Array[Byte]`. Extra work is required for Arrays. For example, you may opt to convert
+ * `Array[T]` to a `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes. Algebird provides one
+ * such wrapper class, [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
- * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
- * @param delta A bound on the probability that a query estimate does not lie within some small interval
- *        (an interval that depends on `eps`) around the truth.
- * @param seed  A seed to initialize the random number generator used to create the pairwise independent
- *        hash functions.
- * @param maxExactCountOpt An Option parameter about how many exact counts a sparse CMS wants to keep.
- * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
- *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
- *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
- *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that
- *           can be imported.
- *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use `Long`.  For larger domains you can try `BigInt`, for example.  Other possibilities
- *           include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire), though Algebird does
- *           not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
+ * @param eps
+ *   One-sided error bound on the error of each point query, i.e. frequency estimate.
+ * @param delta
+ *   A bound on the probability that a query estimate does not lie within some small interval (an interval
+ *   that depends on `eps`) around the truth.
+ * @param seed
+ *   A seed to initialize the random number generator used to create the pairwise independent hash functions.
+ * @param maxExactCountOpt
+ *   An Option parameter about how many exact counts a sparse CMS wants to keep.
+ * @tparam K
+ *   The type used to identify the elements to be counted. For example, if you want to count the occurrence of
+ *   user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *   occurrences of those `Long`s with a CMS of type `K=Long`. Note that this mapping between the elements of
+ *   your problem domain and their identifiers used for counting via CMS should be bijective. We require a
+ *   [[CMSHasher]] context bound for `K`, see [[CMSHasherImplicits]] for available implicits that can be
+ *   imported. Which type K should you pick in practice? For domains that have less than `2^64` unique
+ *   elements, you'd typically use `Long`. For larger domains you can try `BigInt`, for example. Other
+ *   possibilities include Spire's `SafeLong` and `Numerical` data types (https://github.com/non/spire),
+ *   though Algebird does not include the required implicits for CMS-hashing (cf. [[CMSHasherImplicits]].
  */
 class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCountOpt: Option[Int] = None)
     extends Monoid[CMS[K]]
@@ -146,11 +144,9 @@ class CMSMonoid[K: CMSHasher](eps: Double, delta: Double, seed: Int, maxExactCou
 }
 
 /**
- * This mutable builder can be used when speed is essential
- * and you can be sure the scope of the mutability cannot escape
- * in an unsafe way. The intended use is to allocate and call
- * result in one method without letting a reference to the instance
- * escape into a closure.
+ * This mutable builder can be used when speed is essential and you can be sure the scope of the mutability
+ * cannot escape in an unsafe way. The intended use is to allocate and call result in one method without
+ * letting a reference to the instance escape into a closure.
  */
 class CMSSummation[K](params: CMSParams[K]) {
   private[this] val hashes = params.hashes.toArray
@@ -224,7 +220,7 @@ class CMSSummation[K](params: CMSParams[K]) {
 }
 
 /**
- * An Aggregator for [[CMS]].  Can be created using CMS.aggregator.
+ * An Aggregator for [[CMS]]. Can be created using CMS.aggregator.
  */
 case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K, CMS[K], CMS[K]] {
   override val monoid: CMSMonoid[K] = cmsMonoid
@@ -238,13 +234,18 @@ case class CMSAggregator[K](cmsMonoid: CMSMonoid[K]) extends MonoidAggregator[K,
 /**
  * Configuration parameters for [[CMS]].
  *
- * @param hashes Pair-wise independent hashes functions.  We need `N=depth` such functions (`depth` can be derived from
- *               `delta`).
- * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
- * @param delta A bound on the probability that a query estimate does not lie within some small interval
- *              (an interval that depends on `eps`) around the truth.
- * @param maxExactCountOpt An Option parameter about how many exact counts a sparse CMS wants to keep.
- * @tparam K The type used to identify the elements to be counted.
+ * @param hashes
+ *   Pair-wise independent hashes functions. We need `N=depth` such functions (`depth` can be derived from
+ *   `delta`).
+ * @param eps
+ *   One-sided error bound on the error of each point query, i.e. frequency estimate.
+ * @param delta
+ *   A bound on the probability that a query estimate does not lie within some small interval (an interval
+ *   that depends on `eps`) around the truth.
+ * @param maxExactCountOpt
+ *   An Option parameter about how many exact counts a sparse CMS wants to keep.
+ * @tparam K
+ *   The type used to identify the elements to be counted.
  */
 case class CMSParams[K](
     hashes: Seq[CMSHash[K]],
@@ -322,12 +323,17 @@ object CMSFunctions {
   /**
    * Generates `N=depth` pair-wise independent hash functions.
    *
-   * @param eps One-sided error bound on the error of each point query, i.e. frequency estimate.
-   * @param delta Error bound on the probability that a query estimate does NOT lie within some small interval around
-   *              the truth.
-   * @param seed Seed for the random number generator.
-   * @tparam K The type used to identify the elements to be counted.
-   * @return The generated hash functions.
+   * @param eps
+   *   One-sided error bound on the error of each point query, i.e. frequency estimate.
+   * @param delta
+   *   Error bound on the probability that a query estimate does NOT lie within some small interval around the
+   *   truth.
+   * @param seed
+   *   Seed for the random number generator.
+   * @tparam K
+   *   The type used to identify the elements to be counted.
+   * @return
+   *   The generated hash functions.
    */
   def generateHashes[K: CMSHasher](eps: Double, delta: Double, seed: Int): Seq[CMSHash[K]] = {
     // Typically, we would use d -- aka depth -- pair-wise independent hash functions of the form
@@ -348,13 +354,15 @@ object CMSFunctions {
 }
 
 /**
- * A trait for CMS implementations that can count elements in a data stream and that can answer point queries (i.e.
- * frequency estimates) for these elements.
+ * A trait for CMS implementations that can count elements in a data stream and that can answer point queries
+ * (i.e. frequency estimates) for these elements.
  *
  * Known implementations: [[CMS]], [[TopCMS]].
  *
- * @tparam K The type used to identify the elements to be counted.
- * @tparam C The type of the actual CMS that implements this trait.
+ * @tparam K
+ *   The type used to identify the elements to be counted.
+ * @tparam C
+ *   The type of the actual CMS that implements this trait.
  */
 trait CMSCounting[K, C[_]] {
 
@@ -364,19 +372,20 @@ trait CMSCounting[K, C[_]] {
   def eps: Double
 
   /**
-   * Returns the bound on the probability that a query estimate does NOT lie within some small interval (an interval
-   * that depends on `eps`) around the truth.
+   * Returns the bound on the probability that a query estimate does NOT lie within some small interval (an
+   * interval that depends on `eps`) around the truth.
    */
   def delta: Double
 
   /**
-   * Number of hash functions (also: number of rows in the counting table).  This number is derived from `delta`.
+   * Number of hash functions (also: number of rows in the counting table). This number is derived from
+   * `delta`.
    */
   def depth: Int = CMSFunctions.depth(delta)
 
   /**
-   * Number of counters per hash function (also: number of columns in the counting table).  This number is derived from
-   * `eps`.
+   * Number of counters per hash function (also: number of columns in the counting table). This number is
+   * derived from `eps`.
    */
   def width: Int = CMSFunctions.width(eps)
 
@@ -407,27 +416,25 @@ trait CMSCounting[K, C[_]] {
   def +(item: K, count: Long): C[K]
 
   /**
-   * Returns an estimate of the total number of times this item has been seen
-   * in the stream so far. This estimate is an upper bound.
+   * Returns an estimate of the total number of times this item has been seen in the stream so far. This
+   * estimate is an upper bound.
    *
-   * It is always true that `estimatedFrequency >= trueFrequency`.
-   * With probability `p >= 1 - delta`, it also holds that
-   * `estimatedFrequency <= trueFrequency + eps * totalCount`.
+   * It is always true that `estimatedFrequency >= trueFrequency`. With probability `p >= 1 - delta`, it also
+   * holds that `estimatedFrequency <= trueFrequency + eps * totalCount`.
    */
   def frequency(item: K): Approximate[Long]
 
   /**
    * Returns an estimate of the inner product against another data stream.
    *
-   * In other words, let a_i denote the number of times element i has been seen in
-   * the data stream summarized by this CMS, and let b_i denote the same for the other CMS.
-   * Then this returns an estimate of `<a, b> = \sum a_i b_i`.
+   * In other words, let a_i denote the number of times element i has been seen in the data stream summarized
+   * by this CMS, and let b_i denote the same for the other CMS. Then this returns an estimate of `<a, b> =
+   * \sum a_i b_i`.
    *
    * Note: This can also be viewed as the join size between two relations.
    *
-   * It is always true that actualInnerProduct <= estimatedInnerProduct.
-   * With probability `p >= 1 - delta`, it also holds that
-   * `estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount`.
+   * It is always true that actualInnerProduct <= estimatedInnerProduct. With probability `p >= 1 - delta`, it
+   * also holds that `estimatedInnerProduct <= actualInnerProduct + eps * thisTotalCount * otherTotalCount`.
    */
   def innerProduct(other: C[K]): Approximate[Long]
 
@@ -451,13 +458,14 @@ trait CMSCounting[K, C[_]] {
 /**
  * A trait for CMS implementations that can track heavy hitters in a data stream.
  *
- * It is up to the implementation how the semantics of tracking heavy hitters are defined.  For instance, one
- * implementation could track the "top %" heavy hitters whereas another implementation could track the "top N" heavy
- * hitters.
+ * It is up to the implementation how the semantics of tracking heavy hitters are defined. For instance, one
+ * implementation could track the "top %" heavy hitters whereas another implementation could track the "top N"
+ * heavy hitters.
  *
  * Known implementations: [[TopCMS]].
  *
- * @tparam K The type used to identify the elements to be counted.
+ * @tparam K
+ *   The type used to identify the elements to be counted.
  */
 trait CMSHeavyHitters[K] {
 
@@ -530,7 +538,8 @@ object CMS {
 }
 
 /**
- * A Count-Min sketch data structure that allows for counting and frequency estimation of elements in a data stream.
+ * A Count-Min sketch data structure that allows for counting and frequency estimation of elements in a data
+ * stream.
  *
  * Tip: If you also need to track heavy hitters ("Top N" problems), take a look at [[TopCMS]].
  *
@@ -538,28 +547,23 @@ object CMS {
  *
  * This example demonstrates how to count `Long` elements with [[CMS]], i.e. `K=Long`.
  *
- * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`.  That is,
- * the counting table behind the scenes is backed by `Long` values (at least in the current implementation), and thus
- * the returned frequency estimates are always instances of `Approximate[Long]`.
+ * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`. That is,
+ * the counting table behind the scenes is backed by `Long` values (at least in the current implementation),
+ * and thus the returned frequency estimates are always instances of `Approximate[Long]`.
  *
- * @example {{{
+ * @example
+ * {{{
  *
- * // Creates a monoid for a CMS that can count `Long` elements.
- * val cmsMonoid: CMSMonoid[Long] = {
- *   val eps = 0.001
- *   val delta = 1E-10
- *   val seed = 1
- *   CMS.monoid[Long](eps, delta, seed)
- * }
+ * // Creates a monoid for a CMS that can count `Long` elements. val cmsMonoid: CMSMonoid[Long] = { val eps =
+ * 0.001 val delta = 1E-10 val seed = 1 CMS.monoid[Long](eps, delta, seed) }
  *
- * // Creates a CMS instance that has counted the element `1L`.
- * val cms: CMS[Long] = cmsMonoid.create(1L)
+ * // Creates a CMS instance that has counted the element `1L`. val cms: CMS[Long] = cmsMonoid.create(1L)
  *
- * // Estimates the frequency of `1L`
- * val estimate: Approximate[Long] = cms.frequency(1L)
+ * // Estimates the frequency of `1L` val estimate: Approximate[Long] = cms.frequency(1L)
  * }}}
  *
- * @tparam K The type used to identify the elements to be counted.
+ * @tparam K
+ *   The type used to identify the elements to be counted.
  */
 sealed abstract class CMS[K](val params: CMSParams[K]) extends java.io.Serializable with CMSCounting[K, CMS] {
 
@@ -574,7 +578,7 @@ sealed abstract class CMS[K](val params: CMSParams[K]) extends java.io.Serializa
 }
 
 /**
- * Zero element.  Used for initialization.
+ * Zero element. Used for initialization.
  */
 case class CMSZero[K](override val params: CMSParams[K]) extends CMS[K](params) {
 
@@ -729,10 +733,9 @@ case class CMSInstance[K](
   }
 
   /**
-   * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and column k.
-   * Then the Count-Min sketch estimate of the inner product between A and B is the minimum inner product between their
-   * rows:
-   * estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k]|)
+   * Let X be a CMS, and let count_X[j, k] denote the value in X's 2-dimensional count table at row j and
+   * column k. Then the Count-Min sketch estimate of the inner product between A and B is the minimum inner
+   * product between their rows: estimatedInnerProduct = min_j (\sum_k count_A[j, k] * count_B[j, k]|)
    */
   override def innerProduct(other: CMS[K]): Approximate[Long] =
     other match {
@@ -776,8 +779,8 @@ object CMSInstance {
   }
 
   /**
-   * The 2-dimensional table of counters used in the Count-Min sketch.
-   * Each row corresponds to a particular hash function.
+   * The 2-dimensional table of counters used in the Count-Min sketch. Each row corresponds to a particular
+   * hash function.
    */
   // TODO: implement a dense matrix type, and use it here
   case class CountsTable[K](counts: Vector[Vector[Long]]) {
@@ -839,42 +842,36 @@ object CMSInstance {
 case class TopCMSParams[K](logic: HeavyHittersLogic[K])
 
 /**
- * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a data stream
- * and (b) tracking the heavy hitters among these elements.
+ * A Count-Min sketch data structure that allows for (a) counting and frequency estimation of elements in a
+ * data stream and (b) tracking the heavy hitters among these elements.
  *
  * The logic of how heavy hitters are computed is pluggable, see [[HeavyHittersLogic]].
  *
- * Tip: If you do not need to track heavy hitters, take a look at [[CMS]], which is more efficient in this case.
+ * Tip: If you do not need to track heavy hitters, take a look at [[CMS]], which is more efficient in this
+ * case.
  *
  * =Usage=
  *
  * This example demonstrates how to count `Long` elements with [[TopCMS]], i.e. `K=Long`.
  *
- * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`.  That is,
- * the counting table behind the scenes is backed by `Long` values (at least in the current implementation), and thus
- * the returned frequency estimates are always instances of `Approximate[Long]`.
+ * Note that the actual counting is always performed with a `Long`, regardless of your choice of `K`. That is,
+ * the counting table behind the scenes is backed by `Long` values (at least in the current implementation),
+ * and thus the returned frequency estimates are always instances of `Approximate[Long]`.
  *
- * @example {{{
- * // Creates a monoid for a CMS that can count `Long` elements.
- * val topPctCMSMonoid: TopPctCMSMonoid[Long] = {
- *   val eps = 0.001
- *   val delta = 1E-10
- *   val seed = 1
- *   val heavyHittersPct = 0.1
- *   TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct)
- * }
+ * @example
+ *   {{{ // Creates a monoid for a CMS that can count `Long` elements. val topPctCMSMonoid:
+ *   TopPctCMSMonoid[Long] = { val eps = 0.001 val delta = 1E-10 val seed = 1 val heavyHittersPct = 0.1
+ *   TopPctCMS.monoid[Long](eps, delta, seed, heavyHittersPct) }
  *
- * // Creates a TopCMS instance that has counted the element `1L`.
- * val topCMS: TopCMS[Long] = topPctCMSMonoid.create(1L)
+ * // Creates a TopCMS instance that has counted the element `1L`. val topCMS: TopCMS[Long] =
+ * topPctCMSMonoid.create(1L)
  *
- * // Estimates the frequency of `1L`
- * val estimate: Approximate[Long] = topCMS.frequency(1L)
+ * // Estimates the frequency of `1L` val estimate: Approximate[Long] = topCMS.frequency(1L)
  *
- * // What are the heavy hitters so far?
- * val heavyHitters: Set[Long] = topCMS.heavyHitters
- * }}}
+ * // What are the heavy hitters so far? val heavyHitters: Set[Long] = topCMS.heavyHitters }}}
  *
- * @tparam K The type used to identify the elements to be counted.
+ * @tparam K
+ *   The type used to identify the elements to be counted.
  */
 sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
     extends java.io.Serializable
@@ -904,7 +901,7 @@ sealed abstract class TopCMS[K](val cms: CMS[K], params: TopCMSParams[K])
 }
 
 /**
- * Zero element.  Used for initialization.
+ * Zero element. Used for initialization.
  */
 case class TopCMSZero[K](override val cms: CMS[K], params: TopCMSParams[K]) extends TopCMS[K](cms, params) {
 
@@ -1061,15 +1058,17 @@ abstract class HeavyHittersLogic[K] extends java.io.Serializable {
 }
 
 /**
- * Finds all heavy hitters, i.e., elements in the stream that appear at least `(heavyHittersPct * totalCount)` times.
+ * Finds all heavy hitters, i.e., elements in the stream that appear at least `(heavyHittersPct * totalCount)`
+ * times.
  *
- * Every item that appears at least `(heavyHittersPct * totalCount)` times is output, and with probability
- * `p >= 1 - delta`, no item whose count is less than `(heavyHittersPct - eps) * totalCount` is output.
+ * Every item that appears at least `(heavyHittersPct * totalCount)` times is output, and with probability `p
+ * >= 1 - delta`, no item whose count is less than `(heavyHittersPct - eps) * totalCount` is output.
  *
- * This also means that this parameter is an upper bound on the number of heavy hitters that will be tracked: the set
- * of heavy hitters contains at most `1 / heavyHittersPct` elements.  For example, if `heavyHittersPct=0.01` (or
- * 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be tracked/returned as heavy hitters.
- * This parameter can thus control the memory footprint required for tracking heavy hitters.
+ * This also means that this parameter is an upper bound on the number of heavy hitters that will be tracked:
+ * the set of heavy hitters contains at most `1 / heavyHittersPct` elements. For example, if
+ * `heavyHittersPct=0.01` (or 0.25), then at most `1 / 0.01 = 100` items (or `1 / 0.25 = 4` items) will be
+ * tracked/returned as heavy hitters. This parameter can thus control the memory footprint required for
+ * tracking heavy hitters.
  */
 case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] {
 
@@ -1085,13 +1084,14 @@ case class TopPctLogic[K](heavyHittersPct: Double) extends HeavyHittersLogic[K] 
 /**
  * Tracks the top N heavy hitters, where `N` is defined by `heavyHittersN`.
  *
- * '''Warning:''' top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with
- * regard to heavy hitters) when merging instances.  This means merging heavy hitters across CMS instances may lead to
- * incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are being
- * merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely is
- * the end result biased towards these heavy hitters.
+ * '''Warning:''' top-N computations are not associative. The effect is that a top-N CMS has an ordering bias
+ * (with regard to heavy hitters) when merging instances. This means merging heavy hitters across CMS
+ * instances may lead to incorrect, biased results: the outcome is biased by the order in which CMS instances
+ * / heavy hitters are being merged, with the rule of thumb being that the earlier a set of heavy hitters is
+ * being merged, the more likely is the end result biased towards these heavy hitters.
  *
- * @see Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
+ * @see
+ *   Discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]]
  */
 case class TopNLogic[K](heavyHittersN: Int) extends HeavyHittersLogic[K] {
 
@@ -1141,31 +1141,33 @@ case class HeavyHitter[K](item: K, count: Long) extends java.io.Serializable
  *
  * =Usage=
  *
- * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
+ * The type `K` is the type of items you want to count. You must provide an implicit `CMSHasher[K]` for `K`,
+ * and Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
- * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as Double, and then use the `contramap`
- * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
- * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
- * starting point.
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation"
+ * function to convert items of your (unsupported) type `K` to a supported type such as Double, and then use
+ * the `contramap` function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the
+ * documentation of [[CMSHasher]] for an example); 2) You implement a `CMSHasher[K]` from scratch, using the
+ * existing CMSHasher implementations as a starting point.
  *
- * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
- * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
- * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
- * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely
+ * use types such as `Array[Byte]`. Extra work is required for Arrays. For example, you may opt to convert
+ * `Array[T]` to a `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes. Algebird provides one
+ * such wrapper class, [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
- * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
- * @param heavyHittersPct A threshold for finding heavy hitters, i.e., elements that appear at least
- *                  (heavyHittersPct * totalCount) times in the stream.
- * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
- *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
- *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
- *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that
- *           can be imported.
- *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use `Long`.  For larger domains you can try `BigInt`, for example.
+ * @param cms
+ *   A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
+ * @param heavyHittersPct
+ *   A threshold for finding heavy hitters, i.e., elements that appear at least (heavyHittersPct * totalCount)
+ *   times in the stream.
+ * @tparam K
+ *   The type used to identify the elements to be counted. For example, if you want to count the occurrence of
+ *   user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *   occurrences of those `Long`s with a CMS of type `K=Long`. Note that this mapping between the elements of
+ *   your problem domain and their identifiers used for counting via CMS should be bijective. We require a
+ *   [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that can be imported.
+ *   Which type K should you pick in practice? For domains that have less than `2^64` unique elements, you'd
+ *   typically use `Long`. For larger domains you can try `BigInt`, for example.
  */
 class TopPctCMSMonoid[K](cms: CMS[K], heavyHittersPct: Double = 0.01)
     extends TopCMSMonoid[K](cms, TopPctLogic[K](heavyHittersPct))
@@ -1202,62 +1204,67 @@ object TopPctCMS {
 }
 
 /**
- * An Aggregator for [[TopPctCMS]].  Can be created using [[TopPctCMS.aggregator]].
+ * An Aggregator for [[TopPctCMS]]. Can be created using [[TopPctCMS.aggregator]].
  */
 case class TopPctCMSAggregator[K](cmsMonoid: TopPctCMSMonoid[K]) extends TopCMSAggregator(cmsMonoid)
 
 /**
- * Monoid for top-N based [[TopCMS]] sketches.  '''Use with care! (see warning below)'''
+ * Monoid for top-N based [[TopCMS]] sketches. '''Use with care! (see warning below)'''
  *
  * =Warning: Adding top-N CMS instances (`++`) is an unsafe operation=
  *
- * Top-N computations are not associative.  The effect is that a top-N CMS has an ordering bias (with regard to heavy
- * hitters) when ''merging'' CMS instances (e.g. via `++`).  This means merging heavy hitters across CMS instances may
- * lead to incorrect, biased results:  the outcome is biased by the order in which CMS instances / heavy hitters are
- * being merged, with the rule of thumb being that the earlier a set of heavy hitters is being merged, the more likely
- * is the end result biased towards these heavy hitters.
+ * Top-N computations are not associative. The effect is that a top-N CMS has an ordering bias (with regard to
+ * heavy hitters) when ''merging'' CMS instances (e.g. via `++`). This means merging heavy hitters across CMS
+ * instances may lead to incorrect, biased results: the outcome is biased by the order in which CMS instances
+ * / heavy hitters are being merged, with the rule of thumb being that the earlier a set of heavy hitters is
+ * being merged, the more likely is the end result biased towards these heavy hitters.
  *
- * The warning above only applies when ''adding CMS instances'' (think: `cms1 ++ cms2`).  In comparison, heavy hitters
- * are correctly computed when:
+ * The warning above only applies when ''adding CMS instances'' (think: `cms1 ++ cms2`). In comparison, heavy
+ * hitters are correctly computed when:
  *
  *   - a top-N CMS instance is created from a single data stream, i.e. `Seq[K]`
  *   - items are added/counted individually, i.e. `cms + item` or `cms + (item, count)`.
  *
- * See the discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]] for further details.
+ * See the discussion in [[https://github.com/twitter/algebird/issues/353 Algebird issue 353]] for further
+ * details.
  *
  * =Alternatives=
  *
- * The following, alternative data structures may be better picks than a top-N based CMS given the warning above:
+ * The following, alternative data structures may be better picks than a top-N based CMS given the warning
+ * above:
  *
  *   - [[TopPctCMS]]: Has safe merge semantics for its instances including heavy hitters.
- *   - [[SpaceSaver]]: Has the same ordering bias than a top-N CMS, but at least it provides bounds on the bias.
+ *   - [[SpaceSaver]]: Has the same ordering bias than a top-N CMS, but at least it provides bounds on the
+ *     bias.
  *
  * =Usage=
  *
- * The type `K` is the type of items you want to count.  You must provide an implicit `CMSHasher[K]` for `K`,  and
- * Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
+ * The type `K` is the type of items you want to count. You must provide an implicit `CMSHasher[K]` for `K`,
+ * and Algebird ships with several such implicits for commonly used types such as `Long` and `BigInt`.
  *
- * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation" function to
- * convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then use the `contramap`
- * function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the documentation of [[CMSHasher]]
- * for an example); 2) You implement a `CMSHasher[K]` from scratch, using the existing CMSHasher implementations as a
- * starting point.
+ * If your type `K` is not supported out of the box, you have two options: 1) You provide a "translation"
+ * function to convert items of your (unsupported) type `K` to a supported type such as [[Double]], and then
+ * use the `contramap` function of [[CMSHasher]] to create the required `CMSHasher[K]` for your type (see the
+ * documentation of [[CMSHasher]] for an example); 2) You implement a `CMSHasher[K]` from scratch, using the
+ * existing CMSHasher implementations as a starting point.
  *
- * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely use types
- * such as `Array[Byte]`.  Extra work is required for Arrays.  For example, you may opt to convert `Array[T]` to a
- * `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes.  Algebird provides one such wrapper class,
- * [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
+ * Note: Because Arrays in Scala/Java not have sane `equals` and `hashCode` implementations, you cannot safely
+ * use types such as `Array[Byte]`. Extra work is required for Arrays. For example, you may opt to convert
+ * `Array[T]` to a `Seq[T]` via `toSeq`, or you can provide appropriate wrapper classes. Algebird provides one
+ * such wrapper class, [[Bytes]], to safely wrap an `Array[Byte]` for use with CMS.
  *
- * @param cms A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
- * @param heavyHittersN The maximum number of heavy hitters to track.
- * @tparam K The type used to identify the elements to be counted.  For example, if you want to count the occurrence of
- *           user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
- *           occurrences of those `Long`s with a CMS of type `K=Long`.  Note that this mapping between the elements of
- *           your problem domain and their identifiers used for counting via CMS should be bijective.
- *           We require a [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that
- *           can be imported.
- *           Which type K should you pick in practice?  For domains that have less than `2^64` unique elements, you'd
- *           typically use `Long`.  For larger domains you can try `BigInt`, for example.
+ * @param cms
+ *   A [[CMS]] instance, which is used for the counting and the frequency estimation performed by this class.
+ * @param heavyHittersN
+ *   The maximum number of heavy hitters to track.
+ * @tparam K
+ *   The type used to identify the elements to be counted. For example, if you want to count the occurrence of
+ *   user names, you could map each username to a unique numeric ID expressed as a `Long`, and then count the
+ *   occurrences of those `Long`s with a CMS of type `K=Long`. Note that this mapping between the elements of
+ *   your problem domain and their identifiers used for counting via CMS should be bijective. We require a
+ *   [[CMSHasher]] context bound for `K`, see [[CMSHasher]] for available implicits that can be imported.
+ *   Which type K should you pick in practice? For domains that have less than `2^64` unique elements, you'd
+ *   typically use `Long`. For larger domains you can try `BigInt`, for example.
  */
 class TopNCMSMonoid[K](cms: CMS[K], heavyHittersN: Int = 100)
     extends TopCMSMonoid[K](cms, TopNLogic[K](heavyHittersN))
@@ -1284,13 +1291,12 @@ object TopNCMS {
 }
 
 /**
- * An Aggregator for [[TopNCMS]].  Can be created using [[TopNCMS.aggregator]].
+ * An Aggregator for [[TopNCMS]]. Can be created using [[TopNCMS.aggregator]].
  */
 case class TopNCMSAggregator[K](cmsMonoid: TopNCMSMonoid[K]) extends TopCMSAggregator(cmsMonoid)
 
 /**
- * K1 defines a scope for the CMS.  For each k1, keep the top heavyHittersN
- * associated k2 values.
+ * K1 defines a scope for the CMS. For each k1, keep the top heavyHittersN associated k2 values.
  */
 case class ScopedTopNLogic[K1, K2](heavyHittersN: Int) extends HeavyHittersLogic[(K1, K2)] {
 
@@ -1395,9 +1401,8 @@ case class CMSHash[K: CMSHasher](a: Int, b: Int, width: Int) extends java.io.Ser
 /**
  * This formerly held the instances that moved to object CMSHasher
  *
- * These instances are slow, but here for compatibility with old
- * serialized data. For new code, avoid these and instead use the
- * implicits found in the CMSHasher companion object.
+ * These instances are slow, but here for compatibility with old serialized data. For new code, avoid these
+ * and instead use the implicits found in the CMSHasher companion object.
  */
 object CMSHasherImplicits {
 

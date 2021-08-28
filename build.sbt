@@ -176,8 +176,7 @@ lazy val mimaSettings = Def.settings(
 )
 
 /**
- * This returns the previous jar we released that is compatible with
- * the current.
+ * This returns the previous jar we released that is compatible with the current.
  */
 val noBinaryCompatCheck = Set[String]("benchmark", "caliper", "spark")
 

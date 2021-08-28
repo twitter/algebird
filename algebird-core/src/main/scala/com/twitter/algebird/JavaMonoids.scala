@@ -23,7 +23,7 @@ import java.lang.{
   Long => JLong,
   Short => JShort
 }
-import java.util.{List => JList, Map => JMap, ArrayList => JArrayList, HashMap => JHashMap}
+import java.util.{ArrayList => JArrayList, HashMap => JHashMap, List => JList, Map => JMap}
 
 import scala.collection.JavaConverters._
 
@@ -84,8 +84,8 @@ object JBoolRing extends Ring[JBool] {
 }
 
 /**
- * Since Lists are mutable, this always makes a full copy. Prefer scala immutable Lists
- * if you use scala immutable lists, the tail of the result of plus is always the right argument
+ * Since Lists are mutable, this always makes a full copy. Prefer scala immutable Lists if you use scala
+ * immutable lists, the tail of the result of plus is always the right argument
  */
 class JListMonoid[T] extends Monoid[JList[T]] {
   override def isNonZero(x: JList[T]): Boolean = !x.isEmpty
@@ -99,9 +99,8 @@ class JListMonoid[T] extends Monoid[JList[T]] {
 }
 
 /**
- * Since maps are mutable, this always makes a full copy. Prefer scala immutable maps
- * if you use scala immutable maps, this operation is much faster
- * TODO extend this to Group, Ring
+ * Since maps are mutable, this always makes a full copy. Prefer scala immutable maps if you use scala
+ * immutable maps, this operation is much faster TODO extend this to Group, Ring
  */
 class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
   override lazy val zero: JHashMap[K, V] = new JHashMap[K, V](0)

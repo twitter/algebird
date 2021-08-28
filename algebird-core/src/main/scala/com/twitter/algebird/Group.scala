@@ -18,12 +18,12 @@ package com.twitter.algebird
 import algebra.{Group => AGroup}
 import algebra.ring.AdditiveGroup
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
 
 import scala.reflect.ClassTag
@@ -32,8 +32,8 @@ import scala.annotation.implicitNotFound
 import scala.math.Equiv
 
 /**
- * Group: this is a monoid that also has subtraction (and negation):
- *   So, you can do (a-b), or -a (which is equal to 0 - a).
+ * Group: this is a monoid that also has subtraction (and negation): So, you can do (a-b), or -a (which is
+ * equal to 0 - a).
  */
 
 @implicitNotFound(msg = "Cannot find Group type class for ${T}")
@@ -68,10 +68,8 @@ object UnitGroup extends ConstantGroup[Unit](())
 object NullGroup extends ConstantGroup[Null](null)
 
 /**
- * Some(5) - Some(3) == Some(2)
- * Some(5) - Some(5) == None
- * negate Some(5) == Some(-5)
- * Note: Some(0) and None are equivalent under this Group
+ * Some(5) - Some(3) == Some(2) Some(5) - Some(5) == None negate Some(5) == Some(-5) Note: Some(0) and None
+ * are equivalent under this Group
  */
 class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Group[Option[T]] {
 
@@ -83,8 +81,8 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Grou
 }
 
 /**
- * Extends pair-wise sum Array monoid into a Group
- * negate is defined as the negation of each element of the array.
+ * Extends pair-wise sum Array monoid into a Group negate is defined as the negation of each element of the
+ * array.
  */
 class ArrayGroup[T: ClassTag](implicit grp: Group[T]) extends ArrayMonoid[T]() with Group[Array[T]] {
   override def negate(g: Array[T]): Array[T] = {

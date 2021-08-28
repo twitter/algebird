@@ -48,8 +48,7 @@ class TopKTests extends CheckProperties {
   }
 
   /**
-   * The following were specific bugs that we failed some prior
-   * scalacheck (yay for randomized testing)
+   * The following were specific bugs that we failed some prior scalacheck (yay for randomized testing)
    */
   val pqPriorBugs: Seq[List[List[Int]]] = Seq(List(List(1, 1, 1, 2), List(0, 0, 0, 0, 0, 0, 0)))
   property("Specific regressions are handled") {

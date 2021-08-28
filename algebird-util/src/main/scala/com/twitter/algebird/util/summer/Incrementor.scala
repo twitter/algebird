@@ -1,7 +1,8 @@
 package com.twitter.algebird.util.summer
 
 /**
- * @author Mansur Ashraf.
+ * @author
+ *   Mansur Ashraf.
  */
 trait Incrementor {
   def incr(): Unit

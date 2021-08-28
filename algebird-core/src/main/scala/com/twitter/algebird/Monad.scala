@@ -21,16 +21,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import collection.GenTraversable
 
 /**
- * Simple implementation of a Monad type-class.
- * Subclasses only need to override apply and flatMap, but they should override map,
- * join, joinWith, and sequence if there are better implementations.
+ * Simple implementation of a Monad type-class. Subclasses only need to override apply and flatMap, but they
+ * should override map, join, joinWith, and sequence if there are better implementations.
  *
- * Laws Monads must follow:
- * identities:
- *  flatMap(apply(x))(fn) == fn(x)
- *  flatMap(m)(apply _) == m
- * associativity on flatMap (you can either flatMap f first, or f to g:
- *  flatMap(flatMap(m)(f))(g) == flatMap(m) { x => flatMap(f(x))(g) }
+ * Laws Monads must follow: identities: flatMap(apply(x))(fn) == fn(x) flatMap(m)(apply _) == m associativity
+ * on flatMap (you can either flatMap f first, or f to g: flatMap(flatMap(m)(f))(g) == flatMap(m) { x =>
+ * flatMap(f(x))(g) }
  */
 @implicitNotFound(msg = "Cannot find Monad type class for ${M}")
 trait Monad[M[_]] extends Applicative[M] {
@@ -129,8 +125,7 @@ object Monad {
 }
 
 /**
- * This enrichment allows us to use our Monad instances in for expressions:
- * if (import Monad._) has been done
+ * This enrichment allows us to use our Monad instances in for expressions: if (import Monad._) has been done
  */
 class MonadOperators[A, M[_]](m: M[A])(implicit monad: Monad[M]) extends ApplicativeOperators[A, M](m) {
   def flatMap[U](fn: (A) => M[U]): M[U] = monad.flatMap(m)(fn)

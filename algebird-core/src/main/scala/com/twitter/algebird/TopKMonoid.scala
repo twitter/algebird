@@ -41,10 +41,8 @@ object TopKMonoid extends java.io.Serializable {
 }
 
 /**
- * A top-k monoid that is much faster than SortedListTake
- * equivalent to: (left ++ right).sorted.take(k)
- * but doesn't do a total sort
- * If you can handle the mutability, mutable.PriorityQueueMonoid is even faster.
+ * A top-k monoid that is much faster than SortedListTake equivalent to: (left ++ right).sorted.take(k) but
+ * doesn't do a total sort If you can handle the mutability, mutable.PriorityQueueMonoid is even faster.
  *
  * NOTE!!!! This assumes the inputs are already sorted! resorting each time kills speed
  */

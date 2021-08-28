@@ -20,9 +20,7 @@ import scala.annotation.implicitNotFound
 /**
  * Simple implementation of a Functor type-class.
  *
- * Laws Functors must follow:
- *  map(m)(id) == m
- *  map(m)(f andThen g) == map(map(m)(f))(g)
+ * Laws Functors must follow: map(m)(id) == m map(m)(f andThen g) == map(map(m)(f))(g)
  */
 @implicitNotFound(msg = "Cannot find Functor type class for ${M}")
 trait Functor[M[_]] {
@@ -49,8 +47,8 @@ object Functor {
 }
 
 /**
- * This enrichment allows us to use our Functor instances in for expressions:
- * if (import Functor._) has been done
+ * This enrichment allows us to use our Functor instances in for expressions: if (import Functor._) has been
+ * done
  */
 class FunctorOperators[A, M[_]](m: M[A])(implicit functor: Functor[M]) {
   // This is called fmap in haskell

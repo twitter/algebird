@@ -19,18 +19,14 @@ import scala.annotation.implicitNotFound
 import scala.collection.compat._
 
 /**
- * Simple implementation of an Applicative type-class.
- * There are many choices for the canonical second operation (join, sequence, joinWith, ap),
- * all equivalent. For a Functor modeling concurrent computations with failure, like Future,
- * combining results with join can save a lot of time over combining with flatMap. (Given two
- * operations, if the second fails before the first completes, one can fail the entire computation
- * right then. With flatMap, one would have to wait for the first operation to complete before
- * failing it.)
+ * Simple implementation of an Applicative type-class. There are many choices for the canonical second
+ * operation (join, sequence, joinWith, ap), all equivalent. For a Functor modeling concurrent computations
+ * with failure, like Future, combining results with join can save a lot of time over combining with flatMap.
+ * (Given two operations, if the second fails before the first completes, one can fail the entire computation
+ * right then. With flatMap, one would have to wait for the first operation to complete before failing it.)
  *
- * Laws Applicatives must follow:
- *  map(apply(x))(f) == apply(f(x))
- *  join(apply(x), apply(y)) == apply((x, y))
- *  (sequence and joinWith specialize join - they should behave appropriately)
+ * Laws Applicatives must follow: map(apply(x))(f) == apply(f(x)) join(apply(x), apply(y)) == apply((x, y))
+ * (sequence and joinWith specialize join - they should behave appropriately)
  */
 @implicitNotFound(msg = "Cannot find Applicative type class for ${M}")
 trait Applicative[M[_]] extends Functor[M] {
@@ -127,8 +123,8 @@ class PureOp[A](val a: A) extends AnyVal {
 }
 
 /**
- * This enrichment allows us to use our Applicative instances in for expressions:
- * if (import Applicative._) has been done
+ * This enrichment allows us to use our Applicative instances in for expressions: if (import Applicative._)
+ * has been done
  */
 class ApplicativeOperators[A, M[_]](m: M[A])(implicit app: Applicative[M]) extends FunctorOperators[A, M](m) {
   def join[B](mb: M[B]): M[(A, B)] = app.join(m, mb)
@@ -152,9 +148,8 @@ class ApplicativeMonoid[T, M[_]](implicit app: Applicative[M], mon: Monoid[T])
 }
 
 /**
- * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
- * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
- * this generally works.
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your Applicative. If your M[_]
+ * is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...) this generally works.
  */
 class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
     extends ApplicativeMonoid[T, M]
@@ -164,9 +159,8 @@ class ApplicativeGroup[T, M[_]](implicit app: Applicative[M], grp: Group[T])
 }
 
 /**
- * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your
- * Applicative. If your M[_] is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...)
- * this generally works.
+ * Group and Ring ARE NOT AUTOMATIC. You have to check that the laws hold for your Applicative. If your M[_]
+ * is a wrapper type (Option[_], Some[_], Try[_], Future[_], etc...) this generally works.
  */
 class ApplicativeRing[T, M[_]](implicit app: Applicative[M], ring: Ring[T])
     extends ApplicativeGroup[T, M]

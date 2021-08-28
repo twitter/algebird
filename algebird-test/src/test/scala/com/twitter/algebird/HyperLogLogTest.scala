@@ -70,8 +70,7 @@ class HyperLogLogLaws extends CheckProperties {
   }
 
   /**
-   * We can't change the way Array[Byte] was hashed without breaking
-   * serialized HLLs
+   * We can't change the way Array[Byte] was hashed without breaking serialized HLLs
    */
   property("HyperLogLog.hash matches reference") {
     Prop.forAll { a: Array[Byte] => HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq }
@@ -161,8 +160,7 @@ class HLLIntersectionProperty[T: Hash128: Gen](bits: Int, numHlls: Int) extends 
 }
 
 /**
- * SetSizeAggregator should work as an aggregator and return
- * approximate size when > maxSetSize
+ * SetSizeAggregator should work as an aggregator and return approximate size when > maxSetSize
  */
 abstract class SetSizeAggregatorProperty[T] extends ApproximateProperty {
   type Exact = Set[T]

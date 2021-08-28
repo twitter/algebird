@@ -29,10 +29,8 @@ sealed trait Interval[T] extends java.io.Serializable {
   final def &&(that: Interval[T])(implicit ord: Ordering[T]): Interval[T] = intersect(that)
 
   /**
-   * Map the Interval with a non-decreasing function.
-   * If you use a non-monotonic function (like x^2)
-   * then the result is meaningless.
-   * TODO: It might be good to have types for these properties in algebird.
+   * Map the Interval with a non-decreasing function. If you use a non-monotonic function (like x^2) then the
+   * result is meaningless. TODO: It might be good to have types for these properties in algebird.
    */
   def mapNonDecreasing[U](fn: T => U): Interval[U]
 }
@@ -54,11 +52,9 @@ case class Empty[T]() extends Interval[T] {
 object Interval extends java.io.Serializable {
 
   /**
-   * Class that only exists so that [[leftClosedRightOpen]] and
-   * [[leftOpenRightClosed]] can retain the type information of the
-   * returned interval. The compiler doesn't know anything about
-   * ordering, so without [[MaybeEmpty]] the only valid return type
-   * is Interval[T].
+   * Class that only exists so that [[leftClosedRightOpen]] and [[leftOpenRightClosed]] can retain the type
+   * information of the returned interval. The compiler doesn't know anything about ordering, so without
+   * [[MaybeEmpty]] the only valid return type is Interval[T].
    */
   sealed abstract class MaybeEmpty[T, NonEmpty[t] <: Interval[t]] {
     def isEmpty: Boolean
@@ -117,9 +113,8 @@ object Interval extends java.io.Serializable {
     else MaybeEmpty.SoEmpty[T, ExLowExUp]()
 
   /**
-   * This is here for binary compatibility reasons. These methods should
-   * be moved to Interval, which should also be an abstract class for
-   * better binary compatibility at the next incompatible change
+   * This is here for binary compatibility reasons. These methods should be moved to Interval, which should
+   * also be an abstract class for better binary compatibility at the next incompatible change
    */
   implicit final class IntervalMethods[T](val intr: Interval[T]) extends AnyVal {
     def isEmpty(implicit succ: Successible[T], pred: Predecessible[T]): Boolean = intr match {
@@ -142,8 +137,7 @@ object Interval extends java.io.Serializable {
     }
 
     /**
-     * If this returns Some(t), then intr.contains(t) and there
-     * is no s less than t such that intr.contains(s)
+     * If this returns Some(t), then intr.contains(t) and there is no s less than t such that intr.contains(s)
      *
      * if this returns None, it may be Empty, Upper or Universe
      */
@@ -156,8 +150,8 @@ object Interval extends java.io.Serializable {
     }
 
     /**
-     * If this returns Some(t), then intr.contains(t) and there
-     * is no s greater than t such that intr.contains(s)
+     * If this returns Some(t), then intr.contains(t) and there is no s greater than t such that
+     * intr.contains(s)
      *
      * if this returns None, it may be Empty, Lower, or Universe
      */
@@ -176,19 +170,16 @@ object Interval extends java.io.Serializable {
 sealed trait Lower[T] extends Interval[T] {
 
   /**
-   * This may give a false positive (but should try not to).
-   * Note the case of (0,1) for the integers. If they were doubles,
-   * this would intersect, but since there are no members of the
-   * set Int that are bigger than 0 and less than 1, they don't really
-   * intersect. So, ordering is not enough here. You need a stronger
+   * This may give a false positive (but should try not to). Note the case of (0,1) for the integers. If they
+   * were doubles, this would intersect, but since there are no members of the set Int that are bigger than 0
+   * and less than 1, they don't really intersect. So, ordering is not enough here. You need a stronger
    * notion, which we don't have a typeclass for.
    */
   def intersects(u: Upper[T])(implicit ord: Ordering[T]): Boolean
 
   /**
-   * The smallest value that is contained here
-   * This is an Option, because of cases like ExclusiveLower(Int.MaxValue)
-   * which are pathological and equivalent to Empty
+   * The smallest value that is contained here This is an Option, because of cases like
+   * ExclusiveLower(Int.MaxValue) which are pathological and equivalent to Empty
    */
   def least(implicit s: Successible[T]): Option[T]
   def strictLowerBound(implicit p: Predecessible[T]): Option[T]
@@ -205,9 +196,8 @@ sealed trait Lower[T] extends Interval[T] {
 sealed trait Upper[T] extends Interval[T] {
 
   /**
-   * The smallest value that is contained here
-   * This is an Option, because of cases like ExclusiveUpper(Int.MinValue),
-   * which are pathological and equivalent to Empty
+   * The smallest value that is contained here This is an Option, because of cases like
+   * ExclusiveUpper(Int.MinValue), which are pathological and equivalent to Empty
    */
   def greatest(implicit p: Predecessible[T]): Option[T]
   // The smallest value that is not present
@@ -345,8 +335,7 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     lower.least.filter(upper.contains(_)(s.ordering))
 
   /**
-   * Goes from lowest to highest for all items
-   * that are contained in this Intersection
+   * Goes from lowest to highest for all items that are contained in this Intersection
    */
   def leastToGreatest(implicit s: Successible[T]): Iterable[T] = {
     val self = this
@@ -362,8 +351,7 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
     upper.greatest.filter(lower.contains(_)(p.ordering))
 
   /**
-   * Goes from highest to lowest for all items
-   * that are contained in this Intersection
+   * Goes from highest to lowest for all items that are contained in this Intersection
    */
   def greatestToLeast(implicit p: Predecessible[T]): Iterable[T] = {
     val self = this
@@ -376,14 +364,11 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
   }
 
   /**
-   * Some intervals can actually be synonyms for empty:
-   * (0,0) for instance, contains nothing. This cannot be normalized to
-   * [a, b) form, thus we return an option
-   * Also, there are cases like [Int.MinValue, Int.MaxValue] that cannot
-   * are actually equivalent to Universe.
-   * The bottom line: if this returns None, it just means you can't express
-   * it this way, it does not mean it is empty or universe, etc... (there
-   * are other cases).
+   * Some intervals can actually be synonyms for empty: (0,0) for instance, contains nothing. This cannot be
+   * normalized to [a, b) form, thus we return an option Also, there are cases like [Int.MinValue,
+   * Int.MaxValue] that cannot are actually equivalent to Universe. The bottom line: if this returns None, it
+   * just means you can't express it this way, it does not mean it is empty or universe, etc... (there are
+   * other cases).
    */
   def toLeftClosedRightOpen(implicit
       s: Successible[T]

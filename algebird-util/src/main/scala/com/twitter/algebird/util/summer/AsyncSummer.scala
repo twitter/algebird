@@ -18,7 +18,8 @@ package com.twitter.algebird.util.summer
 import com.twitter.util.Future
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 trait AsyncSummer[T, +M <: Iterable[T]] { self =>
   def flush: Future[M]

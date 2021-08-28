@@ -29,15 +29,20 @@ object Scan {
   }
 
   /**
-   * Scans take streams of inputs to streams of outputs, but some scans have trivial inputs and just produce a stream of
-   * outputs. Streams can be thought of as being a hidden state that is queryable for a head element, and another hidden
-   * state that represents the rest of the stream.
-   * @param initState The initial state of the scan; think of this as an infinite stream.
-   * @param destructor This function decomposes a stream into the its head-element and tail-stream.
-   * @tparam S The hidden state of the stream that we are turning into a Scan.
-   * @tparam O The type of the elments of the stream that we are turning into a Scan
-   * @return A Scan whose inputs are irrelevant, and whose outputs are those that we would get from implementing
-   *         a stream using the information provided to this method.
+   * Scans take streams of inputs to streams of outputs, but some scans have trivial inputs and just produce a
+   * stream of outputs. Streams can be thought of as being a hidden state that is queryable for a head
+   * element, and another hidden state that represents the rest of the stream.
+   * @param initState
+   *   The initial state of the scan; think of this as an infinite stream.
+   * @param destructor
+   *   This function decomposes a stream into the its head-element and tail-stream.
+   * @tparam S
+   *   The hidden state of the stream that we are turning into a Scan.
+   * @tparam O
+   *   The type of the elments of the stream that we are turning into a Scan
+   * @return
+   *   A Scan whose inputs are irrelevant, and whose outputs are those that we would get from implementing a
+   *   stream using the information provided to this method.
    */
   def iterate[S, O](initState: S)(destructor: S => (O, S)): Aux[Any, S, O] = new Scan[Any, O] {
     override type State = S
@@ -54,12 +59,15 @@ object Scan {
   def identity[A]: Aux[A, Unit, A] = fromFunction[A, A](x => x)
 
   /**
-   * @param initStateCreator A call-by-name method that allocates new mutable state
-   * @param presentAndUpdateStateFn A function that both presents the output value, and has the side-effect of updating the mutable state
+   * @param initStateCreator
+   *   A call-by-name method that allocates new mutable state
+   * @param presentAndUpdateStateFn
+   *   A function that both presents the output value, and has the side-effect of updating the mutable state
    * @tparam I
    * @tparam S
    * @tparam O
-   * @return A Scan that safely encapsulates state while it's doing its thing.
+   * @return
+   *   A Scan that safely encapsulates state while it's doing its thing.
    */
   def mutable[I, S, O](initStateCreator: => S)(presentAndUpdateStateFn: (I, S) => O): Aux[I, S, O] =
     new Scan[I, O] {
@@ -81,8 +89,9 @@ object Scan {
    * @tparam A
    * @tparam B
    * @tparam C
-   * @return A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where
-   *         `c_i = initState + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
+   * @return
+   *   A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where `c_i = initState +
+   *   aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
    */
   def fromAggregator[A, B, C](aggregator: Aggregator[A, B, C], initState: B): Aux[A, B, C] =
     from(initState) { (a: A, stateBeforeProcessingI: B) =>
@@ -98,8 +107,9 @@ object Scan {
    * @tparam A
    * @tparam B
    * @tparam C
-   * @return A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where
-   *         `c_i = monoidAggregator.monoid.zero + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
+   * @return
+   *   A scan which, when given `[a_1, ..., a_n]` outputs `[c_1, ..., c_n]` where `c_i =
+   *   monoidAggregator.monoid.zero + aggregator.prepare(a_1) + ... + aggregator.prepare(a_i)`
    */
   def fromMonoidAggregator[A, B, C](monoidAggregator: MonoidAggregator[A, B, C]): Aux[A, B, C] =
     fromAggregator(monoidAggregator, monoidAggregator.monoid.zero)
@@ -107,20 +117,22 @@ object Scan {
 }
 
 /**
- * The Scan trait is an alternative to the `scanLeft` method on iterators/other collections for a range of
- * of use-cases where `scanLeft` is awkward to use. At a high level it provides some of the same functionality as
- * `scanLeft`, but with a separation of "what is the state of the scan" from
- * "what are the elements that I'm scanning over?". In particular, when scanning over an iterator with `N` elements,
- * the output is an iterator with `N` elements (in contrast to scanLeft's `N+1`).
+ * The Scan trait is an alternative to the `scanLeft` method on iterators/other collections for a range of of
+ * use-cases where `scanLeft` is awkward to use. At a high level it provides some of the same functionality as
+ * `scanLeft`, but with a separation of "what is the state of the scan" from "what are the elements that I'm
+ * scanning over?". In particular, when scanning over an iterator with `N` elements, the output is an iterator
+ * with `N` elements (in contrast to scanLeft's `N+1`).
  *
- * If you find yourself writing a `scanLeft` over pairs of elements, where you only use one element of the pair within
- * the `scanLeft`, then throw that element away in a `map` immediately after the scanLeft is done, then this
- * abstraction is for you.
+ * If you find yourself writing a `scanLeft` over pairs of elements, where you only use one element of the
+ * pair within the `scanLeft`, then throw that element away in a `map` immediately after the scanLeft is done,
+ * then this abstraction is for you.
  *
  * The canonical method to use a scan is `apply`.
  *
- * @tparam I The type of elements that the computation is scanning over.
- * @tparam O The output type of the scan (typically distinct from the hidden `State` of the scan).
+ * @tparam I
+ *   The type of elements that the computation is scanning over.
+ * @tparam O
+ *   The output type of the scan (typically distinct from the hidden `State` of the scan).
  */
 sealed abstract class Scan[-I, +O] extends Serializable {
 
@@ -138,19 +150,21 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   def initialState: State
 
   /**
-   * @param i An element in the stream to process
-   * @param stateBeforeProcessingI The state of the scan before processing i
-   * @return The output of the scan corresponding to processing i with state stateBeforeProcessing,
-   *         along with the result of updating stateBeforeProcessing with the information from i.
+   * @param i
+   *   An element in the stream to process
+   * @param stateBeforeProcessingI
+   *   The state of the scan before processing i
+   * @return
+   *   The output of the scan corresponding to processing i with state stateBeforeProcessing, along with the
+   *   result of updating stateBeforeProcessing with the information from i.
    */
   def presentAndNextState(i: I, stateBeforeProcessingI: State): (O, State)
 
   /**
    * @param iter
-   * @return If `iter = Iterator(a_1, ..., a_n)`, return:`
-   * `Iterator(o_1, ..., o_n)` where
-   * `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
-   * and `state_0 = initialState`
+   * @return
+   *   If `iter = Iterator(a_1, ..., a_n)`, return:` `Iterator(o_1, ..., o_n)` where `(o_(i+1), state_(i+1)) =
+   *   presentAndNextState(a_i, state_i)` and `state_0 = initialState`
    */
   def scanIterator(iter: Iterator[I]): Iterator[O] = new AbstractIterator[O] {
     override def hasNext: Boolean = iter.hasNext
@@ -167,13 +181,14 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   /**
    * @param inputs
    * @param bf
-   * @tparam In The type of the input collection
-   * @tparam Out The type of the output collection
+   * @tparam In
+   *   The type of the input collection
+   * @tparam Out
+   *   The type of the output collection
    * @return
-   * Given inputs as a collection of the form `[a_1, ..., a_n]` the output will be a collection of the form:
-   * `[o_1, ..., o_n]` where
-   * `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
-   * and `state_0 = initialState`.
+   *   Given inputs as a collection of the form `[a_1, ..., a_n]` the output will be a collection of the form:
+   *   `[o_1, ..., o_n]` where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)` and `state_0 =
+   *   initialState`.
    */
   def apply[In <: TraversableOnce[I], Out](
       inputs: In
@@ -200,13 +215,13 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   }
 
   /**
-   * Return a scan that is semantically identical to
-   * `this.join(Scan.identity[I1])`, but where we don't pollute the `State` by pairing it
-   * redundantly with `Unit`.
+   * Return a scan that is semantically identical to `this.join(Scan.identity[I1])`, but where we don't
+   * pollute the `State` by pairing it redundantly with `Unit`.
    * @tparam I1
-   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
-   * of the form `[o_1, ..., o_n`, then this results in a Scan whose `apply` method
-   * returns `[(o_1, a_1), ..., (o_n, a_n)]` when given the same input.
+   * @return
+   *   If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs of the form `[o_1,
+   *   ..., o_n`, then this results in a Scan whose `apply` method returns `[(o_1, a_1), ..., (o_n, a_n)]`
+   *   when given the same input.
    */
   def joinWithInput[I1 <: I]: Aux[I1, State, (O, I1)] = from(initialState) { (i, stateBeforeProcessingI) =>
     val (o, stateAfterProcessingI) = presentAndNextState(i, stateBeforeProcessingI)
@@ -215,11 +230,11 @@ sealed abstract class Scan[-I, +O] extends Serializable {
 
   /**
    * Return a scan whose output is paired with the state of the scan before each input updates the state.
-   * @return If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs
-   * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`
-   * and `state_0 = initialState`,
-   * return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
-   * `[(o_1, state_0), ..., (o_n, state_(n-1))]`.
+   * @return
+   *   If this Scan's `apply` method is given inputs [a_1, ..., a_n] resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)` and `state_0 =
+   *   initialState`, return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   *   `[(o_1, state_0), ..., (o_n, state_(n-1))]`.
    */
   def joinWithPriorState: Aux[I, State, (State, O)] = from(initialState) { (i, stateBeforeProcessingI) =>
     val (o, stateAfterProcessingA) = presentAndNextState(i, stateBeforeProcessingI)
@@ -228,11 +243,11 @@ sealed abstract class Scan[-I, +O] extends Serializable {
 
   /**
    * Return a scan whose output is paired with the state of the scan after each input updates the state.
-   * @return If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
-   * of the form `[o_1, ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)``
-   *  and state_0 = initialState,
-   * return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
-   * `[(o_1, state_1), ..., (o_n, state_n]`.
+   * @return
+   *   If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, where `(o_(i+1), state_(i+1)) = presentAndNextState(a_i, state_i)`` and state_0 =
+   *   initialState, return a scan that whose apply method, when given inputs `[a_1, ..., a_n]` will return
+   *   `[(o_1, state_1), ..., (o_n, state_n]`.
    */
   def joinWithPosteriorState: Aux[I, State, (O, State)] = from(initialState) { (i, stateBeforeProcessingI) =>
     val (c, stateAfterProcessingA) = presentAndNextState(i, stateBeforeProcessingI)
@@ -242,23 +257,23 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   /**
    * For every `foo`, `scan.joinWithIndex(foo) == scan(foo).zipWithIndex`.
    * @return
-   * If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs
-   * of the form `[o_1, ..., o_n]`, return a scan that whose apply method, when given the same input, will return
-   * `[(o_1, 1), ..., (o_n, n)]`.
+   *   If this Scan's `apply` method is given inputs `[a_1, ..., a_n]` resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, return a scan that whose apply method, when given the same input, will return `[(o_1, 1),
+   *   ..., (o_n, n)]`.
    */
   def joinWithIndex: Aux[I, (State, Long), (O, Long)] = join(Scan.index)
 
   /**
-   * Compose two scans pairwise such that, when given pairwise zipped inputs, the resulting scan will output pairwise
-   * zipped outputs.
+   * Compose two scans pairwise such that, when given pairwise zipped inputs, the resulting scan will output
+   * pairwise zipped outputs.
    * @param scan2
    * @tparam I2
    * @tparam O2
-   * @return If this Scan's apply method is given inputs `[a_1, ..., a_n]` resulting in outputs of
-   * the form `[o_1, ..., o_n]`, and `scan2.apply([b_1, ..., b_n] = [p_1, ..., p_n]` then
-   * `zip` will return a scan whose apply method, when given input
-   * `[(a_1, b_1), ..., (a_n, b_n)]` results in the output `[(o_1, p_1), ..., (o_2, p_2)]`.
-   * In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar))`
+   * @return
+   *   If this Scan's apply method is given inputs `[a_1, ..., a_n]` resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, and `scan2.apply([b_1, ..., b_n] = [p_1, ..., p_n]` then `zip` will return a scan whose
+   *   apply method, when given input `[(a_1, b_1), ..., (a_n, b_n)]` results in the output `[(o_1, p_1), ...,
+   *   (o_2, p_2)]`. In other words: `scan.zip(scan2)(foo.zip(bar)) == scan(foo).zip(scan2(bar))`
    */
   def zip[I2, O2](scan2: Scan[I2, O2]): Aux[(I, I2), (State, scan2.State), (O, O2)] =
     from((initialState, scan2.initialState)) { (i1i2, stateBeforeProcessingI1I2) =>
@@ -275,10 +290,11 @@ sealed abstract class Scan[-I, +O] extends Serializable {
    * @param scan2
    * @tparam I2
    * @tparam O2
-   * @return  If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of
-   * the form `[o_1, ..., o_n]`, and `scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n]` then
-   * `join` will return a scan whose apply method returns `[(o_1, p_1), ..., (o_2, p_2)]`.
-   * In other words: `scan.join(scan2)(foo) == scan(foo).zip(scan2(foo))`
+   * @return
+   *   If this Scan's apply method is given inputs [a_1, ..., a_n] resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, and `scan2.apply([a_1, ..., a_n] = [p_1, ..., p_n]` then `join` will return a scan whose
+   *   apply method returns `[(o_1, p_1), ..., (o_2, p_2)]`. In other words: `scan.join(scan2)(foo) ==
+   *   scan(foo).zip(scan2(foo))`
    */
   def join[I2 <: I, O2](scan2: Scan[I2, O2]): Aux[I2, (State, scan2.State), (O, O2)] =
     from((initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>
@@ -291,9 +307,10 @@ sealed abstract class Scan[-I, +O] extends Serializable {
    * Takes the output of this scan and feeds as input into scan2.
    * @param scan2
    * @tparam P
-   * @return If this Scan's apply method is given inputs `[a_1, ..., a_n]` resulting in outputs of
-   * the form `[o_1, ..., o_n]`, and `scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n]` then
-   * `compose` will return a scan which returns `[p_1, ..., p_n]`.
+   * @return
+   *   If this Scan's apply method is given inputs `[a_1, ..., a_n]` resulting in outputs of the form `[o_1,
+   *   ..., o_n]`, and `scan2.apply([o_1, ..., o_n] = [p_1, ..., p_n]` then `compose` will return a scan which
+   *   returns `[p_1, ..., p_n]`.
    */
   def compose[P](scan2: Scan[O, P]): Aux[I, (State, scan2.State), P] =
     from((initialState, scan2.initialState)) { (i, stateBeforeProcessingI) =>

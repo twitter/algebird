@@ -18,6 +18,7 @@ package com.twitter.algebird.util.summer
 import com.twitter.util.Duration
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 case class FlushFrequency(v: Duration)

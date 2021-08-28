@@ -16,8 +16,9 @@ limitations under the License.
 package com.twitter.algebird.statistics
 
 /**
- *  used to keep track of stats and time spent processing iterators passed to the methods
- *  @author Julien Le Dem
+ * used to keep track of stats and time spent processing iterators passed to the methods
+ * @author
+ *   Julien Le Dem
  */
 private class IterCallStatistics(threadSafe: Boolean) {
 

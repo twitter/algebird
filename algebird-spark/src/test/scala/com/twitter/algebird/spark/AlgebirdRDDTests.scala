@@ -16,8 +16,7 @@ package test {
 }
 
 /**
- * This test almost always times out on travis.
- * Leaving at least a compilation test of using with spark
+ * This test almost always times out on travis. Leaving at least a compilation test of using with spark
  */
 class AlgebirdRDDTest extends AnyFunSuite with BeforeAndAfter {
 
@@ -73,8 +72,7 @@ class AlgebirdRDDTest extends AnyFunSuite with BeforeAndAfter {
   }
 
   /**
-   * These tests almost always timeout on Travis. Leaving the
-   * above to at least check compilation
+   * These tests almost always timeout on Travis. Leaving the above to at least check compilation
    */
   // test("aggregate") {
   //   aggregate(0 to 1000, AlgebirdAggregator.fromSemigroup[Int])

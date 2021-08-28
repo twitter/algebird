@@ -17,12 +17,12 @@ limitations under the License.
 package com.twitter.algebird
 
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
 
 import scala.annotation.implicitNotFound
@@ -30,10 +30,8 @@ import scala.annotation.implicitNotFound
 /**
  * A Metric[V] m is a function (V, V) => Double that satisfies the following properties:
  *
- * 1. m(v1, v2) >= 0
- * 2. m(v1, v2) == 0 iff v1 == v2
- * 3. m(v1, v2) == m(v2, v1)
- * 4. m(v1, v3) <= m(v1, v2) + m(v2, v3)
+ *   1. m(v1, v2) >= 0 2. m(v1, v2) == 0 iff v1 == v2 3. m(v1, v2) == m(v2, v1) 4. m(v1, v3) <= m(v1, v2) +
+ *      m(v2, v3)
  *
  * If you implement this trait, make sure that you follow these rules.
  */

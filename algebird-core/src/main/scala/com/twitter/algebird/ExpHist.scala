@@ -5,37 +5,35 @@ import scala.annotation.tailrec
 import scala.collection.mutable.Builder
 
 /**
- * Exponential Histogram algorithm from
- * http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf
+ * Exponential Histogram algorithm from http://www-cs-students.stanford.edu/~datar/papers/sicomp_streams.pdf
  *
- * An Exponential Histogram is a sliding window counter that can
- * guarantee a bounded relative error. You configure the data
- * structure with
+ * An Exponential Histogram is a sliding window counter that can guarantee a bounded relative error. You
+ * configure the data structure with
  *
- * - epsilon, the relative error you're willing to tolerate
- * - windowSize, the number of time ticks that you want to track
+ *   - epsilon, the relative error you're willing to tolerate
+ *   - windowSize, the number of time ticks that you want to track
  *
- * You interact with the data structure by adding (number, timestamp)
- * pairs into the exponential histogram. querying it for an
- * approximate counts with `guess`.
+ * You interact with the data structure by adding (number, timestamp) pairs into the exponential histogram.
+ * querying it for an approximate counts with `guess`.
  *
- * The approximate count is guaranteed to be within conf.epsilon
- * relative error of the true count seen across the supplied
- * `windowSize`.
+ * The approximate count is guaranteed to be within conf.epsilon relative error of the true count seen across
+ * the supplied `windowSize`.
  *
  * Next steps:
  *
- * - efficient serialization
- * - Query EH with a shorter window than the configured window
- * - Discussion of epsilon vs memory tradeoffs
+ *   - efficient serialization
+ *   - Query EH with a shorter window than the configured window
+ *   - Discussion of epsilon vs memory tradeoffs
  *
- * @param conf the config values for this instance.
- * @param buckets Vector of timestamps of each (powers of 2)
- *                ticks. This is the key to the exponential histogram
- *                representation. See [[ExpHist.Canonical]] for more
- *                info.
- * @param total total ticks tracked. `total == buckets.map(_.size).sum`
- * @param time current timestamp of this instance.
+ * @param conf
+ *   the config values for this instance.
+ * @param buckets
+ *   Vector of timestamps of each (powers of 2) ticks. This is the key to the exponential histogram
+ *   representation. See [[ExpHist.Canonical]] for more info.
+ * @param total
+ *   total ticks tracked. `total == buckets.map(_.size).sum`
+ * @param time
+ *   current timestamp of this instance.
  */
 case class ExpHist(
     conf: ExpHist.Config,
@@ -46,12 +44,13 @@ case class ExpHist(
   import ExpHist.{Bucket, Canonical, Timestamp}
 
   /**
-   * Steps this instance forward to the new supplied time. Any
-   * buckets with a timestamp <= (newTime - conf.windowSize) will be
-   * evicted.
+   * Steps this instance forward to the new supplied time. Any buckets with a timestamp <= (newTime -
+   * conf.windowSize) will be evicted.
    *
-   * @param newTime the new current time.
-   * @return ExpHist instance stepped forward to newTime.
+   * @param newTime
+   *   the new current time.
+   * @return
+   *   ExpHist instance stepped forward to newTime.
    */
   def step(newTime: Timestamp): ExpHist =
     if (newTime <= time) this
@@ -77,9 +76,10 @@ case class ExpHist(
   /**
    * Efficiently add many buckets at once.
    *
-   * @param unsorted vector of buckets. All timestamps must be >= this.time.
-   * @return ExpHist instance with all buckets added, stepped
-   *         forward to the max timestamp in `unsorted`.
+   * @param unsorted
+   *   vector of buckets. All timestamps must be >= this.time.
+   * @return
+   *   ExpHist instance with all buckets added, stepped forward to the max timestamp in `unsorted`.
    */
   def addAll(unsorted: Vector[Bucket]): ExpHist =
     if (unsorted.isEmpty) this
@@ -96,8 +96,8 @@ case class ExpHist(
     }
 
   /**
-   * Returns a [[Fold]] instance that uses `add` to accumulate deltas
-   * into this exponential histogram instance.
+   * Returns a [[Fold]] instance that uses `add` to accumulate deltas into this exponential histogram
+   * instance.
    */
   def fold: Fold[Bucket, ExpHist] =
     Fold.foldMutable[Builder[Bucket, Vector[Bucket]], Bucket, ExpHist](
@@ -121,29 +121,26 @@ case class ExpHist(
   def oldestBucketSize: Long = if (total == 0) 0L else buckets.last.size
 
   /**
-   * Smallest possible count seen in the last conf.windowSize
-   * timestamps.
+   * Smallest possible count seen in the last conf.windowSize timestamps.
    */
   def lowerBoundSum: Long = total - oldestBucketSize
 
   /**
-   * Largest possible count seen in the last conf.windowSize
-   * timestamps.
+   * Largest possible count seen in the last conf.windowSize timestamps.
    */
   def upperBoundSum: Long = total
 
   /**
-   * Estimate of the count seen across the last conf.windowSize
-   * timestamps. Guaranteed to be within conf.epsilon of the true
-   * count.
+   * Estimate of the count seen across the last conf.windowSize timestamps. Guaranteed to be within
+   * conf.epsilon of the true count.
    */
   def guess: Double =
     if (total == 0) 0.0
     else (total - (oldestBucketSize - 1) / 2.0)
 
   /**
-   * Returns an Approximate instance encoding the bounds and the
-   * closest long to the estimated sum tracked by this instance.
+   * Returns an Approximate instance encoding the bounds and the closest long to the estimated sum tracked by
+   * this instance.
    */
   def approximateSum: Approximate[Long] =
     Approximate(lowerBoundSum, math.round(guess), upperBoundSum, 1.0)
@@ -177,8 +174,10 @@ object ExpHist {
   }
 
   /**
-   * @param size number of items tracked by this bucket.
-   * @param timestamp timestamp of the most recent item tracked by this bucket.
+   * @param size
+   *   number of items tracked by this bucket.
+   * @param timestamp
+   *   timestamp of the most recent item tracked by this bucket.
    */
   case class Bucket(size: Long, timestamp: Timestamp)
 
@@ -187,11 +186,12 @@ object ExpHist {
   }
 
   /**
-   * ExpHist guarantees that the returned guess will be within
-   * `epsilon` relative error of the true count across a sliding
-   * window of size `windowSize`.
-   * @param epsilon relative error, from [0, 0.5]
-   * @param windowSize number of time ticks to track
+   * ExpHist guarantees that the returned guess will be within `epsilon` relative error of the true count
+   * across a sliding window of size `windowSize`.
+   * @param epsilon
+   *   relative error, from [0, 0.5]
+   * @param windowSize
+   *   number of time ticks to track
    */
   case class Config(epsilon: Double, windowSize: Long) {
     val k: Int = math.ceil(1 / epsilon).toInt
@@ -208,9 +208,8 @@ object ExpHist {
       ExpHist.dropExpired(buckets, expiration(currTime))
 
     /**
-     * Returns a [[Fold]] instance that uses `add` to accumulate deltas
-     * into an empty exponential histogram instance configured with
-     * this Config.
+     * Returns a [[Fold]] instance that uses `add` to accumulate deltas into an empty exponential histogram
+     * instance configured with this Config.
      */
     def fold: Fold[Bucket, ExpHist] = ExpHist.empty(this).fold
   }
@@ -222,9 +221,8 @@ object ExpHist {
     ExpHist(conf, Vector.empty, 0L, Timestamp(0L))
 
   /**
-   *  Returns an instance directly from a number `i`. All buckets in
-   *  the returned ExpHist will have the same timestamp, equal to
-   *  `ts`.
+   * Returns an instance directly from a number `i`. All buckets in the returned ExpHist will have the same
+   * timestamp, equal to `ts`.
    */
   def from(i: Long, ts: Timestamp, conf: Config): ExpHist = {
     val buckets = Canonical.bucketsFromLong(i, conf.l).map(Bucket(_, ts))
@@ -232,9 +230,12 @@ object ExpHist {
   }
 
   /**
-   * @param buckets [buckets] sorted in DESCENDING order (recent first)
-   * @param cutoff buckets with ts <= cutoff are expired
-   * @return the sum of evicted bucket sizes and the unexpired buckets
+   * @param buckets
+   *   [buckets] sorted in DESCENDING order (recent first)
+   * @param cutoff
+   *   buckets with ts <= cutoff are expired
+   * @return
+   *   the sum of evicted bucket sizes and the unexpired buckets
    */
   private[algebird] def dropExpired(buckets: Vector[Bucket], cutoff: Timestamp): (Long, Vector[Bucket]) = {
     val (dropped, remaining) = buckets.reverse.span(_.timestamp <= cutoff)
@@ -242,8 +243,7 @@ object ExpHist {
   }
 
   /**
-   * Converts the supplied buckets into a NEW vector of buckets
-   * satisfying this law:
+   * Converts the supplied buckets into a NEW vector of buckets satisfying this law:
    *
    * {{{
    * rebucket(buckets, desired).map(_.size).sum == desired
@@ -251,8 +251,10 @@ object ExpHist {
    *
    * (rebucket only works if desired.sum == buckets.map(_.size).sum)
    *
-   * @param buckets vector of buckets sorted in DESCENDING order (recent first)
-   * @param desired bucket sizes to rebucket `buckets` into.
+   * @param buckets
+   *   vector of buckets sorted in DESCENDING order (recent first)
+   * @param desired
+   *   bucket sizes to rebucket `buckets` into.
    */
   private[algebird] def rebucket(buckets: Vector[Bucket], desired: Vector[Long]): Vector[Bucket] =
     if (desired.isEmpty) Vector.empty
@@ -264,12 +266,13 @@ object ExpHist {
     }
 
   /**
-   * @param toDrop total count to remove from the left of `input`.
-   * @param input buckets
-   * @return Vector with buckets, or pieces of buckets, with sizes
-   *         totalling `toDrop` items removed from the head. If an
-   *         element wasn't fully consumed, the remainder will be
-   *         stuck back onto the head.
+   * @param toDrop
+   *   total count to remove from the left of `input`.
+   * @param input
+   *   buckets
+   * @return
+   *   Vector with buckets, or pieces of buckets, with sizes totalling `toDrop` items removed from the head.
+   *   If an element wasn't fully consumed, the remainder will be stuck back onto the head.
    */
   @tailrec private[this] def drop(toDrop: Long, input: Vector[Bucket]): Vector[Bucket] = {
     val (b @ Bucket(count, _)) +: tail = input
@@ -281,9 +284,8 @@ object ExpHist {
   }
 
   /**
-   * The paper that introduces the exponential histogram proves that,
-   * given a positive number `l`, every integer s can be uniquely
-   * represented as the sum of
+   * The paper that introduces the exponential histogram proves that, given a positive number `l`, every
+   * integer s can be uniquely represented as the sum of
    *
    * (l or (l + 1)) * 2^i + (# from 1 to (l + 1)) 2^j
    *
@@ -291,27 +293,23 @@ object ExpHist {
    *
    * The paper calls this the "l-canonical" representation of s.
    *
-   * It turns out that if you follow the exponential histogram
-   * bucket-merging algorithm, you end up with the invariant that the
-   * number of buckets with size 2^i exactly matches that power of 2's
-   * coefficient in s's l-canonical representation.
+   * It turns out that if you follow the exponential histogram bucket-merging algorithm, you end up with the
+   * invariant that the number of buckets with size 2^i exactly matches that power of 2's coefficient in s's
+   * l-canonical representation.
    *
-   * Put another way - only sequences of buckets with sizes matching
-   * the l-canonical representation of some number s are valid
-   * exponential histograms.
+   * Put another way - only sequences of buckets with sizes matching the l-canonical representation of some
+   * number s are valid exponential histograms.
    *
-   * (We use this idea in `ExpHist.rebucket` to take a sequence of
-   * buckets of any size and rebucket them into a sequence where the
-   * above invariant holds.)
+   * (We use this idea in `ExpHist.rebucket` to take a sequence of buckets of any size and rebucket them into
+   * a sequence where the above invariant holds.)
    *
    * This is huge. This means that you can implement `addAll(newBuckets)` by
    *
-   * - calculating newS = s + delta contributed by newBuckets
-   * - generating the l-canonical sequence of bucket sizes for newS
-   * - rebucketing newBuckets ++ oldBuckets into those bucket sizes
+   *   - calculating newS = s + delta contributed by newBuckets
+   *   - generating the l-canonical sequence of bucket sizes for newS
+   *   - rebucketing newBuckets ++ oldBuckets into those bucket sizes
    *
-   * The resulting sequence of buckets is a valid exponential
-   * histogram.
+   * The resulting sequence of buckets is a valid exponential histogram.
    */
   object Canonical {
     @inline private[this] def floorPowerOfTwo(x: Long): Int =
@@ -326,10 +324,12 @@ object ExpHist {
       (0 until bits).map(idx => offset + bit(i, idx)).toVector
 
     /**
-     * @param s the number to convert to l-canonical form
-     * @param l the "l" in l-canonical form
-     * @return vector of the coefficients of 2^i in the
-     *         l-canonical representation of s.
+     * @param s
+     *   the number to convert to l-canonical form
+     * @param l
+     *   the "l" in l-canonical form
+     * @return
+     *   vector of the coefficients of 2^i in the l-canonical representation of s.
      *
      * For example:
      *
@@ -341,17 +341,17 @@ object ExpHist {
      *
      * the "l" in l-canonical means that
      *
-     *  - all return vector entries but the last one == `l` or `l + 1`
-     *  - 1 <= `returnVector.last` <= l + 1
+     *   - all return vector entries but the last one == `l` or `l + 1`
+     *   - 1 <= `returnVector.last` <= l + 1
      *
      * ## L-Canonical Representation Procedure:
      *
-     * - Find the largest j s.t. 2^j <= (s + l) / (1 + l)
-     * - let s' = 2^j(1 + l) - l
+     *   - Find the largest j s.t. 2^j <= (s + l) / (1 + l)
+     *   - let s' = 2^j(1 + l) - l
      *
-     * - let diff = (s - s') is the position of s within that group.
-     * - let b = the little-endian binary rep of diff % (2^j - 1)
-     * - let ret = return vector of length j:
+     *   - let diff = (s - s') is the position of s within that group.
+     *   - let b = the little-endian binary rep of diff % (2^j - 1)
+     *   - let ret = return vector of length j:
      *
      * {{{
      * (0 until j).map { i => ret(i) = b(i) + l }
@@ -369,12 +369,13 @@ object ExpHist {
       }
 
     /**
-     * @param s the number to convert to l-canonical form
-     * @param l the "l" in l-canonical form
-     * @return vector of numbers that sum to s. Each
-     *         entry is a power of 2, and the number of entries of
-     *         each power of 2 matches the l-canonical
-     *         representation of s.
+     * @param s
+     *   the number to convert to l-canonical form
+     * @param l
+     *   the "l" in l-canonical form
+     * @return
+     *   vector of numbers that sum to s. Each entry is a power of 2, and the number of entries of each power
+     *   of 2 matches the l-canonical representation of s.
      *
      * Note that:
      *
@@ -405,8 +406,10 @@ object ExpHist {
     /**
      * Expands out an l-canonical representation into the original number.
      *
-     * @param rep l-canonical representation of some number s for some l
-     * @return The original s
+     * @param rep
+     *   l-canonical representation of some number s for some l
+     * @return
+     *   The original s
      */
     def toLong: Long =
       Monoid.sum(
@@ -415,11 +418,13 @@ object ExpHist {
       )
 
     /**
-     * Expands out the l-canonical representation of some number s into
-     * a list of bucket sizes in ascending order.
+     * Expands out the l-canonical representation of some number s into a list of bucket sizes in ascending
+     * order.
      *
-     * @param rep l-canonical representation of some number s for some l
-     * @return vector of powers of 2 (where ret.sum == the original s)
+     * @param rep
+     *   l-canonical representation of some number s for some l
+     * @return
+     *   vector of powers of 2 (where ret.sum == the original s)
      */
     def toBuckets: Vector[Long] =
       rep.iterator.zipWithIndex.flatMap { case (i, exp) =>

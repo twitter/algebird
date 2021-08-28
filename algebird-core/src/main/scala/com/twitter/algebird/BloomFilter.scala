@@ -125,19 +125,17 @@ object BloomFilter {
   }
 
   /**
-   * Cardinality estimates are taken from Theorem 1 on page 15 of
-   * "Cardinality estimation and dynamic length adaptation for Bloom filters"
-   * by Papapetrou, Siberski, and Nejdl:
+   * Cardinality estimates are taken from Theorem 1 on page 15 of "Cardinality estimation and dynamic length
+   * adaptation for Bloom filters" by Papapetrou, Siberski, and Nejdl:
    * http://www.softnet.tuc.gr/~papapetrou/publications/Bloomfilters-DAPD.pdf
    *
-   * Roughly, by using bounds on the expected number of true bits after n elements
-   * have been inserted into the Bloom filter, we can go from the actual number of
-   * true bits (which is known) to an estimate of the cardinality.
+   * Roughly, by using bounds on the expected number of true bits after n elements have been inserted into the
+   * Bloom filter, we can go from the actual number of true bits (which is known) to an estimate of the
+   * cardinality.
    *
-   * approximationWidth defines an interval around the maximum-likelihood cardinality
-   * estimate. Namely, the approximation returned is of the form
-   * (min, estimate, max) =
-   *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
+   * approximationWidth defines an interval around the maximum-likelihood cardinality estimate. Namely, the
+   * approximation returned is of the form (min, estimate, max) = ((1 - approxWidth) * estimate, estimate, (1
+   * + approxWidth) * estimate)
    */
   def sizeEstimate(
       numBits: Int,
@@ -185,9 +183,8 @@ object BloomFilter {
 /**
  * Bloom Filter - a probabilistic data structure to test presence of an element.
  *
- * Operations
- *   1) insert: hash the value k times, updating the bitfield at the index equal to each hashed value
- *   2) query: hash the value k times.  If there are k collisions, then return true; otherwise false.
+ * Operations 1) insert: hash the value k times, updating the bitfield at the index equal to each hashed value
+ * 2) query: hash the value k times. If there are k collisions, then return true; otherwise false.
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
  */
@@ -199,8 +196,8 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
   override val zero: BF[A] = BFZero[A](hashes, width)
 
   /**
-   * Assume the bloom filters are compatible (same width and same hashing functions).  This
-   * is the union of the 2 bloom filters.
+   * Assume the bloom filters are compatible (same width and same hashing functions). This is the union of the
+   * 2 bloom filters.
    */
   override def plus(left: BF[A], right: BF[A]): BF[A] = left ++ right
 
@@ -380,8 +377,7 @@ sealed abstract class BF[A] extends java.io.Serializable {
     }
 
   /**
-   * This may be faster if you don't care about evaluating
-   * the false positive probability
+   * This may be faster if you don't care about evaluating the false positive probability
    */
   def maybeContains(item: A): Boolean
 
@@ -392,9 +388,8 @@ sealed abstract class BF[A] extends java.io.Serializable {
   def toBitSet: BitSet
 
   /**
-   * Compute the Hamming distance between the two Bloom filters
-   * `a` and `b`. The distance is defined as the number of bits that
-   * need to change to in order to transform one filter into the other.
+   * Compute the Hamming distance between the two Bloom filters `a` and `b`. The distance is defined as the
+   * number of bits that need to change to in order to transform one filter into the other.
    */
   def hammingDistance(that: BF[A]): Int =
     (this, that) match {

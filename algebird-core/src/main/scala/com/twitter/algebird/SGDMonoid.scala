@@ -18,10 +18,8 @@ package com.twitter.algebird
 object SGD {
 
   /**
-   * constructs the gradient for linear regression.
-   * the Pos type is (Double, IndexedSeq[Double])
-   * note the LAST element in the weights is the constant term.
-   * and note that the length of the IndexedSeq in the tuple is
+   * constructs the gradient for linear regression. the Pos type is (Double, IndexedSeq[Double]) note the LAST
+   * element in the weights is the constant term. and note that the length of the IndexedSeq in the tuple is
    * one less than the weights (we don't carry the constant term)
    */
   val linearGradient: (IndexedSeq[Double], (Double, IndexedSeq[Double])) => IndexedSeq[Double] = { (w, pos) =>
@@ -77,11 +75,9 @@ object SGDPos {
 case class SGDPos[+Pos](val pos: List[Pos]) extends SGD[Pos]
 
 /**
- * Basically a specific implementation of the RightFoldedMonoid
- * gradient is the gradient of the function to be minimized
- * To use this, you need to insert an initial weight SGDWeights
- * before you start adding SGDPos objects. Otherwise you will
- * just be doing list concatenation.
+ * Basically a specific implementation of the RightFoldedMonoid gradient is the gradient of the function to be
+ * minimized To use this, you need to insert an initial weight SGDWeights before you start adding SGDPos
+ * objects. Otherwise you will just be doing list concatenation.
  */
 class SGDMonoid[Pos](
     stepfn: (Long, IndexedSeq[Double]) => Double,

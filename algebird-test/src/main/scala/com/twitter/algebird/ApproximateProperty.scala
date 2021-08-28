@@ -21,9 +21,8 @@ trait ApproximateProperty {
 object ApproximateProperty {
 
   /**
-   *  Generates a list of exactly n Ts.
-   *  Useful because `Gen.listOfN(n, gen).sample` gives us Option[List[T]],
-   *  while we often want List[T].
+   * Generates a list of exactly n Ts. Useful because `Gen.listOfN(n, gen).sample` gives us Option[List[T]],
+   * while we often want List[T].
    */
   @annotation.tailrec
   private def genListOf[T](n: Int, gen: Gen[T], trial: Int = 100): List[T] =
@@ -94,7 +93,7 @@ object ApproximateProperty {
             List(
               (
                 "Omitted results",
-                s"${zeroProbTests}/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."
+                s"$zeroProbTests/${objectReps * inputReps} tests returned an Approximate with probability 0. These tests have been omitted from the calculation."
               )
             )
           } else List()
@@ -110,10 +109,9 @@ object ApproximateProperty {
     }
 
   /**
-   * Converts a list of ApproximateProperties to a scalacheck Prop that
-   * fails if too many of the ApproximateProperties fail.
-   * TODO use `new Prop` like the above `toProp` method so that we can
-   * have useful error messages.
+   * Converts a list of ApproximateProperties to a scalacheck Prop that fails if too many of the
+   * ApproximateProperties fail. TODO use `new Prop` like the above `toProp` method so that we can have useful
+   * error messages.
    */
   def toProp(
       a: Seq[ApproximateProperty],
@@ -135,8 +133,8 @@ object ApproximateProperty {
 }
 
 /**
- * All tests that use ApproximateProperty should extend from this class so that
- * the scalacheck property is run exactly once.
+ * All tests that use ApproximateProperty should extend from this class so that the scalacheck property is run
+ * exactly once.
  */
 abstract class ApproximateProperties(name: String) extends Properties(name) {
   override def overrideParameters(p: Test.Parameters): Test.Parameters =

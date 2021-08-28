@@ -21,9 +21,11 @@ private[algebird] trait CompatFold {
    * Simple Fold that collects elements into a container.
    */
   def container[I, C[_]](implicit cbf: Factory[I, C[I]]): Fold[I, C[I]] =
-    Fold.foldMutable[Builder[I, C[I]], I, C[I]]({ case (b, i) => b += i }, { _ =>
-      cbf.newBuilder
-    }, { _.result })
+    Fold.foldMutable[Builder[I, C[I]], I, C[I]](
+      { case (b, i) => b += i },
+      _ => cbf.newBuilder,
+      _.result
+    )
 }
 
 private[algebird] trait CompatDecayedVector {

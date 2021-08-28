@@ -19,7 +19,8 @@ import algebra.ring.Rng
 
 /**
  * This is for the case where your Ring[T] is a Rng (i.e. there is no unit).
- * @see http://en.wikipedia.org/wiki/Pseudo-ring#Adjoining_an_identity_element
+ * @see
+ *   http://en.wikipedia.org/wiki/Pseudo-ring#Adjoining_an_identity_element
  */
 case class AdjoinedUnit[T](ones: BigInt, get: T) {
   def unwrap: Option[T] = if (ones == 0) Some(get) else None

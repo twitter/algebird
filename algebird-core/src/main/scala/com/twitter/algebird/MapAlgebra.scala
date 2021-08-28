@@ -192,15 +192,15 @@ object MapAlgebra {
     m.filter { case (_, v) => Monoid.isNonZero(v) }
 
   /**
-   * For each key, sum all the values. Note that if V is a Monoid, the current
-   * implementation will drop from the output any key where the values are all
-   * Monoid.zero. If the Semigroup is a Monoid, This function is equivalent to:
+   * For each key, sum all the values. Note that if V is a Monoid, the current implementation will drop from
+   * the output any key where the values are all Monoid.zero. If the Semigroup is a Monoid, This function is
+   * equivalent to:
    *
-   *   pairs.filter(_._2 != Monoid.zero).groupBy(_._1).mapValues(_.map(_._2).sum)
+   * pairs.filter(_._2 != Monoid.zero).groupBy(_._1).mapValues(_.map(_._2).sum)
    *
    * Otherwise, the function is equivalent to:
    *
-   *   pairs.groupBy(_._1).mapValues(_.map(_._2).sum)
+   * pairs.groupBy(_._1).mapValues(_.map(_._2).sum)
    */
   def sumByKey[K, V: Semigroup](pairs: TraversableOnce[(K, V)]): Map[K, V] =
     Monoid.sum(pairs.iterator.map(Map(_)))
@@ -208,7 +208,7 @@ object MapAlgebra {
   /**
    * For each key, creates a list of all values. This function is equivalent to:
    *
-   *   pairs.groupBy(_._1).mapValues(_.map(_._2))
+   * pairs.groupBy(_._1).mapValues(_.map(_._2))
    */
   def group[K, V](pairs: TraversableOnce[(K, V)]): Map[K, List[V]] =
     if (pairs.iterator.isEmpty) Map.empty
@@ -245,8 +245,7 @@ object MapAlgebra {
       .transform { case (_, (v, w)) => (v.headOption, w.headOption) }
 
   /**
-   * Reverses a graph losslessly
-   * None key is for v's with no sources.
+   * Reverses a graph losslessly None key is for v's with no sources.
    */
   def invertExact[K, V](m: Map[Option[K], Set[V]]): Map[Option[V], Set[K]] = {
     def nonEmptyIter[T](i: Iterable[T]): Iterable[Option[T]] =

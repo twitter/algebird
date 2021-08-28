@@ -25,8 +25,7 @@ abstract class Shapeless3 extends Shapeless2 {
     new HConsRing(a, lb.value)
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val myRing: Ring[MyType] = genericRing
    */
@@ -49,8 +48,7 @@ abstract class Shapeless2 extends Shapeless1 {
     new HConsGroup(a, lb.value)
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val myGroup: Group[MyType] = genericGroup
    */
@@ -73,8 +71,7 @@ abstract class Shapeless1 extends Shapeless0 {
     new HConsMonoid(a, lb.value)
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val myMonoid: Monoid[MyType] = genericMonoid
    */
@@ -94,8 +91,7 @@ abstract class Shapeless0 {
     new HConsSemigroup[A, B](a, lb.value)
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val mySemigroup: Semigroup[MyType] = genericSemigroup
    */

@@ -17,7 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * @author Oscar Boykin
+ * @author
+ *   Oscar Boykin
  */
 import java.util.{LinkedHashMap => JLinkedHashMap, Map => JMap}
 import scala.collection.mutable.{Map => MMap}

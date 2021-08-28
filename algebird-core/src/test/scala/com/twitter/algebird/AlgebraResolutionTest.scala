@@ -3,8 +3,7 @@ package com.twitter.algebird
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
- * This is just a compilation test that we can resolve
- * algebird types from implicit algebra instances.
+ * This is just a compilation test that we can resolve algebird types from implicit algebra instances.
  */
 class AlgebraResolutionTest extends AnyFunSuite {
   // A type with no built in algebird algebras

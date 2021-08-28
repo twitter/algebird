@@ -38,10 +38,11 @@ case class BitSetLite(in: Array[Byte]) {
 /**
  * Implementation of the HyperLogLog approximate counting as a Monoid
  *
- * @see [[http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf]]
+ * @see
+ *   [[http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf]]
  *
- * HyperLogLog: the analysis of a near-optimal cardinality estimation algorithm
- * Philippe Flajolet and Éric Fusy and Olivier Gandouet and Frédéric Meunier
+ * HyperLogLog: the analysis of a near-optimal cardinality estimation algorithm Philippe Flajolet and Éric
+ * Fusy and Olivier Gandouet and Frédéric Meunier
  */
 object HyperLogLog {
 
@@ -113,15 +114,13 @@ object HyperLogLog {
     rhoW(bsl.in, bits)
 
   /**
-   * The value 'w' is represented as a bitset (encoding in
-   * `bytes`). This function counts the number of leading zeros in 'w'.
+   * The value 'w' is represented as a bitset (encoding in `bytes`). This function counts the number of
+   * leading zeros in 'w'.
    *
-   * Each byte is treated as a set of bits (little-endian). That is,
-   * the one bit represents the first value, then the two bit, then
-   * four, and so on.
+   * Each byte is treated as a set of bits (little-endian). That is, the one bit represents the first value,
+   * then the two bit, then four, and so on.
    *
-   * We treat the leading `bits` bits as if they were instead a single
-   * zero bit.
+   * We treat the leading `bits` bits as if they were instead a single zero bit.
    */
   def rhoW(bytes: Array[Byte], bits: Int): Byte = {
     var i = bits / 8 // tracks the position in bytes
@@ -147,12 +146,11 @@ object HyperLogLog {
   }
 
   /**
-   * We are computing j and \rho(w) from the paper,
-   *  sorry for the name, but it allows someone to compare to the paper extremely low probability
-   *  rhow (position of the leftmost one bit) is > 127, so we use a Byte to store it
-   *  Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and
-   *  the value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading
-   *  zeroes in 'w'. We can calculate rho(w) at once with the method rhoW.
+   * We are computing j and \rho(w) from the paper, sorry for the name, but it allows someone to compare to
+   * the paper extremely low probability rhow (position of the leftmost one bit) is > 127, so we use a Byte to
+   * store it Given a hash <w_0, w_1, w_2 ... w_n> the value 'j' is equal to <w_0, w_1 ... w_(bits-1)> and the
+   * value 'w' is equal to <w_bits ... w_n>. The function rho counts the number of leading zeroes in 'w'. We
+   * can calculate rho(w) at once with the method rhoW.
    */
   def jRhoW(in: Array[Byte], bits: Int): (Int, Byte) =
     (j(in, bits), rhoW(in, bits))
@@ -227,36 +225,22 @@ object HyperLogLog {
   }
 
   /**
-   * The true error is distributed like a Gaussian with
-   * this standard deviation.
-   * let m = 2^bits. The size of the HLL is m bytes.
+   * The true error is distributed like a Gaussian with this standard deviation. let m = 2^bits. The size of
+   * the HLL is m bytes.
    *
-   * bits | size | error
-   *   9       512     0.0460
-   *  10      1024    0.0325
-   *  11      2048    0.0230
-   *  12      4096    0.0163
-   *  13      8192    0.0115
-   *  14      16384   0.0081
-   *  15      32768   0.0057
-   *  16      65536   0.0041
-   *  17      131072  0.0029
-   *  18      262144  0.0020
-   *  19      524288  0.0014
-   *  20      1048576 0.0010
+   * bits | size | error 9 512 0.0460 10 1024 0.0325 11 2048 0.0230 12 4096 0.0163 13 8192 0.0115 14 16384
+   * 0.0081 15 32768 0.0057 16 65536 0.0041 17 131072 0.0029 18 262144 0.0020 19 524288 0.0014 20 1048576
+   * 0.0010
    *
-   *  Keep in mind, to store N distinct longs, you only need 8N bytes.
-   *  See SetSizeAggregator for an approach that uses an exact set
-   *  when the cardinality is small, and switches to HLL after we have
-   *  enough items. Ideally, you would keep an exact set until it is
-   *  smaller to store the HLL (but actually since we use sparse vectors
-   *  to store the HLL, a small HLL takes a lot less than the size above).
+   * Keep in mind, to store N distinct longs, you only need 8N bytes. See SetSizeAggregator for an approach
+   * that uses an exact set when the cardinality is small, and switches to HLL after we have enough items.
+   * Ideally, you would keep an exact set until it is smaller to store the HLL (but actually since we use
+   * sparse vectors to store the HLL, a small HLL takes a lot less than the size above).
    */
   def error(bits: Int): Double = 1.04 / scala.math.sqrt(twopow(bits))
 
   /**
-   * This gives you a number of bits to use to have a given standard
-   * error
+   * This gives you a number of bits to use to have a given standard error
    */
   def bitsForError(err: Double): Int = {
     // If the error is less than 0.00003, the HLL needs more than 1 << 31 bytes
@@ -321,17 +305,24 @@ sealed abstract class HLL extends java.io.Serializable {
   def updateInto(buffer: Array[Byte]): Unit
 
   /**
-   * Returns the modified value of rhoW at j, taking into account the
-   * extra run of bits added to rho due to reduction in the length of j.
+   * Returns the modified value of rhoW at j, taking into account the extra run of bits added to rho due to
+   * reduction in the length of j.
    *
-   * @param currentJ    j for which modified rhoW is needed
-   * @param currentRhoW Current rhoW value for j
-   * @param reducedBits New length of j
-   * @param reducedSize New size (passed in to avoid repeated computation)
-   * @param bitMask     Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
-   * @param buf         Byte array (passed in to avoid repeated allocation)
+   * @param currentJ
+   *   j for which modified rhoW is needed
+   * @param currentRhoW
+   *   Current rhoW value for j
+   * @param reducedBits
+   *   New length of j
+   * @param reducedSize
+   *   New size (passed in to avoid repeated computation)
+   * @param bitMask
+   *   Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
+   * @param buf
+   *   Byte array (passed in to avoid repeated allocation)
    *
-   * @return  New value of rhoW
+   * @return
+   *   New value of rhoW
    */
   protected def getModifiedRhoW(
       currentJ: Int,
@@ -361,9 +352,11 @@ sealed abstract class HLL extends java.io.Serializable {
    *
    * [[http://research.neustar.biz/2013/03/25/hyperloglog-engineering-choosing-the-right-bits/]]
    *
-   * @param reducedBits The new number of bits to use
+   * @param reducedBits
+   *   The new number of bits to use
    *
-   * @return  New HLL instance with reduced size
+   * @return
+   *   New HLL instance with reduced size
    */
   def downsize(reducedBits: Int): HLL = {
     require(reducedBits > 3 && reducedBits <= bits, s"Use at least 4, and at most $bits bits")
@@ -382,12 +375,17 @@ sealed abstract class HLL extends java.io.Serializable {
   /**
    * Returns a new HLL instance with reduced size
    *
-   * @param reducedBits The new number of bits to use (for the length of j)
-   * @param reducedSize New size (passed in to avoid repeated computation)
-   * @param bitMask     Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
-   * @param buf         Byte array (passed in to avoid repeated allocation)
+   * @param reducedBits
+   *   The new number of bits to use (for the length of j)
+   * @param reducedSize
+   *   New size (passed in to avoid repeated computation)
+   * @param bitMask
+   *   Mask to force early termination of HyperLogLog.rhoW (passed in to avoid repeated computation)
+   * @param buf
+   *   Byte array (passed in to avoid repeated allocation)
    *
-   * @return  New HLL instance with reduced size
+   * @return
+   *   New HLL instance with reduced size
    */
   protected def downsize(reducedBits: Int, reducedSize: Int, bitMask: Int, buf: Array[Byte]): HLL
 }
@@ -656,24 +654,20 @@ object HyperLogLogAggregator {
   }
 
   /**
-   * Create an Aggregator that returns the estimate size, not the HLL
-   * approximate data structure itself. This is convenient, but cannot
-   * be combined later with another unique count like an HLL could.
+   * Create an Aggregator that returns the estimate size, not the HLL approximate data structure itself. This
+   * is convenient, but cannot be combined later with another unique count like an HLL could.
    *
-   * @param bits is the log of the size the HLL.
+   * @param bits
+   *   is the log of the size the HLL.
    */
   def sizeAggregator(bits: Int): MonoidAggregator[Array[Byte], HLL, Double] =
     apply(bits).andThenPresent(_.estimatedSize)
 
   /**
-   * Give a HyperLogLog Aggregator that have the given error.
-   * It is up to you, using bitsForError, to see if the size is
-   * still practical for your application.
+   * Give a HyperLogLog Aggregator that have the given error. It is up to you, using bitsForError, to see if
+   * the size is still practical for your application.
    *
-   * 0.016 (1.6%), 4    KB
-   * 0.006 (0.6%), 32   KB
-   * 0.002 (0.2%), 256  KB
-   * 0.001 (0.1%), 1024 KB
+   * 0.016 (1.6%), 4 KB 0.006 (0.6%), 32 KB 0.002 (0.2%), 256 KB 0.001 (0.1%), 1024 KB
    *
    * Cutting the error in half takes 4x the size.
    */
@@ -692,9 +686,9 @@ object HyperLogLogAggregator {
   }
 
   /**
-   * Give an approximate set size (not the HLL) based on inputs of Array[Byte]
-   * see HyperLogLog.bitsForError for a size table based on the error
-   * see SetSizeHashAggregator for a version that uses exact sets up to a given size
+   * Give an approximate set size (not the HLL) based on inputs of Array[Byte] see HyperLogLog.bitsForError
+   * for a size table based on the error see SetSizeHashAggregator for a version that uses exact sets up to a
+   * given size
    */
   def sizeWithError(err: Double): MonoidAggregator[Array[Byte], HLL, Double] =
     withError(err).andThenPresent(_.estimatedSize)
@@ -740,9 +734,9 @@ case class SetSizeAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit toB
 }
 
 /**
- * Use a Hash128 when converting to HLL, rather than an implicit conversion to Array[Byte]
- * Unifying with SetSizeAggregator would be nice, but since they only differ in an implicit
- * parameter, scala seems to be giving me errors.
+ * Use a Hash128 when converting to HLL, rather than an implicit conversion to Array[Byte] Unifying with
+ * SetSizeAggregator would be nice, but since they only differ in an implicit parameter, scala seems to be
+ * giving me errors.
  */
 case class SetSizeHashAggregator[A](hllBits: Int, maxSetSize: Int = 10)(implicit hash: Hash128[A])
     extends SetSizeAggregatorBase[A](hllBits, maxSetSize) {

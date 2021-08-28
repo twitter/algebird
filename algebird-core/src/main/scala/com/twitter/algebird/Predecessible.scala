@@ -16,10 +16,9 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * This is a typeclass to represent things which are countable down. Note that it is important
- * that a value prev(t) is always less than t. Note
- * that prev returns Option because this class comes with the notion that some items may reach a minimum
- * key, which is None.
+ * This is a typeclass to represent things which are countable down. Note that it is important that a value
+ * prev(t) is always less than t. Note that prev returns Option because this class comes with the notion that
+ * some items may reach a minimum key, which is None.
  */
 trait Predecessible[T] extends java.io.Serializable {
   def prev(old: T): Option[T]
@@ -54,8 +53,8 @@ trait Predecessible[T] extends java.io.Serializable {
 object Predecessible extends java.io.Serializable {
 
   /**
-   * This makes it easy to construct from a function when T has an ordering, which is common
-   * Note, your function must respect the ordering
+   * This makes it easy to construct from a function when T has an ordering, which is common Note, your
+   * function must respect the ordering
    */
   def fromPrevOrd[T](prevFn: T => Option[T])(implicit ord: Ordering[T]): Predecessible[T] =
     new Predecessible[T] {

@@ -22,19 +22,19 @@ import algebra.{BoundedSemilattice, Semilattice}
 /**
  * Tracks the maximum wrapped instance of some ordered type `T`.
  *
- * [[Max]][T] is a [[Semigroup]] for all types `T`. If `T` has some
- * minimum element (`Long` has `Long.MinValue`, for example), then
- * [[Max]][T] is a [[Monoid]].
+ * [[Max]] [T] is a [[Semigroup]] for all types `T`. If `T` has some minimum element (`Long` has
+ * `Long.MinValue`, for example), then [[Max]] [T] is a [[Monoid]].
  *
- * @param get wrapped instance of `T`
+ * @param get
+ *   wrapped instance of `T`
  */
 case class Max[@specialized(Int, Long, Float, Double) +T](get: T) {
 
   /**
-   * If this instance wraps a larger `T` than `r`, returns this
-   * instance, else returns `r`.
+   * If this instance wraps a larger `T` than `r`, returns this instance, else returns `r`.
    *
-   * @param r instance of `Max[U]` for comparison
+   * @param r
+   *   instance of `Max[U]` for comparison
    */
   def max[U >: T](r: Max[U])(implicit ord: Ordering[U]): Max[U] =
     Max.ordering.max(this, r)
@@ -42,27 +42,27 @@ case class Max[@specialized(Int, Long, Float, Double) +T](get: T) {
   /**
    * Identical to [[max]].
    *
-   * @param r instance of `Max[U]` for comparison
+   * @param r
+   *   instance of `Max[U]` for comparison
    */
   def +[U >: T](r: Max[U])(implicit ord: Ordering[U]): Max[U] = max(r)
 }
 
 /**
- * Provides a set of operations and typeclass instances needed to use
- * [[Max]] instances.
+ * Provides a set of operations and typeclass instances needed to use [[Max]] instances.
  */
 object Max extends MaxInstances {
 
   /**
-   * Returns an [[Aggregator]] that selects the maximum instance of an
-   * ordered type `T` in the aggregated stream.
+   * Returns an [[Aggregator]] that selects the maximum instance of an ordered type `T` in the aggregated
+   * stream.
    */
   def aggregator[T](implicit ord: Ordering[T]): MaxAggregator[T] =
     MaxAggregator()(ord)
 
   /**
-   * Returns a [[Semigroup]] instance with a `plus` implementation
-   * that always returns the maximum `T` argument.
+   * Returns a [[Semigroup]] instance with a `plus` implementation that always returns the maximum `T`
+   * argument.
    */
   def maxSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
     new Semigroup[T] with Semilattice[T] {
@@ -81,17 +81,15 @@ private[algebird] sealed abstract class MaxInstances extends LowPriorityMaxInsta
     monoid(Long.MinValue)
 
   /**
-   * [[Monoid]] for [[Max]][Double] with `zero == Double.MinValue`
-   * Note: MinValue > NegativeInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
+   * [[Monoid]] for [[Max]] [Double] with `zero == Double.MinValue` Note: MinValue > NegativeInfinity, but
+   * people may be relying on this emitting a non-infinite number. Sadness
    */
   implicit def doubleMonoid: Monoid[Max[Double]] with BoundedSemilattice[Max[Double]] =
     monoid(Double.MinValue)
 
   /**
-   * [[Monoid]] for [[Max]][Float] with `zero == Float.MinValue`
-   * Note: MinValue > NegativeInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
+   * [[Monoid]] for [[Max]] [Float] with `zero == Float.MinValue` Note: MinValue > NegativeInfinity, but
+   * people may be relying on this emitting a non-infinite number. Sadness
    */
   implicit def floatMonoid: Monoid[Max[Float]] with BoundedSemilattice[Max[Float]] =
     monoid(Float.MinValue)
@@ -105,11 +103,13 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
   implicit def ordering[T: Ordering]: Ordering[Max[T]] = Ordering.by(_.get)
 
   /**
-   * Returns a [[Monoid]] instance for [[Max]][T] that combines
-   * instances using [[Max.max]] and uses `zero` for its identity.
+   * Returns a [[Monoid]] instance for [[Max]] [T] that combines instances using [[Max.max]] and uses `zero`
+   * for its identity.
    *
-   * @param zero identity of the returned [[Monoid]] instance
-   * @note `zero` must be `<=` every element of `T` for the returned instance to be lawful.
+   * @param zero
+   *   identity of the returned [[Monoid]] instance
+   * @note
+   *   `zero` must be `<=` every element of `T` for the returned instance to be lawful.
    */
   def monoid[T: Ordering](zero: => T): Monoid[Max[T]] with BoundedSemilattice[Max[T]] = {
     val z = zero // avoid confusion below when overriding zero
@@ -122,8 +122,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
   }
 
   /**
-   * Returns a [[Semigroup]] instance for [[Max]][T]. The `plus`
-   * implementation always returns the maximum `Max[T]` argument.
+   * Returns a [[Semigroup]] instance for [[Max]] [T]. The `plus` implementation always returns the maximum
+   * `Max[T]` argument.
    */
   implicit def semigroup[T: Ordering]: Semigroup[Max[T]] with Semilattice[Max[T]] =
     // There's no need to override `sumOption`, since the default
@@ -136,9 +136,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
     }
 
   /**
-   * Returns a [[Monoid]] instance for `Max[List[T]]` that compares
-   * lists first by length and then element-wise by `T`, and returns
-   * the maximum value.
+   * Returns a [[Monoid]] instance for `Max[List[T]]` that compares lists first by length and then
+   * element-wise by `T`, and returns the maximum value.
    */
   implicit def listMonoid[T: Ordering]: Monoid[Max[List[T]]] with BoundedSemilattice[Max[List[T]]] =
     monoid[List[T]](Nil)(new Ordering[List[T]] {
@@ -176,9 +175,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
   }
 
   /**
-   * Returns a [[Monoid]] instance for `Max[Vector[T]]` that compares
-   * lists first by length and then element-wise by `T`, and returns
-   * the maximum value.
+   * Returns a [[Monoid]] instance for `Max[Vector[T]]` that compares lists first by length and then
+   * element-wise by `T`, and returns the maximum value.
    */
   implicit def vectorMonoid[T: Ordering]: Monoid[Max[Vector[T]]] with BoundedSemilattice[Max[Vector[T]]] =
     monoid[Vector[T]](Vector.empty[T])(new Ordering[Vector[T]] {
@@ -188,9 +186,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
     })
 
   /**
-   * Returns a [[Monoid]] instance for `Max[Stream[T]]` that compares
-   * lists first by length and then element-wise by `T`, and returns
-   * the maximum value.
+   * Returns a [[Monoid]] instance for `Max[Stream[T]]` that compares lists first by length and then
+   * element-wise by `T`, and returns the maximum value.
    */
   implicit def streamMonoid[T: Ordering]: Monoid[Max[Stream[T]]] with BoundedSemilattice[Max[Stream[T]]] =
     monoid[Stream[T]](Stream.empty[T])(new Ordering[Stream[T]] {
@@ -201,8 +198,7 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
 }
 
 /**
- * [[Aggregator]] that selects the maximum instance of `T` in the
- * aggregated stream.
+ * [[Aggregator]] that selects the maximum instance of `T` in the aggregated stream.
  */
 case class MaxAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
   override def prepare(v: T): T = v

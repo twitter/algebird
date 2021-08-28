@@ -26,7 +26,8 @@ import scala.collection.mutable.{Set => MSet}
 import com.twitter.algebird.util.UtilAlgebras._
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 class AsyncListSum[Key, Value](
     bufferSize: BufferSize,
