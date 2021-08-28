@@ -17,9 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * `SetDiff` is a class that represents changes applied to a set. It
- * is in fact a Set[T] => Set[T], but doesn't extend Function1 since
- * that brings in a pack of methods that we don't necessarily want.
+ * `SetDiff` is a class that represents changes applied to a set. It is in fact a Set[T] => Set[T], but
+ * doesn't extend Function1 since that brings in a pack of methods that we don't necessarily want.
  */
 sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) {
   self =>
@@ -39,14 +38,13 @@ sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) {
   def apply(previous: Set[T]): Set[T] = previous ++ add -- remove
 
   /**
-   * Returns a diff that, if applied to a set, undoes the effects of
-   * this diff.
+   * Returns a diff that, if applied to a set, undoes the effects of this diff.
    */
   def invert: SetDiff[T] = SetDiff(remove, add)
 
   /**
-   * Same as apply, but fails to None if the diff's removal set has
-   * any items that aren't present in `previous`.
+   * Same as apply, but fails to None if the diff's removal set has any items that aren't present in
+   * `previous`.
    *
    * Returns Some(_) if and only if invert will undo.
    */
@@ -59,9 +57,8 @@ sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) {
 object SetDiff {
 
   /**
-   * Keeping this constructor private prevents creation of ad-hoc,
-   * invalid `SetDiff` instances. `SetDiff`s must be created by
-   * construction with the supplied helper methods below.
+   * Keeping this constructor private prevents creation of ad-hoc, invalid `SetDiff` instances. `SetDiff`s
+   * must be created by construction with the supplied helper methods below.
    */
   private[SetDiff] def apply[T](add: Set[T], remove: Set[T]): SetDiff[T] =
     new SetDiff[T](add, remove) {}
@@ -80,8 +77,7 @@ object SetDiff {
   def empty[T]: SetDiff[T] = SetDiff(Set.empty, Set.empty)
 
   /**
-   * Tracks the changes between the old and new set in a SetDiff[T]
-   * instance. The law that diffs preserve is:
+   * Tracks the changes between the old and new set in a SetDiff[T] instance. The law that diffs preserve is:
    *
    * {{{
    * val diff = SetDiff.of(a, b)

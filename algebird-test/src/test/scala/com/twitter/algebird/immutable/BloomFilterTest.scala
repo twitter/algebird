@@ -134,7 +134,7 @@ class ImmutableBloomFilterHashIndices extends CheckProperties {
   }
 
   /**
-   *   This is the version of the Hash as of before the "negative values fix"
+   * This is the version of the Hash as of before the "negative values fix"
    */
   case class NegativeHash(numHashes: Int, width: Int) {
     val size = numHashes

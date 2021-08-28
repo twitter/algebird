@@ -27,8 +27,7 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
     }
 
     /**
-     * This is the core law, along with associativity that allows
-     * us to reason about set SetDiffs.
+     * This is the core law, along with associativity that allows us to reason about set SetDiffs.
      */
     "SetDiffs are the same as updating the set" in {
       check { (init: Set[Int], items: List[Either[Int, Int]]) =>

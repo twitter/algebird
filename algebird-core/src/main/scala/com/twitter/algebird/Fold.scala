@@ -19,20 +19,20 @@ import java.io.Serializable
 import scala.collection.compat._
 
 /**
- * Folds are first-class representations of "Traversable.foldLeft." They have the nice property that
- * they can be fused to work in parallel over an input sequence.
+ * Folds are first-class representations of "Traversable.foldLeft." They have the nice property that they can
+ * be fused to work in parallel over an input sequence.
  *
- * A Fold accumulates inputs (I) into some internal type (X), converting to a defined output type
- * (O) when done.  We use existential types to hide internal details and to allow for internal and
- * external (X and O) types to differ for "map" and "join."
+ * A Fold accumulates inputs (I) into some internal type (X), converting to a defined output type (O) when
+ * done. We use existential types to hide internal details and to allow for internal and external (X and O)
+ * types to differ for "map" and "join."
  *
- * In discussing this type we draw parallels to Function1 and related types. You can think of a
- * fold as a function "Seq[I] => O" but in reality we do not have to materialize the input sequence
- * at once to "run" the fold.
+ * In discussing this type we draw parallels to Function1 and related types. You can think of a fold as a
+ * function "Seq[I] => O" but in reality we do not have to materialize the input sequence at once to "run" the
+ * fold.
  *
- * The traversal of the input data structure is NOT done by Fold itself. Instead we expose some
- * methods like "overTraversable" that know how to iterate through various sequence types and drive
- * the fold. We also expose some internal state so library authors can fold over their own types.
+ * The traversal of the input data structure is NOT done by Fold itself. Instead we expose some methods like
+ * "overTraversable" that know how to iterate through various sequence types and drive the fold. We also
+ * expose some internal state so library authors can fold over their own types.
  *
  * See the companion object for constructors.
  */
@@ -41,27 +41,26 @@ sealed trait Fold[-I, +O] extends Serializable {
   /**
    * Users can ignore this type.
    *
-   * The internal accumulator type. No one outside this Fold needs to know what this is, and that's
-   * a good thing. It keeps type signatures sane and makes this easy to use for the amount of
-   * flexibility it provides.
+   * The internal accumulator type. No one outside this Fold needs to know what this is, and that's a good
+   * thing. It keeps type signatures sane and makes this easy to use for the amount of flexibility it
+   * provides.
    */
   type X
 
   /**
-   * Users can ignore this method.  It is exposed so library authors can run folds over their own
-   * sequence types.
+   * Users can ignore this method. It is exposed so library authors can run folds over their own sequence
+   * types.
    *
-   * "build" constructs a FoldState, which tells us how to run the fold.  It is expected that we can
-   * run the same Fold many times over different data structures, but we must build a new FoldState
-   * every time.
+   * "build" constructs a FoldState, which tells us how to run the fold. It is expected that we can run the
+   * same Fold many times over different data structures, but we must build a new FoldState every time.
    *
    * See FoldState for information on how to use this for your own sequence types.
    */
   def build(): FoldState[X, I, O]
 
   /**
-   * Transforms the output of the Fold after iteration is complete. This is analogous to
-   * "Future.map" or "Function1.compose."
+   * Transforms the output of the Fold after iteration is complete. This is analogous to "Future.map" or
+   * "Function1.compose."
    */
   def map[P](f: O => P): Fold[I, P] = {
     val self = this
@@ -73,8 +72,8 @@ sealed trait Fold[-I, +O] extends Serializable {
   }
 
   /**
-   * Joins two folds into one and combines the results. The fused fold accumulates with both at the
-   * same time and combines at the end.
+   * Joins two folds into one and combines the results. The fused fold accumulates with both at the same time
+   * and combines at the end.
    */
   def joinWith[I2 <: I, P, Q](other: Fold[I2, P])(f: (O, P) => Q): Fold[I2, Q] = {
     val self = this
@@ -99,8 +98,8 @@ sealed trait Fold[-I, +O] extends Serializable {
     joinWith(other) { case (o, p) => (o, p) }
 
   /**
-   * Transforms the input of the fold before every accumulation. (The name comes from "contravariant
-   * map.") This is analogous to "Function1.andThen."
+   * Transforms the input of the fold before every accumulation. (The name comes from "contravariant map.")
+   * This is analogous to "Function1.andThen."
    */
   def contramap[H](f: H => I): Fold[H, O] = {
     val self = this
@@ -138,21 +137,17 @@ sealed trait Fold[-I, +O] extends Serializable {
 }
 
 /**
- * A FoldState defines a left fold with a "hidden" accumulator type. It is exposed so
- * library authors can run Folds over their own sequence types.
+ * A FoldState defines a left fold with a "hidden" accumulator type. It is exposed so library authors can run
+ * Folds over their own sequence types.
  *
- * The fold can be executed correctly according to the properties of "add" and your traversed
- * data structure. For example, the "add" function of a monoidal fold will be associative. A
- * FoldState is valid for only one iteration because the accumulator (seeded by "start"  may be
- * mutable.
+ * The fold can be executed correctly according to the properties of "add" and your traversed data structure.
+ * For example, the "add" function of a monoidal fold will be associative. A FoldState is valid for only one
+ * iteration because the accumulator (seeded by "start" may be mutable.
  *
- * The three components of a fold are
- *   add: (X, I) => X - updates and returns internal state for every input I
- *   start: X - the initial state
- *   end: X => O - transforms internal state to a final result
+ * The three components of a fold are add: (X, I) => X - updates and returns internal state for every input I
+ * start: X - the initial state end: X => O - transforms internal state to a final result
  *
- * Folding over Seq(x, y) would produce the result
- *   end(add(add(start, x), y))
+ * Folding over Seq(x, y) would produce the result end(add(add(start, x), y))
  */
 final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val start: X, val end: X => O)
     extends Serializable {
@@ -173,10 +168,10 @@ final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val st
 /**
  * Methods to create and run Folds.
  *
- * The Folds defined here are immutable and serializable, which we expect by default. It is
- * important that you as a user indicate mutability or non-serializability when defining new Folds.
- * Additionally, it is recommended that "end" functions not mutate the accumulator in order to
- * support scans (producing a stream of intermediate outputs by calling "end" at each step).
+ * The Folds defined here are immutable and serializable, which we expect by default. It is important that you
+ * as a user indicate mutability or non-serializability when defining new Folds. Additionally, it is
+ * recommended that "end" functions not mutate the accumulator in order to support scans (producing a stream
+ * of intermediate outputs by calling "end" at each step).
  */
 object Fold extends CompatFold {
 
@@ -187,15 +182,14 @@ object Fold extends CompatFold {
     new FoldApplicative[I]
 
   /**
-   * Turn a common Scala foldLeft into a Fold.
-   * The accumulator MUST be immutable and serializable.
+   * Turn a common Scala foldLeft into a Fold. The accumulator MUST be immutable and serializable.
    */
   def foldLeft[I, O](o: O)(add: (O, I) => O): Fold[I, O] =
     fold[O, I, O](add, o, o => o)
 
   /**
-   * A general way of defining Folds that supports a separate accumulator type.
-   * The accumulator MUST be immutable and serializable.
+   * A general way of defining Folds that supports a separate accumulator type. The accumulator MUST be
+   * immutable and serializable.
    */
   def fold[M, I, O](add: (M, I) => M, start: M, end: M => O): Fold[I, O] =
     new Fold[I, O] {
@@ -205,8 +199,7 @@ object Fold extends CompatFold {
     }
 
   /**
-   * A general way of defining Folds that supports constructing mutable or non-serializable
-   * accumulators.
+   * A general way of defining Folds that supports constructing mutable or non-serializable accumulators.
    */
   def foldMutable[M, I, O](add: (M, I) => M, start: Unit => M, end: M => O): Fold[I, O] =
     new Fold[I, O] {
@@ -237,15 +230,15 @@ object Fold extends CompatFold {
     }
 
   /**
-   * An even simpler Fold that collects into a Seq.  Shorthand for "container[I, Seq];" fewer type
-   * arguments, better type inferrence.
+   * An even simpler Fold that collects into a Seq. Shorthand for "container[I, Seq];" fewer type arguments,
+   * better type inferrence.
    */
   def seq[I]: Fold[I, Seq[I]] =
     container[I, Seq]
 
   /**
-   * A Fold that does no work and returns a constant.  Analogous to Function1 const:
-   *   def const[A, B](b: B): (A => B) = { _ => b }
+   * A Fold that does no work and returns a constant. Analogous to Function1 const: def const[A, B](b: B): (A
+   * => B) = { _ => b }
    */
   def const[O](value: O): Fold[Any, O] =
     Fold.foldLeft(value) { case (u, _) => u }
@@ -319,15 +312,15 @@ object Fold extends CompatFold {
     Fold.foldLeft(0L) { case (x, _) => x + 1 }
 
   /**
-   * A Fold that returns "true" if all elements of the sequence statisfy the predicate.
-   * Note this does not short-circuit enumeration of the sequence.
+   * A Fold that returns "true" if all elements of the sequence statisfy the predicate. Note this does not
+   * short-circuit enumeration of the sequence.
    */
   def forall[I](pred: I => Boolean): Fold[I, Boolean] =
     foldLeft(true)((b, i) => b && pred(i))
 
   /**
-   * A Fold that returns "true" if any element of the sequence statisfies the predicate.
-   * Note this does not short-circuit enumeration of the sequence.
+   * A Fold that returns "true" if any element of the sequence statisfies the predicate. Note this does not
+   * short-circuit enumeration of the sequence.
    */
   def exists[I](pred: I => Boolean): Fold[I, Boolean] =
     foldLeft(false)((b, i) => b || pred(i))

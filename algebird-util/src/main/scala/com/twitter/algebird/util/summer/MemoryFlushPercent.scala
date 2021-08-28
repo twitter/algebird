@@ -16,6 +16,7 @@ limitations under the License.
 package com.twitter.algebird.util.summer
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 case class MemoryFlushPercent(v: Float)

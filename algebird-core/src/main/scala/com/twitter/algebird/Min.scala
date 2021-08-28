@@ -20,19 +20,19 @@ import algebra.{BoundedSemilattice, Semilattice}
 /**
  * Tracks the minimum wrapped instance of some ordered type `T`.
  *
- * [[Min]][T] is a [[Semigroup]] for all types `T`. If `T` has some
- * maximum element (`Long` has `Long.MaxValue`, for example), then
- * [[Min]][T] is a [[Monoid]].
+ * [[Min]] [T] is a [[Semigroup]] for all types `T`. If `T` has some maximum element (`Long` has
+ * `Long.MaxValue`, for example), then [[Min]] [T] is a [[Monoid]].
  *
- * @param get wrapped instance of `T`
+ * @param get
+ *   wrapped instance of `T`
  */
 case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
 
   /**
-   * If this instance wraps a smaller `T` than `r`, returns this
-   * instance, else returns `r`.
+   * If this instance wraps a smaller `T` than `r`, returns this instance, else returns `r`.
    *
-   * @param r instance of `Min[U]` for comparison
+   * @param r
+   *   instance of `Min[U]` for comparison
    */
   def min[U >: T](r: Min[U])(implicit ord: Ordering[U]): Min[U] =
     Min.ordering.min(this, r)
@@ -40,27 +40,27 @@ case class Min[@specialized(Int, Long, Float, Double) +T](get: T) {
   /**
    * Identical to [[min]].
    *
-   * @param r instance of `Min[U]` for comparison
+   * @param r
+   *   instance of `Min[U]` for comparison
    */
   def +[U >: T](r: Min[U])(implicit ord: Ordering[U]): Min[U] = min(r)
 }
 
 /**
- * Provides a set of operations and typeclass instances needed to use
- * [[Min]] instances.
+ * Provides a set of operations and typeclass instances needed to use [[Min]] instances.
  */
 object Min extends MinInstances {
 
   /**
-   * Returns an [[Aggregator]] that selects the minimum instance of an
-   * ordered type `T` in the aggregated stream.
+   * Returns an [[Aggregator]] that selects the minimum instance of an ordered type `T` in the aggregated
+   * stream.
    */
   def aggregator[T](implicit ord: Ordering[T]): MinAggregator[T] =
     MinAggregator()(ord)
 
   /**
-   * Returns a [[Semigroup]] instance with a `plus` implementation
-   * that always returns the minimum `T` argument.
+   * Returns a [[Semigroup]] instance with a `plus` implementation that always returns the minimum `T`
+   * argument.
    */
   def minSemigroup[T](implicit ord: Ordering[T]): Semigroup[T] with Semilattice[T] =
     new Semigroup[T] with Semilattice[T] {
@@ -73,11 +73,13 @@ private[algebird] sealed abstract class MinInstances {
   implicit def ordering[T: Ordering]: Ordering[Min[T]] = Ordering.by(_.get)
 
   /**
-   * Returns a [[Monoid]] instance for [[Min]][T] that combines
-   * instances using [[Min.min]] and uses `zero` for its identity.
+   * Returns a [[Monoid]] instance for [[Min]] [T] that combines instances using [[Min.min]] and uses `zero`
+   * for its identity.
    *
-   * @param zero identity of the returned [[Monoid]] instance
-   * @note `zero` must be `>=` every element of `T` for the returned instance to be lawful.
+   * @param zero
+   *   identity of the returned [[Monoid]] instance
+   * @note
+   *   `zero` must be `>=` every element of `T` for the returned instance to be lawful.
    */
   def monoid[T: Ordering](zero: => T): Monoid[Min[T]] with BoundedSemilattice[Min[T]] = {
     val z = zero // avoid confusion below when overriding zero
@@ -90,8 +92,8 @@ private[algebird] sealed abstract class MinInstances {
   }
 
   /**
-   * Returns a [[Semigroup]] instance for [[Min]][T]. The `plus`
-   * implementation always returns the minimum `Min[T]` argument.
+   * Returns a [[Semigroup]] instance for [[Min]] [T]. The `plus` implementation always returns the minimum
+   * `Min[T]` argument.
    */
   implicit def semigroup[T: Ordering]: Semigroup[Min[T]] with Semilattice[Min[T]] =
     new Semigroup[Min[T]] with Semilattice[Min[T]] {
@@ -109,25 +111,22 @@ private[algebird] sealed abstract class MinInstances {
     monoid(Long.MaxValue)
 
   /**
-   * [[Monoid]] for [[Min]][Double] with `zero == Double.MaxValue`
-   * Note: MaxValue < PositiveInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
+   * [[Monoid]] for [[Min]] [Double] with `zero == Double.MaxValue` Note: MaxValue < PositiveInfinity, but
+   * people may be relying on this emitting a non-infinite number. Sadness
    */
   implicit def doubleMonoid: Monoid[Min[Double]] with BoundedSemilattice[Min[Double]] =
     monoid(Double.MaxValue)
 
   /**
-   * [[Monoid]] for [[Min]][Float] with `zero == Float.MaxValue`
-   * Note: MaxValue < PositiveInfinity, but people may
-   * be relying on this emitting a non-infinite number. Sadness
+   * [[Monoid]] for [[Min]] [Float] with `zero == Float.MaxValue` Note: MaxValue < PositiveInfinity, but
+   * people may be relying on this emitting a non-infinite number. Sadness
    */
   implicit def floatMonoid: Monoid[Min[Float]] with BoundedSemilattice[Min[Float]] =
     monoid(Float.MaxValue)
 }
 
 /**
- * [[Aggregator]] that selects the minimum instance of `T` in the
- * aggregated stream.
+ * [[Aggregator]] that selects the minimum instance of `T` in the aggregated stream.
  */
 case class MinAggregator[T]()(implicit val ord: Ordering[T]) extends Aggregator[T, T, T] {
   override def prepare(v: T): T = v

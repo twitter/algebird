@@ -112,7 +112,7 @@ object BitSetTest extends Properties("BitSet") {
 
   property("(x + a)(a)") = forAll { (x: BitSet, a: Int) =>
     val y = x + a
-    y(a) :| s"$y(${a})"
+    y(a) :| s"$y($a)"
   }
 
   property("!(x - a)(a)") = forAll { (x: BitSet, a: Int) =>

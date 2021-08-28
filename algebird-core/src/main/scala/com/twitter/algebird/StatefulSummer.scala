@@ -17,21 +17,18 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * A Stateful summer is something that is potentially more efficient
- * (a buffer, a cache, etc...) that has the same result as a sum:
- * Law 1: Semigroup.sumOption(items) ==
- *   (Monoid.plus(items.map { stateful.put(_) }.filter { _.isDefined }, stateful.flush) &&
- *     stateful.isFlushed)
- * Law 2: isFlushed == flush.isEmpty
- * @author Oscar Boykin
+ * A Stateful summer is something that is potentially more efficient (a buffer, a cache, etc...) that has the
+ * same result as a sum: Law 1: Semigroup.sumOption(items) == (Monoid.plus(items.map { stateful.put(_)
+ * }.filter { _.isDefined }, stateful.flush) && stateful.isFlushed) Law 2: isFlushed == flush.isEmpty
+ * @author
+ *   Oscar Boykin
  */
 trait StatefulSummer[V] extends Buffered[V, V] {
   def semigroup: Semigroup[V]
 }
 
 /**
- * Sum the entire iterator one item at a time. Only emits on flush
- * you should probably prefer BufferedSumAll
+ * Sum the entire iterator one item at a time. Only emits on flush you should probably prefer BufferedSumAll
  */
 class SumAll[V](implicit override val semigroup: Semigroup[V]) extends StatefulSummer[V] {
   var summed: Option[V] = None

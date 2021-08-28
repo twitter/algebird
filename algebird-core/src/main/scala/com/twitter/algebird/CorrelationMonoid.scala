@@ -11,12 +11,12 @@ object Correlation {
 }
 
 /**
- * A class to calculate covariance and the first two central moments of a sequence of pairs of Doubles, from which the
- * pearson correlation coeifficient can be calculated.
+ * A class to calculate covariance and the first two central moments of a sequence of pairs of Doubles, from
+ * which the pearson correlation coeifficient can be calculated.
  *
- * m{i}x denotes the ith central moment of the first projection of the pair.
- * m{i}y denotes the ith central moment of the second projection of the pair.
- * c2 the covariance equivalent of the second central moment, i.e. c2 = Sum_(x,y) (x - m1x)*(y - m1y).
+ * m{i}x denotes the ith central moment of the first projection of the pair. m{i}y denotes the ith central
+ * moment of the second projection of the pair. c2 the covariance equivalent of the second central moment,
+ * i.e. c2 = Sum_(x,y) (x - m1x)*(y - m1y).
  */
 case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: Double, m0: Double) {
   def totalWeight: Double = m0
@@ -38,7 +38,8 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
   def covariance: Double = c2 / totalWeight
 
   /**
-   * @return Pearson's correlation coefficient
+   * @return
+   *   Pearson's correlation coefficient
    */
   def correlation: Double =
     // correlation is defined as: covariance / (varianceLeft * varianceRight)
@@ -47,10 +48,12 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
     c2 / (Math.sqrt(m2x * m2y))
 
   /**
-   * Assume this instance of Correlation came from summing together Correlation.apply((x_i, y_i)) for i in 1...n.
+   * Assume this instance of Correlation came from summing together Correlation.apply((x_i, y_i)) for i in
+   * 1...n.
    *
-   * @return (m, b) where y = mx + b is the line with the least squares fit of the points (x_i, y_i).
-   *         See, e.g. https://mathworld.wolfram.com/LeastSquaresFitting.html.
+   * @return
+   *   (m, b) where y = mx + b is the line with the least squares fit of the points (x_i, y_i). See, e.g.
+   *   https://mathworld.wolfram.com/LeastSquaresFitting.html.
    */
   def linearLeastSquares: (Double, Double) = {
     val m = c2 / m2x
@@ -75,16 +78,15 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
 object CorrelationMonoid extends Monoid[Correlation] {
 
   /**
-   * The algorithm for combining the correlation calculations from two partitions of pairs of numbers. Comes from
-   * Pébay, Philippe (2008), "Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments",
-   *   Technical Report SAND2008-6212, Sandia National Laboratories
+   * The algorithm for combining the correlation calculations from two partitions of pairs of numbers. Comes
+   * from Pébay, Philippe (2008), "Formulas for Robust, One-Pass Parallel Computation of Covariances and
+   * Arbitrary-Order Statistical Moments", Technical Report SAND2008-6212, Sandia National Laboratories
    * https://prod-ng.sandia.gov/techlib-noauth/access-control.cgi/2008/086212.pdf
    *
-   * Extending this to weights can be found in
-   * Schubert, Erich; Gertz, Michael (9 July 2018). Numerically stable parallel computation of (co-)variance.
-   *   ACM. p. 10. doi:10.1145/3221269.3223036. ISBN 9781450365055.
-   *   http://dl.acm.org/citation.cfm?id=3221269.3223036
-   *   https://dl.acm.org/doi/10.1145/3221269.3223036
+   * Extending this to weights can be found in Schubert, Erich; Gertz, Michael (9 July 2018). Numerically
+   * stable parallel computation of (co-)variance. ACM. p. 10. doi:10.1145/3221269.3223036. ISBN
+   * 9781450365055. http://dl.acm.org/citation.cfm?id=3221269.3223036
+   * https://dl.acm.org/doi/10.1145/3221269.3223036
    */
   override def plus(a: Correlation, b: Correlation): Correlation = {
     val count = a.totalWeight + b.totalWeight

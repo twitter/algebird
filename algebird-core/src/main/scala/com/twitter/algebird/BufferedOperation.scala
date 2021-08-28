@@ -19,9 +19,8 @@ package com.twitter.algebird
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Represents something that consumes I and may emit O. Has some internal
- * state that may be used to improve performance.
- * Generally used to model folds or reduces (see BufferedReduce)
+ * Represents something that consumes I and may emit O. Has some internal state that may be used to improve
+ * performance. Generally used to model folds or reduces (see BufferedReduce)
  */
 trait Buffered[I, O] extends java.io.Serializable {
   def put(i: I): Option[O]
@@ -56,8 +55,8 @@ abstract class ArrayBufferedOperation[I, O](size: Int) extends Buffered[I, O] {
 object ArrayBufferedOperation {
 
   /**
-   * Returns an ArrayBufferedOperation instance that internally uses
-   * the `sumOption` implementation of the supplied Semigroup[T]
+   * Returns an ArrayBufferedOperation instance that internally uses the `sumOption` implementation of the
+   * supplied Semigroup[T]
    */
   def fromSumOption[T](size: Int)(implicit sg: Semigroup[T]): BufferedReduce[T] =
     new ArrayBufferedOperation[T, T](size) with BufferedReduce[T] {
@@ -68,8 +67,8 @@ object ArrayBufferedOperation {
 }
 
 /**
- * This never emits on put, you must call flush
- * designed to be use in the stackable pattern with ArrayBufferedOperation
+ * This never emits on put, you must call flush designed to be use in the stackable pattern with
+ * ArrayBufferedOperation
  */
 trait BufferedReduce[V] extends Buffered[V, V] {
   abstract override def put(item: V): Option[V] = {

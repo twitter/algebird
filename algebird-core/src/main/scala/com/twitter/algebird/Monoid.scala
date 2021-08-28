@@ -22,20 +22,20 @@ import scala.math.Equiv
 import scala.reflect.ClassTag
 
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
 import java.util.{List => JList, Map => JMap}
 
 import scala.collection.{Map => ScMap}
 
 /**
- * Monoid (take a deep breath, and relax about the weird name):
- *   This is a semigroup that has an additive identity (called zero), such that a+0=a, 0+a=a, for every a
+ * Monoid (take a deep breath, and relax about the weird name): This is a semigroup that has an additive
+ * identity (called zero), such that a+0=a, 0+a=a, for every a
  */
 @implicitNotFound(msg = "Cannot find Monoid type class for ${T}")
 trait Monoid[@specialized(Int, Long, Float, Double) T]
@@ -72,8 +72,7 @@ trait Monoid[@specialized(Int, Long, Float, Double) T]
 abstract class AbstractMonoid[T] extends Monoid[T]
 
 /**
- * Some(5) + Some(3) == Some(8)
- * Some(5) + None == Some(5)
+ * Some(5) + Some(3) == Some(8) Some(5) + None == Some(5)
  */
 class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
   override def zero: None.type = None
@@ -105,8 +104,7 @@ object StringMonoid extends Monoid[String] {
 }
 
 /**
- * List concatenation monoid.
- * plus means concatenation, zero is empty list
+ * List concatenation monoid. plus means concatenation, zero is empty list
  */
 class ListMonoid[T] extends Monoid[List[T]] {
   override def zero: List[T] = List[T]()
@@ -138,9 +136,8 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
 /**
  * Pair-wise sum Array monoid.
  *
- * plus returns left[i] + right[i] for all array elements.
- * The resulting array will be as long as the longest array (with its elements duplicated)
- * zero is an empty array
+ * plus returns left[i] + right[i] for all array elements. The resulting array will be as long as the longest
+ * array (with its elements duplicated) zero is an empty array
  */
 class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array[T]] {
 
@@ -163,8 +160,7 @@ class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array
 }
 
 /**
- * Set union monoid.
- * plus means union, zero is empty set
+ * Set union monoid. plus means union, zero is empty set
  */
 class SetMonoid[T] extends Monoid[Set[T]] {
   override def zero: Set[T] = Set[T]()
@@ -184,8 +180,7 @@ class SetMonoid[T] extends Monoid[Set[T]] {
 }
 
 /**
- * Function1 monoid.
- * plus means function composition, zero is the identity function
+ * Function1 monoid. plus means function composition, zero is the identity function
  */
 class Function1Monoid[T] extends Monoid[Function1[T, T]] {
   override def zero: T => T = identity[T]
@@ -210,8 +205,7 @@ object OrVal {
 }
 
 /**
- * Boolean OR monoid.
- * plus means logical OR, zero is false.
+ * Boolean OR monoid. plus means logical OR, zero is false.
  */
 object OrValMonoid extends Monoid[OrVal] {
   override def zero: OrVal = OrVal(false)
@@ -236,8 +230,7 @@ object AndVal {
 }
 
 /**
- * Boolean AND monoid.
- * plus means logical AND, zero is true.
+ * Boolean AND monoid. plus means logical AND, zero is true.
  */
 object AndValMonoid extends Monoid[AndVal] {
   override def zero: AndVal = AndVal(true)
@@ -283,16 +276,15 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlge
   }
 
   /**
-   * Return an Equiv[T] that uses isNonZero to return equality for all zeros
-   * useful for Maps/Vectors that have many equivalent in memory representations of zero
+   * Return an Equiv[T] that uses isNonZero to return equality for all zeros useful for Maps/Vectors that have
+   * many equivalent in memory representations of zero
    */
   def zeroEquiv[T: Equiv: Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
     (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a, b)
   }
 
   /**
-   * Same as v + v + v .. + v (i times in total)
-   * requires i >= 0, wish we had NonnegativeBigInt as a class
+   * Same as v + v + v .. + v (i times in total) requires i >= 0, wish we had NonnegativeBigInt as a class
    */
   def intTimes[T](i: BigInt, v: T)(implicit mon: Monoid[T]): T = {
     require(i >= 0, "Cannot do negative products with a Monoid, try Group.intTimes")

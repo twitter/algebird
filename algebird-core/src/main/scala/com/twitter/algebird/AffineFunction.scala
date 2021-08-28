@@ -17,8 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * Represents functions of the kind:
- * f(x) = slope * x + intercept
+ * Represents functions of the kind: f(x) = slope * x + intercept
  */
 case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializable {
   def toFn(implicit ring: Ring[R]): Function1[R, R] = { x => this.apply(x)(ring) }
@@ -27,13 +26,11 @@ case class AffineFunction[R](slope: R, intercept: R) extends java.io.Serializabl
 }
 
 /**
- * This feeds the value in on the LEFT!!!  This may seem counter intuitive, but
- * with this approach, a stream/iterator which is summed will have the same output
- * as applying the function one at a time in order to the input.
- * If we did the "lexigraphically correct" thing, which might be (f+g)(x) = f(g(x))
- * then we would wind up reversing the list in the sum.
- * (f1 + f2)(x) = f2(f1(x)) so that:
- * listOfFn.foldLeft(x) { (v, fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
+ * This feeds the value in on the LEFT!!! This may seem counter intuitive, but with this approach, a
+ * stream/iterator which is summed will have the same output as applying the function one at a time in order
+ * to the input. If we did the "lexigraphically correct" thing, which might be (f+g)(x) = f(g(x)) then we
+ * would wind up reversing the list in the sum. (f1 + f2)(x) = f2(f1(x)) so that: listOfFn.foldLeft(x) { (v,
+ * fn) => fn(v) } = (Monoid.sum(listOfFn))(x)
  */
 class AffineFunctionMonoid[R](implicit ring: Ring[R]) extends Monoid[AffineFunction[R]] {
   override lazy val zero: AffineFunction[R] = AffineFunction[R](ring.one, ring.zero)

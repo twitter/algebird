@@ -7,9 +7,8 @@ import org.scalatest.propspec.AnyPropSpec
 import org.scalatest.compatible.Assertion
 
 /**
- * Tests abstract algebra against scala's Numeric trait
- * Numeric is basically the ring trait with ordering, so we can use it
- * below to test all the numeric traits.
+ * Tests abstract algebra against scala's Numeric trait Numeric is basically the ring trait with ordering, so
+ * we can use it below to test all the numeric traits.
  */
 class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
   def plusNumericProp[T: Monoid: Numeric: Arbitrary]: Assertion = forAll { (a: T, b: T) =>

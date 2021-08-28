@@ -97,8 +97,7 @@ class MomentsTest extends AnyWordSpec with Matchers {
     assert(approxEq(1e-10)(f1, f2))
 
   /**
-   * Given a list of doubles, create a Moments object to hold
-   * the list's central moments.
+   * Given a list of doubles, create a Moments object to hold the list's central moments.
    */
   def getMoments(xs: List[Double]): Moments =
     MomentsAggregator(xs)

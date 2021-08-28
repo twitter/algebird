@@ -20,8 +20,8 @@ import scala.collection.mutable.{ArrayBuffer, Map => MMap}
 import com.twitter.algebird.{AdaptiveVector, Monoid}
 
 /**
- * A Matrix structure that is designed to hide moving between sparse and dense representations
- * Initial support here is focused on a dense row count with a sparse set of columns
+ * A Matrix structure that is designed to hide moving between sparse and dense representations Initial support
+ * here is focused on a dense row count with a sparse set of columns
  */
 abstract class AdaptiveMatrix[V: Monoid] extends Serializable {
   def rows: Int

@@ -20,11 +20,9 @@ import com.twitter.algebird.Monoid
 import java.util.PriorityQueue
 
 /**
- * for sort-with take and better performance over large values
- * The priority queues should be MAX queues, i.e. the ones we want least
- * should be in the .peek position
- * This is MUCH Faster for Top-K algorithms
- * Note this is MUTABLE. When you put something in plus, it is changed!
+ * for sort-with take and better performance over large values The priority queues should be MAX queues, i.e.
+ * the ones we want least should be in the .peek position This is MUCH Faster for Top-K algorithms Note this
+ * is MUTABLE. When you put something in plus, it is changed!
  */
 class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid[PriorityQueue[K]] {
 

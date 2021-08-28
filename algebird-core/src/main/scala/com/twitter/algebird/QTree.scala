@@ -19,22 +19,25 @@ package com.twitter.algebird
 import scala.util.hashing.MurmurHash3
 
 /**
- * A QTree provides an approximate Map[Double,A:Monoid] suitable for range queries, quantile queries,
- * and combinations of these (for example, if you use a numeric A, you can derive the inter-quartile mean).
+ * A QTree provides an approximate Map[Double,A:Monoid] suitable for range queries, quantile queries, and
+ * combinations of these (for example, if you use a numeric A, you can derive the inter-quartile mean).
  *
- * It is loosely related to the Q-Digest data structure from http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf,
- * but using an immutable tree structure, and carrying a generalized sum (of type A) at each node instead of just a count.
+ * It is loosely related to the Q-Digest data structure from
+ * http://www.cs.virginia.edu/~son/cs851/papers/ucsb.sensys04.pdf, but using an immutable tree structure, and
+ * carrying a generalized sum (of type A) at each node instead of just a count.
  *
- * The basic idea is to keep a binary tree, where the root represents the entire range of the input keys,
- * and each child node represents either the lower or upper half of its parent's range. Ranges are constrained to be
- * dyadic intervals (https://en.wikipedia.org/wiki/Interval_(mathematics)#Dyadic_intervals) for ease of merging.
+ * The basic idea is to keep a binary tree, where the root represents the entire range of the input keys, and
+ * each child node represents either the lower or upper half of its parent's range. Ranges are constrained to
+ * be dyadic intervals (https://en.wikipedia.org/wiki/Interval_(mathematics)#Dyadic_intervals) for ease of
+ * merging.
  *
  * To keep the size bounded, the total count carried by any sub-tree must be at least 1/(2^k) of the total
- * count at the root. Any sub-trees that do not meet this criteria have their children pruned and become leaves.
- * (It's important that they not be pruned away entirely, but that we keep a fringe of low-count leaves that can
- * gain weight over time and ultimately split again when warranted).
+ * count at the root. Any sub-trees that do not meet this criteria have their children pruned and become
+ * leaves. (It's important that they not be pruned away entirely, but that we keep a fringe of low-count
+ * leaves that can gain weight over time and ultimately split again when warranted).
  *
- * Quantile and range queries both give hard upper and lower bounds; the true result will be somewhere in the range given.
+ * Quantile and range queries both give hard upper and lower bounds; the true result will be somewhere in the
+ * range given.
  *
  * Keys must be >= 0.
  */
@@ -71,18 +74,16 @@ object QTree {
   }
 
   /**
-   * The common case of wanting an offset and sum for the same value
-   * This is useful if you want to query the mean inside a range later.
-   * If you truly just care about the counts/histogram, see the value method.
+   * The common case of wanting an offset and sum for the same value This is useful if you want to query the
+   * mean inside a range later. If you truly just care about the counts/histogram, see the value method.
    */
   def apply(k: Long): QTree[Long] = apply(k -> k)
 
   /**
-   * uses 1/65636 as the bin size, if you want to control that see other apply
-   * or value methods.
+   * uses 1/65636 as the bin size, if you want to control that see other apply or value methods.
    *
-   * This is useful if you want to query the mean inside a range later.
-   * If you truly just care about the counts/histogram, see the value method.
+   * This is useful if you want to query the mean inside a range later. If you truly just care about the
+   * counts/histogram, see the value method.
    */
   def apply(k: Double): QTree[Double] = apply(k -> k)
 
@@ -93,15 +94,14 @@ object QTree {
     Some((qtree.offset, qtree.level, qtree.count, qtree.sum, qtree.lowerChild, qtree.upperChild))
 
   /**
-   * If you are sure you only care about the approximate histogram
-   * features of QTree, you can save some space by using QTree[Unit]
+   * If you are sure you only care about the approximate histogram features of QTree, you can save some space
+   * by using QTree[Unit]
    */
   def value(v: Long): QTree[Unit] = apply(v -> (()))
 
   /**
-   * If you are sure you only care about the approximate histogram
-   * features of QTree, you can save some space by using QTree[Unit]
-   * level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
+   * If you are sure you only care about the approximate histogram features of QTree, you can save some space
+   * by using QTree[Unit] level gives a bin size of 2^level. By default this is 1/65536 (level = -16)
    */
   def value(v: Double, level: Int = DefaultLevel): QTree[Unit] =
     apply(v -> (()), level)
@@ -250,9 +250,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     }
 
   /**
-   * Find the smallest dyadic interval that contains the dyadic interval
-   * for this tree's root and the other tree's root, and return its
-   * level (that is, the power of 2 for the interval).
+   * Find the smallest dyadic interval that contains the dyadic interval for this tree's root and the other
+   * tree's root, and return its level (that is, the power of 2 for the interval).
    */
   private def commonAncestorLevel(other: QTree[A]) = {
     val minLevel = _level.min(other.level)
@@ -268,11 +267,9 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   }
 
   /**
-   * This merges with another QTree but DOES NOT compress.
-   * You should probably never use this and instead use
-   * QTreeSemigroup.plus(a, b) or .sumOption. Strongly
-   * prefer sumOption if you can, as it is much more efficient
-   * due to compressing less frequently.
+   * This merges with another QTree but DOES NOT compress. You should probably never use this and instead use
+   * QTreeSemigroup.plus(a, b) or .sumOption. Strongly prefer sumOption if you can, as it is much more
+   * efficient due to compressing less frequently.
    */
   def merge(other: QTree[A])(implicit monoid: Monoid[A]): QTree[A] = {
     val commonAncestor = commonAncestorLevel(other)
@@ -282,9 +279,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   }
 
   /**
-   * give lower and upper bounds respectively of the percentile
-   * value given. For instance, quantileBounds(0.5) would give
-   * an estimate of the median.
+   * give lower and upper bounds respectively of the percentile value given. For instance, quantileBounds(0.5)
+   * would give an estimate of the median.
    */
   def quantileBounds(p: Double): (Double, Double) = {
     require(p >= 0.0 && p <= 1.0, "The given percentile must be of the form 0 <= p <= 1.0")
@@ -319,8 +315,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   }
 
   /**
-   * Get the bounds on the sums within a range (not percentile)
-   * This along with the rangeCountBounds can tell you the mean over a range
+   * Get the bounds on the sums within a range (not percentile) This along with the rangeCountBounds can tell
+   * you the mean over a range
    */
   def rangeSumBounds(from: Double, to: Double)(implicit monoid: Monoid[A]): (A, A) =
     if (from <= lowerBound && to >= upperBound) {
@@ -352,10 +348,9 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     }
 
   /**
-   * Users should never need to call this if they are adding QTrees using the Semigroup
-   * This makes sure no element in the tree has count less than
-   * the total count / 2^k. That means after this call there
-   * are at most 2^k nodes, but usually fewer.
+   * Users should never need to call this if they are adding QTrees using the Semigroup This makes sure no
+   * element in the tree has count less than the total count / 2^k. That means after this call there are at
+   * most 2^k nodes, but usually fewer.
    */
   def compress(k: Int)(implicit m: Monoid[A]): QTree[A] = {
     val minCount = _count >> k
@@ -398,9 +393,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
     }
 
   /**
-   * How many total nodes are there in the QTree.
-   * Not meaningful for learning statistics, but interesting
-   * to estimate serialization size.
+   * How many total nodes are there in the QTree. Not meaningful for learning statistics, but interesting to
+   * estimate serialization size.
    */
   def size: Int = {
     val childSizes = mapChildrenWithDefault(0)(_.size)
@@ -439,10 +433,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
   }
 
   /**
-   * This gives you the mean for the middle 50%-ile.
-   * This probably only makes sense if the Monoid[A] is
-   * equivalent to addition in Numeric[A], which is only
-   * used to convert to Double at the end
+   * This gives you the mean for the middle 50%-ile. This probably only makes sense if the Monoid[A] is
+   * equivalent to addition in Numeric[A], which is only used to convert to Double at the end
    */
   def interQuartileMean(implicit n: Numeric[A], m: Monoid[A]): (Double, Double) = {
     val (l25, u25) = quantileBounds(0.25)
@@ -466,8 +458,7 @@ trait QTreeAggregatorLike[T] {
   def k: Int
 
   /**
-   * We convert T to a Double, then the Double is converted
-   * to a Long by using a 2^level bucket size.
+   * We convert T to a Double, then the Double is converted to a Long by using a 2^level bucket size.
    */
   def level: Int = QTree.DefaultLevel
   implicit def num: Numeric[T]
@@ -480,9 +471,9 @@ object QTreeAggregator {
 }
 
 /**
- * QTree aggregator is an aggregator that can be used to find the approximate percentile bounds.
- * The items that are iterated over to produce this approximation cannot be negative.
- * Returns an Intersection which represents the bounded approximation.
+ * QTree aggregator is an aggregator that can be used to find the approximate percentile bounds. The items
+ * that are iterated over to produce this approximation cannot be negative. Returns an Intersection which
+ * represents the bounded approximation.
  */
 case class QTreeAggregator[T](
     override val percentile: Double,
@@ -499,10 +490,10 @@ case class QTreeAggregator[T](
 }
 
 /**
- * QTreeAggregatorLowerBound is an aggregator that is used to find an appoximate percentile.
- * This is similar to a QTreeAggregator, but is a convenience because instead of returning an Intersection,
- * it instead returns the lower bound of the percentile.
- * Like a QTreeAggregator, the items that are iterated over to produce this approximation cannot be negative.
+ * QTreeAggregatorLowerBound is an aggregator that is used to find an appoximate percentile. This is similar
+ * to a QTreeAggregator, but is a convenience because instead of returning an Intersection, it instead returns
+ * the lower bound of the percentile. Like a QTreeAggregator, the items that are iterated over to produce this
+ * approximation cannot be negative.
  */
 case class QTreeAggregatorLowerBound[T](
     override val percentile: Double,

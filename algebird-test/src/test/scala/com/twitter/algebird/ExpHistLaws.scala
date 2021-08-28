@@ -25,13 +25,13 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   /**
-   * An "exponential histogram" tracks the count of a sliding window
-   * with a fixed maximum relative error. The core guarantees are:
+   * An "exponential histogram" tracks the count of a sliding window with a fixed maximum relative error. The
+   * core guarantees are:
    *
-   * - The actual sum will always be within the tracked bounds
-   * - The EH's guess is always within epsilon the actual.
-   * - The relative error of the count is at most epsilon
-   * - the relative error is always between 0 and 0.5.
+   *   - The actual sum will always be within the tracked bounds
+   *   - The EH's guess is always within epsilon the actual.
+   *   - The relative error of the count is at most epsilon
+   *   - the relative error is always between 0 and 0.5.
    */
   def checkCoreProperties(eh: ExpHist, actualSum: Long): Unit = {
     assert(eh.lowerBoundSum <= actualSum)
@@ -48,8 +48,8 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   /**
-   * Returns the ACTUAL sum of the supplied vector of buckets,
-   * filtering out any bucket with a timestamp <= exclusiveCutoff.
+   * Returns the ACTUAL sum of the supplied vector of buckets, filtering out any bucket with a timestamp <=
+   * exclusiveCutoff.
    */
   def actualBucketSum(buckets: Vector[Bucket], exclusiveCutoff: Timestamp): Long =
     buckets.collect {

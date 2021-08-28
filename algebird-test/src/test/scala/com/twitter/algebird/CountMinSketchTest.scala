@@ -179,7 +179,8 @@ class CMSInstanceTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPro
 }
 
 /**
- * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given `f: L => K`.
+ * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given
+ * `f: L => K`.
  */
 class CMSContraMapSpec extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
@@ -450,8 +451,10 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
   /**
    * Creates a random data stream.
    *
-   * @param size Number of stream elements.
-   * @param range Elements are randomly drawn from [0, range).
+   * @param size
+   *   Number of stream elements.
+   * @param range
+   *   Elements are randomly drawn from [0, range).
    * @return
    */
   def createRandomStream(size: Int, range: Int, rnd: Random = RAND): Seq[K] = {

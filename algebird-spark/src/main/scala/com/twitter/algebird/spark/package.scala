@@ -5,8 +5,7 @@ import org.apache.spark.rdd.RDD
 import scala.reflect.ClassTag
 
 /**
- * To use this, you probably want:
- * import com.twitter.algebird.spark._
+ * To use this, you probably want: import com.twitter.algebird.spark._
  */
 package object spark {
 

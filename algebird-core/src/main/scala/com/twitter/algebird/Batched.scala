@@ -6,19 +6,15 @@ import scala.collection.compat._
 /**
  * Batched: the free semigroup.
  *
- * For any type `T`, `Batched[T]` represents a way to lazily combine T
- * values as a semigroup would (i.e. associatively). A `Semigroup[T]`
- * instance can be used to recover a `T` value from a `Batched[T]`.
+ * For any type `T`, `Batched[T]` represents a way to lazily combine T values as a semigroup would (i.e.
+ * associatively). A `Semigroup[T]` instance can be used to recover a `T` value from a `Batched[T]`.
  *
- * Like other free structures, Batched trades space for time. A sum of
- * batched values defers the underlying semigroup action, instead
- * storing all values in memory (in a tree structure). If an
- * underlying semigroup is available, `Batched.semigroup` and
- * `Batch.monoid` can be configured to periodically sum the tree to
- * keep the overall size below `batchSize`.
+ * Like other free structures, Batched trades space for time. A sum of batched values defers the underlying
+ * semigroup action, instead storing all values in memory (in a tree structure). If an underlying semigroup is
+ * available, `Batched.semigroup` and `Batch.monoid` can be configured to periodically sum the tree to keep
+ * the overall size below `batchSize`.
  *
- * `Batched[T]` values are guaranteed not to be empty -- that is, they
- * will contain at least one `T` value.
+ * `Batched[T]` values are guaranteed not to be empty -- that is, they will contain at least one `T` value.
  */
 sealed abstract class Batched[T] extends Serializable {
 
@@ -30,8 +26,7 @@ sealed abstract class Batched[T] extends Serializable {
   /**
    * Combine two batched values.
    *
-   * As mentioned above, this just creates a new tree structure
-   * containing `this` and `that`.
+   * As mentioned above, this just creates a new tree structure containing `this` and `that`.
    */
   def combine(that: Batched[T]): Batched[T] =
     Batched.Items(this, that)
@@ -39,8 +34,7 @@ sealed abstract class Batched[T] extends Serializable {
   /**
    * Compact this batch if it exceeds `batchSize`.
    *
-   * Compacting a branch means summing it, and then storing the summed
-   * value in a new single-item batch.
+   * Compacting a branch means summing it, and then storing the summed value in a new single-item batch.
    */
   def compact(batchSize: Int)(implicit s: Semigroup[T]): Batched[T] =
     if (size < batchSize) this else Batched.Item(sum(s))
@@ -58,9 +52,8 @@ sealed abstract class Batched[T] extends Serializable {
    *
    * This is the order used by `.sum`.
    *
-   * This iterator traverses the tree from left-to-right. If the
-   * original expression was (w + x + y + z), this iterator returns w,
-   * x, y, and then z.
+   * This iterator traverses the tree from left-to-right. If the original expression was (w + x + y + z), this
+   * iterator returns w, x, y, and then z.
    */
   def iterator: Iterator[T] =
     this match {
@@ -77,9 +70,8 @@ sealed abstract class Batched[T] extends Serializable {
   /**
    * Provide a reversed iterator over the underlying tree structure.
    *
-   * This iterator traverses the tree from right-to-left. If the
-   * original expression was (w + x + y + z), this iterator returns z,
-   * y, x, and then w.
+   * This iterator traverses the tree from right-to-left. If the original expression was (w + x + y + z), this
+   * iterator returns z, y, x, and then w.
    */
   def reverseIterator: Iterator[T] =
     this match {
@@ -106,8 +98,7 @@ object Batched {
   /**
    * Constructed an optional batch from a collection of values.
    *
-   * Since batches cannot be empty, this method returns `None` if `ts`
-   * is empty, and `Some(batch)` otherwise.
+   * Since batches cannot be empty, this method returns `None` if `ts` is empty, and `Some(batch)` otherwise.
    */
   def items[T](ts: TraversableOnce[T]): Option[Batched[T]] =
     if (ts.iterator.isEmpty) None
@@ -120,13 +111,11 @@ object Batched {
   /**
    * Equivalence for batches.
    *
-   * Batches are equivalent if they sum to the same value. Since the
-   * free semigroup is associative, it's not correct to take tree
-   * structure into account when determining equality.
+   * Batches are equivalent if they sum to the same value. Since the free semigroup is associative, it's not
+   * correct to take tree structure into account when determining equality.
    *
-   * One thing to note here is that two equivalent batches might
-   * produce different lists (for instance, if one of the batches has
-   * more zeros in it than another one).
+   * One thing to note here is that two equivalent batches might produce different lists (for instance, if one
+   * of the batches has more zeros in it than another one).
    */
   implicit def equiv[A](implicit e: Equiv[A], s: Semigroup[A]): Equiv[Batched[A]] =
     new Equiv[Batched[A]] {
@@ -137,8 +126,7 @@ object Batched {
   /**
    * The free semigroup for batched values.
    *
-   * This semigroup just accumulates batches and doesn't ever evaluate
-   * them to flatten the tree.
+   * This semigroup just accumulates batches and doesn't ever evaluate them to flatten the tree.
    */
   implicit def semigroup[A]: Semigroup[Batched[A]] =
     new Semigroup[Batched[A]] {
@@ -148,9 +136,8 @@ object Batched {
   /**
    * Compacting semigroup for batched values.
    *
-   * This semigroup ensures that the batch's tree structure has fewer
-   * than `batchSize` values in it. When more values are added, the
-   * tree is compacted using `s`.
+   * This semigroup ensures that the batch's tree structure has fewer than `batchSize` values in it. When more
+   * values are added, the tree is compacted using `s`.
    */
   def compactingSemigroup[A: Semigroup](batchSize: Int): Semigroup[Batched[A]] =
     new BatchedSemigroup[A](batchSize)
@@ -158,24 +145,20 @@ object Batched {
   /**
    * Compacting monoid for batched values.
    *
-   * This monoid ensures that the batch's tree structure has fewer
-   * than `batchSize` values in it. When more values are added, the
-   * tree is compacted using `m`.
+   * This monoid ensures that the batch's tree structure has fewer than `batchSize` values in it. When more
+   * values are added, the tree is compacted using `m`.
    *
-   * It's worth noting that `x + 0` here will produce the same sum as
-   * `x`, but `.toList` will produce different lists (one will have an
-   * extra zero).
+   * It's worth noting that `x + 0` here will produce the same sum as `x`, but `.toList` will produce
+   * different lists (one will have an extra zero).
    */
   def compactingMonoid[A: Monoid](batchSize: Int): Monoid[Batched[A]] =
     new BatchedMonoid[A](batchSize)
 
   /**
-   * This aggregator batches up `agg` so that all the addition can be
-   * performed at once.
+   * This aggregator batches up `agg` so that all the addition can be performed at once.
    *
-   * It is useful when `sumOption` is much faster than using `plus`
-   * (e.g. when there is temporary mutable state used to make
-   * summation fast).
+   * It is useful when `sumOption` is much faster than using `plus` (e.g. when there is temporary mutable
+   * state used to make summation fast).
    */
   def aggregator[A, B, C](batchSize: Int, agg: Aggregator[A, B, C]): Aggregator[A, Batched[B], C] =
     new Aggregator[A, Batched[B], C] {
@@ -186,12 +169,10 @@ object Batched {
     }
 
   /**
-   * This monoid aggregator batches up `agg` so that all the addition
-   * can be performed at once.
+   * This monoid aggregator batches up `agg` so that all the addition can be performed at once.
    *
-   * It is useful when `sumOption` is much faster than using `plus`
-   * (e.g. when there is temporary mutable state used to make
-   * summation fast).
+   * It is useful when `sumOption` is much faster than using `plus` (e.g. when there is temporary mutable
+   * state used to make summation fast).
    */
   def monoidAggregator[A, B, C](
       batchSize: Int,
@@ -240,9 +221,8 @@ object Batched {
   /**
    * Abstract iterator through a batch's tree.
    *
-   * This class is agnostic about whether the traversal is
-   * left-to-right or right-to-left. The abstract method `descend`
-   * controls which direction the iterator moves.
+   * This class is agnostic about whether the traversal is left-to-right or right-to-left. The abstract method
+   * `descend` controls which direction the iterator moves.
    */
   private[algebird] abstract class ItemsIterator[A](root: Batched[A]) extends Iterator[A] {
     var stack: List[Batched[A]] = Nil
@@ -311,9 +291,8 @@ object Batched {
 /**
  * Compacting semigroup for batched values.
  *
- * This semigroup ensures that the batch's tree structure has fewer
- * than `batchSize` values in it. When more values are added, the
- * tree is compacted using `s`.
+ * This semigroup ensures that the batch's tree structure has fewer than `batchSize` values in it. When more
+ * values are added, the tree is compacted using `s`.
  */
 class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T]] {
 
@@ -326,9 +305,8 @@ class BatchedSemigroup[T: Semigroup](batchSize: Int) extends Semigroup[Batched[T
 /**
  * Compacting monoid for batched values.
  *
- * This monoid ensures that the batch's tree structure has fewer
- * than `batchSize` values in it. When more values are added, the
- * tree is compacted using `m`.
+ * This monoid ensures that the batch's tree structure has fewer than `batchSize` values in it. When more
+ * values are added, the tree is compacted using `m`.
  */
 class BatchedMonoid[T: Monoid](batchSize: Int)
     extends BatchedSemigroup[T](batchSize)

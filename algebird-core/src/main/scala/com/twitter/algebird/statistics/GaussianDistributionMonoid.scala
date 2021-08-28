@@ -3,9 +3,10 @@ package com.twitter.algebird.statistics
 import com.twitter.algebird.Monoid
 
 /**
- * @param mean Mean
- * @param sigma2 Variance, where sqrt(sigma2) is the standard deviation
- * aka Normal distribution
+ * @param mean
+ *   Mean
+ * @param sigma2
+ *   Variance, where sqrt(sigma2) is the standard deviation aka Normal distribution
  */
 case class GaussianDistribution(mean: Double, sigma2: Double) {
   def stddev: Double = math.sqrt(sigma2)
@@ -19,9 +20,8 @@ object GaussianDistribution {
 }
 
 /**
- * This monoid stems from the fact that if X and Y are independent random variables
- * that are normally distributed, then their sum is also
- * normally distributed, with its new mean equal to the sum of two means
+ * This monoid stems from the fact that if X and Y are independent random variables that are normally
+ * distributed, then their sum is also normally distributed, with its new mean equal to the sum of two means
  * and variance equal to the sum of two variances.
  * [[http://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables]]
  */

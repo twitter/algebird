@@ -18,12 +18,12 @@ package com.twitter.algebird
 import algebra.{Semigroup => ASemigroup}
 import algebra.ring.AdditiveSemigroup
 import java.lang.{
-  Integer => JInt,
-  Short => JShort,
-  Long => JLong,
-  Float => JFloat,
+  Boolean => JBool,
   Double => JDouble,
-  Boolean => JBool
+  Float => JFloat,
+  Integer => JInt,
+  Long => JLong,
+  Short => JShort
 }
 import java.util.{List => JList, Map => JMap}
 
@@ -38,23 +38,25 @@ import scala.annotation.{implicitNotFound, tailrec}
  * }}}
  *
  * Example instances:
- *  - `Semigroup[Int]`: `plus` `Int#+`
- *  - `Semigroup[List[T]]`: `plus` is `List#++`
+ *   - `Semigroup[Int]`: `plus` `Int#+`
+ *   - `Semigroup[List[T]]`: `plus` is `List#++`
  *
- * @define T T
+ * @define T
+ *   T
  */
 @implicitNotFound(msg = "Cannot find Semigroup type class for ${T}")
 trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] with AdditiveSemigroup[T] {
 
   /**
-   * Returns an instance of `$T` calculated by summing all instances in
-   * `iter` in one pass. Returns `None` if `iter` is empty, else
-   * `Some[$T]`.
+   * Returns an instance of `$T` calculated by summing all instances in `iter` in one pass. Returns `None` if
+   * `iter` is empty, else `Some[$T]`.
    *
-   * @param iter instances of `$T` to be combined
-   * @return `None` if `iter` is empty, else an option value containing the summed `$T`
-   * @note Override if there is a faster way to compute this sum than
-   *       `iter.reduceLeftOption` using [[plus]].
+   * @param iter
+   *   instances of `$T` to be combined
+   * @return
+   *   `None` if `iter` is empty, else an option value containing the summed `$T`
+   * @note
+   *   Override if there is a faster way to compute this sum than `iter.reduceLeftOption` using [[plus]].
    */
   def sumOption(iter: TraversableOnce[T]): Option[T] =
     iter.reduceLeftOption(plus(_, _))
@@ -74,13 +76,13 @@ trait Semigroup[@specialized(Int, Long, Float, Double) T] extends ASemigroup[T] 
 abstract class AbstractSemigroup[T] extends Semigroup[T]
 
 /**
- * Either semigroup is useful for error handling.
- * if everything is correct, use Right (it's right, get it?), if something goes
- * wrong, use Left.  plus does the normal thing for plus(Right, Right), or plus(Left, Left),
- * but if exactly one is Left, we return that value (to keep the error condition).
- * Typically, the left value will be a string representing the errors.
+ * Either semigroup is useful for error handling. if everything is correct, use Right (it's right, get it?),
+ * if something goes wrong, use Left. plus does the normal thing for plus(Right, Right), or plus(Left, Left),
+ * but if exactly one is Left, we return that value (to keep the error condition). Typically, the left value
+ * will be a string representing the errors.
  *
- * @define T Either[L, R]
+ * @define T
+ *   Either[L, R]
  */
 class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semigroup[R])
     extends Semigroup[Either[L, R]] {
@@ -147,8 +149,7 @@ object Semigroup
     new Semigroup[T] { override def plus(l: T, r: T): T = associativeFn(l, r) }
 
   /**
-   * Same as v + v + v .. + v (i times in total)
-   * requires i > 0, wish we had PositiveBigInt as a class
+   * Same as v + v + v .. + v (i times in total) requires i > 0, wish we had PositiveBigInt as a class
    */
   def intTimes[T](i: BigInt, v: T)(implicit sg: Semigroup[T]): T = {
     require(i > 0, "Cannot do non-positive products with a Semigroup, try Monoid/Group.intTimes")

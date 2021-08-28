@@ -17,18 +17,18 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * A useful utility for aggregation systems: you buffer up some number of items
- * in a thread-safe way, and when you have at most K of them, you sum them all
- * together.  A good use-case of this is doing a limited preaggregation before
- * sending on to a next phase (from mappers to reducers on Hadoop, or between
- * storm bolts).
+ * A useful utility for aggregation systems: you buffer up some number of items in a thread-safe way, and when
+ * you have at most K of them, you sum them all together. A good use-case of this is doing a limited
+ * preaggregation before sending on to a next phase (from mappers to reducers on Hadoop, or between storm
+ * bolts).
  *
- * Without this finite buffer history, an aggregated item could build up infinite
- * history, and therefore it is unbounded in the error you could introduce by
- * losing the buffer.
+ * Without this finite buffer history, an aggregated item could build up infinite history, and therefore it is
+ * unbounded in the error you could introduce by losing the buffer.
  *
- * @author Ashu Singhal
- * @author Oscar Boykin
+ * @author
+ *   Ashu Singhal
+ * @author
+ *   Oscar Boykin
  */
 import java.util.concurrent.ArrayBlockingQueue
 
@@ -46,9 +46,8 @@ class SummingQueue[V] private (capacity: Int)(override implicit val semigroup: S
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
 
   /**
-   * puts an item to the queue, optionally sums up the queue and returns value
-   * This never blocks interally. It uses offer. If the queue is full, we drain,
-   * sum the queue.
+   * puts an item to the queue, optionally sums up the queue and returns value This never blocks interally. It
+   * uses offer. If the queue is full, we drain, sum the queue.
    */
   override final def put(item: V): Option[V] =
     if (queueOption.isDefined) {

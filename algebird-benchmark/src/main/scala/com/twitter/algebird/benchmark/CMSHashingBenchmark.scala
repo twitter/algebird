@@ -6,8 +6,8 @@ import com.twitter.algebird.CMSHasher
 /**
  * Benchmarks the hashing algorithms used by Count-Min sketch for CMS[BigInt].
  *
- * The input values are generated ahead of time to ensure that each trial uses the same input (and that the RNG is not
- * influencing the runtime of the trials).
+ * The input values are generated ahead of time to ensure that each trial uses the same input (and that the
+ * RNG is not influencing the runtime of the trials).
  *
  * More details available at https://github.com/twitter/algebird/issues/392.
  */

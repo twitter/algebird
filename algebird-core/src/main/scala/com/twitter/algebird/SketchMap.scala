@@ -20,9 +20,9 @@ import algebra.CommutativeMonoid
 import com.twitter.algebird.matrix.AdaptiveMatrix
 
 /**
- * A Sketch Map is a generalized version of the Count-Min Sketch that is an
- * approximation of Map[K, V] that stores reference to top heavy hitters. The
- * Sketch Map can approximate the sums of any summable value that has a monoid.
+ * A Sketch Map is a generalized version of the Count-Min Sketch that is an approximation of Map[K, V] that
+ * stores reference to top heavy hitters. The Sketch Map can approximate the sums of any summable value that
+ * has a monoid.
  */
 /**
  * Hashes an arbitrary key type to one that the Sketch Map can use.
@@ -159,8 +159,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     }.min
 
   /**
-   * Returns a new set of sorted and concatenated heavy hitters given an
-   * arbitrary list of keys.
+   * Returns a new set of sorted and concatenated heavy hitters given an arbitrary list of keys.
    */
   def updatedHeavyHitters[V: Ordering](hitters: Seq[K], table: AdaptiveMatrix[V]): List[K] = {
     val mapping: Map[K, V] =
@@ -181,9 +180,8 @@ object SketchMapParams {
     SketchMapParams[K](seed, width(eps), depth(delta), heavyHittersCount)(serialization)
 
   /**
-   * Functions to translate between (eps, delta) and (depth, width). The translation is:
-   * depth = ceil(ln 1/delta)
-   * width = ceil(e / eps)
+   * Functions to translate between (eps, delta) and (depth, width). The translation is: depth = ceil(ln
+   * 1/delta) width = ceil(e / eps)
    */
   def eps(width: Int): Double = scala.math.exp(1.0) / width
   def delta(depth: Int): Double = 1.0 / scala.math.exp(depth)
@@ -193,26 +191,23 @@ object SketchMapParams {
 }
 
 /**
- * Data structure representing an approximation of Map[K, V], where V has an
- * implicit ordering and monoid. This is a more generic version of
- * CountMinSketch.
+ * Data structure representing an approximation of Map[K, V], where V has an implicit ordering and monoid.
+ * This is a more generic version of CountMinSketch.
  *
- * Values are stored in valuesTable, a 2D vector containing aggregated sums of
- * values inserted to the Sketch Map.
+ * Values are stored in valuesTable, a 2D vector containing aggregated sums of values inserted to the Sketch
+ * Map.
  *
- * The data structure stores top non-zero values, called Heavy Hitters. The
- * values are sorted by an implicit reverse ordering for the value, and the
- * number of heavy hitters stored is based on the heavyHittersCount set in
- * params.
+ * The data structure stores top non-zero values, called Heavy Hitters. The values are sorted by an implicit
+ * reverse ordering for the value, and the number of heavy hitters stored is based on the heavyHittersCount
+ * set in params.
  *
  * Use SketchMapMonoid to create instances of this class.
  */
 object SketchMap {
 
   /**
-   * Generates a monoid used to create SketchMap instances. Requires a
-   * serialization from K to Array[Byte] for hashing, an ordering for V, and a
-   * monoid for V.
+   * Generates a monoid used to create SketchMap instances. Requires a serialization from K to Array[Byte] for
+   * hashing, an ordering for V, and a monoid for V.
    */
   def monoid[K, V](
       params: SketchMapParams[K]
@@ -232,8 +227,7 @@ case class SketchMap[K, V](
 ) extends java.io.Serializable
 
 /**
- * An Aggregator for the SketchMap.
- * Can be created using SketchMap.aggregator
+ * An Aggregator for the SketchMap. Can be created using SketchMap.aggregator
  */
 case class SketchMapAggregator[K, V: Ordering: Monoid](
     params: SketchMapParams[K],

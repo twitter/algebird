@@ -19,16 +19,14 @@ package com.twitter.algebird
 import algebra.{CommutativeGroup, CommutativeMonoid}
 
 /**
- * A class to calculate the first five central moments over a sequence of Doubles.
- * Given the first five central moments, we can then calculate metrics like skewness
- * and kurtosis.
+ * A class to calculate the first five central moments over a sequence of Doubles. Given the first five
+ * central moments, we can then calculate metrics like skewness and kurtosis.
  *
  * m{i} denotes the ith central moment.
  *
- * This code manually inlines code to make it look like a case class. This is done
- * because we changed the count from a Long to a Double to enable the scale method,
- * which allows exponential decays of moments, but we didn't want to break backwards
- * binary compatibility.
+ * This code manually inlines code to make it look like a case class. This is done because we changed the
+ * count from a Long to a Double to enable the scale method, which allows exponential decays of moments, but
+ * we didn't want to break backwards binary compatibility.
  */
 sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Double, val m4: Double)
     extends Product
@@ -118,8 +116,8 @@ object Moments {
     Aggregator.prepareMonoid { n: N => Moments(num.toDouble(n)) }
 
   /**
-   * Create a Moments object given a single value.
-   *  This is useful for initializing moment calculations at the start of a stream.
+   * Create a Moments object given a single value. This is useful for initializing moment calculations at the
+   * start of a stream.
    */
   def apply[V: Numeric](value: V)(implicit num: Numeric[V]): Moments =
     new Moments(1.0, num.toDouble(value), 0, 0, 0)
@@ -140,22 +138,20 @@ object Moments {
     Some((m.m0, m.m1, m.m2, m.m3, m.m4))
 
   /**
-   * When combining averages, if the counts sizes are too close we
-   * should use a different algorithm.  This constant defines how
-   * close the ratio of the smaller to the total count can be:
+   * When combining averages, if the counts sizes are too close we should use a different algorithm. This
+   * constant defines how close the ratio of the smaller to the total count can be:
    */
   private[this] val STABILITY_CONSTANT = 0.1
 
   /**
-   * Given two streams of doubles (weightN, an) and (weightK, ak) of form (weighted count,
-   * mean), calculates the mean of the combined stream.
+   * Given two streams of doubles (weightN, an) and (weightK, ak) of form (weighted count, mean), calculates
+   * the mean of the combined stream.
    *
-   * Uses a more stable online algorithm which should be suitable for
-   * large numbers of records similar to:
+   * Uses a more stable online algorithm which should be suitable for large numbers of records similar to:
    * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
    *
-   * This differs from the implementation in MomentsGroup.scala only in that here, the counts are weighted, and are
-   * thus doubles instead of longs
+   * This differs from the implementation in MomentsGroup.scala only in that here, the counts are weighted,
+   * and are thus doubles instead of longs
    */
   def getCombinedMeanDouble(weightN: Double, an: Double, weightK: Double, ak: Double): Double =
     if (weightN < weightK) getCombinedMeanDouble(weightK, ak, weightN, an)
@@ -175,18 +171,16 @@ object Moments {
 class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
 
   /**
-   * When combining averages, if the counts sizes are too close we
-   * should use a different algorithm.  This constant defines how
-   * close the ratio of the smaller to the total count can be:
+   * When combining averages, if the counts sizes are too close we should use a different algorithm. This
+   * constant defines how close the ratio of the smaller to the total count can be:
    */
   private val STABILITY_CONSTANT = 0.1
 
   /**
-   * Given two streams of doubles (n, an) and (k, ak) of form (count,
-   * mean), calculates the mean of the combined stream.
+   * Given two streams of doubles (n, an) and (k, ak) of form (count, mean), calculates the mean of the
+   * combined stream.
    *
-   * Uses a more stable online algorithm which should be suitable for
-   * large numbers of records similar to:
+   * Uses a more stable online algorithm which should be suitable for large numbers of records similar to:
    * http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
    *
    * we no longer use this, but we can't remove it due to binary compatibility
@@ -297,12 +291,10 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
 }
 
 /**
- * This should not be used as a group (avoid negate and minus). It was wrongly
- * believed that this was a group for several years in this code, however
- * it was only being tested with positive counts (which is to say the generators
- * were too weak). It isn't the case that minus and negate are totally wrong
- * but (a - a) + b in general isn't associative: it won't equal a - (a - b)
- * which it should.
+ * This should not be used as a group (avoid negate and minus). It was wrongly believed that this was a group
+ * for several years in this code, however it was only being tested with positive counts (which is to say the
+ * generators were too weak). It isn't the case that minus and negate are totally wrong but (a - a) + b in
+ * general isn't associative: it won't equal a - (a - b) which it should.
  */
 @deprecated("use Moments.momentsMonoid, this isn't lawful for negative counts", "0.13.8")
 object MomentsGroup extends MomentsMonoid with Group[Moments] with CommutativeGroup[Moments] {

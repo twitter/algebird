@@ -21,39 +21,25 @@ import java.io.Serializable
 import Operators._
 
 /**
- * Convenience case class defined with a monoid for aggregating elements over
- * a finite window.
+ * Convenience case class defined with a monoid for aggregating elements over a finite window.
  *
- * @param total Known running total of `T`
- * @param items queue of known trailing elements.
+ * @param total
+ *   Known running total of `T`
+ * @param items
+ *   queue of known trailing elements.
  *
- *  Example usage:
+ * Example usage:
  *
- *  case class W28[T](window: Window[T]) {
- *    def total = this.window.total
- *    def items = this.window.items
- *    def size = this.window.size
- *  }
+ * case class W28[T](window: Window[T]) { def total = this.window.total def items = this.window.items def size
+ * = this.window.size }
  *
- *  object W28 {
- *    val windowSize = 28
- *    def apply[T](v: T): W28[T] = W28[T](Window(v))
+ * object W28 { val windowSize = 28 def apply[T](v: T): W28[T] = W28[T](Window(v))
  *
- *    implicit def w28Monoid[T](implicit p: Priority[Group[T], Monoid[T]]): Monoid[W28[T]] =
- *      new Monoid[W28[T]] {
- *        private val WT: Monoid[Window[T]] = Window.monoid[T](windowSize)
- *        def zero = W28[T](WT.zero)
- *        def plus(a: W28[T], b: W28[T]): W28[T] =
- *          W28[T](WT.plus(a.window, b.window))
- *      }
- *  }
- *  val elements = getElements()
+ * implicit def w28Monoid[T](implicit p: Priority[Group[T], Monoid[T]]): Monoid[W28[T]] = new Monoid[W28[T]] {
+ * private val WT: Monoid[Window[T]] = Window.monoid[T](windowSize) def zero = W28[T](WT.zero) def plus(a:
+ * W28[T], b: W28[T]): W28[T] = W28[T](WT.plus(a.window, b.window)) } } val elements = getElements()
  *
- *  val trailing90Totals =
- *    elements
- *      .map{ W90 }
- *      .scanLeft(W90(0)) { (a, b) => a + b }
- *      .map{ _.total }
+ * val trailing90Totals = elements .map{ W90 } .scanLeft(W90(0)) { (a, b) => a + b } .map{ _.total }
  */
 case class Window[T](total: T, items: Queue[T]) {
   def size: Int = items.size
@@ -83,8 +69,7 @@ object Window extends Serializable {
     WindowMonoidFromMonoid[T](size)
 
   /**
-   * This is a faster way to combine two Windows if you
-   * have a group
+   * This is a faster way to combine two Windows if you have a group
    */
   def combineWithGroup[T: Group](windowSize: Int, a: Window[T], b: Window[T]): Window[T] =
     if (b.items.size >= windowSize) {
@@ -126,7 +111,8 @@ object Window extends Serializable {
 /**
  * Provides a natural monoid for combining windows truncated to some window size.
  *
- * @param windowSize Upper limit of the number of items in a window.
+ * @param windowSize
+ *   Upper limit of the number of items in a window.
  */
 abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
   require(windowSize >= 1, s"Windows must have positive sizes, found $windowSize")

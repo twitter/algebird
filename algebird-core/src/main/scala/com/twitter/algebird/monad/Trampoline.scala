@@ -46,9 +46,8 @@ object Trampoline {
     FlatMapped(unit, (_: Unit) => Done(a))
 
   /**
-   * Use this to call to another trampoline returning function
-   * you break the effect of this if you directly recursively call a Trampoline
-   * returning function
+   * Use this to call to another trampoline returning function you break the effect of this if you directly
+   * recursively call a Trampoline returning function
    */
   def call[A](layzee: => Trampoline[A]): Trampoline[A] =
     FlatMapped(unit, (_: Unit) => layzee)

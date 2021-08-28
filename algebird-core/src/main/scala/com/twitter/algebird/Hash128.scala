@@ -17,8 +17,7 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * A typeclass to represent hashing to 128 bits.
- * Used for HLL, but possibly other applications
+ * A typeclass to represent hashing to 128 bits. Used for HLL, but possibly other applications
  */
 trait Hash128[-K] extends java.io.Serializable {
 
@@ -38,9 +37,8 @@ trait Hash128[-K] extends java.io.Serializable {
 }
 
 /**
- * This gives default hashes using Murmur128 with a seed
- * of 12345678 (for no good reason, but it should not be changed
- * lest we break serialized HLLs)
+ * This gives default hashes using Murmur128 with a seed of 12345678 (for no good reason, but it should not be
+ * changed lest we break serialized HLLs)
  */
 object Hash128 extends java.io.Serializable {
   def hash[K](k: K)(implicit h: Hash128[K]): (Long, Long) = h.hash(k)
@@ -64,9 +62,8 @@ object Hash128 extends java.io.Serializable {
     }
 
   /**
-   * This serializes the string into UTF-8, then hashes. This is different
-   * than the UTF-16 based approach in Murmur128.apply(CharSequence),
-   * but has been more commonly used in HLL.
+   * This serializes the string into UTF-8, then hashes. This is different than the UTF-16 based approach in
+   * Murmur128.apply(CharSequence), but has been more commonly used in HLL.
    */
   def murmur128Utf8String(defaultSeed: Long): Hash128[String] =
     murmur128ArrayByte(defaultSeed).contramap(_.getBytes("UTF-8"))

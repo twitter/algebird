@@ -17,9 +17,8 @@ limitations under the License.
 package com.twitter.algebird
 
 /**
- * Represents a container class together with time.
- * Its monoid consists of exponentially scaling the older value and summing with
- * the newer one.
+ * Represents a container class together with time. Its monoid consists of exponentially scaling the older
+ * value and summing with the newer one.
  */
 object DecayedVector extends CompatDecayedVector {
   def buildWithHalflife[C[_]](vector: C[Double], time: Double, halfLife: Double): DecayedVector[C] =

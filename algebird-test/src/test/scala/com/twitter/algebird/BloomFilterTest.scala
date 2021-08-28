@@ -132,7 +132,7 @@ class BFHashIndices extends CheckProperties {
   }
 
   /**
-   *   This is the version of the BFHash as of before the "negative values fix"
+   * This is the version of the BFHash as of before the "negative values fix"
    */
   case class NegativeBFHash(numHashes: Int, width: Int) {
     val size: Int = numHashes

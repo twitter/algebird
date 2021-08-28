@@ -22,8 +22,10 @@ import com.twitter.bijection.{AbstractBijection, Bijection, ImplicitBijection, R
 /**
  * Bijections on Algebird's abstract algebra datatypes.
  *
- *  @author Oscar Boykin
- *  @author Sam Ritchie
+ * @author
+ *   Oscar Boykin
+ * @author
+ *   Sam Ritchie
  */
 class BijectedSemigroup[T, U](implicit val sg: Semigroup[T], bij: ImplicitBijection[T, U])
     extends InvariantSemigroup[T, U](bij.bijection.toFunction, bij.bijection.inverse.toFunction) {

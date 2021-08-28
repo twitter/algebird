@@ -51,19 +51,17 @@ object BloomFilter {
   }
 
   /**
-   * Cardinality estimates are taken from Theorem 1 on page 15 of
-   * "Cardinality estimation and dynamic length adaptation for Bloom filters"
-   * by Papapetrou, Siberski, and Nejdl:
+   * Cardinality estimates are taken from Theorem 1 on page 15 of "Cardinality estimation and dynamic length
+   * adaptation for Bloom filters" by Papapetrou, Siberski, and Nejdl:
    * http://www.softnet.tuc.gr/~papapetrou/publications/Bloomfilters-DAPD.pdf
    *
-   * Roughly, by using bounds on the expected number of true bits after n elements
-   * have been inserted into the Bloom filter, we can go from the actual number of
-   * true bits (which is known) to an estimate of the cardinality.
+   * Roughly, by using bounds on the expected number of true bits after n elements have been inserted into the
+   * Bloom filter, we can go from the actual number of true bits (which is known) to an estimate of the
+   * cardinality.
    *
-   * approximationWidth defines an interval around the maximum-likelihood cardinality
-   * estimate. Namely, the approximation returned is of the form
-   * (min, estimate, max) =
-   *   ((1 - approxWidth) * estimate, estimate, (1 + approxWidth) * estimate)
+   * approximationWidth defines an interval around the maximum-likelihood cardinality estimate. Namely, the
+   * approximation returned is of the form (min, estimate, max) = ((1 - approxWidth) * estimate, estimate, (1
+   * + approxWidth) * estimate)
    */
   def sizeEstimate(
       numBits: Int,
@@ -74,17 +72,16 @@ object BloomFilter {
     assert(0 <= approximationWidth && approximationWidth < 1, "approximationWidth must lie in [0, 1)")
 
     /**
-     * s(n) is the expected number of bits that have been set to true after
-     * n elements have been inserted into the Bloom filter.
-     * This is \hat{S}(n) in the cardinality estimation paper used above.
+     * s(n) is the expected number of bits that have been set to true after n elements have been inserted into
+     * the Bloom filter. This is \hat{S}(n) in the cardinality estimation paper used above.
      */
     def s(n: Int): Double =
       width * (1 - scala.math.pow(1 - 1.0 / width, numHashes * n))
 
     /**
-     * sInverse(t) is the maximum likelihood value for the number of elements
-     * that have been inserted into the Bloom filter when it has t bits set to true.
-     * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.
+     * sInverse(t) is the maximum likelihood value for the number of elements that have been inserted into the
+     * Bloom filter when it has t bits set to true. This is \hat{S}^{-1}(t) in the cardinality estimation
+     * paper used above.
      */
     def sInverse(t: Int): Double =
       scala.math.log1p(-t.toDouble / width) / (numHashes * scala.math.log1p(-1.0 / width))
@@ -111,9 +108,8 @@ object BloomFilter {
 /**
  * Bloom Filter - a probabilistic data structure to test presence of an element.
  *
- * Operations
- *   1) insert: hash the value k times, updating the bitfield at the index equal to each hashed value
- *   2) query: hash the value k times.  If there are k collisions, then return true; otherwise false.
+ * Operations 1) insert: hash the value k times, updating the bitfield at the index equal to each hashed value
+ * 2) query: hash the value k times. If there are k collisions, then return true; otherwise false.
  *
  * http://en.wikipedia.org/wiki/Bloom_filter
  */
@@ -215,8 +211,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
       }
 
     /**
-     * This may be faster if you don't care about evaluating
-     * the false positive probability
+     * This may be faster if you don't care about evaluating the false positive probability
      */
     def maybeContains(item: A): Boolean
 
@@ -227,9 +222,8 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
     def toBitSet: BitSet
 
     /**
-     * Compute the Hamming distance between the two Bloom filters
-     * `a` and `b`. The distance is defined as the number of bits that
-     * need to change to in order to transform one filter into the other.
+     * Compute the Hamming distance between the two Bloom filters `a` and `b`. The distance is defined as the
+     * number of bits that need to change to in order to transform one filter into the other.
      */
     def hammingDistance(that: Hash): Int =
       (this, that) match {
@@ -350,8 +344,8 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
       override val zero: Hash = Empty
 
       /**
-       * Assume the bloom filters are compatible (same width and same hashing functions).  This
-       * is the union of the 2 bloom filters.
+       * Assume the bloom filters are compatible (same width and same hashing functions). This is the union of
+       * the 2 bloom filters.
        */
       override def plus(left: Hash, right: Hash): Hash = left ++ right
 
@@ -413,11 +407,11 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
   val empty: Hash = Empty
 
   /**
-   * Attempts to create a new BloomFilter instance from a [[BitSet]]. Failure might occur
-   * if the BitSet has a maximum entry behond the BloomFilter expected size.
+   * Attempts to create a new BloomFilter instance from a [[BitSet]]. Failure might occur if the BitSet has a
+   * maximum entry behond the BloomFilter expected size.
    *
-   * This method will be helpfull on BloomFilter desirialization. Serialization is achieved
-   * through the serialization of the underlying [[BitSet]].
+   * This method will be helpfull on BloomFilter desirialization. Serialization is achieved through the
+   * serialization of the underlying [[BitSet]].
    */
   def fromBitSet(bitSet: BitSet): Try[Hash] =
     if (bitSet.isEmpty) {

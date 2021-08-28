@@ -19,23 +19,20 @@ package com.twitter.algebird
 import scala.collection.compat._
 
 /**
- * Classes that support algebraic structures with dynamic switching between
- * two representations, the original type O and the eventual type E.
- * In the case of Semigroup, we specify
- * - Two Semigroups eventualSemigroup and originalSemigroup
- * - A Semigroup homomorphism convert: O => E
- * - A conditional mustConvert: O => Boolean
- * Then we get a Semigroup[Either[E,O]], where:
- *   Left(x)  + Left(y)  = Left(x+y)
- *   Left(x)  + Right(y) = Left(x+convert(y))
- *   Right(x) + Left(y)  = Left(convert(x)+y)
- *   Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y)
- *                         Right(x+y) otherwise.
- * EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously,
- * with the contract that convert respect the appropriate structure.
+ * Classes that support algebraic structures with dynamic switching between two representations, the original
+ * type O and the eventual type E. In the case of Semigroup, we specify
+ *   - Two Semigroups eventualSemigroup and originalSemigroup
+ *   - A Semigroup homomorphism convert: O => E
+ *   - A conditional mustConvert: O => Boolean Then we get a Semigroup[Either[E,O]], where: Left(x) + Left(y)
+ *     = Left(x+y) Left(x) + Right(y) = Left(x+convert(y)) Right(x) + Left(y) = Left(convert(x)+y) Right(x) +
+ *     Right(y) = Left(convert(x+y)) if mustConvert(x+y) Right(x+y) otherwise. EventuallyMonoid,
+ *     EventuallyGroup, and EventuallyRing are defined analogously, with the contract that convert respect the
+ *     appropriate structure.
  *
- * @param E eventual type
- * @param O original type
+ * @param E
+ *   eventual type
+ * @param O
+ *   original type
  */
 class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     eventualSemigroup: Semigroup[E],
@@ -77,9 +74,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
       Semigroup.sumOption(buffer).foreach(sum => newBuffer += convert(sum))
       newBuffer += e
       Left(newBuffer)
-    }
-
-    (iter.iterator.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]())) {
+    } iter.iterator.foldLeft[Either[Buffer[E], Buffer[O]]](Right(Buffer[O]())) {
       case (buffer @ Left(be), v) =>
         // turns the list of either into an either of lists
         checkSize(be)
@@ -98,7 +93,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
             bo += vo
             buffer
         }
-    }) match { // finally apply sumOption accordingly
+    } match { // finally apply sumOption accordingly
       case Left(be) => Semigroup.sumOption(be).map(left(_))
       case Right(bo) =>
         if (bo.lengthCompare(1) <= 0) bo.headOption.map(Right(_))
@@ -122,7 +117,8 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
 }
 
 /**
- * @see EventuallySemigroup
+ * @see
+ *   EventuallySemigroup
  */
 class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     lSemigroup: Semigroup[E],
@@ -135,7 +131,8 @@ class EventuallyMonoid[E, O](convert: O => E)(mustConvert: O => Boolean)(implici
 }
 
 /**
- * @see EventuallySemigroup
+ * @see
+ *   EventuallySemigroup
  */
 class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     lGroup: Group[E],
@@ -154,7 +151,8 @@ class EventuallyGroup[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
 }
 
 /**
- * @see EventuallySemigroup
+ * @see
+ *   EventuallySemigroup
  */
 class EventuallyRing[E, O](convert: O => E)(mustConvert: O => Boolean)(implicit
     lRing: Ring[E],

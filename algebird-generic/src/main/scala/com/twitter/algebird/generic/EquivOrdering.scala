@@ -22,8 +22,7 @@ object EquivOrdering extends EquivOrdering1 {
     }
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val myOrd: Ordering[MyType] = genericOrdering
    */
@@ -42,8 +41,7 @@ abstract class EquivOrdering1 {
     }
 
   /**
-   * this is intentionally not implicit to avoid superceding the instance that may be
-   * set up in a companion
+   * this is intentionally not implicit to avoid superceding the instance that may be set up in a companion
    *
    * use it with implicit val myEqv: Equiv[MyType] = genericEquiv
    */

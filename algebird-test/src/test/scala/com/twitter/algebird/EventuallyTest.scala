@@ -186,10 +186,9 @@ class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks
   property("EventuallyAggregator converts correctly") {
 
     /**
-     * Note, not all middle functions with all mustConvert are lawful.
-     * here we are forcing a structure such that a + b >= a, b for the middle type,
-     * and the mustConvert is a threshold on some projection of that middle type.
-     * You should check the laws for each type you care about.
+     * Note, not all middle functions with all mustConvert are lawful. here we are forcing a structure such
+     * that a + b >= a, b for the middle type, and the mustConvert is a threshold on some projection of that
+     * middle type. You should check the laws for each type you care about.
      *
      * For HLL/Set, which is the common example, this is lawful.
      */

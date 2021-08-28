@@ -24,7 +24,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  */
 case class SyncSummingQueue[Key, Value](
     bufferSize: BufferSize,
@@ -74,9 +75,8 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
     if (capacity > 0) Some(new ArrayBlockingQueue[V](capacity, true)) else None
 
   /**
-   * puts an item to the queue, optionally sums up the queue and returns value
-   * This never blocks interally. It uses offer. If the queue is full, we drain,
-   * sum the queue.
+   * puts an item to the queue, optionally sums up the queue and returns value This never blocks interally. It
+   * uses offer. If the queue is full, we drain, sum the queue.
    */
   final def put(item: V): Option[V] =
     if (queueOption.isDefined) {

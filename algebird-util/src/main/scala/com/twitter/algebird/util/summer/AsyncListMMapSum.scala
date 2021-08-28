@@ -20,10 +20,11 @@ import com.twitter.util.{Future, FuturePool}
 import scala.collection.mutable.{ListBuffer, Map => MMap}
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  *
- * This is a simple asyncronous summer, where a shared mutable map is used between all readers/writers.
- * When flushing it acquires the lock, drains the mutable map but does the compaction without holding the lock.
+ * This is a simple asyncronous summer, where a shared mutable map is used between all readers/writers. When
+ * flushing it acquires the lock, drains the mutable map but does the compaction without holding the lock.
  */
 class AsyncListMMapSum[Key, Value](
     bufferSize: BufferSize,

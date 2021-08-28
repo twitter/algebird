@@ -21,7 +21,8 @@ import com.twitter.util.Future
 import scala.collection.mutable.ListBuffer
 
 /**
- * @author Ian O Connell
+ * @author
+ *   Ian O Connell
  *
  * This class is designed to use a local mutable CMS to skip keeping low freqeuncy keys in a buffer.
  */
