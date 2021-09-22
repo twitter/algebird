@@ -26,17 +26,23 @@ import java.util.PriorityQueue
  */
 class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid[PriorityQueue[K]] {
 
-  require(max > 0, "PriorityQueueMonoid requires keeping at least 1 item")
+  def maximumItems: Int = max
+  def ordering: Ordering[K] = ord
+  private[this] val revOrd: Ordering[K] = ord.reverse
+  
+  require(max > 0, s"PriorityQueueMonoid requires keeping at least 1 item, invalid max=$max")
   // Java throws if you try to make a queue size 0
   protected val MINQUEUESIZE = 1
   def build(k: K): PriorityQueue[K] = {
-    val q = new PriorityQueue[K](1, ord.reverse);
+    val q = new PriorityQueue[K](1, revOrd);
     q.add(k)
     q
   }
   def build(items: Iterable[K]): PriorityQueue[K] = {
-    val q = new PriorityQueue(items.size.max(MINQUEUESIZE), ord.reverse);
-    items.foreach { item =>
+    val q = new PriorityQueue(items.size.max(MINQUEUESIZE), revOrd)
+    val it = items.iterator
+    while (it.hasNext) {
+      val item = it.next()
       if (q.size < max || ord.lteq(item, q.peek)) {
         q.add(item)
       }
@@ -44,10 +50,15 @@ class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid
     limit(q)
     q
   }
-  protected def limit(q: PriorityQueue[K]): Unit =
-    while (q.size > max) { q.poll() }
+  protected def limit(q: PriorityQueue[K]): Unit = {
+    var excess = q.size - max
+    while (excess > 0) {
+      q.poll()
+      excess -= 1
+    }
+  }
 
-  override def zero: PriorityQueue[K] = new PriorityQueue[K](MINQUEUESIZE, ord.reverse)
+  override def zero: PriorityQueue[K] = new PriorityQueue[K](MINQUEUESIZE, revOrd)
   override def isNonZero(q: PriorityQueue[K]): Boolean = q.size > 0
 
   override def plus(left: PriorityQueue[K], right: PriorityQueue[K]): PriorityQueue[K] = {
