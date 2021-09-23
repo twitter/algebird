@@ -29,7 +29,7 @@ class PriorityQueueMonoid[K](max: Int)(implicit ord: Ordering[K]) extends Monoid
   def maximumItems: Int = max
   def ordering: Ordering[K] = ord
   private[this] val revOrd: Ordering[K] = ord.reverse
-  
+
   require(max > 0, s"PriorityQueueMonoid requires keeping at least 1 item, invalid max=$max")
   // Java throws if you try to make a queue size 0
   protected val MINQUEUESIZE = 1
