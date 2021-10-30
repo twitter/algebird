@@ -64,7 +64,7 @@ object QTree {
       offset: Long,
       level: Int,
       count: Long,
-      sum: A, //the sum at just this node (*not* including its children)
+      sum: A, // the sum at just this node (*not* including its children)
       lowerChild: Option[QTree[A]],
       upperChild: Option[QTree[A]]
   ): QTree[A] = {
@@ -164,10 +164,10 @@ class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extend
 }
 
 class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
-    _sum: A, //the sum at just this node (*not* including its children)
-    _offset: Long, //the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
+    _sum: A, // the sum at just this node (*not* including its children)
+    _offset: Long, // the range this tree covers is offset*(2^level) ... (offset+1)*(2^level)
     _level: Int,
-    _count: Long, //the total count for this node and all of its children
+    _count: Long, // the total count for this node and all of its children
     _lowerChildNullable: QTree[A],
     _upperChildNullable: QTree[A]
 ) extends scala.Product6[Long, Int, Long, A, Option[QTree[A]], Option[QTree[A]]]

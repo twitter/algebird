@@ -198,7 +198,7 @@ trait AbstractEventuallyAggregator[A, E, O, C] extends Aggregator[A, Either[E, O
 
 trait EventuallyAggregator[A, E, O, C] extends AbstractEventuallyAggregator[A, E, O, C] {
 
-  //avoid init order issues and cyclical references
+  // avoid init order issues and cyclical references
   @transient override lazy val semigroup: EventuallySemigroup[E, O] =
     new EventuallySemigroup[E, O](convert)(mustConvert)(leftSemigroup, rightAggregator.semigroup)
 }

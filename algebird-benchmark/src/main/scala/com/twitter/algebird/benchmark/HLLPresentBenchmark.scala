@@ -33,7 +33,7 @@ object HLLPresentBenchmark {
 class HLLPresentBenchmark {
   import HLLPresentBenchmark._
 
-  //don't cache the lazy values
+  // don't cache the lazy values
   def clone(hll: HLL): HLL =
     hll match {
       case SparseHLL(bits, maxRhow) => SparseHLL(bits, maxRhow)

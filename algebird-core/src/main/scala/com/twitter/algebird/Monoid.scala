@@ -141,7 +141,7 @@ class SeqMonoid[T] extends Monoid[Seq[T]] {
  */
 class ArrayMonoid[T: ClassTag](implicit semi: Semigroup[T]) extends Monoid[Array[T]] {
 
-  //additive identity
+  // additive identity
   override def isNonZero(v: Array[T]): Boolean = v.nonEmpty
 
   override def zero: Array[T] = Array[T]()

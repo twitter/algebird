@@ -82,7 +82,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit
         if (buffer.size > maxBuffer) sumBuffer()
         buffer += sm
       }
-      if (buffer.size > 1) sumBuffer() //don't bother to sum if there is only one item.
+      if (buffer.size > 1) sumBuffer() // don't bother to sum if there is only one item.
       Some(buffer(0))
     }
 

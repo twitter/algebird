@@ -129,7 +129,7 @@ object Interval extends java.io.Serializable {
       case Intersection(ExclusiveLower(l), InclusiveUpper(u)) =>
         !succ.next(l).exists(succ.ordering.lteq(_, u))
       case InclusiveLower(_) => false // we at least have l
-      case InclusiveUpper(_) => false //false // we at least have u
+      case InclusiveUpper(_) => false // false // we at least have u
       case ExclusiveLower(l) =>
         succ.next(l).isEmpty
       case ExclusiveUpper(u) =>
