@@ -113,7 +113,7 @@ object gen extends ExpHistGen with IntervalGen {
         (5, genUncorr),
         (1, genRandom),
         (1, CorrelationMonoid.zero),
-        (1, genSum) //,
+        (1, genSum) // ,
       )
   }
 }

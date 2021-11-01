@@ -246,7 +246,7 @@ class HeavyHittersCachingSummer[K, V](
     new ApproxHHTracker(hhPct, updateFreq, roFreq)
 
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
-    //todo not sure if need to increment as backing summer may already be doing it
+    // todo not sure if need to increment as backing summer may already be doing it
     insertOp.incr
     val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 

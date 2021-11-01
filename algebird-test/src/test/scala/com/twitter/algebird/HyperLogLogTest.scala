@@ -281,7 +281,7 @@ class SetSizeAggregatorProperties extends ApproximateProperties("SetSizeAggregat
 
 class HyperLogLogTest extends AnyWordSpec with Matchers {
 
-  import HyperLogLog._ //Get the implicit int2bytes, long2Bytes
+  import HyperLogLog._ // Get the implicit int2bytes, long2Bytes
 
   val r: ju.Random = new java.util.Random
 

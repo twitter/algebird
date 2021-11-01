@@ -53,7 +53,7 @@ class SpaceSaverLaws extends CheckProperties {
       try {
         val fromBytes =
           SpaceSaver.fromBytes(a, SpaceSaverTest.arrayByteToString)
-        //We check that `fromBytes` doesn't yield exceptions
+        // We check that `fromBytes` doesn't yield exceptions
         fromBytes.isFailure || fromBytes.isSuccess
       } catch {
         case _: OutOfMemoryError =>

@@ -39,7 +39,7 @@ object SpaceSaver {
       case SSOne(capacity, item) =>
         val itemAsBytes = tSerializer(item)
         val itemLength = itemAsBytes.length
-        //1 for the type, 4 for capacity, 4 for itemAsBytes.length
+        // 1 for the type, 4 for capacity, 4 for itemAsBytes.length
         val buffer = new Array[Byte](1 + 4 + 4 + itemLength)
         ByteBuffer
           .wrap(buffer)
@@ -53,7 +53,7 @@ object SpaceSaver {
             capacity,
             counters,
             _
-          ) => //We do not care about the buckets are thery are created by SSMany.apply
+          ) => // We do not care about the buckets are thery are created by SSMany.apply
         val buffer = scala.collection.mutable.ArrayBuffer.newBuilder[Byte]
         buffer += (2: Byte)
 

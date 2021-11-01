@@ -63,7 +63,7 @@ class AsyncMapSum[Key, Value](
     val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
     if (!queue.offer(curData)) {
       flush.map { flushRes =>
-        sizeIncr.incr //todo not sure if need to increase size
+        sizeIncr.incr // todo not sure if need to increase size
         Semigroup.plus(flushRes, curData)
       }
     } else {

@@ -91,17 +91,17 @@ class EitherSemigroup[L, R](implicit semigroupl: Semigroup[L], semigroupr: Semig
     if (l.isLeft) {
       // l is Left, r may or may not be:
       if (r.isRight) {
-        //Avoid the allocation:
+        // Avoid the allocation:
         l
       } else {
-        //combine the lefts:
+        // combine the lefts:
         Left(semigroupl.plus(l.left.get, r.left.get))
       }
     } else if (r.isLeft) {
-      //l is not a Left value, so just return right:
+      // l is not a Left value, so just return right:
       r
     } else {
-      //both l and r are Right values:
+      // both l and r are Right values:
       Right(semigroupr.plus(l.right.get, r.right.get))
     }
 }
