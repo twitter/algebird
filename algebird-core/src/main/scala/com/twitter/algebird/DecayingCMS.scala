@@ -290,15 +290,15 @@ final class DecayingCMS[K](
       any match {
         case that: DecayingCMS[_]#CMS =>
           this.logScale == that.logScale &&
-            this.timeInHL == that.timeInHL &&
-            this.cells.length == that.cells.length && {
-              var i = 0
-              while (i < depth) {
-                if (this.cells(i) != that.cells(i)) return false
-                i += 1
-              }
-              true
+          this.timeInHL == that.timeInHL &&
+          this.cells.length == that.cells.length && {
+            var i = 0
+            while (i < depth) {
+              if (this.cells(i) != that.cells(i)) return false
+              i += 1
             }
+            true
+          }
         case _ =>
           false
       }

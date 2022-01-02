@@ -23,7 +23,7 @@ import com.twitter.util.Promise
  * general version of the TunnelMonoid. See the documentation for TunnelMonoid for general motivation. NOTE:
  * the Promise will be fulfilled with the value just before the PromiseLink is calculated.
  */
-class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { //TODo(jcoveney) rename PromiseLink
+class PromiseLinkMonoid[V](monoid: Monoid[V]) extends Monoid[PromiseLink[V]] { // TODo(jcoveney) rename PromiseLink
   def zero: PromiseLink[V] = PromiseLink(new Promise, monoid.zero)
 
   def plus(older: PromiseLink[V], newer: PromiseLink[V]): PromiseLink[V] = {

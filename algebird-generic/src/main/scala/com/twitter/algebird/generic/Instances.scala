@@ -123,8 +123,8 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
     that match {
       case hcs: HConsSemigroup[_, _] =>
         (hashCode == hcs.hashCode) &&
-          (a == hcs.a) &&
-          (b == hcs.b)
+        (a == hcs.a) &&
+        (b == hcs.b)
       case _ => false
     }
 }
