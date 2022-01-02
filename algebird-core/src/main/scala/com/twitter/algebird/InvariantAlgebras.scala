@@ -16,9 +16,9 @@ class InvariantSemigroup[T, U](val forward: T => U, val reverse: U => T)(implici
     that match {
       case r: InvariantSemigroup[_, _] =>
         (hashCode == r.hashCode) &&
-          (forward == r.forward) &&
-          (reverse == r.reverse) &&
-          (semigroup == r.semigroup)
+        (forward == r.forward) &&
+        (reverse == r.reverse) &&
+        (semigroup == r.semigroup)
       case _ => false
     }
 }

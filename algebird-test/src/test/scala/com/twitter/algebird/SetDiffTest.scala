@@ -91,7 +91,7 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
         a.strictApply(set) match {
           case None =>
             (a.remove.diff(set).nonEmpty || (a.add & set).nonEmpty) &&
-              (a.invert(a(set)) != set) // invert only succeeds when strictApply does
+            (a.invert(a(set)) != set) // invert only succeeds when strictApply does
           /*
            * And if it DOES succeed it inverts!
            * Note that this law is not true:
