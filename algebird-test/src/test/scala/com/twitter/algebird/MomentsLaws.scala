@@ -25,8 +25,6 @@ class MomentsLaws extends CheckProperties {
     val recur = Gen.lzy(opBasedGen[A](genA))
     val pair = Gen.zip(recur, recur)
 
-    import Operators.Ops
-
     Gen.frequency(
       (10, init),
       (1, pair.map { case (a, b) => a + b })
@@ -56,8 +54,9 @@ class MomentsLaws extends CheckProperties {
   }
 
   property("scaling by a and b is the same as scaling by a*b; similarly for addition") {
-    // use Int here instead of doubles so that we don't have to worry about overlfowing to Infinity and having to
-    // fine-tune numerical precision thresholds.
+    // use Int here instead of doubles so that we don't have to worry about
+    // overflowing to Infinity and having to fine-tune numerical precision
+    // thresholds.
     forAll(opGen, Gen.choose(0, Int.MaxValue), Gen.choose(0, Int.MaxValue)) { (mom, a0, b0) =>
       val a = a0 & Int.MaxValue
       val b = b0 & Int.MaxValue
@@ -72,6 +71,37 @@ class MomentsLaws extends CheckProperties {
       val addThenScale = Monoid.plus(mom1, mom2).scale(z)
       val scaleThenAdd = Monoid.plus(mom1.scale(z), mom2.scale(z))
       equiv.equiv(addThenScale, scaleThenAdd)
+    }
+  }
+
+  property("adding double matches adding singleton Moments instance") {
+    forAll(opGen, Gen.choose(0, Int.MaxValue)) { (mom, x) =>
+      val plusMoments = mom + Moments(x)
+      val plusDouble = mom + x
+      equiv.equiv(plusMoments, plusDouble)
+    }
+  }
+
+  property("adding doubles via +, fold, aggregator should match") {
+    forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) { (mom, xs) =>
+      val fullViaAdd = xs.foldLeft(mom)(_ + _)
+      val fullViaFold = mom.fold.overTraversable(xs)
+      val fullViaAgg = mom + MomentsAggregator(xs)
+
+      equiv.equiv(fullViaAdd, fullViaFold)
+      equiv.equiv(fullViaAdd, fullViaAgg)
+    }
+  }
+
+  property("adding Moment instances via +, sumOption should match") {
+    forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) { (mom, ints) =>
+      val xs = ints.map(Moments(_)).toTraversable
+      val monoid = Moments.momentsMonoid
+
+      val fullViaAdd = xs.foldLeft(mom)(_ + _)
+      val fullViaMonoid = mom + monoid.sum(xs)
+
+      equiv.equiv(fullViaAdd, fullViaMonoid)
     }
   }
 
@@ -100,7 +130,7 @@ class MomentsTest extends AnyWordSpec with Matchers {
    * Given a list of doubles, create a Moments object to hold the list's central moments.
    */
   def getMoments(xs: List[Double]): Moments =
-    MomentsAggregator(xs)
+    Moments.aggregator(xs)
 
   "Moments should count" in {
     val m1 = getMoments(List(1, 2, 3, 4, 5))
