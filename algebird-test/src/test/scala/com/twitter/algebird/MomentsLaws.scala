@@ -79,7 +79,7 @@ class MomentsLaws extends CheckProperties {
       val plusMoments = mom + Moments(x)
       val plusDouble = mom + x
       equiv.equiv(plusMoments, plusDouble)
-      }
+    }
   }
 
   property("adding doubles via +, fold, aggregator should match") {

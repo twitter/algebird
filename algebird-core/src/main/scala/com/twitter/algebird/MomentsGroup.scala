@@ -88,15 +88,16 @@ sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Do
   }
 
   /**
-   * Returns a [[Fold]] instance that uses `+` to accumulate deltas into this [[Moments]] instance.
+   * Returns a [[Fold]] instance that uses `+` to accumulate deltas into this
+   * [[Moments]] instance.
    */
   def fold: Fold[Double, Moments] =
     Fold.foldMutable[Moments.MomentsState, Double, Moments](
       { case (state, x) =>
         state += x
       },
-      _ => Moments.MomentsState.newEmpty,
-      (state: Moments.MomentsState) => this + state.toMoments
+      _ => Moments.MomentsState.fromMoments(this),
+      (state: Moments.MomentsState) => state.toMoments
     )
 
   override def productArity: Int = 5
@@ -229,6 +230,9 @@ object Moments {
   }
 
   object MomentsState {
+    def fromMoments(m: Moments): MomentsState =
+      new MomentsState(m.m0D, m.m1, m.m2, m.m3, m.m4)
+
     def newEmpty: MomentsState =
       new MomentsState(0.0, 0.0, 0.0, 0.0, 0.0)
   }
@@ -367,12 +371,20 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
   override def sumOption(items: TraversableOnce[Moments]): Option[Moments] =
     if (items.isEmpty) None
     else {
-      val state = Moments.MomentsState.newEmpty
       val iter = items.toIterator
-      while (iter.hasNext) {
-        state += iter.next()
+      val init = iter.next()
+
+      // If there is only a single item, skip the MomentsState instantiation and
+      // return it.
+      if (!iter.hasNext) {
+        Some(init)
+      } else {
+        val state = Moments.MomentsState.fromMoments(init)
+        while (iter.hasNext) {
+          state += iter.next()
+        }
+        Some(state.toMoments)
       }
-      Some(state.toMoments)
     }
 }
 
