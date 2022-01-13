@@ -88,8 +88,7 @@ sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Do
   }
 
   /**
-   * Returns a [[Fold]] instance that uses `+` to accumulate deltas into this
-   * [[Moments]] instance.
+   * Returns a [[Fold]] instance that uses `+` to accumulate deltas into this [[Moments]] instance.
    */
   def fold: Fold[Double, Moments] =
     Fold.foldMutable[Moments.MomentsState, Double, Moments](
