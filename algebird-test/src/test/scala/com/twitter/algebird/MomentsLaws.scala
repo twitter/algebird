@@ -99,7 +99,7 @@ class MomentsLaws extends CheckProperties {
       val monoid = Moments.momentsMonoid
 
       val fullViaAdd = xs.foldLeft(mom)(_ + _)
-      val fullViaMonoid = mom + monoid.sumOption(xs).getOrElse(monoid.zero)
+      val fullViaMonoid = mom + monoid.sum(xs)
 
       equiv.equiv(fullViaAdd, fullViaMonoid)
     }

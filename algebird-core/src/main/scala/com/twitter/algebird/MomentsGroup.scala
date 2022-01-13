@@ -50,7 +50,7 @@ sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Do
   def stddev: Double = math.sqrt(variance)
 
   def skewness: Double =
-    math.sqrt(m0D) * m3 / math.pow(m2, 1.5)
+    math.sqrt(m0D) * m3 / (m2 * stddev)
 
   def kurtosis: Double =
     m0D * m4 / (m2 * m2) - 3
@@ -232,7 +232,7 @@ object Moments {
     def fromMoments(m: Moments): MomentsState =
       new MomentsState(m.m0D, m.m1, m.m2, m.m3, m.m4)
 
-    def newEmpty: MomentsState =
+    def newEmpty(): MomentsState =
       new MomentsState(0.0, 0.0, 0.0, 0.0, 0.0)
   }
 
