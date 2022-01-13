@@ -83,8 +83,7 @@ class MomentsLaws extends CheckProperties {
   }
 
   property("adding doubles via +, fold, aggregator should match") {
-    forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) {
-      (mom, xs) =>
+    forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) { (mom, xs) =>
       val fullViaAdd = xs.foldLeft(mom)(_ + _)
       val fullViaFold = mom.fold.overTraversable(xs)
       val fullViaAgg = mom + MomentsAggregator(xs)
@@ -95,17 +94,16 @@ class MomentsLaws extends CheckProperties {
   }
 
   property("adding Moment instances via +, sumOption should match") {
-      forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) {
-        (mom, ints) =>
-        val xs = ints.map(Moments(_)).toTraversable
-        val monoid = Moments.momentsMonoid
+    forAll(opGen, Gen.containerOf[Seq, Double](Gen.choose(0, 1000))) { (mom, ints) =>
+      val xs = ints.map(Moments(_)).toTraversable
+      val monoid = Moments.momentsMonoid
 
-        val fullViaAdd = xs.foldLeft(mom)(_ + _)
-        val fullViaMonoid = mom + monoid.sumOption(xs).getOrElse(monoid.zero)
+      val fullViaAdd = xs.foldLeft(mom)(_ + _)
+      val fullViaMonoid = mom + monoid.sumOption(xs).getOrElse(monoid.zero)
 
-        equiv.equiv(fullViaAdd, fullViaMonoid)
-      }
+      equiv.equiv(fullViaAdd, fullViaMonoid)
     }
+  }
 
   property("scaling does affect total weight, doesn't affect mean, variance, or moments") {
     // def sign(x: Int): Int = if (x < 0) -1 else 1
