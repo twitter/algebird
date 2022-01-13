@@ -69,7 +69,7 @@ val sharedSettings = Seq(
         Nil
     }
   },
-  javacOptions ++= Seq("-target", "1.6", "-source", "1.6"),
+  javacOptions ++= Seq("-target", "1.8", "-source", "1.8"),
   libraryDependencies ++= Seq(
     "junit" % "junit" % "4.13.2" % Test,
     "com.github.sbt" % "junit-interface" % "0.13.3" % Test
