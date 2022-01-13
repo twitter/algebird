@@ -34,7 +34,9 @@ class MomentsBenchmark {
 
   @Benchmark
   def timePlusMoments(state: MomentsState, bh: Blackhole): Unit =
-    bh.consume(state.inputMoments.reduce(_ + _))
+    bh.consume(
+      state.inputMoments.foldLeft(Moments.momentsMonoid.zero)(_ + _)
+    )
 
   @Benchmark
   def timeSumOption(state: MomentsState, bh: Blackhole): Unit =
