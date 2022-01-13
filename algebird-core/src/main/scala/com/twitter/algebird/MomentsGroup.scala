@@ -172,8 +172,11 @@ object Moments {
         val delta_n = delta / countCombined
         val delta_n2 = delta_n * delta_n
         val delta_n3 = delta_n2 * delta_n
-        val count_sq = count * count
-        val rn_sq = b.m0D * b.m0D
+        val count_sq = math.pow(count, 2)
+        val rn_sq = math.pow(b.m0D, 2)
+
+        // val count_sq = count * count
+        // val rn_sq = b.m0D * b.m0D
 
         val meanCombined = Moments.getCombinedMeanDouble(count, mean, b.m0D, b.mean)
 
@@ -344,8 +347,11 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
       val delta_n = delta / countCombined
       val delta_n2 = delta_n * delta_n
       val delta_n3 = delta_n2 * delta_n
-      val ln_sq = a.m0D * a.m0D
-      val rn_sq = b.m0D * b.m0D
+      val ln_sq = math.pow(a.m0D, 2)
+      val rn_sq = math.pow(b.m0D, 2)
+
+      // val ln_sq = a.m0D * a.m0D
+      // val rn_sq = b.m0D * b.m0D
 
       val meanCombined = Moments.getCombinedMeanDouble(a.m0D, a.mean, b.m0D, b.mean)
 
