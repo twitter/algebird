@@ -238,7 +238,7 @@ object Fold extends CompatFold {
 
   /**
    * A Fold that does no work and returns a constant. Analogous to Function1 const: def const[A, B](b: B): (A
-   * => B) = { _ => b }
+   * \=> B) = { _ => b }
    */
   def const[O](value: O): Fold[Any, O] =
     Fold.foldLeft(value) { case (u, _) => u }
