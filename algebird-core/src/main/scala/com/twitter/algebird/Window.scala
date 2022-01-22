@@ -31,7 +31,7 @@ import Operators._
  * Example usage:
  *
  * case class W28[T](window: Window[T]) { def total = this.window.total def items = this.window.items def size
- * = this.window.size }
+ * \= this.window.size }
  *
  * object W28 { val windowSize = 28 def apply[T](v: T): W28[T] = W28[T](Window(v))
  *

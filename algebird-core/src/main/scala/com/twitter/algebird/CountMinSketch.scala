@@ -552,7 +552,7 @@ object CMS {
  * and thus the returned frequency estimates are always instances of `Approximate[Long]`.
  *
  * @example
- * {{{
+ *   {{{
  *
  * // Creates a monoid for a CMS that can count `Long` elements. val cmsMonoid: CMSMonoid[Long] = { val eps =
  * 0.001 val delta = 1E-10 val seed = 1 CMS.monoid[Long](eps, delta, seed) }
@@ -560,7 +560,7 @@ object CMS {
  * // Creates a CMS instance that has counted the element `1L`. val cms: CMS[Long] = cmsMonoid.create(1L)
  *
  * // Estimates the frequency of `1L` val estimate: Approximate[Long] = cms.frequency(1L)
- * }}}
+ *   }}}
  *
  * @tparam K
  *   The type used to identify the elements to be counted.
