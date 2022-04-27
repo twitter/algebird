@@ -23,11 +23,18 @@ import scala.collection.compat._
  * type O and the eventual type E. In the case of Semigroup, we specify
  *   - Two Semigroups eventualSemigroup and originalSemigroup
  *   - A Semigroup homomorphism convert: O => E
- *   - A conditional mustConvert: O => Boolean Then we get a Semigroup[Either[E,O]], where: Left(x) + Left(y)
- * \= Left(x+y) Left(x) + Right(y) = Left(x+convert(y)) Right(x) + Left(y) = Left(convert(x)+y) Right(x) +
- * Right(y) = Left(convert(x+y)) if mustConvert(x+y) Right(x+y) otherwise. EventuallyMonoid, EventuallyGroup,
- * and EventuallyRing are defined analogously, with the contract that convert respect the appropriate
- * structure.
+ *   - A conditional mustConvert: O => Boolean
+ *
+ * Then we get a Semigroup[Either[E,O]], where:
+ * {{{
+ *      Left(x) + Left(y) = Left(x+y)
+ *      Left(x) + Right(y) = Left(x+convert(y))
+ *      Right(x) + Left(y) = Left(convert(x)+y)
+ *      Right(x) + Right(y) = Left(convert(x+y)) if mustConvert(x+y) Right(x+y) otherwise.
+ * }}}
+ *
+ * EventuallyMonoid, EventuallyGroup, and EventuallyRing are defined analogously, with the contract that
+ * convert respect the appropriate structure.
  *
  * @param E
  *   eventual type
