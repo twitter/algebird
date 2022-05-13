@@ -43,7 +43,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 
   private[this] final val WIDTH = 1000
   private[this] final val DEPTH = 4
-  private[this] final val hh = new java.util.HashMap[Int, Long]()
+  private[this] final val hh = new java.util.HashMap[Int, Long]
   private[this] final var totalCount = 0L
   private[this] final var hhMinReq = 0L
   private[this] final val hhPercent = hhPct.toFloat

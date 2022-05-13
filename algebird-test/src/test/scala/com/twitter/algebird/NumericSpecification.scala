@@ -37,10 +37,10 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     val grp = implicitly[Group[T]]
     val num = implicitly[Numeric[T]]
     assert(
-      (a == mon.plus(mon.zero, a)) &&
-        (a == mon.plus(a, mon.zero)) &&
-        (a == grp.minus(a, grp.zero)) &&
-        (mon.nonZeroOption(a) == Some(a).filter(_ != num.zero))
+      a == mon.plus(mon.zero, a) &&
+        a == mon.plus(a, mon.zero) &&
+        a == grp.minus(a, grp.zero) &&
+        mon.nonZeroOption(a) == Some(a).filter(_ != num.zero)
     )
   }
 
@@ -48,8 +48,8 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     val mon = implicitly[Monoid[T]]
     val num = implicitly[Numeric[T]]
     assert(
-      (num.zero == mon.zero) && (!mon.isNonZero(mon.zero)) && (mon
-        .nonZeroOption(mon.zero) == None)
+      num.zero == mon.zero && !mon.isNonZero(mon.zero) && mon
+        .nonZeroOption(mon.zero) == None
     )
   }
 
@@ -99,8 +99,8 @@ class NumericSpecification extends AnyPropSpec with ScalaCheckPropertyChecks wit
     val ring = implicitly[Ring[T]]
     val num = implicitly[Numeric[T]]
     assert(
-      (num.one == ring.one) && (a == ring.times(a, ring.one)) && (a == ring
-        .times(ring.one, a))
+      num.one == ring.one && a == ring.times(a, ring.one) && a == ring
+        .times(ring.one, a)
     )
   }
   property("Int one") {

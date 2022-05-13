@@ -22,7 +22,7 @@ object ReferenceHyperLogLog {
     )
   def byteToIndicator(bi: (Byte, Int)): Seq[Int] =
     (0 to 7).flatMap { i =>
-      if (((bi._1 >> (7 - i)) & 1) == 1) {
+      if ((bi._1 >> 7 - i & 1) == 1) {
         Vector(bi._2 + i)
       } else {
         Vector[Int]()
@@ -331,7 +331,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     "be consistent for sparse vs. dense" in {
       val mon = new HyperLogLogMonoid(12)
       val data = (1 to 100).map(_ => r.nextLong)
-      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ (seq.last + mon.create(value)))
+      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ seq.last + mon.create(value))
       // Now the ith entry of partialSums (0-based) is an HLL structure for i underlying elements
       partialSums.foreach { hll =>
         assert(hll.isInstanceOf[SparseHLL])
@@ -345,7 +345,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
     "properly convert to dense" in {
       val mon = new HyperLogLogMonoid(10)
       val data = (1 to 200).map(_ => r.nextLong)
-      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ (seq.last + mon.create(value)))
+      val partialSums = data.foldLeft(Seq(mon.zero))((seq, value) => seq :+ seq.last + mon.create(value))
       partialSums.foreach { hll =>
         if (hll.size - hll.zeroCnt <= 64) {
           assert(hll.isInstanceOf[SparseHLL])
@@ -358,7 +358,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
       val mon = new HyperLogLogMonoid(10)
       val data = (1 to 200).map(_ => r.nextLong)
       val partialSums = data.foldLeft(IndexedSeq(mon.zero)) { (seq, value) =>
-        seq :+ (seq.last + mon.create(value))
+        seq :+ seq.last + mon.create(value)
       }
       (1 to 200).map { n =>
         val bc = mon.sum(data.slice(0, n).map(mon.toHLL(_)))

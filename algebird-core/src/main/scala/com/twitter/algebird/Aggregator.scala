@@ -479,7 +479,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     val ag1 = this
     new Aggregator[(A, A2), (B, B2), (C, C2)] {
       override def prepare(a: (A, A2)): (B, B2) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      override val semigroup = new Tuple2Semigroup()(ag1.semigroup, ag2.semigroup)
+      override val semigroup = new Tuple2Semigroup(ag1.semigroup, ag2.semigroup)
       override def present(b: (B, B2)): (C, C2) = (ag1.present(b._1), ag2.present(b._2))
     }
   }
@@ -502,7 +502,7 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
     new MonoidAggregator[A, Option[B], Option[C]] {
       override def prepare(input: A): Option[B] = Some(self.prepare(input))
       override def present(reduction: Option[B]): Option[C] = reduction.map(self.present)
-      override def monoid = new OptionMonoid[B]()(self.semigroup)
+      override def monoid = new OptionMonoid[B](self.semigroup)
     }
 }
 
@@ -578,7 +578,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
         case Left(a)   => (self.prepare(a), that.monoid.zero)
         case Right(a2) => (self.monoid.zero, that.prepare(a2))
       }
-      override val monoid = new Tuple2Monoid[B, B2]()(self.monoid, that.monoid)
+      override val monoid = new Tuple2Monoid[B, B2](self.monoid, that.monoid)
       override def present(bs: (B, B2)): (C, C2) = (self.present(bs._1), that.present(bs._2))
     }
 
@@ -625,7 +625,7 @@ trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
     val ag1 = self
     new MonoidAggregator[(A, A2), (B, B2), (C, C2)] {
       override def prepare(a: (A, A2)): (B, B2) = (ag1.prepare(a._1), ag2.prepare(a._2))
-      override val monoid = new Tuple2Monoid[B, B2]()(ag1.monoid, ag2.monoid)
+      override val monoid = new Tuple2Monoid[B, B2](ag1.monoid, ag2.monoid)
       override def present(b: (B, B2)): (C, C2) = (ag1.present(b._1), ag2.present(b._2))
     }
   }

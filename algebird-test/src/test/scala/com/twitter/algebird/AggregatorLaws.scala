@@ -130,7 +130,7 @@ class AggregatorLaws extends CheckProperties {
       val aggregator = Aggregator.numericSum[T]
       val ares = aggregator(in)
       val sres = in.map(num.toDouble).sum
-      (sres == ares) || {
+      sres == ares || {
         (sres - ares).abs / (sres.abs + ares.abs) < 1e-5
       }
     }
@@ -164,30 +164,30 @@ class AggregatorLaws extends CheckProperties {
     }
 
   property("Aggregator.count is like List.count") {
-    forAll((in: List[Int], fn: Int => Boolean) => in.count(fn) == (Aggregator.count(fn)(in)))
+    forAll((in: List[Int], fn: Int => Boolean) => in.count(fn) == Aggregator.count(fn)(in))
   }
   property("Aggregator.exists is like List.exists") {
-    forAll((in: List[Int], fn: Int => Boolean) => in.exists(fn) == (Aggregator.exists(fn)(in)))
+    forAll((in: List[Int], fn: Int => Boolean) => in.exists(fn) == Aggregator.exists(fn)(in))
   }
   property("Aggregator.forall is like List.forall") {
-    forAll((in: List[Int], fn: Int => Boolean) => in.forall(fn) == (Aggregator.forall(fn)(in)))
+    forAll((in: List[Int], fn: Int => Boolean) => in.forall(fn) == Aggregator.forall(fn)(in))
   }
   property("Aggregator.head is like List.head") {
-    forAll((in: List[Int]) => in.headOption == (Aggregator.head.applyOption(in)))
+    forAll((in: List[Int]) => in.headOption == Aggregator.head.applyOption(in))
   }
   property("Aggregator.last is like List.last") {
-    forAll((in: List[Int]) => in.lastOption == (Aggregator.last.applyOption(in)))
+    forAll((in: List[Int]) => in.lastOption == Aggregator.last.applyOption(in))
   }
   property("Aggregator.maxBy is like List.maxBy") {
     forAll { (head: Int, in: List[Int], fn: Int => Int) =>
       val nonempty = head :: in
-      nonempty.maxBy(fn) == (Aggregator.maxBy(fn).apply(nonempty))
+      nonempty.maxBy(fn) == Aggregator.maxBy(fn).apply(nonempty)
     }
   }
   property("Aggregator.minBy is like List.minBy") {
     forAll { (head: Int, in: List[Int], fn: Int => Int) =>
       val nonempty = head :: in
-      nonempty.minBy(fn) == (Aggregator.minBy(fn).apply(nonempty))
+      nonempty.minBy(fn) == Aggregator.minBy(fn).apply(nonempty)
     }
   }
   property("Aggregator.sortedTake same as List.sorted.take") {

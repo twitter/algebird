@@ -56,7 +56,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
   property("IndexedSeq should sum") {
     forAll { (lIndexedSeq: IndexedSeq[Int]) =>
       val rIndexedSeq = lIndexedSeq.map(_ => scala.util.Random.nextInt)
-      (lIndexedSeq.size == rIndexedSeq.size) ==> {
+      lIndexedSeq.size == rIndexedSeq.size ==> {
         val leftBase = lIndexedSeq.map(Max(_))
         val rightBase = rIndexedSeq.map(Max(_))
         val sumBase = (0 until lIndexedSeq.size).map { idx =>

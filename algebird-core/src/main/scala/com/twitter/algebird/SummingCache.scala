@@ -68,7 +68,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
     (new JLinkedHashMap[K, V](capacity + 1, 0.75f, true) {
       override protected def removeEldestEntry(eldest: JMap.Entry[K, V]): Boolean =
         if (super.size > capacity) {
-          lastEvicted += (eldest.getKey -> eldest.getValue)
+          lastEvicted += eldest.getKey -> eldest.getValue
           true
         } else {
           false

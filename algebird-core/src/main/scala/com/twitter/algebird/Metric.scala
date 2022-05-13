@@ -52,7 +52,7 @@ object Metric {
       def pad(v: Iterable[V]) = {
         val diff = maxSize - v.size
         if (diff > 0) {
-          v ++ (Iterator.fill(diff)(Monoid.zero[V]))
+          v ++ Iterator.fill(diff)(Monoid.zero[V])
         } else {
           v
         }
@@ -92,7 +92,7 @@ object Metric {
   implicit val longMetric: Metric[Long] =
     Metric.from((a: Long, b: Long) => math.abs((a - b).toDouble))
   implicit val floatMetric: Metric[Float] =
-    Metric.from((a: Float, b: Float) => math.abs((a.toDouble - b.toDouble)))
+    Metric.from((a: Float, b: Float) => math.abs(a.toDouble - b.toDouble))
   implicit val shortMetric: Metric[Short] =
     Metric.from((a: Short, b: Short) => math.abs((a - b).toDouble))
   implicit val boolMetric: Metric[Boolean] =
@@ -104,7 +104,7 @@ object Metric {
   implicit val jLongMetric: Metric[JLong] =
     Metric.from((a: JLong, b: JLong) => math.abs((a - b).toDouble))
   implicit val jFloatMetric: Metric[JFloat] =
-    Metric.from((a: JFloat, b: JFloat) => math.abs((a.toDouble - b.toDouble)))
+    Metric.from((a: JFloat, b: JFloat) => math.abs(a.toDouble - b.toDouble))
   implicit val jShortMetric: Metric[JShort] =
     Metric.from((a: JShort, b: JShort) => math.abs((a - b).toDouble))
   implicit val jBoolMetric: Metric[JBool] =

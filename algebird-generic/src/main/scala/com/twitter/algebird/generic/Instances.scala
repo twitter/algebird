@@ -122,9 +122,9 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
   override def equals(that: Any): Boolean =
     that match {
       case hcs: HConsSemigroup[_, _] =>
-        (hashCode == hcs.hashCode) &&
-        (a == hcs.a) &&
-        (b == hcs.b)
+        hashCode == hcs.hashCode &&
+        a == hcs.a &&
+        b == hcs.b
       case _ => false
     }
 }

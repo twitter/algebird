@@ -116,7 +116,7 @@ class ScMapMonoid[K, V](implicit semigroup: Semigroup[V]) extends GenericMapMono
 /**
  * You can think of this as a Sparse vector group
  */
-class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(group) with Group[Map[K, V]] {
+class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V](group) with Group[Map[K, V]] {
   override def negate(kv: Map[K, V]): Map[K, V] =
     kv.iterator.map { case (k, v) =>
       (k, group.negate(v))
@@ -124,7 +124,7 @@ class MapGroup[K, V](implicit val group: Group[V]) extends MapMonoid[K, V]()(gro
 }
 
 class ScMapGroup[K, V](implicit val group: Group[V])
-    extends ScMapMonoid[K, V]()(group)
+    extends ScMapMonoid[K, V](group)
     with Group[ScMap[K, V]] {
   override def negate(kv: ScMap[K, V]): ScMap[K, V] =
     kv.iterator.map { case (k, v) =>
@@ -160,11 +160,11 @@ trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Rng[M] with MapOperations[K
 }
 
 class MapRing[K, V](implicit override val ring: Ring[V])
-    extends MapGroup[K, V]()(ring)
+    extends MapGroup[K, V](ring)
     with GenericMapRing[K, V, Map[K, V]]
 
 class ScMapRing[K, V](implicit override val ring: Ring[V])
-    extends ScMapGroup[K, V]()(ring)
+    extends ScMapGroup[K, V](ring)
     with GenericMapRing[K, V, ScMap[K, V]]
 
 object MapAlgebra {

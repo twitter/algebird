@@ -11,7 +11,7 @@ class MaxLaws extends CheckProperties {
   def maxTest[T: Arbitrary: Ordering]: Prop =
     forAll { (l: Max[T], r: Max[T]) =>
       val realMax = Max(Ordering[T].max(l.get, r.get))
-      l + r == realMax && (l.max(r)) == realMax
+      l + r == realMax && l.max(r) == realMax
     }
 
   def maxSemiGroupTest[T: Arbitrary: Ordering]: Prop =

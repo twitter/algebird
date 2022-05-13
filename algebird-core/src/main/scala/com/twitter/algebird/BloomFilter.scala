@@ -72,7 +72,7 @@ private[algebird] case class LongBitSet(toArray: Array[Long]) extends AnyVal {
     BitSet.fromBitMaskNoCopy(toArray)
 
   def set(i: Int): Unit =
-    toArray(i / 64) |= 1L << (i % 64)
+    toArray(i / 64) |= 1L << i % 64
 
   def +=(xs: Array[Int]): Unit = {
     var idx = 0
@@ -238,8 +238,8 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
           while (iter.hasNext) { set(iter.next) }
       }
       if (sets == 0) Some(zero)
-      else if (sets == numHashes && (oneItem != null)) Some(oneItem)
-      else if (sets < (width / 10)) {
+      else if (sets == numHashes && oneItem != null) Some(oneItem)
+      else if (sets < width / 10) {
         val sbs = RichCBitSet.fromBitSet(longBitSet.toBitSetNoCopy)
         Some(BFSparse(hashes, sbs, width))
       } else Some(BFInstance(hashes, longBitSet.toBitSetNoCopy, width))
@@ -323,9 +323,9 @@ object BF {
           a.hasNext == b.hasNext
         }
 
-        (a eq b) || ((a.numHashes == b.numHashes) &&
-          (a.width == b.width) &&
-          eqIntIter(toIntIt(a), toIntIt(b)))
+        (a eq b) || a.numHashes == b.numHashes &&
+        a.width == b.width &&
+        eqIntIter(toIntIt(a), toIntIt(b))
       }
     }
 }
@@ -508,7 +508,7 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, override val width: Int
         // We check to see if we are filling < 5%
         // of the bits, if so, stay sparse, if not go dense
         val newMaxSize = numBits + bf.numBits
-        if (newMaxSize < (width / 10)) {
+        if (newMaxSize < width / 10) {
           BFSparse(hashes, bits ++ otherBits, width)
         } else {
           // Make a dense bitset
@@ -583,7 +583,7 @@ case class BFInstance[A](hashes: BFHash[A], bits: BitSet, override val width: In
     val thisBS = LongBitSet.empty(width)
     thisBS += itemHashes
 
-    BFInstance[A](hashes, bits | (thisBS.toBitSetNoCopy), width)
+    BFInstance[A](hashes, bits | thisBS.toBitSetNoCopy, width)
   }
 
   override def checkAndAdd(other: A): (BF[A], ApproximateBoolean) =
@@ -623,12 +623,12 @@ case class BFHash[A](numHashes: Int, width: Int)(implicit hash: Hash128[A]) {
     // unfortunately, this is the function we committed to some time ago, and we have tests
     // locking it down. x.toInt & 0x7fffffff should work, but this gives a few different values
     def toNonNegativeInt(x: Long): Int =
-      (math
+      math
         .abs(x)
-        .toInt) & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
+        .toInt & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
 
     val upper = toNonNegativeInt(x >> 32)
-    val lower = toNonNegativeInt((x << 32) >> 32)
+    val lower = toNonNegativeInt(x << 32 >> 32)
     buffer(idx) = upper
     buffer(idx + 1) = lower
   }

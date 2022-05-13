@@ -47,7 +47,7 @@ class RightFolded2Test extends CheckProperties {
     if (tailL.isEmpty) {
       if (!headL.isEmpty) (headL :: acc).reverse else acc.reverse
     } else {
-      val newAcc = (headL :+ (tailL.head)) :: acc
+      val newAcc = (headL :+ tailL.head) :: acc
       chunk(tailL.tail, newAcc)(pred)
     }
   }

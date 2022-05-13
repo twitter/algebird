@@ -20,7 +20,7 @@ object ScanTest {
       (nextState.reverse.mkString, nextState)
   }
 
-  val mutableFreeScan: StringScan = Scan.mutable(new Queue[Char]()) { (char, previousState) =>
+  val mutableFreeScan: StringScan = Scan.mutable(new Queue[Char]) { (char, previousState) =>
     previousState.enqueue(char)
     previousState.mkString
   }

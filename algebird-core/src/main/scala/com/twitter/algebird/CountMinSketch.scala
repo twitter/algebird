@@ -348,7 +348,7 @@ object CMSFunctions {
     val r = new scala.util.Random(seed)
     val numHashes = depth(delta)
     val numCounters = width(eps)
-    (0 to (numHashes - 1)).map(_ => CMSHash[K](r.nextInt(), 0, numCounters))
+    (0 to numHashes - 1).map(_ => CMSHash[K](r.nextInt(), 0, numCounters))
   }
 
 }
@@ -743,11 +743,11 @@ case class CMSInstance[K](
         require(other.depth == depth && other.width == width, "Tables must have the same dimensions.")
 
         def innerProductAtDepth(d: Int) =
-          (0 to (width - 1)).iterator.map { w =>
+          (0 to width - 1).iterator.map { w =>
             countsTable.getCount((d, w)) * other.countsTable.getCount((d, w))
           }.sum
 
-        val est = (0 to (depth - 1)).iterator.map(innerProductAtDepth).min
+        val est = (0 to depth - 1).iterator.map(innerProductAtDepth).min
         val minimum =
           math.max(est - (eps * totalCount * other.totalCount).toLong, 0)
         Approximate(minimum, est, est, 1 - delta)
@@ -758,7 +758,7 @@ case class CMSInstance[K](
     require(count >= 0, "count must be >= 0 (negative counts not implemented")
     if (count != 0L) {
       val newCountsTable =
-        (0 to (depth - 1)).foldLeft(countsTable) { case (table, row) =>
+        (0 to depth - 1).foldLeft(countsTable) { case (table, row) =>
           val pos = (row, params.hashes(row)(item))
           table + (pos, count)
         }
@@ -820,7 +820,7 @@ object CMSInstance {
         val xs = xss.next.iterator
         val ys = yss.next.iterator
         val row = Vector.newBuilder[Long]
-        while (xs.hasNext) row += (xs.next + ys.next)
+        while (xs.hasNext) row += xs.next + ys.next
         rows += row.result
       }
       CountsTable[K](rows.result)

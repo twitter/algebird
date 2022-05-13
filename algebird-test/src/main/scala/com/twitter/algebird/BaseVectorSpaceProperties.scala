@@ -71,5 +71,5 @@ object BaseVectorSpaceProperties {
     )
 
   def beCloseTo(a: Double, b: Double): Boolean =
-    a == b || (math.abs(a - b) / math.abs(a)) < 1e-10 || (a.isInfinite && b.isInfinite) || a.isNaN || b.isNaN
+    a == b || math.abs(a - b) / math.abs(a) < 1e-10 || a.isInfinite && b.isInfinite || a.isNaN || b.isNaN
 }

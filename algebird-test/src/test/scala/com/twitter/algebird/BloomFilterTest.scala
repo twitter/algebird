@@ -73,7 +73,7 @@ class BloomFilterLaws extends CheckProperties {
         a.hammingDistance(b) == 0
       else {
         val dist = a.hammingDistance(b)
-        (dist > 0) && (dist <= a.width)
+        dist > 0 && dist <= a.width
       }
     }
   }
@@ -102,7 +102,7 @@ class BloomFilterLaws extends CheckProperties {
       val next1 = a + b
 
       Equiv[BF[String]].equiv(next, next1) &&
-      (check == a.contains(b))
+      check == a.contains(b)
     }
   }
 
@@ -141,7 +141,7 @@ class BFHashIndices extends CheckProperties {
 
     private def splitLong(x: Long) = {
       val upper = math.abs(x >> 32).toInt
-      val lower = math.abs((x << 32) >> 32).toInt
+      val lower = math.abs(x << 32 >> 32).toInt
       (upper, lower)
     }
 
@@ -176,7 +176,7 @@ class BFHashIndices extends CheckProperties {
       val s = v.toString
       val (hash, negativeHash) = pair
       val indices = negativeHash.apply(s)
-      (indices == (hash.apply(s).toStream)) || indices.exists(_ < 0)
+      indices == hash.apply(s).toStream || indices.exists(_ < 0)
     }
   }
 }
@@ -344,7 +344,7 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
 
     "not serialize @transient dense BFInstance" in {
       def serialize(bf: BF[String]): Array[Byte] = {
-        val stream = new ByteArrayOutputStream()
+        val stream = new ByteArrayOutputStream
         val out = new ObjectOutputStream(stream)
         out.writeObject(bf)
         out.close()

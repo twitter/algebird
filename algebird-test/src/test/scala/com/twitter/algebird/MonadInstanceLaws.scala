@@ -31,7 +31,7 @@ class MonadInstanceLaws extends CheckProperties {
   property("Trampoline should run without stackoverflow") {
     forAll { (b: Int) =>
       val bsmall = b % 1000000
-      ping(bsmall, 0).get == (bsmall.max(0))
+      ping(bsmall, 0).get == bsmall.max(0)
     }
   }
 

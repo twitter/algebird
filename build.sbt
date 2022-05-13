@@ -17,9 +17,9 @@ val sparkVersion = "2.4.8"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, y)) if y <= 12 =>
+    case Some(2, y) if y <= 12 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
-    case Some((2, y)) if y >= 13 =>
+    case Some(2, y) if y >= 13 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
     case _ => Nil
   }
@@ -76,7 +76,7 @@ val sharedSettings = Seq(
   ),
   // Publishing options:
   pomIncludeRepository := { x => false },
-  pomExtra := (<url>https://github.com/twitter/algebird</url>
+  pomExtra := <url>https://github.com/twitter/algebird</url>
     <licenses>
       <license>
         <name>Apache 2</name>
@@ -96,7 +96,7 @@ val sharedSettings = Seq(
         <name>Sam Ritchie</name>
         <url>http://twitter.com/sritchie</url>
       </developer>
-    </developers>),
+    </developers>,
   Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
     (Compile / scalaSource).value,
     scalaVersion.value

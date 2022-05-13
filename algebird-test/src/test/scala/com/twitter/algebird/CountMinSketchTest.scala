@@ -33,7 +33,7 @@ class CmsLaws extends CheckProperties {
     new Equiv[CMS[K]] {
       def equiv(x: CMS[K], y: CMS[K]): Boolean = {
         val d = CMSInstance(x.params)
-        (d ++ x) == (d ++ y)
+        d ++ x == d ++ y
       }
     }
 
@@ -100,7 +100,7 @@ class TopPctCmsLaws extends CheckProperties {
   implicit def topCmsEquiv[K]: Equiv[TopCMS[K]] =
     new Equiv[TopCMS[K]] {
       def equiv(x: TopCMS[K], y: TopCMS[K]): Boolean =
-        (x ++ x) == (x ++ y)
+        x ++ x == x ++ y
     }
 
   property("TopPctCms[Short] is a Monoid") {
@@ -406,10 +406,10 @@ class CmsProperties extends ApproximateProperties("CountMinSketch") {
 
   implicit val intGen: Gen[Int] = Gen.choose(1, 100)
 
-  property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int](), 10, 10, 0.01)
-  property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int](), 10, 10, 0.01)
-  property("CMS inner product works") = toProp(new CmsInnerProductProperty[Int](), 10, 10, 0.01)
-  property("CMS counts total count") = toProp(new CmsTotalCountProperty[Int](), 10, 10, 0.01)
+  property("CMS works for small lists") = toProp(new CmsSmallFrequencyProperty[Int], 10, 10, 0.01)
+  property("CMS works for large lists") = toProp(new CmsLargeFrequencyProperty[Int], 10, 10, 0.01)
+  property("CMS inner product works") = toProp(new CmsInnerProductProperty[Int], 10, 10, 0.01)
+  property("CMS counts total count") = toProp(new CmsTotalCountProperty[Int], 10, 10, 0.01)
 }
 
 abstract class CMSRingTest[K: CMSHasher: Ring] extends CMSTest[K]((x: Int) => implicitly[Ring[K]].fromInt(x))
@@ -634,7 +634,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
 
       val single = monoid.create(singleData)
       aggregated.heavyHitters should be(single.heavyHitters)
-      aggregated.heavyHitters contains (toK(3)) // C=3 is global top 1 heavy hitter
+      aggregated.heavyHitters contains toK(3) // C=3 is global top 1 heavy hitter
     }
 
     "exactly compute heavy hitters when created from a single, small stream" in {

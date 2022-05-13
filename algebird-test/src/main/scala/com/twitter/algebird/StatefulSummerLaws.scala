@@ -49,7 +49,7 @@ object StatefulSummerLaws {
   def isFlushedIsConsistent[V](summer: StatefulSummer[V], items: Iterable[V]): Boolean =
     items.forall { v =>
       summer.put(v)
-      (summer.isFlushed == summer.flush.isEmpty) &&
+      summer.isFlushed == summer.flush.isEmpty &&
       // Now flush should empty
       summer.isFlushed &&
       summer.flush.isEmpty

@@ -40,7 +40,7 @@ class AdjoinedUnitRing[T](implicit rng: Rng[T]) extends Ring[AdjoinedUnit[T]] {
     new FromAlgebraGroup(rng.additive)
 
   override def isNonZero(it: AdjoinedUnit[T]): Boolean =
-    (it.ones != 0) || group.isNonZero(it.get)
+    it.ones != 0 || group.isNonZero(it.get)
 
   override def plus(left: AdjoinedUnit[T], right: AdjoinedUnit[T]): AdjoinedUnit[T] =
     AdjoinedUnit(left.ones + right.ones, rng.plus(left.get, right.get))

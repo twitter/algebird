@@ -47,19 +47,19 @@ class SGDLaws extends CheckProperties {
       (y.isInfinity || {
         val pos = (y, IndexedSeq(x))
         val grad = SGD.linearGradient(w.weights, pos)
-        (scala.math.abs(grad(0)) < eps) && (scala.math.abs(grad(1)) < eps)
+        scala.math.abs(grad(0)) < eps && scala.math.abs(grad(1)) < eps
       })
     }
   }
 
   property("Gradient at x=0 has zero first component") {
-    forAll((w: SGDWeights, y: Double) => (SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0))
+    forAll((w: SGDWeights, y: Double) => SGD.linearGradient(w.weights, (y, IndexedSeq(0.0)))(0) == 0.0)
   }
 
   property("Zero-step leaves Weights unchanged") {
     forAll { (w: SGDWeights, pos: SGDPos[(Double, Vector[Double])]) =>
       val next = zeroStepMonoid.newWeights(w, pos.pos.head)
-      (next.weights == w.weights && next.count == (w.count + 1L))
+      (next.weights == w.weights && next.count == w.count + 1L)
     }
   }
 

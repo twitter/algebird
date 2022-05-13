@@ -10,14 +10,14 @@ import com.twitter.algebird.Ring
 import com.twitter.algebird.Monoid
 
 class StatisticsRingLaws extends CheckProperties with Matchers {
-  implicit val statsRing: StatisticsRing[Int] = new StatisticsRing[Int]()(Ring.intRing)
+  implicit val statsRing: StatisticsRing[Int] = new StatisticsRing[Int](Ring.intRing)
   implicit val arb: Arbitrary[Int] = Arbitrary(for (v <- choose(0, 1 << 30)) yield v)
 
   property("StatisticsRing is a Ring")(ringLaws[Int])
 }
 
 class StatisticsMonoidLaws extends CheckProperties with Matchers {
-  implicit val statsMonoid: StatisticsMonoid[Int] = new StatisticsMonoid[Int]()(Monoid.intMonoid)
+  implicit val statsMonoid: StatisticsMonoid[Int] = new StatisticsMonoid[Int](Monoid.intMonoid)
   implicit val arb: Arbitrary[Int] = Arbitrary(for (v <- choose(0, 1 << 14)) yield v)
 
   property("StatisticsMonoid is a Monoid")(monoidLaws[Int])

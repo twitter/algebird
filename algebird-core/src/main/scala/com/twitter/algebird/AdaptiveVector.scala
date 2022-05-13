@@ -118,7 +118,7 @@ object AdaptiveVector {
     override val zero: AdaptiveVector[V] = AdaptiveVector.fill[V](0)(Monoid.zero[V])
     override def isNonZero(v: AdaptiveVector[V]): Boolean = !isZero(v)
 
-    def isZero(v: AdaptiveVector[V]): Boolean = (v.size == 0) || {
+    def isZero(v: AdaptiveVector[V]): Boolean = v.size == 0 || {
       val sparseAreZero =
         if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
       sparseAreZero &&
@@ -158,7 +158,7 @@ object AdaptiveVector {
 
   implicit def equiv[V: Equiv]: Equiv[AdaptiveVector[V]] =
     Equiv.fromFunction[AdaptiveVector[V]] { (l, r) =>
-      (l.size == r.size) && (denseEquiv[V].equiv(l, r) ||
+      l.size == r.size && (denseEquiv[V].equiv(l, r) ||
         toVector(l).view.zip(toVector(r)).forall { case (lv, rv) =>
           Equiv[V].equiv(lv, rv)
         })

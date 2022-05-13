@@ -316,9 +316,9 @@ object ExpHist {
       JLong.numberOfTrailingZeros(JLong.highestOneBit(x))
 
     @inline private[this] def modPow2Minus1(i: Int, exp2: Int): Int =
-      i & ((1 << exp2) - 1)
+      i & (1 << exp2) - 1
     @inline private[this] def quotientPow2(i: Int, exp2: Int): Int = i >>> exp2
-    @inline private[this] def bit(i: Int, idx: Int): Int = (i >>> idx) & 1
+    @inline private[this] def bit(i: Int, idx: Int): Int = i >>> idx & 1
 
     private[this] def binarize(i: Int, bits: Int, offset: Int): Vector[Int] =
       (0 until bits).map(idx => offset + bit(i, idx)).toVector
@@ -365,7 +365,7 @@ object ExpHist {
         val denom = l + 1
         val j = floorPowerOfTwo(num / denom)
         val offset = (num - (denom << j)).toInt
-        CanonicalVector(binarize(modPow2Minus1(offset, j), j, l) :+ (quotientPow2(offset, j) + 1))
+        CanonicalVector(binarize(modPow2Minus1(offset, j), j, l) :+ quotientPow2(offset, j) + 1)
       }
 
     /**

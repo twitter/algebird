@@ -36,9 +36,9 @@ class DecayedVectorProperties extends CheckProperties {
 
     def beCloseTo(a: Double, b: Double, eps: Double = 1e-5) =
       a == b ||
-        ((2.0 * math.abs(a - b)) / (math.abs(a) + math.abs(b))) < eps ||
-        (a.isInfinite && b.isInfinite) ||
-        (a.isNaN && b.isNaN)
+        2.0 * math.abs(a - b) / (math.abs(a) + math.abs(b)) < eps ||
+        a.isInfinite && b.isInfinite ||
+        a.isNaN && b.isNaN
 
     val mapsAreClose = (a.vector.keySet ++ b.vector.keySet).forall { key =>
       (a.vector.get(key), b.vector.get(key)) match {

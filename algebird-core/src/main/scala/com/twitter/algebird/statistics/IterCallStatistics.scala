@@ -84,5 +84,5 @@ private class IterCallStatistics(threadSafe: Boolean) {
   override def toString: String =
     countStats.toString + ", " +
       "total time: " + totalCallTime + "ms, " +
-      "avg time: " + (totalCallTime.toDouble / countStats.count)
+      "avg time: " + totalCallTime.toDouble / countStats.count
 }

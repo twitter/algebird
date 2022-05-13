@@ -45,7 +45,7 @@ case class Correlation(c2: Double, m2x: Double, m2y: Double, m1x: Double, m1y: D
     // correlation is defined as: covariance / (varianceLeft * varianceRight)
     // however, dividing by "count" cancels out, and leaves us with the following formula, which relies on fewer
     // divisions
-    c2 / (Math.sqrt(m2x * m2y))
+    c2 / Math.sqrt(m2x * m2y)
 
   /**
    * Assume this instance of Correlation came from summing together Correlation.apply((x_i, y_i)) for i in

@@ -29,7 +29,7 @@ import ref.SoftReference
  * we care about.
  */
 class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
-  private val map = new SoftReference(new HashMap[K, V]())
+  private val map = new SoftReference(new HashMap[K, V])
 
   def size: Int = map.get.map(_.size).getOrElse(0)
 
@@ -74,7 +74,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
 
     if (
       currentCapacity < maxCapacity &&
-      sentinelCache.size > (currentCapacity * growthMargin)
+      sentinelCache.size > currentCapacity * growthMargin
     ) {
       currentCapacity = (currentCapacity * 2).min(maxCapacity)
 

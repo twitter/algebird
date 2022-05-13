@@ -60,7 +60,7 @@ object SGDWeights {
       val newW = left.weights.view
         .zip(right.weights)
         .map { case (l: Double, r: Double) =>
-          (lc * l + rc * r) / ((lc + rc).toDouble)
+          (lc * l + rc * r) / (lc + rc).toDouble
         }
         .toIndexedSeq
       SGDWeights(lc + rc, newW)

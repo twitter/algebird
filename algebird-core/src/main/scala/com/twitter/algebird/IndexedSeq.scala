@@ -49,13 +49,11 @@ class IndexedSeqMonoid[T](implicit mont: Monoid[T])
     v.exists(t => mont.isNonZero(t))
 }
 
-class IndexedSeqGroup[T](implicit grp: Group[T])
-    extends IndexedSeqMonoid[T]()(grp)
-    with Group[IndexedSeq[T]] {
+class IndexedSeqGroup[T](implicit grp: Group[T]) extends IndexedSeqMonoid[T](grp) with Group[IndexedSeq[T]] {
   override def negate(g: IndexedSeq[T]): IndexedSeq[T] = g.map(grp.negate(_))
 }
 
-class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T]()(rng) with Ring[IndexedSeq[T]] {
+class IndexedSeqRing[T](implicit rng: Ring[T]) extends IndexedSeqGroup[T](rng) with Ring[IndexedSeq[T]] {
 
   // TODO
   override def one: Nothing =

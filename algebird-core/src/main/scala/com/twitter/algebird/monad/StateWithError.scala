@@ -37,7 +37,7 @@ sealed trait StateWithError[S, +F, +T] {
   StateWithError[S, F1, (T, U)] =
     StateFn { (requested: S) =>
       (run(requested), that.run(requested)) match {
-        case (Right((s1, r1)), Right((s2, r2))) =>
+        case (Right(s1, r1), Right(s2, r2)) =>
           Right((sgs.plus(s1, s2), (r1, r2)))
         case (Left(err1), Left(err2)) =>
           Left(sgf.plus(err1, err2)) // Our earlier is not ready
@@ -74,7 +74,7 @@ final case class FlatMappedState[S, F, T, U](start: StateWithError[S, F, T], fn:
         case StateFn(fn) =>
           fn(inState) match {
             case err @ Left(_) => err // bail at first error
-            case noError @ Right((newState, out)) =>
+            case noError @ Right(newState, out) =>
               stack match {
                 case head :: tailStack => loop(newState, head(out), tailStack)
                 case Nil               => noError // recursion ends

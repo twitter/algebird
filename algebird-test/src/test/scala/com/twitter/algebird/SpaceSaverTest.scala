@@ -32,7 +32,7 @@ class SpaceSaverLaws extends CheckProperties {
         }
 
         implicit def equiv[T]: Equiv[SpaceSaver[T]] =
-          Equiv.fromFunction((left, right) => (left.consistentWith(right)) && (right.consistentWith(left)))
+          Equiv.fromFunction((left, right) => left.consistentWith(right) && right.consistentWith(left))
 
         commutativeSemigroupLaws[SpaceSaver[Int]]
       }

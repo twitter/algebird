@@ -90,7 +90,7 @@ class OptionMonoid[T](implicit semi: Semigroup[T]) extends Monoid[Option[T]] {
 }
 
 class EitherMonoid[L, R](implicit semigroupl: Semigroup[L], monoidr: Monoid[R])
-    extends EitherSemigroup[L, R]()(semigroupl, monoidr)
+    extends EitherSemigroup[L, R](semigroupl, monoidr)
     with Monoid[Either[L, R]] {
   override lazy val zero: Right[L, R] = Right(monoidr.zero)
 }
@@ -280,7 +280,7 @@ object Monoid extends GeneratedMonoidImplicits with ProductMonoids with FromAlge
    * many equivalent in memory representations of zero
    */
   def zeroEquiv[T: Equiv: Monoid]: Equiv[T] = Equiv.fromFunction { (a: T, b: T) =>
-    (!isNonZero(a) && !isNonZero(b)) || Equiv[T].equiv(a, b)
+    !isNonZero(a) && !isNonZero(b) || Equiv[T].equiv(a, b)
   }
 
   /**

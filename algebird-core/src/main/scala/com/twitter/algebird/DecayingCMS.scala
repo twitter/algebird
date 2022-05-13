@@ -155,10 +155,10 @@ final class DecayingCMS[K](
     override def toString: String =
       s"DoubleAt($value, $timeInHL)"
 
-    def <(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) < 0
-    def <=(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) <= 0
-    def >(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) > 0
-    def >=(rhs: DoubleAt): Boolean = (lhs.compare(rhs)) >= 0
+    def <(rhs: DoubleAt): Boolean = lhs.compare(rhs) < 0
+    def <=(rhs: DoubleAt): Boolean = lhs.compare(rhs) <= 0
+    def >(rhs: DoubleAt): Boolean = lhs.compare(rhs) > 0
+    def >=(rhs: DoubleAt): Boolean = lhs.compare(rhs) >= 0
 
     def time: Long =
       toTimestamp(timeInHL)
@@ -205,7 +205,7 @@ final class DecayingCMS[K](
     (t * halfLifeSecs * 1000.0).toLong
 
   def fromTimestamp(t: Long): Double =
-    (t.toDouble / 1000.0) / halfLifeSecs
+    t.toDouble / 1000.0 / halfLifeSecs
 
   val hashFns: Array[K => Int] = {
     val rng = new Random(seed)

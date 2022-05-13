@@ -43,22 +43,22 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
       }
     }
     "+ is the same as SetDiff.add" in {
-      check((d: SetDiff[Int], inc: Int) => d + inc == (d.merge(SetDiff.add(inc))))
+      check((d: SetDiff[Int], inc: Int) => d + inc == d.merge(SetDiff.add(inc)))
     }
     "- is the same as SetDiff.remove" in {
-      check((d: SetDiff[Int], dec: Int) => d - dec == (d.merge(SetDiff.remove(dec))))
+      check((d: SetDiff[Int], dec: Int) => d - dec == d.merge(SetDiff.remove(dec)))
     }
     "++ is the same as SetDiff.addAll" in {
-      check((d: SetDiff[Int], inc: Set[Int]) => d ++ inc == (d.merge(SetDiff.addAll(inc))))
+      check((d: SetDiff[Int], inc: Set[Int]) => d ++ inc == d.merge(SetDiff.addAll(inc)))
     }
     "-- is the same as SetDiff.removeAll" in {
-      check((d: SetDiff[Int], dec: Set[Int]) => d -- dec == (d.merge(SetDiff.removeAll(dec))))
+      check((d: SetDiff[Int], dec: Set[Int]) => d -- dec == d.merge(SetDiff.removeAll(dec)))
     }
     "+ then - is the same as -" in {
-      check((i: Int) => (SetDiff.add(i).merge(SetDiff.remove(i))) == SetDiff.remove(i))
+      check((i: Int) => SetDiff.add(i).merge(SetDiff.remove(i)) == SetDiff.remove(i))
     }
     "- then + is the same as +" in {
-      check((i: Int) => (SetDiff.remove(i).merge(SetDiff.add(i))) == SetDiff.add(i))
+      check((i: Int) => SetDiff.remove(i).merge(SetDiff.add(i)) == SetDiff.add(i))
     }
 
     "apply diffs between sets" in {
@@ -91,20 +91,20 @@ class SetDiffTest extends AnyWordSpec with Matchers with Checkers {
         a.strictApply(set) match {
           case None =>
             (a.remove.diff(set).nonEmpty || (a.add & set).nonEmpty) &&
-            (a.invert(a(set)) != set) // invert only succeeds when strictApply does
+            a.invert(a(set)) != set // invert only succeeds when strictApply does
           /*
            * And if it DOES succeed it inverts!
            * Note that this law is not true:
            * d.invert(d(init)) == init
            */
           case Some(newSet) =>
-            (a(set) == newSet) && (a.invert(newSet) == set)
+            a(set) == newSet && a.invert(newSet) == set
         }
       }
     }
     "if diff.invert(diff(a)) == a implies diff.strictApply(a).isDefined" in {
       check { (a: Set[Int], diff: SetDiff[Int]) =>
-        (diff.invert(diff(a)) != a) || diff.strictApply(a).isDefined
+        diff.invert(diff(a)) != a || diff.strictApply(a).isDefined
       }
     }
 

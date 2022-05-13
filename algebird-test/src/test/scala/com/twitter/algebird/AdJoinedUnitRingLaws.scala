@@ -24,7 +24,7 @@ import org.scalacheck.Prop.forAll
 class AdjoinedUnitRingLaws extends CheckProperties {
   // AdjoinedUnit requires this method to be correct, so it is tested here:
   property("intTimes works correctly") {
-    forAll((bi0: BigInt, bi1: BigInt) => Group.intTimes(bi0, bi1) == (bi0 * bi1))
+    forAll((bi0: BigInt, bi1: BigInt) => Group.intTimes(bi0, bi1) == bi0 * bi1)
   }
 
   implicit def rng[T: Ring]: Rng[T] = implicitly[Ring[T]]

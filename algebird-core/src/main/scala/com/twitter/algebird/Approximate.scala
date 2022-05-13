@@ -90,7 +90,7 @@ case class Approximate[N](min: N, estimate: N, max: N, probWithinBounds: Double)
    */
   def ~(v: N): Boolean = boundsContain(v)
 
-  def isExact: Boolean = (probWithinBounds == 1.0) && numeric.equiv(min, max)
+  def isExact: Boolean = probWithinBounds == 1.0 && numeric.equiv(min, max)
 
   def +(right: Approximate[N]): Approximate[N] = {
     val n = numeric

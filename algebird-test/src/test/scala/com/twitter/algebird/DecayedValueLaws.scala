@@ -17,7 +17,7 @@ class DecayedValueLaws extends CheckProperties {
   property("DecayedValue Monoid laws") {
     implicit val equiv: Equiv[DecayedValue] =
       Equiv.fromFunction { (dvl, dvr) =>
-        approxEq(EPS)(dvl.value, dvr.value) && (dvl.scaledTime == dvr.scaledTime)
+        approxEq(EPS)(dvl.value, dvr.value) && dvl.scaledTime == dvr.scaledTime
       }
     commutativeMonoidLaws[DecayedValue]
   }
@@ -27,7 +27,7 @@ class DecayedValueLaws extends CheckProperties {
       val rand = new scala.util.Random
       val data = (0 to params.count).map { t =>
         val noise = rand.nextDouble * params.maxNoise * rand.nextInt.signum
-        DecayedValue.build(params.mean + (params.mean * noise), t, params.halfLife)
+        DecayedValue.build(params.mean + params.mean * noise, t, params.halfLife)
       }
       val result = decayedMonoid.sum(data)
       approxEq(EPS)(fn(result, params), params.mean)

@@ -18,8 +18,8 @@ class AveragedValueLaws extends CheckProperties {
   property("AveragedValue is a group and commutative") {
     implicit val equiv: Equiv[AveragedValue] =
       Equiv.fromFunction { (avl, avr) =>
-        ((avl.count == 0L) && (avr.count == 0L)) || {
-          approxEq(1e-10)(avl.value, avr.value) && (avl.count == avr.count)
+        avl.count == 0L && avr.count == 0L || {
+          approxEq(1e-10)(avl.value, avr.value) && avl.count == avr.count
         }
       }
     groupLaws[AveragedValue] && isCommutative[AveragedValue]
@@ -38,7 +38,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue can absorb numbers directly") {
-    forAll((base: AveragedValue, x: BigInt) => (base + AveragedValue(x)) == (base + x))
+    forAll((base: AveragedValue, x: BigInt) => base + AveragedValue(x) == base + x)
   }
 
   property("AveragedValue works by + or sumOption") {

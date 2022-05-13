@@ -48,8 +48,8 @@ class IntervalLaws extends CheckProperties {
       val intr = Interval.closed(x, x + 1)
       intr.contains(x) &&
       intr.contains(x + 1) &&
-      (!intr.contains(x + 2)) &&
-      (!intr.contains(x - 1))
+      !intr.contains(x + 2) &&
+      !intr.contains(x - 1)
     }
   }
   property("(x, x + 2) contains x+1") {
@@ -57,8 +57,8 @@ class IntervalLaws extends CheckProperties {
       val x = y.asInstanceOf[Long]
       val intr = Interval.open(x, x + 2)
       intr.contains(x + 1) &&
-      (!intr.contains(x + 2)) &&
-      (!intr.contains(x))
+      !intr.contains(x + 2) &&
+      !intr.contains(x)
     }
   }
 
@@ -88,26 +88,26 @@ class IntervalLaws extends CheckProperties {
   property("[x, y).isEmpty == (x >= y)") {
     forAll { (x: Int, y: Int) =>
       val intr = Intersection(InclusiveLower(x), ExclusiveUpper(y))
-      intr.isEmpty == (x >= y)
+      intr.isEmpty == x >= y
     }
   }
   property("(x, y).isEmpty == (x >= (y - 1))") {
     forAll { (x: Int, y: Int) =>
       val intr = Intersection(ExclusiveLower(x), ExclusiveUpper(y))
-      val isEmpty = if (y > Int.MinValue) x >= (y - 1) else true
+      val isEmpty = if (y > Int.MinValue) x >= y - 1 else true
       intr.isEmpty == isEmpty
     }
   }
   property("[x, y].isEmpty == x > y") {
     forAll { (x: Int, y: Int) =>
       val intr = Intersection(InclusiveLower(x), InclusiveUpper(y))
-      intr.isEmpty == (x > y)
+      intr.isEmpty == x > y
     }
   }
   property("(x, y].isEmpty = x >= y") {
     forAll { (x: Int, y: Int) =>
       val intr = Intersection(ExclusiveLower(x), InclusiveUpper(y))
-      intr.isEmpty == (x >= y)
+      intr.isEmpty == x >= y
     }
   }
 
@@ -131,19 +131,19 @@ class IntervalLaws extends CheckProperties {
   }
 
   property("(x, inf) and (-inf, y) intersects if and only if y > x") {
-    forAll((x: Long, y: Long) => ((y > x) == ExclusiveLower(x).intersects(ExclusiveUpper(y))))
+    forAll((x: Long, y: Long) => y > x == ExclusiveLower(x).intersects(ExclusiveUpper(y)))
   }
 
   property("(x, inf) and (-inf, y] intersect if and only if y > x") {
-    forAll((x: Long, y: Long) => ((y > x) == ExclusiveLower(x).intersects(InclusiveUpper(y))))
+    forAll((x: Long, y: Long) => y > x == ExclusiveLower(x).intersects(InclusiveUpper(y)))
   }
 
   property("[x, inf) and (-inf, y) intersect if and only if y > x") {
-    forAll((x: Long, y: Long) => ((y > x) == InclusiveLower(x).intersects(ExclusiveUpper(y))))
+    forAll((x: Long, y: Long) => y > x == InclusiveLower(x).intersects(ExclusiveUpper(y)))
   }
 
   property("[x, inf) and (-inf, y] intersect if and only if y >= x") {
-    forAll((x: Long, y: Long) => ((y >= x) == InclusiveLower(x).intersects(InclusiveUpper(y))))
+    forAll((x: Long, y: Long) => y >= x == InclusiveLower(x).intersects(InclusiveUpper(y)))
   }
 
   def lowerUpperIntersection(low: Lower[Long], upper: Upper[Long], items: List[Long]): Boolean =
@@ -172,26 +172,26 @@ class IntervalLaws extends CheckProperties {
     }
   property("If an a Lower intersects an Upper, the intersection is non Empty") {
     forAll { (low: Lower[Long], upper: Upper[Long], items: List[Long]) =>
-      (lowerUpperIntersection(low, upper, items))
+      lowerUpperIntersection(low, upper, items)
     }
   }
 
   // This specific case broke the tests before
   property("(n, n+1) follows the intersect law") {
     forAll { (n: Long) =>
-      ((n == Long.MaxValue) ||
-      lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n + 1L), Nil))
+      n == Long.MaxValue ||
+      lowerUpperIntersection(ExclusiveLower(n), ExclusiveUpper(n + 1L), Nil)
     }
   }
 
   property("toLeftClosedRightOpen is an Injection") {
     forAll { (intr: GenIntersection[Long], tests: List[Long]) =>
-      (intr.toLeftClosedRightOpen
+      intr.toLeftClosedRightOpen
         .map { case Intersection(InclusiveLower(low), ExclusiveUpper(high)) =>
           val intr2 = Interval.leftClosedRightOpen(low, high)
           tests.forall(t => intr(t) == intr2(t))
         }
-        .getOrElse(true)) // none means this can't be expressed as this kind of interval
+        .getOrElse(true) // none means this can't be expressed as this kind of interval
     }
   }
 
@@ -228,14 +228,14 @@ class IntervalLaws extends CheckProperties {
   property("leastToGreatest and greatestToLeast are ordered and adjacent") {
     forAll { (intr: GenIntersection[Long]) =>
       val items1 = intr.leastToGreatest.take(100)
-      ((items1.size < 2) || items1.sliding(2).forall { it =>
+      (items1.size < 2 || items1.sliding(2).forall { it =>
         it.toList match {
           case low :: high :: Nil if low + 1L == high => true
           case _                                      => false
         }
       } && {
         val items2 = intr.greatestToLeast.take(100)
-        (items2.size < 2) || items2.sliding(2).forall { it =>
+        items2.size < 2 || items2.sliding(2).forall { it =>
           it.toList match {
             case high :: low :: Nil if low + 1L == high => true
             case _                                      => false
@@ -256,7 +256,7 @@ class IntervalLaws extends CheckProperties {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedLeast match {
         case Some(l) =>
-          (i :: rest).forall(v => !intr(v) || (l <= v))
+          (i :: rest).forall(v => !intr(v) || l <= v)
         case None => true
       }
     }
@@ -265,7 +265,7 @@ class IntervalLaws extends CheckProperties {
     forAll { (intr: Interval[Long], i: Long, rest: List[Long]) =>
       intr.boundedGreatest match {
         case Some(u) =>
-          (i :: rest).forall(v => !intr(v) || (v <= u))
+          (i :: rest).forall(v => !intr(v) || v <= u)
         case None => true
       }
     }
@@ -327,7 +327,7 @@ class IntervalLaws extends CheckProperties {
 
   property("invalid closed bounds are empty") {
     forAll { (a: Long, b: Long) =>
-      (a == b) || {
+      a == b || {
         val soempty =
           if (a < b) Interval.closed(b, a) else Interval.closed(a, b)
         soempty.isEmpty
@@ -337,7 +337,7 @@ class IntervalLaws extends CheckProperties {
 
   property("invalid open bounds are empty") {
     forAll { (a: Long, b: Long) =>
-      (a == b) || {
+      a == b || {
         val soempty = if (a < b) Interval.open(b, a) else Interval.open(a, b)
         soempty.isEmpty
       }

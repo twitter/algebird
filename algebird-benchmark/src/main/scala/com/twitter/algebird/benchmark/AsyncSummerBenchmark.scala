@@ -156,7 +156,7 @@ class AsyncSummerBenchmark {
 }
 
 case class Counter(name: String) extends Incrementor {
-  private val counter = new AtomicLong()
+  private val counter = new AtomicLong
 
   override def incr(): Unit = counter.incrementAndGet()
 

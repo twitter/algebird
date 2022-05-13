@@ -29,7 +29,7 @@ class EventuallyRingLaws extends CheckProperties {
         case (Right(a), Right(b)) => a == b
         case (Left(a), Left(b))   => a == b
         case (Right(a), Left(b))  => (a.toLong == b)
-        case (Left(a), Right(b))  => (a == (b.toLong))
+        case (Left(a), Right(b))  => (a == b.toLong)
       }
     Prop.forAll { (pred: Int => Boolean) =>
       implicit val evRing = new EventuallyRing[Long, Int](_.toLong)(pred)
@@ -207,7 +207,7 @@ class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks
           val middle = tail.foldLeft(Right(h): Either[Double, List[Int]]) {
             case (Right(a), b) =>
               lift(rightAg.semigroup.plus(a, b))
-            case (Left(a), b) => Left(a + (b.sum.toDouble))
+            case (Left(a), b) => Left(a + b.sum.toDouble)
           }
           Some(middle match {
             case Right(_) => "Right"

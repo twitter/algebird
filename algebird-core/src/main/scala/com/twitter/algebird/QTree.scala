@@ -255,8 +255,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    */
   private def commonAncestorLevel(other: QTree[A]) = {
     val minLevel = _level.min(other.level)
-    val leftOffset = offset << (_level - minLevel)
-    val rightOffset = other.offset << (other.level - minLevel)
+    val leftOffset = offset << _level - minLevel
+    val rightOffset = other.offset << other.level - minLevel
     var offsetDiff = leftOffset ^ rightOffset
     var ancestorLevel = minLevel
     while (offsetDiff > 0) {
@@ -354,7 +354,7 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
    */
   def compress(k: Int)(implicit m: Monoid[A]): QTree[A] = {
     val minCount = _count >> k
-    if ((minCount > 1L) || (_count < 1L)) {
+    if (minCount > 1L || _count < 1L) {
       pruneChildren(minCount)
     } else {
       // count > 0, so for all nodes, if minCount <= 1, then count >= minCount

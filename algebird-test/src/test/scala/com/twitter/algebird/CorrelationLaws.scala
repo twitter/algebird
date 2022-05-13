@@ -45,8 +45,8 @@ class CorrelationLaws extends CheckProperties {
       approxEq(EPS)(corr.meanX, momentX.mean) &&
       approxEq(EPS)(corr.meanY, momentY.mean) &&
       (l.length < 2 ||
-        (approxEqOrBothNaN(EPS)(corr.stddevX, momentX.stddev) &&
-          approxEqOrBothNaN(EPS)(corr.stddevY, momentY.stddev)))
+        approxEqOrBothNaN(EPS)(corr.stddevX, momentX.stddev) &&
+        approxEqOrBothNaN(EPS)(corr.stddevY, momentY.stddev))
     }
   }
 
@@ -55,8 +55,8 @@ class CorrelationLaws extends CheckProperties {
     forAll { (m: Int, b: Int) =>
       val calculatedCorrelation = aggregateFunction(x => m * x + b)(testList)
       (m == 0.0
-      || (m > 0.0 && approxEq(EPS)(calculatedCorrelation, 1.0))
-      || (m < 0.0 && approxEq(EPS)(calculatedCorrelation, -1.0)))
+      || m > 0.0 && approxEq(EPS)(calculatedCorrelation, 1.0)
+      || m < 0.0 && approxEq(EPS)(calculatedCorrelation, -1.0))
     }
   }
 
@@ -114,7 +114,7 @@ class CorrelationLaws extends CheckProperties {
     forAll { (corr: Correlation, a0: Int) =>
       val a = a0 & Int.MaxValue
       val scaled = corr.scale(a.toDouble)
-      (a == 0.0) ||
+      a == 0.0 ||
       approxEqOrBothNaN(EPS)(scaled.totalWeight, corr.totalWeight * a) &&
       approxEqOrBothNaN(EPS)(scaled.meanX, corr.meanX) &&
       approxEqOrBothNaN(EPS)(scaled.meanY, corr.meanY) &&

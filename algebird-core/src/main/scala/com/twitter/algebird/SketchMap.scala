@@ -100,7 +100,7 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit
     val initTable =
       AdaptiveMatrix.fill[V](params.depth, params.width)(monoid.zero)
     /* For each row, update the table for each K,V pair */
-    val newTable = (0 to (params.depth - 1)).foldLeft(initTable) { case (table, row) =>
+    val newTable = (0 to params.depth - 1).foldLeft(initTable) { case (table, row) =>
       data.foldLeft(table) { case (innerTable, (key, value)) =>
         val pos = (row, params.hashes(row)(key))
         val currValue: V = innerTable.getValue(pos)
@@ -143,7 +143,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     val r = new scala.util.Random(seed)
     val numHashes = depth
     val numCounters = width
-    (0 to (numHashes - 1)).map { _ =>
+    (0 to numHashes - 1).map { _ =>
       val smhash: SketchMapHash[K] =
         SketchMapHash(CMSHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
       (k: K) => smhash(k)

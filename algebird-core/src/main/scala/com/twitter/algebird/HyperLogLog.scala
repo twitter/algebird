@@ -31,7 +31,7 @@ case class BitSetLite(in: Array[Byte]) {
     // 1 is in the bitset.
     val arrayIdx = x / 8
     val remainder = x % 8
-    ((in(arrayIdx) >>> (7 - remainder)) & 1) == 1
+    (in(arrayIdx) >>> 7 - remainder & 1) == 1
   }
 }
 
@@ -100,7 +100,7 @@ object HyperLogLog {
       val limit = Math.min(8, need)
       var j = 0
       while (j < limit) {
-        sum += ((byte >>> (7 - j)) & 1) << (i * 8 + j)
+        sum += (byte >>> 7 - j & 1) << i * 8 + j
         j += 1
       }
       need -= 8
@@ -124,11 +124,11 @@ object HyperLogLog {
    */
   def rhoW(bytes: Array[Byte], bits: Int): Byte = {
     var i = bits / 8 // tracks the position in bytes
-    var j = 7 - (bits % 8) // tracks the bit position in bytes(i)
+    var j = 7 - bits % 8 // tracks the bit position in bytes(i)
     var zeros = 1 // start with a single zero
     while (i < bytes.length) {
       while (j >= 0) {
-        if (((bytes(i) >>> j) & 1) == 1) {
+        if ((bytes(i) >>> j & 1) == 1) {
           return zeros.toByte
         }
         zeros += 1
@@ -169,8 +169,8 @@ object HyperLogLog {
         maxRhow.foldLeft(byteBuf) { (bb, jrhow) =>
           val (j, rhow) = jrhow
           bb.put((j & 0xff).toByte)
-          if (jLen >= 2) bb.put(((j >> 8) & 0xff).toByte)
-          if (jLen >= 3) bb.put(((j >> 16) & 0xff).toByte)
+          if (jLen >= 2) bb.put((j >> 8 & 0xff).toByte)
+          if (jLen >= 3) bb.put((j >> 16 & 0xff).toByte)
           bb.put(rhow.get)
         }
         buf
@@ -452,7 +452,7 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
         getModifiedRhoW(j, rhoW.get, reducedBits, reducedSize, bitMask, buf)
       val newJ = j % reducedSize
       val newRhoW = reducedMaxRhoW.getOrElse(newJ, 0: Byte)
-      reducedMaxRhoW += (newJ -> (newRhoW.max(modifiedRhoW)))
+      reducedMaxRhoW += newJ -> newRhoW.max(modifiedRhoW)
     }
     SparseHLL(reducedBits, reducedMaxRhoW.iterator.map { case (k, v) => (k, Max(v)) }.toMap)
   }
@@ -463,7 +463,7 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
  */
 case class DenseHLL(override val bits: Int, v: Bytes) extends HLL {
 
-  assert(v.size == (1 << bits), "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
+  assert(v.size == 1 << bits, "Invalid size for dense vector: " + size + " != (1 << " + bits + ")")
 
   override def size: Int = v.size
 
@@ -526,7 +526,7 @@ case class DenseHLL(override val bits: Int, v: Bytes) extends HLL {
 
     while (idx < arrSize) {
       val maxb = arr(idx)
-      buffer.update(idx, (buffer(idx)).max(maxb))
+      buffer.update(idx, buffer(idx).max(maxb))
       idx += 1
     }
   }

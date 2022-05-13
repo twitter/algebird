@@ -26,10 +26,10 @@ import scala.math.Equiv
  */
 trait MetricProperties {
   private def beCloseTo(a: Double, b: Double, eps: Double = 1e-10): Boolean =
-    a == b || (math.abs(a - b) / math.abs(a)) < eps || (a.isInfinite && b.isInfinite)
+    a == b || math.abs(a - b) / math.abs(a) < eps || a.isInfinite && b.isInfinite
 
   private def beGreaterThan(a: Double, b: Double, eps: Double = 1e-10): Boolean =
-    a > b - eps || (a.isInfinite && b.isInfinite)
+    a > b - eps || a.isInfinite && b.isInfinite
 
   def isNonNegative[T: Metric: Arbitrary]: Prop =
     forAll { (a: T, b: T) =>

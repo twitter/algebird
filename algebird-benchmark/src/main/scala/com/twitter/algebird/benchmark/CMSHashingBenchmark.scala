@@ -82,8 +82,8 @@ class CMSHashingBenchmark {
   private val PRIME_MODULUS = (1L << 31) - 1
 
   private def brokenCurrentHash(a: Int, b: Int, width: Int)(x: BigInt) = {
-    val unModded: BigInt = (x * a) + b
-    val modded: BigInt = (unModded + (unModded >> 32)) & PRIME_MODULUS
+    val unModded: BigInt = x * a + b
+    val modded: BigInt = unModded + (unModded >> 32) & PRIME_MODULUS
     val h = modded.toInt % width
     assert(h >= 0, "hash must not be negative")
     h

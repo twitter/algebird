@@ -54,7 +54,7 @@ object ShapelessTest extends Properties("Shapeless Instances") {
     HListSum.sum1(a) == a.head
   }
   property("HList.sum(1) works (2)") = forAll { (a: Int :: Int :: HNil) =>
-    HListSum.sum(a) == (a.head + a.tail.head)
-    HListSum.sum1(a) == (a.head + a.tail.head)
+    HListSum.sum(a) == a.head + a.tail.head
+    HListSum.sum1(a) == a.head + a.tail.head
   }
 }

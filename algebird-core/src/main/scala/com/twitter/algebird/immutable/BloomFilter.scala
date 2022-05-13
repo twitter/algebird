@@ -131,12 +131,12 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
     // unfortunately, this is the function we committed to some time ago, and we have tests
     // locking it down. x.toInt & 0x7fffffff should work, but this gives a few different values
     def toNonNegativeInt(x: Long): Int =
-      (math
+      math
         .abs(x)
-        .toInt) & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
+        .toInt & 0x7fffffff // no change for positive numbers, converts Integer.MIN_VALUE to positive number
 
     val upper = toNonNegativeInt(x >> 32)
-    val lower = toNonNegativeInt((x << 32) >> 32)
+    val lower = toNonNegativeInt(x << 32 >> 32)
     buffer(idx) = upper
     buffer(idx + 1) = lower
   }

@@ -84,7 +84,7 @@ class OptionGroup[T](implicit group: Group[T]) extends OptionMonoid[T] with Grou
  * Extends pair-wise sum Array monoid into a Group negate is defined as the negation of each element of the
  * array.
  */
-class ArrayGroup[T: ClassTag](implicit grp: Group[T]) extends ArrayMonoid[T]() with Group[Array[T]] {
+class ArrayGroup[T: ClassTag](implicit grp: Group[T]) extends ArrayMonoid[T] with Group[Array[T]] {
   override def negate(g: Array[T]): Array[T] = {
     val res = new Array[T](g.length)
     var idx = 0
@@ -148,7 +148,7 @@ object Group extends GeneratedGroupImplicits with ProductGroups with FromAlgebra
   implicit def indexedSeqGroup[T: Group]: Group[IndexedSeq[T]] =
     new IndexedSeqGroup[T]
   implicit def mapGroup[K, V](implicit group: Group[V]): Group[Map[K, V]] =
-    new MapGroup[K, V]()(group)
+    new MapGroup[K, V](group)
   implicit def scMapGroup[K, V](implicit group: Group[V]): Group[scala.collection.Map[K, V]] =
-    new ScMapGroup[K, V]()(group)
+    new ScMapGroup[K, V](group)
 }

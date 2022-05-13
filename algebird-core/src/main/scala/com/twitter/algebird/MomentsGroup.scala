@@ -125,11 +125,11 @@ sealed class Moments(val m0D: Double, val m1: Double, val m2: Double, val m3: Do
   override def equals(that: Any): Boolean =
     that match {
       case thatM: Moments =>
-        (m0D == thatM.m0D) &&
-        (m1 == thatM.m1) &&
-        (m2 == thatM.m2) &&
-        (m3 == thatM.m3) &&
-        (m4 == thatM.m4)
+        m0D == thatM.m0D &&
+        m1 == thatM.m1 &&
+        m2 == thatM.m2 &&
+        m3 == thatM.m3 &&
+        m4 == thatM.m4
       case _ => false
     }
 

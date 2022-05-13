@@ -55,7 +55,7 @@ class HyperLogLogSeriesLaws extends CheckProperties {
       val h = monoid.sum(it.map(i => monoid.create(int2Bytes(i), i)))
       val n = h.since(0L).toHLL.approximateSize.estimate
       val delta = (cardinality * errorPct).toInt
-      (cardinality - delta) <= n && n <= (cardinality + delta)
+      cardinality - delta <= n && n <= cardinality + delta
     }
 
     // We've verified that at 8-bits, the follow cardinalities all

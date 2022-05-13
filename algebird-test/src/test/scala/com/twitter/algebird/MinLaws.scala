@@ -11,7 +11,7 @@ class MinLaws extends CheckProperties {
   def minTest[T: Arbitrary: Ordering]: Prop =
     forAll { (l: Min[T], r: Min[T]) =>
       val realMin = Min(Ordering[T].min(l.get, r.get))
-      l + r == realMin && (l.min(r)) == realMin
+      l + r == realMin && l.min(r) == realMin
     }
 
   def minSemigroupTest[T: Arbitrary: Ordering]: Prop =

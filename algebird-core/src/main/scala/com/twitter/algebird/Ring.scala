@@ -149,7 +149,7 @@ object FloatRing extends Ring[Float] {
         while (iter.hasNext) {
           val y = iter.next().toDouble - c
           val t = sum + y
-          c = (t - sum) - y
+          c = t - sum - y
           sum = t
         }
 
@@ -177,7 +177,7 @@ object DoubleRing extends Ring[Double] {
         while (iter.hasNext) {
           val y = iter.next() - c
           val t = sum + y
-          c = (t - sum) - y
+          c = t - sum - y
           sum = t
         }
 
@@ -300,11 +300,11 @@ object Ring extends GeneratedRingImplicits with ProductRings with RingImplicits0
    * This is actually a Rng but we leave the unsafe Ring for legacy reasons
    */
   implicit def mapRing[K, V](implicit ring: Ring[V]): Ring[Map[K, V]] =
-    new UnsafeFromAlgebraRng(new MapRing[K, V]()(ring))
+    new UnsafeFromAlgebraRng(new MapRing[K, V](ring))
 
   /**
    * This is actually a Rng but we leave the unsafe Ring for legacy reasons
    */
   implicit def scMapRing[K, V](implicit ring: Ring[V]): Ring[scala.collection.Map[K, V]] =
-    new UnsafeFromAlgebraRng(new ScMapRing[K, V]()(ring))
+    new UnsafeFromAlgebraRng(new ScMapRing[K, V](ring))
 }

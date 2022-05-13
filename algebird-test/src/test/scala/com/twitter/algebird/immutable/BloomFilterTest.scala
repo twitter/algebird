@@ -71,7 +71,7 @@ class ImmutableBloomFilterLaws extends CheckProperties {
         a.hammingDistance(b) == 0
       else {
         val dist = a.hammingDistance(b)
-        (dist > 0) && (dist <= a.width)
+        dist > 0 && dist <= a.width
       }
     }
   }
@@ -100,7 +100,7 @@ class ImmutableBloomFilterLaws extends CheckProperties {
       val next1 = a + b
 
       Equiv[bf.Hash].equiv(next, next1) &&
-      (check == a.contains(b))
+      check == a.contains(b)
     }
   }
 
@@ -143,7 +143,7 @@ class ImmutableBloomFilterHashIndices extends CheckProperties {
 
     private def splitLong(x: Long) = {
       val upper = math.abs(x >> 32).toInt
-      val lower = math.abs((x << 32) >> 32).toInt
+      val lower = math.abs(x << 32 >> 32).toInt
       (upper, lower)
     }
 
@@ -178,7 +178,7 @@ class ImmutableBloomFilterHashIndices extends CheckProperties {
       val s = v.toString
       val (bf, negativeHash) = pair
       val indices = negativeHash.apply(s)
-      (indices == (bf.hashToArray(s).toStream)) || indices.exists(_ < 0)
+      indices == bf.hashToArray(s).toStream || indices.exists(_ < 0)
     }
   }
 }
@@ -377,7 +377,7 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
       val bloomFilter = BloomFilter[String](10, 0.1)
 
       def serialize(bf: bloomFilter.Hash): Array[Byte] = {
-        val stream = new ByteArrayOutputStream()
+        val stream = new ByteArrayOutputStream
         val out = new ObjectOutputStream(stream)
         out.writeObject(bf)
         out.close()

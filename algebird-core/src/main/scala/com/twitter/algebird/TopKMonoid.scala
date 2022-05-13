@@ -66,7 +66,7 @@ class TopKMonoid[T](k: Int)(implicit ord: Ordering[T]) extends Monoid[TopK[T]] {
         for {
           biggest <- bigger.max
           smallest <- smaller.items.headOption
-        } yield (ord.lteq(biggest, smallest))
+        } yield ord.lteq(biggest, smallest)
       if (biggerWins.getOrElse(true)) { // smaller is small, or empty
         bigger
       } else {

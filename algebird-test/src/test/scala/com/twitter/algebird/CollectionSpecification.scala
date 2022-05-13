@@ -47,7 +47,7 @@ class CollectionSpecification extends CheckProperties {
   property("List plus") {
     forAll { (a: List[Int], b: List[Int]) =>
       val mon = implicitly[Monoid[List[Int]]]
-      ((a ++ b == mon.plus(a, b)) && (mon.zero == List[Int]()))
+      (a ++ b == mon.plus(a, b) && mon.zero == List[Int]())
     }
   }
 
@@ -61,7 +61,7 @@ class CollectionSpecification extends CheckProperties {
   property("Seq plus") {
     forAll { (a: Seq[Int], b: Seq[Int]) =>
       val mon = implicitly[Monoid[Seq[Int]]]
-      ((a ++ b == mon.plus(a, b)) && (mon.zero == Seq[Int]()))
+      (a ++ b == mon.plus(a, b) && mon.zero == Seq[Int]())
     }
   }
 
@@ -77,7 +77,7 @@ class CollectionSpecification extends CheckProperties {
   property("Set plus") {
     forAll { (a: Set[Int], b: Set[Int]) =>
       val mon = implicitly[Monoid[Set[Int]]]
-      ((a ++ b == mon.plus(a, b)) && (mon.zero == Set[Int]()))
+      (a ++ b == mon.plus(a, b) && mon.zero == Set[Int]())
     }
   }
 
@@ -109,9 +109,9 @@ class CollectionSpecification extends CheckProperties {
   ): Prop =
     forAll { (a: M, b: M) =>
       // Subsets because zeros are removed from the times/plus values
-      ((rng.times(a, b)).keys.toSet.subsetOf((a.keys.toSet & b.keys.toSet)) &&
-      (rng.plus(a, b)).keys.toSet.subsetOf((a.keys.toSet | b.keys.toSet)) &&
-      (rng.plus(a, a).keys == a.filter(kv => (kv._2 + kv._2) != 0).keys))
+      rng.times(a, b).keys.toSet.subsetOf(a.keys.toSet & b.keys.toSet) &&
+      rng.plus(a, b).keys.toSet.subsetOf(a.keys.toSet | b.keys.toSet) &&
+      rng.plus(a, a).keys == a.filter(kv => kv._2 + kv._2 != 0).keys
     }
 
   property("Map plus/times keys") {
@@ -207,11 +207,11 @@ class CollectionSpecification extends CheckProperties {
   }
 
   property("MapAlgebra.removeZeros works") {
-    forAll((m: Map[Int, Int]) => (MapAlgebra.removeZeros(m).values.toSet.contains(0) == false))
+    forAll((m: Map[Int, Int]) => MapAlgebra.removeZeros(m).values.toSet.contains(0) == false)
   }
 
   property("Monoid.sum performs w/ or w/o MapAlgebra.removeZeros") {
-    forAll((m: Map[Int, Int]) => (Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m))))
+    forAll((m: Map[Int, Int]) => Monoid.sum(m) == Monoid.sum(MapAlgebra.removeZeros(m)))
   }
 
   property("MapAlgebra.sumByKey works") {
@@ -239,26 +239,26 @@ class CollectionSpecification extends CheckProperties {
   property("MapAlgebra.dot works") {
     forAll { (m1: Map[Int, Int], m2: Map[Int, Int]) =>
       // .toList below is to make sure we don't remove duplicate values
-      (MapAlgebra.dot(m1, m2) ==
-        (m1.keySet ++ m2.keySet).toList.map(k => m1.getOrElse(k, 0) * m2.getOrElse(k, 0)).sum)
+      MapAlgebra.dot(m1, m2) ==
+        (m1.keySet ++ m2.keySet).toList.map(k => m1.getOrElse(k, 0) * m2.getOrElse(k, 0)).sum
     }
   }
 
   property("MapAlgebra.toGraph is correct") {
     forAll { (l: Set[(Int, Int)]) =>
-      (MapAlgebra
+      MapAlgebra
         .toGraph(l)
         .toIterator
         .flatMap { case (k, sv) =>
           sv.map(v => (k, v))
         }
-        .toSet == l)
+        .toSet == l
     }
   }
 
   property("MapAlgebra.sparseEquiv is correct") {
     forAll { (l: Map[Int, String], empties: Set[Int]) =>
-      (!empties.isEmpty) ==> {
+      !empties.isEmpty ==> {
         val mapEq = MapAlgebra.sparseEquiv[Int, String]
         mapEq.equiv(l -- empties, l ++ empties.map(_ -> "").toMap) && !mapEq
           .equiv(l -- empties, l ++ empties.map(_ -> "not empty").toMap)
@@ -279,7 +279,7 @@ class CollectionSpecification extends CheckProperties {
 
   property("MapAlgebra.invertExact works") {
     forAll { (m: Map[Option[Int], Set[Int]]) =>
-      (MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined).toMap)
+      MapAlgebra.invertExact(MapAlgebra.invertExact(m)) == m.filterKeys(_.isDefined).toMap
     }
   }
 
@@ -297,7 +297,7 @@ class CollectionSpecification extends CheckProperties {
         .mapValues(_.get)
         .toMap
       val m1Orm2 = m1.keySet | m2.keySet
-      ((m1after == m1) && (m2after == m2) && (m3.keySet == m1Orm2))
+      (m1after == m1 && m2after == m2 && m3.keySet == m1Orm2)
     }
   }
 
@@ -306,13 +306,13 @@ class CollectionSpecification extends CheckProperties {
 
   property("MapAlgebra.mergeLookup works") {
     forAll { (items: Set[Int]) =>
-      (mapEq.equiv(
+      mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Option[Int], Int](items)(square)(_ => None),
         Map((None: Option[Int]) -> Monoid.sum(items.map(x => square(x).getOrElse(0))))
       ) && mapEq.equiv(
         MapAlgebra.mergeLookup[Int, Int, Int](items)(square)(identity),
         MapAlgebra.sumByKey(items.map(x => x -> square(x).getOrElse(0)))
-      ))
+      )
     }
   }
 
@@ -325,7 +325,7 @@ class CollectionSpecification extends CheckProperties {
         m <- Arbitrary.arbitrary[Map[Int, T]]
       } yield AdaptiveVector.fromMap(
         m.filter { case (k, _) =>
-          (k < 1000) && (k >= 0)
+          k < 1000 && k >= 0
         },
         sparse,
         1000

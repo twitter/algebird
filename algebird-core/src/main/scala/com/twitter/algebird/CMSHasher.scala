@@ -68,11 +68,11 @@ object CMSHasher {
   implicit object CMSHasherLong extends CMSHasher[Long] {
 
     override def hash(a: Int, b: Int, width: Int)(x: Long): Int = {
-      val unModded: Long = (x * a) + b
+      val unModded: Long = x * a + b
       // Apparently a super fast way of computing x mod 2^p-1
       // See page 149 of http://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf
       // after Proposition 7.
-      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
+      val modded: Long = unModded + (unModded >> 32) & Int.MaxValue
       // Modulo-ing integers is apparently twice as fast as modulo-ing Longs.
       modded.toInt % width
     }
@@ -85,8 +85,8 @@ object CMSHasher {
   implicit object CMSHasherInt extends CMSHasher[Int] {
 
     override def hash(a: Int, b: Int, width: Int)(x: Int): Int = {
-      val unModded: Int = (x * a) + b
-      val modded: Long = (unModded + (unModded >> 32)) & Int.MaxValue
+      val unModded: Int = x * a + b
+      val modded: Long = unModded + (unModded >> 32) & Int.MaxValue
       modded.toInt % width
     }
   }

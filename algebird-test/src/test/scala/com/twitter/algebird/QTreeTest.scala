@@ -26,7 +26,7 @@ class QTreeLaws extends CheckProperties {
 
   implicit val qtSemigroup: QTreeSemigroup[Long] = new QTreeSemigroup[Long](4)
   implicit val qtGen: Arbitrary[QTree[Long]] = Arbitrary {
-    for (v <- choose(0L, 10000L)) yield (QTree(v))
+    for (v <- choose(0L, 10000L)) yield QTree(v)
   }
 
   property("QTree is associative") {
@@ -68,7 +68,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
   }
 
   for (k <- (1 to 6))
-    ("QTree with sizeHint 2^" + k) should {
+    "QTree with sizeHint 2^" + k should {
       "always contain the true quantile within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
@@ -99,12 +99,12 @@ class QTreeTest extends AnyWordSpec with Matchers {
       "have size bounded by 2^(k+2)" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
-        assert(qt.size <= (1 << (k + 2)))
+        assert(qt.size <= (1 << k + 2))
       }
     }
 
   for (quantile <- List(0, .05, .5, .777777777, .95))
-    ("A QTreeAggregator with quantile set as " + quantile) should {
+    "A QTreeAggregator with quantile set as " + quantile should {
       "work as an aggregator for doubles with a small stream" in {
         val list = randomList(10000).map(i => math.round(i * 100).toDouble)
         val agg = QTreeAggregator(quantile)(implicitly[Numeric[Double]])

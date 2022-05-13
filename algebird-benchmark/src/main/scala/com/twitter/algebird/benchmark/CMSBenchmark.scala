@@ -53,7 +53,7 @@ object CMSBenchmark {
       largeStrings = (1 to size).map(_ => nextString(MaxBits / bitsPerChar)).toVector
       largeBigInts = largeStrings.map(s => BigInt(s.getBytes))
       largeBigDecimals = largeStrings.map { s =>
-        val md = (s.head % 256) - 128
+        val md = s.head % 256 - 128
         BigDecimal(BigInt(s.tail.getBytes)) * BigDecimal(1).pow(md)
       }
 

@@ -87,7 +87,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
   property("hit rates will always be 0 when cap is 0") {
     forAll { items: List[(Int, Int)] =>
       // Only run this when we have at least 2 items
-      (items.size > 1) ==> {
+      items.size > 1 ==> {
         val keyHits = getHits(Capacity(0), items)
         !keyHits.exists(_ != 0)
       }
@@ -97,7 +97,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
   property("hit rates in general should be between [0, 1] ") {
     forAll { (c: Capacity, items: List[(Int, Int)]) =>
       // Only run this when we have at least 2 items
-      (items.size > 1) ==> {
+      items.size > 1 ==> {
         val keyHits = getHits(c, items)
         val hitRate = keyHits.sum / items.size.toDouble
         hitRate >= 0 && hitRate <= 1

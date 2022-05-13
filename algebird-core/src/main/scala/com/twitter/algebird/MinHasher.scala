@@ -21,7 +21,7 @@ object MinHasher {
 
   def pickHashesAndBands(threshold: Double, maxHashes: Int): (Int, Int) = {
     val bands = pickBands(threshold, maxHashes)
-    val hashes = (maxHashes / bands) * bands
+    val hashes = maxHashes / bands * bands
     (hashes, bands)
   }
 

@@ -20,15 +20,15 @@ class SketchMapLaws extends CheckProperties {
   val params: SketchMapParams[Int] = SketchMapParams[Int](SEED, EPS, 1e-3, HEAVY_HITTERS_COUNT)
   implicit val smMonoid: SketchMapMonoid[Int, Long] = SketchMap.monoid[Int, Long](params)
   implicit val smGen: Arbitrary[SketchMap[Int, Long]] = Arbitrary {
-    for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
+    for (key: Int <- Gen.choose(0, 10000)) yield smMonoid.create((key, 1L))
   }
 
   // TODO: SketchMap's heavy hitters are not strictly associative
   // (approximately they are)
   implicit def equiv[K, V]: Equiv[SketchMap[K, V]] =
     Equiv.fromFunction { (left, right) =>
-      (left.valuesTable == right.valuesTable) &&
-      (left.totalValue == right.totalValue)
+      left.valuesTable == right.valuesTable &&
+      left.totalValue == right.totalValue
     }
 
   property("SketchMap is a commutative monoid") {
@@ -48,7 +48,7 @@ class SketchMapTest extends AnyWordSpec with Matchers {
     "count total number of elements in a stream" in {
       val totalCount = 1243
       val range = 234
-      val data = (0 to (totalCount - 1)).map(_ => (RAND.nextInt(range), 1L))
+      val data = (0 to totalCount - 1).map(_ => (RAND.nextInt(range), 1L))
       val sm = MONOID.create(data)
       assert(sm.totalValue == totalCount)
     }

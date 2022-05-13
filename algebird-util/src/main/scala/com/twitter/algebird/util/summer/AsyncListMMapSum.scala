@@ -42,7 +42,7 @@ class AsyncListMMapSum[Key, Value](
   require(bufferSize.v > 0, "Use the Null summer for an empty async summer")
 
   private[this] final val queueMap = MMap[Key, ListBuffer[Value]]()
-  private[this] final val mutex = new Object()
+  private[this] final val mutex = new Object
   @volatile private[this] var presentTuples = 0
 
   protected override val emptyResult = Map.empty[Key, Value]

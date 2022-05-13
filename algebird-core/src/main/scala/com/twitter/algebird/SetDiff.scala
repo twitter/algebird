@@ -27,8 +27,8 @@ sealed abstract case class SetDiff[T] private (add: Set[T], remove: Set[T]) {
   def ++(ts: Iterable[T]): SetDiff[T] = SetDiff(add ++ ts, remove -- ts)
   def --(ts: Iterable[T]): SetDiff[T] = SetDiff(add -- ts, remove ++ ts)
   def merge(other: SetDiff[T]): SetDiff[T] = {
-    val newAdd = (add ++ other.add) -- other.remove
-    val newRem = (remove -- other.add) ++ other.remove
+    val newAdd = add ++ other.add -- other.remove
+    val newRem = remove -- other.add ++ other.remove
     SetDiff(newAdd, newRem)
   }
 

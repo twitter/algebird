@@ -19,8 +19,8 @@ class DecayingCMSProperties extends CheckProperties {
     } else {
       val (aa, ab) = (Math.abs(a), Math.abs(b))
       if (aa < eps && ab < eps) true
-      else if (aa < ab) (b / a) < 1.0 + eps
-      else (a / b) < 1.0 + eps
+      else if (aa < ab) b / a < 1.0 + eps
+      else a / b < 1.0 + eps
     }
 
   def fuzzyEq[K](module: DecayingCMS[K])(cms0: module.CMS, cms1: module.CMS): Boolean = {
@@ -151,7 +151,7 @@ class DecayingCMSProperties extends CheckProperties {
         val sum0 = cms.cells(0).sum
         cms.cells.foldLeft(Prop(true)) { (res, row) =>
           val sum = row.sum
-          res && (Prop(close(sum, sum0)) :| s"close($sum, $sum0)")
+          res && Prop(close(sum, sum0)) :| s"close($sum, $sum0)"
         }
       }
     }
@@ -292,8 +292,8 @@ class DecayingCMSProperties extends CheckProperties {
         items.iterator.map(_._2).foldLeft(Prop(true)) { (res, k) =>
           val x = cms1.get(k).value
           res &&
-          (Prop(xmin <= x) :| s"$xmin <= $x was false for key $k") &&
-          (Prop(x <= xmax) :| s"$x <= $xmax was false for key $k")
+          Prop(xmin <= x) :| s"$xmin <= $x was false for key $k" &&
+          Prop(x <= xmax) :| s"$x <= $xmax was false for key $k"
         }
       }
     }

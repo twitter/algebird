@@ -4328,14 +4328,14 @@ trait GeneratedSemigroupImplicits {
       asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B]
   ): Semigroup[(A, B)] =
-    new Tuple2Semigroup[A, B]()(asemigroup, bsemigroup)
+    new Tuple2Semigroup[A, B](asemigroup, bsemigroup)
 
   implicit def semigroup3[A, B, C](implicit
       asemigroup: Semigroup[A],
       bsemigroup: Semigroup[B],
       csemigroup: Semigroup[C]
   ): Semigroup[(A, B, C)] =
-    new Tuple3Semigroup[A, B, C]()(asemigroup, bsemigroup, csemigroup)
+    new Tuple3Semigroup[A, B, C](asemigroup, bsemigroup, csemigroup)
 
   implicit def semigroup4[A, B, C, D](implicit
       asemigroup: Semigroup[A],
@@ -4343,7 +4343,7 @@ trait GeneratedSemigroupImplicits {
       csemigroup: Semigroup[C],
       dsemigroup: Semigroup[D]
   ): Semigroup[(A, B, C, D)] =
-    new Tuple4Semigroup[A, B, C, D]()(asemigroup, bsemigroup, csemigroup, dsemigroup)
+    new Tuple4Semigroup[A, B, C, D](asemigroup, bsemigroup, csemigroup, dsemigroup)
 
   implicit def semigroup5[A, B, C, D, E](implicit
       asemigroup: Semigroup[A],
@@ -4352,7 +4352,7 @@ trait GeneratedSemigroupImplicits {
       dsemigroup: Semigroup[D],
       esemigroup: Semigroup[E]
   ): Semigroup[(A, B, C, D, E)] =
-    new Tuple5Semigroup[A, B, C, D, E]()(asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup)
+    new Tuple5Semigroup[A, B, C, D, E](asemigroup, bsemigroup, csemigroup, dsemigroup, esemigroup)
 
   implicit def semigroup6[A, B, C, D, E, F](implicit
       asemigroup: Semigroup[A],
@@ -4362,7 +4362,7 @@ trait GeneratedSemigroupImplicits {
       esemigroup: Semigroup[E],
       fsemigroup: Semigroup[F]
   ): Semigroup[(A, B, C, D, E, F)] =
-    new Tuple6Semigroup[A, B, C, D, E, F]()(
+    new Tuple6Semigroup[A, B, C, D, E, F](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4380,7 +4380,7 @@ trait GeneratedSemigroupImplicits {
       fsemigroup: Semigroup[F],
       gsemigroup: Semigroup[G]
   ): Semigroup[(A, B, C, D, E, F, G)] =
-    new Tuple7Semigroup[A, B, C, D, E, F, G]()(
+    new Tuple7Semigroup[A, B, C, D, E, F, G](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4400,7 +4400,7 @@ trait GeneratedSemigroupImplicits {
       gsemigroup: Semigroup[G],
       hsemigroup: Semigroup[H]
   ): Semigroup[(A, B, C, D, E, F, G, H)] =
-    new Tuple8Semigroup[A, B, C, D, E, F, G, H]()(
+    new Tuple8Semigroup[A, B, C, D, E, F, G, H](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4422,7 +4422,7 @@ trait GeneratedSemigroupImplicits {
       hsemigroup: Semigroup[H],
       isemigroup: Semigroup[I]
   ): Semigroup[(A, B, C, D, E, F, G, H, I)] =
-    new Tuple9Semigroup[A, B, C, D, E, F, G, H, I]()(
+    new Tuple9Semigroup[A, B, C, D, E, F, G, H, I](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4446,7 +4446,7 @@ trait GeneratedSemigroupImplicits {
       isemigroup: Semigroup[I],
       jsemigroup: Semigroup[J]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J)] =
-    new Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J]()(
+    new Tuple10Semigroup[A, B, C, D, E, F, G, H, I, J](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4472,7 +4472,7 @@ trait GeneratedSemigroupImplicits {
       jsemigroup: Semigroup[J],
       ksemigroup: Semigroup[K]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K)] =
-    new Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K]()(
+    new Tuple11Semigroup[A, B, C, D, E, F, G, H, I, J, K](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4500,7 +4500,7 @@ trait GeneratedSemigroupImplicits {
       ksemigroup: Semigroup[K],
       lsemigroup: Semigroup[L]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    new Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L]()(
+    new Tuple12Semigroup[A, B, C, D, E, F, G, H, I, J, K, L](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4530,7 +4530,7 @@ trait GeneratedSemigroupImplicits {
       lsemigroup: Semigroup[L],
       msemigroup: Semigroup[M]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    new Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M]()(
+    new Tuple13Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4562,7 +4562,7 @@ trait GeneratedSemigroupImplicits {
       msemigroup: Semigroup[M],
       nsemigroup: Semigroup[N]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    new Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(
+    new Tuple14Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4596,7 +4596,7 @@ trait GeneratedSemigroupImplicits {
       nsemigroup: Semigroup[N],
       osemigroup: Semigroup[O]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    new Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(
+    new Tuple15Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4632,7 +4632,7 @@ trait GeneratedSemigroupImplicits {
       osemigroup: Semigroup[O],
       psemigroup: Semigroup[P]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    new Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(
+    new Tuple16Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4670,7 +4670,7 @@ trait GeneratedSemigroupImplicits {
       psemigroup: Semigroup[P],
       qsemigroup: Semigroup[Q]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    new Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(
+    new Tuple17Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4710,7 +4710,7 @@ trait GeneratedSemigroupImplicits {
       qsemigroup: Semigroup[Q],
       rsemigroup: Semigroup[R]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    new Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(
+    new Tuple18Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4752,7 +4752,7 @@ trait GeneratedSemigroupImplicits {
       rsemigroup: Semigroup[R],
       ssemigroup: Semigroup[S]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    new Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(
+    new Tuple19Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4796,7 +4796,7 @@ trait GeneratedSemigroupImplicits {
       ssemigroup: Semigroup[S],
       tsemigroup: Semigroup[T]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    new Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(
+    new Tuple20Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4842,7 +4842,7 @@ trait GeneratedSemigroupImplicits {
       tsemigroup: Semigroup[T],
       usemigroup: Semigroup[U]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    new Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(
+    new Tuple21Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4890,7 +4890,7 @@ trait GeneratedSemigroupImplicits {
       usemigroup: Semigroup[U],
       vsemigroup: Semigroup[V]
   ): Semigroup[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    new Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(
+    new Tuple22Semigroup[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -4919,14 +4919,14 @@ trait GeneratedSemigroupImplicits {
 
 trait GeneratedMonoidImplicits {
   implicit def monoid2[A, B](implicit amonoid: Monoid[A], bmonoid: Monoid[B]): Monoid[(A, B)] =
-    new Tuple2Monoid[A, B]()(amonoid, bmonoid)
+    new Tuple2Monoid[A, B](amonoid, bmonoid)
 
   implicit def monoid3[A, B, C](implicit
       amonoid: Monoid[A],
       bmonoid: Monoid[B],
       cmonoid: Monoid[C]
   ): Monoid[(A, B, C)] =
-    new Tuple3Monoid[A, B, C]()(amonoid, bmonoid, cmonoid)
+    new Tuple3Monoid[A, B, C](amonoid, bmonoid, cmonoid)
 
   implicit def monoid4[A, B, C, D](implicit
       amonoid: Monoid[A],
@@ -4934,7 +4934,7 @@ trait GeneratedMonoidImplicits {
       cmonoid: Monoid[C],
       dmonoid: Monoid[D]
   ): Monoid[(A, B, C, D)] =
-    new Tuple4Monoid[A, B, C, D]()(amonoid, bmonoid, cmonoid, dmonoid)
+    new Tuple4Monoid[A, B, C, D](amonoid, bmonoid, cmonoid, dmonoid)
 
   implicit def monoid5[A, B, C, D, E](implicit
       amonoid: Monoid[A],
@@ -4943,7 +4943,7 @@ trait GeneratedMonoidImplicits {
       dmonoid: Monoid[D],
       emonoid: Monoid[E]
   ): Monoid[(A, B, C, D, E)] =
-    new Tuple5Monoid[A, B, C, D, E]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid)
+    new Tuple5Monoid[A, B, C, D, E](amonoid, bmonoid, cmonoid, dmonoid, emonoid)
 
   implicit def monoid6[A, B, C, D, E, F](implicit
       amonoid: Monoid[A],
@@ -4953,7 +4953,7 @@ trait GeneratedMonoidImplicits {
       emonoid: Monoid[E],
       fmonoid: Monoid[F]
   ): Monoid[(A, B, C, D, E, F)] =
-    new Tuple6Monoid[A, B, C, D, E, F]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid)
+    new Tuple6Monoid[A, B, C, D, E, F](amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid)
 
   implicit def monoid7[A, B, C, D, E, F, G](implicit
       amonoid: Monoid[A],
@@ -4964,7 +4964,7 @@ trait GeneratedMonoidImplicits {
       fmonoid: Monoid[F],
       gmonoid: Monoid[G]
   ): Monoid[(A, B, C, D, E, F, G)] =
-    new Tuple7Monoid[A, B, C, D, E, F, G]()(amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid)
+    new Tuple7Monoid[A, B, C, D, E, F, G](amonoid, bmonoid, cmonoid, dmonoid, emonoid, fmonoid, gmonoid)
 
   implicit def monoid8[A, B, C, D, E, F, G, H](implicit
       amonoid: Monoid[A],
@@ -4976,7 +4976,7 @@ trait GeneratedMonoidImplicits {
       gmonoid: Monoid[G],
       hmonoid: Monoid[H]
   ): Monoid[(A, B, C, D, E, F, G, H)] =
-    new Tuple8Monoid[A, B, C, D, E, F, G, H]()(
+    new Tuple8Monoid[A, B, C, D, E, F, G, H](
       amonoid,
       bmonoid,
       cmonoid,
@@ -4998,7 +4998,7 @@ trait GeneratedMonoidImplicits {
       hmonoid: Monoid[H],
       imonoid: Monoid[I]
   ): Monoid[(A, B, C, D, E, F, G, H, I)] =
-    new Tuple9Monoid[A, B, C, D, E, F, G, H, I]()(
+    new Tuple9Monoid[A, B, C, D, E, F, G, H, I](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5022,7 +5022,7 @@ trait GeneratedMonoidImplicits {
       imonoid: Monoid[I],
       jmonoid: Monoid[J]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J)] =
-    new Tuple10Monoid[A, B, C, D, E, F, G, H, I, J]()(
+    new Tuple10Monoid[A, B, C, D, E, F, G, H, I, J](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5048,7 +5048,7 @@ trait GeneratedMonoidImplicits {
       jmonoid: Monoid[J],
       kmonoid: Monoid[K]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K)] =
-    new Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K]()(
+    new Tuple11Monoid[A, B, C, D, E, F, G, H, I, J, K](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5076,7 +5076,7 @@ trait GeneratedMonoidImplicits {
       kmonoid: Monoid[K],
       lmonoid: Monoid[L]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    new Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L]()(
+    new Tuple12Monoid[A, B, C, D, E, F, G, H, I, J, K, L](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5106,7 +5106,7 @@ trait GeneratedMonoidImplicits {
       lmonoid: Monoid[L],
       mmonoid: Monoid[M]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    new Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M]()(
+    new Tuple13Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5138,7 +5138,7 @@ trait GeneratedMonoidImplicits {
       mmonoid: Monoid[M],
       nmonoid: Monoid[N]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    new Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(
+    new Tuple14Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5172,7 +5172,7 @@ trait GeneratedMonoidImplicits {
       nmonoid: Monoid[N],
       omonoid: Monoid[O]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    new Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(
+    new Tuple15Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5208,7 +5208,7 @@ trait GeneratedMonoidImplicits {
       omonoid: Monoid[O],
       pmonoid: Monoid[P]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    new Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(
+    new Tuple16Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5246,7 +5246,7 @@ trait GeneratedMonoidImplicits {
       pmonoid: Monoid[P],
       qmonoid: Monoid[Q]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    new Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(
+    new Tuple17Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5286,7 +5286,7 @@ trait GeneratedMonoidImplicits {
       qmonoid: Monoid[Q],
       rmonoid: Monoid[R]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    new Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(
+    new Tuple18Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5328,7 +5328,7 @@ trait GeneratedMonoidImplicits {
       rmonoid: Monoid[R],
       smonoid: Monoid[S]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    new Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(
+    new Tuple19Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5372,7 +5372,7 @@ trait GeneratedMonoidImplicits {
       smonoid: Monoid[S],
       tmonoid: Monoid[T]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    new Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(
+    new Tuple20Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5418,7 +5418,7 @@ trait GeneratedMonoidImplicits {
       tmonoid: Monoid[T],
       umonoid: Monoid[U]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    new Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(
+    new Tuple21Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5466,7 +5466,7 @@ trait GeneratedMonoidImplicits {
       umonoid: Monoid[U],
       vmonoid: Monoid[V]
   ): Monoid[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    new Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(
+    new Tuple22Monoid[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       amonoid,
       bmonoid,
       cmonoid,
@@ -5495,14 +5495,14 @@ trait GeneratedMonoidImplicits {
 
 trait GeneratedGroupImplicits {
   implicit def group2[A, B](implicit agroup: Group[A], bgroup: Group[B]): Group[(A, B)] =
-    new Tuple2Group[A, B]()(agroup, bgroup)
+    new Tuple2Group[A, B](agroup, bgroup)
 
   implicit def group3[A, B, C](implicit
       agroup: Group[A],
       bgroup: Group[B],
       cgroup: Group[C]
   ): Group[(A, B, C)] =
-    new Tuple3Group[A, B, C]()(agroup, bgroup, cgroup)
+    new Tuple3Group[A, B, C](agroup, bgroup, cgroup)
 
   implicit def group4[A, B, C, D](implicit
       agroup: Group[A],
@@ -5510,7 +5510,7 @@ trait GeneratedGroupImplicits {
       cgroup: Group[C],
       dgroup: Group[D]
   ): Group[(A, B, C, D)] =
-    new Tuple4Group[A, B, C, D]()(agroup, bgroup, cgroup, dgroup)
+    new Tuple4Group[A, B, C, D](agroup, bgroup, cgroup, dgroup)
 
   implicit def group5[A, B, C, D, E](implicit
       agroup: Group[A],
@@ -5519,7 +5519,7 @@ trait GeneratedGroupImplicits {
       dgroup: Group[D],
       egroup: Group[E]
   ): Group[(A, B, C, D, E)] =
-    new Tuple5Group[A, B, C, D, E]()(agroup, bgroup, cgroup, dgroup, egroup)
+    new Tuple5Group[A, B, C, D, E](agroup, bgroup, cgroup, dgroup, egroup)
 
   implicit def group6[A, B, C, D, E, F](implicit
       agroup: Group[A],
@@ -5529,7 +5529,7 @@ trait GeneratedGroupImplicits {
       egroup: Group[E],
       fgroup: Group[F]
   ): Group[(A, B, C, D, E, F)] =
-    new Tuple6Group[A, B, C, D, E, F]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup)
+    new Tuple6Group[A, B, C, D, E, F](agroup, bgroup, cgroup, dgroup, egroup, fgroup)
 
   implicit def group7[A, B, C, D, E, F, G](implicit
       agroup: Group[A],
@@ -5540,7 +5540,7 @@ trait GeneratedGroupImplicits {
       fgroup: Group[F],
       ggroup: Group[G]
   ): Group[(A, B, C, D, E, F, G)] =
-    new Tuple7Group[A, B, C, D, E, F, G]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup)
+    new Tuple7Group[A, B, C, D, E, F, G](agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup)
 
   implicit def group8[A, B, C, D, E, F, G, H](implicit
       agroup: Group[A],
@@ -5552,7 +5552,7 @@ trait GeneratedGroupImplicits {
       ggroup: Group[G],
       hgroup: Group[H]
   ): Group[(A, B, C, D, E, F, G, H)] =
-    new Tuple8Group[A, B, C, D, E, F, G, H]()(agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup)
+    new Tuple8Group[A, B, C, D, E, F, G, H](agroup, bgroup, cgroup, dgroup, egroup, fgroup, ggroup, hgroup)
 
   implicit def group9[A, B, C, D, E, F, G, H, I](implicit
       agroup: Group[A],
@@ -5565,7 +5565,7 @@ trait GeneratedGroupImplicits {
       hgroup: Group[H],
       igroup: Group[I]
   ): Group[(A, B, C, D, E, F, G, H, I)] =
-    new Tuple9Group[A, B, C, D, E, F, G, H, I]()(
+    new Tuple9Group[A, B, C, D, E, F, G, H, I](
       agroup,
       bgroup,
       cgroup,
@@ -5589,7 +5589,7 @@ trait GeneratedGroupImplicits {
       igroup: Group[I],
       jgroup: Group[J]
   ): Group[(A, B, C, D, E, F, G, H, I, J)] =
-    new Tuple10Group[A, B, C, D, E, F, G, H, I, J]()(
+    new Tuple10Group[A, B, C, D, E, F, G, H, I, J](
       agroup,
       bgroup,
       cgroup,
@@ -5615,7 +5615,7 @@ trait GeneratedGroupImplicits {
       jgroup: Group[J],
       kgroup: Group[K]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K)] =
-    new Tuple11Group[A, B, C, D, E, F, G, H, I, J, K]()(
+    new Tuple11Group[A, B, C, D, E, F, G, H, I, J, K](
       agroup,
       bgroup,
       cgroup,
@@ -5643,7 +5643,7 @@ trait GeneratedGroupImplicits {
       kgroup: Group[K],
       lgroup: Group[L]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    new Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L]()(
+    new Tuple12Group[A, B, C, D, E, F, G, H, I, J, K, L](
       agroup,
       bgroup,
       cgroup,
@@ -5673,7 +5673,7 @@ trait GeneratedGroupImplicits {
       lgroup: Group[L],
       mgroup: Group[M]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    new Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M]()(
+    new Tuple13Group[A, B, C, D, E, F, G, H, I, J, K, L, M](
       agroup,
       bgroup,
       cgroup,
@@ -5705,7 +5705,7 @@ trait GeneratedGroupImplicits {
       mgroup: Group[M],
       ngroup: Group[N]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    new Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(
+    new Tuple14Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       agroup,
       bgroup,
       cgroup,
@@ -5739,7 +5739,7 @@ trait GeneratedGroupImplicits {
       ngroup: Group[N],
       ogroup: Group[O]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    new Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(
+    new Tuple15Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       agroup,
       bgroup,
       cgroup,
@@ -5775,7 +5775,7 @@ trait GeneratedGroupImplicits {
       ogroup: Group[O],
       pgroup: Group[P]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    new Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(
+    new Tuple16Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       agroup,
       bgroup,
       cgroup,
@@ -5813,7 +5813,7 @@ trait GeneratedGroupImplicits {
       pgroup: Group[P],
       qgroup: Group[Q]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    new Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(
+    new Tuple17Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       agroup,
       bgroup,
       cgroup,
@@ -5853,7 +5853,7 @@ trait GeneratedGroupImplicits {
       qgroup: Group[Q],
       rgroup: Group[R]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    new Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(
+    new Tuple18Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       agroup,
       bgroup,
       cgroup,
@@ -5895,7 +5895,7 @@ trait GeneratedGroupImplicits {
       rgroup: Group[R],
       sgroup: Group[S]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    new Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(
+    new Tuple19Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       agroup,
       bgroup,
       cgroup,
@@ -5939,7 +5939,7 @@ trait GeneratedGroupImplicits {
       sgroup: Group[S],
       tgroup: Group[T]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    new Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(
+    new Tuple20Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       agroup,
       bgroup,
       cgroup,
@@ -5985,7 +5985,7 @@ trait GeneratedGroupImplicits {
       tgroup: Group[T],
       ugroup: Group[U]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    new Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(
+    new Tuple21Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       agroup,
       bgroup,
       cgroup,
@@ -6033,7 +6033,7 @@ trait GeneratedGroupImplicits {
       ugroup: Group[U],
       vgroup: Group[V]
   ): Group[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    new Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(
+    new Tuple22Group[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       agroup,
       bgroup,
       cgroup,
@@ -6062,10 +6062,10 @@ trait GeneratedGroupImplicits {
 
 trait GeneratedRingImplicits {
   implicit def ring2[A, B](implicit aring: Ring[A], bring: Ring[B]): Ring[(A, B)] =
-    new Tuple2Ring[A, B]()(aring, bring)
+    new Tuple2Ring[A, B](aring, bring)
 
   implicit def ring3[A, B, C](implicit aring: Ring[A], bring: Ring[B], cring: Ring[C]): Ring[(A, B, C)] =
-    new Tuple3Ring[A, B, C]()(aring, bring, cring)
+    new Tuple3Ring[A, B, C](aring, bring, cring)
 
   implicit def ring4[A, B, C, D](implicit
       aring: Ring[A],
@@ -6073,7 +6073,7 @@ trait GeneratedRingImplicits {
       cring: Ring[C],
       dring: Ring[D]
   ): Ring[(A, B, C, D)] =
-    new Tuple4Ring[A, B, C, D]()(aring, bring, cring, dring)
+    new Tuple4Ring[A, B, C, D](aring, bring, cring, dring)
 
   implicit def ring5[A, B, C, D, E](implicit
       aring: Ring[A],
@@ -6082,7 +6082,7 @@ trait GeneratedRingImplicits {
       dring: Ring[D],
       ering: Ring[E]
   ): Ring[(A, B, C, D, E)] =
-    new Tuple5Ring[A, B, C, D, E]()(aring, bring, cring, dring, ering)
+    new Tuple5Ring[A, B, C, D, E](aring, bring, cring, dring, ering)
 
   implicit def ring6[A, B, C, D, E, F](implicit
       aring: Ring[A],
@@ -6092,7 +6092,7 @@ trait GeneratedRingImplicits {
       ering: Ring[E],
       fring: Ring[F]
   ): Ring[(A, B, C, D, E, F)] =
-    new Tuple6Ring[A, B, C, D, E, F]()(aring, bring, cring, dring, ering, fring)
+    new Tuple6Ring[A, B, C, D, E, F](aring, bring, cring, dring, ering, fring)
 
   implicit def ring7[A, B, C, D, E, F, G](implicit
       aring: Ring[A],
@@ -6103,7 +6103,7 @@ trait GeneratedRingImplicits {
       fring: Ring[F],
       gring: Ring[G]
   ): Ring[(A, B, C, D, E, F, G)] =
-    new Tuple7Ring[A, B, C, D, E, F, G]()(aring, bring, cring, dring, ering, fring, gring)
+    new Tuple7Ring[A, B, C, D, E, F, G](aring, bring, cring, dring, ering, fring, gring)
 
   implicit def ring8[A, B, C, D, E, F, G, H](implicit
       aring: Ring[A],
@@ -6115,7 +6115,7 @@ trait GeneratedRingImplicits {
       gring: Ring[G],
       hring: Ring[H]
   ): Ring[(A, B, C, D, E, F, G, H)] =
-    new Tuple8Ring[A, B, C, D, E, F, G, H]()(aring, bring, cring, dring, ering, fring, gring, hring)
+    new Tuple8Ring[A, B, C, D, E, F, G, H](aring, bring, cring, dring, ering, fring, gring, hring)
 
   implicit def ring9[A, B, C, D, E, F, G, H, I](implicit
       aring: Ring[A],
@@ -6128,7 +6128,7 @@ trait GeneratedRingImplicits {
       hring: Ring[H],
       iring: Ring[I]
   ): Ring[(A, B, C, D, E, F, G, H, I)] =
-    new Tuple9Ring[A, B, C, D, E, F, G, H, I]()(aring, bring, cring, dring, ering, fring, gring, hring, iring)
+    new Tuple9Ring[A, B, C, D, E, F, G, H, I](aring, bring, cring, dring, ering, fring, gring, hring, iring)
 
   implicit def ring10[A, B, C, D, E, F, G, H, I, J](implicit
       aring: Ring[A],
@@ -6142,7 +6142,7 @@ trait GeneratedRingImplicits {
       iring: Ring[I],
       jring: Ring[J]
   ): Ring[(A, B, C, D, E, F, G, H, I, J)] =
-    new Tuple10Ring[A, B, C, D, E, F, G, H, I, J]()(
+    new Tuple10Ring[A, B, C, D, E, F, G, H, I, J](
       aring,
       bring,
       cring,
@@ -6168,7 +6168,7 @@ trait GeneratedRingImplicits {
       jring: Ring[J],
       kring: Ring[K]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K)] =
-    new Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K]()(
+    new Tuple11Ring[A, B, C, D, E, F, G, H, I, J, K](
       aring,
       bring,
       cring,
@@ -6196,7 +6196,7 @@ trait GeneratedRingImplicits {
       kring: Ring[K],
       lring: Ring[L]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    new Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L]()(
+    new Tuple12Ring[A, B, C, D, E, F, G, H, I, J, K, L](
       aring,
       bring,
       cring,
@@ -6226,7 +6226,7 @@ trait GeneratedRingImplicits {
       lring: Ring[L],
       mring: Ring[M]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    new Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M]()(
+    new Tuple13Ring[A, B, C, D, E, F, G, H, I, J, K, L, M](
       aring,
       bring,
       cring,
@@ -6258,7 +6258,7 @@ trait GeneratedRingImplicits {
       mring: Ring[M],
       nring: Ring[N]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    new Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N]()(
+    new Tuple14Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       aring,
       bring,
       cring,
@@ -6292,7 +6292,7 @@ trait GeneratedRingImplicits {
       nring: Ring[N],
       oring: Ring[O]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    new Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]()(
+    new Tuple15Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       aring,
       bring,
       cring,
@@ -6328,7 +6328,7 @@ trait GeneratedRingImplicits {
       oring: Ring[O],
       pring: Ring[P]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    new Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]()(
+    new Tuple16Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       aring,
       bring,
       cring,
@@ -6366,7 +6366,7 @@ trait GeneratedRingImplicits {
       pring: Ring[P],
       qring: Ring[Q]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    new Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]()(
+    new Tuple17Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       aring,
       bring,
       cring,
@@ -6406,7 +6406,7 @@ trait GeneratedRingImplicits {
       qring: Ring[Q],
       rring: Ring[R]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    new Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]()(
+    new Tuple18Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       aring,
       bring,
       cring,
@@ -6448,7 +6448,7 @@ trait GeneratedRingImplicits {
       rring: Ring[R],
       sring: Ring[S]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    new Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]()(
+    new Tuple19Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       aring,
       bring,
       cring,
@@ -6492,7 +6492,7 @@ trait GeneratedRingImplicits {
       sring: Ring[S],
       tring: Ring[T]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    new Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]()(
+    new Tuple20Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       aring,
       bring,
       cring,
@@ -6538,7 +6538,7 @@ trait GeneratedRingImplicits {
       tring: Ring[T],
       uring: Ring[U]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    new Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]()(
+    new Tuple21Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       aring,
       bring,
       cring,
@@ -6586,7 +6586,7 @@ trait GeneratedRingImplicits {
       uring: Ring[U],
       vring: Ring[V]
   ): Ring[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    new Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]()(
+    new Tuple22Ring[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       aring,
       bring,
       cring,

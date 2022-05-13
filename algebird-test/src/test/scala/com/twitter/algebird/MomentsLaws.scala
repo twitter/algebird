@@ -48,7 +48,7 @@ class MomentsLaws extends CheckProperties {
 
   property("scaling by 0 and 1 works as you'd expect") {
     forAll(opGen) { (mom: Moments) =>
-      (mom.scale(0.0) == Monoid.zero[Moments]) &&
+      mom.scale(0.0) == Monoid.zero[Moments] &&
       mom.scale(1.0) == mom
     }
   }
@@ -110,7 +110,7 @@ class MomentsLaws extends CheckProperties {
     forAll(opGen, Gen.choose(0, Int.MaxValue)) { (mom, a0) =>
       val a = a0 & Int.MaxValue
       val scaled = mom.scale(a.toDouble)
-      (a == 0) || {
+      a == 0 || {
         approxEq(EPS)(scaled.totalWeight, mom.totalWeight * a) &&
         approxEq(EPS)(scaled.mean, mom.mean) &&
         approxEq(EPS)(scaled.variance, mom.variance) &&

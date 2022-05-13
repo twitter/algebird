@@ -157,10 +157,10 @@ object BaseProperties extends MetricProperties {
   def approxEq(eps: Double)(f1: Double, f2: Double): Boolean =
     if (f2 == 0)
       scala.math.abs(f1) < eps
-    else (scala.math.abs(f1 - f2) / scala.math.abs(f2)) < eps
+    else scala.math.abs(f1 - f2) / scala.math.abs(f2) < eps
 
   def approxEqOrBothNaN(eps: Double)(f1: Double, f2: Double): Boolean =
-    (f1.isNaN && f2.isNaN) || f1 == f2 || approxEq(eps)(f1, f2)
+    f1.isNaN && f2.isNaN || f1 == f2 || approxEq(eps)(f1, f2)
 
   trait HigherEq[M[_]] {
     def apply[T](m: M[T], n: M[T]): Boolean
@@ -215,7 +215,7 @@ object BaseProperties extends MetricProperties {
     "isNonZeroWorksRing" |: forAll { (a: T, b: T) =>
       implicit val monT: Monoid[T] = implicitly[Ring[T]]
       val prodZero = !monT.isNonZero(Ring.times(a, b))
-      (Monoid.isNonZero(a) && Monoid.isNonZero(b)) || prodZero
+      Monoid.isNonZero(a) && Monoid.isNonZero(b) || prodZero
     }
 
   def weakZeroDifferentTypes[T: Monoid: Equiv, U <: T: Arbitrary]: Prop =
@@ -248,9 +248,9 @@ object BaseProperties extends MetricProperties {
   def hasAdditiveInversesDifferentTypes[T: Group, U <: T: Arbitrary]: Prop =
     forAll { (a: U) =>
       val grp = implicitly[Group[T]]
-      (!grp.isNonZero(grp.plus(grp.negate(a), a))) &&
-      (!grp.isNonZero(grp.minus(a, a))) &&
-      (!grp.isNonZero(grp.plus(a, grp.negate(a))))
+      !grp.isNonZero(grp.plus(grp.negate(a), a)) &&
+      !grp.isNonZero(grp.minus(a, a)) &&
+      !grp.isNonZero(grp.plus(a, grp.negate(a)))
     }
 
   def hasAdditiveInverses[T: Group: Arbitrary]: Prop =
@@ -270,8 +270,8 @@ object BaseProperties extends MetricProperties {
   def zeroAnnihilates[T: Ring: Arbitrary]: Prop =
     "zeroAnnihilates" |: forAll { (a: T) =>
       val ring = implicitly[Ring[T]]
-      (!ring.isNonZero(ring.times(a, ring.zero))) &&
-      (!ring.isNonZero(ring.times(ring.zero, a)))
+      !ring.isNonZero(ring.times(a, ring.zero)) &&
+      !ring.isNonZero(ring.times(ring.zero, a))
     }
 
   def isDistributiveDifferentTypes[T: Ring: Equiv, U <: T: Arbitrary]: Prop =

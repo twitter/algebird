@@ -10,7 +10,7 @@ class GaussianDistributionMonoidTests extends CheckProperties {
     for {
       mean <- Gen.choose(0, 10000)
       sigma <- Gen.choose(0, 10000)
-    } yield (GaussianDistribution(mean, sigma))
+    } yield GaussianDistribution(mean, sigma)
   }
 
   property("GaussianDistributionMonoid is a Monoid") {

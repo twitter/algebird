@@ -59,11 +59,11 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
   protected def timeoutIncr: Incrementor
 
   protected def timedOut =
-    (System.currentTimeMillis - lastDump) >= flushFrequency.v.inMilliseconds
+    System.currentTimeMillis - lastDump >= flushFrequency.v.inMilliseconds
   protected lazy val runtime = Runtime.getRuntime
 
   protected def memoryWaterMark = {
-    val used = ((runtime.totalMemory - runtime.freeMemory).toDouble * 100) / runtime.maxMemory
+    val used = (runtime.totalMemory - runtime.freeMemory).toDouble * 100 / runtime.maxMemory
     used > softMemoryFlush.v
   }
 

@@ -227,7 +227,7 @@ case class InclusiveLower[T](lower: T) extends Interval[T] with Lower[T] {
       if (ordering.gt(lower, thatlb)) this else that
     case ExclusiveLower(thatlb) =>
       if (ordering.gt(lower, thatlb)) this else that
-    case Intersection(thatL, thatU) => (this && thatL) && thatU
+    case Intersection(thatL, thatU) => this && thatL && thatU
   }
   override def intersects(u: Upper[T])(implicit ordering: Ordering[T]): Boolean =
     u match {
@@ -252,7 +252,7 @@ case class ExclusiveLower[T](lower: T) extends Interval[T] with Lower[T] {
       if (ordering.gteq(lower, thatlb)) this else that
     case ExclusiveLower(thatlb) =>
       if (ordering.gteq(lower, thatlb)) this else that
-    case Intersection(thatL, thatU) => (this && thatL) && thatU
+    case Intersection(thatL, thatU) => this && thatL && thatU
   }
   override def intersects(u: Upper[T])(implicit ordering: Ordering[T]): Boolean =
     u match {
@@ -313,11 +313,11 @@ case class Intersection[L[t] <: Lower[t], U[t] <: Upper[t], T](lower: L[T], uppe
   override def intersect(that: Interval[T])(implicit ordering: Ordering[T]): Interval[T] = that match {
     case Universe()                 => this
     case Empty()                    => that
-    case lb @ InclusiveLower(_)     => (lb && lower) && upper
-    case lb @ ExclusiveLower(_)     => (lb && lower) && upper
+    case lb @ InclusiveLower(_)     => lb && lower && upper
+    case lb @ ExclusiveLower(_)     => lb && lower && upper
     case ub @ InclusiveUpper(_)     => lower && (ub && upper)
     case ub @ ExclusiveUpper(_)     => lower && (ub && upper)
-    case Intersection(thatL, thatU) => (lower && thatL) && (upper && thatU)
+    case Intersection(thatL, thatU) => lower && thatL && (upper && thatU)
   }
   override def mapNonDecreasing[T1](fn: T => T1): Interval[T1] = {
     val newLower = lower match {

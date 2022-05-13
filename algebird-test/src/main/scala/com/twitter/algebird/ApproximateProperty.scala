@@ -72,7 +72,7 @@ object ApproximateProperty {
       val diff = scala.math.sqrt(-n * scala.math.log(falsePositiveRate) / 2.0)
 
       val success =
-        if (successes >= (sumOfProbabilities - diff)) Prop.Proof else Prop.False
+        if (successes >= sumOfProbabilities - diff) Prop.Proof else Prop.False
 
       // Args that get printed when Scalacheck runs the test
       val argsList: List[(String, String)] = {
@@ -128,7 +128,7 @@ object ApproximateProperty {
     val (successes, sumOfProbabilities, _) = monoid.sum(list)
     val n = list.length
 
-    (sumOfProbabilities - successes) > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
+    sumOfProbabilities - successes > scala.math.sqrt(n * scala.math.log(falsePositiveRate) / -2)
   }
 }
 
