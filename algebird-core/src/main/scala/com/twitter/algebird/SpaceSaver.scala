@@ -278,7 +278,7 @@ case class SSMany[T] private (
         .map { key =>
           val (count1, err1) = counters.getOrElse(key, (min, min))
           val (count2, err2) = x.counters.getOrElse(key, (x.min, x.min))
-          (key -> ((count1 + count2, err1 + err2)))
+          key -> ((count1 + count2, err1 + err2))
         }
         .sorted(SpaceSaver.ordering)
         .take(capacity)

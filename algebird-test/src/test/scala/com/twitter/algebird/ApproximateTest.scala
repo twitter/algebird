@@ -18,7 +18,7 @@ class ApproximateLaws extends CheckProperties {
       for {
         v0 <- choose(0L, (1L << 15) - 2)
         v1 <- choose(v0, (1L << 15) - 1)
-        v2 <- choose(v1, (1L << 15))
+        v2 <- choose(v1, 1L << 15)
       } yield Approximate(v0, v1, v2, 0.9)
     }
 
@@ -88,7 +88,7 @@ class ApproximateLaws extends CheckProperties {
       (a || b).withProb >= (a.withProb * b.withProb) &&
       (a && b).isTrue == (a.isTrue && b.isTrue) &&
       (a && b).withProb >= (a.withProb * b.withProb) &&
-      (a.not).isTrue == (!(a.isTrue)) &&
+      a.not.isTrue == (!a.isTrue) &&
       (a.not.withProb) == a.withProb
     }
   }

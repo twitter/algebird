@@ -297,7 +297,7 @@ object Moments {
         case newCount =>
           val scaling = weightK / newCount
           // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-          if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
+          if (scaling < STABILITY_CONSTANT) an + (ak - an) * scaling
           else (weightN * an + weightK * ak) / newCount
       }
 
@@ -330,7 +330,7 @@ class MomentsMonoid extends Monoid[Moments] with CommutativeMonoid[Moments] {
         case newCount =>
           val scaling = k.toDouble / newCount
           // a_n + (a_k - a_n)*(k/(n+k)) is only stable if n is not approximately k
-          if (scaling < STABILITY_CONSTANT) (an + (ak - an) * scaling)
+          if (scaling < STABILITY_CONSTANT) an + (ak - an) * scaling
           else (n * an + k * ak) / newCount
       }
 

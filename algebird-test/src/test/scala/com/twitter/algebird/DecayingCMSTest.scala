@@ -329,7 +329,7 @@ class DecayingCMSProperties extends CheckProperties {
       val g = genCms(module, stdKey, genTimestamp(module), stdVal)
       forAll(g, g) { (x, y) =>
         // abs(x + y) <= abs(x) + abs(y)
-        val lhs = ((x + y).l2Norm).timeToUnit
+        val lhs = (x + y).l2Norm.timeToUnit
         val rhs = (x.l2Norm + y.l2Norm).timeToUnit
         Prop(lhs <= rhs || close(lhs, rhs))
       }
@@ -391,9 +391,9 @@ class DecayingCMSProperties extends CheckProperties {
 
         val dvm = new DecayedValueMonoid(0.0)
         val dv = dvm.sum(inputs.map { case (t, n) =>
-          DecayedValue.build(n, (t.toDouble / 1000.0), halfLifeSecs)
+          DecayedValue.build(n, t.toDouble / 1000.0, halfLifeSecs)
         })
-        val expected = dvm.valueAsOf(dv, halfLifeSecs, (tlast.toDouble / 1000.0))
+        val expected = dvm.valueAsOf(dv, halfLifeSecs, tlast.toDouble / 1000.0)
 
         val cms0 = module.monoid.zero
         val cmss = inputs.map { case (t, n) => cms0.add(t, key, n) }

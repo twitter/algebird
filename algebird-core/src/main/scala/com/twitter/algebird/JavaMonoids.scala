@@ -107,7 +107,7 @@ class JMapMonoid[K, V: Semigroup] extends Monoid[JMap[K, V]] {
 
   val nonZero: (V => Boolean) = implicitly[Semigroup[V]] match {
     case mon: Monoid[_] => mon.isNonZero(_)
-    case _              => (_ => true)
+    case _              => _ => true
   }
 
   override def isNonZero(x: JMap[K, V]): Boolean =
