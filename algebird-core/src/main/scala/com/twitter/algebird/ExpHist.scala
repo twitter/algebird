@@ -136,7 +136,7 @@ case class ExpHist(
    */
   def guess: Double =
     if (total == 0) 0.0
-    else (total - (oldestBucketSize - 1) / 2.0)
+    else total - (oldestBucketSize - 1) / 2.0
 
   /**
    * Returns an Approximate instance encoding the bounds and the closest long to the estimated sum tracked by

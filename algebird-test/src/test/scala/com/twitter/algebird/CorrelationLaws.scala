@@ -95,8 +95,8 @@ class CorrelationLaws extends CheckProperties {
     forAll { (corr: Correlation, a0: Int, b0: Int) =>
       val a = a0 & Int.MaxValue
       val b = b0 & Int.MaxValue
-      (corrApproxEq(corr.scale(a).scale(b), corr.scale(a.toDouble * b)) &&
-      corrApproxEq(corr.scale(a.toDouble + b), CorrelationMonoid.plus(corr.scale(a), corr.scale(b))))
+      corrApproxEq(corr.scale(a).scale(b), corr.scale(a.toDouble * b)) &&
+      corrApproxEq(corr.scale(a.toDouble + b), CorrelationMonoid.plus(corr.scale(a), corr.scale(b)))
     }
   }
 

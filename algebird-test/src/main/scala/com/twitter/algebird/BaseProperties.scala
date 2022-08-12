@@ -35,7 +35,7 @@ object BaseProperties extends MetricProperties {
     scale <- Gen.choose(-7, +7)
     base <- implicitly[Arbitrary[Int]].arbitrary
   } yield {
-    (BigDecimal(base) * BigDecimal(10).pow(scale))
+    BigDecimal(base) * BigDecimal(10).pow(scale)
   })
 
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.

@@ -28,7 +28,7 @@ import org.scalacheck.Prop
 object MonadLaws {
   // $COVERAGE-OFF$Turn off coverage for deprecated laws.
   @deprecated("No longer used. Use Equiv[T] instance", since = "0.13.0")
-  def defaultEq[T]: (T, T) => Boolean = { (t0: T, t1: T) => (t0 == t1) }
+  def defaultEq[T]: (T, T) => Boolean = { (t0: T, t1: T) => t0 == t1 }
 
   @deprecated("use leftIdentity[T]", since = "0.13.0")
   def leftIdentityEquiv[M[_], T, U](implicit
@@ -62,7 +62,7 @@ object MonadLaws {
       for {
         m <- implicitly[Arbitrary[Map[T, M[U]]]].arbitrary
         defu <- implicitly[Arbitrary[M[U]]].arbitrary
-      } yield ({ (t: T) => m.getOrElse(t, defu) })
+      } yield { (t: T) => m.getOrElse(t, defu) }
     }
 
   @deprecated("use monadLaws[T]", since = "0.13.0")
