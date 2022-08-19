@@ -40,7 +40,7 @@ jobs:
       - name: java ${{matrix.java}} setup
         uses: olafurpg/setup-scala@v13
       - run: |
-          sbt ++2.12.15 coverage test coverageReport
+          sbt ++2.12.16 coverage test coverageReport
           bash <(curl -s https://codecov.io/bash)
   mimaReport:
     runs-on: ubuntu-latest
