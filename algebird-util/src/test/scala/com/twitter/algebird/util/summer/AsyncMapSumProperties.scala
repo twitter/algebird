@@ -47,7 +47,7 @@ class AsyncMapSumProperties extends CheckProperties {
           sizeCounter,
           workPool
         )
-        (summingWithAndWithoutSummerShouldMatch(summer, inputs))
+        summingWithAndWithoutSummerShouldMatch(summer, inputs)
     }
   }
 

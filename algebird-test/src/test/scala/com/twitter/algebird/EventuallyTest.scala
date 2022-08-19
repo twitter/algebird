@@ -28,8 +28,8 @@ class EventuallyRingLaws extends CheckProperties {
       Equiv.fromFunction[Either[Long, Int]] {
         case (Right(a), Right(b)) => a == b
         case (Left(a), Left(b))   => a == b
-        case (Right(a), Left(b))  => (a.toLong == b)
-        case (Left(a), Right(b))  => (a == (b.toLong))
+        case (Right(a), Left(b))  => a.toLong == b
+        case (Left(a), Right(b))  => a == (b.toLong)
       }
     Prop.forAll { (pred: Int => Boolean) =>
       implicit val evRing = new EventuallyRing[Long, Int](_.toLong)(pred)

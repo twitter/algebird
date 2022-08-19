@@ -309,7 +309,7 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
       val larger = bigMon.create(1) // uses implicit long2Bytes to make 8 byte array
       val smaller = smallMon.create(1) // uses implicit int2Bytes to make 4 byte array
       intercept[AssertionError] {
-        (larger + smaller)
+        larger + smaller
       }
     }
     "Correctly serialize" in {

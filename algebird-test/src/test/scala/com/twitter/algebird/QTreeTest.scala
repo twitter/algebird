@@ -26,7 +26,7 @@ class QTreeLaws extends CheckProperties {
 
   implicit val qtSemigroup: QTreeSemigroup[Long] = new QTreeSemigroup[Long](4)
   implicit val qtGen: Arbitrary[QTree[Long]] = Arbitrary {
-    for (v <- choose(0L, 10000L)) yield (QTree(v))
+    for (v <- choose(0L, 10000L)) yield QTree(v)
   }
 
   property("QTree is associative") {
@@ -67,7 +67,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
     }
   }
 
-  for (k <- (1 to 6))
+  for (k <- 1 to 6)
     ("QTree with sizeHint 2^" + k) should {
       "always contain the true quantile within its bounds" in {
         val list = randomList(10000)

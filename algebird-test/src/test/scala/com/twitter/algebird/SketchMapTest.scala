@@ -20,7 +20,7 @@ class SketchMapLaws extends CheckProperties {
   val params: SketchMapParams[Int] = SketchMapParams[Int](SEED, EPS, 1e-3, HEAVY_HITTERS_COUNT)
   implicit val smMonoid: SketchMapMonoid[Int, Long] = SketchMap.monoid[Int, Long](params)
   implicit val smGen: Arbitrary[SketchMap[Int, Long]] = Arbitrary {
-    for (key: Int <- Gen.choose(0, 10000)) yield (smMonoid.create((key, 1L)))
+    for (key: Int <- Gen.choose(0, 10000)) yield smMonoid.create((key, 1L))
   }
 
   // TODO: SketchMap's heavy hitters are not strictly associative

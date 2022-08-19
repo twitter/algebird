@@ -64,7 +64,7 @@ class HeavyHittersCachingSummerProperties extends CheckProperties {
             sizeCounter,
             summer
           )
-        (summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs))
+        summingWithAndWithoutSummerShouldMatch(heavyHittersCachingSummer, inputs)
     }
   }
 

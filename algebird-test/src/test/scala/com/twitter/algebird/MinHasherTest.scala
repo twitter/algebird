@@ -11,7 +11,7 @@ import java.{util => ju}
 class MinHasherTest extends CheckProperties {
   implicit val mhMonoid: MinHasher32 = new MinHasher32(0.5, 512)
   implicit val mhGen: Arbitrary[MinHashSignature] = Arbitrary {
-    for (v <- Gen.choose(0, 10000)) yield (mhMonoid.init(v))
+    for (v <- Gen.choose(0, 10000)) yield mhMonoid.init(v)
   }
 
   property("MinHasher is a commutative monoid") {

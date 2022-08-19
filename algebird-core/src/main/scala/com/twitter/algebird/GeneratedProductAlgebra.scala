@@ -5041,7 +5041,10 @@ trait ProductSemigroups {
       msemigroup: Semigroup[M],
       nsemigroup: Semigroup[N]
   ): Semigroup[X] =
-    new Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](applyX, unapplyX)(
+    new Product14Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5078,7 +5081,10 @@ trait ProductSemigroups {
       nsemigroup: Semigroup[N],
       osemigroup: Semigroup[O]
   ): Semigroup[X] =
-    new Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](applyX, unapplyX)(
+    new Product15Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5117,7 +5123,10 @@ trait ProductSemigroups {
       osemigroup: Semigroup[O],
       psemigroup: Semigroup[P]
   ): Semigroup[X] =
-    new Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](applyX, unapplyX)(
+    new Product16Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5158,7 +5167,10 @@ trait ProductSemigroups {
       psemigroup: Semigroup[P],
       qsemigroup: Semigroup[Q]
   ): Semigroup[X] =
-    new Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](applyX, unapplyX)(
+    new Product17Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5201,7 +5213,10 @@ trait ProductSemigroups {
       qsemigroup: Semigroup[Q],
       rsemigroup: Semigroup[R]
   ): Semigroup[X] =
-    new Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](applyX, unapplyX)(
+    new Product18Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5246,7 +5261,10 @@ trait ProductSemigroups {
       rsemigroup: Semigroup[R],
       ssemigroup: Semigroup[S]
   ): Semigroup[X] =
-    new Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](applyX, unapplyX)(
+    new Product19Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5293,7 +5311,10 @@ trait ProductSemigroups {
       ssemigroup: Semigroup[S],
       tsemigroup: Semigroup[T]
   ): Semigroup[X] =
-    new Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](applyX, unapplyX)(
+    new Product20Semigroup[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
+      applyX,
+      unapplyX
+    )(
       asemigroup,
       bsemigroup,
       csemigroup,
@@ -5892,7 +5913,10 @@ trait ProductMonoids {
       rmonoid: Monoid[R],
       smonoid: Monoid[S]
   ): Monoid[X] =
-    new Product19Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](applyX, unapplyX)(
+    new Product19Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
+      applyX,
+      unapplyX
+    )(
       amonoid,
       bmonoid,
       cmonoid,
@@ -5939,7 +5963,10 @@ trait ProductMonoids {
       smonoid: Monoid[S],
       tmonoid: Monoid[T]
   ): Monoid[X] =
-    new Product20Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](applyX, unapplyX)(
+    new Product20Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
+      applyX,
+      unapplyX
+    )(
       amonoid,
       bmonoid,
       cmonoid,
@@ -5988,7 +6015,10 @@ trait ProductMonoids {
       tmonoid: Monoid[T],
       umonoid: Monoid[U]
   ): Monoid[X] =
-    new Product21Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](applyX, unapplyX)(
+    new Product21Monoid[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
+      applyX,
+      unapplyX
+    )(
       amonoid,
       bmonoid,
       cmonoid,
@@ -6675,7 +6705,10 @@ trait ProductGroups {
       ugroup: Group[U],
       vgroup: Group[V]
   ): Group[X] =
-    new Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](applyX, unapplyX)(
+    new Product22Group[X, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
+      applyX,
+      unapplyX
+    )(
       agroup,
       bgroup,
       cgroup,

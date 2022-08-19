@@ -33,7 +33,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
 
   val nonZero: (V => Boolean) = semigroup match {
     case mon: Monoid[_] => mon.isNonZero(_)
-    case _              => (_ => true)
+    case _              => _ => true
   }
 
   override def isNonZero(x: M): Boolean =
@@ -73,7 +73,7 @@ abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: 
         }
         .getOrElse(kv._2)
       if (nonZero(newV))
-        add(oldMap, (kv._1 -> newV))
+        add(oldMap, kv._1 -> newV)
       else
         remove(oldMap, kv._1)
     }
@@ -151,7 +151,7 @@ trait GenericMapRing[K, V, M <: ScMap[K, V]] extends Rng[M] with MapOperations[K
       val newV =
         if (bigOnLeft) ring.times(bigV, kv._2) else ring.times(kv._2, bigV)
       if (ring.isNonZero(newV)) {
-        add(oldMap, (kv._1 -> newV))
+        add(oldMap, kv._1 -> newV)
       } else {
         remove(oldMap, kv._1)
       }

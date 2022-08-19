@@ -120,7 +120,7 @@ object AdaptiveVector {
 
     def isZero(v: AdaptiveVector[V]): Boolean = (v.size == 0) || {
       val sparseAreZero =
-        if (Monoid.isNonZero(v.sparseValue)) (v.denseCount == v.size) else true
+        if (Monoid.isNonZero(v.sparseValue)) v.denseCount == v.size else true
       sparseAreZero &&
       v.denseIterator.forall(idxv => !Monoid.isNonZero(idxv._2))
     }
