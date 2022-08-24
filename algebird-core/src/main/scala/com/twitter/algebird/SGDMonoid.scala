@@ -37,7 +37,7 @@ object SGD {
   def constantStep(s: Double): (Long, IndexedSeq[Double]) => Double = { (_, _) => s }
   // A standard: a/(steps + b)^c
   def countAdaptiveStep(a: Double, b: Double, c: Double = 1.0): (Long, IndexedSeq[Double]) => Double = {
-    (cnt, _) => a / scala.math.pow((cnt + b), c)
+    (cnt, _) => a / scala.math.pow(cnt + b, c)
   }
 
   def weightsOf[T](s: SGD[T]): Option[IndexedSeq[Double]] =

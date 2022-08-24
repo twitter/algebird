@@ -60,8 +60,8 @@ class MomentsLaws extends CheckProperties {
     forAll(opGen, Gen.choose(0, Int.MaxValue), Gen.choose(0, Int.MaxValue)) { (mom, a0, b0) =>
       val a = a0 & Int.MaxValue
       val b = b0 & Int.MaxValue
-      (equiv.equiv(mom.scale(a).scale(b), mom.scale(a.toDouble * b)) &&
-      equiv.equiv(mom.scale(a.toDouble + b), Monoid.plus(mom.scale(a), mom.scale(b))))
+      equiv.equiv(mom.scale(a).scale(b), mom.scale(a.toDouble * b)) &&
+      equiv.equiv(mom.scale(a.toDouble + b), Monoid.plus(mom.scale(a), mom.scale(b)))
     }
   }
 

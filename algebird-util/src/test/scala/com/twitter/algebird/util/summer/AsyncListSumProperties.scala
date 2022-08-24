@@ -53,7 +53,7 @@ class AsyncListSumProperties extends CheckProperties {
           Compact(false),
           CompactionSize(0)
         )
-        (summingWithAndWithoutSummerShouldMatch(summer, inputs))
+        summingWithAndWithoutSummerShouldMatch(summer, inputs)
     }
   }
 

@@ -204,7 +204,7 @@ object HyperLogLog {
     assert(bb.remaining % (jLen + 1) == 0, "Invalid byte array")
     val maxRhow = (1 to bb.remaining / (jLen + 1)).map { _ =>
       val j = jLen match {
-        case 1 => (bb.get.toInt & 0xff)
+        case 1 => bb.get.toInt & 0xff
         case 2 => (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8)
         case 3 =>
           (bb.get.toInt & 0xff) + ((bb.get.toInt & 0xff) << 8) + ((bb.get.toInt & 0xff) << 16)
@@ -494,7 +494,7 @@ case class DenseHLL(override val bits: Int, v: Bytes) extends HLL {
   override def +(other: HLL): HLL =
     other match {
 
-      case SparseHLL(_, _) => (other + this)
+      case SparseHLL(_, _) => other + this
 
       case DenseHLL(_, ov) =>
         assert(ov.size == v.size, "Incompatible HLL size: " + ov.size + " != " + v.size)
@@ -526,7 +526,7 @@ case class DenseHLL(override val bits: Int, v: Bytes) extends HLL {
 
     while (idx < arrSize) {
       val maxb = arr(idx)
-      buffer.update(idx, (buffer(idx)).max(maxb))
+      buffer.update(idx, buffer(idx).max(maxb))
       idx += 1
     }
   }
