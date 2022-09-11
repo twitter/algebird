@@ -8,7 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: olafurpg/setup-scala@v13
+      - uses: actions/setup-java@v3
+        with:
+          cache: "sbt"
+          distribution: "temurin"
+          java-version: 8
       - name: Publish ${{ github.ref }}
         run: sbt ci-release
         env:
