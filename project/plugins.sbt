@@ -13,6 +13,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.5")
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.3")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.10.4")
-addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.10")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.11")
 
 dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
