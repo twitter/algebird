@@ -8,7 +8,7 @@ val javaEwahVersion = "1.1.13"
 val kindProjectorVersion = "0.13.2"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
-val scalaTestVersion = "3.2.13"
+val scalaTestVersion = "3.2.14"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.15.2"
 val scalaCollectionCompat = "2.8.1"
@@ -296,7 +296,7 @@ lazy val algebirdGeneric = module("generic")
   .settings(
     crossScalaVersions += "2.13.8",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "2.3.9",
+      "com.chuusai" %% "shapeless" % "2.3.10",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5"
     ) ++ {
       if (isScala213x(scalaVersion.value)) {
