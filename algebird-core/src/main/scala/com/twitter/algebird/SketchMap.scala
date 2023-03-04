@@ -145,7 +145,7 @@ case class SketchMapParams[K](seed: Int, width: Int, depth: Int, heavyHittersCou
     val numCounters = width
     (0 to (numHashes - 1)).map { _ =>
       val smhash: SketchMapHash[K] =
-        SketchMapHash(CMSHash[Long](r.nextInt, 0, numCounters), seed)(serialization)
+        SketchMapHash(CMSHash[Long](r.nextInt(), 0, numCounters), seed)(serialization)
       (k: K) => smhash(k)
     }
   }

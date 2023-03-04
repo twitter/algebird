@@ -126,7 +126,7 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
       val it = ws.toIterator
       var queue = Queue.empty[T]
       while (it.hasNext) {
-        queue = (queue ++ it.next.items).takeRight(windowSize)
+        queue = (queue ++ it.next().items).takeRight(windowSize)
       }
       Some(Window(monoid.sum(queue), queue))
     }
@@ -140,7 +140,7 @@ abstract class WindowMonoid[T](windowSize: Int) extends Monoid[Window[T]] {
       while (it.hasNext) {
         // avoid materializing the whole list in memory
         // at one time
-        queue = queue :+ it.next
+        queue = queue :+ it.next()
         size = size + 1
         if (size > windowSize) {
           queue = queue.tail

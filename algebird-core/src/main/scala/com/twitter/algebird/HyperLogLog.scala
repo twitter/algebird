@@ -419,7 +419,7 @@ case class SparseHLL(override val bits: Int, maxRhow: Map[Int, Max[Byte]]) exten
         val iter: Iterator[(Int, Max[Byte])] = maxRhow.iterator
 
         while (iter.hasNext) {
-          val (idx, _) = iter.next
+          val (idx, _) = iter.next()
           val existing: Byte = newContents(idx)
           val other: Byte = maxRhow(idx).get
 
@@ -575,7 +575,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
       None
     } else {
       val iter = items.iterator.buffered
-      var curValue = iter.next
+      var curValue = iter.next()
       while (iter.hasNext) {
         curValue = (curValue, iter.head) match {
           case (DenseHLL(_, _), _) => denseUpdate(curValue, iter)

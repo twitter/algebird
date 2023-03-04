@@ -95,7 +95,7 @@ object AdaptiveMatrix {
         var row = 0
         val iter = storage.iterator
         while (iter.hasNext) {
-          val curRow = iter.next
+          val curRow = iter.next()
           curRow.foreach { case (col, value) =>
             buffer(row * cols + col) = value
           }
@@ -114,7 +114,7 @@ object AdaptiveMatrix {
           val sparseStorage = (0 until rows).map(_ => MMap[Int, V]()).toIndexedSeq
 
           while (iter.hasNext) {
-            val current = iter.next
+            val current = iter.next()
             current match {
               case d @ DenseMatrix(_, _, _) => return denseUpdate(d, iter)
               case s @ SparseColumnMatrix(_) =>

@@ -187,10 +187,10 @@ trait FlatMapPreparer[A, T] extends Preparer[A, T] {
   def prepareFn: A => TraversableOnce[T]
 
   def map[U](fn: T => U): FlatMapPreparer[A, U] =
-    FlatMapPreparer { a: A => prepareFn(a).map(fn) }
+    FlatMapPreparer { (a: A) => prepareFn(a).map(fn) }
 
   override def flatMap[U](fn: T => TraversableOnce[U]): FlatMapPreparer[A, U] =
-    FlatMapPreparer { a: A => prepareFn(a).flatMap(fn) }
+    FlatMapPreparer { (a: A) => prepareFn(a).flatMap(fn) }
 
   override def monoidAggregate[B, C](aggregator: MonoidAggregator[T, B, C]): MonoidAggregator[A, B, C] =
     aggregator.sumBefore.composePrepare(prepareFn)
@@ -242,10 +242,10 @@ object FlatMapPreparer {
     override val prepareFn: TraversableOnce[A] => TraversableOnce[A] = (a: TraversableOnce[A]) => a
 
     override def map[U](fn: A => U): FlatMapPreparer[TraversableOnce[A], U] =
-      FlatMapPreparer { a: TraversableOnce[A] => a.map(fn) }
+      FlatMapPreparer { (a: TraversableOnce[A]) => a.map(fn) }
 
     override def flatMap[U](fn: A => TraversableOnce[U]): FlatMapPreparer[TraversableOnce[A], U] =
-      FlatMapPreparer { a: TraversableOnce[A] => a.flatMap(fn) }
+      FlatMapPreparer { (a: TraversableOnce[A]) => a.flatMap(fn) }
 
     override def monoidAggregate[B, C](
         aggregator: MonoidAggregator[A, B, C]

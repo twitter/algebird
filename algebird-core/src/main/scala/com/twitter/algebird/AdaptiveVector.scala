@@ -145,7 +145,7 @@ object AdaptiveVector {
       def iteq: Boolean =
         (lit.hasNext, rit.hasNext) match {
           case (true, true) =>
-            val (lnext, rnext) = (lit.next, rit.next)
+            val (lnext, rnext) = (lit.next(), rit.next())
             if (lnext._1 == rnext._1 && Equiv[V].equiv(lnext._2, rnext._2))
               iteq
             else

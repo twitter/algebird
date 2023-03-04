@@ -21,7 +21,7 @@ object SpaceSaver {
     SSMany(capacity, Map(item -> ((count, 0L))))
 
   private[algebird] val ordering =
-    Ordering.by[(_, (Long, Long)), (Long, Long)] { case (_, (count, err)) =>
+    Ordering.by[(?, (Long, Long)), (Long, Long)] { case (_, (count, err)) =>
       (-count, err)
     }
 
@@ -78,7 +78,7 @@ object SpaceSaver {
           buff.putLong(b)
           buffer ++= buff.array()
         }
-        buffer.result.toArray
+        buffer.result().toArray
     }
 
   // Make sure to be reversible so fromBytes(toBytes(x)) == x
@@ -202,8 +202,8 @@ case class SSOne[T] private[algebird] (override val capacity: Int, item: T) exte
   override def counters: Map[T, (Long, Long)] = Map(item -> ((1L, 1L)))
 
   override def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
-    case other: SSOne[_]  => SSMany(this).add(other)
-    case other: SSMany[_] => other.add(this)
+    case other: SSOne[?]  => SSMany(this).add(other)
+    case other: SSMany[?] => other.add(this)
   }
 }
 
@@ -286,8 +286,8 @@ case class SSMany[T] private (
   }
 
   override def ++(other: SpaceSaver[T]): SpaceSaver[T] = other match {
-    case other: SSOne[_]  => add(other)
-    case other: SSMany[_] => merge(other)
+    case other: SSOne[?]  => add(other)
+    case other: SSMany[?] => merge(other)
   }
 }
 

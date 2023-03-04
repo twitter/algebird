@@ -73,7 +73,7 @@ object Metric {
 
   def minkowskiMap[K, V: Monoid: Metric](p: Double): Metric[Map[K, V]] =
     Metric.from { (a: Map[K, V], b: Map[K, V]) =>
-      val outP = (a.keySet ++ b.keySet).map { key: K =>
+      val outP = (a.keySet ++ b.keySet).map { (key: K) =>
         val v1 = a.getOrElse(key, Monoid.zero[V])
         val v2 = b.getOrElse(key, Monoid.zero[V])
         math.pow(implicitly[Metric[V]].apply(v1, v2), p)

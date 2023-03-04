@@ -160,8 +160,8 @@ private[algebird] sealed abstract class LowPriorityMaxInstances {
     while (true) {
       if (xs.hasNext) {
         if (ys.hasNext) {
-          val x = xs.next
-          val y = ys.next
+          val x = xs.next()
+          val y = ys.next()
           val cmp = ord.compare(x, y)
           if (cmp != 0) return cmp
         } else {

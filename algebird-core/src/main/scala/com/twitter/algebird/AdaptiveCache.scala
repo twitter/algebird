@@ -87,9 +87,9 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
       summingCache = new SummingWithHitsCache(currentCapacity)
 
       if (currentCapacity == maxCapacity)
-        sentinelCache.stopGrowing
+        sentinelCache.stopGrowing()
       else
-        sentinelCache.clear
+        sentinelCache.clear()
     }
     ret
   }
@@ -101,7 +101,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
 
   override def flush: Option[Map[K, V]] = {
     val ret = summingCache.flush
-    sentinelCache.clear
+    sentinelCache.clear()
     ret
   }
 

@@ -48,6 +48,7 @@ sonatype.sbt
 BUILD
 target/
 lib_managed/
+project/metals.sbt
 project/boot/
 project/build/target/
 project/plugins/target/

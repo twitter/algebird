@@ -104,7 +104,7 @@ object Batched {
     if (ts.iterator.isEmpty) None
     else {
       val it = ts.iterator
-      val t0 = it.next
+      val t0 = it.next()
       Some(Item(t0).append(it))
     }
 

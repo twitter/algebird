@@ -13,7 +13,7 @@ object Scan {
    */
   type Aux[-I, S, +O] = Scan[I, O] { type State = S }
 
-  implicit def applicative[I]: Applicative[Scan[I, *]] = new ScanApplicative[I]
+  implicit def applicative[I]: Applicative[Scan[I, _]] = new ScanApplicative[I]
 
   def from[I, S, O](initState: S)(presentAndNextStateFn: (I, S) => (O, S)): Aux[I, S, O] =
     new Scan[I, O] {
@@ -169,9 +169,9 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   def scanIterator(iter: Iterator[I]): Iterator[O] = new AbstractIterator[O] {
     override def hasNext: Boolean = iter.hasNext
     var state: State = initialState
-    override def next: O = {
+    override def next(): O = {
       val thisState = state
-      val thisA = iter.next
+      val thisA = iter.next()
       val (thisC, nextState) = presentAndNextState(thisA, thisState)
       state = nextState
       thisC
@@ -321,7 +321,7 @@ sealed abstract class Scan[-I, +O] extends Serializable {
 
 }
 
-class ScanApplicative[I] extends Applicative[Scan[I, *]] {
+class ScanApplicative[I] extends Applicative[Scan[I, _]] {
   override def map[T, U](mt: Scan[I, T])(fn: T => U): Scan[I, U] =
     mt.andThenPresent(fn)
 

@@ -37,7 +37,7 @@ class StatisticsSemigroup[T](threadSafe: Boolean = true)(implicit wrappedSemigro
   def getSumOptionCallTime: Long = sumOptionCallsStats.getTotalCallTime
 
   override def plus(x: T, y: T): T = {
-    plusCallsCount.increment
+    plusCallsCount.increment()
     Semigroup.plus(x, y)
   }
 
@@ -66,7 +66,7 @@ class StatisticsMonoid[T](threadSafe: Boolean = true)(implicit wrappedMonoid: Mo
   def getSumCallTime: Long = sumCallsStats.getTotalCallTime
 
   override def zero: T = {
-    zeroCallsCount.increment
+    zeroCallsCount.increment()
     Monoid.zero
   }
 
@@ -95,12 +95,12 @@ class StatisticsGroup[T](threadSafe: Boolean = true)(implicit group: Group[T])
   def getMinusCallCount: Long = minusCallsCount.get
 
   override def negate(x: T): T = {
-    negateCallsCount.increment
+    negateCallsCount.increment()
     Group.negate(x)
   }
 
   override def minus(l: T, r: T): T = {
-    minusCallsCount.increment
+    minusCallsCount.increment()
     Group.minus(l, r)
   }
 
@@ -129,12 +129,12 @@ class StatisticsRing[T](threadSafe: Boolean = true)(implicit ring: Ring[T])
   def getProductCallTime: Long = productCallsStats.getTotalCallTime
 
   override def one: T = {
-    oneCallsCount.increment
+    oneCallsCount.increment()
     Ring.one
   }
 
   override def times(x: T, y: T): T = {
-    timesCallsCount.increment
+    timesCallsCount.increment()
     Ring.times(x, y)
   }
 

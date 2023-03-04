@@ -36,7 +36,7 @@ private class IterCallStatistics(threadSafe: Boolean) {
       total.add(v)
       // log2(v + 1) for v up to 2^maxBucket
       val bucket = min(64 - numberOfLeadingZeros(v), maxBucket)
-      distribution(bucket).increment
+      distribution(bucket).increment()
     }
 
     def count: Long = distribution.foldLeft(0L)(_ + _.get) // sum
@@ -59,8 +59,8 @@ private class IterCallStatistics(threadSafe: Boolean) {
   private class CountingIterator[T](val i: Iterator[T]) extends Iterator[T] {
     private[this] final var nextCount: Long = 0
     override def hasNext: Boolean = i.hasNext
-    override def next: T = {
-      val n = i.next
+    override def next(): T = {
+      val n = i.next()
       nextCount += 1
       n
     }

@@ -42,7 +42,7 @@ trait Applicative[M[_]] extends Functor[M] {
       case _ =>
         val mb =
           ms.foldLeft(apply(Seq.newBuilder[T]))((mb, mt) => joinWith(mb, mt)((b, t) => b += t))
-        map(mb)(_.result)
+        map(mb)(_.result())
     }
   def joinWith[T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V): M[V] =
     map(join(mt, mu)) { case (t, u) => fn(t, u) }
@@ -102,7 +102,7 @@ object Applicative {
   )(implicit app: Applicative[M], cbf: Factory[T, R[T]]): M[R[T]] = {
     val bldr = cbf.newBuilder
     val mbldr = ms.iterator.foldLeft(app.apply(bldr))((mb, mt) => app.joinWith(mb, mt)(_ += _))
-    app.map(mbldr)(_.result)
+    app.map(mbldr)(_.result())
   }
 
   def joinWith[M[_], T, U, V](mt: M[T], mu: M[U])(fn: (T, U) => V)(implicit app: Applicative[M]): M[V] =

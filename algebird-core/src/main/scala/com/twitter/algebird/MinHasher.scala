@@ -69,7 +69,7 @@ abstract class MinHasher[H](val numHashes: Int, val numBands: Int)(implicit n: N
   private val hashFunctions = {
     val r = new scala.util.Random(seed)
     val numHashFunctions = math.ceil(numBytes / 16.0).toInt
-    (1 to numHashFunctions).map(_ => MurmurHash128(r.nextLong))
+    (1 to numHashFunctions).map(_ => MurmurHash128(r.nextLong()))
   }
 
   /** Signature for empty set, needed to be a proper Monoid */
