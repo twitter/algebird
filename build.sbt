@@ -333,6 +333,7 @@ lazy val docSettings = Seq(
     "gray-lighter" -> "#F4F3F4",
     "white-color" -> "#FFFFFF"
   ),
+  micrositePushSiteWith := GHPagesPlugin,
   autoAPIMappings := true,
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
@@ -345,14 +346,13 @@ lazy val docSettings = Seq(
     (LocalRootProject / baseDirectory).value.getAbsolutePath,
     "-diagrams"
   ),
-  git.remoteRepo := "git@github.com:twitter/algebird.git",
   makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
 )
 
 // Documentation is generated for projects defined in
 // `docsSourcesAndProjects`.
 lazy val docs = project
-  .enablePlugins(MicrositesPlugin, MdocPlugin, ScalaUnidocPlugin, GhpagesPlugin)
+  .enablePlugins(MicrositesPlugin, MdocPlugin, ScalaUnidocPlugin)
   .settings(moduleName := "algebird-docs")
   .settings(sharedSettings)
   .settings(noPublishSettings)
