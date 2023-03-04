@@ -18,6 +18,7 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird._
 import com.twitter.util.{Future, FuturePool}
 import scala.collection.mutable.{ListBuffer, Map => MMap}
+import scala.collection.compat._
 
 /**
  * @author
@@ -54,7 +55,7 @@ class AsyncListMMapSum[Key, Value](
       val curData = mutex.synchronized {
         presentTuples = 0
         val l = queueMap.toList
-        queueMap.clear
+        queueMap.clear()
         l
       }
       val result: Map[Key, Value] = curData.iterator.flatMap { case (k, listV) =>
@@ -66,11 +67,11 @@ class AsyncListMMapSum[Key, Value](
     }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    insertOp.incr
+    insertOp.incr()
     var newlyAddedTuples = 0
 
     mutex.synchronized {
-      vals.foreach { case (k, v) =>
+      vals.iterator.foreach { case (k, v) =>
         val existingV = queueMap.getOrElseUpdate(k, ListBuffer[Value]())
         existingV += v
         newlyAddedTuples += 1
@@ -79,7 +80,7 @@ class AsyncListMMapSum[Key, Value](
     }
 
     if (presentTuples >= bufferSize.v) {
-      sizeIncr.incr
+      sizeIncr.incr()
       flush
     } else
       Future.value(emptyResult)

@@ -78,7 +78,7 @@ object SpaceSaver {
           buff.putLong(b)
           buffer ++= buff.array()
         }
-        buffer.result.toArray
+        buffer.result().toArray
     }
 
   // Make sure to be reversible so fromBytes(toBytes(x)) == x

@@ -22,7 +22,7 @@ package com.twitter.algebird
  */
 import java.util.{LinkedHashMap => JLinkedHashMap, Map => JMap}
 import scala.collection.mutable.{Map => MMap}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object SummingCache {
   def apply[K, V: Semigroup](cap: Int): SummingCache[K, V] =
@@ -57,7 +57,7 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
   override def flush: Option[Map[K, V]] = {
     // Get a copy of the cache, since it is mutable
     val res = optNonEmpty(cache.iterator.toMap)
-    cache.clear
+    cache.clear()
     res
   }
   override def isFlushed: Boolean = cache.isEmpty

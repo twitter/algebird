@@ -32,7 +32,7 @@ package com.twitter.algebird
  */
 import java.util.concurrent.ArrayBlockingQueue
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
 
 object SummingQueue {

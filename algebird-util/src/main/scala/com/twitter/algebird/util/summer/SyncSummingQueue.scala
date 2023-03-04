@@ -20,8 +20,9 @@ import java.util.concurrent.ArrayBlockingQueue
 import com.twitter.algebird._
 import com.twitter.util.Future
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable.ListBuffer
+import scala.collection.compat._
 
 /**
  * @author
@@ -56,8 +57,8 @@ case class SyncSummingQueue[Key, Value](
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
     val outputs = squeue
-      .put(Monoid.sum(vals.map { i =>
-        tuplesIn.incr
+      .put(Monoid.sum(vals.iterator.map { i =>
+        tuplesIn.incr()
         Map(i)
       }))
       .getOrElse(Map.empty)
@@ -80,10 +81,10 @@ class CustomSummingQueue[V](capacity: Int, sizeIncr: Incrementor, putCalls: Incr
    */
   final def put(item: V): Option[V] =
     if (queueOption.isDefined) {
-      putCalls.incr
+      putCalls.incr()
       queueOption.flatMap { queue =>
         if (!queue.offer(item)) {
-          sizeIncr.incr
+          sizeIncr.incr()
           // Queue is full, do the work:
           Monoid.plus(flush, Some(item))
         } else {

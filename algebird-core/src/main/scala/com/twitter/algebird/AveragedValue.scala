@@ -31,7 +31,7 @@ import scala.collection.compat._
  * As long as your count doesn't overflow a Long, the mean calculation won't overflow.
  *
  * @see
- *   [[MomentsGroup.getCombinedMean]] for implementation of [[+]]
+ *   [[Moments.getCombinedMeanDouble]] for implementation of [[+]]
  * @param count
  *   the number of aggregated items
  * @param value
@@ -77,7 +77,7 @@ case class AveragedValue(count: Long, value: Double) {
    *   an instance representing the mean of this instance and `that`.
    */
   def +(that: Double): AveragedValue =
-    AveragedValue(count + 1L, MomentsGroup.getCombinedMean(count, value, 1L, that))
+    AveragedValue(count + 1L, Moments.getCombinedMeanDouble(count.toDouble, value, 1L, that))
 
   /**
    * Returns a new instance that averages `that` into this instance.
@@ -140,7 +140,6 @@ object AveragedValue {
  *   `AveragedValue`
  */
 object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[AveragedValue] {
-  import MomentsGroup.getCombinedMean
 
   override val zero: AveragedValue = AveragedValue(0L, 0.0)
 
@@ -160,7 +159,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
       val it = iter.toIterator
       while (it.hasNext) {
         val av = it.next()
-        average = getCombinedMean(count, average, av.count, av.value)
+        average = Moments.getCombinedMeanDouble(count.toDouble, average, av.count.toDouble, av.value)
         count += av.count
       }
       Some(AveragedValue(count, average))
@@ -172,7 +171,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
   override def plus(l: AveragedValue, r: AveragedValue): AveragedValue = {
     val n = l.count
     val k = r.count
-    val newAve = getCombinedMean(n, l.value, k, r.value)
+    val newAve = Moments.getCombinedMeanDouble(n.toDouble, l.value, k.toDouble, r.value)
     AveragedValue(n + k, newAve)
   }
 }

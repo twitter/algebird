@@ -49,7 +49,7 @@ case class SparseColumnMatrix[V: Monoid](rowsByColumns: IndexedSeq[AdaptiveVecto
     while (row < rows) {
       val iter = rowsByColumns(row).denseIterator
       while (iter.hasNext) {
-        val (col, value) = iter.next
+        val (col, value) = iter.next()
         val indx = row * lcols + col
         buffer(indx) = valueMonoid.plus(buffer(indx), value)
       }

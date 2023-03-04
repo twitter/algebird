@@ -5,6 +5,7 @@ import java.lang.Math
 import java.util.Arrays.deepHashCode
 import scala.concurrent.duration.Duration
 import scala.util.Random
+import scala.collection.compat._
 
 /**
  * DecayingCMS is a module to build count-min sketch instances whose counts decay exponentially.
@@ -210,7 +211,7 @@ final class DecayingCMS[K](
   val hashFns: Array[K => Int] = {
     val rng = new Random(seed)
     def genPos(): Int =
-      rng.nextInt match {
+      rng.nextInt() match {
         case 0 => genPos()
         case n => n & 0x7fffffff
       }
@@ -323,10 +324,10 @@ final class DecayingCMS[K](
       var i = 0
       while (i < cells.length) {
         val it = cells(i).iterator
-        var localMax = it.next // we know it doesn't start empty
+        var localMax = it.next() // we know it doesn't start empty
         if (localMax < minMinimum) minMinimum = localMax
         while (it.hasNext) {
-          val n = it.next
+          val n = it.next()
           if (n > localMax) localMax = n
           else if (n < minMinimum) minMinimum = n
         }
@@ -362,7 +363,7 @@ final class DecayingCMS[K](
         val it0 = this.cells(i).iterator
         val it1 = that.cells(i).iterator
         while (it0.hasNext) {
-          val x = it0.next * it1.next
+          val x = it0.next() * it1.next()
           if (x != 0.0) sum += x
         }
         if (sum < res) res = sum
@@ -426,7 +427,7 @@ final class DecayingCMS[K](
       val x = this
       val y = other
       val timeInHL = Math.max(x.timeInHL, y.timeInHL)
-      val cms = new CMS(allocCells, 0.0, timeInHL)
+      val cms = new CMS(allocCells(), 0.0, timeInHL)
 
       val xscale = x.getScale(timeInHL)
       val yscale = y.getScale(timeInHL)
@@ -445,7 +446,7 @@ final class DecayingCMS[K](
           bldr += prod(left(j), xscale) + prod(right(j), yscale)
           j += 1
         }
-        cms.cells(i) = bldr.result
+        cms.cells(i) = bldr.result()
         i += 1
       }
       cms
@@ -505,7 +506,7 @@ final class DecayingCMS[K](
       if (expL == 0.0) {
         new CMS(monoid.zero.cells, 0.0, ts)
       } else {
-        val cms = new CMS(allocCells, 0.0, ts)
+        val cms = new CMS(allocCells(), 0.0, ts)
         var i = 0
         while (i < depth) {
           val ci = cells(i)
@@ -547,7 +548,7 @@ final class DecayingCMS[K](
               bldr += scratch(j)
               j += 1
             }
-            cells(i) = bldr.result
+            cells(i) = bldr.result()
             i += 1
           }
           cells
@@ -595,7 +596,7 @@ final class DecayingCMS[K](
 
         override def sumOption(xs: TraversableOnce[CMS]): Option[CMS] = {
 
-          val it: Iterator[CMS] = xs.toIterator
+          val it: Iterator[CMS] = xs.iterator
           val ChunkSize = 1000
 
           // the idea here is that we read up to 1000 CMS values into
@@ -606,7 +607,7 @@ final class DecayingCMS[K](
           val arr = new Array[CMS](ChunkSize)
           while (it.hasNext) {
             while (it.hasNext && i < ChunkSize) {
-              arr(i) = it.next
+              arr(i) = it.next()
               i += 1
             }
             if (i > 1) {

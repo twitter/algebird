@@ -2,7 +2,6 @@ package com.twitter.algebird.macros
 
 import scala.language.experimental.macros
 
-import com.twitter.algebird._
 import com.twitter.algebird.macros.MacroCompat._
 
 import org.scalacheck.{Arbitrary, Gen}

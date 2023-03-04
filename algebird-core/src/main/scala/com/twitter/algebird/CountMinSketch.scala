@@ -185,9 +185,9 @@ class CMSSummation[K](params: CMSParams[K]) {
         val rit = matrix.iterator
         while (rit.hasNext) {
           var col = 0
-          val cit = rit.next.iterator
+          val cit = rit.next().iterator
           while (cit.hasNext) {
-            cells(offset + col) += cit.next
+            cells(offset + col) += cit.next()
             col += 1
           }
           offset += width
@@ -206,7 +206,7 @@ class CMSSummation[K](params: CMSParams[K]) {
           b += cells(offset + col)
           col += 1
         }
-        b.result
+        b.result()
       }
 
       val b = Vector.newBuilder[Vector[Long]]
@@ -215,7 +215,7 @@ class CMSSummation[K](params: CMSParams[K]) {
         b += vectorize(row)
         row += 1
       }
-      CMSInstance(CMSInstance.CountsTable(b.result), totalCount, params)
+      CMSInstance(CMSInstance.CountsTable(b.result()), totalCount, params)
     }
 }
 
@@ -724,7 +724,7 @@ case class CMSInstance[K](
     val it = countsTable.counts.iterator
     var i = 0
     while (it.hasNext) {
-      val row = it.next
+      val row = it.next()
       val count = row(hs(i)(item))
       if (count < freq) freq = count
       i += 1
@@ -817,13 +817,13 @@ object CMSInstance {
       val yss = other.counts.iterator
       val rows = Vector.newBuilder[Vector[Long]]
       while (xss.hasNext) {
-        val xs = xss.next.iterator
-        val ys = yss.next.iterator
+        val xs = xss.next().iterator
+        val ys = yss.next().iterator
         val row = Vector.newBuilder[Long]
-        while (xs.hasNext) row += (xs.next + ys.next)
-        rows += row.result
+        while (xs.hasNext) row += (xs.next() + ys.next())
+        rows += row.result()
       }
-      CountsTable[K](rows.result)
+      CountsTable[K](rows.result())
     }
   }
 

@@ -151,9 +151,9 @@ class QTreeSemigroup[A](k: Int)(implicit val underlyingMonoid: Monoid[A]) extend
       val batchSize = compressBatchSize
       var count = 1 // start at 1, so we only compress after batchSize items
       val iter = items.toIterator
-      var result = iter.next // due to not being empty, this does not throw
+      var result = iter.next() // due to not being empty, this does not throw
       while (iter.hasNext) {
-        result = result.merge(iter.next)
+        result = result.merge(iter.next())
         count += 1
         if (count % batchSize == 0) {
           result = result.compress(k)
@@ -428,8 +428,8 @@ class QTree[@specialized(Int, Long, Float, Double) A] private[algebird] (
       print(" (" + parentCount + ")")
     }
     println(" {" + _sum + "}")
-    lowerChild.foreach(_.dump)
-    upperChild.foreach(_.dump)
+    lowerChild.foreach(_.dump())
+    upperChild.foreach(_.dump())
   }
 
   /**

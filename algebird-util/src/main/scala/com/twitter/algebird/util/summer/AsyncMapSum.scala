@@ -19,7 +19,8 @@ import com.twitter.algebird._
 import com.twitter.util.{Future, FuturePool}
 import java.util.concurrent.ArrayBlockingQueue
 import scala.collection.mutable.ArrayBuffer
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.collection.compat._
 
 /**
  * @author
@@ -58,12 +59,12 @@ class AsyncMapSum[Key, Value](
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
-    insertOp.incr
+    insertOp.incr()
 
-    val curData = Semigroup.sumOption(vals.map(Map(_))).getOrElse(Map.empty)
+    val curData = Semigroup.sumOption(vals.iterator.map(Map(_))).getOrElse(Map.empty)
     if (!queue.offer(curData)) {
       flush.map { flushRes =>
-        sizeIncr.incr // todo not sure if need to increase size
+        sizeIncr.incr() // todo not sure if need to increase size
         Semigroup.plus(flushRes, curData)
       }
     } else {

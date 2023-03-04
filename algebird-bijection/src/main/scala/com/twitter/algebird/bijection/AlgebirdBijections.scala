@@ -19,6 +19,8 @@ package com.twitter.algebird.bijection
 import com.twitter.algebird.{Group, InvariantSemigroup, Monoid, Ring, Semigroup}
 import com.twitter.bijection.{AbstractBijection, Bijection, ImplicitBijection, Reverse}
 
+import scala.collection.compat._
+
 /**
  * Bijections on Algebird's abstract algebra datatypes.
  *
@@ -53,7 +55,7 @@ class BijectedRing[T, U](implicit val ring: Ring[T], bij: ImplicitBijection[T, U
   override def times(l: U, r: U): U =
     bijection.invert(ring.times(bijection(l), bijection(r)))
   override def product(iter: TraversableOnce[U]): U =
-    bijection.invert(ring.product(iter.map(bijection.toFunction)))
+    bijection.invert(ring.product(iter.iterator.map(bijection.toFunction)))
 }
 
 trait AlgebirdBijections {

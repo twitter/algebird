@@ -70,7 +70,7 @@ class EventuallySemigroup[E, O](convert: O => E)(mustConvert: O => Boolean)(impl
   private[this] final def checkSize[T: Semigroup](buffer: Buffer[T]): Unit =
     if (buffer.size > maxBuffer) {
       val sum = Semigroup.sumOption(buffer)
-      buffer.clear
+      buffer.clear()
       sum.foreach(buffer += _)
     }
 

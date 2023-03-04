@@ -41,10 +41,6 @@ val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.12.16",
   crossScalaVersions := Seq("2.11.12", scalaVersion.value),
-  resolvers ++= Seq(
-    Opts.resolver.sonatypeSnapshots,
-    Opts.resolver.sonatypeReleases
-  ),
   Test / parallelExecution := true,
   scalacOptions ++= Seq(
     "-unchecked",
