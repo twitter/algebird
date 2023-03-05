@@ -39,7 +39,7 @@ crossScalaVersions := Nil
 
 val sharedSettings = Seq(
   organization := "com.twitter",
-  scalaVersion := "2.12.16",
+  scalaVersion := "2.12.17",
   crossScalaVersions := Seq("2.11.12", scalaVersion.value),
   Test / parallelExecution := true,
   scalacOptions ++= Seq(
@@ -205,7 +205,7 @@ def module(name: String) = {
 }
 
 lazy val algebirdCore = module("core").settings(
-  crossScalaVersions += "2.13.8",
+  crossScalaVersions += "2.13.10",
   initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -235,7 +235,7 @@ lazy val algebirdCore = module("core").settings(
 lazy val algebirdTest = module("test")
   .settings(
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions += "2.13.8",
+    crossScalaVersions += "2.13.10",
     libraryDependencies ++=
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
@@ -266,14 +266,14 @@ lazy val algebirdBenchmark = module("benchmark")
 
 lazy val algebirdUtil = module("util")
   .settings(
-    crossScalaVersions += "2.13.8",
+    crossScalaVersions += "2.13.10",
     libraryDependencies ++= Seq("com.twitter" %% "util-core" % utilVersion)
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
 
 lazy val algebirdBijection = module("bijection")
   .settings(
-    crossScalaVersions += "2.13.8",
+    crossScalaVersions += "2.13.10",
     libraryDependencies += "com.twitter" %% "bijection-core" % bijectionVersion
   )
   .dependsOn(algebirdCore, algebirdTest % "test->test")
@@ -290,7 +290,7 @@ lazy val algebirdSpark = module("spark")
 
 lazy val algebirdGeneric = module("generic")
   .settings(
-    crossScalaVersions += "2.13.8",
+    crossScalaVersions += "2.13.10",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.10",
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5"
