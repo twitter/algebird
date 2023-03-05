@@ -62,7 +62,7 @@ case class HLLSeries(bits: Int, rows: Vector[Map[Int, Long]]) {
     while (i >= 0) {
       val it = rows(i).iterator
       while (it.hasNext) {
-        val (k, t) = it.next
+        val (k, t) = it.next()
         if (t >= threshold && seen.add(k)) {
           sum += HyperLogLog.negativePowersOfTwo(i + 1)
         }
@@ -142,7 +142,7 @@ class HyperLogLogSeriesMonoid(val bits: Int) extends Monoid[HLLSeries] {
       val bldr = Vector.newBuilder[Map[Int, Long]]
       val lit = left.rows.iterator
       val rit = right.rows.iterator
-      while (lit.hasNext && rit.hasNext) bldr += combine(lit.next, rit.next)
+      while (lit.hasNext && rit.hasNext) bldr += combine(lit.next(), rit.next())
       val zipped = bldr.result()
       HLLSeries(bits, zipped ++ right.rows.slice(ln, rn))
     }

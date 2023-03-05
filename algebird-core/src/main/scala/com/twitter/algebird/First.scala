@@ -63,7 +63,7 @@ private[algebird] sealed abstract class FirstInstances {
       override def plus(l: T, r: T): T = l
 
       override def sumOption(iter: TraversableOnce[T]): Option[T] =
-        if (iter.iterator.isEmpty) None else Some(iter.iterator.next)
+        if (iter.iterator.isEmpty) None else Some(iter.iterator.next())
     }
 
   /**

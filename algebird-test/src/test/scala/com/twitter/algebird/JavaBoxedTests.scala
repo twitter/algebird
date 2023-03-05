@@ -5,7 +5,7 @@ import java.util.{List => JList, Map => JMap}
 
 import org.scalacheck.{Arbitrary, Gen}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import java.{util => ju}
 
 class JavaBoxedTests extends CheckProperties {

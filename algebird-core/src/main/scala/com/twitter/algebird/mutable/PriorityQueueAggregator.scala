@@ -16,7 +16,7 @@ limitations under the License.
 package com.twitter.algebird.mutable
 
 import com.twitter.algebird.MonoidAggregator
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import java.util.PriorityQueue
 

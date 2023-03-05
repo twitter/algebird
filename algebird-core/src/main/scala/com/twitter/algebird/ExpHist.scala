@@ -105,7 +105,7 @@ case class ExpHist(
         b += bucket
       },
       _ => Vector.newBuilder[Bucket],
-      x => addAll(x.result)
+      x => addAll(x.result())
     )
 
   // This internal method assumes that the instance is stepped forward

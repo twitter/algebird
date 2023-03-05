@@ -20,10 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.twitter.algebird._
 import com.twitter.util.{Future, FuturePool}
-
-import scala.collection.JavaConverters._
-import scala.collection.mutable.{Set => MSet}
 import com.twitter.algebird.util.UtilAlgebras._
+
+import scala.jdk.CollectionConverters._
+import scala.collection.mutable.{Set => MSet}
+import scala.collection.compat._
 
 /**
  * @author
@@ -88,7 +89,7 @@ class AsyncListSum[Key, Value](
       val keys = MSet[Key]()
       keys ++= queueMap.keySet.iterator.asScala
 
-      val lFuts = Future.collect(keys.toIterator.flatMap { k =>
+      val lFuts = Future.collect(keys.iterator.flatMap { k =>
         val retV = queueMap.remove(k)
 
         if (retV != null) {
@@ -103,7 +104,7 @@ class AsyncListSum[Key, Value](
 
   @annotation.tailrec
   private[this] final def doInsert(key: Key, value: Value): Unit = {
-    tuplesIn.incr
+    tuplesIn.incr()
     val (success, countChange) = if (queueMap.containsKey(key)) {
       val oldValue = queueMap.get(key)
       if (oldValue != null) {
@@ -121,20 +122,20 @@ class AsyncListSum[Key, Value](
       // Successful insert
       elementsInCache.addAndGet(countChange)
     } else {
-      insertFails.incr
+      insertFails.incr()
       return doInsert(key, value)
     }
   }
 
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] =
     workPool {
-      insertOp.incr
-      vals.foreach { case (k, v) =>
+      insertOp.incr()
+      vals.iterator.foreach { case (k, v) =>
         doInsert(k, v)
       }
 
       if (elementsInCache.get >= innerBuffSize) {
-        sizeIncr.incr
+        sizeIncr.incr()
         flush
       } else {
         Future.value(Map.empty[Key, Value])

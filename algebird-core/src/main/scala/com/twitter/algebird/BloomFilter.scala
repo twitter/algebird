@@ -33,7 +33,7 @@ object RichCBitSet {
   def fromBitSet(bs: BitSet): CBitSet = {
     val nbs = new CBitSet
     val it = bs.iterator
-    while (it.hasNext) { nbs.set(it.next) }
+    while (it.hasNext) { nbs.set(it.next()) }
     nbs
   }
   implicit def cb2rcb(cb: CBitSet): RichCBitSet = new RichCBitSet(cb)
@@ -60,7 +60,7 @@ class RichCBitSet(val cb: CBitSet) extends AnyVal {
     val a = LongBitSet.empty(width)
     val iter = cb.intIterator
     while (iter.hasNext) {
-      val i = iter.next
+      val i = iter.next()
       a.set(i)
     }
     a.toBitSetNoCopy
@@ -235,7 +235,7 @@ case class BloomFilterMonoid[A](numHashes: Int, width: Int)(implicit hash: Hash1
         case BFInstance(_, bitset, _) =>
           // these Ints are boxed so, that's a minor bummer
           val iter = bitset.iterator
-          while (iter.hasNext) { set(iter.next) }
+          while (iter.hasNext) { set(iter.next()) }
       }
       if (sets == 0) Some(zero)
       else if (sets == numHashes && (oneItem != null)) Some(oneItem)
@@ -307,7 +307,7 @@ object BF {
               new IntIterator {
                 val boxedIter: Iterator[Int] = bitset.iterator
                 override def hasNext: Boolean = boxedIter.hasNext
-                override def next: Int = boxedIter.next
+                override def next: Int = boxedIter.next()
               }
             case BFZero(_, _) =>
               new IntIterator {
@@ -484,7 +484,7 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, override val width: Int
     var count = 0
     while (it.hasNext) {
       count += 1
-      it.next
+      it.next()
     }
     count
   }

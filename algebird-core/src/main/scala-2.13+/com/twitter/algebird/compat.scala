@@ -24,7 +24,7 @@ private[algebird] trait CompatFold {
     Fold.foldMutable[Builder[I, C[I]], I, C[I]](
       { case (b, i) => b += i },
       _ => cbf.newBuilder,
-      _.result
+      _.result()
     )
 }
 

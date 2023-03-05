@@ -18,6 +18,8 @@ package com.twitter.algebird.util.summer
 import com.twitter.algebird._
 import com.twitter.util.Future
 
+import scala.collection.compat._
+
 /**
  * @author
  *   Ian O Connell
@@ -30,8 +32,8 @@ class NullSummer[Key, Value](tuplesIn: Incrementor, tuplesOut: Incrementor)(impl
   def addAll(vals: TraversableOnce[(Key, Value)]): Future[Map[Key, Value]] = {
 
     val r = Semigroup
-      .sumOption(vals.map { inV =>
-        tuplesIn.incr
+      .sumOption(vals.iterator.map { inV =>
+        tuplesIn.incr()
         Map(inV)
       })
       .getOrElse(Map.empty)

@@ -20,6 +20,8 @@ import com.twitter.util.Future
 
 import scala.collection.mutable.ListBuffer
 
+import scala.collection.compat._
+
 /**
  * @author
  *   Ian O Connell
@@ -53,7 +55,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
 
   private[this] final val hashes: IndexedSeq[CMSHash[Long]] = {
     val r = new scala.util.Random(5)
-    (0 until DEPTH).map(_ => CMSHash[Long](r.nextInt, 0, WIDTH))
+    (0 until DEPTH).map(_ => CMSHash[Long](r.nextInt(), 0, WIDTH))
   }.toIndexedSeq
 
   @inline
@@ -91,7 +93,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
     def pruneHH(): Unit = {
       val iter = hh.values.iterator
       while (iter.hasNext) {
-        val n = iter.next
+        val n = iter.next()
         if (n < hhMinReq) {
           iter.remove
         }
@@ -118,7 +120,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
   // We include the ability to reset the CMS so we can age our counters
   // over time
   private[this] def resetCMS(): Unit = {
-    hh.clear
+    hh.clear()
     totalCount = 0L
     hhMinReq = 0L
     countsTable = Array.fill(WIDTH * DEPTH)(0L)
@@ -158,7 +160,7 @@ class ApproxHHTracker(hhPct: HeavyHittersPercent, updateFreq: UpdateFrequency, r
     val hh = new ListBuffer[T]
     val nonHH = new ListBuffer[T]
 
-    t.foreach { t =>
+    t.iterator.foreach { t =>
       if (hhFilter(extractor(t)))
         hh += t
       else
@@ -247,7 +249,7 @@ class HeavyHittersCachingSummer[K, V](
 
   def addAll(vals: TraversableOnce[T]): Future[Iterable[T]] = {
     // todo not sure if need to increment as backing summer may already be doing it
-    insertOp.incr
+    insertOp.incr()
     val (hh, nonHH) = approxHH.splitTraversableOnce(vals, { t: T => t._1.hashCode })
 
     if (!hh.isEmpty) {

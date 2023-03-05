@@ -33,9 +33,9 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
 
   def size: Int = map.get.map(_.size).getOrElse(0)
 
-  def clear(): Unit = map.get.foreach(_.clear)
+  def clear(): Unit = map.get.foreach(_.clear())
 
-  def stopGrowing(): Unit = map.clear
+  def stopGrowing(): Unit = map.clear()
 
   def put(in: Map[K, V]): Unit =
     if (map.get.isDefined) {
@@ -87,9 +87,9 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
       summingCache = new SummingWithHitsCache(currentCapacity)
 
       if (currentCapacity == maxCapacity)
-        sentinelCache.stopGrowing
+        sentinelCache.stopGrowing()
       else
-        sentinelCache.clear
+        sentinelCache.clear()
     }
     ret
   }
@@ -101,7 +101,7 @@ class AdaptiveCache[K, V: Semigroup](maxCapacity: Int, growthMargin: Double = 3.
 
   override def flush: Option[Map[K, V]] = {
     val ret = summingCache.flush
-    sentinelCache.clear
+    sentinelCache.clear()
     ret
   }
 
