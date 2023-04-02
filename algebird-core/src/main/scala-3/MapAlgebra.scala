@@ -19,7 +19,6 @@ import com.twitter.algebird.macros.{Cuber, Roller}
 import scala.collection.mutable.{Builder, Map => MMap}
 import scala.collection.{Map => ScMap}
 import algebra.ring.Rng
-import scala.collection.compat._
 
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M

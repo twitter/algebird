@@ -222,8 +222,9 @@ def module(name: String) = {
 
 lazy val algebirdCore = module("core")
   .settings(
+    scalaVersion := "3.2.2",
     crossScalaVersions += "2.13.8",
-    // crossScalaVersions += "3.2.2",
+    crossScalaVersions += "3.2.2",
     initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
