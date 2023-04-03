@@ -44,7 +44,8 @@ object SemigroupMacro:
         }
 
       case '{ $m: Mirror.SumOf[T] { type MirroredElemTypes = elementTypes } } =>
-        ???
+        val tname = TypeRepr.of[T].typeSymbol.name
+        report.errorAndAbort(s"unable to derive Semigroup for ${tname}")
                     
   private[macros] def applyPlus(a:Tuple):Tuple =
     a match

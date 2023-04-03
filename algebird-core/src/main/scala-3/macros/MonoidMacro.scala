@@ -49,7 +49,8 @@ object MonoidMacro:
         }
 
       case '{ $m: Mirror.SumOf[T] { type MirroredElemTypes = elementTypes } } =>
-        ???
+        val tname = TypeRepr.of[T].typeSymbol.name
+        report.errorAndAbort(s"unable to derive Monoid for ${tname}")
                     
   private[macros] def applyZeros(a:Tuple):Tuple =
     a match

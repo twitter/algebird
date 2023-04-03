@@ -62,7 +62,8 @@ object RingMacro:
         }
 
       case '{ $m: Mirror.SumOf[T] { type MirroredElemTypes = elementTypes } } =>
-        ???
+        val tname = TypeRepr.of[T].typeSymbol.name
+        report.errorAndAbort(s"unable to derive Ring for ${tname}")
   private[macros] def applyOnes(a:Tuple):Tuple =
     a match
         case EmptyTuple => EmptyTuple

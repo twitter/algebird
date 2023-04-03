@@ -55,7 +55,8 @@ object GroupMacro:
         }
 
       case '{ $m: Mirror.SumOf[T] { type MirroredElemTypes = elementTypes } } =>
-        ???
+        val tname = TypeRepr.of[T].typeSymbol.name
+        report.errorAndAbort(s"unable to derive Group for ${tname}")
   private[macros] def applyNegates(a:Tuple):Tuple =
     a match
         case EmptyTuple => EmptyTuple
