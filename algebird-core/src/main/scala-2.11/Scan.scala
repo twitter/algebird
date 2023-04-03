@@ -169,9 +169,9 @@ sealed abstract class Scan[-I, +O] extends Serializable {
   def scanIterator(iter: Iterator[I]): Iterator[O] = new AbstractIterator[O] {
     override def hasNext: Boolean = iter.hasNext
     var state: State = initialState
-    override def next(): O = {
+    override def next: O = {
       val thisState = state
-      val thisA = iter.next()
+      val thisA = iter.next
       val (thisC, nextState) = presentAndNextState(thisA, thisState)
       state = nextState
       thisC

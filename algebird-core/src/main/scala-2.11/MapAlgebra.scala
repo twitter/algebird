@@ -224,7 +224,7 @@ object MapAlgebra {
         } else oldVOpt.get
         bldr += v
       }
-      mutable.iterator.map { case (k, bldr) => (k, bldr.result()) }.toMap
+      mutable.iterator.map { case (k, bldr) => (k, bldr.result) }.toMap
     }
 
   // Consider this as edges from k -> v, produce a Map[K,Set[V]]
