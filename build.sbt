@@ -17,6 +17,24 @@ val sparkVersion = "2.4.8"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y)) if y <= 11 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case Some((2, y)) if y <= 12 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case Some((2, y)) if y >= 13 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case Some((3, _)) =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case _ => Nil
+  }
+def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, y)) if y <= 12 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
     case Some((2, y)) if y >= 13 =>
@@ -107,7 +125,7 @@ val sharedSettings = Seq(
     (Test / scalaSource).value,
     scalaVersion.value
   ),
-  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
+  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFolders(
     (Compile / javaSource).value,
     scalaVersion.value
   )
@@ -224,6 +242,7 @@ lazy val algebirdCore = module("core")
   .settings(
     scalaVersion := "3.2.2",
     crossScalaVersions += "2.13.8",
+    crossScalaVersions += "2.12.16",
     crossScalaVersions += "3.2.2",
     initialCommands := """
                      import com.twitter.algebird._

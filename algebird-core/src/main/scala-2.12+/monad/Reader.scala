@@ -55,8 +55,7 @@ final case class FlatMappedReader[E, U, +T](first: Reader[E, U], fn: U => Reader
             case head :: tail => loop(head(fn(env)), tail)
             case Nil          => fn(env)
           }
-        case FlatMappedReader(first, nextFn) =>
-          loop(first, nextFn.asInstanceOf[Any => Reader[E, Any]] :: stack)
+        case FlatMappedReader(first, nextFn) => loop(first, nextFn.asInstanceOf[Any => Reader[E, Any]] :: stack)
       }
     loop(first, List(fn.asInstanceOf[(Any) => Reader[E, Any]])).asInstanceOf[T]
   }
