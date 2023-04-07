@@ -580,7 +580,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
         curValue = (curValue, iter.head) match {
           case (DenseHLL(_, _), _) => denseUpdate(curValue, iter)
           case (_, DenseHLL(_, _)) => denseUpdate(curValue, iter)
-          case _                   => curValue + iter.next
+          case _                   => curValue + iter.next()
         }
       }
       Some(curValue)

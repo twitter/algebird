@@ -39,7 +39,7 @@ object GaussianDistributionMonoid extends Monoid[GaussianDistribution] {
       var sigma2 = 0.0
       val it = its.toIterator
       while (it.hasNext) {
-        val g = it.next
+        val g = it.next()
         mean += g.mean
         sigma2 += g.sigma2
       }

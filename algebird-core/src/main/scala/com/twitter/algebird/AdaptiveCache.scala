@@ -33,9 +33,9 @@ class SentinelCache[K, V](implicit sgv: Semigroup[V]) {
 
   def size: Int = map.get.map(_.size).getOrElse(0)
 
-  def clear(): Unit = map.get.foreach(_.clear)
+  def clear(): Unit = map.get.foreach(_.clear())
 
-  def stopGrowing(): Unit = map.clear
+  def stopGrowing(): Unit = map.clear()
 
   def put(in: Map[K, V]): Unit =
     if (map.get.isDefined) {

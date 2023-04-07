@@ -155,7 +155,7 @@ object Aggregator extends java.io.Serializable {
       override def apply(inputs: TraversableOnce[F]): P = present(agg(inputs))
 
       override def applyOption(inputs: TraversableOnce[F]): Option[P] =
-        if (inputs.isEmpty) None else Some(apply(inputs))
+        if (inputs.iterator.isEmpty) None else Some(apply(inputs))
 
       override def append(l: T, r: F): T = appnd(l, r)
 
@@ -165,7 +165,7 @@ object Aggregator extends java.io.Serializable {
       override def appendAll(items: TraversableOnce[F]): T = agg(items)
 
       private def agg(inputs: TraversableOnce[F]): T =
-        inputs.foldLeft(m.zero)(append)
+        inputs.iterator.foldLeft(m.zero)(append)
     }
 
   /**
