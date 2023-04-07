@@ -9,8 +9,10 @@ val kindProjectorVersion = "0.13.2"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.15"
-val scalaTestPlusVersion = "3.1.0.0-RC2"
+val scalaTestPlusFor211Version = "3.1.0.0-RC2"
+val scalaTestPlusVersion = "3.2.11.0"
 val scalacheckVersion = "1.15.3"
+val scalacheckFor211Version = "1.15.2"
 val scalaCollectionCompat = "2.9.0"
 val utilVersion = "21.2.0"
 val sparkVersion = "2.4.8"
@@ -40,6 +42,13 @@ def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: Stri
     case Some((2, y)) if y >= 13 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
     case _ => Nil
+  }
+def scalaVersionSpecificJavaFoldersForTest(srcBaseDir: java.io.File, scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y)) if y <= 12 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case _ =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
   }
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
@@ -125,7 +134,7 @@ val sharedSettings = Seq(
     (Compile / javaSource).value,
     scalaVersion.value
   ),
-  Test / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFolders(
+  Test / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFoldersForTest(
     (Test / scalaSource).value,
     scalaVersion.value
   )
@@ -258,10 +267,7 @@ def module(name: String) = {
 
 lazy val algebirdCore = module("core")
   .settings(
-    scalaVersion := "3.2.2",
-    crossScalaVersions += "2.13.10",
-    crossScalaVersions += "2.12.17",
-    crossScalaVersions += "3.2.2",
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.2.2"),
     initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -281,17 +287,29 @@ lazy val algebirdCore = module("core")
   )
   .settings(compilerExtraSettings)
 
+val algebirdTestDependenciesSettings = Seq(
+  libraryDependencies ++=
+    Seq(
+      "org.scalatest" %% "scalatest" % scalaTestVersion
+    ) ++ (if (scalaVersion.value.startsWith("2.11"))
+            Seq(
+              "org.scalacheck" %% "scalacheck" % scalacheckFor211Version,
+              "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusFor211Version % "test"
+            )
+          else
+            Seq(
+              "org.scalacheck" %% "scalacheck" % scalacheckVersion,
+              "org.scalatestplus" %% "scalacheck-1-15" % scalaTestPlusVersion % "test"
+            ))
+)
+
 lazy val algebirdTest = module("test")
   .settings(
+    // scalaVersion := "3.2.2",
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions += "2.13.10",
-    libraryDependencies ++=
-      Seq(
-        "org.scalacheck" %% "scalacheck" % scalacheckVersion,
-        "org.scalatest" %% "scalatest" % scalaTestVersion,
-        "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
-      )
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.2.2")
   )
+  .settings(algebirdTestDependenciesSettings)
   .settings(compilerExtraSettings)
   .dependsOn(algebirdCore)
 
