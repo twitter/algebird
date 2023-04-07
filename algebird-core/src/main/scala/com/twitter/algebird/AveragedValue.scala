@@ -77,7 +77,7 @@ case class AveragedValue(count: Long, value: Double) {
    *   an instance representing the mean of this instance and `that`.
    */
   def +(that: Double): AveragedValue =
-    AveragedValue(count + 1L, MomentsGroup.getCombinedMean(count, value, 1L, that))
+    AveragedValue(count + 1L, Moments.getCombinedMeanDouble(count, value, 1L, that))
 
   /**
    * Returns a new instance that averages `that` into this instance.
@@ -112,7 +112,7 @@ object AveragedValue {
    */
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, AveragedValue, Double] =
     Aggregator
-      .prepareMonoid { (n: N) => AveragedValue(num.toDouble(n)) }
+      .prepareMonoid((n: N) => AveragedValue(num.toDouble(n)))
       .andThenPresent(_.value)
 
   /**
@@ -140,7 +140,6 @@ object AveragedValue {
  *   `AveragedValue`
  */
 object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[AveragedValue] {
-  import MomentsGroup.getCombinedMean
 
   override val zero: AveragedValue = AveragedValue(0L, 0.0)
 
@@ -160,7 +159,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
       val it = iter.toIterator
       while (it.hasNext) {
         val av = it.next()
-        average = getCombinedMean(count, average, av.count, av.value)
+        average = Moments.getCombinedMeanDouble(count, average, av.count, av.value)
         count += av.count
       }
       Some(AveragedValue(count, average))
@@ -172,7 +171,7 @@ object AveragedGroup extends Group[AveragedValue] with CommutativeGroup[Averaged
   override def plus(l: AveragedValue, r: AveragedValue): AveragedValue = {
     val n = l.count
     val k = r.count
-    val newAve = getCombinedMean(n, l.value, k, r.value)
+    val newAve = Moments.getCombinedMeanDouble(n, l.value, k, r.value)
     AveragedValue(n + k, newAve)
   }
 }

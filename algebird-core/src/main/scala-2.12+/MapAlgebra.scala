@@ -229,7 +229,7 @@ object MapAlgebra {
 
   // Consider this as edges from k -> v, produce a Map[K,Set[V]]
   def toGraph[K, V](pairs: TraversableOnce[(K, V)]): Map[K, Set[V]] =
-    Monoid.sum(pairs.map { case (k, v) => Map(k -> Set(v)) })
+    Monoid.sum(pairs.iterator.map { case (k, v) => Map(k -> Set(v)) })
 
   /** join the keys of two maps (similar to outer-join in a DB) */
   def join[K, V, W](map1: Map[K, V], map2: Map[K, W]): Map[K, (Option[V], Option[W])] =
