@@ -176,7 +176,7 @@ sealed trait AdaptiveVector[V] extends IndexedSeq[V] {
 
   /** How many items are not sparse */
   def denseCount: Int
-  def size: Int
+  // def size: Int
   override def apply(idx: Int): V
   def updated(idx: Int, v: V): AdaptiveVector[V]
 

@@ -39,6 +39,8 @@ def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: Stri
       new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
     case Some((2, y)) if y >= 13 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
+    case Some((3, _)) =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
     case _ => Nil
   }
 
@@ -127,6 +129,10 @@ val sharedSettings = Seq(
   ),
   Compile / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFolders(
     (Compile / javaSource).value,
+    scalaVersion.value
+  ),
+  Test / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFolders(
+    (Test / scalaSource).value,
     scalaVersion.value
   )
 ) ++ mimaSettings

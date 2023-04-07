@@ -31,6 +31,7 @@ private[algebird] trait CompatFold {
 private[algebird] trait CompatDecayedVector {
   // This is the default monoid that never thresholds.
   // If you want to set a specific accuracy you need to implicitly override this
-  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]]):Monoid[DecayedVector[C]] =
-    DecayedVector.monoidWithEpsilon(-1.0)
+//  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]]):Monoid[DecayedVector[C]] =
+//    DecayedVector.monoidWithEpsilon(-1.0)
 }
+
