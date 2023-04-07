@@ -114,7 +114,7 @@ object Aggregator extends java.io.Serializable {
         if (inputs.iterator.isEmpty) None
         else {
           val itr = inputs.iterator
-          val t = prepare(itr.next)
+          val t = prepare(itr.next())
           Some(itr.foldLeft(t)(appnd))
         }
     }

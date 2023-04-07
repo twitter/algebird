@@ -39,8 +39,6 @@ def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: Stri
       new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
     case Some((2, y)) if y >= 13 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
-    case Some((3, _)) =>
-      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
     case _ => Nil
   }
 
@@ -63,10 +61,6 @@ val sharedSettings = Seq(
   organization := "com.twitter",
   scalaVersion := "2.12.17",
   crossScalaVersions := Seq("2.11.12", scalaVersion.value),
-  resolvers ++= Seq(
-    Opts.resolver.sonatypeSnapshots,
-    Opts.resolver.sonatypeReleases
-  ),
   Test / parallelExecution := true,
   scalacOptions ++= Seq(
     "-unchecked",
@@ -376,6 +370,7 @@ lazy val docSettings = Seq(
     "gray-lighter" -> "#F4F3F4",
     "white-color" -> "#FFFFFF"
   ),
+  micrositePushSiteWith := GHPagesPlugin,
   autoAPIMappings := true,
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
@@ -388,14 +383,13 @@ lazy val docSettings = Seq(
     (LocalRootProject / baseDirectory).value.getAbsolutePath,
     "-diagrams"
   ),
-  git.remoteRepo := "git@github.com:twitter/algebird.git",
   makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md"
 )
 
 // Documentation is generated for projects defined in
 // `docsSourcesAndProjects`.
 lazy val docs = project
-  .enablePlugins(MicrositesPlugin, MdocPlugin, ScalaUnidocPlugin, GhpagesPlugin)
+  .enablePlugins(MicrositesPlugin, MdocPlugin, ScalaUnidocPlugin)
   .settings(moduleName := "algebird-docs")
   .settings(sharedSettings)
   .settings(noPublishSettings)

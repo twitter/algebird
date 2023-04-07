@@ -22,7 +22,7 @@ package com.twitter.algebird
  */
 import java.util.{LinkedHashMap => JLinkedHashMap, Map => JMap}
 import scala.collection.mutable.{Map => MMap}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object SummingCache {
   def apply[K, V: Semigroup](cap: Int): SummingCache[K, V] =

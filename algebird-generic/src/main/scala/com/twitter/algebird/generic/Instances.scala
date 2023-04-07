@@ -2,6 +2,7 @@ package com.twitter.algebird.generic
 
 import shapeless._
 import com.twitter.algebird._
+import scala.collection.compat._
 
 object Shapeless extends Shapeless3 {
 
@@ -105,12 +106,12 @@ class HConsSemigroup[A, B <: HList](protected val a: Semigroup[A], protected val
     a.plus(x.head, y.head) :: b.plus(x.tail, y.tail)
 
   override def sumOption(xs: TraversableOnce[A :: B]): Option[A :: B] =
-    if (xs.isEmpty) {
+    if (xs.iterator.isEmpty) {
       None
     } else {
       val bufA = ArrayBufferedOperation.fromSumOption[A](1000)(a)
       val bufB = ArrayBufferedOperation.fromSumOption[B](1000)(b)
-      xs.foreach { case a0 :: b0 =>
+      xs.iterator.foreach { case a0 :: b0 =>
         bufA.put(a0)
         bufB.put(b0)
       }

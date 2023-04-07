@@ -60,7 +60,7 @@ class RichCBitSet(val cb: CBitSet) extends AnyVal {
     val a = LongBitSet.empty(width)
     val iter = cb.intIterator
     while (iter.hasNext) {
-      val i = iter.next
+      val i = iter.next()
       a.set(i)
     }
     a.toBitSetNoCopy
@@ -484,7 +484,7 @@ case class BFSparse[A](hashes: BFHash[A], bits: CBitSet, override val width: Int
     var count = 0
     while (it.hasNext) {
       count += 1
-      it.next
+      it.next()
     }
     count
   }

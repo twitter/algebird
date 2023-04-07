@@ -66,7 +66,7 @@ sealed trait Fold[-I, +O] extends Serializable {
     val self = this
     new Fold[I, P] {
       type X = self.X
-      override def build: FoldState[X, I, P] =
+      override def build(): FoldState[X, I, P] =
         self.build().map(f)
     }
   }

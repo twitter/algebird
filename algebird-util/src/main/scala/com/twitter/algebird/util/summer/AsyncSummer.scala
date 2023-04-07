@@ -69,11 +69,11 @@ trait WithFlushConditions[T, M <: Iterable[T]] extends AsyncSummer[T, M] {
 
   def tick: Future[M] =
     if (timedOut) {
-      timeoutIncr.incr
+      timeoutIncr.incr()
       lastDump = System.currentTimeMillis // reset the timeout condition
       flush
     } else if (memoryWaterMark) {
-      memoryIncr.incr
+      memoryIncr.incr()
       lastDump = System.currentTimeMillis // reset the timeout condition
       flush
     } else {

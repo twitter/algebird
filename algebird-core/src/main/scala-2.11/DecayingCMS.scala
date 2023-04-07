@@ -5,6 +5,7 @@ import java.lang.Math
 import java.util.Arrays.deepHashCode
 import scala.concurrent.duration.Duration
 import scala.util.Random
+import scala.collection.compat._
 
 /**
  * DecayingCMS is a module to build count-min sketch instances whose counts decay exponentially.
@@ -595,7 +596,7 @@ final class DecayingCMS[K](
 
         override def sumOption(xs: TraversableOnce[CMS]): Option[CMS] = {
 
-          val it: Iterator[CMS] = xs.toIterator
+          val it: Iterator[CMS] = xs.iterator
           val ChunkSize = 1000
 
           // the idea here is that we read up to 1000 CMS values into

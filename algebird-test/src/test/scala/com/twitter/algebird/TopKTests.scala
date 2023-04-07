@@ -22,7 +22,7 @@ import com.twitter.algebird.mutable.PriorityQueueMonoid
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class TopKTests extends CheckProperties {
   import com.twitter.algebird.BaseProperties._

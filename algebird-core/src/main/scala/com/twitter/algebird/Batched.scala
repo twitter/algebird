@@ -45,7 +45,7 @@ sealed abstract class Batched[T] extends Serializable {
    * This method will grow the tree to the left.
    */
   def append(that: TraversableOnce[T]): Batched[T] =
-    that.foldLeft(this)((b, t) => b.combine(Batched(t)))
+    that.iterator.foldLeft(this)((b, t) => b.combine(Batched(t)))
 
   /**
    * Provide an iterator over the underlying tree structure.

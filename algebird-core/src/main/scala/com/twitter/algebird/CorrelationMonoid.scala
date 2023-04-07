@@ -1,5 +1,7 @@
 package com.twitter.algebird
 
+import scala.collection.compat._
+
 object Correlation {
   def apply(x: (Double, Double), weight: Double): Correlation =
     Correlation(c2 = 0, m2x = 0, m2y = 0, m1x = x._1, m1y = x._2, weight)
@@ -113,9 +115,9 @@ object CorrelationMonoid extends Monoid[Correlation] {
   override val zero: Correlation = Correlation(0, 0, 0, 0, 0, 0)
 
   override def sumOption(cs: TraversableOnce[Correlation]): Option[Correlation] =
-    if (cs.isEmpty) None
+    if (cs.iterator.isEmpty) None
     else {
-      val iter = cs.toIterator
+      val iter = cs.iterator
       val item = iter.next()
 
       var m0 = item.m0
