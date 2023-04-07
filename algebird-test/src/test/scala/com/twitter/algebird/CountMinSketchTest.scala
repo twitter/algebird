@@ -565,7 +565,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
         .filter(_._2 < minHhCount)
         .keys
         .toSet
-      infrequent.intersect(estimatedHhs) should be('empty)
+      infrequent.intersect(estimatedHhs) should be(Symbol("empty"))
     }
 
     "(when adding CMS instances) drop old heavy hitters when new heavy hitters replace them" in {

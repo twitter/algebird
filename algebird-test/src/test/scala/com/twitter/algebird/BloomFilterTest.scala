@@ -269,14 +269,14 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
 
     "be possible to create from an iterator" in {
       val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 100).map(_ => RAND.nextInt().toString)
       val bf = bfMonoid.create(entries.iterator)
       assert(bf.isInstanceOf[BF[String]])
     }
 
     "be possible to create from a sequence" in {
       val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 100).map(_ => RAND.nextInt().toString)
       val bf = bfMonoid.create(entries: _*)
       assert(bf.isInstanceOf[BF[String]])
     }
@@ -285,7 +285,7 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
       (0 to 100).foreach { _ =>
         val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = bfMonoid.create(entries: _*)
 
         entries.foreach(i => assert(bf.contains(i.toString).isTrue))
@@ -335,7 +335,7 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
       (0 to 10).foreach { _ =>
         val aggregator = BloomFilterAggregator[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = aggregator(entries)
 
         entries.foreach(i => assert(bf.contains(i.toString).isTrue))
@@ -382,7 +382,7 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
       (0 to 100).foreach { _ =>
         val bfMonoid = new BloomFilterMonoid[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = bfMonoid.create(entries: _*)
         entries
           .map(entry => (entry, bfMonoid.create(entry)))

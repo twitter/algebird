@@ -76,7 +76,7 @@ class SummingWithHitsCacheTest extends SummingCacheTest {
     forAll { (c: Capacity, values: List[Int]) =>
       // Only run this when we have at least 2 items and non-zero cap
       (values.size > 1 && c.cap > 1) ==> {
-        val key = RAND.nextInt
+        val key = RAND.nextInt()
         val items = values.map((key, _))
         val keyHits = getHits(c, items)
         !keyHits.exists(_ != 1)
