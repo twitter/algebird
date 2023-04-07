@@ -58,7 +58,7 @@ object ApproximateProperty {
       }
 
   def toProp(a: ApproximateProperty, objectReps: Int, inputReps: Int, falsePositiveRate: Double): Prop =
-    Prop { _: Gen.Parameters =>
+    Prop { (_: Gen.Parameters) =>
       require(0 <= falsePositiveRate && falsePositiveRate <= 1)
 
       val list = successesAndProbabilities(a, objectReps, inputReps)

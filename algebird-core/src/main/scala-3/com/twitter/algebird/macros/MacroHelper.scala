@@ -54,3 +54,5 @@ trait MacroHelper:
           }
         )
       )
+
+private[algebird] object MacroCompat

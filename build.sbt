@@ -10,7 +10,7 @@ val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.15"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
-val scalacheckVersion = "1.15.2"
+val scalacheckVersion = "1.15.3"
 val scalaCollectionCompat = "2.9.0"
 val utilVersion = "21.2.0"
 val sparkVersion = "2.4.8"
@@ -136,16 +136,6 @@ val sharedSettings = Seq(
     scalaVersion.value
   )
 ) ++ mimaSettings
-// NOTE: After dropping Scala 2.11, we can remove src/main/scala-2.11 and share sources between scala 2.12, 2.13 and 3.x.
-lazy val kindprojectorSettings = Seq(
-  Compile / scalacOptions ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _))       => Seq("-Ykind-projector:underscores")
-      case Some((2, 12 | 13)) => Seq("-Xsource:3", "-P:kind-projector:underscore-placeholders")
-      case _                  => Seq.empty
-    }
-  }
-)
 
 lazy val noPublishSettings = Seq(
   publish / skip := true,
@@ -210,6 +200,34 @@ lazy val mimaSettings = Def.settings(
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHasher.*")
   )
 )
+// NOTE: After dropping Scala 2.11, we can remove src/main/scala-2.11 and share sources between scala 2.12, 2.13 and 3.x.
+
+val compilerExtraSettings =
+  Seq(
+    Compile / scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _))       => Seq("-Ykind-projector:underscores")
+        case Some((2, 12 | 13)) => Seq("-Xsource:3", "-P:kind-projector:underscore-placeholders")
+        case _                  => Seq.empty
+      }
+    },
+    libraryDependencies ++= {
+      if (isScala3(scalaVersion.value)) {
+        Seq.empty
+      } else if (isScala213x(scalaVersion.value)) {
+        Seq(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+        )
+      } else {
+        Seq(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+          compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)),
+          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+        )
+      }
+    }
+  )
 
 /**
  * This returns the previous jar we released that is compatible with the current.
@@ -259,22 +277,7 @@ lazy val algebirdCore = module("core")
         ("org.typelevel" %% "algebra" % algebraVersion).cross(CrossVersion.for3Use2_13),
         "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
         "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompat
-      ) ++ {
-        if (isScala3(scalaVersion.value)) {
-          Seq.empty
-        } else if (isScala213x(scalaVersion.value)) {
-          Seq(
-            "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-            compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
-          )
-        } else {
-          Seq(
-            "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-            compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)),
-            compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
-          )
-        }
-      },
+      ),
     Compile / sourceGenerators += Def.task {
       GenTupleAggregators.gen((Compile / sourceManaged).value)
     }.taskValue,
@@ -282,7 +285,7 @@ lazy val algebirdCore = module("core")
     Compile / doc / sources ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
     Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
   )
-  .settings(kindprojectorSettings)
+  .settings(compilerExtraSettings)
 
 lazy val algebirdTest = module("test")
   .settings(
@@ -293,17 +296,9 @@ lazy val algebirdTest = module("test")
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion,
         "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
-      ) ++ {
-        if (isScala213x(scalaVersion.value)) {
-          Seq()
-        } else {
-          Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
-        }
-      },
-    addCompilerPlugin(
-      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
-    )
+      )
   )
+  .settings(compilerExtraSettings)
   .dependsOn(algebirdCore)
 
 lazy val algebirdBenchmark = module("benchmark")
