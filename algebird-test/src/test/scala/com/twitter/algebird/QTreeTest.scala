@@ -36,7 +36,7 @@ class QTreeLaws extends CheckProperties {
 
 class QTreeTest extends AnyWordSpec with Matchers {
   def randomList(n: Long): scala.collection.immutable.IndexedSeq[Double] =
-    (1L to n).map(_ => math.random)
+    (1L to n).map(_ => Math.random())
 
   def buildQTree(k: Int, list: Seq[Double]): QTree[Double] = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
@@ -72,7 +72,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
       "always contain the true quantile within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
-        val quantile = math.random
+        val quantile = Math.random()
         val (lower, upper) = qt.quantileBounds(quantile)
         val truth = trueQuantile(list, quantile)
         assert(truth >= lower)
@@ -89,8 +89,8 @@ class QTreeTest extends AnyWordSpec with Matchers {
       "always contain the true range sum within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
-        val from = math.random
-        val to = math.random
+        val from = Math.random()
+        val to = Math.random()
         val (lower, upper) = qt.rangeSumBounds(from, to)
         val truth = trueRangeSum(list, from, to)
         assert(truth >= lower)

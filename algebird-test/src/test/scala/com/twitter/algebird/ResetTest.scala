@@ -24,7 +24,7 @@ class ResetTest extends CheckProperties {
 
   implicit def resetArb[T: Arbitrary]: Arbitrary[ResetState[T]] = Arbitrary {
     Arbitrary.arbitrary[T].map { t =>
-      if (scala.math.random < 0.1) {
+      if (Math.random() < 0.1) {
         ResetValue(t)
       } else {
         SetValue(t)
