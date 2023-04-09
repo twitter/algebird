@@ -24,7 +24,7 @@ import scala.math.Equiv
 /**
  * Base properties useful for all tests using Algebird's typeclasses.
  */
-object BaseProperties extends MetricProperties {
+object BaseProperties extends MetricProperties with BasePropertiesCompat {
 
   /**
    * We generate a restricted set of BigDecimals for our tests because if we use the full range then the way
@@ -170,11 +170,6 @@ object BaseProperties extends MetricProperties {
     override def apply[T](m: M[T], n: M[T]): Boolean = m == n
   }
 
-  def isNonZero[V: Semigroup](v: V): Boolean =
-    implicitly[Semigroup[V]] match {
-      case mon: Monoid[_] => mon.isNonZero(v)
-      case _              => true
-    }
 
   def isAssociativeDifferentTypes[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
     "isAssociativeEq" |: forAll { (a: U, b: U, c: U) =>

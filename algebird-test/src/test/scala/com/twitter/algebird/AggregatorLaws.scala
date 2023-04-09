@@ -59,22 +59,8 @@ class AggregatorTests extends AnyFunSuite {
   }
 }
 
-class AggregatorLaws extends CheckProperties {
+class AggregatorLaws extends CheckProperties with AggregatorLawsCompat {
 
-  implicit def aggregator[A, B, C](implicit
-      prepare: Arbitrary[A => B],
-      sg: Semigroup[B],
-      present: Arbitrary[B => C]
-  ): Arbitrary[Aggregator[A, B, C]] = Arbitrary {
-    for {
-      pp <- prepare.arbitrary
-      ps <- present.arbitrary
-    } yield new Aggregator[A, B, C] {
-      def prepare(a: A) = pp(a)
-      def semigroup = sg
-      def present(b: B) = ps(b)
-    }
-  }
 
   property("composing before Aggregator is correct") {
     forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
@@ -93,14 +79,6 @@ class AggregatorLaws extends CheckProperties {
   property("composing two Aggregators is correct") {
     forAll { (in: List[Int], ag1: Aggregator[Int, String, Int], ag2: Aggregator[Int, Int, String]) =>
       val c = GeneratedTupleAggregator.from2((ag1, ag2))
-      in.isEmpty || c(in) == ((ag1(in), ag2(in)))
-    }
-  }
-
-  property("Applicative composing two Aggregators is correct") {
-    forAll { (in: List[Int], ag1: Aggregator[Int, Set[Int], Int], ag2: Aggregator[Int, Unit, String]) =>
-      type AggInt[T] = Aggregator[Int, ?, T]
-      val c = Applicative.join[AggInt, Int, String](ag1, ag2)
       in.isEmpty || c(in) == ((ag1(in), ag2(in)))
     }
   }
