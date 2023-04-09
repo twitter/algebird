@@ -2,7 +2,7 @@ package com.twitter.algebird
 
 import scala.collection.compat._
 
-object Scan {
+object Scan extends ScanApplicativeCompat {
 
   /**
    * Most consumers of Scan don't care about the type of the type State type variable. But for those that do,
@@ -13,7 +13,6 @@ object Scan {
    */
   type Aux[-I, S, +O] = Scan[I, O] { type State = S }
 
-  implicit def applicative[I]: Applicative[Scan[I, _]] = new ScanApplicative[I]
 
   def from[I, S, O](initState: S)(presentAndNextStateFn: (I, S) => (O, S)): Aux[I, S, O] =
     new Scan[I, O] {
@@ -321,13 +320,3 @@ sealed abstract class Scan[-I, +O] extends Serializable {
 
 }
 
-class ScanApplicative[I] extends Applicative[Scan[I, _]] {
-  override def map[T, U](mt: Scan[I, T])(fn: T => U): Scan[I, U] =
-    mt.andThenPresent(fn)
-
-  override def apply[T](v: T): Scan[I, T] =
-    Scan.const(v)
-
-  override def join[T, U](mt: Scan[I, T], mu: Scan[I, U]): Scan[I, (T, U)] =
-    mt.join(mu)
-}
