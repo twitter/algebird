@@ -2,6 +2,8 @@ package com.twitter.algebird
 
 import scala.collection.mutable.{Builder, Map => MMap}
 import scala.collection.{Map => ScMap}
+import scala.collection.compat._
+
 
 abstract class GenericMapMonoid[K, V, M <: ScMap[K, V]](implicit val semigroup: Semigroup[V])
     extends Monoid[M]
