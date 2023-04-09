@@ -85,7 +85,7 @@ class CollectionSpecification extends CheckProperties {
     monoidLaws[Set[Int]]
   }
 
-  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid]:Arbitrary[Map[K, V]] = Arbitrary { // scalafix:ok
+  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary { // scalafix:ok
     val mv = implicitly[Monoid[V]]
     implicitly[Arbitrary[Map[K, V]]].arbitrary
       .map {
