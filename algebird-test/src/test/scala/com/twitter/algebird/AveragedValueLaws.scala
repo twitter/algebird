@@ -26,7 +26,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue.aggregator returns the average") {
-    forAll { v: NonEmptyVector[Double] => approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items)) }
+    forAll { (v: NonEmptyVector[Double]) => approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items)) }
   }
 
   property("AveragedValue instances subtract") {
@@ -42,7 +42,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue works by + or sumOption") {
-    forAll { v: NonEmptyVector[Double] =>
+    forAll { (v: NonEmptyVector[Double]) =>
       val avgs = v.items.map(AveragedValue(_))
       val sumOpt = Semigroup.sumOption[AveragedValue](avgs).get
       val byPlus = avgs.reduce(_ + _)
@@ -53,7 +53,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   def numericAggregatorTest[T: Numeric: Arbitrary]: Prop =
-    forAll { v: NonEmptyVector[T] =>
+    forAll { (v: NonEmptyVector[T]) =>
       val averaged = AveragedValue.numericAggregator[T].apply(v.items)
       approxEq(1e-10)(avg(v.items), averaged)
     }

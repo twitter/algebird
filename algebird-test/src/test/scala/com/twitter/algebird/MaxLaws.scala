@@ -15,7 +15,7 @@ class MaxLaws extends CheckProperties {
     }
 
   def maxSemiGroupTest[T: Arbitrary: Ordering]: Prop =
-    forAll { v: NonEmptyVector[T] =>
+    forAll { (v: NonEmptyVector[T]) =>
       val maxItems = v.items.map(Max(_))
       v.items.max == Max.semigroup[T].combineAllOption(maxItems).get.get
     }
@@ -31,7 +31,7 @@ class MaxLaws extends CheckProperties {
   property("Max.{ +, max } works on ints")(maxTest[Int])
 
   property("Max.aggregator returns the maximum item") {
-    forAll { v: NonEmptyVector[Int] => v.items.max == Max.aggregator[Int].apply(v.items) }
+    forAll { (v: NonEmptyVector[Int]) => v.items.max == Max.aggregator[Int].apply(v.items) }
   }
 
   property("Max.semigroup[Int] returns the maximum item") {

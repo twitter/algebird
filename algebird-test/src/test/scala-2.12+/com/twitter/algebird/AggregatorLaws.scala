@@ -126,7 +126,7 @@ class AggregatorLaws extends CheckProperties {
   }
 
   def checkNumericSum[T: Arbitrary](implicit num: Numeric[T]): Prop =
-    forAll { in: List[T] =>
+    forAll { (in: List[T]) =>
       val aggregator = Aggregator.numericSum[T]
       val ares = aggregator(in)
       val sres = in.map(num.toDouble).sum

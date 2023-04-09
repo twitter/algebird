@@ -101,7 +101,7 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   def isPowerOfTwo(i: Long): Boolean = (i & -i) == i
 
   property("verify isPowerOfTwo") {
-    forAll { i: PosNum[Int] =>
+    forAll { (i: PosNum[Int]) =>
       val power = math.pow(2, i.value % 32).toLong
       assert(isPowerOfTwo(power))
     }
@@ -109,7 +109,7 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
 
   // The next two properties are invariants from the paper.
   property("Invariant 1: relative error bound applies as old buckets expire") {
-    forAll { hist: ExpHist =>
+    forAll { (hist: ExpHist) =>
       val numBuckets = hist.buckets.size
 
       // sequence of histograms, each with one more oldest bucket
@@ -124,7 +124,7 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("Invariant 2: bucket sizes are nondecreasing powers of two") {
-    forAll { e: ExpHist =>
+    forAll { (e: ExpHist) =>
       assert(e.buckets.forall(b => isPowerOfTwo(b.size)))
 
       // sizes are nondecreasing:
@@ -134,11 +134,11 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("Total tracked by e is the sum of all bucket sizes") {
-    forAll { e: ExpHist => assert(e.buckets.map(_.size).sum == e.total) }
+    forAll { (e: ExpHist) => assert(e.buckets.map(_.size).sum == e.total) }
   }
 
   property("ExpHist bucket sizes are the l-canonical rep of the tracked total") {
-    forAll { e: ExpHist => assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l)) }
+    forAll { (e: ExpHist) => assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l)) }
   }
 
   property("adding i results in upperBoundSum == i") {

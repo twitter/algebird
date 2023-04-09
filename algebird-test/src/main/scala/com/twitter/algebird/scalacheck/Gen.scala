@@ -47,9 +47,9 @@ object gen extends ExpHistGen with IntervalGen {
     for {
       m0 <- choose(1L, Int.MaxValue.toLong)
       m1 <- choose(-1e50, 1e50)
-      m2 <- choose(0, 1e50)
+      m2 <- choose[Double](0, 1e50)
       m3 <- choose(-1e10, 1e50)
-      m4 <- choose(0, 1e50)
+      m4 <- choose[Double](0, 1e50)
     } yield new Moments(m0, m1, m2, m3, m4)
 
   private val genLongString: Gen[String] = for {
@@ -91,8 +91,8 @@ object gen extends ExpHistGen with IntervalGen {
     val genRandom: Gen[Correlation] =
       for {
         c2 <- choose(-1e10, 1e10)
-        m2x <- choose(0, 1e10)
-        m2y <- choose(0, 1e10)
+        m2x <- choose[Double](0, 1e10)
+        m2y <- choose[Double](0, 1e10)
         m1x <- choose(-1e10, 1e10)
         m1y <- choose(-1e10, 1e10)
         m0 <- choose(-1e10, 1e10)

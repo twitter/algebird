@@ -9,18 +9,18 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("A Monoid should be able to sum") {
     val monoid = implicitly[Monoid[Int]]
-    forAll { intList: List[Int] => intList.sum == monoid.sum(intList) }
+    forAll((intList: List[Int]) => intList.sum == monoid.sum(intList))
   }
 
   property("A Ring should be able to product") {
     val ring = implicitly[Ring[Int]]
-    forAll { intList: List[Int] => intList.product == ring.product(intList) }
+    forAll((intList: List[Int]) => intList.product == ring.product(intList))
   }
 
   property("An OptionMonoid should be able to sum") {
     val monoid = implicitly[Monoid[Option[Int]]]
 
-    forAll { intList: List[Option[Int]] =>
+    forAll { (intList: List[Option[Int]]) =>
       val flattenedList = intList.flatten
       val expectedResult =
         if (flattenedList.nonEmpty) Some(flattenedList.sum) else None
@@ -31,7 +31,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
   property("An OptionMonoid based on a Semigroup should be able to sum") {
     val maxMonoid = implicitly[Monoid[Option[Max[Int]]]]
     val minMonoid = implicitly[Monoid[Option[Min[Int]]]]
-    forAll { intList: List[Option[Int]] =>
+    forAll { (intList: List[Option[Int]]) =>
       val minList = intList.map {
         case Some(x) => Some(Min(x))
         case None    => None
@@ -84,7 +84,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("An ArrayMonoid should sum") {
     val monoid = new ArrayMonoid[Int]
-    forAll { intList: List[Int] =>
+    forAll { (intList: List[Int]) =>
       val (l, r) = intList.splitAt(intList.size / 2)
       val left = l.padTo(math.max(l.size, r.size), 0)
       val right = r.padTo(math.max(l.size, r.size), 0)
@@ -97,7 +97,7 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("An ArrayGroup should negate") {
     val arrayGroup = new ArrayGroup[Int]
-    forAll { intList: List[Int] =>
+    forAll { (intList: List[Int]) =>
       intList.map(-1 * _).toSeq == arrayGroup
         .negate(intList.toArray)
         .toSeq
@@ -106,8 +106,12 @@ class AbstractAlgebraTest extends CheckProperties with Matchers {
 
   property("a user-defined product monoid should work") {
     case class Metrics(count: Int, largestValue: Option[Max[Int]])
-    implicit val MetricsMonoid = Monoid(Metrics.apply _, Metrics.unapply _)
-    implicit val metricsGen = Arbitrary {
+    val unapply: Metrics => Option[(Int, Option[Max[Int]])] = { case Metrics(count, largestValue) =>
+      Some((count, largestValue))
+    }
+    implicit val MetricsMonoid: Monoid[Metrics] =
+      Monoid.apply[Metrics, Int, Option[Max[Int]]](Metrics.apply _, unapply)
+    implicit val metricsGen: Arbitrary[Metrics] = Arbitrary[Metrics] {
       for {
         count <- Gen.choose(0, 10000)
         largest <- Gen.oneOf[Option[Max[Int]]](None, Gen.choose(1, 100).map(n => Some(Max(n))))

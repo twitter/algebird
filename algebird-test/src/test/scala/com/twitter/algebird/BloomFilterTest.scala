@@ -250,13 +250,13 @@ class BloomFilterProperties extends ApproximateProperties("BloomFilter") {
 
   for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {
     property(s"has small false positive rate with false positive rate = $falsePositiveRate") = {
-      implicit val intGen = Gen.choose(1, 1000)
+      implicit val intGen:Gen[Int] = Gen.choose(1, 1000)
       toProp(new BloomFilterFalsePositives[Int](falsePositiveRate), 50, 50, 0.01)
     }
   }
 
   property("approximate cardinality") = {
-    implicit val intGen = Gen.choose(1, 1000)
+    implicit val intGen:Gen[Int] = Gen.choose(1, 1000)
     toProp(new BloomFilterCardinality[Int], 50, 1, 0.01)
   }
 }

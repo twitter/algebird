@@ -19,7 +19,7 @@ package com.twitter.algebird
 import org.scalacheck.Prop._
 import com.twitter.algebird.scalacheck.PosNum
 
-class IntervalLaws extends CheckProperties {
+class IntervalLaws extends CheckProperties with IntervalLawsCompat {
   import com.twitter.algebird.scalacheck.arbitrary._
   import com.twitter.algebird.Interval.GenIntersection
 
@@ -36,14 +36,14 @@ class IntervalLaws extends CheckProperties {
   }
 
   property("[x, x + 1) contains x") {
-    forAll { y: Int =>
+    forAll { (y: Int) =>
       val x = y.asInstanceOf[Long]
       Interval.leftClosedRightOpen(x, x + 1).contains(x)
     }
   }
 
   property("[x, x + 1] contains x, x+1") {
-    forAll { y: Int =>
+    forAll { (y: Int) =>
       val x = y.asInstanceOf[Long]
       val intr = Interval.closed(x, x + 1)
       intr.contains(x) &&
@@ -53,7 +53,7 @@ class IntervalLaws extends CheckProperties {
     }
   }
   property("(x, x + 2) contains x+1") {
-    forAll { y: Int =>
+    forAll { (y: Int) =>
       val x = y.asInstanceOf[Long]
       val intr = Interval.open(x, x + 2)
       intr.contains(x + 1) &&
@@ -63,26 +63,26 @@ class IntervalLaws extends CheckProperties {
   }
 
   property("(x, x + 1] contains x + 1") {
-    forAll { y: Int =>
+    forAll { (y: Int) =>
       val x = y.asInstanceOf[Long]
       Interval.leftOpenRightClosed(x, x + 1).contains(x + 1)
     }
   }
 
   property("[x, x + 1) does not contain x + 1") {
-    forAll { x: Int => !Interval.leftClosedRightOpen(x, x + 1).contains(x + 1) }
+    forAll((x: Int) => !Interval.leftClosedRightOpen(x, x + 1).contains(x + 1))
   }
 
   property("(x, x + 1] does not contain x") {
-    forAll { x: Int => !Interval.leftOpenRightClosed(x, x + 1).contains(x) }
+    forAll((x: Int) => !Interval.leftOpenRightClosed(x, x + 1).contains(x))
   }
 
   property("[x, x) is empty") {
-    forAll { x: Int => Interval.leftClosedRightOpen(x, x).isEmpty }
+    forAll((x: Int) => Interval.leftClosedRightOpen(x, x).isEmpty)
   }
 
   property("(x, x] is empty") {
-    forAll { x: Int => Interval.leftOpenRightClosed(x, x).isEmpty }
+    forAll((x: Int) => Interval.leftOpenRightClosed(x, x).isEmpty)
   }
 
   property("[x, y).isEmpty == (x >= y)") {
@@ -295,32 +295,6 @@ class IntervalLaws extends CheckProperties {
             case (None, None)         => false // should never happen
           }
         case None => true
-      }
-    }
-  }
-  property("if boundedLeast is none, we are Universe, Upper or isEmpty is true") {
-    forAll { (a: Interval[Long]) =>
-      a.boundedLeast match {
-        case Some(_) => true
-        case None =>
-          a.isEmpty || (a match {
-            case _: Upper[_] => true
-            case Universe()  => true
-            case _           => false
-          })
-      }
-    }
-  }
-  property("if boundedGreatest is none, we are Universe, Lower or isEmpty is true") {
-    forAll { (a: Interval[Long]) =>
-      a.boundedGreatest match {
-        case Some(_) => true
-        case None =>
-          a.isEmpty || (a match {
-            case _: Lower[_] => true
-            case Universe()  => true
-            case _           => false
-          })
       }
     }
   }

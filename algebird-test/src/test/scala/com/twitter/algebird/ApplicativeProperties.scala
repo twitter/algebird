@@ -54,7 +54,7 @@ class ApplicativeProperties extends CheckProperties {
   property("sequenceGen") {
     // This follows from the laws, so we are just testing
     // the implementation of sequenceGen against sequence here
-    forAll { ls: List[Option[Int]] =>
+    forAll { (ls: List[Option[Int]]) =>
       val res: Option[Vector[Int]] = Applicative.sequenceGen(ls)
       Applicative.sequence(ls).map(_.toVector) == res
     }
@@ -62,27 +62,27 @@ class ApplicativeProperties extends CheckProperties {
   // Applicative algebras:
   import BaseProperties._
   property("Applicative Semigroup") {
-    implicit val optSg = new ApplicativeSemigroup[Int, Option]
-    implicit val listSg = new ApplicativeSemigroup[String, List]
+    implicit val optSg: Semigroup[Option[Int]] = new ApplicativeSemigroup[Int, Option]
+    implicit val listSg: Semigroup[List[String]] = new ApplicativeSemigroup[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     semigroupLaws[Option[Int]] && isAssociative[List[String]]
   }
 
   property("Applicative Monoid") {
-    implicit val optSg = new ApplicativeMonoid[Int, Option]
-    implicit val listSg = new ApplicativeMonoid[String, List]
+    implicit val optSg: Monoid[Option[Int]] = new ApplicativeMonoid[Int, Option]
+    implicit val listSg: Monoid[List[String]] = new ApplicativeMonoid[String, List]
     // the + here is actually a cross-product, and testing sumOption blows up
     monoidLaws[Option[Int]] && validZero[List[String]]
   }
 
   // These laws work for only "non-empty" monads
   property("Applicative Group") {
-    implicit val optSg = new ApplicativeGroup[Int, Some]
+    implicit val optSg: ApplicativeGroup[Int, Some] = new ApplicativeGroup[Int, Some]
     groupLaws[Some[Int]]
   }
 
   property("Applicative Ring") {
-    implicit val optSg = new ApplicativeRing[Int, Some]
+    implicit val optSg: ApplicativeRing[Int, Some] = new ApplicativeRing[Int, Some]
     ringLaws[Some[Int]]
   }
 }

@@ -35,7 +35,7 @@ class CollectionSpecification extends CheckProperties {
     implicit val equiv: Equiv[Map[String, Option[Int]]] =
       Equiv.fromFunction { (a, b) =>
         val keys: Set[String] = a.keySet | b.keySet
-        keys.forall { key: String =>
+        keys.forall { (key: String) =>
           val v1: Int = a.getOrElse(key, None).getOrElse(0)
           val v2: Int = b.getOrElse(key, None).getOrElse(0)
           v1 == v2
@@ -85,7 +85,7 @@ class CollectionSpecification extends CheckProperties {
     monoidLaws[Set[Int]]
   }
 
-  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid] = Arbitrary { // scalafix:ok
+  implicit def mapArb[K: Arbitrary, V: Arbitrary: Monoid]:Arbitrary[Map[K, V]] = Arbitrary { // scalafix:ok
     val mv = implicitly[Monoid[V]]
     implicitly[Arbitrary[Map[K, V]]].arbitrary
       .map {
@@ -93,14 +93,15 @@ class CollectionSpecification extends CheckProperties {
       }
   }
 
+
   implicit def scMapArb[K: Arbitrary, V: Arbitrary: Monoid]: Arbitrary[ScMap[K, V]] = Arbitrary {
     mapArb[K, V].arbitrary
-      .map { map: Map[K, V] => map: ScMap[K, V] }
+      .map { (map: Map[K, V]) => map: ScMap[K, V] }
   }
 
   implicit def mMapArb[K: Arbitrary, V: Arbitrary: Monoid]: Arbitrary[MMap[K, V]] = Arbitrary {
     mapArb[K, V].arbitrary
-      .map { map: Map[K, V] => MMap(map.toSeq: _*): MMap[K, V] }
+      .map { (map: Map[K, V]) => MMap(map.toSeq: _*): MMap[K, V] }
   }
 
   def mapPlusTimesKeys[M <: ScMap[Int, Int]](implicit
@@ -336,26 +337,26 @@ class CollectionSpecification extends CheckProperties {
     )
 
   property("AdaptiveVector[Int] has a semigroup") {
-    implicit val arb = Arbitrary(arbAV(2))
+    implicit val arb:Arbitrary[AdaptiveVector[Int]] = Arbitrary(arbAV(2))
     semigroupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a monoid") {
     // TODO: remove this equiv instance once #583 is resolved.
-    implicit val equiv = AdaptiveVector.denseEquiv[Int]
-    implicit val arb = Arbitrary(arbAV(0))
+    implicit val equiv:Equiv[AdaptiveVector[Int]] = AdaptiveVector.denseEquiv[Int]
+    implicit val arb: Arbitrary[AdaptiveVector[Int]] = Arbitrary(arbAV(0))
     monoidLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[Int] has a group") {
-    implicit val arb = Arbitrary(arbAV(1))
+    implicit val arb:Arbitrary[AdaptiveVector[Int]] = Arbitrary(arbAV(1))
     groupLaws[AdaptiveVector[Int]]
   }
 
   property("AdaptiveVector[String] has a monoid") {
     // TODO: remove this equiv instance once #583 is resolved.
-    implicit val equiv = AdaptiveVector.denseEquiv[String]
-    implicit val arb = Arbitrary(arbAV(""))
+    implicit val equiv:Equiv[AdaptiveVector[String]] = AdaptiveVector.denseEquiv[String]
+    implicit val arb:Arbitrary[AdaptiveVector[String]] = Arbitrary(arbAV(""))
     monoidLaws[AdaptiveVector[String]]
   }
 }

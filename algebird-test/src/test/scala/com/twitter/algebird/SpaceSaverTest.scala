@@ -40,7 +40,7 @@ class SpaceSaverLaws extends CheckProperties {
   }
 
   property("SpaceSaver can serialize/deserialize itself") {
-    forAll { ss: SpaceSaver[String] =>
+    forAll { (ss: SpaceSaver[String]) =>
       val ssAsBytes = SpaceSaver.toBytes(ss, SpaceSaverTest.stringToArrayByte)
       SpaceSaver
         .fromBytes(ssAsBytes, SpaceSaverTest.arrayByteToString)
@@ -49,7 +49,7 @@ class SpaceSaverLaws extends CheckProperties {
   }
 
   property("SpaceSaver.fromBytes yield a failure on bad Array[Byte]") {
-    forAll { a: Array[Byte] =>
+    forAll { (a: Array[Byte]) =>
       try {
         val fromBytes =
           SpaceSaver.fromBytes(a, SpaceSaverTest.arrayByteToString)

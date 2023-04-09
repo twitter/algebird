@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 class LastLaws extends CheckProperties {
   property("Last should sum properly") {
-    forAll { v: NonEmptyVector[Last[Int]] =>
+    forAll { (v: NonEmptyVector[Last[Int]]) =>
       val last = Semigroup.sumOption[Last[Int]](v.items).get
       last == v.items.last
     }
@@ -18,7 +18,7 @@ class LastLaws extends CheckProperties {
   }
 
   property("Last.aggregator returns the last item") {
-    forAll { v: NonEmptyVector[Int] => v.items.last == Last.aggregator(v.items) }
+    forAll { (v: NonEmptyVector[Int]) => v.items.last == Last.aggregator(v.items) }
   }
 
   property("Last[Int] is a Semigroup")(semigroupLaws[Last[Int]])
