@@ -175,8 +175,6 @@ final class FoldState[X, -I, +O] private[algebird] (val add: (X, I) => X, val st
  */
 object Fold extends CompatFold with FoldApplicativeCompat {
 
-
-
   /**
    * Turn a common Scala foldLeft into a Fold. The accumulator MUST be immutable and serializable.
    */
@@ -330,5 +328,3 @@ object Fold extends CompatFold with FoldApplicativeCompat {
       case (c, _)            => c
     }
 }
-
-

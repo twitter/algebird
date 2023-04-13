@@ -5,12 +5,12 @@ import com.twitter.algebird.BaseProperties._
 class GeneratedProductAlgebraLaws extends CheckProperties {
   property("Product2Ring is a ring") {
     type T = (Int, Int)
-    implicit val ring:Ring[T] = Ring[T, Int, Int](Tuple2.apply, Tuple2.unapply)
+    implicit val ring: Ring[T] = Ring[T, Int, Int](Tuple2.apply, Tuple2.unapply)
     ringLaws[T] && isCommutative[T]
   }
   property("Product3Ring is a ring") {
     type T = (Int, Int, Int)
-    implicit val ring:Ring[T] = Ring[T, Int, Int, Int](Tuple3.apply, Tuple3.unapply)
+    implicit val ring: Ring[T] = Ring[T, Int, Int, Int](Tuple3.apply, Tuple3.unapply)
     ringLaws[T] && isCommutative[T]
   }
   property("Product4Ring is a ring") {
@@ -76,18 +76,20 @@ class GeneratedProductAlgebraLaws extends CheckProperties {
   property("Product14Ring is a ring") {
     type T =
       (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
-    implicit val ring: Ring[T] = Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
-      Tuple14.apply,
-      Tuple14.unapply
-    )
+    implicit val ring: Ring[T] =
+      Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
+        Tuple14.apply,
+        Tuple14.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product15Ring is a ring") {
     type T = (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)
-    implicit val ring: Ring[T] = Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
-      Tuple15.apply,
-      Tuple15.unapply
-    )
+    implicit val ring: Ring[T] =
+      Ring[T, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int](
+        Tuple15.apply,
+        Tuple15.unapply
+      )
     ringLaws[T] && isCommutative[T]
   }
   property("Product16Ring is a ring") {

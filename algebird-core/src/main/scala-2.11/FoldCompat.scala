@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-
 trait FoldApplicativeCompat {
   implicit def applicative[I]: Applicative[Fold[I, *]] =
     new FoldApplicative[I]

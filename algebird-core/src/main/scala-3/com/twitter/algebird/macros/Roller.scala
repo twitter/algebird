@@ -59,7 +59,7 @@ object Roller extends MacroHelper:
         def options(i: Expr[Int], index: Expr[Int]): Expr[Seq[Option[Any]]] =
           '{
             (1 to ${ arity }).map(index =>
-              if (((1 << { index - 1 }) & ${ i }) == 0) then None
+              if ((1 << { index - 1 }) & ${ i }) == 0 then None
               else ${ idents }(index - 1).asInstanceOf[Option[Any]]
             )
           }

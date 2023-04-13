@@ -182,9 +182,11 @@ class CMSInstanceTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPro
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given
  * `f: L => K`.
  */
-class CMSContraMapSpec extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks with CMSContraMapSpecCompat {
-
-
+class CMSContraMapSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaCheckDrivenPropertyChecks
+    with CMSContraMapSpecCompat {
 
   "supports, via contramap, creating CMS monoids for such types K that are not supported out of the box" in {
     // Given a "source" CMSHasher[K] which is supported out of the box

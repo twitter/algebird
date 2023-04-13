@@ -26,7 +26,7 @@ class AveragedValueLaws extends CheckProperties {
   }
 
   property("AveragedValue.aggregator returns the average") {
-    forAll { (v: NonEmptyVector[Double]) => approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items)) }
+    forAll((v: NonEmptyVector[Double]) => approxEq(1e-10)(avg(v.items), AveragedValue.aggregator(v.items)))
   }
 
   property("AveragedValue instances subtract") {

@@ -21,7 +21,6 @@ import scala.collection.{Map => ScMap}
 import algebra.ring.Rng
 import scala.collection.compat._
 
-
 trait MapOperations[K, V, M <: ScMap[K, V]] {
   def add(oldMap: M, kv: (K, V)): M
   def remove(oldMap: M, k: K): M

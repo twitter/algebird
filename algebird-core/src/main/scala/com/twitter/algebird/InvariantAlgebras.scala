@@ -1,6 +1,5 @@
 package com.twitter.algebird
 
-
 class InvariantMonoid[T, U](forward: T => U, reverse: U => T)(implicit val monoid: Monoid[T])
     extends InvariantSemigroup[T, U](forward, reverse)
     with Monoid[U] {

@@ -170,7 +170,6 @@ object BaseProperties extends MetricProperties with BasePropertiesCompat {
     override def apply[T](m: M[T], n: M[T]): Boolean = m == n
   }
 
-
   def isAssociativeDifferentTypes[T: Semigroup: Equiv, U <: T: Arbitrary]: Prop =
     "isAssociativeEq" |: forAll { (a: U, b: U, c: U) =>
       val semi = implicitly[Semigroup[T]]

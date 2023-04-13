@@ -18,7 +18,7 @@ object Aggregator extends java.io.Serializable with AggregatorCompat {
    * This is a trivial aggregator that always returns a single value
    */
   def const[T](t: T): MonoidAggregator[Any, Unit, T] =
-    prepareMonoid { (_: Any) => () }.andThenPresent(_ => t)
+    prepareMonoid((_: Any) => ()).andThenPresent(_ => t)
 
   /**
    * Using Aggregator.prepare,present you can add to this aggregator
@@ -170,7 +170,7 @@ object Aggregator extends java.io.Serializable with AggregatorCompat {
    * How many items satisfy a predicate
    */
   def count[T](pred: T => Boolean): MonoidAggregator[T, Long, Long] =
-    prepareMonoid { (t: T) => if (pred(t)) 1L else 0L }
+    prepareMonoid((t: T) => if (pred(t)) 1L else 0L)
 
   /**
    * Do any items satisfy some predicate
@@ -308,7 +308,7 @@ object Aggregator extends java.io.Serializable with AggregatorCompat {
    * Put everything in a Set. Note, this could fill the memory if the Set is very large.
    */
   def toSet[T]: MonoidAggregator[T, Set[T], Set[T]] =
-    prepareMonoid { (t: T) => Set(t) }
+    prepareMonoid((t: T) => Set(t))
 
   /**
    * This builds an in-memory Set, and then finally gets the size of that set. This may not be scalable if the
@@ -503,8 +503,6 @@ trait Aggregator[-A, B, +C] extends java.io.Serializable { self =>
       override def monoid = new OptionMonoid[B]()(self.semigroup)
     }
 }
-
-
 
 trait MonoidAggregator[-A, B, +C] extends Aggregator[A, B, C] { self =>
   def monoid: Monoid[B]

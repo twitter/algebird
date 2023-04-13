@@ -40,7 +40,7 @@ class SummingCacheTest extends CheckProperties {
   def test[K, V: Monoid](c: Capacity, items: List[(K, V)]): Boolean = {
     val sc = newCache[K, V](c)
     val mitems = items.map(Map(_))
-    implicit val mapEq:Equiv[Map[K,V]] = mapEquiv[K, V]
+    implicit val mapEq: Equiv[Map[K, V]] = mapEquiv[K, V]
     StatefulSummerLaws.sumIsPreserved(sc, mitems) &&
     StatefulSummerLaws.isFlushedIsConsistent(sc, mitems)
   }
@@ -110,7 +110,7 @@ class SummingQueueTest extends CheckProperties {
   val zeroCapQueue: SummingQueue[Int] = SummingQueue[Int](0) // passes all through
 
   property("0 capacity always returns") {
-    forAll { (i: Int) => zeroCapQueue(i) == Some(i) }
+    forAll((i: Int) => zeroCapQueue(i) == Some(i))
   }
 
   val sb: SummingQueue[Int] = SummingQueue[Int](3) // buffers three at a time

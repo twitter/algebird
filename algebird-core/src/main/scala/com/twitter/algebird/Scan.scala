@@ -13,7 +13,6 @@ object Scan extends ScanApplicativeCompat {
    */
   type Aux[-I, S, +O] = Scan[I, O] { type State = S }
 
-
   def from[I, S, O](initState: S)(presentAndNextStateFn: (I, S) => (O, S)): Aux[I, S, O] =
     new Scan[I, O] {
       override type State = S
@@ -319,4 +318,3 @@ sealed abstract class Scan[-I, +O] extends Serializable {
     }
 
 }
-

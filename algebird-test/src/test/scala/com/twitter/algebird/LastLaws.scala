@@ -18,7 +18,7 @@ class LastLaws extends CheckProperties {
   }
 
   property("Last.aggregator returns the last item") {
-    forAll { (v: NonEmptyVector[Int]) => v.items.last == Last.aggregator(v.items) }
+    forAll((v: NonEmptyVector[Int]) => v.items.last == Last.aggregator(v.items))
   }
 
   property("Last[Int] is a Semigroup")(semigroupLaws[Last[Int]])

@@ -61,7 +61,6 @@ class AggregatorTests extends AnyFunSuite {
 
 class AggregatorLaws extends CheckProperties with AggregatorLawsCompat {
 
-
   property("composing before Aggregator is correct") {
     forAll { (in: List[Int], compose: (Int => Int), ag: Aggregator[Int, Int, Int]) =>
       val composed = ag.composePrepare(compose)

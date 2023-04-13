@@ -34,4 +34,3 @@ private[algebird] trait CompatDecayedVector {
 //  implicit def monoid[F, C[_]](implicit vs: VectorSpace[F, C], metric: Metric[C[F]]):Monoid[DecayedVector[C]] =
 //    DecayedVector.monoidWithEpsilon(-1.0)
 }
-

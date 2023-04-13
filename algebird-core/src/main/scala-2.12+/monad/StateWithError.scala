@@ -80,7 +80,8 @@ final case class FlatMappedState[S, F, T, U](start: StateWithError[S, F, T], fn:
                 case Nil               => noError // recursion ends
               }
           }
-        case FlatMappedState(st, next) => loop(inState, st, next.asInstanceOf[Any => StateWithError[S, F, Any]] :: stack)
+        case FlatMappedState(st, next) =>
+          loop(inState, st, next.asInstanceOf[Any => StateWithError[S, F, Any]] :: stack)
       }
     loop(state, this, Nil).asInstanceOf[Either[F, (S, U)]]
   }

@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.twitter.algebird
 
-
 import algebra.CommutativeMonoid
 
 import scala.collection.compat._

@@ -30,7 +30,7 @@ class MinLaws extends CheckProperties {
   }
 
   property("Min.aggregator returns the minimum item") {
-    forAll { (v: NonEmptyVector[Int]) => v.items.min == Min.aggregator[Int].apply(v.items) }
+    forAll((v: NonEmptyVector[Int]) => v.items.min == Min.aggregator[Int].apply(v.items))
   }
 
   property("Min.semigroup[Int] returns the minimum item") {

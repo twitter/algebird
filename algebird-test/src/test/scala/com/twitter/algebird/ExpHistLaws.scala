@@ -134,11 +134,11 @@ class ExpHistLaws extends AnyPropSpec with ScalaCheckPropertyChecks {
   }
 
   property("Total tracked by e is the sum of all bucket sizes") {
-    forAll { (e: ExpHist) => assert(e.buckets.map(_.size).sum == e.total) }
+    forAll((e: ExpHist) => assert(e.buckets.map(_.size).sum == e.total))
   }
 
   property("ExpHist bucket sizes are the l-canonical rep of the tracked total") {
-    forAll { (e: ExpHist) => assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l)) }
+    forAll((e: ExpHist) => assert(e.buckets.map(_.size) == Canonical.bucketsFromLong(e.total, e.conf.l)))
   }
 
   property("adding i results in upperBoundSum == i") {

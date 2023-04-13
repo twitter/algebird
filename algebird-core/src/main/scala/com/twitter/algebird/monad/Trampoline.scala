@@ -66,7 +66,8 @@ object Trampoline {
             case next :: tail => loop(next(a), tail)
             case Nil          => a
           }
-        case FlatMapped(item, fn) => loop(item, fn.asInstanceOf[Any => com.twitter.algebird.monad.Trampoline[Any]] :: stack)
+        case FlatMapped(item, fn) =>
+          loop(item, fn.asInstanceOf[Any => com.twitter.algebird.monad.Trampoline[Any]] :: stack)
       }
     // Sorry for the cast, but it is tough to get the types right without a lot of wrapping
     loop(tramp, Nil).asInstanceOf[A]

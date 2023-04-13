@@ -305,7 +305,6 @@ val algebirdTestDependenciesSettings = Seq(
 
 lazy val algebirdTest = module("test")
   .settings(
-    // scalaVersion := "3.2.2",
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
     crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.2.2")
   )

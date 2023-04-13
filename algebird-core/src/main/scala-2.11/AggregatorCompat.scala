@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
 trait AggregatorCompat {
-   implicit def applicative[I]: Applicative[({ type L[O] = Aggregator[I, _, O] })#L] =
+  implicit def applicative[I]: Applicative[({ type L[O] = Aggregator[I, _, O] })#L] =
     new AggregatorApplicative[I]
 }
 

@@ -10,6 +10,7 @@ import java.lang.{
 import java.util.{ArrayList => JArrayList, HashMap => JHashMap, List => JList, Map => JMap}
 
 import scala.collection.JavaConverters._
+
 /**
  * Since maps are mutable, this always makes a full copy. Prefer scala immutable maps if you use scala
  * immutable maps, this operation is much faster TODO extend this to Group, Ring

@@ -18,7 +18,7 @@ class FirstLaws extends CheckProperties {
   }
 
   property("First.aggregator returns the first item") {
-    forAll { (v: NonEmptyVector[Int]) => v.items.head == First.aggregator(v.items) }
+    forAll((v: NonEmptyVector[Int]) => v.items.head == First.aggregator(v.items))
   }
 
   property("First[Int] is a semigroup")(semigroupLaws[First[Int]])

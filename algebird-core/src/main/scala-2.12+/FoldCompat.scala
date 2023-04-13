@@ -1,7 +1,7 @@
 package com.twitter.algebird
 
-
 private[algebird] trait FoldApplicativeCompat {
+
   /**
    * "import Fold.applicative" will bring the Applicative instance into scope. See FoldApplicative.
    */
