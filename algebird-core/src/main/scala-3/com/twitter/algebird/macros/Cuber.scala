@@ -28,11 +28,8 @@ trait Cuber[I]:
   def apply(in: I): TraversableOnce[K]
 
 object Cuber extends MacroHelper:
-  // NOTE: workaround false-positive format error `[dialect scala3] pattern must be a value`
-  // format: off
   implicit inline def cuber[T]: Cuber[T] = ${ deriveCuberImpl[T] }
   inline def derived[T]: Cuber[T] = ${ deriveCuberImpl[T] }
-  // format: on
   def deriveCuberImpl[T: Type](using q: Quotes): Expr[Cuber[T]] =
     import q.reflect.*
     val tname = TypeRepr.of[T].typeSymbol.name

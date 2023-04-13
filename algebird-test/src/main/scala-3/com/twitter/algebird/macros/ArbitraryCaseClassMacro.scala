@@ -13,7 +13,6 @@ import org.scalacheck.{Arbitrary, Gen}
 object ArbitraryCaseClassMacro:
   inline def gen[T]: Gen[T] = ${ caseClassGen[T] }
   inline def arbitrary[T]: Arbitrary[T] = ${ caseClassArbitrary[T] }
-
   def summonAll[T: Type](using q: Quotes): List[Expr[Gen[?]]] =
     Type.of[T] match
       case '[tpe *: tpes] =>
