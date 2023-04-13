@@ -1,14 +1,6 @@
 package com.twitter.algebird
-import java.lang.{
-  Boolean => JBool,
-  Double => JDouble,
-  Float => JFloat,
-  Integer => JInt,
-  Long => JLong,
-  Short => JShort
-}
-import java.util.{ArrayList => JArrayList, HashMap => JHashMap, List => JList, Map => JMap}
 
+import java.util.{HashMap => JHashMap, Map => JMap}
 import scala.collection.JavaConverters._
 
 /**

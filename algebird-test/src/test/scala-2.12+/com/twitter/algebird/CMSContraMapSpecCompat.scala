@@ -1,12 +1,8 @@
 package com.twitter.algebird
 
-import org.scalatestplus.scalacheck.{ScalaCheckDrivenPropertyChecks, ScalaCheckPropertyChecks}
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import scala.util.Random
-import CMSHasherImplicits.CMSHasherBigInt
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.propspec.AnyPropSpec
 import org.scalatest.wordspec.AnyWordSpec
 
 trait CMSContraMapSpecCompat { self: AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks =>

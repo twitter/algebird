@@ -23,9 +23,7 @@ import java.lang.{
   Long => JLong,
   Short => JShort
 }
-import java.util.{ArrayList => JArrayList, HashMap => JHashMap, List => JList, Map => JMap}
-
-import scala.jdk.CollectionConverters._
+import java.util.{ArrayList => JArrayList, List => JList}
 
 object JIntRing extends Ring[JInt] {
   override val zero: JInt = JInt.valueOf(0)

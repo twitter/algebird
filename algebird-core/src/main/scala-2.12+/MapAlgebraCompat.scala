@@ -1,6 +1,6 @@
 package com.twitter.algebird
 
-import scala.collection.mutable.{Builder, Map => MMap}
+import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map => ScMap}
 import scala.collection.compat._
 
