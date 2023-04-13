@@ -46,6 +46,7 @@ jobs:
           sbt ++2.12.17 coverage test coverageReport
           bash <(curl -s https://codecov.io/bash)
   mimaReport:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

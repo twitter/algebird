@@ -35,6 +35,12 @@ def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) 
       ) :: Nil
     case _ => Nil
   }
+// Workaround: skip compiling java api for Scala 3 because
+// 1. it seems Scala 3 generates Monoid$ in later stage than Scala 2.x,
+//    which prevents javaapi from compiling due to missing symbol.
+// 2. we cannot use `compileOrder := CompileOrder.ScalaThenJava`
+//    as algebird-core must compile CassandraMurmurHash.java BEFORE Scala,
+//    but at the same time algebird-core must compile javaapi AFTER Scala.
 def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, y)) if y <= 12 =>
@@ -46,9 +52,10 @@ def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: Stri
 def scalaVersionSpecificJavaFoldersForTest(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, y)) if y <= 12 =>
-      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
-    case _ =>
-      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
+      new java.io.File(s"${srcBaseDir.getPath}-2") :: new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case Some((2, y)) if y >= 13 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2") :: new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
+    case _ => Nil
   }
 
 def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
