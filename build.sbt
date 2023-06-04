@@ -274,7 +274,7 @@ def module(name: String) = {
 
 lazy val algebirdCore = module("core")
   .settings(
-    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.2.2"),
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.3.0"),
     initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
@@ -313,7 +313,7 @@ val algebirdTestDependenciesSettings = Seq(
 lazy val algebirdTest = module("test")
   .settings(
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.2.2")
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.3.0")
   )
   .settings(algebirdTestDependenciesSettings)
   .settings(compilerExtraSettings)
