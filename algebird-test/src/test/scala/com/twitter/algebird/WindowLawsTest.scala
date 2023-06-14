@@ -21,7 +21,7 @@ class WindowLaws extends CheckProperties {
 
   property("Window obeys monoid laws using a group")(monoidLaws[Window[Int]])
   property("Window obeys monoid laws using a monoid") {
-    implicit val mon = Window.monoid[String](5)
+    implicit val mon: WindowMonoid[String] = Window.monoid[String](5)
     monoidLaws[Window[String]]
   }
 }

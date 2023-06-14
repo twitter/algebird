@@ -9,18 +9,52 @@ val kindProjectorVersion = "0.13.2"
 val paradiseVersion = "2.1.1"
 val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.15"
-val scalaTestPlusVersion = "3.1.0.0-RC2"
-val scalacheckVersion = "1.15.2"
+val scalaTestPlusFor211Version = "3.1.0.0-RC2"
+val scalaTestPlusVersion = "3.2.11.0"
+val scalacheckVersion = "1.15.3"
+val scalacheckFor211Version = "1.15.2"
 val scalaCollectionCompat = "2.9.0"
 val utilVersion = "21.2.0"
 val sparkVersion = "2.4.8"
 
 def scalaVersionSpecificFolders(srcBaseDir: java.io.File, scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y)) if y <= 11 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case Some((2, y)) if y <= 12 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case Some((2, y)) if y >= 13 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case Some((3, _)) =>
+      new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: new java.io.File(
+        s"${srcBaseDir.getPath}-2.12+"
+      ) :: Nil
+    case _ => Nil
+  }
+// Workaround: skip compiling java api for Scala 3 because
+// 1. it seems Scala 3 generates Monoid$ in later stage than Scala 2.x,
+//    which prevents javaapi from compiling due to missing symbol.
+// 2. we cannot use `compileOrder := CompileOrder.ScalaThenJava`
+//    as algebird-core must compile CassandraMurmurHash.java BEFORE Scala,
+//    but at the same time algebird-core must compile javaapi AFTER Scala.
+def scalaVersionSpecificJavaFolders(srcBaseDir: java.io.File, scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, y)) if y <= 12 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
     case Some((2, y)) if y >= 13 =>
       new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
+    case _ => Nil
+  }
+def scalaVersionSpecificJavaFoldersForTest(srcBaseDir: java.io.File, scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y)) if y <= 12 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2") :: new java.io.File(s"${srcBaseDir.getPath}-2.12-") :: Nil
+    case Some((2, y)) if y >= 13 =>
+      new java.io.File(s"${srcBaseDir.getPath}-2") :: new java.io.File(s"${srcBaseDir.getPath}-2.13+") :: Nil
     case _ => Nil
   }
 
@@ -30,6 +64,8 @@ def scalaBinaryVersion(scalaVersion: String) = scalaVersion match {
   case version if version.startsWith("2.13") => "2.13"
   case version                               => sys.error(s"unsupported scala version $version")
 }
+
+def isScala3(scalaVersion: String) = scalaVersion.startsWith("3.")
 
 def isScala212x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.12"
 def isScala213x(scalaVersion: String) = scalaBinaryVersion(scalaVersion) == "2.13"
@@ -101,8 +137,12 @@ val sharedSettings = Seq(
     (Test / scalaSource).value,
     scalaVersion.value
   ),
-  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders(
+  Compile / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFolders(
     (Compile / javaSource).value,
+    scalaVersion.value
+  ),
+  Test / unmanagedSourceDirectories ++= scalaVersionSpecificJavaFoldersForTest(
+    (Test / scalaSource).value,
     scalaVersion.value
   )
 ) ++ mimaSettings
@@ -170,6 +210,34 @@ lazy val mimaSettings = Def.settings(
     ProblemFilters.exclude[IncompatibleSignatureProblem]("com.twitter.algebird.MinHasher.*")
   )
 )
+// NOTE: After dropping Scala 2.11, we can remove src/main/scala-2.11 and share sources between scala 2.12, 2.13 and 3.x.
+
+val compilerExtraSettings =
+  Seq(
+    Compile / scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _))       => Seq("-Ykind-projector:underscores")
+        case Some((2, 12 | 13)) => Seq("-Xsource:3", "-P:kind-projector:underscore-placeholders")
+        case _                  => Seq.empty
+      }
+    },
+    libraryDependencies ++= {
+      if (isScala3(scalaVersion.value)) {
+        Seq.empty
+      } else if (isScala213x(scalaVersion.value)) {
+        Seq(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+        )
+      } else {
+        Seq(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+          compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)),
+          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
+        )
+      }
+    }
+  )
 
 /**
  * This returns the previous jar we released that is compatible with the current.
@@ -204,54 +272,51 @@ def module(name: String) = {
     .settings(sharedSettings ++ Seq(Keys.name := id, mimaPreviousArtifacts := previousVersion(name).toSet))
 }
 
-lazy val algebirdCore = module("core").settings(
-  crossScalaVersions += "2.13.10",
-  initialCommands := """
+lazy val algebirdCore = module("core")
+  .settings(
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.3.0"),
+    initialCommands := """
                      import com.twitter.algebird._
                      """.stripMargin('|'),
+    libraryDependencies ++=
+      Seq(
+        "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
+        ("org.typelevel" %% "algebra" % algebraVersion).cross(CrossVersion.for3Use2_13),
+        "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
+        "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompat
+      ),
+    Compile / sourceGenerators += Def.task {
+      GenTupleAggregators.gen((Compile / sourceManaged).value)
+    }.taskValue,
+    // Scala 2.12's doc task was failing.
+    Compile / doc / sources ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
+    Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
+  )
+  .settings(compilerExtraSettings)
+
+val algebirdTestDependenciesSettings = Seq(
   libraryDependencies ++=
     Seq(
-      "com.googlecode.javaewah" % "JavaEWAH" % javaEwahVersion,
-      "org.typelevel" %% "algebra" % algebraVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.scalatest" %% "scalatest" % scalaTestVersion % "test",
-      "org.scala-lang.modules" %% "scala-collection-compat" % scalaCollectionCompat
-    ) ++ {
-      if (isScala213x(scalaVersion.value)) {
-        Seq()
-      } else {
-        Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
-      }
-    },
-  addCompilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
-  Compile / sourceGenerators += Def.task {
-    GenTupleAggregators.gen((Compile / sourceManaged).value)
-  }.taskValue,
-  // Scala 2.12's doc task was failing.
-  Compile / doc / sources ~= (_.filterNot(_.absolutePath.contains("javaapi"))),
-  Test / testOptions := Seq(Tests.Argument(TestFrameworks.JUnit, "-a"))
+      "org.scalatest" %% "scalatest" % scalaTestVersion
+    ) ++ (if (scalaVersion.value.startsWith("2.11"))
+            Seq(
+              "org.scalacheck" %% "scalacheck" % scalacheckFor211Version,
+              "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusFor211Version % "test"
+            )
+          else
+            Seq(
+              "org.scalacheck" %% "scalacheck" % scalacheckVersion,
+              "org.scalatestplus" %% "scalacheck-1-15" % scalaTestPlusVersion % "test"
+            ))
 )
 
 lazy val algebirdTest = module("test")
   .settings(
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "4")),
-    crossScalaVersions += "2.13.10",
-    libraryDependencies ++=
-      Seq(
-        "org.scalacheck" %% "scalacheck" % scalacheckVersion,
-        "org.scalatest" %% "scalatest" % scalaTestVersion,
-        "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
-      ) ++ {
-        if (isScala213x(scalaVersion.value)) {
-          Seq()
-        } else {
-          Seq(compilerPlugin(("org.scalamacros" % "paradise" % paradiseVersion).cross(CrossVersion.full)))
-        }
-      },
-    addCompilerPlugin(
-      ("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)
-    )
+    crossScalaVersions := Seq("2.11.12", "2.12.17", "2.13.10", "3.3.0")
   )
+  .settings(algebirdTestDependenciesSettings)
+  .settings(compilerExtraSettings)
   .dependsOn(algebirdCore)
 
 lazy val algebirdBenchmark = module("benchmark")

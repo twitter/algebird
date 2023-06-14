@@ -64,16 +64,18 @@ class SummingCache[K, V](capacity: Int)(implicit sgv: Semigroup[V]) extends Stat
 
   protected var lastEvicted: Map[K, V] = Map.empty[K, V]
   // TODO fancier caches will give better performance:
-  protected lazy val cache: MMap[K, V] =
+  protected lazy val cache: MMap[K, V] = {
+    val cap = capacity
     (new JLinkedHashMap[K, V](capacity + 1, 0.75f, true) {
       override protected def removeEldestEntry(eldest: JMap.Entry[K, V]): Boolean =
-        if (super.size > capacity) {
+        if (super.size > cap) {
           lastEvicted += (eldest.getKey -> eldest.getValue)
           true
         } else {
           false
         }
     }).asScala
+  }
 }
 
 object SummingWithHitsCache {

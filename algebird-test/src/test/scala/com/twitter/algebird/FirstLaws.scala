@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 class FirstLaws extends CheckProperties {
   property("First should sum properly") {
-    forAll { v: NonEmptyVector[First[Int]] =>
+    forAll { (v: NonEmptyVector[First[Int]]) =>
       val first = Semigroup.sumOption[First[Int]](v.items).get
       first == v.items.head
     }
@@ -18,7 +18,7 @@ class FirstLaws extends CheckProperties {
   }
 
   property("First.aggregator returns the first item") {
-    forAll { v: NonEmptyVector[Int] => v.items.head == First.aggregator(v.items) }
+    forAll((v: NonEmptyVector[Int]) => v.items.head == First.aggregator(v.items))
   }
 
   property("First[Int] is a semigroup")(semigroupLaws[First[Int]])

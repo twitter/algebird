@@ -38,44 +38,44 @@ class CmsLaws extends CheckProperties {
     }
 
   property("CountMinSketch[Short] is a Monoid") {
-    implicit val cmsMonoid = monoid[Short]
-    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+    implicit val cmsMonoid: CMSMonoid[Short] = monoid[Short]
+    implicit val cmsGen: Arbitrary[CMS[Short]] = createArbitrary[Short](cmsMonoid)
     commutativeMonoidLaws[CMS[Short]]
   }
 
   property("CountMinSketch[Int] is a Monoid") {
-    implicit val cmsMonoid = monoid[Int]
-    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+    implicit val cmsMonoid: CMSMonoid[Int] = monoid[Int]
+    implicit val cmsGen: Arbitrary[CMS[Int]] = createArbitrary[Int](cmsMonoid)
     commutativeMonoidLaws[CMS[Int]]
   }
 
   property("CountMinSketch[Long] is a Monoid") {
-    implicit val cmsMonoid = monoid[Long]
-    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+    implicit val cmsMonoid: CMSMonoid[Long] = monoid[Long]
+    implicit val cmsGen: Arbitrary[CMS[Long]] = createArbitrary[Long](cmsMonoid)
     commutativeMonoidLaws[CMS[Long]]
   }
 
   property("CountMinSketch[BigInt] is a Monoid") {
-    implicit val cmsMonoid = monoid[BigInt]
-    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+    implicit val cmsMonoid: CMSMonoid[BigInt] = monoid[BigInt]
+    implicit val cmsGen: Arbitrary[CMS[BigInt]] = createArbitrary[BigInt](cmsMonoid)
     commutativeMonoidLaws[CMS[BigInt]]
   }
 
   property("CountMinSketch[BigDecimal] is a Monoid") {
-    implicit val cmsMonoid = monoid[BigDecimal]
-    implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
+    implicit val cmsMonoid: CMSMonoid[BigDecimal] = monoid[BigDecimal]
+    implicit val cmsGen: Arbitrary[CMS[BigDecimal]] = createArbitrary[BigDecimal](cmsMonoid)
     commutativeMonoidLaws[CMS[BigDecimal]]
   }
 
   property("CountMinSketch[String] is a Monoid") {
-    implicit val cmsMonoid = monoid[String]
-    implicit val cmsGen = cmsArb(cmsMonoid)(_.toString)
+    implicit val cmsMonoid: CMSMonoid[String] = monoid[String]
+    implicit val cmsGen: Arbitrary[CMS[String]] = cmsArb(cmsMonoid)(_.toString)
     commutativeMonoidLaws[CMS[String]]
   }
 
   property("CountMinSketch[Bytes] is a commutative monoid") {
-    implicit val cmsMonoid = monoid[Bytes]
-    implicit val cmsGen = cmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
+    implicit val cmsMonoid: CMSMonoid[Bytes] = monoid[Bytes]
+    implicit val cmsGen: Arbitrary[CMS[Bytes]] = cmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
     commutativeMonoidLaws[CMS[Bytes]]
   }
 }
@@ -104,44 +104,44 @@ class TopPctCmsLaws extends CheckProperties {
     }
 
   property("TopPctCms[Short] is a Monoid") {
-    implicit val cmsMonoid = monoid[Short]
-    implicit val cmsGen = createArbitrary[Short](cmsMonoid)
+    implicit val cmsMonoid: TopCMSMonoid[Short] = monoid[Short]
+    implicit val cmsGen: Arbitrary[TopCMS[Short]] = createArbitrary[Short](cmsMonoid)
     commutativeMonoidLaws[TopCMS[Short]]
   }
 
   property("TopPctCms[Int] is a Monoid") {
-    implicit val cmsMonoid = monoid[Int]
-    implicit val cmsGen = createArbitrary[Int](cmsMonoid)
+    implicit val cmsMonoid: TopCMSMonoid[Int] = monoid[Int]
+    implicit val cmsGen: Arbitrary[TopCMS[Int]] = createArbitrary[Int](cmsMonoid)
     commutativeMonoidLaws[TopCMS[Int]]
   }
 
   property("TopPctCms[Long] is a Monoid") {
-    implicit val cmsMonoid = monoid[Long]
-    implicit val cmsGen = createArbitrary[Long](cmsMonoid)
+    implicit val cmsMonoid: TopCMSMonoid[Long] = monoid[Long]
+    implicit val cmsGen: Arbitrary[TopCMS[Long]] = createArbitrary[Long](cmsMonoid)
     commutativeMonoidLaws[TopCMS[Long]]
   }
 
   property("TopPctCms[BigInt] is a Monoid") {
-    implicit val cmsMonoid = monoid[BigInt]
-    implicit val cmsGen = createArbitrary[BigInt](cmsMonoid)
+    implicit val cmsMonoid: TopCMSMonoid[BigInt] = monoid[BigInt]
+    implicit val cmsGen: Arbitrary[TopCMS[BigInt]] = createArbitrary[BigInt](cmsMonoid)
     commutativeMonoidLaws[TopCMS[BigInt]]
   }
 
   property("TopPctCms[BigDecimal] is a Monoid") {
-    implicit val cmsMonoid = monoid[BigDecimal]
-    implicit val cmsGen = createArbitrary[BigDecimal](cmsMonoid)
+    implicit val cmsMonoid: TopCMSMonoid[BigDecimal] = monoid[BigDecimal]
+    implicit val cmsGen: Arbitrary[TopCMS[BigDecimal]] = createArbitrary[BigDecimal](cmsMonoid)
     commutativeMonoidLaws[TopCMS[BigDecimal]]
   }
 
   property("TopPctCms[String] is a Monoid") {
-    implicit val cmsMonoid = monoid[String]
-    implicit val cmsGen = topCmsArb(cmsMonoid)(_.toString)
+    implicit val cmsMonoid: TopCMSMonoid[String] = monoid[String]
+    implicit val cmsGen: Arbitrary[TopCMS[String]] = topCmsArb(cmsMonoid)(_.toString)
     commutativeMonoidLaws[TopCMS[String]]
   }
 
   property("TopPctCms[Bytes] is a Monoid") {
-    implicit val cmsMonoid = monoid[Bytes]
-    implicit val cmsGen = topCmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
+    implicit val cmsMonoid: TopCMSMonoid[Bytes] = monoid[Bytes]
+    implicit val cmsGen: Arbitrary[TopCMS[Bytes]] = topCmsArb(cmsMonoid)(CmsLaws.int2Bytes(_))
     commutativeMonoidLaws[TopCMS[Bytes]]
   }
 }
@@ -182,32 +182,11 @@ class CMSInstanceTest extends AnyWordSpec with Matchers with ScalaCheckDrivenPro
  * Verifies contramap functionality, which allows us to translate `CMSHasher[K]` into `CMSHasher[L]`, given
  * `f: L => K`.
  */
-class CMSContraMapSpec extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
-  "translates CMSHasher[K] into CMSHasher[L], given a function f: L => K" in {
-    // Given a "source" CMSHasher[K]
-    val sourceHasher: CMSHasher[String] = CMSHasher.CMSHasherString
-    // and a translation function from an unsupported type L (here: Seq[Byte]) to K
-    def f(bytes: Seq[Byte]): String = new String(bytes.toArray[Byte], "UTF-8")
-
-    // When we run contramap on a CMSHasher[K] supplying f,
-    // then the result should be a CMSHasher[L]...
-    val targetHasher: CMSHasher[Seq[Byte]] =
-      sourceHasher.contramap((d: Seq[Byte]) => f(d))
-    targetHasher shouldBe an[CMSHasher[
-      _
-    ]] // Can't test CMSHasher[Seq[Byte]] specifically because of type erasure.
-
-    // ...and hashing should work correctly (this is only a smoke test).
-    val a = 4
-    val b = 0
-    val width = 1234
-    val x = Array(113.toByte).toSeq // same as Seq(133.toByte)
-    val result = targetHasher.hash(a, b, width)(x)
-    val expected = sourceHasher.hash(a, b, width)("q")
-    result should be(expected)
-    result should be(434)
-  }
+class CMSContraMapSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaCheckDrivenPropertyChecks
+    with CMSContraMapSpecCompat {
 
   "supports, via contramap, creating CMS monoids for such types K that are not supported out of the box" in {
     // Given a "source" CMSHasher[K] which is supported out of the box
@@ -329,7 +308,7 @@ object CmsProperty {
   }
 }
 
-abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty {
+abstract class CmsFrequencyProperty[K: CMSHasher: Gen] extends CmsProperty[K] {
   type Exact = Vector[K]
   type Approx = CMS[K]
 
@@ -565,7 +544,7 @@ abstract class CMSTest[K: CMSHasher](toK: Int => K)
         .filter(_._2 < minHhCount)
         .keys
         .toSet
-      infrequent.intersect(estimatedHhs) should be('empty)
+      infrequent.intersect(estimatedHhs) should be(Symbol("empty"))
     }
 
     "(when adding CMS instances) drop old heavy hitters when new heavy hitters replace them" in {

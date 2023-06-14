@@ -39,16 +39,16 @@ class MinHasherSpec extends AnyWordSpec with Matchers {
     val sharedFraction = 1 - uniqueFraction
     val unique1 = 1
       .to((s * uniqueFraction).toInt)
-      .map(_ => math.random)
+      .map(_ => Math.random())
       .toSet
     val unique2 = 1
       .to((s * uniqueFraction).toInt)
-      .map(_ => math.random)
+      .map(_ => Math.random())
       .toSet
 
     val shared = 1
       .to((s * sharedFraction).toInt)
-      .map(_ => math.random)
+      .map(_ => Math.random())
       .toSet
     (unique1 ++ shared, unique2 ++ shared)
   }

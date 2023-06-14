@@ -73,7 +73,7 @@ class HyperLogLogLaws extends CheckProperties {
    * We can't change the way Array[Byte] was hashed without breaking serialized HLLs
    */
   property("HyperLogLog.hash matches reference") {
-    Prop.forAll { a: Array[Byte] => HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq }
+    Prop.forAll((a: Array[Byte]) => HyperLogLog.hash(a).toSeq == ReferenceHyperLogLog.hash(a).toSeq)
   }
 
   property("HyperLogLog.j and rhow match reference") {
@@ -200,13 +200,13 @@ abstract class LargeSetSizeAggregatorProperty[T: Gen](bits: Int) extends SetSize
   }
 }
 
-class SmallBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int)
+class SmallBytesSetSizeAggregatorProperty[T: Gen](bits: Int)(implicit ev: T => Array[Byte])
     extends SmallSetSizeAggregatorProperty[T] {
   def makeApproximate(s: Set[T]): Long =
     SetSizeAggregator[T](bits, maxSetSize).apply(s)
 }
 
-class LargeBytesSetSizeAggregatorProperty[T <% Array[Byte]: Gen](bits: Int)
+class LargeBytesSetSizeAggregatorProperty[T: Gen](bits: Int)(implicit ev: T => Array[Byte])
     extends LargeSetSizeAggregatorProperty[T](bits) {
   def makeApproximate(s: Set[T]): Long =
     SetSizeAggregator[T](bits, maxSetSize).apply(s)
@@ -286,9 +286,9 @@ class HyperLogLogTest extends AnyWordSpec with Matchers {
   val r: ju.Random = new java.util.Random
 
   def exactCount[T](it: Iterable[T]): Int = it.toSet.size
-  def approxCount[T <% Array[Byte]](bits: Int, it: Iterable[T]): Double = {
+  def approxCount[T](bits: Int, it: Iterable[T])(implicit ev: T => Array[Byte]): Double = {
     val hll = new HyperLogLogMonoid(bits)
-    hll.sizeOf(hll.sum(it.map(hll.create(_)))).estimate.toDouble
+    hll.sizeOf(hll.sum(it.map(elm => hll.create(ev(elm))))).estimate.toDouble
   }
 
   def aveErrorOf(bits: Int): Double = 1.04 / scala.math.sqrt(1 << bits)

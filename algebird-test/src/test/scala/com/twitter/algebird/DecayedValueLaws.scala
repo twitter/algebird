@@ -26,7 +26,7 @@ class DecayedValueLaws extends CheckProperties {
     forAll { (params: Params) =>
       val rand = new scala.util.Random
       val data = (0 to params.count).map { t =>
-        val noise = rand.nextDouble * params.maxNoise * rand.nextInt.signum
+        val noise = rand.nextDouble() * params.maxNoise * rand.nextInt().signum
         DecayedValue.build(params.mean + (params.mean * noise), t, params.halfLife)
       }
       val result = decayedMonoid.sum(data)

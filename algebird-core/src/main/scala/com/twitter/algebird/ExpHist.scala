@@ -182,7 +182,7 @@ object ExpHist {
   case class Bucket(size: Long, timestamp: Timestamp)
 
   object Bucket {
-    implicit val ord: Ordering[Bucket] = Ordering.by { b: Bucket => (b.timestamp, b.size) }
+    implicit val ord: Ordering[Bucket] = Ordering.by((b: Bucket) => (b.timestamp, b.size))
   }
 
   /**
@@ -260,7 +260,7 @@ object ExpHist {
     if (desired.isEmpty) Vector.empty
     else {
       val input = buckets.dropWhile(_.size == 0)
-      val bucketSize +: tail = desired
+      val bucketSize +: tail = desired: @unchecked
       val remaining = drop(bucketSize, input)
       input.head.copy(size = bucketSize) +: rebucket(remaining, tail)
     }
@@ -275,7 +275,7 @@ object ExpHist {
    *   If an element wasn't fully consumed, the remainder will be stuck back onto the head.
    */
   @tailrec private[this] def drop(toDrop: Long, input: Vector[Bucket]): Vector[Bucket] = {
-    val (b @ Bucket(count, _)) +: tail = input
+    val (b @ Bucket(count, _)) +: tail = input: @unchecked
     (toDrop - count) match {
       case 0          => tail
       case x if x < 0 => b.copy(size = -x) +: tail

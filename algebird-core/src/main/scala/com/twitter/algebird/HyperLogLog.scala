@@ -556,7 +556,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   val size: Int = 1 << bits
 
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
-  def apply[T](t: T)(implicit ev: T => Array[Byte]): HLL = create(t)
+  def apply[T](t: T)(implicit ev: T => Array[Byte]): HLL = create(ev(t))
 
   override val zero: HLL = SparseHLL(bits, Monoid.zero[Map[Int, Max[Byte]]])
 
@@ -602,7 +602,7 @@ class HyperLogLogMonoid(val bits: Int) extends Monoid[HLL] with BoundedSemilatti
   @deprecated("Use toHLL", since = "0.10.0 / 2015-05")
   def batchCreate[T](instances: Iterable[T])(implicit ev: T => Array[Byte]): HLL = {
     val allMaxRhow = instances
-      .map(x => jRhoW(hash(x), bits))
+      .map(x => jRhoW(hash(ev(x)), bits))
       .groupBy { case (j, _) => j }
       .map { case (j, iter) => (j, Max(iter.maxBy(_._2)._2)) }
     if (allMaxRhow.size * 16 <= size) {

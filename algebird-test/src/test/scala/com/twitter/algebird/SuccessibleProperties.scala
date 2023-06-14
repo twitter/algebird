@@ -25,7 +25,7 @@ class SuccessibleProperties extends CheckProperties {
   property("Long is Successible")(laws[Long])
   property("BigInt is Successible")(laws[BigInt])
   property("Successible.fromNextOrd[Int] is Successible") {
-    implicit val succ =
+    implicit val succ: Successible[Int] =
       Successible.fromNextOrd[Int](IntegralSuccessible.next(_))
     laws[Int]
   }

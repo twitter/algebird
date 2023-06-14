@@ -259,7 +259,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
   }
 
   case class Item(item: A) extends Hash {
-    override val numBits: Int = numHashes
+    override val numBits: Int = this.numHashes
 
     override def toBitSet: BitSet = BitSet(hashToArray(item))
 
@@ -272,7 +272,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
 
     override def +(other: A): Hash = {
       val bs = BitSet.newEmpty(0)
-      val hash = new Array[Int](numHashes)
+      val hash = new Array[Int](this.numHashes)
 
       hashToArray(item, hash)
       bs.mutableAdd(hash)
@@ -336,7 +336,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
 
     // use an approximation width of 0.05
     override def size: Approximate[Long] =
-      BloomFilter.sizeEstimate(numBits, numHashes, width, 0.05)
+      BloomFilter.sizeEstimate(this.numBits, this.numHashes, this.width, 0.05)
   }
 
   implicit val monoid: Monoid[Hash] with BoundedSemilattice[Hash] =
@@ -350,7 +350,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
       override def plus(left: Hash, right: Hash): Hash = left ++ right
 
       override def sum(t: TraversableOnce[Hash]): Hash =
-        if (t.iterator.isEmpty) empty
+        if (t.iterator.isEmpty) this.empty
         else {
           val iter = t.iterator
           var bs = BitSet.newEmpty(0)
@@ -402,7 +402,7 @@ final case class BloomFilter[A](numHashes: Int, width: Int)(implicit val hash: H
   /**
    * Create a bloom filter with multiple items from an iterator
    */
-  def create(data: Iterator[A]): Hash = monoid.sum(data.map(Item))
+  def create(data: Iterator[A]): Hash = monoid.sum(data.map(Item.apply))
 
   val empty: Hash = Empty
 

@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class SemigroupTest extends AnyFunSuite with ScalaCheckPropertyChecks {
   test("Semigroup.maybePlus works") {
-    forAll { s: String =>
+    forAll { (s: String) =>
       assert(Semigroup.maybePlus(None, s) == s)
       assert(Semigroup.maybePlus(s, None) == s)
     }

@@ -73,7 +73,7 @@ class CorrelationLaws extends CheckProperties {
   }
 
   property("the swap method on moments works as you'd think") {
-    forAll { l: List[(Double, Double)] =>
+    forAll { (l: List[(Double, Double)]) =>
       val swapped = CorrelationAggregator(l).swap
       val fn: ((Double, Double)) => (Double, Double) = { tup => tup.swap }
 

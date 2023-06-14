@@ -252,13 +252,13 @@ class ImmutableBloomFilterProperties extends ApproximateProperties("BloomFilter"
 
   for (falsePositiveRate <- List(0.1, 0.01, 0.001)) {
     property(s"has small false positive rate with false positive rate = $falsePositiveRate") = {
-      implicit val intGen = Gen.choose(1, 1000)
+      implicit val intGen: Gen[Int] = Gen.choose(1, 1000)
       toProp(new BloomFilterFalsePositives[Int](falsePositiveRate), 50, 50, 0.01)
     }
   }
 
   property("approximate cardinality") = {
-    implicit val intGen = Gen.choose(1, 1000)
+    implicit val intGen: Gen[Int] = Gen.choose(1, 1000)
     toProp(new BloomFilterCardinality[Int], 50, 1, 0.01)
   }
 }
@@ -271,21 +271,21 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
 
     "be possible to create from an iterator" in {
       val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 100).map(_ => RAND.nextInt().toString)
       val bf = bloomFilter.create(entries.iterator)
       assert(bf.isInstanceOf[bloomFilter.Hash])
     }
 
     "be possible to create from a sequence" in {
       val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 100).map(_ => RAND.nextInt().toString)
       val bf = bloomFilter.create(entries: _*)
       assert(bf.isInstanceOf[bloomFilter.Hash])
     }
 
     "be possible to create from a BitSet" in {
       val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
-      val entries = (0 until 100).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 100).map(_ => RAND.nextInt().toString)
       val bf = bloomFilter.create(entries: _*)
 
       val instance = bloomFilter.fromBitSet(bf.toBitSet)
@@ -300,7 +300,7 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
 
     "fail to create from a larger BitSet" in {
       val bloomFilter = BloomFilter[String](6, 0.01)
-      val entries = (0 until 6).map(_ => RAND.nextInt.toString)
+      val entries = (0 until 6).map(_ => RAND.nextInt().toString)
       val bf = bloomFilter.create(entries: _*)
 
       val instance = BloomFilter[String](6, 0.1).fromBitSet(bf.toBitSet)
@@ -311,7 +311,7 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
       (0 to 100).foreach { _ =>
         val bloomFilter = BloomFilter[String](RAND.nextInt(5) + 1, RAND.nextInt(64) + 32)
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = bloomFilter.create(entries: _*)
 
         entries.foreach { i =>
@@ -366,7 +366,7 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
         import bloomFilter.aggregator
 
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = aggregator(entries)
 
         entries.foreach(i => assert(bf.contains(i.toString).isTrue))
@@ -414,7 +414,7 @@ class ImmutableBloomFilterTest extends AnyWordSpec with Matchers {
         import bloomFilter._
 
         val numEntries = 5
-        val entries = (0 until numEntries).map(_ => RAND.nextInt.toString)
+        val entries = (0 until numEntries).map(_ => RAND.nextInt().toString)
         val bf = bloomFilter.create(entries: _*)
         entries
           .map(entry => (entry, bloomFilter.create(entry)))

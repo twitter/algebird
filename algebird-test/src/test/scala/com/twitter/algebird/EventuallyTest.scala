@@ -15,7 +15,7 @@ class EventuallyRingLaws extends CheckProperties {
     Arbitrary(Gen.oneOf(lGen, rGen))
 
   property("EventuallyRing is a Ring") {
-    implicit val eventuallyRing =
+    implicit val eventuallyRing: EventuallyRing[Long, Int] =
       new EventuallyRing[Long, Int](_.toLong)(_ > 10000)
     ringLaws[Either[Long, Int]]
   }
@@ -32,7 +32,7 @@ class EventuallyRingLaws extends CheckProperties {
         case (Left(a), Right(b))  => a == (b.toLong)
       }
     Prop.forAll { (pred: Int => Boolean) =>
-      implicit val evRing = new EventuallyRing[Long, Int](_.toLong)(pred)
+      implicit val evRing: EventuallyRing[Long, Int] = new EventuallyRing[Long, Int](_.toLong)(pred)
       // TODO: convert to ringLaws https://github.com/twitter/algebird/issues/598
       monoidLaws[Either[Long, Int]]
     }
@@ -193,7 +193,7 @@ class EventuallyAggregatorLaws extends AnyPropSpec with ScalaCheckPropertyChecks
      * For HLL/Set, which is the common example, this is lawful.
      */
     forAll { (in: List[Int], thresh: Int, rightAg: Aggregator[Int, List[Int], Int]) =>
-      val pred = { x: List[Int] => x.lengthCompare(thresh) > 0 }
+      val pred = { (x: List[Int]) => x.lengthCompare(thresh) > 0 }
       val eventuallyAg = eventuallyAggregator(rightAg)(pred)
       eventuallyAg.semigroup
 

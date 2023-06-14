@@ -248,7 +248,7 @@ object Moments {
   val fold: Fold[Double, Moments] = momentsMonoid.zero.fold
 
   def numericAggregator[N](implicit num: Numeric[N]): MonoidAggregator[N, Moments, Moments] =
-    Aggregator.prepareMonoid { n: N => Moments(num.toDouble(n)) }
+    Aggregator.prepareMonoid((n: N) => Moments(num.toDouble(n)))
 
   /**
    * Create a Moments object given a single value. This is useful for initializing moment calculations at the

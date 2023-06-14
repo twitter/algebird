@@ -36,7 +36,7 @@ class QTreeLaws extends CheckProperties {
 
 class QTreeTest extends AnyWordSpec with Matchers {
   def randomList(n: Long): scala.collection.immutable.IndexedSeq[Double] =
-    (1L to n).map(_ => math.random)
+    (1L to n).map(_ => Math.random())
 
   def buildQTree(k: Int, list: Seq[Double]): QTree[Double] = {
     val qtSemigroup = new QTreeSemigroup[Double](k)
@@ -56,10 +56,10 @@ class QTreeTest extends AnyWordSpec with Matchers {
     s"QTree with elements (1 to $k)" should {
       val trueMedian = (1 + k) / 2
       s"have median $trueMedian" in {
-        implicit val sg = new QTreeSemigroup[Unit](6)
+        implicit val sg: QTreeSemigroup[Unit] = new QTreeSemigroup[Unit](6)
 
         val list = (1 to k).map(_.toDouble)
-        val qtree = sg.sumOption(list.map(QTree.value(_))).get
+        val qtree: QTree[Unit] = sg.sumOption(list.map(QTree.value(_))).get
 
         val (lower, upper) = qtree.quantileBounds(0.5)
         assert(lower <= trueMedian && trueMedian <= upper)
@@ -72,7 +72,7 @@ class QTreeTest extends AnyWordSpec with Matchers {
       "always contain the true quantile within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
-        val quantile = math.random
+        val quantile = Math.random()
         val (lower, upper) = qt.quantileBounds(quantile)
         val truth = trueQuantile(list, quantile)
         assert(truth >= lower)
@@ -89,8 +89,8 @@ class QTreeTest extends AnyWordSpec with Matchers {
       "always contain the true range sum within its bounds" in {
         val list = randomList(10000)
         val qt = buildQTree(k, list)
-        val from = math.random
-        val to = math.random
+        val from = Math.random()
+        val to = Math.random()
         val (lower, upper) = qt.rangeSumBounds(from, to)
         val truth = trueRangeSum(list, from, to)
         assert(truth >= lower)
