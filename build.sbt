@@ -11,7 +11,7 @@ val quasiquotesVersion = "2.1.0"
 val scalaTestVersion = "3.2.16"
 val scalaTestPlusVersion = "3.1.0.0-RC2"
 val scalacheckVersion = "1.15.2"
-val scalaCollectionCompat = "2.10.0"
+val scalaCollectionCompat = "2.11.0"
 val utilVersion = "21.2.0"
 val sparkVersion = "2.4.8"
 
