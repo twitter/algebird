@@ -177,7 +177,7 @@ object BitSetTest extends Properties("BitSet") {
   property("(x | y)(z) == x(z) || y(z)") = forAll { (x: BitSet, y: BitSet, z: Int) =>
     // do apply first in case we mutate erroneously
     def law(z: Int): Boolean =
-      (x(z) || y(z)) == (x | y) (z)
+      (x(z) || y(z)) == (x | y)(z)
 
     law(z) && x.iterator.forall(law) && y.iterator.forall(law)
   }
@@ -202,7 +202,7 @@ object BitSetTest extends Properties("BitSet") {
   property("(x & y)(z) == x(z) && y(z)") = forAll { (x: BitSet, y: BitSet, z: Int) =>
     // do apply first in case we mutate erroneously
     def law(z: Int): Boolean =
-      (x(z) && y(z)) == (x & y) (z)
+      (x(z) && y(z)) == (x & y)(z)
 
     law(z) && x.iterator.forall(law) && y.iterator.forall(law)
   }
