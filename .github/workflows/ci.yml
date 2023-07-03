@@ -30,7 +30,7 @@ jobs:
           - 17
         scala:
           - 2.11.12
-          - 2.12.17
+          - 2.12.18
           - 2.13.11
   test-coverage:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
           distribution: "temurin"
           java-version: 17
       - run: |
-          sbt ++2.12.17 coverage test coverageReport
+          sbt ++2.12.18 coverage test coverageReport
           bash <(curl -s https://codecov.io/bash)
   mimaReport:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
           - 17
         scala:
           - 2.11.12
-          - 2.12.17
+          - 2.12.18
           - 2.13.11
   microsite:
     runs-on: ubuntu-latest
