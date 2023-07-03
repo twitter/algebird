@@ -58,7 +58,7 @@ class CombinatorTest extends CheckProperties {
           val lc = m(l)
           val rc = m(r)
           if (lc == rc) l > r else lc > rc
-        // Probably only approximately true with this cut-off
+          // Probably only approximately true with this cut-off
         }
         .take(40)
         .toSet
