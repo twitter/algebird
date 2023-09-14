@@ -11,7 +11,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.3")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.9")
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.6")
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.11.0")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.11.1")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
 
 dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
