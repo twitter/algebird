@@ -21,7 +21,7 @@ Notes on rings:
 - A ring does not necessarily have an identity under `*` (called the *multiplicative identity*).
 - A ring is not necessarily commutitive under `*`.
 - A ring does not necessarily satisfy the inverse property under `*`.
-- There is not necessarily any special property of the additive identity under multiplication.
+- For any x &isin; R, `0*x = x*0 = 0`.
 
 A few other types of rings:
 
