@@ -324,7 +324,6 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
         val items = (1 until exactCardinality).map(_.toString)
         val bf = bfMonoid.create(items: _*)
         val size = bf.size
-
         assert(size ~ exactCardinality)
         assert(size.min <= size.estimate)
         assert(size.max >= size.estimate)
@@ -373,6 +372,16 @@ class BloomFilterTest extends AnyWordSpec with Matchers {
       val index = bfHash.apply(s).head
 
       assert(index >= 0)
+    }
+  }
+
+  "BloomFilter method `size`" should {
+
+    "return the appropriate size when it's saturated " in {
+      val bfMonoid = BloomFilterMonoid[String](5, 13)
+      val strings = List(8, 9, 8, 10, 1, 8, 11, 12, 13, 14, 15, 67, 18981, 1122, 86787).map(_.toString)
+      val bf = bfMonoid.create(strings: _*)
+      assert(bf.size.isZero)
     }
   }
 

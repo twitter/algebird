@@ -159,13 +159,16 @@ object BloomFilter {
      * This is \hat{S}^{-1}(t) in the cardinality estimation paper used above.
      */
     def sInverse(t: Int): Double =
-      scala.math.log1p(-t.toDouble / width) / (numHashes * scala.math.log1p(-1.0 / width))
+      if (numBits == width) 0.0
+      else
+        scala.math.log(1 - t.toDouble / width) / (numHashes * scala.math.log1p(-1.0 / width))
 
     // Variable names correspond to those used in the paper.
     val t = numBits
     val n = sInverse(t).round.toInt
     // Take the min and max because the probability formula assumes
     // nl <= sInverse(t - 1) and sInverse(t + 1) <= nr
+
     val nl =
       scala.math.min(sInverse(t - 1).floor, (1 - approximationWidth) * n).toInt
     val nr =
