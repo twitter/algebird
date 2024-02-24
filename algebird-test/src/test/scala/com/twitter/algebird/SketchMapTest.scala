@@ -1,5 +1,7 @@
 package com.twitter.algebird
 
+import com.twitter.algebird.matrix.DenseMatrix
+import com.twitter.algebird.matrix.SparseColumnMatrix
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -51,6 +53,38 @@ class SketchMapTest extends AnyWordSpec with Matchers {
       val data = (0 to (totalCount - 1)).map(_ => (RAND.nextInt(range), 1L))
       val sm = MONOID.create(data)
       assert(sm.totalValue == totalCount)
+    }
+
+    "plus should work commutatively" in {
+      implicit val m = Monoid.longMonoid
+      val valueTableLeft =
+        DenseMatrix(
+          PARAMS.width,
+          PARAMS.depth,
+          rowsByColumns = IndexedSeq(10L) ++ (1 until PARAMS.width * PARAMS.depth).map(_ => 0L)
+        )
+      val testLeft = SketchMap[Int, Long](
+        valuesTable = valueTableLeft,
+        heavyHitterKeys = List(1),
+        totalValue = 10
+      )
+
+      val valueTableRight = SparseColumnMatrix(rowsByColumns =
+        IndexedSeq(
+          SparseVector(
+            map = Map(1 -> 1L),
+            sparseValue = 1L,
+            length = PARAMS.width * PARAMS.depth
+          )
+        )
+      )
+      val testRight = SketchMap[Int, Long](
+        valuesTable = valueTableRight,
+        heavyHitterKeys = List(1),
+        totalValue = 1
+      )
+
+      assert(MONOID.plus(testLeft, testRight) == MONOID.plus(testRight, testLeft))
     }
 
     "exactly compute frequencies in a small stream" in {

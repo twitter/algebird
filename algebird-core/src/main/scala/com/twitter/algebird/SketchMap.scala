@@ -18,6 +18,7 @@ package com.twitter.algebird
 
 import algebra.CommutativeMonoid
 import com.twitter.algebird.matrix.AdaptiveMatrix
+import com.twitter.algebird.matrix.DenseMatrix
 
 /**
  * A Sketch Map is a generalized version of the Count-Min Sketch that is an approximation of Map[K, V] that
@@ -50,7 +51,10 @@ class SketchMapMonoid[K, V](val params: SketchMapParams[K])(implicit
     SketchMap(AdaptiveMatrix.fill(params.depth, params.width)(monoid.zero), Nil, monoid.zero)
 
   override def plus(left: SketchMap[K, V], right: SketchMap[K, V]): SketchMap[K, V] = {
-    val newValuesTable = Monoid.plus(left.valuesTable, right.valuesTable)
+    val newValuesTable = right.valuesTable match {
+      case DenseMatrix(_, _, _) => Monoid.plus(right.valuesTable, left.valuesTable)
+      case _                    => Monoid.plus(left.valuesTable, right.valuesTable)
+    }
     val newHeavyHitters = left.heavyHitterKeys.toSet ++ right.heavyHitterKeys
 
     SketchMap(
