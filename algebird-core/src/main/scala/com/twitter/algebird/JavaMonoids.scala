@@ -40,7 +40,7 @@ object JShortRing extends Ring[JShort] {
   override val zero: JShort = Short.box(0)
   override val one: JShort = Short.box(1)
   override def plus(x: JShort, y: JShort): JShort = (x + y).toShort
-  override def negate(x: JShort): JShort = (-x).toShort
+  override def negate(x: JShort): JShort = -x.toShort
   override def minus(x: JShort, y: JShort): JShort = (x - y).toShort
   override def times(x: JShort, y: JShort): JShort = (x * y).toShort
 }

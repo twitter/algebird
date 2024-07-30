@@ -92,7 +92,7 @@ object IntRing extends Ring[Int] {
 object ShortRing extends Ring[Short] {
   override def zero: Short = 0.toShort
   override def one: Short = 1.toShort
-  override def negate(v: Short): Short = (-v).toShort
+  override def negate(v: Short): Short = -v.toShort
   override def plus(l: Short, r: Short): Short = (l + r).toShort
   override def minus(l: Short, r: Short): Short = (l - r).toShort
   override def times(l: Short, r: Short): Short = (l * r).toShort
