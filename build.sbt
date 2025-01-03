@@ -240,6 +240,7 @@ lazy val algebirdTest = module("test")
       Seq(
         "org.scalacheck" %% "scalacheck" % scalacheckVersion,
         "org.scalatest" %% "scalatest" % scalaTestVersion,
+        "org.apache.commons" % "commons-statistics-inference" % "1.1",
         "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test"
       ) ++ {
         if (isScala213x(scalaVersion.value)) {

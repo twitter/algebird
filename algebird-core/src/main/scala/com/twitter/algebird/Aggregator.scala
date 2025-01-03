@@ -1,5 +1,7 @@
 package com.twitter.algebird
 
+import com.twitter.algebird.mutable.{Reservoir, ReservoirSamplingToListAggregator}
+
 import java.util.PriorityQueue
 import scala.collection.compat._
 import scala.collection.generic.CanBuildFrom
@@ -286,12 +288,9 @@ object Aggregator extends java.io.Serializable {
   def reservoirSample[T](
       count: Int,
       seed: Int = DefaultSeed
-  ): MonoidAggregator[T, PriorityQueue[(Double, T)], Seq[T]] = {
-    val rng = new java.util.Random(seed)
-    Preparer[T]
-      .map(rng.nextDouble() -> _)
-      .monoidAggregate(sortByTake(count)(_._1))
-      .andThenPresent(_.map(_._2))
+  ): MonoidAggregator[T, Reservoir[T], Seq[T]] = {
+    val rng = new scala.util.Random(seed)
+    new ReservoirSamplingToListAggregator[T](count)(() => rng)
   }
 
   /**
