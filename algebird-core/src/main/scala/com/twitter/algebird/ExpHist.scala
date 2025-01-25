@@ -348,7 +348,6 @@ object ExpHist {
      *
      *   - Find the largest j s.t. 2^j <= (s + l) / (1 + l)
      *   - let s' = 2^j(1 + l) - l
-     *
      *   - let diff = (s - s') is the position of s within that group.
      *   - let b = the little-endian binary rep of diff % (2^j - 1)
      *   - let ret = return vector of length j:

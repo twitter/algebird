@@ -282,24 +282,28 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 16 aggregators" in {
-      val agg: Aggregator[Int, Tuple16[
+      val agg: Aggregator[
         Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int
-      ], Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] = Tuple16(
+        Tuple16[
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int
+        ],
+        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]
+      ] = Tuple16(
         MinAgg,
         MinAgg,
         MinAgg,
@@ -975,24 +979,28 @@ class TupleAggregatorsTest extends AnyWordSpec with Matchers {
     }
 
     "Create an aggregator from a tuple of 16 aggregators" in {
-      val agg: Aggregator[Int, Tuple16[
+      val agg: Aggregator[
         Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int,
-        Int
-      ], Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]] =
+        Tuple16[
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int,
+          Int
+        ],
+        Tuple16[Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int]
+      ] =
         MultiAggregator(
           (
             MinAgg,
